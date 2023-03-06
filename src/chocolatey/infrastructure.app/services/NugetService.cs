@@ -629,7 +629,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             localRepositorySource,
                             null,
                             null));
+
+                var removedSources = remove_pinned_source_dependencies(sourcePackageDependencyInfos, allLocalPackages);
                 sourcePackageDependencyInfos.AddRange(localPackagesDependencyInfos);
+
+                if (removedSources.Count > 0 && version == null)
+                {
+                    remove_invalid_dependencies_and_parents(availablePackage, removedSources, sourcePackageDependencyInfos, localPackagesDependencyInfos);
+                }
 
                 var dependencyResolver = new PackageResolver();
 
@@ -1195,7 +1202,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     localRepositorySource,
                                     null,
                                     null));
-                        sourcePackageDependencyInfos.AddRange(localPackagesDependencyInfos);
 
                         var parentInfos = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
                         NugetCommon.GetPackageParents(availablePackage.Identity.Id, parentInfos, localPackagesDependencyInfos).GetAwaiter().GetResult();
@@ -1207,7 +1213,19 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                         }
 
-                        sourcePackageDependencyInfos.RemoveWhere(p => p.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase) && !p.Version.Equals(availablePackage.Identity.Version));
+                        var removedSources = remove_pinned_source_dependencies(sourcePackageDependencyInfos, allLocalPackages);
+
+                        if (version != null || removedSources.Count == 0)
+                        {
+                            sourcePackageDependencyInfos.RemoveWhere(p => p.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase) && !p.Version.Equals(availablePackage.Identity.Version));
+                        }
+
+                        sourcePackageDependencyInfos.AddRange(localPackagesDependencyInfos);
+
+                        if (removedSources.Count > 0 && version == null)
+                        {
+                            remove_invalid_dependencies_and_parents(availablePackage, removedSources, sourcePackageDependencyInfos, localPackagesDependencyInfos);
+                        }
 
                         var dependencyResolver = new PackageResolver();
 
@@ -1611,6 +1629,74 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
             }
 
             return false;
+        }
+
+        private static void remove_invalid_dependencies_and_parents(
+            IPackageSearchMetadata availablePackage,
+            HashSet<SourcePackageDependencyInfo> removedSources,
+            HashSet<SourcePackageDependencyInfo> sourcePackageDependencyInfos,
+            IEnumerable<SourcePackageDependencyInfo> localPackagesDependencyInfos)
+        {
+            var removedIds = removedSources.Select(r => r.Id).Distinct().ToList();
+            SourcePackageDependencyInfo removedAvailablePackage = null;
+
+            foreach (var localPackage in localPackagesDependencyInfos.Where(s => removedIds.Contains(s.Id, StringComparer.OrdinalIgnoreCase)))
+            {
+                var packagesToRemove = sourcePackageDependencyInfos.Where(s => s.Dependencies.Any(d => d.Id.Equals(localPackage.Id, StringComparison.OrdinalIgnoreCase) && !d.VersionRange.Satisfies(localPackage.Version))).ToList();
+
+                if (removedAvailablePackage == null)
+                {
+                    removedAvailablePackage = packagesToRemove.FirstOrDefault(p => p.Id.Equals(availablePackage.Identity.Id) && p.Version == availablePackage.Identity.Version);
+                }
+
+                sourcePackageDependencyInfos.RemoveWhere(s => packagesToRemove.Contains(s));
+                removedSources.AddRange(packagesToRemove);
+            }
+
+            if (removedAvailablePackage != null && !sourcePackageDependencyInfos.Any(s => s.Id.Equals(removedAvailablePackage.Id)))
+            {
+                removedSources.Remove(removedAvailablePackage);
+                sourcePackageDependencyInfos.Add(removedAvailablePackage);
+                removedAvailablePackage = null;
+            }
+
+            var removedIdsTargetDependency = removedSources
+                .Where(r => r.Dependencies.Any(d => d.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase)))
+                .Select(r => r.Id)
+                .Distinct();
+
+            var ranges = sourcePackageDependencyInfos
+                .Where(s => removedIdsTargetDependency.Contains(s.Id, StringComparer.OrdinalIgnoreCase))
+                .SelectMany(r => r.Dependencies)
+                .Where(d => d.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase))
+                .Select(r => r.VersionRange);
+            var maxVersion = sourcePackageDependencyInfos
+                .Where(s => s.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase) && ranges.All(r => r.Satisfies(s.Version)))
+                .Max(s => s.Version);
+
+            sourcePackageDependencyInfos.RemoveWhere(s => s.Id.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase) && s.Version != maxVersion);
+        }
+
+        private HashSet<SourcePackageDependencyInfo> remove_pinned_source_dependencies(HashSet<SourcePackageDependencyInfo> dependencyInfos, List<PackageResult> localPackages)
+        {
+            var pinnedPackages = localPackages.Select(l => _packageInfoService.get_package_information(l.PackageMetadata))
+                .Where(p => p != null && p.IsPinned)
+                .Select(p => p.Package.Id)
+                .ToList();
+
+            var dependencyInfosToExclude = new HashSet<SourcePackageDependencyInfo>();
+
+            foreach (var dependencyInfo in dependencyInfos)
+            {
+                if (pinnedPackages.Contains(dependencyInfo.Id, StringComparer.OrdinalIgnoreCase))
+                {
+                    dependencyInfosToExclude.Add(dependencyInfo);
+                }
+            }
+
+            dependencyInfos.RemoveWhere(source => dependencyInfosToExclude.Contains(source));
+
+            return dependencyInfosToExclude;
         }
 
         private void validate_nuspec(string nuspecFilePath, ChocolateyConfiguration config)
