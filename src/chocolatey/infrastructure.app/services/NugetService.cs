@@ -1261,7 +1261,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         IEnumerable<SourcePackageDependencyInfo> resolvedPackages = new List<SourcePackageDependencyInfo>();
                         if (config.IgnoreDependencies)
                         {
-                            resolvedPackages = packagesToInstall.Select(p => sourcePackageDependencyInfos.Single(x => p.Identity.Equals(new PackageIdentity(x.Id, x.Version))));
+                            resolvedPackages = packagesToInstall.Select(p => sourcePackageDependencyInfos.SingleOrDefault(x => p.Identity.Equals(new PackageIdentity(x.Id, x.Version))));
 
                             if (config.ForceDependencies)
                             {
@@ -1290,7 +1290,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             try
                             {
                                 resolvedPackages = dependencyResolver.Resolve(resolverContext, CancellationToken.None)
-                                    .Select(p => sourcePackageDependencyInfos.Single(x => PackageIdentityComparer.Default.Equals(x, p)));
+                                    .Select(p => sourcePackageDependencyInfos.SingleOrDefault(x => PackageIdentityComparer.Default.Equals(x, p)));
 
                                 if (!config.ForceDependencies)
                                 {
@@ -1327,6 +1327,30 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         foreach (SourcePackageDependencyInfo packageDependencyInfo in resolvedPackages)
                         {
+                            if (packageDependencyInfo is null)
+                            {
+                                ResultMessage message = null;
+
+                                if (config.IgnoreDependencies)
+                                {
+                                    message = new ResultMessage(ResultType.Error, "Unable to resolve dependency chain. This may be caused by a parent package depending on this package, try specifying a specific version to use or don't ignore any dependencies!");
+                                }
+                                else
+                                {
+                                    message = new ResultMessage(ResultType.Error, "An unknown failure happened during the resolving of the dependency chain!");
+                                }
+
+                                var existingPackage = packageResultsToReturn.GetOrAdd(packageName, (key) =>
+                                {
+                                    // In general, this value should already be set. But just in case
+                                    // it isn't we create a new package result.
+                                    return new PackageResult(availablePackage, string.Empty);
+                                });
+                                existingPackage.Messages.Add(message);
+
+                                break;
+                            }
+
                             var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                             if (packageRemoteMetadata is null)
