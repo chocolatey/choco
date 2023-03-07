@@ -7,7 +7,7 @@ branches:
     track-merge-target: true
     regex: ^support[/-]
     source-branches:
-    - main
+    - master
     tracks-release-branches: true
     is-release-branch: false
     is-mainline: false
