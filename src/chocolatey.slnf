@@ -1,0 +1,12 @@
+{
+  "solution": {
+    "path": "chocolatey.sln",
+    "projects": [
+      "chocolatey.console\\chocolatey.console.csproj",
+      "chocolatey.resources\\chocolatey.resources.csproj",
+      "chocolatey.tests.integration\\chocolatey.tests.integration.csproj",
+      "chocolatey.tests\\chocolatey.tests.csproj",
+      "chocolatey\\chocolatey.csproj"
+    ]
+  }
+}
