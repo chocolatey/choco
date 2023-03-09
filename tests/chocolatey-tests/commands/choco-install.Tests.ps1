@@ -1385,8 +1385,8 @@ To install a local, or remote file, you may use:
         }
 
         It "should identify a circular dependency" {
-            $result1.Lines | Should -Contain "Circular dependency detected 'circulardependency1 0.0.1 => circulardependency2 0.0.1 => circulardependency1 0.0.1'."
-            $result2.Lines | Should -Contain "Circular dependency detected 'circulardependency1 0.0.1 => circulardependency2 0.0.1 => circulardependency1 0.0.1'."
+            $result1.Lines | Should -Contain "Unable to resolve dependency 'circulardependency1': Circular dependency detected 'circulardependency1 0.0.1 => circulardependency2 0.0.1 => circulardependency1 0.0.1'." -Because $result1.String
+            $result2.Lines | Should -Contain "Unable to resolve dependency 'circulardependency1': Circular dependency detected 'circulardependency1 0.0.1 => circulardependency2 0.0.1 => circulardependency1 0.0.1'." -Because $result2.String
         }
     }
 
