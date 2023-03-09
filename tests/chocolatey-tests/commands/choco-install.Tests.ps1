@@ -1570,6 +1570,110 @@ To install a local, or remote file, you may use:
         }
     }
 
+    Context 'Installing a package while passing in an uppercase letter as the identifier' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "2.1.0"
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier (Repository optimization disabled)' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm --disable-repository-optimizations
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "2.1.0"
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier and specific version' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm --disable-repository-optimizations --version 1.0.0
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier and specific version (Repository optimization disabled)' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm --disable-repository-optimizations --version 1.0.0
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths
