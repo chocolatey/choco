@@ -340,11 +340,14 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 if (version is null)
                 {
+                    // We only need to force a lower case package name when we
+                    // are using our own repository optimization queries.
+                    var packageNameLower = packageName.to_lower();
                     var metadataList = new HashSet<IPackageSearchMetadata>();
 
                     foreach (var listResource in listResources)
                     {
-                        var package = listResource.PackageAsync(packageName, config.Prerelease, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
+                        var package = listResource.PackageAsync(packageNameLower, config.Prerelease, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
                         if (package != null)
                         {
                             metadataList.Add(package);
