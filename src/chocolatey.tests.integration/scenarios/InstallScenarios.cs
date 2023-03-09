@@ -1327,7 +1327,7 @@ namespace chocolatey.tests.integration.scenarios
                 packageResult.Name.ShouldEqual(Configuration.Input);
             }
 
-            [Fact, Pending("Current version of the NuGet client library changes this to 1.0"), Broken]
+            [Fact]
             public void should_have_a_version_of_one_dot_zero_dot_zero()
             {
                 packageResult.Version.ShouldEqual("1.0.0");
