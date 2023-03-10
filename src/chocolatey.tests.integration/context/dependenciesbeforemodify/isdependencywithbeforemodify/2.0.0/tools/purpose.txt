@@ -1,0 +1,1 @@
+﻿This package is used to test out upgrade behaviour with beforeModify scripts in play for the main package and dependencies.
