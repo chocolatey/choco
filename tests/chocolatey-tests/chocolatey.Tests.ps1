@@ -189,7 +189,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'License warning is worded properly' -Tag FossOnly, Broken -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
+    Context 'License warning is worded properly' -Tag FossOnly -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
             $null = Invoke-Choco install chocolatey-license-business -y
             $Output = Invoke-Choco list -lo
