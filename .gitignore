@@ -43,7 +43,6 @@ docs/generated
 
 # Testing related
 .vagrant
-buildOutput.txt
 
 # Build related
 tools/**
