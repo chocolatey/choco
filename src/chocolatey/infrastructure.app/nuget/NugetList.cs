@@ -336,7 +336,10 @@ namespace chocolatey.infrastructure.app.nuget
             IEnumerable<ListResource> listResources,
             NuGetVersion version = null)
         {
-            if (config.Features.UsePackageRepositoryOptimizations)
+            // We can only use the optimized ListResource query when the user has asked us to, via the UsePackageRepositoryOptimizations
+            // feature, as well as when a ListResource exists for the feed in question.  Some technologies, such as Sleet or Baget, only
+            // offer V3 feeds, not V2, and as a result, no ListResource is available.
+            if (config.Features.UsePackageRepositoryOptimizations && listResources.Any())
             {
                 if (version is null)
                 {

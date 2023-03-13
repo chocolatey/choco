@@ -238,7 +238,7 @@ var source = sourceValue;
                 var resource = repository.GetResource<T>();
                 if (resource is null)
                 {
-                    "chocolatey".Log().Warn("The source {0} failed to get a {1} resource".format_with(repository.PackageSource.Source, typeof(T)));
+                    "chocolatey".Log().Warn(ChocolateyLoggers.LogFileOnly, "The source {0} failed to get a {1} resource".format_with(repository.PackageSource.Source, typeof(T)));
                 }
                 else
                 {
