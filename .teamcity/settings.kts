@@ -1,6 +1,4 @@
 import jetbrains.buildServer.configs.kotlin.v2019_2.*
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.DockerCommandStep
-import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.dockerCommand
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.script
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.powerShell
 import jetbrains.buildServer.configs.kotlin.v2019_2.Dependencies
@@ -13,7 +11,6 @@ project {
     buildType(Chocolatey)
     buildType(ChocolateyDockerWin)
     buildType(ChocolateyPosix)
-    buildType(ChocolateyDockerManifest)
 }
 
 object Chocolatey : BuildType({
@@ -92,6 +89,9 @@ object ChocolateyDockerWin : BuildType({
     params {
         // TeamCity has suggested "${Chocolatey.depParamRefs.buildNumber}"
         param("env.CHOCOLATEY_VERSION", "%dep.Chocolatey.build.number%")
+        param("env.vcsroot.branch", "%vcsroot.branch%")
+        param("env.Git_Branch", "%teamcity.build.vcs.branch.Chocolatey_ChocolateyVcsRoot%")
+        param("teamcity.git.fetchAllHeads", "true")
     }
 
     vcs {
@@ -99,66 +99,9 @@ object ChocolateyDockerWin : BuildType({
     }
 
     steps {
-        step {
-            name = "Login Docker"
-            conditions {
-                exists("system.DockerUsername")
-                exists("system.DockerPassword")
-            }
-            type = "DockerLogin"
-        }
-
-        dockerCommand {
-            name = "Build Docker Image"
-            commandType = build {
-                source = file {
-                    path = "docker/Dockerfile.windows"
-                }
-                contextDir = "."
-                platform = DockerCommandStep.ImagePlatform.Windows
-                namesAndTags = "chocolatey/choco:latest-windows"
-            }
-        }
-
-        // powerShell {
-        //     name = "Test Docker Image"
-        //     scriptMode = script {
-        //         content = """
-        //             docker run --rm chocolatey/choco:latest-windows choco.exe --version
-        //             exit ${'$'}LastExitCode
-        //         """.trimIndent()
-        //     }
-        // }
-
-        dockerCommand {
-            name = "Push Docker Image"
-            conditions {
-                exists("system.DockerUsername")
-                exists("system.DockerPassword")
-            }
-            commandType = push {
-                namesAndTags = "chocolatey/choco:latest-windows"
-                removeImageAfterPush = false
-            }
-        }
-
-        dockerCommand {
-            name = "Tag Docker Image with Version"
-            commandType = other {
-                subCommand = "tag"
-                commandArgs = "chocolatey/choco:latest-windows chocolatey/choco:v%env.CHOCOLATEY_VERSION%-windows"
-            }
-        }
-
-        dockerCommand {
-            name = "Push Versioned Tag"
-            conditions {
-                exists("system.DockerUsername")
-                exists("system.DockerPassword")
-            }
-            commandType = push {
-                namesAndTags = "chocolatey/choco:v%env.CHOCOLATEY_VERSION%-windows"
-            }
+        script {
+            name = "Call Cake"
+            scriptContent = "call build.official.bat --verbosity=diagnostic --target=Docker"
         }
     }
 
@@ -167,8 +110,6 @@ object ChocolateyDockerWin : BuildType({
             buildType = "Chocolatey"
             successfulOnly = true
             branchFilter = """
-                +:release/*
-                +:hotfix/*
                 +:tags/*
             """.trimIndent()
         }
@@ -198,6 +139,7 @@ object ChocolateyPosix : BuildType({
     name = "Docker (Linux)"
 
     params {
+        param("env.CAKE_NUGET_SOURCE", "") // The Cake version we use has issues with authing to our private source on Linux
         param("env.CHOCOLATEY_VERSION", "%dep.Chocolatey.build.number%")
         param("env.CHOCOLATEY_OFFICIAL_KEY", "%system.teamcity.build.checkoutDir%/chocolatey.official.snk")
         password("env.GITHUB_PAT", "%system.GitHubPAT%", display = ParameterDisplay.HIDDEN, readOnly = true)
@@ -211,7 +153,7 @@ object ChocolateyPosix : BuildType({
     }
 
     artifactRules = """
-        chocolatey.*.tar.gz
+        code_drop/Packages/Chocolatey/chocolatey.*.tar.gz
     """.trimIndent()
 
     steps {
@@ -223,19 +165,17 @@ object ChocolateyPosix : BuildType({
             type = "StrongNameKeyLinux"
         }
 
-        step {
-            name = "Login Docker"
-            conditions {
-                exists("system.DockerUsername")
-                exists("system.DockerPassword")
-            }
-            type = "DockerLogin"
-        }
-
         script {
             name = "Install Prerequisites"
             scriptContent = """
-                sudo amazon-linux-extras install mono
+                sudo apt update
+                sudo apt install dirmngr gnupg apt-transport-https ca-certificates software-properties-common
+                sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+                sudo apt-add-repository 'deb https://download.mono-project.com/repo/ubuntu stable-focal main'
+                sudo apt install mono-complete -y
+
+                # Import Cert Bundle for Mono, allowing for knowledge of existing cert chains
+                cert-sync /etc/ssl/certs/ca-certificates.crt
             """.trimIndent()
         }
 
@@ -243,8 +183,6 @@ object ChocolateyPosix : BuildType({
             name = "Build Chocolatey"
             scriptContent = """
                 ./build.official.sh
-                cd ./code_drop/chocolatey/console
-                tar -czvf ../../../chocolatey.v%env.CHOCOLATEY_VERSION%.tar.gz .
             """.trimIndent()
         }
 
@@ -253,6 +191,7 @@ object ChocolateyPosix : BuildType({
             name = "Publish TarGz to GitHub Release"
             conditions {
                 exists("env.GITHUB_PAT")
+                startsWith("teamcity.build.branch", "tags")
             }
             scriptContent = """
                 curl \
@@ -262,52 +201,23 @@ object ChocolateyPosix : BuildType({
                     -H "X-GitHub-Api-Version: 2022-11-28" \
                     -H "Content-Type: application/octet-stream" \
                     https://uploads.github.com/repos/chocolatey/choco/releases/%env.CHOCOLATEY_VERSION%/assets?name=chocolatey.v%env.CHOCOLATEY_VERSION%.tar.gz \
-                    --data-binary "@chocolatey.v%env.CHOCOLATEY_VERSION%.tar.gz"
+                    --data-binary "@code_drop/Packages/Chocolatey/chocolatey.v%env.CHOCOLATEY_VERSION%.tar.gz"
             """.trimIndent()
         }
 
-        dockerCommand {
+        script {
             name = "Build Docker Image"
-            commandType = build {
-                source = file {
-                    path = "docker/Dockerfile.linux"
-                }
-                contextDir = "."
-                platform = DockerCommandStep.ImagePlatform.Linux
-                namesAndTags = "chocolatey/choco:latest-linux"
-                commandArgs = "--build-arg buildscript=build.official.sh"
-            }
+            scriptContent = "./build.official.sh --verbosity=diagnostic --target=Docker"
         }
 
-        dockerCommand {
-            name = "Push Docker Image"
+        script {
+            name = "Create Docker Manifest"
             conditions {
-                exists("system.DockerUsername")
-                exists("system.DockerPassword")
+                exists("env.DOCKER_USER")
+                exists("env.DOCKER_PASSWORD")
+                startsWith("teamcity.build.branch", "tags")
             }
-            commandType = push {
-                namesAndTags = "chocolatey/choco:latest-linux"
-                removeImageAfterPush = false
-            }
-        }
-
-        dockerCommand {
-            name = "Tag Docker Image with Version"
-            commandType = other {
-                subCommand = "tag"
-                commandArgs = "chocolatey/choco:latest-linux chocolatey/choco:v%env.CHOCOLATEY_VERSION%-linux"
-            }
-        }
-
-        dockerCommand {
-            name = "Push Versioned Tag"
-            conditions {
-                exists("system.DockerUsername")
-                exists("system.DockerPassword")
-            }
-            commandType = push {
-                namesAndTags = "chocolatey/choco:v%env.CHOCOLATEY_VERSION%-linux"
-            }
+            scriptContent = "./build.official.sh --verbosity=diagnostic --target=DockerManifest"
         }
     }
 
@@ -316,97 +226,6 @@ object ChocolateyPosix : BuildType({
             buildType = "Chocolatey"
             successfulOnly = true
             branchFilter = """
-                +:release/*
-                +:hotfix/*
-                +:tags/*
-            """.trimIndent()
-        }
-    }
-
-    dependencies {
-        snapshot(AbsoluteId("Chocolatey")) {
-            onDependencyFailure = FailureAction.FAIL_TO_START
-            synchronizeRevisions = false
-        }
-    }
-
-    requirements {
-        contains("docker.server.osType", "linux")
-        exists("docker.server.version")
-    }
-})
-
-object ChocolateyDockerManifest : BuildType({
-    id = AbsoluteId("ChocolateyDockerManifest")
-    name = "Docker Manifest"
-
-    params {
-        param("env.CHOCOLATEY_VERSION", "%dep.Chocolatey.build.number%")
-    }
-
-    vcs {
-        root(DslContext.settingsRoot)
-    }
-
-    steps {
-        step {
-            name = "Login Docker"
-            conditions {
-                exists("system.DockerUsername")
-                exists("system.DockerPassword")
-            }
-            type = "DockerLogin"
-        }
-
-        dockerCommand {
-            name = "Create Combined Manifest"
-            commandType = other {
-                subCommand = "manifest"
-                commandArgs = "create chocolatey/choco:latest chocolatey/choco:latest-linux chocolatey/choco:latest-windows"
-            }
-        }
-
-        dockerCommand {
-            name = "Push Combined Manifest"
-            conditions {
-                exists("system.DockerUsername")
-                exists("system.DockerPassword")
-            }
-            commandType = other {
-                subCommand = "manifest"
-                commandArgs = "push chocolatey/choco:latest"
-            }
-        }
-
-        dockerCommand {
-            name = "Create Versioned Manifest"
-            commandType = other {
-                subCommand = "manifest"
-                commandArgs = "create chocolatey/choco:v%env.CHOCOLATEY_VERSION% chocolatey/choco:v%env.CHOCOLATEY_VERSION%-linux chocolatey/choco:v%env.CHOCOLATEY_VERSION%-windows"
-            }
-        }
-
-        dockerCommand {
-            name = "Push Versioned Manifest"
-            conditions {
-                exists("system.DockerUsername")
-                exists("system.DockerPassword")
-            }
-            commandType = other {
-                subCommand = "manifest"
-                commandArgs = "push chocolatey/choco:v%env.CHOCOLATEY_VERSION%"
-            }
-        }
-
-    }
-
-    triggers {
-        finishBuildTrigger {
-            buildType = "Chocolatey"
-            successfulOnly = true
-            branchFilter = """
-                +:release/*
-                +:hotfix/*
                 +:tags/*
             """.trimIndent()
         }
@@ -417,13 +236,10 @@ object ChocolateyDockerManifest : BuildType({
             onDependencyFailure = FailureAction.FAIL_TO_START
             synchronizeRevisions = false
         }
-        snapshot(AbsoluteId("ChocolateyPosix")) {
-            onDependencyFailure = FailureAction.FAIL_TO_START
-            synchronizeRevisions = false
-        }
     }
 
     requirements {
+        contains("docker.server.osType", "linux")
         exists("docker.server.version")
     }
 })
