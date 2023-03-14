@@ -312,6 +312,23 @@ Task("Prepare-NuGet-Packages")
     CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.xml", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/net48/chocolatey.xml");
 });
 
+Task("Prepare-MSI")
+    .WithCriteria(() => BuildParameters.ShouldBuildMsi, "Skipping because creation of MSI has been disabled")
+    .WithCriteria(() => BuildParameters.IsTagged, "Skipping because build is not tagged")
+    .IsDependeeOf("Build-MSI")
+    .Does(() =>
+{
+    var installScriptPath = BuildParameters.RootDirectoryPath + "/src/chocolatey.install/assets/Install.ps1";
+
+    if (!FileExists(installScriptPath)) 
+    {
+        DownloadFile(
+            "https://community.chocolatey.org/install.ps1",
+            installScriptPath
+        );
+    }
+});
+
 BuildParameters.Tasks.BuildMsiTask
     .WithCriteria(() => BuildParameters.IsTagged, "Skipping because build is not tagged");
 
