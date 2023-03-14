@@ -27,9 +27,9 @@
     <CustomAction Id="SetRedirectsDirectoryPath" Property="RedirectsDirectoryPath" Value="[INSTALLDIR]\\redirects" />
     <CustomAction Id="SetToolsDirectoryPath" Property="ToolsDirectoryPath" Value="[INSTALLDIR]\\tools" />
 
-    <PropertyRef Id="WIX_IS_NETFRAMEWORK_40_OR_LATER_INSTALLED" />
-    <Condition Message="!(loc.RequiresDotNet4)">
-      <![CDATA[Installed OR WIX_IS_NETFRAMEWORK_40_OR_LATER_INSTALLED]]>
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
+    <Condition Message="!(loc.RequiresDotNet48)">
+      <![CDATA[Installed OR WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED]]>
     </Condition>
 
     <!-- Custom Actions to Install Chocolatey -->

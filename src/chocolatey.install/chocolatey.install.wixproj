@@ -107,6 +107,7 @@
     <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="NetFx48.wxs" />
     <Compile Include="chocolatey.wxs" />
   </ItemGroup>
   <ItemGroup>
