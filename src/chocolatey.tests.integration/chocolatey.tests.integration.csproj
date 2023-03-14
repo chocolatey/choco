@@ -141,6 +141,54 @@
     <None Include="context\badpackage\2.0\tools\chocolateyUninstall.ps1">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="context\dependenciesbeforemodify\hasdependencywithbeforemodify\1.0.0\hasdependencywithbeforemodify.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\hasdependencywithbeforemodify\1.0.0\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\hasdependencywithbeforemodify\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\hasdependencywithbeforemodify\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\hasdependencywithbeforemodify\2.0.0\hasdependencywithbeforemodify.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\hasdependencywithbeforemodify\2.0.0\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\hasdependencywithbeforemodify\2.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\hasdependencywithbeforemodify\2.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\isdependencywithbeforemodify\1.0.0\isdependencywithbeforemodify.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\isdependencywithbeforemodify\1.0.0\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\isdependencywithbeforemodify\1.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\isdependencywithbeforemodify\1.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\isdependencywithbeforemodify\2.0.0\isdependencywithbeforemodify.nuspec">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\isdependencywithbeforemodify\2.0.0\tools\chocolateyBeforeModify.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\isdependencywithbeforemodify\2.0.0\tools\chocolateyinstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="context\dependenciesbeforemodify\isdependencywithbeforemodify\2.0.0\tools\chocolateyuninstall.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="context\dependencies\conflictingdependency\1.0.1\conflictingdependency.nuspec">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -661,6 +709,10 @@
     <None Include="context\upgradepackage\1.1.0\tools\graphical.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Content Include="context\dependenciesbeforemodify\hasdependencywithbeforemodify\1.0.0\tools\purpose.txt" />
+    <Content Include="context\dependenciesbeforemodify\hasdependencywithbeforemodify\2.0.0\tools\purpose.txt" />
+    <Content Include="context\dependenciesbeforemodify\isdependencywithbeforemodify\1.0.0\tools\purpose.txt" />
+    <Content Include="context\dependenciesbeforemodify\isdependencywithbeforemodify\2.0.0\tools\purpose.txt" />
     <Content Include="context\exactpackage\exactpackage.dontfind\1.0.0\tools\purpose.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

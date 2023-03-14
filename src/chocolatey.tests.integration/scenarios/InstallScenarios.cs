@@ -4013,5 +4013,100 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("pre-beforemodify-all.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
             }
         }
+
+        public class when_installing_a_package_that_requires_updating_a_dependency : ScenariosBase
+        {
+            private const string TargetPackageName = "hasdependencywithbeforemodify";
+            private const string DependencyName = "isdependencywithbeforemodify";
+
+            public override void Context()
+            {
+                base.Context();
+
+                Scenario.add_packages_to_source_location(Configuration, "{0}.*".format_with(TargetPackageName) + Constants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "{0}.*".format_with(DependencyName) + Constants.PackageExtension);
+                Scenario.install_package(Configuration, DependencyName, "1.0.0");
+
+                Configuration.PackageNames = Configuration.Input = TargetPackageName;
+            }
+
+            public override void Because()
+            {
+                Results = Service.install_run(Configuration);
+            }
+
+            [Fact]
+            public void should_install_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", TargetPackageName, "{0}.nupkg".format_with(TargetPackageName));
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("2.0.0.0");
+            }
+
+            [Fact]
+            public void should_upgrade_the_minimum_version_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", DependencyName, "{0}.nupkg".format_with(DependencyName));
+                var package = new OptimizedZipPackage(packageFile);
+                package.Version.Version.to_string().ShouldEqual("2.0.0.0");
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_everything_installed_successfully()
+            {
+                MockLogger.contains_message("installed 2/2", LogLevel.Warn).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_run_target_package_beforeModify_for_upgraded_version()
+            {
+                MockLogger.contains_message("Ran BeforeModify: {0} {1}".format_with(TargetPackageName, "2.0.0"), LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_run_already_installed_dependency_package_beforeModify()
+            {
+                MockLogger.contains_message("Ran BeforeModify: {0} {1}".format_with(DependencyName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_not_run_dependency_package_beforeModify_for_upgraded_version()
+            {
+                MockLogger.contains_message("Ran BeforeModify: {0} {1}".format_with(DependencyName, "2.0.0"), LogLevel.Info).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+            }
+        }
     }
 }

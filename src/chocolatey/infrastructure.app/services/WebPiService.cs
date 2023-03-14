@@ -215,6 +215,11 @@ The `webpi` source is deprecated and will be removed in Chocolatey v2.0.0.
 
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
+            return install_run(config, continueAction, beforeModifyAction: null);
+        }
+
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeModifyAction)
+        {
             write_deprecation_warning();
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
             var args = ExternalCommandArgsBuilder.build_arguments(config, _installArguments);

@@ -385,8 +385,14 @@ folder.");
 
         public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction)
         {
+            return install_run(config, continueAction, beforeModifyAction: null);
+        }
+
+        public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, Action<PackageResult> beforeModifyAction)
+        {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
+            var packagesModified = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             //todo: #23 handle all
 
@@ -445,6 +451,21 @@ folder.");
                     },
                 uninstallSuccessAction: null,
                 addUninstallHandler: true);
+
+            EventHandler<PackageOperationEventArgs> beforeModifyHandler = (sender, eventArgs) =>
+            {
+                // Soundness: any code called here must avoid calling packageManager methods for
+                // InstallPackage() and UninstallPackage(), or in some other way handle the
+                // unbounded recursion doing so would create.
+                // Additionally, errors thrown during here have been known to cause very strange
+                // NuGet / LINQ exceptions to be thrown during later calls to seemingly unrelated
+                // code paths. Debug this event handler if you see strange errors, such as
+                // complaints about InternalsVisibleTo and strong name signing.
+                backup_and_before_modify(eventArgs.Package, config, beforeModifyAction, packagesModified);
+            };
+
+            packageManager.PackageUninstalling += beforeModifyHandler;
+            packageManager.PackageInstalling += beforeModifyHandler;
 
             config.start_backup();
 
@@ -513,10 +534,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 {
                     var forcedResult = packageInstalls.GetOrAdd(packageName, new PackageResult(availablePackage, _fileSystem.combine_paths(ApplicationParameters.PackagesLocation, availablePackage.Id)));
                     forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
-
-                    remove_rollback_directory_if_exists(packageName);
-                    backup_existing_version(config, installedPackage, _packageInfoService.get_package_information(installedPackage));
-
+                    
                     try
                     {
                         packageManager.UninstallPackage(installedPackage, forceRemove: config.Force, removeDependencies: config.ForceDependencies);
@@ -612,6 +630,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageInstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
+            var packagesModified = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             SemanticVersion version = !string.IsNullOrWhiteSpace(config.Version) ? new SemanticVersion(config.Version) : null;
             if (config.Force) config.AllowDowngrade = true;
@@ -631,6 +650,21 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     },
                 uninstallSuccessAction: null,
                 addUninstallHandler: false);
+
+            EventHandler<PackageOperationEventArgs> beforeModifyHandler = (sender, eventArgs) =>
+            {
+                // Soundness: any code called here must avoid calling packageManager methods for
+                // InstallPackage() and UninstallPackage(), or in some other way handle the
+                // unbounded recursion doing so would create.
+                // Additionally, errors thrown during here have been known to cause very strange
+                // NuGet / LINQ exceptions to be thrown during later calls to seemingly unrelated
+                // code paths. Debug this event handler if you see strange errors, such as
+                // complaints about InternalsVisibleTo and strong name signing.
+                backup_and_before_modify(eventArgs.Package, config, beforeUpgradeAction, packagesModified);
+            };
+
+            packageManager.PackageUninstalling += beforeModifyHandler;
+            packageManager.PackageInstalling += beforeModifyHandler;
 
             var configIgnoreDependencies = config.IgnoreDependencies;
             set_package_names_if_all_is_specified(config, () => { config.IgnoreDependencies = true; });
@@ -680,7 +714,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
                     else
                     {
-                        var installResults = install_run(config, continueAction);
+                        var installResults = install_run(config, continueAction, beforeUpgradeAction);
                         foreach (var result in installResults)
                         {
                             packageInstalls.GetOrAdd(result.Key, result.Value);
@@ -845,17 +879,15 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 packageName,
                                 version == null ? null : version.ToString()))
                             {
-                                if (beforeUpgradeAction != null)
-                                {
-                                    var currentPackageResult = new PackageResult(installedPackage, get_install_directory(config, installedPackage));
-                                    beforeUpgradeAction(currentPackageResult);
-                                }
-
-                                remove_rollback_directory_if_exists(packageName);
-                                ensure_package_files_have_compatible_attributes(config, installedPackage, pkgInfo);
-                                rename_legacy_package_version(config, installedPackage, pkgInfo);
-                                backup_existing_version(config, installedPackage, pkgInfo);
-                                remove_shim_directors(config, installedPackage, pkgInfo);
+                                // Take a backup before trying to update anything.
+                                // 1. If we're taking the '--force' route we don't use UninstallPackage() here as we don't really want
+                                //    to treat this as a proper uninstall, but we DO want to take backups and be able to run a beforeModify.
+                                // 2. If we're taking the UpdatePackage route, we need to pre-emptively take a backup in case the new
+                                //    version of the package doesn't have necessary dependencies available, in which case the upgrade will
+                                //    actually fail BEFORE we do any backups or beforeModify to the main package. Without this pre-step,
+                                //    we can accidentally flag the already-installed package as "bad" since the upgrade failed, and there
+                                //    needs to be a backup to restore from.
+                                backup_and_before_modify(installedPackage, config, beforeUpgradeAction, packagesModified);
                                 if (config.Force && (installedPackage.Version == availablePackage.Version))
                                 {
                                     FaultTolerance.try_catch_with_logging_exception(
@@ -871,6 +903,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 {
                                     packageManager.UpdatePackage(availablePackage, updateDependencies: !config.IgnoreDependencies, allowPrereleaseVersions: config.Prerelease);
                                 }
+
                                 remove_nuget_cache_for_package(availablePackage);
                             }
                         }
@@ -1214,7 +1247,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
         /// <param name="config">The configuration.</param>
         /// <param name="installedPackage">The installed package.</param>
         /// <param name="pkgInfo">The package information.</param>
-        private void remove_shim_directors(ChocolateyConfiguration config, IPackage installedPackage, ChocolateyPackageInformation pkgInfo)
+        private void remove_shim_directors(ChocolateyConfiguration config, IPackage installedPackage)
         {
             var pkgInstallPath = get_install_directory(config, installedPackage);
 
@@ -1285,21 +1318,35 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
         public virtual ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult> continueAction, bool performAction, Action<PackageResult> beforeUninstallAction = null)
         {
             var packageUninstalls = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
+            var packagesModified = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             SemanticVersion version = config.Version != null ? new SemanticVersion(config.Version) : null;
-            var packageManager = NugetCommon.GetPackageManager(config, _nugetLogger, _packageDownloader,
-                                                               installSuccessAction: null,
-                                                               uninstallSuccessAction: (e) =>
-                                                                   {
-                                                                       var pkg = e.Package;
-                                                                       "chocolatey".Log().Info(ChocolateyLoggers.Important, " {0} has been successfully uninstalled.".format_with(pkg.Id));
-                                                                   },
-                                                               addUninstallHandler: true);
-
-            var loopCount = 0;
-            packageManager.PackageUninstalling += (s, e) =>
+            var packageManager = NugetCommon.GetPackageManager(
+                config,
+                _nugetLogger,
+                _packageDownloader,
+                installSuccessAction: null,
+                uninstallSuccessAction: (e) =>
                 {
                     var pkg = e.Package;
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, " {0} has been successfully uninstalled.".format_with(pkg.Id));
+                },
+                addUninstallHandler: true);
+
+            var loopCount = 0;
+
+            packageManager.PackageUninstalling += (s, e) =>
+                {
+                    // Soundness: any code called here must avoid calling packageManager methods for
+                    // InstallPackage() and UninstallPackage(), or in some other way handle the
+                    // unbounded recursion doing so would create.
+                    var pkg = e.Package;
+
+                    // Errors thrown during here have been known to cause very strange
+                    // NuGet / LINQ exceptions to be thrown during later calls to seemingly unrelated
+                    // code paths. Debug this event handler if you see strange errors, such as
+                    // complaints about InternalsVisibleTo and strong name signing.
+                    backup_and_before_modify(pkg, config, beforeUninstallAction, packagesModified);
 
                     // TODO: Removal special handling for SxS packages once we hit v2.0.0
 
@@ -1326,8 +1373,8 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                     }
 
                     // is this the latest version, have you passed --sxs, or is this a side-by-side install? This is the only way you get through to the continue action.
-                    var latestVersion = packageManager.LocalRepository.FindPackage(e.Package.Id);
-                    var pkgInfo = _packageInfoService.get_package_information(e.Package);
+                    var latestVersion = packageManager.LocalRepository.FindPackage(pkg.Id);
+                    var pkgInfo = _packageInfoService.get_package_information(pkg);
                     if (latestVersion.Version == pkg.Version || config.AllowMultipleVersions || (pkgInfo != null && pkgInfo.IsSideBySide))
                     {
                         packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
@@ -1338,6 +1385,16 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                         //todo: #2578 allow cleaning of pkgstore files
                     }
                 };
+
+            packageManager.PackageUninstalled += (sender, eventArgs) =>
+            {
+                var pkg = eventArgs.Package;
+                var pkgInfo = _packageInfoService.get_package_information(pkg);
+
+                ensure_nupkg_is_removed(pkg, pkgInfo);
+                remove_installation_files(pkg, pkgInfo);
+                remove_cache_for_package(config, pkg);
+            };
 
             // if we are uninstalling a package and not forcing dependencies,
             // look to see if the user is missing the actual package they meant
@@ -1495,21 +1552,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                                 packageVersion.Id, packageVersion.Version.to_string())
                                 )
                             {
-                                if (beforeUninstallAction != null)
-                                {
-                                    // guessing this is not added so that it doesn't fail the action if an error is recorded?
-                                    //var currentPackageResult = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageVersion, get_install_directory(config, packageVersion)));
-                                    var currentPackageResult = new PackageResult(packageVersion, get_install_directory(config, packageVersion));
-                                    beforeUninstallAction(currentPackageResult);
-                                }
-                                ensure_package_files_have_compatible_attributes(config, packageVersion, pkgInfo);
-                                rename_legacy_package_version(config, packageVersion, pkgInfo);
-                                remove_rollback_directory_if_exists(packageName);
-                                backup_existing_version(config, packageVersion, pkgInfo);
                                 packageManager.UninstallPackage(packageVersion.Id.to_lower(), forceRemove: config.Force, removeDependencies: config.ForceDependencies, version: packageVersion.Version);
-                                ensure_nupkg_is_removed(packageVersion, pkgInfo);
-                                remove_installation_files(packageVersion, pkgInfo);
-                                remove_cache_for_package(config, packageVersion);
                             }
                         }
                         catch (Exception ex)
@@ -1541,6 +1584,87 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
             config.reset_config(removeBackup: true);
 
             return packageUninstalls;
+        }
+
+        /// <summary>
+        /// This method should be called before any modifications are made to a package.
+        /// Typically this should be injected into the IPackageManager's Installing and Uninstalling events
+        /// in order to handle both installation and uninstallation of dependencies as well as the primary
+        /// packages.
+        /// </summary>
+        /// <param name="package">The package currently being modified. For IPackageManager event handlers, this will be the eventArgs.Package property.</param>
+        /// <param name="config">The current configuration.</param>
+        /// <param name="beforeModifyAction">Any action to run before performing backup operations. Typically this is an invocation of the chocolateyBeforeModify script.</param>
+        /// <param name="packagesModified">Dictionary to add any modified packages' packageResults to.</param>
+        protected virtual void backup_and_before_modify(
+            IPackage package,
+            ChocolateyConfiguration config,
+            Action<PackageResult> beforeModifyAction,
+            ConcurrentDictionary<string, PackageResult> packagesModified)
+        {
+            try
+            {
+                var installDirectory = get_install_directory(config, package);
+
+                if (installDirectory != null && !packagesModified.ContainsKey(package.Id))
+                {
+                    // Ensure we have the correct package metadata to pass to the beforeModify handlers.
+                    // The given IPackage can have the wrong version if NuGet is running InstallPackage()
+                    // without first running UninstallPackage(), it will pass in the package being installed
+                    // or upgraded to, not the package it's installing over the top of. This has been
+                    // observed when calling `choco install` and an already-installed dependency needs to
+                    // be upgraded to satisfy the new package's dependency requirements.
+                    var nugetFileSystem = NugetCommon.GetNuGetFileSystem(config, _nugetLogger);
+                    var localPackage = NugetCommon
+                        .GetLocalRepository(NugetCommon.GetPathResolver(config, nugetFileSystem), nugetFileSystem, _nugetLogger)
+                        .FindPackagesById(package.Id)
+                        .OrderByDescending(p => p.Version)
+                        .FirstOrDefault();
+                    var packageResult = new PackageResult(localPackage, installDirectory);
+
+                    // Only run the beforeModify / backup if this handler was the one to add the result to the dictionary,
+                    // so we ensure it doesn't run duplicate actions.
+                    if (packagesModified.TryAdd(package.Id, packageResult))
+                    {
+                        // if this is an already installed package we're modifying, ensure we run its beforeModify script and back it up properly.
+                        // Check the package ID isn't already in the dictionary of packages that we've modified so we don't run a beforeModify
+                        // more than once.
+                        if (beforeModifyAction != null)
+                        {
+                            "chocolatey".Log().Debug("Running beforeModify step for '{0}'", package.Id);
+                            beforeModifyAction(packageResult);
+                        }
+
+                        "chocolatey".Log().Debug("Backing up package files for '{0}'", package.Id);
+
+                        backup_existing_package_files(config, package);
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                // If there's failures here, NuGet might report very strange things when it tries to run other operations.
+                // Try starting here and placing breakpoints to determine if we're causing errors here.
+                "chocolatey".Log().Error("Failed to run backup or beforeModify steps for package '{0}': {1}", package.Id, error.Message);
+                "chocolatey".Log().Trace(error.StackTrace);
+            }
+        }
+
+        /// <summary>
+        /// Takes a backup of the existing package files, optionally pre-checking the file attributes and any locked files.
+        /// </summary>
+        /// <param name="config"></param>
+        /// <param name="package"></param>
+        /// <param name="ignoreAttributes"></param>
+        private void backup_existing_package_files(ChocolateyConfiguration config, IPackage package)
+        {
+            var packageInformation = _packageInfoService.get_package_information(package);
+
+            remove_rollback_directory_if_exists(package.Id);
+            ensure_package_files_have_compatible_attributes(config, package, packageInformation);
+            rename_legacy_package_version(config, package, packageInformation);
+            backup_existing_version(config, package, packageInformation);
+            remove_shim_directors(config, package);
         }
 
         /// <summary>

@@ -19,7 +19,6 @@ namespace chocolatey.tests.integration.scenarios
     using System.Collections.Generic;
     using System.Linq;
     using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.results;
