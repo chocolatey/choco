@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding='utf-8'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi' xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension" xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+  <?define ProductName="Chocolatey (Install Only)"?>
+  <?define ProductId="{671AC678-CDB7-49F1-A98A-B3F52D73BEAD}" ?>
+  <?define ProductCode="{62FC4E65-47F0-488A-B841-ECA07E98A58B}" ?>
+  <?define ProductVersion="$(var.VersionNumber)" ?>
+  <?define ProductSummary="The Package Manager for Windows"?>
+  <?define ProductVendor="Chocolatey Software, Inc."?>
+  <?define ArtifactName="Chocolatey"?>
+  <?define InstallerIco="assets\choco.ico"?>
+
   <Product Name="$(var.ProductName)" Id="*" UpgradeCode="$(var.ProductCode)" Language="1033" Manufacturer="$(var.ProductVendor)" Codepage="1252" Version="$(var.ProductVersion)">
     <Package Id='*' Platform='x86' Keywords='Installer' Description="$(var.ProductName)" Comments="$(var.ProductSummary)" InstallScope="perMachine" InstallerVersion="200" Compressed="yes" />
     <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="!(loc.NewerVersionInstalled)" />
@@ -27,7 +36,7 @@
     <SetProperty Id="InstallChocolatey"
       Before="InstallChocolatey"
       Sequence="execute" 
-      Value="&quot;C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -Command &quot;$env:ChocolateyInstall='[INSTALLDIR]'; &amp; '[#ChocolateyInstall]' -ChocolateyDownloadUrl '[#ChocolateyNupkg]' -UseNativeUnzip&quot;" />
+      Value="&quot;[SystemFolder]\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -Command &quot;$env:ChocolateyInstall='[INSTALLDIR]'; &amp; '[#ChocolateyInstall]' -ChocolateyDownloadUrl '[#ChocolateyNupkg]' -UseNativeUnzip&quot;" />
     <CustomAction Id="InstallChocolatey" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="yes" />
 
     <!-- Custom Additions to the InstallExecuteSequence (e.g. the actions above) -->

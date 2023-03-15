@@ -127,7 +127,7 @@ Func<FilePathCollection> getFilesToSign = () =>
 
 Func<FilePathCollection> getMsisToSign = () =>
 {
-    var msisToSign = GetFiles(BuildParameters.Paths.Directories.Build + "/Chocolatey.msi"); // TODO: Correct
+    var msisToSign = GetFiles(BuildParameters.Paths.Directories.Build + "/MSIs/**/*.msi");
 
     Information("The following msi's have been selected to be signed...");
     foreach (var msiToSign in msisToSign)
@@ -312,6 +312,9 @@ Task("Prepare-NuGet-Packages")
     CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.xml", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/net48/chocolatey.xml");
 });
 
+BuildParameters.Tasks.BuildMsiTask
+    .WithCriteria(() => BuildParameters.IsTagged, "Skipping because build is not tagged");
+
 Task("Create-TarGz-Packages")
     .IsDependentOn("Build")
     .IsDependeeOf("Package")
@@ -369,6 +372,8 @@ BuildParameters.SetParameters(context: Context,
                             getILMergeConfigs: getILMergeConfigs,
                             preferDotNetGlobalToolUsage: !IsRunningOnWindows(),
                             shouldBuildMsi: true,
+                            msiUsedWithinNupkg: false,
+                            shouldAuthenticodeSignMsis: true,
                             shouldRunNuGet: IsRunningOnWindows(),
                             shouldAuthenticodeSignPowerShellScripts: IsRunningOnWindows(),
                             shouldPublishAwsLambdas: false,
