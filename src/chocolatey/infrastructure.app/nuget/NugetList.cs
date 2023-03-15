@@ -91,6 +91,21 @@ namespace chocolatey.infrastructure.app.nuget
                 searchFilter.OrderBy = SearchOrderBy.DownloadCount;
             }
 
+            if (configuration.ListCommand.ByIdOnly)
+            {
+                searchFilter.ByIdOnly = true;
+            }
+
+            if (configuration.ListCommand.ByTagOnly)
+            {
+                searchFilter.ByTagOnly = true;
+            }
+
+            if (configuration.ListCommand.IdStartsWith)
+            {
+                searchFilter.IdStartsWith = true;
+            }
+
             var cacheContext = new ChocolateySourceCacheContext(configuration);
 
             NuGetVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? NuGetVersion.Parse(configuration.Version) : null;
@@ -255,7 +270,11 @@ namespace chocolatey.infrastructure.app.nuget
                 results = results.Where(p => p.Identity.Version.Equals(version)).ToHashSet();
             }
 
-            if (configuration.ListCommand.ByIdOnly)
+            if (configuration.ListCommand.IdStartsWith)
+            {
+                results = results.Where(p => p.Identity.Id.ToLower().StartsWith(searchTermLower)).ToHashSet();
+            }
+            else if (configuration.ListCommand.ByIdOnly)
             {
                 results = results.Where(p => p.Identity.Id.ToLower().Contains(searchTermLower)).ToHashSet();
             }
@@ -263,11 +282,6 @@ namespace chocolatey.infrastructure.app.nuget
             if (configuration.ListCommand.ByTagOnly)
             {
                 results = results.Where(p => p.Tags.contains(searchTermLower, StringComparison.InvariantCultureIgnoreCase)).ToHashSet();
-            }
-
-            if (configuration.ListCommand.IdStartsWith)
-            {
-                results = results.Where(p => p.Identity.Id.ToLower().StartsWith(searchTermLower)).ToHashSet();
             }
 
             if (configuration.ListCommand.ApprovedOnly)
