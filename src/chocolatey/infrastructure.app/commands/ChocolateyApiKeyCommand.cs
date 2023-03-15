@@ -18,7 +18,9 @@ namespace chocolatey.infrastructure.app.commands
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using attributes;
+    using chocolatey.infrastructure.app.domain;
     using commandline;
     using configuration;
     using infrastructure.commands;
@@ -31,11 +33,6 @@ namespace chocolatey.infrastructure.app.commands
     public class ChocolateyApiKeyCommand : ICommand
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
-
-        private const string RemoveOptionDeprecationMessage = @"
-The --rem / --remove option is deprecated and will be removed in v2.0.0.
-In future versions, this option will be replaced with the `remove` subcommand.
-";
 
         public ChocolateyApiKeyCommand(IChocolateyConfigSettingsService configSettingsService)
         {
@@ -53,28 +50,57 @@ In future versions, this option will be replaced with the `remove` subcommand.
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The API key for the source. This is the authentication that identifies you and allows you to push to a source. With some sources this is either a key or it could be a user name and password specified as 'user:password'.",
                      option => configuration.ApiKeyCommand.Key = option.remove_surrounding_quotes())
-                .Add("rem|remove",
-                    "Removes an API key from Chocolatey (DEPRECATED)",
-                    option => configuration.ApiKeyCommand.Remove = true)
                 ;
         }
 
         public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
+
+            if (unparsedArguments.Count > 1)
+            {
+                throw new ApplicationException("A single apikey command must be listed. Please see the help menu for those commands.");
+            }
+
+            var command = ApiKeyCommandType.Unknown;
+            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
+
+            if (!Enum.TryParse(unparsedCommand, true, out command) || command == ApiKeyCommandType.Unknown)
+            {
+                command = ApiKeyCommandType.List;
+
+                if (!string.IsNullOrWhiteSpace(unparsedCommand))
+                {
+                    this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
+                }
+                else if (!string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key))
+                {
+                    this.Log().Warn("ApiKey provided. Setting command to add.");
+                    command = ApiKeyCommandType.Add;
+                }
+            }
+
+            configuration.ApiKeyCommand.Command = command;
         }
 
         public virtual void handle_validation(ChocolateyConfiguration configuration)
         {
-            if (!configuration.ApiKeyCommand.Remove && !string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key)
-                && string.IsNullOrWhiteSpace(configuration.Sources))
+            switch (configuration.ApiKeyCommand.Command)
             {
-                throw new ApplicationException("You must specify both 'source' and 'key' to set an API key.");
-            }
-            if (configuration.ApiKeyCommand.Remove && string.IsNullOrWhiteSpace(configuration.Sources))
-            {
-                throw new ApplicationException("You must specify 'source' to remove an API key.");
+                case ApiKeyCommandType.Remove:
+                    if (string.IsNullOrWhiteSpace(configuration.Sources))
+                    {
+                        throw new ApplicationException("You must specify 'source' to remove an API key.");
+                    }
 
+                    break;
+                case ApiKeyCommandType.Add:
+                    if (string.IsNullOrWhiteSpace(configuration.Sources) || string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key))
+                    {
+                        throw new ApplicationException("You must specify both 'source' and 'key' to set an API key.");
+                    }
+
+                    break;
             }
         }
 
@@ -87,9 +113,6 @@ This lists api keys that are set or sets an api key for a particular
 
 Anything that doesn't contain source and key will list api keys.
 ");
-            this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-            this.Log().Warn(RemoveOptionDeprecationMessage);
-
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco apikey [<options/switches>]
@@ -100,9 +123,12 @@ Anything that doesn't contain source and key will list api keys.
             "chocolatey".Log().Info(@"
     choco apikey
     choco apikey -s https://somewhere/out/there
-    choco apikey -s=""https://somewhere/out/there/"" -k=""value""
-    choco apikey -s ""https://push.chocolatey.org/"" -k=""123-123123-123""
-    choco apikey -s ""http://internal_nexus"" -k=""user:password""
+    choco apikey list
+    choco apikey list -s https://somewhere/out/there
+    choco apikey add -s=""https://somewhere/out/there/"" -k=""value""
+    choco apikey add -s ""https://push.chocolatey.org/"" -k=""123-123123-123""
+    choco apikey add -s ""http://internal_nexus"" -k=""user:password""
+    choco apikey remove -s https://somewhere/out/there
 
 For source location, this can be a folder/file share or an
 http location. When it comes to urls, they can be different from the packages
@@ -130,7 +156,7 @@ In order to save your API key for {0},
  {0}, go to {0}account,
  copy the API Key, and then use it in the following command:
 
-    choco apikey -k <your key here> -s {0}
+    choco apikey add -k <your key here> -s {0}
 
 ".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
 
@@ -157,15 +183,16 @@ If you find other exit codes that we have not yet documented, please
 
         public virtual void run(ChocolateyConfiguration configuration)
         {
-            if (configuration.ApiKeyCommand.Remove)
+            switch (configuration.ApiKeyCommand.Command)
             {
-                this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-                this.Log().Warn(RemoveOptionDeprecationMessage);
-                _configSettingsService.remove_api_key(configuration);
-            }
-            else if (string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key))
-            {
-                _configSettingsService.get_api_key(configuration, (key) =>
+                case ApiKeyCommandType.Remove:
+                    _configSettingsService.remove_api_key(configuration);
+                    break;
+                case ApiKeyCommandType.Add:
+                    _configSettingsService.set_api_key(configuration);
+                    break;
+                default:
+                    _configSettingsService.get_api_key(configuration, (key) =>
                     {
                         string authenticatedString = string.IsNullOrWhiteSpace(key.Key) ? string.Empty : "(Authenticated)";
 
@@ -178,10 +205,7 @@ If you find other exit codes that we have not yet documented, please
                             this.Log().Info(() => "{0}|{1}".format_with(key.Source, authenticatedString));
                         }
                     });
-            }
-            else
-            {
-                _configSettingsService.set_api_key(configuration);
+                    break;
             }
         }
 

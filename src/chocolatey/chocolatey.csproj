@@ -198,6 +198,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyTemplateCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpdateCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyVersionCommand.cs" />
+    <Compile Include="infrastructure.app\domain\ApiKeyCommandType.cs" />
     <Compile Include="infrastructure.app\domain\SourceTypes.cs" />
     <Compile Include="infrastructure.app\domain\ChocolateyPackageMetadata.cs" />
     <Compile Include="infrastructure.app\domain\TemplateCommandType.cs" />
