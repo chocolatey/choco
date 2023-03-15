@@ -22,6 +22,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
+    using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
@@ -109,18 +110,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 optionSet.Contains("k").ShouldBeTrue();
             }
-
-            [Fact]
-            public void should_add_remove_to_the_option_set()
-            {
-                optionSet.Contains("remove").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_remove_to_the_option_set()
-            {
-                optionSet.Contains("rem").ShouldBeTrue();
-            }
         }
 
         public class when_handling_validation : ChocolateyApiKeyCommandSpecsBase
@@ -171,7 +160,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_throw_when_key_is_removed_without_a_source()
             {
-                configuration.ApiKeyCommand.Remove = true;
+                configuration.ApiKeyCommand.Command = ApiKeyCommandType.Remove;
                 configuration.Sources = "";
                 var errored = false;
                 Exception error = null;
@@ -194,7 +183,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void should_continue_when_removing_and_source_is_set()
             {
-                configuration.ApiKeyCommand.Remove = true;
+                configuration.ApiKeyCommand.Command = ApiKeyCommandType.Remove;
                 configuration.Sources = "bob";
                 command.handle_validation(configuration);
             }
@@ -242,6 +231,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 base.Context();
                 configuration.Sources = "bob";
                 configuration.ApiKeyCommand.Key = "bob";
+                configuration.ApiKeyCommand.Command = ApiKeyCommandType.Add;
             }
 
             public override void Because()

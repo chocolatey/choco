@@ -150,8 +150,7 @@ Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($
             $PackagePath = New-ChocolateyTestPackage @NewChocolateyTestPackage
 
             if ($UseConfig) {
-                # TODO: These really should use the full parameter names
-                $null = Invoke-Choco apikey -s $RepositoryToUse$RepositoryEndpoint -k $ApiKey
+                $null = Invoke-Choco apikey add --source $RepositoryToUse$RepositoryEndpoint --api-key $ApiKey
                 # Ensure the key is null (should always be, but scoping can be wonky)
                 $KeyParameter = $null
             } else {
