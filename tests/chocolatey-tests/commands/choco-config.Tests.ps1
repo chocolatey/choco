@@ -102,37 +102,16 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
             $Output.Lines | Should -Contain "Settings"
         }
 
-        It "Displays Sources section" {
-            $Output.Lines | Should -Contain "Sources"
+        It "Does not display Sources section" {
+            $Output.Lines | Should  -Not -Contain "Sources"
         }
 
-        It "Displays Features" {
-            $Output.Lines | Should -Contain "Features"
+        It "Does not display Features" {
+            $Output.Lines | Should -Not -Contain "Features"
         }
 
-        It "Displays API Keys section" {
-            $Output.Lines | Should -Contain "API Keys"
-        }
-
-        It "Displays note about choco <_>" -ForEach @(
-            "source"
-            "feature"
-        ) {
-            $Output.Lines | Should -Contain "NOTE: Use choco $_ to interact with $($_)s."
-        }
-
-        It "Displays note about choco apikey" {
-            $Output.Lines | Should -Contain "NOTE: Api Keys are not shown through this command."
-            $Output.Lines | Should -Contain "Use choco apikey to interact with API keys."
-        }
-
-        It "Displays deprecation note about sources and features" {
-            $pattern = @(
-                'Starting in v2.0.0, the `config list` command will only list the'
-                ' configuration values, instead of also listing the configured features'
-                ' and sources.'
-            ) -join "\r?\n"
-            $Output.String | Should -Match $pattern
+        It "Does not display API Keys section" {
+            $Output.Lines | Should -Not -Contain "API Keys"
         }
 
         It "Displays Available Setting <_>" -ForEach @(

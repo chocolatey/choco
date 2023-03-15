@@ -33,14 +33,6 @@ namespace chocolatey.infrastructure.app.commands
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
 
-        internal const string DeprecatedConfigListResultsMessage = @"
-Starting in v2.0.0, the `config list` command will only list the
- configuration values, instead of also listing the configured features
- and sources.
- Use the `choco feature` or `choco source` commands to list and interact
- with these values.
-";
-
         public ChocolateyConfigCommand(IChocolateyConfigSettingsService configSettingsService)
         {
             _configSettingsService = configSettingsService;
@@ -105,9 +97,6 @@ Chocolatey will allow you to interact with the configuration file settings.
 
 NOTE: Available in 0.9.9.9+.
 ");
-
-            this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-            this.Log().Warn(DeprecatedConfigListResultsMessage);
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
