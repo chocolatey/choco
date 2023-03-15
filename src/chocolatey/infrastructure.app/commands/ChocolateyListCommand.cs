@@ -50,7 +50,7 @@ namespace chocolatey.infrastructure.app.commands
 
             optionSet
                 .Add("s=|source=",
-                     "Source - Source location for install. Can use special 'webpi' or 'windowsfeatures' sources. Defaults to sources." + deprecationNotice,
+                     "Source - Source location for install. Can use special 'windowsfeatures', 'ruby', 'cygwin', or 'python' sources. Defaults to sources." + deprecationNotice,
                      option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("l|lo|local|localonly|local-only",
                      localOnlyDescription,
@@ -205,8 +205,6 @@ Starting in v2.0.0 the shortcut `clist` will be removed and can not be used
 ");
             }
 
-            "chocolatey".Log().Warn(WebPiService.DeprecationMessage);
-
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"
     choco list --local-only (DEPRECATED: will be default for list in v2.0.0)
@@ -260,13 +258,6 @@ Will be removed for the list command in v2.0.0.");
 
             "chocolatey".Log().Info(@"
 Available in 0.9.10+.
-
-WebPI (DEPRECATED)
-This specifies the source is Web PI (Web Platform Installer) and that
- we are searching for a WebPI product, such as IISExpress. If you do
- not have the Web PI command line installed, it will install that first
- and then perform the search requested.
- e.g. `choco {0} --source webpi`
 
 Windows Features
 This specifies that the source is a Windows Feature and we should

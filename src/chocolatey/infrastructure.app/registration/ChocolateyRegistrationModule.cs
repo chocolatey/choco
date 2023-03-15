@@ -67,7 +67,6 @@ namespace chocolatey.infrastructure.app.registration
 
             registrator.register_service<ISourceRunner>(
                 typeof(INugetService),
-                typeof(WebPiService),
                 typeof(WindowsFeatureService),
                 typeof(CygwinService),
                 typeof(PythonService),
