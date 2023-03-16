@@ -71,7 +71,7 @@ exit $command.Count
         }
 
         It 'Reports missing API key' {
-            $Output.Lines | Should -Contain "An ApiKey was not found for 'https://push.chocolatey.org/'. You must either set an api key in the configuration or specify one with --api-key."
+            $Output.Lines | Should -Contain "An API key was not found for 'https://push.chocolatey.org/'. You must either set an API key with the apikey command or specify one with --api-key."
         }
     }
 

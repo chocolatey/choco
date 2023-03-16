@@ -46,7 +46,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Source - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
                      option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("k=|key=|apikey=|api-key=",
-                     "ApiKey - The api key for the source. If not specified (and not local file source), does a lookup. If not specified and one is not found for an https source, push will fail.",
+                     "ApiKey - The API key for the source. If not specified (and not local file source), does a lookup. If not specified and one is not found for an https source, push will fail.",
                      option => configuration.PushCommand.Key = option.remove_surrounding_quotes())
                 //.Add("b|disablebuffering|disable-buffering",
                 //    "DisableBuffering -  Disable buffering when pushing to an HTTP(S) server to decrease memory usage. Note that when this option is enabled, integrated windows authentication might not work.",
@@ -86,7 +86,7 @@ namespace chocolatey.infrastructure.app.commands
 
             if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
             {
-                throw new ApplicationException("An ApiKey was not found for '{0}'. You must either set an api key in the configuration or specify one with --api-key.".format_with(configuration.Sources));
+                throw new ApplicationException("An API key was not found for '{0}'. You must either set an API key with the apikey command or specify one with --api-key.".format_with(configuration.Sources));
             }
 
             // security advisory

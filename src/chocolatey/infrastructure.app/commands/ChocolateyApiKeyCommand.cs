@@ -28,8 +28,8 @@ namespace chocolatey.infrastructure.app.commands
     using logging;
     using services;
 
-    [CommandFor("apikey", "retrieves, saves or deletes an apikey for a particular source")]
-    [CommandFor("setapikey", "retrieves, saves or deletes an apikey for a particular source (alias for apikey)")]
+    [CommandFor("apikey", "retrieves, saves or deletes an API key for a particular source")]
+    [CommandFor("setapikey", "retrieves, saves or deletes an API key for a particular source (alias for apikey)")]
     public class ChocolateyApiKeyCommand : ICommand
     {
         private readonly IChocolateyConfigSettingsService _configSettingsService;
@@ -75,7 +75,7 @@ namespace chocolatey.infrastructure.app.commands
                 }
                 else if (!string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key))
                 {
-                    this.Log().Warn("ApiKey provided. Setting command to add.");
+                    this.Log().Warn("API key provided. Setting command to add.");
                     command = ApiKeyCommandType.Add;
                 }
             }
@@ -108,10 +108,10 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "ApiKey Command");
             this.Log().Info(@"
-This lists api keys that are set or sets an api key for a particular
+This lists API keys that are set or sets an api key for a particular
  source so it doesn't need to be specified every time.
 
-Anything that doesn't contain source and key will list api keys.
+Anything that doesn't contain source and key will list API keys.
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"

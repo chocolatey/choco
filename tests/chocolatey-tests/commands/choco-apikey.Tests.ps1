@@ -112,7 +112,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Displays a message with the key being added" {
-            $Output.Lines | Should -Contain "Added apiKey for https://test.com/api/$($Key)"
+            $Output.Lines | Should -Contain "Added API key for https://test.com/api/$($Key)"
         }
 
         It "Adds the apikey in the file" {
@@ -156,7 +156,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Displays a message with the key being added" {
-            $Output.Lines | Should -Contain "Added apiKey for https://test.com/api/add/$($Key)"
+            $Output.Lines | Should -Contain "Added API key for https://test.com/api/add/$($Key)"
         }
 
         It "Adds the apikey in the file" {
@@ -203,7 +203,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Displays a message with the key being added" {
-            $Output.Lines | Should -Contain "Updated apiKey for https://test.com/api/$($Key)"
+            $Output.Lines | Should -Contain "Updated API key for https://test.com/api/$($Key)"
         }
 
         # Skipping for now, may need to read the file twice to compare the values
@@ -251,7 +251,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Displays a message with the key being added" {
-            $Output.Lines | Should -Contain "Updated apiKey for https://test.com/api/add/$($Key)"
+            $Output.Lines | Should -Contain "Updated API key for https://test.com/api/add/$($Key)"
         }
 
         # Skipping for now, may need to read the file twice to compare the values
@@ -283,7 +283,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Displays a message with the key being removed" {
-            $Output.Lines | Should -Contain "Removed ApiKey for https://remove.test.com/api"
+            $Output.Lines | Should -Contain "Removed API key for https://remove.test.com/api"
         }
 
         # Skipping for now, may need to read the file twice to compare the values
@@ -307,7 +307,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Displays a message with ApiKey not found" {
-            $Output.Lines | Should -Contain "ApiKey was not found for https://non-existing.test.com/api"
+            $Output.Lines | Should -Contain "API key was not found for https://non-existing.test.com/api"
         }
     }
 

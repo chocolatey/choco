@@ -271,7 +271,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldContain("ApiKey was not found");
+                error.Message.ShouldContain("API key was not found");
             }
 
             [Fact]
