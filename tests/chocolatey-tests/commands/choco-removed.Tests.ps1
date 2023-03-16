@@ -98,4 +98,19 @@ exit $command.Count
     ) {
         Get-ChildItem -Path $env:ChocolateyInstall -Name "$Name.exe" -Recurse -ErrorAction SilentlyContinue | Should -HaveCount 0
     }
+
+    Context 'Ensure WebPI source removal' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.999.999')) {
+
+        BeforeAll {
+            $Output = Invoke-Choco list --source webpi
+        }
+
+        It 'Exits with Failure (1)' {
+            $Output.ExitCode | Should -Be 1
+        }
+
+        It "Reports that the path for the source could not be resolved" {
+            $Output.String | Should -Match "The path '[^'].*webpi' for the selected source could not be resolved."
+        }
+    }
 }

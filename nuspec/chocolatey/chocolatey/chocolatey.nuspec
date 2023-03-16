@@ -68,7 +68,6 @@ There are quite a few commands you can call - you should check out the [command 
 - Install ruby gem - choco install compass -source ruby
 - Install python egg - choco install sphynx -source python
 - Install windows feature - choco install IIS -source windowsfeatures
-- Install webpi feature - choco install IIS7.5Express -source webpi
 
 #### More
 

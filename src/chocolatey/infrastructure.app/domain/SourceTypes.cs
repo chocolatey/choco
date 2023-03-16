@@ -49,13 +49,6 @@ namespace chocolatey.infrastructure.app.domain
         public const string RUBY = "ruby";
 
         /// <summary>
-        /// The source is of type Web PI and need to be handled by an
-        /// alternative source runner.
-        /// </summary>
-        [Obsolete("The WebPI service has been retired, and this source type will be removed in v2.0.0 of Chocolatey.")]
-        public const string WEBPI = "webpi";
-
-        /// <summary>
         /// The source is a windows feature and is only provided as an
         /// alias for <see cref="WINDOWS_FEATURES" />
         /// </summary>

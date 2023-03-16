@@ -230,7 +230,7 @@ function Convert-CommandText {
     $commandText = $commandText -creplace '^(.+)(\s+Command\s*)$', "# `$1`$2 (choco $commandName)"
     $commandText = $commandText -creplace '^(DEPRECATION NOTICE|Usage|Troubleshooting|Examples|Exit Codes|Connecting to Chocolatey.org|See It In Action|Alternative Sources|Resources|Packages.config|Scripting \/ Integration - Best Practices \/ Style Guide)', '## $1'
     $commandText = $commandText -replace '^(Commands|How To Pass Options)', '## $1'
-    $commandText = $commandText -replace '^(WebPI|Windows Features|Ruby|Cygwin|Python)\s*$', '### $1'
+    $commandText = $commandText -replace '^(Windows Features|Ruby|Cygwin|Python)\s*$', '### $1'
     $commandText = $commandText -replace '(?<!\s)NOTE:', '> :choco-info: **NOTE**'
     $commandText = $commandText -replace '\*> :choco-info: \*\*NOTE\*\*\*', '> :choco-info: **NOTE**'
     $commandText = $commandText -replace 'the command reference', '[how to pass arguments](xref:choco-commands#how-to-pass-options-switches)'

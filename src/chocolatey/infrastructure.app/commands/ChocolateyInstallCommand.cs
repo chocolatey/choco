@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             optionSet
                 .Add("s=|source=",
-                     "Source - The source to find the package(s) to install. Special sources include: ruby, webpi, cygwin, windowsfeatures, and python. To specify more than one source, pass it with a semi-colon separating the values (e.g. \"'source1;source2'\"). Defaults to default feeds.",
+                     "Source - The source to find the package(s) to install. Special sources include: ruby, cygwin, windowsfeatures, and python. To specify more than one source, pass it with a semi-colon separating the values (e.g. \"'source1;source2'\"). Defaults to default feeds.",
                      option => configuration.Sources = option.remove_surrounding_quotes())
                 .Add("version=",
                      "Version - A specific version to install. Defaults to unspecified.",
@@ -263,7 +263,6 @@ Side by side installations has been deprecated and will be removed in v2.0.0.
 Instead of using side by side installations, distinct packages should be created
 if similar functionality is needed going forward.
 ");
-            "chocolatey".Log().Warn(WebPiService.DeprecationMessage);
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
@@ -397,13 +396,6 @@ This specifies the source is Ruby Gems and that we are installing a
  gem. If you do not have ruby installed prior to running this command,
  the command will install that first.
  e.g. `choco install compass -source ruby`
-
-WebPI (DEPRECATED)
-This specifies the source is Web PI (Web Platform Installer) and that
- we are installing a WebPI product, such as IISExpress. If you do not
- have the Web PI command line installed, it will install that first and
- then the product requested.
- e.g. `choco install IISExpress --source webpi`
 
 Cygwin
 This specifies the source is Cygwin and that we are installing a cygwin
