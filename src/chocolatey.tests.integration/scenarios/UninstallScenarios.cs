@@ -1527,5 +1527,93 @@ namespace chocolatey.tests.integration.scenarios
                 MockLogger.contains_message("upgradepackage {0} Uninstalled".format_with(NonNormalizedVersion), LogLevel.Info).ShouldBeTrue();
             }
         }
+        
+        public class when_uninstalling_a_package_with_remove_dependencies_with_beforeModify : ScenariosBase
+        {
+            private const string TargetPackageName = "hasdependencywithbeforemodify";
+            private const string DependencyName = "isdependencywithbeforemodify";
+            
+            public override void Context()
+            {
+                base.Context();
+
+                Scenario.add_packages_to_source_location(Configuration, "{0}.*".format_with(TargetPackageName) + NuGetConstants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "{0}.*".format_with(DependencyName) + NuGetConstants.PackageExtension);
+                Scenario.install_package(Configuration, TargetPackageName, "1.0.0");
+                Scenario.install_package(Configuration, DependencyName, "1.0.0");
+
+                Configuration.PackageNames = Configuration.Input = TargetPackageName;
+                Configuration.ForceDependencies = true;
+            }
+
+            public override void Because()
+            {
+                Results = Service.uninstall_run(Configuration);
+            }
+
+            [Fact]
+            public void should_uninstall_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", TargetPackageName, "{0}.nupkg".format_with(TargetPackageName));
+                File.Exists(packageFile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_uninstall_the_dependency()
+            {
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", DependencyName, "{0}.nupkg".format_with(DependencyName));
+                File.Exists(packageFile).ShouldBeFalse();
+            }
+
+            [Fact]
+            public void should_contain_a_message_that_everything_uninstalled_successfully()
+            {
+                MockLogger.contains_message("uninstalled 2/2", LogLevel.Warn).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_run_target_package_beforeModify()
+            {
+                MockLogger.contains_message("Ran BeforeModify: {0} {1}".format_with(TargetPackageName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void should_run_dependency_package_beforeModify()
+            {
+                MockLogger.contains_message("Ran BeforeModify: {0} {1}".format_with(DependencyName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+            }
+
+            [Fact]
+            public void should_have_a_successful_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Success.ShouldBeTrue();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_inconclusive_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Inconclusive.ShouldBeFalse();
+                }
+            }
+
+            [Fact]
+            public void should_not_have_warning_package_result()
+            {
+                foreach (var packageResult in Results)
+                {
+                    packageResult.Value.Warning.ShouldBeFalse();
+                }
+
+            }
+        }
     }
 }

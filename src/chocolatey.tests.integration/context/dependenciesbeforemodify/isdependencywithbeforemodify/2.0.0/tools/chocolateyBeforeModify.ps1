@@ -1,0 +1,1 @@
+﻿Write-Output "Ran BeforeModify: $env:PackageName $env:PackageVersion"

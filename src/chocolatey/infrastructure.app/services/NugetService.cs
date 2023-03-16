@@ -458,6 +458,11 @@ folder.");
 
         public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
+            return install_run(config, continueAction, beforeModifyAction: null);
+        }
+
+        public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
+        {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackagesLocation);
             var packageResultsToReturn = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -757,8 +762,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     if (packageToUninstall != null)
                     {
                         shouldAddForcedResultMessage = true;
-                        remove_rollback_directory_if_exists(packageRemoteMetadata.Identity.Id);
-                        backup_existing_version(config, packageToUninstall.PackageMetadata, _packageInfoService.get_package_information(packageToUninstall.PackageMetadata));
+                        backup_and_before_modify(packageToUninstall, config, beforeModifyAction);
                         packageToUninstall.InstallLocation = pathResolver.GetInstallPath(packageToUninstall.Identity);
                         try
                         {
@@ -1013,7 +1017,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
                     else
                     {
-                        var installResults = install_run(config, continueAction);
+                        var installResults = install_run(config, continueAction, beforeUpgradeAction);
                         foreach (var result in installResults)
                         {
                             packageResultsToReturn.GetOrAdd(result.Key, result.Value);
@@ -1366,21 +1370,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                             try
                             {
-                                remove_rollback_directory_if_exists(packageName);
-
                                 if (packageToUninstall != null)
                                 {
                                     var oldPkgInfo = _packageInfoService.get_package_information(packageToUninstall.PackageMetadata);
 
-                                    if (beforeUpgradeAction != null && packageToUninstall.PackageMetadata != null)
-                                    {
-                                        beforeUpgradeAction(packageToUninstall, config);
-                                    }
-
-                                    ensure_package_files_have_compatible_attributes(config, packageToUninstall.PackageMetadata, oldPkgInfo);
-                                    rename_legacy_package_version(config, packageToUninstall.PackageMetadata, oldPkgInfo);
-                                    backup_existing_version(config, packageToUninstall.PackageMetadata, oldPkgInfo);
-                                    remove_shim_directors(config, packageToUninstall.PackageMetadata, pkgInfo);
+                                    backup_and_before_modify(packageToUninstall, oldPkgInfo, config, beforeUpgradeAction);
 
                                     packageToUninstall.InstallLocation = pathResolver.GetInstallPath(packageToUninstall.Identity);
                                     try
@@ -1812,7 +1806,11 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
             return installDirectory;
         }
 
+        [Obsolete("This overload is obsolete and will be removed in a future version.")]
         public virtual void ensure_package_files_have_compatible_attributes(ChocolateyConfiguration config, IPackageMetadata installedPackage, ChocolateyPackageInformation pkgInfo)
+            => ensure_package_files_have_compatible_attributes(config, installedPackage);
+
+        protected virtual void ensure_package_files_have_compatible_attributes(ChocolateyConfiguration config, IPackageMetadata installedPackage)
         {
             var installDirectory = get_install_directory(config, installedPackage);
             if (!_fileSystem.directory_exists(installDirectory)) return;
@@ -1820,7 +1818,11 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
             _filesService.ensure_compatible_file_attributes(installDirectory, config);
         }
 
+        [Obsolete("This overload is obsolete and will be removed in a future version.")]
         public virtual void rename_legacy_package_version(ChocolateyConfiguration config, IPackageMetadata installedPackage, ChocolateyPackageInformation pkgInfo)
+            => normalize_package_legacy_folder_name(config, installedPackage, pkgInfo);
+
+        protected virtual void normalize_package_legacy_folder_name(ChocolateyConfiguration config, IPackageMetadata installedPackage, ChocolateyPackageInformation pkgInfo)
         {
             if (pkgInfo != null && pkgInfo.IsSideBySide) return;
 
@@ -1840,15 +1842,19 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
 
         }
 
+        [Obsolete("This overload is obsolete and will be removed in a future version.")]
         public virtual void backup_existing_version(ChocolateyConfiguration config, IPackageMetadata installedPackage, ChocolateyPackageInformation packageInfo)
+            => backup_existing_version(config, packageInfo);
+
+        protected virtual void backup_existing_version(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
         {
             _fileSystem.create_directory_if_not_exists(ApplicationParameters.PackageBackupLocation);
 
-            var pkgInstallPath = get_install_directory(config, installedPackage);
+            var pkgInstallPath = get_install_directory(config, packageInfo.Package);
 
             if (_fileSystem.directory_exists(pkgInstallPath))
             {
-                this.Log().Debug("Backing up existing {0} prior to operation.".format_with(installedPackage.Id));
+                this.Log().Debug("Backing up existing {0} prior to operation.".format_with(packageInfo.Package.Id));
 
                 var backupLocation = pkgInstallPath.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
 
@@ -1965,7 +1971,7 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
         /// <param name="config">The configuration.</param>
         /// <param name="installedPackage">The installed package.</param>
         /// <param name="pkgInfo">The package information.</param>
-        private void remove_shim_directors(ChocolateyConfiguration config, IPackageMetadata installedPackage, ChocolateyPackageInformation pkgInfo)
+        private void remove_shim_directors(ChocolateyConfiguration config, IPackageMetadata installedPackage)
         {
             var pkgInstallPath = get_install_directory(config, installedPackage);
 
@@ -2206,7 +2212,6 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
                     var pathResolver = NugetCommon.GetPathResolver(config, _fileSystem);
                     var nugetProject = new FolderNuGetProject(ApplicationParameters.PackagesLocation, pathResolver, NuGetFramework.AnyFramework);
 
-
                     var pkgInfo = _packageInfoService.get_package_information(installedPackage.PackageMetadata);
                     if (pkgInfo != null && pkgInfo.IsPinned)
                     {
@@ -2236,21 +2241,10 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
 
                         foreach (var packageToUninstall in packagesToUninstall)
                         {
-                            if (beforeUninstallAction != null)
-                            {
-                                // guessing this is not added so that it doesn't fail the action if an error is recorded?
-                                //var currentPackageResult = packageUninstalls.GetOrAdd(packageName, new PackageResult(packageVersion, get_install_directory(config, packageVersion)));
-                                beforeUninstallAction(packageToUninstall, config);
-                            }
-
-                            var uninstallPkgInfo = _packageInfoService.get_package_information(packageToUninstall.PackageMetadata);
-
                             try
                             {
-                                ensure_package_files_have_compatible_attributes(config, packageToUninstall.PackageMetadata, uninstallPkgInfo);
-                                rename_legacy_package_version(config, packageToUninstall.PackageMetadata, uninstallPkgInfo);
-                                remove_rollback_directory_if_exists(packageName);
-                                backup_existing_version(config, packageToUninstall.PackageMetadata, uninstallPkgInfo);
+                                var uninstallPkgInfo = _packageInfoService.get_package_information(packageToUninstall.PackageMetadata);
+                                backup_and_before_modify(packageToUninstall, uninstallPkgInfo, config, beforeUninstallAction);
 
                                 var packageResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name + "." + packageToUninstall.Version.to_string(), packageToUninstall);
                                 packageResult.InstallLocation = packageToUninstall.InstallLocation;
@@ -2313,6 +2307,76 @@ Side by side installations are deprecated and is pending removal in v2.0.0".form
             config.reset_config(removeBackup: true);
 
             return packageResultsToReturn;
+        }
+
+        /// <summary>
+        /// This method should be called before any modifications are made to a package.
+        /// Typically this should be called before doing an uninstall of an existing package
+        /// or package dependency during an install, upgrade, or uninstall operation.
+        /// </summary>
+        /// <param name="packageResult">The package currently being modified.</param>
+        /// <param name="config">The current configuration.</param>
+        /// <param name="beforeModifyAction">Any action to run before performing backup operations. Typically this is an invocation of the chocolateyBeforeModify script.</param>
+        protected void backup_and_before_modify(
+            PackageResult packageResult,
+            ChocolateyConfiguration config,
+            Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
+        {
+            var packageInformation = _packageInfoService.get_package_information(packageResult.PackageMetadata);
+            backup_and_before_modify(packageResult, packageInformation, config, beforeModifyAction);
+        }
+
+        /// <summary>
+        /// This method should be called before any modifications are made to a package.
+        /// Typically this should be called before doing an uninstall of an existing package
+        /// or package dependency during an install, upgrade, or uninstall operation.
+        /// </summary>
+        /// <param name="packageResult">The package currently being modified.</param>
+        /// <param name="packageInformation">The package information for the package being modified.</param>
+        /// <param name="config">The current configuration.</param>
+        /// <param name="beforeModifyAction">Any action to run before performing backup operations. Typically this is an invocation of the chocolateyBeforeModify script.</param>
+        protected virtual void backup_and_before_modify(
+            PackageResult packageResult,
+            ChocolateyPackageInformation packageInformation,
+            ChocolateyConfiguration config,
+            Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
+        {
+            try
+            {
+                if (packageResult.InstallLocation != null)
+                {
+                    // If this is an already installed package we're modifying, ensure we run its beforeModify script and back it up properly.
+                    if (beforeModifyAction != null)
+                    {
+                        "chocolatey".Log().Debug("Running beforeModify step for '{0}'", packageResult.PackageMetadata.Id);
+                        beforeModifyAction(packageResult, config);
+                    }
+
+                    "chocolatey".Log().Debug("Backing up package files for '{0}'", packageResult.PackageMetadata.Id);
+
+                    backup_existing_package_files(config, packageResult.PackageMetadata, packageInformation);
+                }
+            }
+            catch (Exception error)
+            {
+                "chocolatey".Log().Error("Failed to run backup or beforeModify steps for package '{0}': {1}", packageResult.PackageMetadata.Id, error.Message);
+                "chocolatey".Log().Trace(error.StackTrace);
+            }
+        }
+
+        /// <summary>
+        /// Takes a backup of the existing package files.
+        /// </summary>
+        /// <param name="config">The current configuration settings</param>
+        /// <param name="package">The metadata for the package to backup</param>
+        /// <param name="packageInformation">The package information to backup</param>
+        protected void backup_existing_package_files(ChocolateyConfiguration config, IPackageMetadata package, ChocolateyPackageInformation packageInformation)
+        {
+            remove_rollback_directory_if_exists(package.Id);
+            ensure_package_files_have_compatible_attributes(config, package);
+            normalize_package_legacy_folder_name(config, package, packageInformation);
+            backup_existing_version(config, packageInformation);
+            remove_shim_directors(config, package);
         }
 
         /// <summary>
