@@ -1,6 +1,6 @@
 <!-- TOC -->
 
-- [Committers & Contributors](#committers--contributors)
+- [Committers \& Contributors](#committers--contributors)
   - [Committers](#committers)
   - [Chocolatey Community Team](#chocolatey-community-team)
   - [Contributors](#contributors)
@@ -11,11 +11,13 @@
   - [Checksum @ 0.2.0](#checksum--020)
   - [log4net @ 2.0.12](#log4net--2012)
   - [Microsoft.Web.Xdt @ 2.1.1](#microsoftwebxdt--211)
-  - [NuGet.Client @ 3.0.0-alpha-20230123-128 (modified)](#nugetclient--300alpha20230123128-modified)
+  - [NuGet.Client @ 3.0.0-alpha-20230123-128 (modified)](#nugetclient--300-alpha-20230123-128-modified)
   - [Rhino.Licensing @ 1.4.1 (modified)](#rhinolicensing--141-modified)
-  - [Rx (Reactive Extensions) @ 2.1.30214.0](#rx-reactive-extensions--21302140)
   - [Shim Generator (shimgen) @ 1.0.0](#shim-generator-shimgen--100)
   - [SimpleInjector @ 2.8.3](#simpleinjector--283)
+  - [System.Reactive @ 5.0.0](#systemreactive--500)
+  - [System.Runtime.CompilerServices.Unsafe @ 4.5.3](#systemruntimecompilerservicesunsafe--453)
+  - [System.Threading.Tasks.Extensions @ 4.5.4](#systemthreadingtasksextensions--454)
 
 <!-- /TOC -->
 
@@ -69,17 +71,6 @@ We would like to credit other super sweet tools/frameworks that aid in the devel
 
 Chocolatey CLI (choco) uses a number of 3rd-party components.
 Their details are below.
-
-- [7-Zip @ 21.07](#7-zip--2107)
-- [AlphaFS @ 2.1.3](#alphafs--213)
-- [Checksum @ 0.2.0](#checksum--020)
-- [log4net @ 2.0.12](#log4net--2012)
-- [Microsoft.Web.Xdt @ 2.1.1](#microsoftwebxdt--211)
-- [NuGet.Client @ 3.0.0-alpha-20230123-128 (modified)](#nugetclient--300alpha20230123128-modified)
-- [Rhino.Licensing @ 1.4.1 (modified)](#rhinolicensing--141-modified)
-- [Rx (Reactive Extensions) @ 2.1.30214.0](#rx-reactive-extensions--21302140)
-- [Shim Generator (shimgen) @ 1.0.0](#shim-generator-shimgen--100)
-- [SimpleInjector @ 2.8.3](#simpleinjector--283)
 
 ### 7-Zip @ 21.07
 
@@ -741,28 +732,6 @@ Chocolatey uses [Rhino.Licensing](https://github.com/ayende/rhino-licensing) [(m
   THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ```
 
-### Rx (Reactive Extensions) @ 2.1.30214.0
-
-Chocolatey uses [Rx](http://reactivex.io/) for schedules and internal messaging.
-[License terms](https://github.com/Reactive-Extensions/Rx.NET/blob/5003248b99f8bf4afc2d4f7570b5789cedda9155/LICENSE):
-
-```txt
-  Copyright (c) .NET Foundation and Contributors
-  All Rights Reserved
-
-  Licensed under the Apache License, Version 2.0 (the "License"); you
-  may not use this file except in compliance with the License. You may
-  obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-  implied. See the License for the specific language governing permissions
-  and limitations under the License.
-```
-
 ### Shim Generator (shimgen) @ 1.0.0
 
 Chocolatey uses [shimgen](https://github.com/chocolatey/shimgen) to generate shim executables that call the original binaries.
@@ -856,4 +825,97 @@ Chocolatey uses [SimpleInjector](https://simpleinjector.org/) for IoC containers
   THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
   CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
   DEALINGS IN THE SOFTWARE.
+```
+
+### System.Reactive @ 5.0.0
+
+Chocolatey uses [System.Reactive](https://github.com/dotnet/reactive) for schedules and internal messaging.
+[License terms](https://github.com/dotnet/reactive/blob/47d0f7918408bb7d9e69a19b4da4992b1173bdb1/LICENSE):
+
+```txt
+The MIT License (MIT)
+
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### System.Runtime.CompilerServices.Unsafe @ 4.5.3
+
+This is a dependency of System.Threading.Tasks.Extensions.
+[Licensed terms](https://github.com/dotnet/runtime/blob/5bdc36e1d956fc39cd768b6cf59ac4b4bf5f56a5/LICENSE.TXT):
+
+```txt
+The MIT License (MIT)
+
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### System.Threading.Tasks.Extensions @ 4.5.4
+
+This is a dependency of System.Reactive.
+[Licensed terms](https://github.com/dotnet/runtime/blob/5bdc36e1d956fc39cd768b6cf59ac4b4bf5f56a5/LICENSE.TXT):
+
+```txt
+The MIT License (MIT)
+
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
