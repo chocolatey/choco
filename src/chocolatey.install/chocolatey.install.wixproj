@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Setup" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\tools\WiX.3.11.2\build\wix.props" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProjectGuid>{6B96B4AE-8FD2-4719-AAFB-BA027B798089}</ProjectGuid>
+    <SchemaVersion>2.0</SchemaVersion>
+    <Stable Condition=" '$(Stable)' == '' ">False</Stable>
+    <OutputName>Overwritten-By-ReadVersion</OutputName>
+    <OutputType>Package</OutputType>
+    <SuppressPdbOutput>true</SuppressPdbOutput>
+    <SetMsiAssemblyNameFileVersion>True</SetMsiAssemblyNameFileVersion>
+    <DefineSolutionProperties>false</DefineSolutionProperties>
+    <SuppressSpecificWarnings>1076</SuppressSpecificWarnings>
+    <Cultures>en-US</Cultures>
+  </PropertyGroup>
+  <Target Name="Setup">
+    <CallTarget Targets="SetConstants" />
+    <CallTarget Targets="Build" />
+  </Target>
+  <Target Name="ReadVersion">
+    <!-- Read the version from the compiled .exe -->
+    <GetAssemblyIdentity AssemblyFiles="..\..\code_drop\temp\_PublishedApps\choco_merged\choco.exe">
+      <Output TaskParameter="Assemblies" ItemName="AsmInfo" />
+    </GetAssemblyIdentity>
+
+    <!-- Create the MSBuild property $(VersionNumber) -->
+    <CreateProperty Value="%(AsmInfo.Version)">
+      <Output TaskParameter="Value" PropertyName="VersionNumber" />
+    </CreateProperty>
+
+    <!-- Create the WiX preprocessor variable $(var.VersionNumber) -->
+    <CreateProperty Value="$(DefineConstants);VersionNumber=$(VersionNumber)">
+      <Output TaskParameter="Value" PropertyName="DefineConstants" />
+    </CreateProperty>
+
+    <!-- Update the MSBuild properties $(TargetName), etc. -->
+    <CreateProperty Value="$(SolutionName)-$(VersionNumber)">
+      <Output TaskParameter="Value" PropertyName="TargetName" />
+    </CreateProperty>
+    <CreateProperty Value="$(TargetName)$(TargetExt)">
+      <Output TaskParameter="Value" PropertyName="TargetFileName" />
+    </CreateProperty>
+    <CreateProperty Value="$(TargetName)$(TargetPdbExt)">
+      <Output TaskParameter="Value" PropertyName="TargetPdbName" />
+    </CreateProperty>
+    <CreateProperty Value="$(TargetDir)$(TargetFileName)">
+      <Output TaskParameter="Value" PropertyName="TargetPath" />
+    </CreateProperty>
+    <CreateProperty Value="$(TargetPdbDir)$(TargetPdbName)">
+      <Output TaskParameter="Value" PropertyName="TargetPdbPath" />
+    </CreateProperty>
+
+    <!-- Find the packaged NUPKG, to pass in -->
+    <PropertyGroup>
+      <NupkgSearchPath>$(ProjectDir)\..\..\code_drop\Packages\Chocolatey</NupkgSearchPath>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <MyFiles Include="$(ProjectDir)\..\..\code_drop\Packages\Chocolatey\chocolatey.*.nupkg" />
+    </ItemGroup>
+
+    <FindUnderPath Path="$(NupkgSearchPath)" Files="@(MyFiles)" UpdateToAbsolutePaths="true">
+      <Output TaskParameter="InPath" ItemName="NupkgFileFound" />
+    </FindUnderPath>
+
+    <CreateProperty Value="@(NupkgFileFound)">
+      <Output TaskParameter="Value" PropertyName="NUPKG" />
+    </CreateProperty>
+
+    <!-- Update the MSBuild property from which candle.exe args are derived -->
+    <CreateProperty
+      Value="
+      Configuration=$(ConfigurationName);
+      OutDir=$(OutDir);
+      OutputName=Chocolatey-$(VersionNumber);
+      Platform=$(PlatformName);
+      ProjectDir=$(ProjectDir);
+      ProjectExt=$(ProjectExt);
+      ProjectFileName=$(ProjectFileName);
+      ProjectName=$(ProjectName);
+      ProjectPath=$(ProjectPath);
+      TargetDir=$(TargetDir);
+      TargetExt=$(TargetExt);
+      TargetFileName=$(TargetFileName);
+      TargetName=$(TargetName);
+      TargetPath=$(TargetPath);
+      NUPKG=$(NUPKG);
+    ">
+      <Output TaskParameter="Value" PropertyName="ProjectDefineConstants" />
+    </CreateProperty>
+  </Target>
+  <Target Name="SetConstants">
+    <CreateProperty Value="@(WixConstant->'%(Identity)=%(Value)')">
+      <Output TaskParameter="Value" PropertyName="CommonWixConstants" />
+    </CreateProperty>
+    <CreateProperty Value="Debug;$(CommonWixConstants)" Condition=" '$(Configuration)' == 'Debug' ">
+      <Output TaskParameter="Value" PropertyName="DefineConstants" />
+    </CreateProperty>
+    <CreateProperty Value="$(CommonWixConstants)" Condition=" '$(Configuration)' == 'Release' ">
+      <Output TaskParameter="Value" PropertyName="DefineConstants" />
+    </CreateProperty>
+  </Target>
+  <PropertyGroup>
+    <OutputPath Condition=" '$(OutputPath)' == '' ">..\..\code_drop\MSIs\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="NetFx48.wxs" />
+    <Compile Include="chocolatey.wxs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="*.wxl" />
+  </ItemGroup>
+  <ItemGroup>
+    <WixExtension Include="WixUIExtension">
+      <HintPath>$(WixExtDir)WixUIExtension.dll</HintPath>
+      <Name>WixUIExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixNetFxExtension">
+      <HintPath>$(WixExtDir)WixNetFxExtension.dll</HintPath>
+      <Name>WixNetFxExtension</Name>
+    </WixExtension>
+    <WixExtension Include="WixUtilExtension">
+      <HintPath>$(WixExtDir)WixUtilExtension.dll</HintPath>
+      <Name>WixUtilExtension</Name>
+    </WixExtension>
+  </ItemGroup>
+  <Import Project="$(WixTargetsPath)" />
+  <PropertyGroup>
+    <BuildDependsOn>ReadVersion;$(BuildDependsOn)</BuildDependsOn>
+  </PropertyGroup>
+</Project>

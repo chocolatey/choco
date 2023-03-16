@@ -52,3 +52,4 @@ tools/**
 !tools/Modules/packages.config
 BuildArtifacts/
 code_drop/
+src/chocolatey.install/assets/Install.ps1

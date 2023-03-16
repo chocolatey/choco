@@ -125,6 +125,19 @@ Func<FilePathCollection> getFilesToSign = () =>
     return filesToSign;
 };
 
+Func<FilePathCollection> getMsisToSign = () =>
+{
+    var msisToSign = GetFiles(BuildParameters.Paths.Directories.Build + "/MSIs/**/*.msi");
+
+    Information("The following msi's have been selected to be signed...");
+    foreach (var msiToSign in msisToSign)
+    {
+        Information(msiToSign.FullPath);
+    }
+
+    return msisToSign;
+};
+
 ///////////////////////////////////////////////////////////////////////////////
 // CUSTOM TASKS
 ///////////////////////////////////////////////////////////////////////////////
@@ -299,6 +312,26 @@ Task("Prepare-NuGet-Packages")
     CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.xml", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/net48/chocolatey.xml");
 });
 
+Task("Prepare-MSI")
+    .WithCriteria(() => BuildParameters.ShouldBuildMsi, "Skipping because creation of MSI has been disabled")
+    .WithCriteria(() => BuildParameters.IsTagged, "Skipping because build is not tagged")
+    .IsDependeeOf("Build-MSI")
+    .Does(() =>
+{
+    var installScriptPath = BuildParameters.RootDirectoryPath + "/src/chocolatey.install/assets/Install.ps1";
+
+    if (!FileExists(installScriptPath)) 
+    {
+        DownloadFile(
+            "https://community.chocolatey.org/install.ps1",
+            installScriptPath
+        );
+    }
+});
+
+BuildParameters.Tasks.BuildMsiTask
+    .WithCriteria(() => BuildParameters.IsTagged, "Skipping because build is not tagged");
+
 Task("Create-TarGz-Packages")
     .IsDependentOn("Build")
     .IsDependeeOf("Package")
@@ -352,8 +385,12 @@ BuildParameters.SetParameters(context: Context,
                             treatWarningsAsErrors: false,
                             getScriptsToSign: getScriptsToSign,
                             getFilesToSign: getFilesToSign,
+                            getMsisToSign: getMsisToSign,
                             getILMergeConfigs: getILMergeConfigs,
                             preferDotNetGlobalToolUsage: !IsRunningOnWindows(),
+                            shouldBuildMsi: true,
+                            msiUsedWithinNupkg: false,
+                            shouldAuthenticodeSignMsis: true,
                             shouldRunNuGet: IsRunningOnWindows(),
                             shouldAuthenticodeSignPowerShellScripts: IsRunningOnWindows(),
                             shouldPublishAwsLambdas: false,
