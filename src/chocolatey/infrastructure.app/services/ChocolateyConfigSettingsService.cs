@@ -365,10 +365,17 @@ namespace chocolatey.infrastructure.app.services
 
         public void config_list(ChocolateyConfiguration configuration)
         {
-            this.Log().Info(ChocolateyLoggers.Important, "Settings");
             foreach (var config in configFileSettings.ConfigSettings)
             {
-                this.Log().Info(() => "{0} = {1} | {2}".format_with(config.Key, config.Value, config.Description));
+                if (configuration.RegularOutput)
+                {
+                    this.Log().Info(() => "{0} = {1} | {2}".format_with(config.Key, config.Value, config.Description));
+
+                }
+                else
+                {
+                    this.Log().Info(() => "{0}|{1}|{2}".format_with(config.Key, config.Value, config.Description));
+                }
             }
         }
 
