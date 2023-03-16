@@ -1,4 +1,4 @@
-#load nuget:?package=Chocolatey.Cake.Recipe&version=0.20.1
+#load nuget:?package=Chocolatey.Cake.Recipe&version=0.21.0
 
 ///////////////////////////////////////////////////////////////////////////////
 // TOOLS
@@ -299,6 +299,37 @@ Task("Prepare-NuGet-Packages")
     CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.xml", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/net48/chocolatey.xml");
 });
 
+Task("Create-TarGz-Packages")
+    .IsDependentOn("Build")
+    .IsDependeeOf("Package")
+    .WithCriteria(!IsRunningOnWindows(), "Skipping because this is a Windows build")
+    .Does(() =>
+{
+    EnsureDirectoryExists(BuildParameters.Paths.Directories.ChocolateyPackages);
+
+    var outputFile = string.Format(
+        "{0}/chocolatey.v{1}.tar.gz",
+        MakeAbsolute(new DirectoryPath(BuildParameters.Paths.Directories.ChocolateyPackages.FullPath)),
+        BuildParameters.Version.SemVersion
+    );
+
+    StartProcess(
+        "tar",
+        new ProcessSettings {
+            Arguments = string.Format(
+                "-czvf {0} .",
+                outputFile
+            ),
+            WorkingDirectory = BuildParameters.Paths.Directories.PublishedApplications.FullPath + "/choco/"
+        }
+    );
+
+    if (FileExists(outputFile))
+    {
+        BuildParameters.BuildProvider.UploadArtifact(outputFile);
+    }
+});
+
 ///////////////////////////////////////////////////////////////////////////////
 // RECIPE SCRIPT
 ///////////////////////////////////////////////////////////////////////////////
@@ -324,6 +355,7 @@ BuildParameters.SetParameters(context: Context,
                             getILMergeConfigs: getILMergeConfigs,
                             preferDotNetGlobalToolUsage: !IsRunningOnWindows(),
                             shouldRunNuGet: IsRunningOnWindows(),
+                            shouldAuthenticodeSignPowerShellScripts: IsRunningOnWindows(),
                             shouldPublishAwsLambdas: false,
                             chocolateyNupkgGlobbingPattern: "/**/chocolatey[!-no7zip]*.nupkg");
 

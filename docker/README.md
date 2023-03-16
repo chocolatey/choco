@@ -10,7 +10,6 @@ To build the Windows image yourself, follow these steps:
 1. Either build choco on the host or put a pre-built chocolatey `.nupkg` in `.\code_drop\Packages\Chocolatey`.
     * See the README at the root of the repository for instructions on how to build choco.
 1. Run the docker build command. `docker build -t choco:latest-windows -f docker/Dockerfile.windows .` (the trailing . is important)
-    * To change the version of the servercore image used, add the argument `--build-arg tagversion=servercore-tag`
     * To build a official version, put an official `.nupkg` in `.\code_drop\Packages\Chocolatey` and change the image name to `chocolatey/choco:latest-windows`
     * If you get messages similar to "Can't add file x to tar: archive/tar: missed writing 794 bytes", make sure Visual Studio is closed.
 1. Run your new image using the command `docker run -ti --rm choco:latest-windows cmd.exe`
