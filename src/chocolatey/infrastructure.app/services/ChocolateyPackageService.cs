@@ -513,10 +513,6 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
         protected virtual ChocolateyPackageInformation get_package_information(PackageResult packageResult, ChocolateyConfiguration config)
         {
             var pkgInfo = _packageInfoService.get_package_information(packageResult.PackageMetadata);
-            if (config.AllowMultipleVersions)
-            {
-                pkgInfo.IsSideBySide = true;
-            }
 
             return pkgInfo;
         }
@@ -547,7 +543,6 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
             if (config.ApplyPackageParametersToDependencies) arguments.Append(" --apply-package-parameters-to-dependencies");
 
             if (config.AllowDowngrade) arguments.Append(" --allow-downgrade");
-            if (config.AllowMultipleVersions) arguments.Append(" --allow-multiple-versions");
 
             // most times folks won't want to skip automation scripts on upgrade
             //if (config.SkipPackageInstallProvider) arguments.Append(" --skip-automation-scripts");
@@ -580,11 +575,6 @@ package '{0}' - stopping further execution".format_with(packageResult.Name));
         public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
         {
             validate_package_names(config);
-
-            if (config.AllowMultipleVersions)
-            {
-                this.Log().Warn(ChocolateyLoggers.Important, "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0.");
-            }
 
             this.Log().Info(is_packages_config_file(config.PackageNames) ? @"Installing from config file:" : @"Installing the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));
@@ -746,7 +736,6 @@ Would have determined packages that are out of date based on what is
                     packageConfig.InstallArguments = string.IsNullOrWhiteSpace(pkgSettings.InstallArguments) ? packageConfig.InstallArguments : pkgSettings.InstallArguments;
                     packageConfig.PackageParameters = string.IsNullOrWhiteSpace(pkgSettings.PackageParameters) ? packageConfig.PackageParameters : pkgSettings.PackageParameters;
                     if (pkgSettings.ForceX86) packageConfig.ForceX86 = true;
-                    if (pkgSettings.AllowMultipleVersions) packageConfig.AllowMultipleVersions = true;
                     if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
                     if (pkgSettings.ApplyInstallArgumentsToDependencies) packageConfig.ApplyInstallArgumentsToDependencies = true;
                     if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
@@ -830,11 +819,6 @@ Would have determined packages that are out of date based on what is
         public virtual ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
         {
             validate_package_names(config);
-
-            if (config.AllowMultipleVersions)
-            {
-                this.Log().Warn(ChocolateyLoggers.Important, "Upgrading the same package with multiple versions is deprecated and will be removed in v2.0.0.");
-            }
 
             this.Log().Info(@"Upgrading the following packages:");
             this.Log().Info(ChocolateyLoggers.Important, @"{0}".format_with(config.PackageNames));

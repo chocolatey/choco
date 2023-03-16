@@ -208,15 +208,6 @@ namespace chocolatey.tests
             }
         }
 
-        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
-        public sealed class SideBySideAttribute : CategoryAttribute
-        {
-            public SideBySideAttribute()
-                : base("Side-by-Side")
-            {
-            }
-        }
-
         /// <summary>
         /// Attribute used to define a test class or method as belonging to source priorities.
         /// </summary>

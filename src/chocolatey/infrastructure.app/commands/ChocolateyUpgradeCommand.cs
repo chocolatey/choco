@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,21 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor("upgrade", "upgrades packages from various sources")]
-    public class ChocolateyUpgradeCommand : ICommand
+    public class ChocolateyUpgradeCommand : ChocolateyCommandBase, ICommand
     {
         private readonly IChocolateyPackageService _packageService;
+
+        private readonly string[] _removedOptions = new[]
+        {
+            "-m",
+            "-sxs",
+            "--sidebyside",
+            "--side-by-side",
+            "--allowmultiple",
+            "--allow-multiple",
+            "--allowmultipleversions",
+            "--allow-multiple-versions",
+        };
 
         public ChocolateyUpgradeCommand(IChocolateyPackageService packageService)
         {
@@ -72,9 +84,6 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("allowdowngrade|allow-downgrade",
                      "AllowDowngrade - Should an attempt at downgrading be allowed? Defaults to false.",
                      option => configuration.AllowDowngrade = option != null)
-                .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
-                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false. (DEPRECATED)",
-                     option => configuration.AllowMultipleVersions = option != null)
                 .Add("i|ignoredependencies|ignore-dependencies",
                      "IgnoreDependencies - Ignore dependencies when upgrading package(s). Defaults to false.",
                      option => configuration.IgnoreDependencies = option != null)
@@ -233,6 +242,11 @@ namespace chocolatey.infrastructure.app.commands
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments.Where(arg => !arg.StartsWith("-")));
+
+            if (configuration.RegularOutput)
+            {
+                warn_for_removed_options(unparsedArguments.Where(arg => arg.StartsWith("-")), _removedOptions);
+            }
         }
 
         public virtual void handle_validation(ChocolateyConfiguration configuration)

@@ -30,64 +30,27 @@ namespace chocolatey.infrastructure.app.nuget
     public sealed class ChocolateyPackagePathResolver : PackagePathResolver
     {
         public string RootDirectory { get; set; }
-        public new bool UseSideBySidePaths { get; set; }
         private IFileSystem _filesystem;
 
-        public ChocolateyPackagePathResolver(string rootDirectory, IFileSystem filesystem, bool useSideBySidePaths)
-            : base(rootDirectory, useSideBySidePaths)
+        public ChocolateyPackagePathResolver(string rootDirectory, IFileSystem filesystem)
+             : base(rootDirectory, useSideBySidePaths: false)
         {
             RootDirectory = rootDirectory;
-            UseSideBySidePaths = useSideBySidePaths;
             _filesystem = filesystem;
         }
 
         public override string GetInstallPath(PackageIdentity packageIdentity)
-        {
-            if (UseSideBySidePaths)
-            {
-                return Path.Combine(RootDirectory, GetPackageDirectory(packageIdentity, useVersionInPath: true));
-            }
-            else
-            {
-                var packageVersionPath = Path.Combine(RootDirectory, GetPackageDirectory(packageIdentity, useVersionInPath: true));
-                if (_filesystem.directory_exists(packageVersionPath)) return packageVersionPath;
+            => GetInstallPath(packageIdentity.Id);
 
+        public string GetInstallPath(string packageId)
+            => _filesystem.combine_paths(RootDirectory, packageId);
 
-                return Path.Combine(RootDirectory, GetPackageDirectory(packageIdentity, false));
-            }
-        }
-
+        [Obsolete("This overload will be removed in a future version.")]
         public string GetInstallPath(string id, NuGetVersion version)
-        {
-            return GetInstallPath(new PackageIdentity(id, version));
-        }
-
-        [Obsolete("Side by Side installations are deprecated, and is pending removal in v2.0.0")]
-        public override string GetPackageDirectoryName(PackageIdentity packageIdentity)
-        {
-            return GetPackageDirectory(packageIdentity, UseSideBySidePaths);
-        }
-
-        public string GetPackageDirectory(PackageIdentity packageIdentity, bool useVersionInPath)
-        {
-            string directory = packageIdentity.Id;
-            if (useVersionInPath)
-            {
-                directory += "." + packageIdentity.Version.to_string();
-            }
-
-            return directory;
-        }
+            => GetInstallPath(id);
 
         public override string GetPackageFileName(PackageIdentity packageIdentity)
-        {
-            string fileNameBase = packageIdentity.Id;
-            if (UseSideBySidePaths)
-            {
-                fileNameBase += "." + packageIdentity.Version.to_string();
-            }
-            return fileNameBase + NuGetConstants.PackageExtension;
-        }
+            => packageIdentity.Id + NuGetConstants.PackageExtension;
     }
 
     // ReSharper restore InconsistentNaming

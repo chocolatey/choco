@@ -50,9 +50,6 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "forceX86")]
         public bool ForceX86 { get; set; }
 
-        [XmlAttribute(AttributeName = "allowMultipleVersions")]
-        public bool AllowMultipleVersions { get; set; }
-
         [XmlAttribute(AttributeName = "ignoreDependencies")]
         public bool IgnoreDependencies { get; set; }
 
