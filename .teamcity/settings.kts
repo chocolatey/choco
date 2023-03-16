@@ -153,7 +153,6 @@ object ChocolateyPosix : BuildType({
     }
 
     artifactRules = """
-        code_drop/Packages/Chocolatey/chocolatey.*.tar.gz
     """.trimIndent()
 
     steps {
@@ -182,7 +181,7 @@ object ChocolateyPosix : BuildType({
         script {
             name = "Build Chocolatey"
             scriptContent = """
-                ./build.official.sh
+                ./build.official.sh --verbosity=diagnostic
             """.trimIndent()
         }
 
