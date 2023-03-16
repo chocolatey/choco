@@ -370,26 +370,6 @@ namespace chocolatey.infrastructure.app.services
             {
                 this.Log().Info(() => "{0} = {1} | {2}".format_with(config.Key, config.Value, config.Description));
             }
-
-            this.Log().Info("");
-            this.Log().Info(ChocolateyLoggers.Important, "Sources");
-            this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-            this.Log().Warn(ChocolateyConfigCommand.DeprecatedConfigListResultsMessage);
-            source_list(configuration);
-            this.Log().Info("");
-            this.Log().Info(@"NOTE: Use choco source to interact with sources.");
-            this.Log().Info("");
-            this.Log().Info(ChocolateyLoggers.Important, "Features");
-            this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-            this.Log().Warn(ChocolateyConfigCommand.DeprecatedConfigListResultsMessage);
-            feature_list(configuration);
-            this.Log().Info("");
-            this.Log().Info(@"NOTE: Use choco feature to interact with features.");
-            ;
-            this.Log().Info("");
-            this.Log().Info(ChocolateyLoggers.Important, "API Keys");
-            this.Log().Info(@"NOTE: Api Keys are not shown through this command.
- Use choco apikey to interact with API keys.");
         }
 
         public void config_get(ChocolateyConfiguration configuration)
