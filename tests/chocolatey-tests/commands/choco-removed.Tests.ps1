@@ -71,7 +71,7 @@ exit $command.Count
         }
 
         It 'Reports missing API key' {
-            $Output.Lines | Should -Contain "An ApiKey was not found for 'https://push.chocolatey.org/'. You must either set an api key in the configuration or specify one with --api-key."
+            $Output.Lines | Should -Contain "An API key was not found for 'https://push.chocolatey.org/'. You must either set an API key with the apikey command or specify one with --api-key."
         }
     }
 
@@ -111,6 +111,20 @@ exit $command.Count
 
         It "Reports that the path for the source could not be resolved" {
             $Output.String | Should -Match "The path '[^'].*webpi' for the selected source could not be resolved."
+        }
+    }
+
+    Context 'Ensure apikey --remove removed from Chocolatey' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.999.999')) -Tag ApiKeyCommand {
+        BeforeAll {
+            $Output = Invoke-Choco apikey --remove -s "https://test.com/api/v2"
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Reports that the command doesn't exist" {
+            $Output.Lines | Should -Contain "Unknown command --remove. Setting to list."
         }
     }
 }

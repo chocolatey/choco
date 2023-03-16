@@ -3,9 +3,9 @@ You can just call me choco.
 
 ![Chocolatey Logo](https://rawcdn.githack.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
 
-[![](https://img.shields.io/chocolatey/dt/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey) 
-[![](https://img.shields.io/chocolatey/v/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey) 
-[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/chocolatey/choco?label=docker&logo=docker&sort=semver)](https://hub.docker.com/r/chocolatey/choco) 
+[![](https://img.shields.io/chocolatey/dt/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey)
+[![](https://img.shields.io/chocolatey/v/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey)
+[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/chocolatey/choco?label=docker&logo=docker&sort=semver)](https://hub.docker.com/r/chocolatey/choco)
 [![Project Stats](https://www.openhub.net/p/chocolatey/widgets/project_thin_badge.gif)](https://www.openhub.net/p/chocolatey)
 [![Coverage Status](https://coveralls.io/repos/github/chocolatey/choco/badge.svg?branch=develop)](https://coveralls.io/github/chocolatey/choco?branch=develop)
 
@@ -108,7 +108,7 @@ Prerequisites:
 Submitting a ticket:
 
  * We'll need debug and verbose output, so please run and capture the log with `-dv` or `--debug --verbose`. You can submit that with the issue or create a gist and link it.
- * **Please note** that the debug/verbose output for some commands may have sensitive data (passwords or apiKeys) related to Chocolatey, so please remove those if they are there prior to submitting the issue.
+ * **Please note** that the debug/verbose output for some commands may have sensitive data (passwords or API keys) related to Chocolatey, so please remove those if they are there prior to submitting the issue.
  * choco.exe logs to a file in `$env:ChocolateyInstall\log\`. You can grab the specific log output from there so you don't have to capture or redirect screen output. Please limit the amount included to just the command run (the log is appended to with every command).
  * Please save the log output in a [gist](https://gist.github.com) (save the file as `log.sh`) and link to the gist from the issue. Feel free to create it as secret so it doesn't fill up against your public gists. Anyone with a direct link can still get to secret gists. If you accidentally include secret information in your gist, please delete it and create a new one (gist history can be seen by anyone) and update the link in the ticket (issue history is not retained except by email - deleting the gist ensures that no one can get to it). Using gists this way also keeps accidental secrets from being shared in the ticket in the first place as well.
  * We'll need the entire log output from the run, so please don't limit it down to areas you feel are relevant. You may miss some important details we'll need to know. This will help expedite issue triage.
@@ -150,8 +150,8 @@ Running the build on Windows should produce an artifact that is tested and ready
  * If building from Git, then having Git 2.22+ installed is required.
  * MonoDevelop is helpful for working on source.
 
-##### Before building: 
- 
+##### Before building:
+
  * Consider adding the following to your `~/.profile` (or other relevant dot source file):
 
 ```sh

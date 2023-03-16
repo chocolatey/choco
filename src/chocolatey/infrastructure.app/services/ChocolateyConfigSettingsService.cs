@@ -331,7 +331,7 @@ namespace chocolatey.infrastructure.app.services
 
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                this.Log().Info(() => "Added ApiKey for {0}".format_with(configuration.Sources));
+                this.Log().Info(() => "Added API key for {0}".format_with(configuration.Sources));
             }
             else
             {
@@ -339,7 +339,7 @@ namespace chocolatey.infrastructure.app.services
                 {
                     apiKey.Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key);
                     _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                    this.Log().Info(() => "Updated ApiKey for {0}".format_with(configuration.Sources));
+                    this.Log().Info(() => "Updated API key for {0}".format_with(configuration.Sources));
                 }
                 else this.Log().Warn(NO_CHANGE_MESSAGE);
             }
@@ -354,11 +354,11 @@ namespace chocolatey.infrastructure.app.services
 
                 _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                this.Log().Info(() => "Removed ApiKey for {0}".format_with(configuration.Sources));
+                this.Log().Info(() => "Removed API key for {0}".format_with(configuration.Sources));
             }
             else
             {
-                this.Log().Info(() => "ApiKey was not found for {0}".format_with(configuration.Sources));
+                this.Log().Info(() => "API key was not found for {0}".format_with(configuration.Sources));
             }
 
         }
