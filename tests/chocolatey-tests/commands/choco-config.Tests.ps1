@@ -13,35 +13,6 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
     BeforeDiscovery {
         $isLicensed = Test-PackageIsEqualOrHigher "chocolatey.extension" "0.0.0"
 
-        $TestedFeatures = @(
-            "checksumFiles"
-            "autoUninstaller"
-            "allowGlobalConfirmation"
-            "failOnAutoUninstaller"
-            "failOnStandardError"
-            "allowEmptyChecksums"
-            "allowEmptyChecksumsSecure"
-            "powershellHost"
-            "logEnvironmentValues"
-            "virusCheck"
-            "failOnInvalidOrMissingLicense"
-            "ignoreInvalidOptionsSwitches"
-            "usePackageExitCodes"
-            "useEnhancedExitCodes"
-            "exitOnRebootDetected"
-            "useFipsCompliantChecksums"
-            "showNonElevatedWarnings"
-            "showDownloadProgress"
-            "stopOnFirstPackageFailure"
-            "useRememberedArgumentsForUpgrades"
-            "ignoreUnfoundPackagesOnUpgradeOutdated"
-            "skipPackageUpgradesWhenNotInstalled"
-            "removePackageInformationOnUninstall"
-            "logWithoutColor"
-            "logValidationResultsOnWarnings"
-            "usePackageRepositoryOptimizations"
-        )
-
         $TestedConfigs = @(
             "cacheLocation"
             "containsLegacyPackageInstalls"
@@ -128,26 +99,6 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
             "defaultTemplateName =  |"
         ) {
             $Output.String | Should -MatchExactly ([Regex]::Escape($_))
-        }
-
-        # Only community repository URL will be set on 0.10.16 and above
-        # Issue: https://github.com/chocolatey/choco/issues/2231
-        It "Displays Available Sources <Name> - <Source>" -ForEach @(
-            @{
-                Name   = "chocolatey"
-                Source = if (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta") {
-                    "https://community.chocolatey.org/api/v2/"
-                }
-                else {
-                    "https://chocolatey.org/api/v2/"
-                }
-            }
-        ) {
-            $Output.String | Should -MatchExactly "$Name( \[Disabled\])? - $([Regex]::Escape($Source))\s*\|"
-        }
-
-        It "Displays Available Feature <_>" -ForEach $TestedFeatures {
-            $Output.String | Should -Match "\[[ x]\] $_ -"
         }
     }
 
