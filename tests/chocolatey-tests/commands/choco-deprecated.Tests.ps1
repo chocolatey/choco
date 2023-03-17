@@ -52,34 +52,3 @@ Describe "choco deprecated shims" -Skip:(-not (Test-ChocolateyVersionEqualOrHigh
         }
     }
 }
-
-Describe "Deprecated Chocolatey Helper Commands" -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0")) -Tag Chocolatey, DeprecatedHelpers {
-    BeforeAll {
-        Initialize-ChocolateyTestInstall
-        New-ChocolateyInstallSnapshot
-
-        $PackageName = New-Guid
-        $HelperUnderTest = "Get-BinRoot"
-        $null = Invoke-Choco new $PackageName --version 1.0.0
-        $TemplateOutput = Get-ChildItem -Path $PackageName -Recurse | Select-String -Pattern 'Get-BinRoot'
-        $HelperUnderTest > "$PackageName/tools/chocolateyInstall.ps1"
-        $null = Invoke-Choco pack "$PackageName/$PackageName.nuspec"
-        $Output = Invoke-Choco install $PackageName --source . -y
-    }
-
-    AfterAll {
-        Remove-Item "./$PackageName" -Recurse -Force -ErrorAction Ignore
-        Remove-ChocolateyTestInstall
-    }
-    It 'should not mention Get-BinRoot in any of the generated files' {
-        $TemplateOutput | Should -BeNullOrEmpty -Because 'Get-BinRoot has been deprecated and removed from the template'
-    }
-
-    It 'should exit success (0)' {
-        $Output.ExitCode | Should -Be 0
-    }
-
-    It 'should warn that Get-BinRoot is deprecated' {
-        $Output.Lines | Should -Contain 'WARNING: Get-BinRoot was deprecated in v1 and will be removed in v2. It has been replaced with Get-ToolsLocation (starting with v0.9.10), however many packages no longer require a special separate directory since package folders no longer have versions on them. Some do though and should continue to use Get-ToolsLocation.'
-    }
-}
