@@ -14,6 +14,12 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         $RemovedShims = @(
             "\bin\cpack.exe"
             "\bin\cver.exe"
+            "\bin\chocolatey.exe"
+            "\bin\cinst.exe"
+            "\bin\clist.exe"
+            "\bin\cpush.exe"
+            "\bin\cuninst.exe"
+            "\bin\cup.exe"
         )
         $PowerShellFiles = Get-ChildItem -Path $ChocolateyDirectoriesToCheck -Include "*.ps1", "*.psm1" -Recurse -ErrorAction Ignore
         # For certain test scenarios we run, there are additional files available in the bin directory.
@@ -48,7 +54,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             Join-Path $env:ChocolateyInstall -ChildPath "choco.exe" | Should -Exist
         }
 
-        It "has <_> available on PATH" -ForEach @("choco.exe"; "cinst.exe"; "cpush.exe") {
+        It "has <_> available on PATH" -ForEach @("choco.exe") {
             $executable = $_
             $pathList = $env:PATH -split ";"
             $found = $false

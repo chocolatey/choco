@@ -284,21 +284,9 @@ NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
  dash (`-`). For more details, see the command reference (`choco -?`).
 ");
 
-            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-            "chocolatey".Log().Warn(@"
-Starting in v2.0.0 the shortcut `cup` will be removed and can not be used
-to upgrade or install packages anymore. We recommend you make sure that you always
-use the full command going forward (`choco upgrade`).
-
-Side by side installations has been deprecated and will be removed in v2.0.0.
-Instead of using side by side installations, distinct packages should be created
-if similar functionality is needed going forward.
-");
-
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco upgrade <pkg|all> [<pkg2> <pkgN>] [<options/switches>]
-    cup <pkg|all> [<pkg2> <pkgN>] [<options/switches>] (DEPRECATED, will be removed in v2.0.0)
 
 NOTE: `all` is a special package keyword that will allow you to upgrade
  all currently installed packages.

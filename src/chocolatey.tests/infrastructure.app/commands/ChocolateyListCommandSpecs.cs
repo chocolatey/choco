@@ -111,22 +111,6 @@ namespace chocolatey.tests.infrastructure.app.commands
                 optionSet.Contains("l").ShouldBeTrue();
             }
 
-            [NUnit.Framework.Theory]
-            [NUnit.Framework.TestCase("localonly")]
-            [NUnit.Framework.TestCase("source")]
-            [NUnit.Framework.TestCase("user")]
-            [NUnit.Framework.TestCase("password")]
-            [NUnit.Framework.TestCase("cert")]
-            [NUnit.Framework.TestCase("certpassword")]
-            [NUnit.Framework.TestCase("approved-only")]
-            [NUnit.Framework.TestCase("download-cache-only")]
-            [NUnit.Framework.TestCase("disable-package-repository-optimizations")]
-            [Obsolete("Will be removed in v2.0.0 for the list command")]
-            public void should_add_deprecation_notice_to_option(string argument)
-            {
-                optionSet[argument].Description.ShouldContain("DEPRECATION NOTICE");
-            }
-
             [Fact]
             public void should_add_prerelease_to_the_option_set()
             {
@@ -292,21 +276,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_add_short_version_of_password_to_the_option_set()
             {
                 optionSet.Contains("p").ShouldBeTrue();
-            }
-
-            [NUnit.Framework.Theory]
-            [NUnit.Framework.TestCase("localonly")]
-            [NUnit.Framework.TestCase("source")]
-            [NUnit.Framework.TestCase("user")]
-            [NUnit.Framework.TestCase("password")]
-            [NUnit.Framework.TestCase("cert")]
-            [NUnit.Framework.TestCase("certpassword")]
-            [NUnit.Framework.TestCase("approved-only")]
-            [NUnit.Framework.TestCase("download-cache-only")]
-            [NUnit.Framework.TestCase("disable-package-repository-optimizations")]
-            public void should_add_deprecation_notice_to_option(string argument)
-            {
-                optionSet[argument].Description.ShouldNotContain("DEPRECATION NOTICE");
             }
         }
 
@@ -496,35 +465,6 @@ Repository).");
             public void should_not_report_any_warning_messages()
             {
                 MockLogger.Messages.Keys.ShouldNotContain("Warn");
-            }
-        }
-
-        public class when_outputting_help_message_for_list_command : ChocolateyListCommandSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                configuration.CommandName = "list";
-            }
-
-            public override void Because()
-            {
-                command.help_message(configuration);
-            }
-
-            [Fact, Obsolete("Will be removed in v2.0.0")]
-            public void should_output_deprecation_notice_header()
-            {
-                MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain("DEPRECATION NOTICE");
-            }
-
-            [Fact]
-            public void should_output_removal_in_v2_0_0()
-            {
-                MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain(@"
-Will be removed for the list command in v2.0.0.");
             }
         }
 

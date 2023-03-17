@@ -91,24 +91,12 @@
     <EmbeddedResource Include="helpers\functions\UnInstall-ChocolateyZipPackage.ps1" />
     <EmbeddedResource Include="helpers\functions\Update-SessionEnvironment.ps1" />
     <EmbeddedResource Include="redirects\choco.exe.ignore" />
-    <EmbeddedResource Include="redirects\chocolatey.exe.ignore" />
-    <EmbeddedResource Include="redirects\cinst.exe.ignore" />
-    <EmbeddedResource Include="redirects\clist.exe.ignore" />
-    <EmbeddedResource Include="redirects\cpush.exe.ignore" />
-    <EmbeddedResource Include="redirects\cuninst.exe.ignore" />
-    <EmbeddedResource Include="redirects\cup.exe.ignore" />
     <EmbeddedResource Include="tools\checksum.exe.ignore" />
     <EmbeddedResource Include="tools\shimgen.exe.ignore" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="LICENSE.txt" />
     <EmbeddedResource Include="redirects\choco.exe" />
-    <EmbeddedResource Include="redirects\chocolatey.exe" />
-    <EmbeddedResource Include="redirects\cinst.exe" />
-    <EmbeddedResource Include="redirects\clist.exe" />
-    <EmbeddedResource Include="redirects\cpush.exe" />
-    <EmbeddedResource Include="redirects\cuninst.exe" />
-    <EmbeddedResource Include="redirects\cup.exe" />
     <EmbeddedResource Include="tools\7zip.license.txt" Condition="'$(Configuration)' != 'ReleaseOfficialNo7zip'" />
     <EmbeddedResource Include="tools\checksum.exe" />
     <EmbeddedResource Include="tools\checksum.license.txt" />
