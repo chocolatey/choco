@@ -27,14 +27,13 @@ namespace chocolatey.infrastructure.app.commands
     using results;
     using services;
 
-    [CommandFor("list", "lists remote or local packages")]
-    [CommandFor("search", "searches remote or local packages")]
-    [CommandFor("find", "searches remote or local packages (alias for search)")]
-    public class ChocolateyListCommand : IListCommand<PackageResult>
+    [CommandFor("search", "searches remote packages")]
+    [CommandFor("find", "searches remote packages (alias for search)")]
+    public class ChocolateySearchCommand : IListCommand<PackageResult>
     {
         private readonly IChocolateyPackageService _packageService;
 
-        public ChocolateyListCommand(IChocolateyPackageService packageService)
+        public ChocolateySearchCommand(IChocolateyPackageService packageService)
         {
             _packageService = packageService;
         }

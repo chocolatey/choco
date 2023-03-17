@@ -165,7 +165,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInstallCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyHelpCommandSpecs.cs" />
-    <Compile Include="infrastructure.app\commands\ChocolateyListCommandSpecs.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateySearchCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyNewCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyOutdatedCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyPackCommandSpecs.cs" />

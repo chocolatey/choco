@@ -1,14 +1,13 @@
 ﻿<#
     .Synopsis
-        Tests for `choco list` and aliases
+        Tests for `choco search` and aliases
 
     .Link
-        https://github.com/chocolatey/choco/blob/master/src/chocolatey.tests.integration/scenarios/ListScenarios.cs
+        https://github.com/chocolatey/choco/blob/master/src/chocolatey.tests.integration/scenarios/SearchScenarios.cs
 #>
 param(
-    # Which command to test (used for testing aliases instead of the base command, 'list')
+    # Which command to test (used for testing aliases instead of the base command, 'search')
     [string[]]$Command = @(
-        "list"
         "find"
         "search"
     )
@@ -16,7 +15,7 @@ param(
 
 Import-Module helpers/common-helpers
 
-Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchCommand, FindCommand {
+Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindCommand {
     BeforeDiscovery {
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
     }
@@ -185,6 +184,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
     }
 
+    # TODO: Extract to separate list file
     Context "Listing local packages" {
         BeforeAll {
             $Output = Invoke-Choco $_ --LocalOnly
@@ -207,6 +207,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
     }
 
+    # TODO: Separate to separate list file
     Context "Listing local packages (limiting output)" {
         BeforeAll {
             $Output = Invoke-Choco $_ --LocalOnly --LimitOutput
@@ -229,6 +230,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
     }
 
+    # TODO: Separate to separate list file
     Context "Listing local packages (limiting output, ID only)" {
         BeforeAll {
             $Output = Invoke-Choco $_ --LocalOnly --IdOnly
@@ -247,7 +249,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
     }
 
-    Context "Listing packages with no sources enabled" {
+    Context "Searching packages with no sources enabled" {
         BeforeAll {
             Disable-ChocolateySource -All
 
@@ -313,7 +315,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Listing packages on source using proxy and proxy bypass list" -Skip:(!$licensedProxyFixed) {
+    Context "Searching packages on source using proxy and proxy bypass list" -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
@@ -336,7 +338,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Listing packages on source using proxy and proxy bypass list on command" -Skip:(!$licensedProxyFixed) {
+    Context "Searching packages on source using proxy and proxy bypass list on command" -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
@@ -358,7 +360,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
     }
 
     # Issue: https://github.com/chocolatey/choco/issues/2304
-    Context "Listing packages with exact and all version displayed without pre-release argument" -Skip:(-Not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta-233")) {
+    Context "Searching packages with exact and all version displayed without pre-release argument" -Skip:(-Not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta-233")) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -378,7 +380,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
     }
 
-    Context "Listing packages with exact, all versions and pre-release arguments" -Skip:(-Not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta-233")) {
+    Context "Searching packages with exact, all versions and pre-release arguments" -Skip:(-Not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta-233")) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 

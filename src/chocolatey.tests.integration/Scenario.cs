@@ -349,10 +349,10 @@ namespace chocolatey.tests.integration
             return config;
         }
 
-        public static ChocolateyConfiguration list()
+        public static ChocolateyConfiguration search()
         {
             var config = baseline_configuration();
-            config.CommandName = "list";
+            config.CommandName = "search";
 
             return config;
         }

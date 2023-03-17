@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,23 +27,23 @@ namespace chocolatey.tests.infrastructure.app.commands
     using Moq;
     using Should;
 
-    public class ChocolateyListCommandSpecs
+    public class ChocolateySearchCommandSpecs
     {
-        [ConcernFor("list")]
-        public abstract class ChocolateyListCommandSpecsBase : TinySpec
+        [ConcernFor("search")]
+        public abstract class ChocolateySearchCommandSpecsBase : TinySpec
         {
-            protected ChocolateyListCommand command;
+            protected ChocolateySearchCommand command;
             protected Mock<IChocolateyPackageService> packageService = new Mock<IChocolateyPackageService>();
             protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
                 configuration.Sources = "bob";
-                command = new ChocolateyListCommand(packageService.Object);
+                command = new ChocolateySearchCommand(packageService.Object);
             }
         }
 
-        public class when_implementing_command_for : ChocolateyListCommandSpecsBase
+        public class when_implementing_command_for : ChocolateySearchCommandSpecsBase
         {
             private List<string> results;
 
@@ -53,9 +53,9 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_list()
+            public void should_not_implement_list()
             {
-                results.ShouldContain("list");
+                results.ShouldNotContain("list");
             }
 
             [Fact]
@@ -71,7 +71,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_configurating_the_argument_parser_for_list_command : ChocolateyListCommandSpecsBase
+        public class when_configurating_the_argument_parser_for_search_command : ChocolateySearchCommandSpecsBase
         {
             private OptionSet optionSet;
 
@@ -79,7 +79,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 base.Context();
                 optionSet = new OptionSet();
-                configuration.CommandName = "list";
+                configuration.CommandName = "search";
             }
 
             public override void Because()
@@ -174,7 +174,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
         [NUnit.Framework.TestFixture("search")]
         [NUnit.Framework.TestFixture("find")]
-        public class when_configurating_the_argument_parser : ChocolateyListCommandSpecsBase
+        public class when_configurating_the_argument_parser : ChocolateySearchCommandSpecsBase
         {
             private OptionSet optionSet;
 
@@ -279,7 +279,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_handling_additional_argument_parsing : ChocolateyListCommandSpecsBase
+        public class when_handling_additional_argument_parsing : ChocolateySearchCommandSpecsBase
         {
             private readonly IList<string> unparsedArgs = new List<string>();
             private readonly string source = "https://somewhereoutthere";
@@ -314,12 +314,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_noop_is_called_with_list_command : ChocolateyListCommandSpecsBase
+        public class when_noop_is_called_with_search_command : ChocolateySearchCommandSpecsBase
         {
             public override void Context()
             {
                 base.Context();
-                configuration.CommandName = "list";
+                configuration.CommandName = "search";
             }
 
             public override void Because()
@@ -344,12 +344,12 @@ Repository).");
             }
         }
 
-        public class when_noop_is_called_with_list_command_and_local_only : ChocolateyListCommandSpecsBase
+        public class when_noop_is_called_with_search_command_and_local_only : ChocolateySearchCommandSpecsBase
         {
             public override void Context()
             {
                 base.Context();
-                configuration.CommandName = "list";
+                configuration.CommandName = "search";
                 configuration.ListCommand.LocalOnly = true;
             }
 
@@ -371,7 +371,7 @@ Repository).");
             }
         }
 
-        public class when_noop_is_called : ChocolateyListCommandSpecsBase
+        public class when_noop_is_called : ChocolateySearchCommandSpecsBase
         {
             public override void Because()
             {
@@ -391,12 +391,12 @@ Repository).");
             }
         }
 
-        public class when_run_is_called_with_list_command : ChocolateyListCommandSpecsBase
+        public class when_run_is_called_with_search_command : ChocolateySearchCommandSpecsBase
         {
             public override void Context()
             {
                 base.Context();
-                configuration.CommandName = "list";
+                configuration.CommandName = "search";
             }
 
             public override void Because()
@@ -421,12 +421,12 @@ Repository).");
             }
         }
 
-        public class when_run_is_called_with_list_command_and_local_only : ChocolateyListCommandSpecsBase
+        public class when_run_is_called_with_search_command_and_local_only : ChocolateySearchCommandSpecsBase
         {
             public override void Context()
             {
                 base.Context();
-                configuration.CommandName = "list";
+                configuration.CommandName = "search";
                 configuration.ListCommand.LocalOnly = true;
             }
 
@@ -448,7 +448,7 @@ Repository).");
             }
         }
 
-        public class when_run_is_called : ChocolateyListCommandSpecsBase
+        public class when_run_is_called : ChocolateySearchCommandSpecsBase
         {
             public override void Because()
             {
@@ -470,7 +470,7 @@ Repository).");
 
         [NUnit.Framework.TestFixture("search")]
         [NUnit.Framework.TestFixture("find")]
-        public class when_outputting_help_message : ChocolateyListCommandSpecsBase
+        public class when_outputting_help_message : ChocolateySearchCommandSpecsBase
         {
             public when_outputting_help_message(string commandName)
             {

@@ -28,9 +28,9 @@ namespace chocolatey.tests.integration.scenarios
     using NUnit.Framework;
     using Should;
 
-    public class ListScenarios
+    public class SearchScenarios
     {
-        [ConcernFor("list")]
+        [ConcernFor("search")]
         public abstract class ScenariosBase : TinySpec
         {
             protected IList<PackageResult> Results;
@@ -39,7 +39,7 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Context()
             {
-                Configuration = Scenario.list();
+                Configuration = Scenario.search();
                 Scenario.reset(Configuration);
                 Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + NuGetConstants.PackageExtension);
                 Scenario.add_packages_to_source_location(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
@@ -553,7 +553,7 @@ namespace chocolatey.tests.integration.scenarios
         {
             public override void Context()
             {
-                Configuration = Scenario.list();
+                Configuration = Scenario.search();
                 Scenario.reset(Configuration);
                 Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + NuGetConstants.PackageExtension);
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
@@ -612,7 +612,7 @@ namespace chocolatey.tests.integration.scenarios
         {
             public override void Context()
             {
-                Configuration = Scenario.list();
+                Configuration = Scenario.search();
                 Scenario.reset(Configuration);
                 Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + NuGetConstants.PackageExtension);
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
@@ -667,7 +667,7 @@ namespace chocolatey.tests.integration.scenarios
         {
             public override void Context()
             {
-                Configuration = Scenario.list();
+                Configuration = Scenario.search();
                 Scenario.reset(Configuration);
                 Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + NuGetConstants.PackageExtension);
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
@@ -714,7 +714,7 @@ namespace chocolatey.tests.integration.scenarios
         {
             public override void Context()
             {
-                Configuration = Scenario.list();
+                Configuration = Scenario.search();
                 Scenario.reset(Configuration);
                 Scenario.add_packages_to_source_location(Configuration, "exactpackage*" + NuGetConstants.PackageExtension);
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();

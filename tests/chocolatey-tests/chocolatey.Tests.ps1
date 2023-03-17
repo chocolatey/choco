@@ -198,7 +198,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     Context 'License warning is worded properly' -Tag FossOnly -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
             $null = Invoke-Choco install chocolatey-license-business -y
-            $Output = Invoke-Choco list -lo
+            $Output = Invoke-Choco search -lo
         }
 
         AfterAll {
@@ -218,7 +218,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         BeforeAll {
             Remove-Item $Profile.CurrentUserCurrentHost -ErrorAction Ignore
             New-Item $Profile.CurrentUserCurrentHost -Force
-            $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            $chocolatey = (Invoke-Choco search chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command Search
             Enable-ChocolateySource -Name local
             $null = Invoke-Choco install chocolatey -f --version $chocolatey.Version
         }
@@ -245,7 +245,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         BeforeAll {
             New-Item $Profile.CurrentUserCurrentHost -Force
             "" | Set-Content -Path $Profile.CurrentUserCurrentHost -Encoding UTF8
-            $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            $chocolatey = (Invoke-Choco search chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command Search
         }
 
         AfterAll {
@@ -278,7 +278,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     ) {
         BeforeAll {
-            $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            $chocolatey = (Invoke-Choco search chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command Search
 
             foreach ($shim in $RemovedShims) {
                 $shimToRemove = "$env:ChocolateyInstall$shim"
