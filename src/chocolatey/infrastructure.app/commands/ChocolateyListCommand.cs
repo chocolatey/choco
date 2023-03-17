@@ -34,16 +34,16 @@ namespace chocolatey.infrastructure.app.commands
         [Obsolete("Remove unsupported argument in V3!")]
         private readonly string[] _unsupportedArguments = new[]
         {
-            "l",
-            "lo",
-            "local",
-            "localonly",
-            "local-only",
-            "a",
-            "all",
-            "allversions",
-            "all-versions",
-            "order-by-popularity"
+            "-l",
+            "-lo",
+            "--local",
+            "--localonly",
+            "--local-only",
+            "-a",
+            "--all",
+            "--allversions",
+            "--all-versions",
+            "--order-by-popularity"
         };
 
         public ChocolateyListCommand(IChocolateyPackageService packageService)
@@ -117,7 +117,7 @@ namespace chocolatey.infrastructure.app.commands
 
             foreach (var argument in unparsedArguments)
             {
-                if (_unsupportedArguments.Contains(argument.TrimStart('-'), StringComparer.OrdinalIgnoreCase))
+                if (_unsupportedArguments.Contains(argument, StringComparer.OrdinalIgnoreCase))
                 {
                     this.Log().Warn(ChocolateyLoggers.Important, @"
 UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!", argument);
