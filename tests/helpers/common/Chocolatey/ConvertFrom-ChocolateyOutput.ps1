@@ -4,7 +4,7 @@
             Converts from Chocolatey's --LimitOutput (-r) to PowerShell object
 
         .Example
-            (Invoke-Choco list -lo -r).Lines | ConvertFrom-ChocolateyOutput -Command List
+            (Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List
 
         .Example
             (Invoke-Choco pin list -r).Lines | ConvertFrom-ChocolateyOutput -Command PinList

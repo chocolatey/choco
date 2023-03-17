@@ -40,6 +40,7 @@ $script:someCommands = @('-?', 'search', 'list', 'info', 'install', 'outdated', 
 # ensure these all have a space to start, or they will cause issues
 $allcommands = " --debug --verbose --trace --noop --help --accept-license --confirm --limit-output --no-progress --log-file='' --execution-timeout='' --cache-location='' --proxy='' --proxy-user='' --proxy-password='' --proxy-bypass-list='' --proxy-bypass-on-local --force --no-color --skip-compatibility-checks"
 $proListOptions = " --audit --use-self-service"
+$proSearchOptions = " --use-self-service"
 $proInfoOptions = " --use-self-service"
 $proInstallUpgradeOptions = " --install-directory='' --package-parameters-sensitive='' --max-download-rate='' --install-arguments-sensitive='' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum='' --deflate-package-size --no-deflate-package-size --deflate-nupkg-only --use-self-service"
 $proUpgradeOptions = " --exclude-chocolatey-packages-during-upgrade-all --include-chocolatey-packages-during-upgrade-all --use-self-service"
@@ -50,8 +51,8 @@ $proOutdatedOptions = " --use-self-service"
 $proPushOptions = " --use-self-service"
 
 $commandOptions = @{
-    list      = "--lo --id-only --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --local-only --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations" + $proListOptions + $allcommands
-    search    = "--pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --local-only --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations" + $proListOptions + $allcommands
+    list      = "--id-only --pre --exact --by-id-only --id-starts-with --detailed --prerelease --include-programs --page='' --page-size=''" + $proListOptions + $allcommands
+    search    = "--pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --prerelease --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations" + $proSearchOptions + $allcommands
     info      = "--pre --lo --source='' --user='' --password='' --local-only --prerelease --disable-package-repository-optimizations" + $proInfoOptions + $allcommands
     install   = "-y -whatif -? --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --user='' --password='' --prerelease --forcex86 --not-silent --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --allow-downgrade --force-dependencies --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --allow-multiple-versions --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --stop-on-first-package-failure --disable-package-repository-optimizations --pin" + $proInstallUpgradeOptions + $allcommands
     pin       = "--name='' --version='' -?" + $proPinOptions + $allcommands
@@ -71,6 +72,7 @@ $commandOptions = @{
     export    = "--include-version-numbers --output-file-path='' -?" + $allcommands
     template  = "--name=''" + $allcommands
 }
+$commandOptions['find'] = $commandOptions['search']
 
 try {
     # if license exists
@@ -98,14 +100,14 @@ function script:chocoLocalPackages($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) {
         return;
     } #file search
-    @(& $script:choco list $filter -lo -r --id-starts-with) | ForEach-Object { $_.Split('|')[0] }
+    @(& $script:choco list $filter -r --id-starts-with) | ForEach-Object { $_.Split('|')[0] }
 }
 
 function script:chocoLocalPackagesUpgrade($filter) {
     if ($filter -ne $null -and $filter.StartsWith(".")) {
         return;
     } #file search
-    @('all|') + @(& $script:choco list $filter -lo -r --id-starts-with) |
+    @('all|') + @(& $script:choco list $filter -r --id-starts-with) |
         Where-Object { $_ -like "$filter*" } |
         ForEach-Object { $_.Split('|')[0] }
 }
@@ -144,7 +146,7 @@ function ChocolateyTabExpansion($lastBlock) {
         }
 
         # Handles list/search first tab
-        "^(list|search)\s+(?<subcommand>[^-\s]*)$" {
+        "^(list|search|find)\s+(?<subcommand>[^-\s]*)$" {
             @('<filter>', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 

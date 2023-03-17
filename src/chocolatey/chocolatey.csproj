@@ -200,6 +200,7 @@
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="infrastructure.app\attributes\MultiServiceAttribute.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyTemplateCommand.cs" />
     <Compile Include="infrastructure.app\domain\ApiKeyCommandType.cs" />
     <Compile Include="infrastructure.app\domain\SourceTypes.cs" />
@@ -404,7 +405,7 @@
     <Compile Include="infrastructure.app\domain\SourceType.cs" />
     <Compile Include="infrastructure\extractors\AssemblyFileExtractor.cs" />
     <Compile Include="infrastructure.app\builders\ConfigurationBuilder.cs" />
-    <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateySearchCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUnpackSelfCommand.cs" />
     <Compile Include="infrastructure.app\attributes\CommandForAttribute.cs" />
     <Compile Include="infrastructure.app\domain\CommandNameType.cs" />

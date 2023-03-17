@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor("info", "retrieves package information. Shorthand for choco search pkgname --exact --verbose")]
-    public class ChocolateyInfoCommand : ChocolateyListCommand
+    public class ChocolateyInfoCommand : ChocolateySearchCommand
     {
         public ChocolateyInfoCommand(IChocolateyPackageService packageService)
             : base(packageService)

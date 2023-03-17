@@ -1,5 +1,5 @@
 ﻿function Get-ExpectedChocolateyHeader {
-    $packages = (Invoke-Choco list --local-only --limitoutput).Lines |
+    $packages = (Invoke-Choco list --limitoutput).Lines |
         Where-Object { $_ -NotMatch 'please upgrade' } |
         ConvertFrom-ChocolateyOutput -Command List
 

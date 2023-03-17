@@ -195,10 +195,10 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'License warning is worded properly' -Tag FossOnly -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
+    Context 'License warning is worded properly' -Tag FossOnly,ListCommand,License -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
             $null = Invoke-Choco install chocolatey-license-business -y
-            $Output = Invoke-Choco list -lo
+            $Output = Invoke-Choco list
         }
 
         AfterAll {
@@ -214,11 +214,11 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'PowerShell Profile comments updated correctly' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
+    Context 'PowerShell Profile comments updated correctly' -Tag ListCommand, Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
             Remove-Item $Profile.CurrentUserCurrentHost -ErrorAction Ignore
             New-Item $Profile.CurrentUserCurrentHost -Force
-            $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            $chocolatey = (Invoke-Choco list chocolatey -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
             Enable-ChocolateySource -Name local
             $null = Invoke-Choco install chocolatey -f --version $chocolatey.Version
         }
@@ -241,11 +241,11 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'PowerShell Profile properly updated when Windows thinks a 5 byte file is signed' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
+    Context 'PowerShell Profile properly updated when Windows thinks a 5 byte file is signed' -Tag ListCommand, Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
         BeforeAll {
             New-Item $Profile.CurrentUserCurrentHost -Force
             "" | Set-Content -Path $Profile.CurrentUserCurrentHost -Encoding UTF8
-            $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            $chocolatey = (Invoke-Choco list chocolatey -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
         }
 
         AfterAll {
@@ -265,7 +265,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it requires signed executables
-    Context 'Ensure we <Removal> shims during upgrade' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -ForEach @(
+    Context 'Ensure we <Removal> shims during upgrade' -Tag ListCommand, Shims -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -ForEach @(
         @{
             RemovedShims = $RemovedShims
             Signed       = $true
@@ -278,7 +278,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     ) {
         BeforeAll {
-            $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            $chocolatey = (Invoke-Choco list chocolatey -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
 
             foreach ($shim in $RemovedShims) {
                 $shimToRemove = "$env:ChocolateyInstall$shim"

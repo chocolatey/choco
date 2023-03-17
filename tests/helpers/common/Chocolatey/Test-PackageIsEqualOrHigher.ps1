@@ -10,7 +10,7 @@ function Test-PackageIsEqualOrHigher {
         [switch]$AllowMissingPackage
     )
 
-    $package = (Invoke-Choco list --local-only --limitoutput).Lines |
+    $package = (Invoke-Choco list --limitoutput).Lines |
         Where-Object { $_ -notmatch 'please upgrade' } |
         ConvertFrom-ChocolateyOutput -Command List |
         Where-Object Name -EQ $PackageName
