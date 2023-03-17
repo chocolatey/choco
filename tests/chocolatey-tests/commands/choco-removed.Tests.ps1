@@ -96,6 +96,12 @@ exit $command.Count
     It 'Does not have shim (<Name>) created' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0')) -ForEach @(
         @{ Name = 'cver' }
         @{ Name = 'cpack' }
+        @{ Name = 'chocolatey' }
+        @{ Name = 'cinst' }
+        @{ Name = 'clist' }
+        @{ Name = 'cpush' }
+        @{ Name = 'cuninst' }
+        @{ Name = 'cup' }
     ) {
         Get-ChildItem -Path $env:ChocolateyInstall -Name "$Name.exe" -Recurse -ErrorAction SilentlyContinue | Should -HaveCount 0
     }

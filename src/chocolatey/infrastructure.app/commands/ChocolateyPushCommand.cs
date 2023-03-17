@@ -153,21 +153,9 @@ A feed can be a local folder, a file share, the community feed
  endpoints required for NuGet packages.
 ".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
 
-            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-            "chocolatey".Log().Warn(@"
-Default push location is deprecated and will be removed by v2.0.0.
-It is recommended to always specify the source you want to push to
-using the `--source` argument.
-
-Starting in v2.0.0 the shortcut `cpush` will be removed and can not be used
-to push packages anymore. We recommend you make sure that you always
-use the full command going forward (`choco push`).
-");
-
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco push [<path to nupkg>] [<options/switches>]
-    cpush [<path to nupkg>] [<options/switches>] (DEPRECATED, will be removed in v2.0.0)
 
 NOTE: If there is more than one nupkg file in the folder, the command
  will require specifying the path to the file.

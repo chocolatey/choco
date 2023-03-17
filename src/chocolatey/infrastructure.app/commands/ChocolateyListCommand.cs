@@ -183,27 +183,7 @@ NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
     choco find <filter> [<options/switches>]
     choco list <filter> [<options/switches>]
     choco search <filter> [<options/switches>]
-    clist <filter> [<options/switches>] (DEPRECATED, will be removed in v2.0.0)
 ");
-
-            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-
-            if (configuration.CommandName.is_equal_to("list"))
-            {
-                "chocolatey".Log().Warn(@"
-Starting in v2.0.0 the list command will be made local only and will only
- work with the installed packages. All options available for connecting
- to sources will be removed and can only be used when using `search` or
- `find`.
-
-To avoid breakage, change any calls made to remote sources to use `choco search`
- or `choco find` instead. These will continue to work as usual.
-
-Starting in v2.0.0 the shortcut `clist` will be removed and can not be used
- to list packages anymore. We recommend you make sure that you always
- use the full command going forward (`choco list`).
-");
-            }
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");
             "chocolatey".Log().Info(@"

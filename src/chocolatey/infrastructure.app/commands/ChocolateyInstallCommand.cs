@@ -253,21 +253,9 @@ NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
  dash (`-`). For more details, see the command reference (`choco -?`).
 ");
 
-            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-            "chocolatey".Log().Warn(@"
-Starting in v2.0.0 the shortcut `cinst` will be removed and can not be used
-to install packages anymore. We recommend you make sure that you always
-use the full command going forward (`choco install`).
-
-Side by side installations has been deprecated and will be removed in v2.0.0.
-Instead of using side by side installations, distinct packages should be created
-if similar functionality is needed going forward.
-");
-
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco install <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
-    cinst <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>] (DEPRECATED, will be removed in v2.0.0)
 
 NOTE: `all` is a special package keyword that will allow you to install
  all packages from a custom feed. Will not work with Chocolatey default
