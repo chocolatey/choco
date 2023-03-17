@@ -214,7 +214,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'PowerShell Profile comments updated correctly' -Tag ListCommand,Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
+    Context 'PowerShell Profile comments updated correctly' -Tag ListCommand, Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
             Remove-Item $Profile.CurrentUserCurrentHost -ErrorAction Ignore
             New-Item $Profile.CurrentUserCurrentHost -Force
@@ -241,7 +241,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'PowerShell Profile properly updated when Windows thinks a 5 byte file is signed', ListCommand,Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
+    Context 'PowerShell Profile properly updated when Windows thinks a 5 byte file is signed' -Tag ListCommand, Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
         BeforeAll {
             New-Item $Profile.CurrentUserCurrentHost -Force
             "" | Set-Content -Path $Profile.CurrentUserCurrentHost -Encoding UTF8
@@ -265,7 +265,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it requires signed executables
-    Context 'Ensure we <Removal> shims during upgrade' -Tag ListCommand,Shims -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -ForEach @(
+    Context 'Ensure we <Removal> shims during upgrade' -Tag ListCommand, Shims -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -ForEach @(
         @{
             RemovedShims = $RemovedShims
             Signed       = $true

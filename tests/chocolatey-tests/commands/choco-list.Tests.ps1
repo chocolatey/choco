@@ -15,7 +15,6 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         Remove-ChocolateyTestInstall
     }
 
-    # TODO: Extract to separate list file
     Context "Listing local packages" {
         BeforeAll {
             $Output = Invoke-Choco list
@@ -38,7 +37,6 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
     }
 
-    # TODO: Separate to separate list file
     Context "Listing local packages (limiting output)" {
         BeforeAll {
             $Output = Invoke-Choco list --LimitOutput
@@ -61,7 +59,6 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
     }
 
-    # TODO: Separate to separate list file
     Context "Listing local packages (limiting output, ID only)" {
         BeforeAll {
             $Output = Invoke-Choco list --IdOnly
