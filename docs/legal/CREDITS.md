@@ -10,6 +10,7 @@
   - [AlphaFS @ 2.1.3](#alphafs--213)
   - [Checksum @ 0.2.0](#checksum--020)
   - [log4net @ 2.0.12](#log4net--2012)
+  - [Microsoft.Bcl.HashCode @ 1.1.1](#microsoftbclhashcode--111)
   - [Microsoft.Web.Xdt @ 2.1.1](#microsoftwebxdt--211)
   - [NuGet.Client @ 3.0.0-alpha-20230123-128 (modified)](#nugetclient--300-alpha-20230123-128-modified)
   - [Rhino.Licensing @ 1.4.1 (modified)](#rhinolicensing--141-modified)
@@ -564,6 +565,37 @@ Chocolatey uses [log4net](http://logging.apache.org/log4net/) for logging.
       of your accepting any such warranty or additional liability.
 
       END OF TERMS AND CONDITIONS
+```
+
+### Microsoft.Bcl.HashCode @ 1.1.1
+
+Chocolatey uses [Microsoft.Bcl.HashCode](https://www.nuget.org/packages/Microsoft.Bcl.HashCode) to establish reliable HashCode for objects that are using internally when checking for changes in objects.
+[License terms](https://github.com/dotnet/runtime/blob/673afec8a76cb4437eba318d7132140b7da9b111/LICENSE.TXT)
+
+```txt
+The MIT License (MIT)
+
+Copyright (c) .NET Foundation and Contributors
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 ```
 
 ### Microsoft.Web.Xdt @ 2.1.1

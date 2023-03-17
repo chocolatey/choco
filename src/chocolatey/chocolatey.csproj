@@ -143,6 +143,9 @@
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.1\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Web.XmlTransform, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Xdt.3.1.0\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
@@ -257,7 +260,6 @@
     <Compile Include="infrastructure.app\services\PendingRebootService.cs" />
     <Compile Include="infrastructure.app\templates\ChocolateyTodoTemplate.cs" />
     <Compile Include="infrastructure.app\utility\ArgumentsUtility.cs" />
-    <Compile Include="infrastructure.app\utility\HashCode.cs" />
     <Compile Include="infrastructure.app\utility\PackageUtility.cs" />
     <Compile Include="infrastructure.app\validations\SystemStateValidation.cs" />
     <Compile Include="infrastructure\filesystem\FileSystem.cs" />
