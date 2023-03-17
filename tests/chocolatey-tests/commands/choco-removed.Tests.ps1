@@ -17,6 +17,7 @@ Describe "Ensuring removed things are removed" -Tag Removed, Chocolatey {
         @{ FunctionName = 'Write-ChocolateySuccess' }
         @{ FunctionName = 'Write-ChocolateyFailure' }
         @{ FunctionName = 'Install-ChocolateyDesktopLink' }
+        @{ FunctionName = 'Get-BinRoot' }
     ) {
         BeforeAll {
             $TestScript = @'
