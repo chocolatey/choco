@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - Present Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,10 +17,7 @@
 namespace chocolatey.tests.integration.scenarios
 {
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.results;
@@ -361,167 +358,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        public class when_listing_local_packages : ScenariosBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                Configuration.ListCommand.LocalOnly = true;
-                Configuration.Sources = ApplicationParameters.PackagesLocation;
-            }
-
-            public override void Because()
-            {
-                MockLogger.reset();
-                Results = Service.list_run(Configuration).ToList();
-            }
-
-            [Fact]
-            public void should_contain_packages_and_versions_with_a_space_between_them()
-            {
-                MockLogger.contains_message("upgradepackage 1.0.0").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_not_contain_packages_and_versions_with_a_pipe_between_them()
-            {
-                MockLogger.contains_message("upgradepackage|1.0.0").ShouldBeFalse();
-            }
-
-            [Fact]
-            public void should_contain_a_summary()
-            {
-                MockLogger.contains_message("packages installed").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_contain_debugging_messages()
-            {
-                MockLogger.contains_message("Searching for package information", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.contains_message("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.contains_message("Start of List", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeTrue();
-            }
-        }
-
-        public class when_listing_local_packages_with_id_only : ScenariosBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                Configuration.ListCommand.LocalOnly = true;
-                Configuration.ListCommand.IdOnly = true;
-                Configuration.Sources = ApplicationParameters.PackagesLocation;
-            }
-
-            public override void Because()
-            {
-                MockLogger.reset();
-                Results = Service.list_run(Configuration).ToList();
-            }
-
-            [Fact]
-            public void should_contain_package_name()
-            {
-                MockLogger.contains_message("upgradepackage").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_not_contain_any_version_number()
-            {
-                MockLogger.contains_message(".0").ShouldBeFalse();
-            }
-        }
-
-        public class when_listing_local_packages_limiting_output : ScenariosBase
-        {
-            public override void Context()
-            {
-                base.Context();
-
-                Configuration.ListCommand.LocalOnly = true;
-                Configuration.Sources = ApplicationParameters.PackagesLocation;
-                Configuration.RegularOutput = false;
-            }
-
-            public override void Because()
-            {
-                MockLogger.reset();
-                Results = Service.list_run(Configuration).ToList();
-            }
-
-            [Fact]
-            public void should_contain_packages_and_versions_with_a_pipe_between_them()
-            {
-                MockLogger.contains_message("upgradepackage|1.0.0").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_only_have_messages_related_to_package_information()
-            {
-                var count = MockLogger.Messages.SelectMany(messageLevel => messageLevel.Value.or_empty_list_if_null()).Count();
-                count.ShouldEqual(2);
-            }
-
-            [Fact]
-            public void should_not_contain_packages_and_versions_with_a_space_between_them()
-            {
-                MockLogger.contains_message("upgradepackage 1.0.0").ShouldBeFalse();
-            }
-
-            [Fact]
-            public void should_not_contain_a_summary()
-            {
-                MockLogger.contains_message("packages installed").ShouldBeFalse();
-            }
-
-            [Fact]
-            public void should_not_contain_debugging_messages()
-            {
-                MockLogger.contains_message("Searching for package information", LogLevel.Debug).ShouldBeFalse();
-                MockLogger.contains_message("Running list with the following filter", LogLevel.Debug).ShouldBeFalse();
-                MockLogger.contains_message("Start of List", LogLevel.Debug).ShouldBeFalse();
-                MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeFalse();
-            }
-        }
-
-        public class when_listing_local_packages_limiting_output_with_id_only : ScenariosBase
-        {
-            public override void Context()
-            {
-                base.Context();
-
-                Configuration.ListCommand.LocalOnly = true;
-                Configuration.ListCommand.IdOnly = true;
-                Configuration.Sources = ApplicationParameters.PackagesLocation;
-                Configuration.RegularOutput = false;
-            }
-
-            public override void Because()
-            {
-                MockLogger.reset();
-                Results = Service.list_run(Configuration).ToList();
-            }
-
-            [Fact]
-            public void should_contain_packages_id()
-            {
-                MockLogger.contains_message("upgradepackage").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_not_contain_any_version_number()
-            {
-                MockLogger.contains_message(".0").ShouldBeFalse();
-            }
-
-            [Fact]
-            public void should_not_contain_pipe()
-            {
-                MockLogger.contains_message("|").ShouldBeFalse();
-            }
-        }
-
         public class when_listing_packages_with_no_sources_enabled : ScenariosBase
         {
             public override void Context()
@@ -757,58 +593,6 @@ namespace chocolatey.tests.integration.scenarios
                 Results[0].PackageMetadata.Version.ToNormalizedString().ShouldEqual("1.0.0");
                 Results[1].PackageMetadata.Version.ToNormalizedString().ShouldEqual("1.0.0-beta1");
                 Results[2].PackageMetadata.Version.ToNormalizedString().ShouldEqual("0.9.0");
-            }
-        }
-
-        public class when_listing_local_packages_with_uppercase_id_package_installed : ScenariosBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                Scenario.add_packages_to_source_location(Configuration, "UpperCase" + "*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "UpperCase", "1.1.0");
-
-                Configuration.ListCommand.LocalOnly = true;
-                Configuration.Sources = ApplicationParameters.PackagesLocation;
-            }
-
-            public override void Because()
-            {
-                MockLogger.reset();
-                Results = Service.list_run(Configuration).ToList();
-            }
-
-            [Fact]
-            public void should_contain_packages_and_versions_with_a_space_between_them()
-            {
-                MockLogger.contains_message("upgradepackage 1.0.0").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_contain_uppercase_id_package()
-            {
-                MockLogger.contains_message("UpperCase 1.1.0").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_not_contain_packages_and_versions_with_a_pipe_between_them()
-            {
-                MockLogger.contains_message("upgradepackage|1.0.0").ShouldBeFalse();
-            }
-
-            [Fact]
-            public void should_contain_a_summary()
-            {
-                MockLogger.contains_message("packages installed").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_contain_debugging_messages()
-            {
-                MockLogger.contains_message("Searching for package information", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.contains_message("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.contains_message("Start of List", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.contains_message("End of List", LogLevel.Debug).ShouldBeTrue();
             }
         }
     }

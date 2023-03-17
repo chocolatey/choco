@@ -349,6 +349,14 @@ namespace chocolatey.tests.integration
             return config;
         }
 
+        public static ChocolateyConfiguration list()
+        {
+            var config = baseline_configuration();
+            config.CommandName = "list";
+
+            return config;
+        }
+
         public static ChocolateyConfiguration search()
         {
             var config = baseline_configuration();

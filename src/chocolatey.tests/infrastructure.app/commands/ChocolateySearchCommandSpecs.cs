@@ -99,18 +99,6 @@ namespace chocolatey.tests.infrastructure.app.commands
                 optionSet.Contains("s").ShouldBeTrue();
             }
 
-            [Fact, Obsolete("Local Only will be removed in v2.0.0 for the list command")]
-            public void should_add_localonly_to_the_option_set()
-            {
-                optionSet.Contains("localonly").ShouldBeTrue();
-            }
-
-            [Fact, Obsolete("Local Only will be removed in v2.0.0 for the list command")]
-            public void should_add_short_version_of_localonly_to_the_option_set()
-            {
-                optionSet.Contains("l").ShouldBeTrue();
-            }
-
             [Fact]
             public void should_add_prerelease_to_the_option_set()
             {
@@ -147,25 +135,25 @@ namespace chocolatey.tests.infrastructure.app.commands
                 optionSet.Contains("a").ShouldBeTrue();
             }
 
-            [Fact, Obsolete("Will be removed in v2.0.0")]
+            [Fact]
             public void should_add_user_to_the_option_set()
             {
                 optionSet.Contains("user").ShouldBeTrue();
             }
 
-            [Fact, Obsolete("Will be removed in v2.0.0")]
+            [Fact]
             public void should_add_short_version_of_user_to_the_option_set()
             {
                 optionSet.Contains("u").ShouldBeTrue();
             }
 
-            [Fact, Obsolete("Will be removed in v2.0.0")]
+            [Fact]
             public void should_add_password_to_the_option_set()
             {
                 optionSet.Contains("password").ShouldBeTrue();
             }
 
-            [Fact, Obsolete("Will be removed in v2.0.0")]
+            [Fact]
             public void should_add_short_version_of_password_to_the_option_set()
             {
                 optionSet.Contains("p").ShouldBeTrue();
@@ -204,18 +192,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void should_add_short_version_of_source_to_the_option_set()
             {
                 optionSet.Contains("s").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_localonly_to_the_option_set()
-            {
-                optionSet.Contains("localonly").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_localonly_to_the_option_set()
-            {
-                optionSet.Contains("l").ShouldBeTrue();
             }
 
             [Fact]
@@ -332,43 +308,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 packageService.Verify(c => c.list_noop(configuration), Times.Once);
             }
-
-            [Fact]
-            public void should_report_deprecation_of_remote_sources()
-            {
-                MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain(@"Using the list command with remote sources is deprecated and will be made
-to only list locally installed packages in v2.0.0. Use the search, or find,
-command to find packages on remote sources (such as the Chocolatey Community
-Repository).");
-            }
-        }
-
-        public class when_noop_is_called_with_search_command_and_local_only : ChocolateySearchCommandSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                configuration.CommandName = "search";
-                configuration.ListCommand.LocalOnly = true;
-            }
-
-            public override void Because()
-            {
-                command.noop(configuration);
-            }
-
-            [Fact]
-            public void should_call_service_list_noop()
-            {
-                packageService.Verify(c => c.list_noop(configuration), Times.Once);
-            }
-
-            [Fact]
-            public void should_not_report_any_warning_messages()
-            {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
-            }
         }
 
         public class when_noop_is_called : ChocolateySearchCommandSpecsBase
@@ -408,43 +347,6 @@ Repository).");
             public void should_call_service_list_run()
             {
                 packageService.Verify(c => c.list_run(configuration), Times.Once);
-            }
-
-            [Fact]
-            public void should_report_deprecation_of_remote_sources()
-            {
-                MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain(@"Using the list command with remote sources is deprecated and will be made
-to only list locally installed packages in v2.0.0. Use the search, or find,
-command to find packages on remote sources (such as the Chocolatey Community
-Repository).");
-            }
-        }
-
-        public class when_run_is_called_with_search_command_and_local_only : ChocolateySearchCommandSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                configuration.CommandName = "search";
-                configuration.ListCommand.LocalOnly = true;
-            }
-
-            public override void Because()
-            {
-                command.run(configuration);
-            }
-
-            [Fact]
-            public void should_call_service_list_run()
-            {
-                packageService.Verify(c => c.list_run(configuration), Times.Once);
-            }
-
-            [Fact]
-            public void should_not_report_any_warning_messages()
-            {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
             }
         }
 

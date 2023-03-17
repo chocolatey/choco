@@ -3,7 +3,7 @@
         return $script:LicenseType
     }
 
-    $package = (Invoke-Choco list --local-only --limitoutput).Lines |
+    $package = (Invoke-Choco list --limitoutput).Lines |
         ConvertFrom-ChocolateyOutput -Command List |
         Where-Object Name -Match "^chocolatey-license-" |
         Select-Object -First 1 # We only expect one package, so we only take the first result

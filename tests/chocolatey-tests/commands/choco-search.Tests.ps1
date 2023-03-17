@@ -50,7 +50,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Contains packages and versions with a space between them" {
-            $Output.Lines | Should -Contain "upgradepackage 1.1.0"
+            $Output.Lines | Should -Contain "upgradepackage 1.1.0" -Because $Output.String
         }
 
         It "Should not contain pipe-delimited values" {
@@ -181,71 +181,6 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
 
         It "Should contain a summary" {
             $Output.String | Should -Match "\d+ packages found."
-        }
-    }
-
-    # TODO: Extract to separate list file
-    Context "Listing local packages" {
-        BeforeAll {
-            $Output = Invoke-Choco $_ --LocalOnly
-        }
-
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Should contain packages and version with a space between them" {
-            $Output.Lines | Should -Contain "upgradepackage 1.0.0"
-        }
-
-        It "Should not contain pipe-delimited packages and versions" {
-            $Output.Lines | Should -Not -Contain "upgradepackage|1.0.0"
-        }
-
-        It "Should contain a summary" {
-            $Output.String | Should -Match "\d+ packages installed"
-        }
-    }
-
-    # TODO: Separate to separate list file
-    Context "Listing local packages (limiting output)" {
-        BeforeAll {
-            $Output = Invoke-Choco $_ --LocalOnly --LimitOutput
-        }
-
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Should not contain packages and version with a space between them" {
-            $Output.Lines | Should -Not -Contain "upgradepackage 1.0.0"
-        }
-
-        It "Should contain pipe-delimited packages and versions" {
-            $Output.Lines | Should -Contain "upgradepackage|1.0.0"
-        }
-
-        It "Should not contain a summary" {
-            $Output.String | Should -Not -Match "\d+ packages installed"
-        }
-    }
-
-    # TODO: Separate to separate list file
-    Context "Listing local packages (limiting output, ID only)" {
-        BeforeAll {
-            $Output = Invoke-Choco $_ --LocalOnly --IdOnly
-        }
-
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Should contain package name(s)" {
-            $Output.Lines | Should -Contain "upgradepackage"
-        }
-
-        It "Should not contain any version numbers" {
-            $Output.String | Should -Not -Match $VersionRegex
         }
     }
 
@@ -493,6 +428,21 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
 
         It "Should output the amount of packages found" {
             $Output.Lines | Should -Contain "1 packages found." -Because $Output.String
+        }
+    }
+
+    Context "Searching with '--local-only' searches for package with the name" {
+        BeforeAll {
+            # This test will need to be updated if we start caching search results
+            $Output = Invoke-Choco $currentCommand --local-only --verbose
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Uses search term '--local-only'" {
+            $Output.String | Should -BeLike "*searchTerm='--local-only'*"
         }
     }
 
