@@ -665,6 +665,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class PushCommandConfiguration
     {
         public string Key { get; set; }
+        public string DefaultSource { get; set; }
         //DisableBuffering?
     }
 

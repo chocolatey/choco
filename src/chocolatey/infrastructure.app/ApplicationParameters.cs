@@ -194,6 +194,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string WebRequestTimeoutSeconds = "webRequestTimeoutSeconds";
             public static readonly string UpgradeAllExceptions = "upgradeAllExceptions";
             public static readonly string DefaultTemplateName = "defaultTemplateName";
+            public static readonly string DefaultPushSource = "defaultPushSource";
         }
 
         public static class Features

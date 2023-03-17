@@ -26,6 +26,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
+    using NUnit.Framework;
     using Should;
 
     public class ChocolateyPushCommandSpecs
@@ -146,6 +147,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 reset();
                 configuration.Sources = "";
+                configuration.PushCommand.DefaultSource = string.Empty;
                 because();
 
                 configuration.Sources.ShouldEqual(ApplicationParameters.ChocolateyCommunityFeedPushSource);
@@ -156,6 +158,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 reset();
                 configuration.Sources = "";
+                configuration.PushCommand.DefaultSource = "";
                 configSettingsService.Setup(c => c.get_api_key(
                     It.Is<ChocolateyConfiguration>(config => config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)),
                     null))
@@ -168,6 +171,64 @@ namespace chocolatey.tests.infrastructure.app.commands
                     null),
                     Times.Never);
                 configuration.PushCommand.Key.ShouldNotEqual(apiKey);
+            }
+
+            [Fact]
+            public void should_set_the_source_to_defaultpushsource_if_set_and_no_explicit_source()
+            {
+                reset();
+                configuration.Sources = "";
+                configuration.PushCommand.DefaultSource = "https://localhost/default/source";
+                because();
+
+                configuration.Sources.ShouldEqual("https://localhost/default/source");
+            }
+
+            [Fact]
+            public void should_not_override_explicit_source_if_defaultpushsource_is_set()
+            {
+                reset();
+                configuration.Sources = "https://localhost/somewhere/out/there";
+                configuration.PushCommand.DefaultSource = "https://localhost/default/source";
+                because();
+
+                configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
+            }
+
+            [Fact]
+            public void should_throw_when_defaultpushsource_is_disabled_and_no_explicit_sources()
+            {
+                reset();
+                configuration.PushCommand.DefaultSource = "disabled";
+                configuration.Sources = "";
+
+                var errorred = false;
+                Exception error = null;
+
+                try
+                {
+                    because();
+                }
+                catch (Exception ex)
+                {
+                    errorred = true;
+                    error = ex;
+                }
+
+                errorred.ShouldBeTrue();
+                error.ShouldNotBeNull();
+                error.ShouldBeType<ApplicationException>();
+                error.Message.ShouldContain("Default push source is disabled.");
+            }
+
+            [Fact]
+            public void should_continue_when_defaultpushsource_is_disabled_and_explicit_sources_passed()
+            {
+                reset();
+                configuration.Sources = "https://somewhere/out/there";
+                configuration.PushCommand.Key = "bob";
+                configuration.PushCommand.DefaultSource = "disabled";
+                because();
             }
 
             [Fact]
@@ -215,6 +276,52 @@ namespace chocolatey.tests.infrastructure.app.commands
                 because();
 
                 configSettingsService.Verify(c => c.get_api_key(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
+            }
+
+            [Fact]
+            public void should_throw_if_multiple_sources_are_passed()
+            {
+                reset();
+                configuration.Sources = "https://localhost/somewhere/out/there;https://localhost/somewhere/out/there";
+
+                Assert.Throws<ApplicationException>(() => because(), "Multiple sources are not support by push command.");
+            }
+
+            [Fact]
+            public void should_update_source_if_alias_is_passed()
+            {
+                reset();
+                configuration.Sources = "chocolatey";
+                configuration.MachineSources = new List<MachineSourceConfiguration>
+                {
+                    new MachineSourceConfiguration
+                    {
+                        Name = "chocolatey",
+                        Key = "https://localhost/somewhere/out/there"
+                    }
+                 };
+                because();
+
+                configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
+            }
+
+            [Fact]
+            public void should_update_source_if_alias_is_passed_via_defaultpushsource()
+            {
+                reset();
+                configuration.Sources = "";
+                configuration.PushCommand.DefaultSource = "myrepo";
+                configuration.MachineSources = new List<MachineSourceConfiguration>
+                {
+                    new MachineSourceConfiguration
+                    {
+                        Name = "myrepo",
+                        Key = "https://localhost/somewhere/out/there"
+                    }
+                };
+                because();
+
+                configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
             }
         }
 
