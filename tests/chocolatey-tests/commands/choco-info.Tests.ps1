@@ -79,7 +79,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Listing package information when using proxy and proxy bypass list in config" -Skip:(!$licensedProxyFixed) {
+    Context "Listing package information when using proxy and proxy bypass list in config" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeDiscovery {
             $infoItems = @(
                 @{ Title = "Tags"; Value = "mvcmusicstore db" }
@@ -112,7 +112,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Listing package information when using proxy and proxy bypass list on command" -Skip:(!$licensedProxyFixed) {
+    Context "Listing package information when using proxy and proxy bypass list on command" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeDiscovery {
             $infoItems = @(
                 @{ Title = "Tags"; Value = "mvcmusicstore db" }

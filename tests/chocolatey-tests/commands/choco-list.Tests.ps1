@@ -334,7 +334,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Listing packages on source using proxy and proxy bypass list" -Skip:(!$licensedProxyFixed) {
+    Context "Listing packages on source using proxy and proxy bypass list" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
@@ -357,7 +357,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Listing packages on source using proxy and proxy bypass list on command" -Skip:(!$licensedProxyFixed) {
+    Context "Listing packages on source using proxy and proxy bypass list on command" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"

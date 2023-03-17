@@ -1,6 +1,6 @@
 ﻿Import-Module helpers/common-helpers
 
-Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY) {
+Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $env:API_KEY) {
     BeforeDiscovery {
         $isLicensed30OrMissingVersion = Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-beta' -AllowMissingPackage
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
