@@ -143,37 +143,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_set_the_source_to_default_feed_if_not_set_explicitly()
-            {
-                reset();
-                configuration.Sources = "";
-                configuration.PushCommand.DefaultSource = string.Empty;
-                because();
-
-                configuration.Sources.ShouldEqual(ApplicationParameters.ChocolateyCommunityFeedPushSource);
-            }
-
-            [Fact]
-            public void should_not_check_for_fallback_community_url()
-            {
-                reset();
-                configuration.Sources = "";
-                configuration.PushCommand.DefaultSource = "";
-                configSettingsService.Setup(c => c.get_api_key(
-                    It.Is<ChocolateyConfiguration>(config => config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)),
-                    null))
-                    .Returns(apiKey);
-                because();
-
-                configuration.Sources.ShouldEqual(ApplicationParameters.ChocolateyCommunityFeedPushSource);
-                configSettingsService.Verify(c => c.get_api_key(
-                    It.Is<ChocolateyConfiguration>(config => config.Sources.is_equal_to(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)),
-                    null),
-                    Times.Never);
-                configuration.PushCommand.Key.ShouldNotEqual(apiKey);
-            }
-
-            [Fact]
             public void should_set_the_source_to_defaultpushsource_if_set_and_no_explicit_source()
             {
                 reset();
@@ -196,10 +165,10 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_throw_when_defaultpushsource_is_disabled_and_no_explicit_sources()
+            public void should_throw_when_defaultpushsource_is_not_set_and_no_explicit_sources()
             {
                 reset();
-                configuration.PushCommand.DefaultSource = "disabled";
+                configuration.PushCommand.DefaultSource = "";
                 configuration.Sources = "";
 
                 var errorred = false;
@@ -218,16 +187,16 @@ namespace chocolatey.tests.infrastructure.app.commands
                 errorred.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldContain("Default push source is disabled.");
+                error.Message.ShouldContain("Default push source configuration is not set.");
             }
 
             [Fact]
-            public void should_continue_when_defaultpushsource_is_disabled_and_explicit_sources_passed()
+            public void should_continue_when_defaultpushsource_is_not_set_and_explicit_sources_passed()
             {
                 reset();
                 configuration.Sources = "https://somewhere/out/there";
                 configuration.PushCommand.Key = "bob";
-                configuration.PushCommand.DefaultSource = "disabled";
+                configuration.PushCommand.DefaultSource = "";
                 because();
             }
 
