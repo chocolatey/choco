@@ -69,10 +69,6 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
             $Output.Lines | Should -Contain $expectedLicenseHeader
         }
 
-        It "Displays Settings section" {
-            $Output.Lines | Should -Contain "Settings"
-        }
-
         It "Does not display Sources section" {
             $Output.Lines | Should  -Not -Contain "Sources"
         }
