@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,21 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor("uninstall", "uninstalls a package")]
-    public class ChocolateyUninstallCommand : ICommand
+    public class ChocolateyUninstallCommand : ChocolateyCommandBase, ICommand
     {
         private readonly IChocolateyPackageService _packageService;
+
+        private readonly string[] _removedOptions = new[]
+        {
+            "-m",
+            "-sxs",
+            "--sidebyside",
+            "--side-by-side",
+            "--allowmultiple",
+            "--allow-multiple",
+            "--allowmultipleversions",
+            "--allow-multiple-versions",
+        };
 
         public ChocolateyUninstallCommand(IChocolateyPackageService packageService)
         {
@@ -66,9 +78,6 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("paramsglobal|params-global|packageparametersglobal|package-parameters-global|applyparamstodependencies|apply-params-to-dependencies|apply-package-parameters-to-dependencies",
                      "Apply Package Parameters To Dependencies  - Should package parameters be applied to dependent packages? Defaults to false.",
                      option => configuration.ApplyPackageParametersToDependencies = option != null)
-                .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
-                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false. (DEPRECATED)",
-                     option => configuration.AllowMultipleVersions = option != null)
                 .Add("x|forcedependencies|force-dependencies|removedependencies|remove-dependencies",
                      "RemoveDependencies - Uninstall dependencies when uninstalling package(s). Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
@@ -144,6 +153,11 @@ namespace chocolatey.infrastructure.app.commands
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments.Where(arg => !arg.StartsWith("-")));
+
+            if (configuration.RegularOutput)
+            {
+                warn_for_removed_options(unparsedArguments.Where(arg => arg.StartsWith("-")), _removedOptions);
+            }
         }
 
         public virtual void handle_validation(ChocolateyConfiguration configuration)

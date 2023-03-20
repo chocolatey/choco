@@ -160,18 +160,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_add_allowmultipleversions_to_the_option_set()
-            {
-                optionSet.Contains("allowmultipleversions").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_allowmultipleversions_to_the_option_set()
-            {
-                optionSet.Contains("m").ShouldBeTrue();
-            }
-
-            [Fact]
             public void should_add_ignoredependencies_to_the_option_set()
             {
                 optionSet.Contains("ignoredependencies").ShouldBeTrue();

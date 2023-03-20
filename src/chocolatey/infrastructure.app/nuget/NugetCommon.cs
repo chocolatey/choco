@@ -71,9 +71,13 @@ namespace chocolatey.infrastructure.app.nuget
             get { return _console.Value; }
         }
 
+        [Obsolete("This overload is obsolete and will be removed in a future version.")]
         public static ChocolateyPackagePathResolver GetPathResolver(ChocolateyConfiguration configuration, IFileSystem nugetPackagesFileSystem)
+            => GetPathResolver(nugetPackagesFileSystem);
+
+        public static ChocolateyPackagePathResolver GetPathResolver(IFileSystem nugetPackagesFileSystem)
         {
-            return new ChocolateyPackagePathResolver(ApplicationParameters.PackagesLocation, nugetPackagesFileSystem, configuration.AllowMultipleVersions);
+            return new ChocolateyPackagePathResolver(ApplicationParameters.PackagesLocation, nugetPackagesFileSystem);
         }
 
         public static void ClearRepositoriesCache()

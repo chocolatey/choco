@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,9 +27,21 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor("install", "installs packages using configured sources")]
-    public class ChocolateyInstallCommand : ICommand
+    public class ChocolateyInstallCommand : ChocolateyCommandBase, ICommand
     {
         private readonly IChocolateyPackageService _packageService;
+
+        private readonly string[] _removedOptions = new[]
+        {
+            "-m",
+            "-sxs",
+            "--sidebyside",
+            "--side-by-side",
+            "--allowmultiple",
+            "--allow-multiple",
+            "--allowmultipleversions",
+            "--allow-multiple-versions",
+        };
 
         public ChocolateyInstallCommand(IChocolateyPackageService packageService)
         {
@@ -72,9 +84,6 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("allowdowngrade|allow-downgrade",
                      "AllowDowngrade - Should an attempt at downgrading be allowed? Defaults to false.",
                      option => configuration.AllowDowngrade = option != null)
-                .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
-                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false. (DEPRECATED)",
-                     option => configuration.AllowMultipleVersions = option != null)
                 .Add("i|ignoredependencies|ignore-dependencies",
                      "IgnoreDependencies - Ignore dependencies when installing package(s). Defaults to false.",
                      option => configuration.IgnoreDependencies = option != null)
@@ -196,6 +205,11 @@ namespace chocolatey.infrastructure.app.commands
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments.Where(arg => !arg.StartsWith("-")));
+
+            if (configuration.RegularOutput)
+            {
+                warn_for_removed_options(unparsedArguments.Where(arg => arg.StartsWith("-")), _removedOptions);
+            }
         }
 
         public virtual void handle_validation(ChocolateyConfiguration configuration)
@@ -296,21 +310,6 @@ NOTE: Chocolatey Pro / Business builds on top of a great open source
     choco install <path/to/nuspec>
     choco install <path/to/nupkg>
 
-Install multiple versions of a package using -m (AllowMultiple versions)
-
-    choco install ruby --version 1.9.3.55100 -my
-    choco install ruby --version 2.0.0.59800 -my
-    choco install ruby --version 2.1.5 -my
-
-What is `-my`? See option bundling in the command reference
- (`choco -?`).
-
-NOTE: All of these will add to PATH variable. We'll be adding a special
- option to not allow PATH changes. Until then you will need to manually
- go modify Path to just one Ruby and then use something like uru
- (https://bitbucket.org/jonforums/uru) or pik
- (https://community.chocolatey.org/packages/pik) to switch between versions.
-
 NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
@@ -369,8 +368,8 @@ NOTE: The filename is only required to end in .config, the name is not required 
       <package id=""chocolateytestpackage"" version=""0.1"" source=""somelocation"" />
       <package id=""alloptions"" version=""0.1.1""
                source=""https://somewhere/api/v2/"" installArguments=""""
-               packageParameters="""" forceX86=""false"" allowMultipleVersions=""false""
-               ignoreDependencies=""false"" executionTimeout=""1000"" force=""false""
+               packageParameters="""" forceX86=""false"" ignoreDependencies=""false""
+               executionTimeout=""1000"" force=""false""
                />
     </packages>
 

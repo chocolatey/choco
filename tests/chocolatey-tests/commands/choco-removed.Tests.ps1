@@ -134,4 +134,41 @@ exit $command.Count
             $Output.Lines | Should -Contain "Unknown command --remove. Setting to list."
         }
     }
+
+    Context 'Ensure --allow-multiple removed from Chocolatey' -Tag InstallCommand, UpgradeCommand, UninstallCommand, AllowMultiple -Foreach @(
+        @{ Command = 'install' }
+        @{ Command = 'update' }
+        @{ Command = 'uninstall' }
+    ){
+        BeforeAll {
+            $package = 'upgradepackage'
+            $options = @(
+                '--version'
+                if ($Command -in 'upgrade', 'uninstall') {
+                    '1.1.0'
+                }
+                else {
+                    '1.0.0'
+                }
+                '--allow-multiple'
+            )
+
+            $Output = Invoke-Choco $Command $package @options
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Does not use a versioned package folder' -Skip:($Command -eq 'upgrade') {
+            $expectedPath = Join-Path $env:ChocolateyInstall -ChildPath 'lib' |
+                Join-Path -ChildPath $package
+
+            $expectedPath | Should -Exist -Because 'choco should use the unversioned package folder path.'
+        }
+
+        It 'Emits a warning for the removed option' {
+            $Output.Lines | Should -Contain 'The --allow-multiple option is no longer supported.'
+        }
+    }
 }

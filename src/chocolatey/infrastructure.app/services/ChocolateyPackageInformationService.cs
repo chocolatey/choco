@@ -141,25 +141,11 @@ A corrupt .registry file exists at {0}.
                  );
 
             packageInformation.HasSilentUninstall = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SILENT_UNINSTALLER_FILE));
-            packageInformation.IsSideBySide = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, SIDE_BY_SIDE_FILE));
             packageInformation.IsPinned = _fileSystem.file_exists(_fileSystem.combine_paths(pkgStorePath, PIN_FILE));
             var argsFile = _fileSystem.combine_paths(pkgStorePath, ARGS_FILE);
             if (_fileSystem.file_exists(argsFile)) packageInformation.Arguments = _fileSystem.read_file(argsFile);
             var extraInfoFile = _fileSystem.combine_paths(pkgStorePath, EXTRA_FILE);
             if (_fileSystem.file_exists(extraInfoFile)) packageInformation.ExtraInformation = _fileSystem.read_file(extraInfoFile);
-
-            if (packageInformation.IsSideBySide && !_deprecationWarning.Contains(package.Id))
-            {
-                var logger = _config.RegularOutput ?
-                    logging.ChocolateyLoggers.Important :
-                    logging.ChocolateyLoggers.LogFileOnly;
-
-                this.Log().Warn(logger, @"
-{0} has been installed as a side by side installation.
-Side by side installations are deprecated and is pending removal in v2.0.0.", package.Id);
-
-                _deprecationWarning.Add(package.Id);
-            }
 
             var versionOverrideFile = _fileSystem.combine_paths(pkgStorePath, VERSION_OVERRIDE_FILE);
             if (_fileSystem.file_exists(versionOverrideFile))
@@ -248,14 +234,9 @@ Side by side installations are deprecated and is pending removal in v2.0.0.", pa
             {
                 _fileSystem.write_file(_fileSystem.combine_paths(pkgStorePath, SILENT_UNINSTALLER_FILE), string.Empty, Encoding.ASCII);
             }
-            if (packageInformation.IsSideBySide)
-            {
-                _fileSystem.write_file(_fileSystem.combine_paths(pkgStorePath, SIDE_BY_SIDE_FILE), string.Empty, Encoding.ASCII);
-            }
-            else
-            {
-                _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, SIDE_BY_SIDE_FILE));
-            }
+
+            // Legacy side-by-side installation data cleanup
+            _fileSystem.delete_file(_fileSystem.combine_paths(pkgStorePath, SIDE_BY_SIDE_FILE));
 
             if (packageInformation.IsPinned)
             {

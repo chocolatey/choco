@@ -159,7 +159,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
   <package id="missingpackage" />
   <package id="upgradepackage" version="1.0.0"
            installArguments="hi"
-           packageParameters="yo" forceX86="true" allowMultipleVersions="false"
+           packageParameters="yo" forceX86="true"
            ignoreDependencies="true"
            />
 </packages>
