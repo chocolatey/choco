@@ -1,6 +1,6 @@
 ﻿Import-Module helpers/common-helpers
 
-Describe "choco push" -Tag Chocolatey, PushCommand -Skip:($null -eq $env:API_KEY -or $null -eq $env:PUSH_REPO) {
+Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $env:API_KEY -or $null -eq $env:PUSH_REPO) {
     BeforeAll {
         Remove-NuGetPaths
         $ApiKey = $env:API_KEY
