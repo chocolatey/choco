@@ -36,13 +36,21 @@ namespace chocolatey.infrastructure.app.commands
         {
             "-l",
             "-lo",
+            "--lo",
+            "-local",
             "--local",
+            "-localonly",
             "--localonly",
+            "-local-only",
             "--local-only",
             "-a",
+            "-all",
             "--all",
+            "-allversions",
             "--allversions",
+            "-all-versions",
             "--all-versions",
+            "-order-by-popularity",
             "--order-by-popularity"
         };
 
