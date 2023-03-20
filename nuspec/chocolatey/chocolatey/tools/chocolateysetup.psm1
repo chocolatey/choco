@@ -1,4 +1,4 @@
-﻿$thisScriptFolder = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
+$thisScriptFolder = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
 $chocoInstallVariableName = "ChocolateyInstall"
 $sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
@@ -78,7 +78,7 @@ function Remove-ShimWithAuthenticodeSignature {
 function Remove-UnsupportedShimFiles {
     param([string[]]$Paths)
 
-    $shims = @("cpack.exe", "cver.exe")
+    $shims = @("cpack.exe", "cver.exe", "chocolatey.exe", "cinst.exe", "clist.exe", "cpush.exe", "cuninst.exe", "cup.exe")
 
     $Paths | ForEach-Object {
         $path = $_
