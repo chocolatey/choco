@@ -1,5 +1,6 @@
 ﻿Import-Module helpers/common-helpers
 
+# These are skipped in the Proxy Test environment because they push to a port outside of 8443 which is not allowed by our proxy.
 Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $env:API_KEY -or $null -eq $env:PUSH_REPO) {
     BeforeAll {
         Remove-NuGetPaths
