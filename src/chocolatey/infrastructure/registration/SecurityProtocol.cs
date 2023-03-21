@@ -20,42 +20,27 @@ namespace chocolatey.infrastructure.registration
     using System.Net;
     using app.configuration;
     using logging;
+    using platforms;
 
     public sealed class SecurityProtocol
     {
-        private const int Tls11 = 768;
-        private const int Tls12 = 3072;
-
-        public static void SetProtocol(bool provideWarning)
+        public static void SetProtocol(ChocolateyConfiguration config)
         {
-            try
+            if (config.Information.PlatformVersion < Version.Parse("6.2") && config.Information.PlatformType == PlatformType.Windows)
             {
-                // TODO: Streamline this method now that we are building against .NET 4.8
-
-                // We can't address the protocols directly when built with .NET
-                // Framework 4.0. However if someone is running .NET 4.5 or
-                // greater, they have in-place upgrades for System.dll, which
-                // will allow us to set these protocols directly.
-                const SecurityProtocolType tls11 = (SecurityProtocolType)Tls11;
-                const SecurityProtocolType tls12 = (SecurityProtocolType)Tls12;
-                ServicePointManager.SecurityProtocol = tls12 | tls11 | SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
+                // If the Windows version is less than 8.0/Server 2012, explicitly enable TLS 1.2
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
             }
-            catch (Exception)
+            else
             {
-                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls | SecurityProtocolType.Ssl3;
-                //todo: #2585 provide this warning with the ability to opt out of seeing it again so we can move it up to more prominent visibility and not just the verbose log
-                if (provideWarning)
-                {
-                "chocolatey".Log().Warn(ChocolateyLoggers.Verbose,
-@" !!WARNING!!
-Choco prefers to use TLS v1.2 if it is available, but this client is
- running on .NET 4.0, which uses an older SSL. It's using TLS 1.0 or
- earlier, which makes it susceptible to BEAST and also doesn't
- implement the 1/n-1 record splitting mitigation for Cipher-Block
- Chaining. Upgrade to at least .NET 4.5 at your earliest convenience.
+                // Otherwise, let the OS handle it as per Microsoft best practices
+                // https://web.archive.org/web/20230321032852/https://learn.microsoft.com/en-us/dotnet/framework/network-programming/tls
 
- For more information you should visit https://www.howsmyssl.com/");
-                }
+                // Windows 10 and Server 1019 do not support TLS 1.3
+                // But TLS 1.3 is both available and enabled by default in Windows 11 and Server 2022, so no need to explicitly enable it (unlike TLS 1.2 in Windows 7)
+                // https://web.archive.org/web/20230321032830/https://learn.microsoft.com/en-us/windows/win32/secauthn/protocols-in-tls-ssl--schannel-ssp-
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.SystemDefault;
             }
 
             try
@@ -76,7 +61,7 @@ Choco prefers to use TLS v1.2 if it is available, but this client is
 #pragma warning disable IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void set_protocol(ChocolateyConfiguration config, bool provideWarning)
-            => SetProtocol(provideWarning);
+            => SetProtocol(config);
 #pragma warning restore IDE1006
     }
 }

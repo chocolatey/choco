@@ -540,7 +540,7 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            SecurityProtocol.SetProtocol(provideWarning: false);
+            SecurityProtocol.SetProtocol(configuration);
         }
 
         private ResolveEventHandler _handler = null;

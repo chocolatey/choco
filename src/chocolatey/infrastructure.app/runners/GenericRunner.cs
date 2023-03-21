@@ -146,7 +146,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             }
 
             FailOnMissingOrInvalidLicenseIfFeatureSet(config);
-            SecurityProtocol.SetProtocol(provideWarning: true);
+            SecurityProtocol.SetProtocol(config);
             EventManager.Publish(new PreRunMessage(config));
 
             try
@@ -230,7 +230,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             }
 
             FailOnMissingOrInvalidLicenseIfFeatureSet(config);
-            SecurityProtocol.SetProtocol(provideWarning: true);
+            SecurityProtocol.SetProtocol(config);
             EventManager.Publish(new PreRunMessage(config));
 
             try
@@ -266,7 +266,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
         public int Count(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
         {
             FailOnMissingOrInvalidLicenseIfFeatureSet(config);
-            SecurityProtocol.SetProtocol(provideWarning: true);
+            SecurityProtocol.SetProtocol(config);
 
             var command = FindCommand(config, container, isConsole, parseArgs) as IListCommand;
             if (command == null)
