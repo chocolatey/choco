@@ -64,7 +64,7 @@ exit $command.Count
             $null = Invoke-Choco new testPackage --version 1.0.0
             $null = Invoke-Choco pack testPackage/testPackage.nuspec
             $null = Invoke-Choco apikey add -s https://chocolatey.org -k None
-            $Output = Invoke-Choco push ./testPackage.1.0.0.nupkg
+            $Output = Invoke-Choco push ./testPackage.1.0.0.nupkg --source https://push.chocolatey.org/
         }
 
         It 'Exits with Failure (1)' {
@@ -109,7 +109,7 @@ exit $command.Count
     Context 'Ensure WebPI source removal' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.999.999')) {
 
         BeforeAll {
-            $Output = Invoke-Choco list --source webpi
+            $Output = Invoke-Choco search --source webpi
         }
 
         It 'Exits with Failure (1)' {
@@ -137,7 +137,7 @@ exit $command.Count
 
     Context 'Ensure --allow-multiple removed from Chocolatey' -Tag InstallCommand, UpgradeCommand, UninstallCommand, AllowMultiple -Foreach @(
         @{ Command = 'install' }
-        @{ Command = 'update' }
+        @{ Command = 'upgrade' }
         @{ Command = 'uninstall' }
     ){
         BeforeAll {
