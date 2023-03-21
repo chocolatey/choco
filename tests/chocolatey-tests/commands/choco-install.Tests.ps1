@@ -1341,7 +1341,8 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Installing a Package with proxy and proxy bypass list" -Skip:(!$licensedProxyFixed) {
+    # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
+    Context "Installing a Package with proxy and proxy bypass list" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
@@ -1360,7 +1361,8 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Installing a Package with proxy and proxy bypass list on command" -Skip:(!$licensedProxyFixed) {
+    # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
+    Context "Installing a Package with proxy and proxy bypass list on command" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
@@ -1481,7 +1483,8 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Installing package with beforeInstall scriptblock defined" -Skip:(!$hasBeforeInstallBlock) {
+    # These are skipped in the Proxy Test environment because the beforeInstall reaches out to GitHub which is not permitted through our proxy.
+    Context "Installing package with beforeInstall scriptblock defined" -Tag ProxySkip -Skip:(!$hasBeforeInstallBlock) {
         BeforeAll {
             New-ChocolateyInstallSnapshot
             Remove-Item "$env:ChocolateyInstall\logs\*" -ErrorAction Ignore
