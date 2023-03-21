@@ -5,8 +5,7 @@ Describe "Python Source" -Tag Chocolatey, UpgradeCommand, PythonSource, ProxySki
     BeforeAll {
         Initialize-ChocolateyTestInstall
         New-ChocolateyInstallSnapshot
-        # TODO: Internalize Python and most dependencies. (KB perhaps not internalized due to excessive size...)
-        $null = Invoke-Choco install python3 --source https://community.chocolatey.org/api/v2/
+        $null = Invoke-Choco install python3
     }
 
     AfterAll {
