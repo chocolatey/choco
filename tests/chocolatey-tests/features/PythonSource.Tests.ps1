@@ -1,6 +1,7 @@
-﻿Import-Module helpers/common-helpers
+Import-Module helpers/common-helpers
 
 # This is skipped when not run in CI because it modifies the local system.
+# This is skipped on Proxy as Python needs to reach out to pypi which our proxy server does not allow.
 Describe "Python Source" -Tag Chocolatey, UpgradeCommand, PythonSource, ProxySkip -Skip:(-not $env:TEST_KITCHEN) {
     BeforeAll {
         Initialize-ChocolateyTestInstall

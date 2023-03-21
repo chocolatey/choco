@@ -79,6 +79,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
+    # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
     Context "Listing package information when using proxy and proxy bypass list in config" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeDiscovery {
             $infoItems = @(
@@ -112,6 +113,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
+    # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
     Context "Listing package information when using proxy and proxy bypass list on command" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeDiscovery {
             $infoItems = @(

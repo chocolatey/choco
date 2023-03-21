@@ -1341,6 +1341,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
+    # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
     Context "Installing a Package with proxy and proxy bypass list" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
@@ -1360,6 +1361,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
+    # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
     Context "Installing a Package with proxy and proxy bypass list on command" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
@@ -1481,6 +1483,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
+    # These are skipped in the Proxy Test environment because the beforeInstall reaches out to GitHub which is not permitted through our proxy.
     Context "Installing package with beforeInstall scriptblock defined" -Tag ProxySkip -Skip:(!$hasBeforeInstallBlock) {
         BeforeAll {
             New-ChocolateyInstallSnapshot
