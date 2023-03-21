@@ -1,4 +1,4 @@
-Import-Module helpers/common-helpers
+﻿Import-Module helpers/common-helpers
 
 Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolatey {
     BeforeDiscovery {
@@ -334,8 +334,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     ) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
         BeforeAll {
             New-ChocolateyInstallSnapshot
-            # TODO: Internalize pwsh and powershell packages...
-            $pwshInstall = Invoke-Choco install $_ -y -s https://community.chocolatey.org/api/v2/
+            $pwshInstall = Invoke-Choco install $_ -y
             $ChocoUnzipped = "$(Get-TempDirectory)$(New-Guid)"
             $modulePath = "$ChocoUnzipped/tools/chocolateySetup.psm1"
 
