@@ -1,0 +1,5 @@
+﻿M:NuGet.Versioning.SemanticVersion.ToFullString;Use ToFullStringChecked() extension method instead.
+M:Chocolatey.NuGet.Versioning.SemanticVersion.ToFullString();Use ToFullStringChecked() extension method instead.
+M:NuGet.Versioning.SemanticVersion.ToNormalizedString;Use ToNormalizedStringChecked() extension method instead.
+M:Chocolatey.NuGet.Versioning.SemanticVersion.ToNormalizedString();Use ToNormalizedStringChecked() extension method instead.
+M:System.StringComparer.InvariantCultureIgnoreCase;Use OrdinalIgnoreCase comparer instead.

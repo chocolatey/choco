@@ -1,19 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32901.82
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.console", "chocolatey.console\chocolatey.console.csproj", "{E24E3386-244F-4404-9E6E-5B53818EA903}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chocolatey.Console", "Chocolatey.Console\Chocolatey.Console.csproj", "{E24E3386-244F-4404-9E6E-5B53818EA903}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.tests", "chocolatey.tests\chocolatey.tests.csproj", "{5C4C60F0-47B1-498E-ABF7-D315E1A94BC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chocolatey.Tests", "Chocolatey.Tests\Chocolatey.Tests.csproj", "{5C4C60F0-47B1-498E-ABF7-D315E1A94BC9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{7656D054-387D-409C-A9FB-62A44599AA77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey", "chocolatey\chocolatey.csproj", "{5563DC61-35FD-4FAB-B331-9AE1FDB23F80}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chocolatey", "Chocolatey\Chocolatey.csproj", "{5563DC61-35FD-4FAB-B331-9AE1FDB23F80}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.resources", "chocolatey.resources\chocolatey.resources.csproj", "{AF584111-FE32-448D-A1D0-63217AF8B43C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chocolatey.Resources", "Chocolatey.Resources\Chocolatey.Resources.csproj", "{AF584111-FE32-448D-A1D0-63217AF8B43C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "chocolatey.tests.integration", "chocolatey.tests.integration\chocolatey.tests.integration.csproj", "{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chocolatey.Tests.Integration", "Chocolatey.Tests.Integration\Chocolatey.Tests.Integration.csproj", "{12ECAD4F-D463-4D72-A792-A4FCCFE9C456}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuspec", "nuspec", "{FB6236DD-17EF-4C36-943C-47792FBC3306}"
 EndProject
@@ -52,7 +52,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nuget", "nuget", "{9AF88603
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chocolatey", "chocolatey", "{4795798A-2F92-467A-88FC-772E66BF8E57}"
 EndProject
-Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "chocolatey.install", "chocolatey.install\chocolatey.install.wixproj", "{6B96B4AE-8FD2-4719-AAFB-BA027B798089}"
+Project("{930C7802-8A8C-48F9-8165-68863BCCD9DD}") = "Chocolatey.Install", "Chocolatey.Install\chocolatey.install.wixproj", "{6B96B4AE-8FD2-4719-AAFB-BA027B798089}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0C825236-3273-4E71-B74F-2F010809CC85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

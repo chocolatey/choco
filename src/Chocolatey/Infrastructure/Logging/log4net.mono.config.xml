@@ -1,0 +1,158 @@
+﻿<?xml version="1.0"?>
+<!-- For colors that can be used with ManagedColoredConsoleAppender, see
+     http://msdn.microsoft.com/en-us/library/system.consolecolor(v=vs.110).aspx 
+-->
+<log4net>
+  <appender name="NormalLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
+    <mapping>
+      <level value="FATAL" />
+      <foreColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="ERROR" />
+      <foreColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="WARN" />
+      <foreColor value="Yellow" />
+    </mapping>
+    <mapping>
+      <level value="INFO" />
+      <foreColor value="Gray" />
+    </mapping>
+    <mapping>
+      <level value="DEBUG" />
+      <foreColor value="DarkBlue" />
+    </mapping>
+    <layout type="log4net.Layout.PatternLayout">
+      <conversionPattern value="%message%newline" />
+    </layout>
+    <filter type="log4net.Filter.LevelRangeFilter">
+      <param name="LevelMin" value="INFO" />
+      <param name="LevelMax" value="FATAL" />
+    </filter>
+  </appender>
+
+  <appender name="ImportantLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
+    <mapping>
+      <level value="FATAL" />
+      <foreColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="ERROR" />
+      <foreColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="WARN" />
+      <foreColor value="Magenta" />
+    </mapping>
+    <mapping>
+      <level value="INFO" />
+      <foreColor value="Green" />
+    </mapping>
+    <mapping>
+      <level value="DEBUG" />
+      <foreColor value="Blue" />
+    </mapping>
+    <layout type="log4net.Layout.PatternLayout">
+      <conversionPattern value="%message%newline" />
+    </layout>
+    <filter type="log4net.Filter.LevelRangeFilter">
+      <param name="LevelMin" value="INFO" />
+      <param name="LevelMax" value="FATAL" />
+    </filter>
+  </appender>
+
+  <appender name="VerboseLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
+    <mapping>
+      <level value="FATAL" />
+      <foreColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="ERROR" />
+      <foreColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="WARN" />
+      <foreColor value="DarkMagenta" />
+    </mapping>
+    <mapping>
+      <level value="INFO" />
+      <foreColor value="DarkGreen" />
+    </mapping>
+    <mapping>
+      <level value="DEBUG" />
+      <foreColor value="DarkBlue" />
+    </mapping>
+    <layout type="log4net.Layout.PatternLayout">
+      <conversionPattern value="%message%newline" />
+    </layout>
+    <filter type="log4net.Filter.LevelRangeFilter">
+      <param name="LevelMin" value="ERROR" />
+      <param name="LevelMax" value="FATAL" />
+    </filter>
+  </appender>
+  
+  <appender name="TraceLoggingColoredConsoleAppender" type="log4net.Appender.ManagedColoredConsoleAppender">
+    <mapping>
+      <level value="FATAL" />
+      <foreColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="ERROR" />
+      <foreColor value="Red" />
+    </mapping>
+    <mapping>
+      <level value="WARN" />
+      <foreColor value="DarkMagenta" />
+    </mapping>
+    <mapping>
+      <level value="INFO" />
+      <foreColor value="DarkGreen" />
+    </mapping>
+    <mapping>
+      <level value="DEBUG" />
+      <foreColor value="DarkBlue" />
+    </mapping>
+    <layout type="log4net.Layout.PatternLayout">
+      <conversionPattern value="%message%newline" />
+    </layout>
+    <filter type="log4net.Filter.LevelRangeFilter">
+      <param name="LevelMin" value="FATAL" />
+      <param name="LevelMax" value="FATAL" />
+    </filter>
+  </appender>
+  
+  <root>
+    <level value="DEBUG" />
+  </root>
+
+  <logger name="Important">
+    <level value="DEBUG" />
+    <appender-ref ref="ImportantLoggingColoredConsoleAppender" />
+  </logger>  
+  
+  <logger name="Verbose">
+    <level value="DEBUG" />
+    <appender-ref ref="VerboseLoggingColoredConsoleAppender" />
+  </logger>
+
+  <logger name="Trace">
+    <level value="DEBUG" />
+    <appender-ref ref="TraceLoggingColoredConsoleAppender" />
+  </logger>
+
+  <logger name="chocolatey">
+    <level value="DEBUG"/>
+    <appender-ref ref="NormalLoggingColoredConsoleAppender" />
+  </logger>
+
+  <logger name="LogFileOnly">
+    <level value="DEBUG"/>
+  </logger>
+
+  <logger name="Rhino.Licensing">
+    <level value="DEBUG"/>
+  </logger>
+
+</log4net>

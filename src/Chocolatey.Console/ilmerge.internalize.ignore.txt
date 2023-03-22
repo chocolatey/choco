@@ -1,0 +1,6 @@
+chocolatey.*
+NuGet.*
+SimpleInjector.*
+Rhino.Licensing.*
+log4net.*
+Microsoft.Web.XmlTransform.*

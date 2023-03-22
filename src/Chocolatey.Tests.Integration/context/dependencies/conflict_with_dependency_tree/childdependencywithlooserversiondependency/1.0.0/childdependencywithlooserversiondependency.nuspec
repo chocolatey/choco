@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>childdependencywithlooserversiondependency</id>
+    <version>1.0.0</version>
+    <authors>__REPLACE_AUTHORS_OF_SOFTWARE__</authors>
+    <owners>__REPLACE_YOUR_NAME__</owners>
+    <description>__REPLACE__</description>
+    <dependencies>
+      <dependency id="isexactversiondependency" version="[1.0.0, 3)" />
+    </dependencies>
+  </metadata>
+</package>
