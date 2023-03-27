@@ -18,10 +18,10 @@ namespace chocolatey.infrastructure.app.domain
 {
     public enum ConfigCommandType
     {
-        unknown,
-        list,
-        get,
-        set,
-        unset,
+        Unknown,
+        List,
+        Get,
+        Set,
+        Unset,
     }
 }

@@ -32,7 +32,7 @@ namespace chocolatey.infrastructure.configuration
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void initialize_with(ChocolateyConfiguration configuration)
+        public static void InitializeWith(ChocolateyConfiguration configuration)
         {
             _configuration = configuration;
         }
@@ -47,7 +47,7 @@ namespace chocolatey.infrastructure.configuration
         ///     cref="ChocolateyConfiguration" />
         ///   if one has not been.
         /// </returns>
-        public static ChocolateyConfiguration get_configuration_settings()
+        public static ChocolateyConfiguration GetConfigurationSettings()
         {
             return _configuration;
         }

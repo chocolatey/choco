@@ -43,14 +43,14 @@ namespace chocolatey.tests.infrastructure.app.commands
                 command = new ChocolateyExportCommand(nugetService.Object, fileSystem.Object);
             }
 
-            public void reset()
+            public void Reset()
             {
                 nugetService.ResetCalls();
                 fileSystem.ResetCalls();
             }
         }
 
-        public class when_implementing_command_for : ChocolateyExportCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyExportCommandSpecsBase
         {
             private List<string> results;
 
@@ -60,13 +60,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_help()
+            public void Should_implement_help()
             {
                 results.ShouldContain("export");
             }
         }
 
-        public class when_configurating_the_argument_parser : ChocolateyExportCommandSpecsBase
+        public class When_configurating_the_argument_parser : ChocolateyExportCommandSpecsBase
         {
             private OptionSet optionSet;
 
@@ -78,55 +78,55 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                command.configure_argument_parser(optionSet, configuration);
+                command.ConfigureArgumentParser(optionSet, configuration);
             }
 
             [Fact]
-            public void should_add_output_file_path_to_the_option_set()
+            public void Should_add_output_file_path_to_the_option_set()
             {
                 optionSet.Contains("output-file-path").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_output_file_path_to_the_option_set()
+            public void Should_add_short_version_of_output_file_path_to_the_option_set()
             {
                 optionSet.Contains("o").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_include_version_numbers_to_the_option_set()
+            public void Should_add_include_version_numbers_to_the_option_set()
             {
                 optionSet.Contains("include-version-numbers").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_include_version_to_the_option_set()
+            public void Should_add_include_version_to_the_option_set()
             {
                 optionSet.Contains("include-version").ShouldBeTrue();
             }
         }
 
-        public class when_handling_additional_argument_parsing : ChocolateyExportCommandSpecsBase
+        public class When_handling_additional_argument_parsing : ChocolateyExportCommandSpecsBase
         {
             private readonly IList<string> unparsedArgs = new List<string>();
             private Action because;
 
             public override void Because()
             {
-                because = () => command.handle_additional_argument_parsing(unparsedArgs, configuration);
+                because = () => command.ParseAdditionalArguments(unparsedArgs, configuration);
             }
 
-            public new void reset()
+            public new void Reset()
             {
                 configuration.ExportCommand.OutputFilePath = string.Empty;
                 unparsedArgs.Clear();
-                base.reset();
+                base.Reset();
             }
 
             [Fact]
-            public void should_handle_passing_in_an_empty_string_for_output_file_path()
+            public void Should_handle_passing_in_an_empty_string_for_output_file_path()
             {
-                reset();
+                Reset();
                 unparsedArgs.Add(" ");
                 because();
 
@@ -134,9 +134,9 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_handle_passing_in_a_string_for_output_file_path()
+            public void Should_handle_passing_in_a_string_for_output_file_path()
             {
-                reset();
+                Reset();
                 unparsedArgs.Add("custompackages.config");
                 because();
 
@@ -144,21 +144,21 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_noop_is_called : ChocolateyExportCommandSpecsBase
+        public class When_noop_is_called : ChocolateyExportCommandSpecsBase
         {
             public override void Because()
             {
-                command.noop(configuration);
+                command.DryRun(configuration);
             }
 
             [Fact]
-            public void should_log_a_message()
+            public void Should_log_a_message()
             {
                 MockLogger.Verify(l => l.Info(It.IsAny<string>()), Times.AtLeastOnce);
             }
 
             [Fact]
-            public void should_log_the_message_we_expect()
+            public void Should_log_the_message_we_expect()
             {
                 var messages = MockLogger.MessagesFor(LogLevel.Info);
                 messages.ShouldNotBeEmpty();
@@ -167,12 +167,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_run_is_called : ChocolateyExportCommandSpecsBase
+        public class When_run_is_called : ChocolateyExportCommandSpecsBase
         {
-            public new void reset()
+            public new void Reset()
             {
                 Context();
-                base.reset();
+                base.Reset();
             }
 
             public override void AfterEachSpec()
@@ -187,34 +187,34 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_call_nuget_service_get_all_installed_packages()
+            public void Should_call_nuget_service_get_all_installed_packages()
             {
-                reset();
-                command.run(configuration);
+                Reset();
+                command.Run(configuration);
 
-                nugetService.Verify(n => n.get_all_installed_packages(It.IsAny<ChocolateyConfiguration>()), Times.Once);
+                nugetService.Verify(n => n.GetInstalledPackages(It.IsAny<ChocolateyConfiguration>()), Times.Once);
             }
 
             [Fact]
-            public void should_call_replace_file_when_file_already_exists()
+            public void Should_call_replace_file_when_file_already_exists()
             {
-                fileSystem.Setup(f => f.file_exists(It.IsAny<string>())).Returns(true);
+                fileSystem.Setup(f => f.FileExists(It.IsAny<string>())).Returns(true);
 
-                reset();
-                command.run(configuration);
+                Reset();
+                command.Run(configuration);
 
-                fileSystem.Verify(n => n.replace_file(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
+                fileSystem.Verify(n => n.ReplaceFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Once);
             }
 
             [Fact]
-            public void should_not_call_replace_file_when_file_doesnt_exist()
+            public void Should_not_call_replace_file_when_file_doesnt_exist()
             {
-                fileSystem.Setup(f => f.file_exists(It.IsAny<string>())).Returns(false);
+                fileSystem.Setup(f => f.FileExists(It.IsAny<string>())).Returns(false);
 
-                reset();
-                command.run(configuration);
+                Reset();
+                command.Run(configuration);
 
-                fileSystem.Verify(n => n.replace_file(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
+                fileSystem.Verify(n => n.ReplaceFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()), Times.Never);
             }
         }
     }

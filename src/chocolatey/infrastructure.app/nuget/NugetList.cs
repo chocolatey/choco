@@ -36,8 +36,6 @@ namespace chocolatey.infrastructure.app.nuget
     using NuGet.Protocol.Core.Types;
     using NuGet.Versioning;
 
-    // ReSharper disable InconsistentNaming
-
     public static class NugetList
     {
         public static int LastPackageLimitUsed { get; private set; }
@@ -46,14 +44,14 @@ namespace chocolatey.infrastructure.app.nuget
 
         public static IEnumerable<IPackageSearchMetadata> GetPackages(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-            return execute_package_search(configuration, nugetLogger, filesystem).GetAwaiter().GetResult();
+            return SearchPackagesAsync(configuration, nugetLogger, filesystem).GetAwaiter().GetResult();
         }
 
         public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
             var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger, filesystem);
             var packageRepositoriesResources = NugetCommon.GetRepositoryResources(packageRepositories);
-            string searchTermLower = configuration.Input.to_lower();
+            string searchTermLower = configuration.Input.ToLowerSafe();
 
             SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
             searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
@@ -73,14 +71,14 @@ namespace chocolatey.infrastructure.app.nuget
             return totalCount;
         }
 
-        private async static Task<IQueryable<IPackageSearchMetadata>> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
+        private async static Task<IQueryable<IPackageSearchMetadata>> SearchPackagesAsync(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
             ThresholdHit = false;
             LowerThresholdHit = false;
 
             var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger, filesystem);
             var packageRepositoriesResources = NugetCommon.GetRepositoryResources(packageRepositories);
-            string searchTermLower = configuration.Input.to_lower();
+            string searchTermLower = configuration.Input.ToLowerSafe();
 
             SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
             searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
@@ -152,7 +150,7 @@ namespace chocolatey.infrastructure.app.nuget
 
                     if (repositoryResources.searchResource != null && version == null)
                     {
-                        var takeNumber = get_take_numbers(configuration);
+                        var takeNumber = GetTakeAmount(configuration);
 
                         var partResults = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadataIdOnly());
                         var latestResults = new List<IPackageSearchMetadata>();
@@ -254,7 +252,7 @@ namespace chocolatey.infrastructure.app.nuget
                 }
                 else
                 {
-                    var exactPackage = find_package(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoriesResources.Select(x => x.packageMetadataResource), packageRepositoriesResources.Select(x => x.listResource), version);
+                    var exactPackage = FindPackage(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoriesResources.Select(x => x.packageMetadataResource), packageRepositoriesResources.Select(x => x.listResource), version);
 
                     if (exactPackage == null) return new List<IPackageSearchMetadata>().AsQueryable();
 
@@ -281,7 +279,7 @@ namespace chocolatey.infrastructure.app.nuget
 
             if (configuration.ListCommand.ByTagOnly)
             {
-                results = results.Where(p => p.Tags.contains(searchTermLower, StringComparison.InvariantCultureIgnoreCase)).ToHashSet();
+                results = results.Where(p => p.Tags.ContainsSafe(searchTermLower, StringComparison.InvariantCultureIgnoreCase)).ToHashSet();
             }
 
             if (configuration.ListCommand.ApprovedOnly)
@@ -306,7 +304,7 @@ namespace chocolatey.infrastructure.app.nuget
             return results.AsQueryable();
         }
 
-        private static int get_take_numbers(ChocolateyConfiguration configuration)
+        private static int GetTakeAmount(ChocolateyConfiguration configuration)
         {
             // We calculate the amount of items we take at the same time, while making
             // sure to take the minimum value of 30 packages which we know is a safe value
@@ -320,7 +318,7 @@ namespace chocolatey.infrastructure.app.nuget
             return 30;
         }
 
-        public static ISet<IPackageSearchMetadata> find_all_package_versions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
+        public static ISet<IPackageSearchMetadata> FindAllPackageVersions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
         {
             var metadataList = new HashSet<IPackageSearchMetadata>();
             foreach (var resource in resources)
@@ -341,7 +339,7 @@ namespace chocolatey.infrastructure.app.nuget
         /// <param name="version">Version to search for</param>
         /// <param name="cacheContext">Settings for caching of results from sources</param>
         /// <returns>One result or nothing</returns>
-        public static IPackageSearchMetadata find_package(
+        public static IPackageSearchMetadata FindPackage(
             string packageName,
             ChocolateyConfiguration config,
             ILogger nugetLogger,
@@ -359,7 +357,7 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     // We only need to force a lower case package name when we
                     // are using our own repository optimization queries.
-                    var packageNameLower = packageName.to_lower();
+                    var packageNameLower = packageName.ToLowerSafe();
                     var metadataList = new HashSet<IPackageSearchMetadata>();
 
                     foreach (var listResource in listResources)
@@ -456,7 +454,4 @@ namespace chocolatey.infrastructure.app.nuget
             return obj.Identity.GetHashCode();
         }
     }
-
-
-    // ReSharper restore InconsistentNaming
 }

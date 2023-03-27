@@ -30,7 +30,7 @@ namespace chocolatey.infrastructure.app.services
         ///   Noops the specified package install.
         /// </summary>
         /// <param name="packageResult">The package result.</param>
-        void install_noop(PackageResult packageResult);
+        void InstallDryRun(PackageResult packageResult);
 
         /// <summary>
         ///   Installs the specified package.
@@ -38,13 +38,13 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="configuration">The configuration</param>
         /// <param name="packageResult">The package result.</param>
         /// <returns>true if the chocolateyInstall.ps1 was found, even if it has failures</returns>
-        bool install(ChocolateyConfiguration configuration, PackageResult packageResult);
+        bool Install(ChocolateyConfiguration configuration, PackageResult packageResult);
 
         /// <summary>
         ///   Noops the specified package uninstall.
         /// </summary>
         /// <param name="packageResult">The package result.</param>
-        void uninstall_noop(PackageResult packageResult);
+        void UninstallDryRun(PackageResult packageResult);
 
         /// <summary>
         ///   Uninstalls the specified package.
@@ -52,13 +52,13 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="configuration">The configuration</param>
         /// <param name="packageResult">The package result.</param>
         /// <returns>true if the chocolateyUninstall.ps1 was found, even if it has failures</returns>
-        bool uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
+        bool Uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
 
         /// <summary>
         ///   Noops the specified package before modify operation.
         /// </summary>
         /// <param name="packageResult">The package result.</param>
-        void before_modify_noop(PackageResult packageResult);
+        void BeforeModifyDryRun(PackageResult packageResult);
 
         /// <summary>
         ///   Runs any before modification script on the specified package.
@@ -66,13 +66,10 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="configuration">The configuration</param>
         /// <param name="packageResult">The package result.</param>
         /// <returns>true if the chocolateyBeforeModify.ps1 was found, even if it has failures</returns>
-        bool before_modify(ChocolateyConfiguration configuration, PackageResult packageResult);
+        bool BeforeModify(ChocolateyConfiguration configuration, PackageResult packageResult);
 
-        void prepare_powershell_environment(IPackageSearchMetadata package, ChocolateyConfiguration configuration, string packageDirectory);
+        void PreparePowerShellEnvironment(IPackageSearchMetadata package, ChocolateyConfiguration configuration, string packageDirectory);
 
-        [Obsolete("This version of running the powershell host do not support running additional hooks. Use the appropriate overload instead")]
-        PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript);
-
-        PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList);
+        PowerShellExecutionResults RunHost(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList);
     }
 }

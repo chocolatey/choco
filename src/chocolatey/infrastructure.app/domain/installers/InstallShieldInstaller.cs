@@ -28,14 +28,14 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public InstallShieldInstaller()
         {
-            InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
+            InstallExecutable = "\"{0}\"".FormatWith(InstallTokens.InstallerLocation);
             SilentInstall = "/s /v\"/qn\"";
             NoReboot = "/v\"REBOOT=ReallySuppress\"";
-            LogFile = "/f2\"{0}\\MSI.Install.log\"".format_with(InstallTokens.PACKAGE_LOCATION);
-            CustomInstallLocation = "/v\"INSTALLDIR=\\\"{0}\\\"".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
-            Language = "/l\"{0}\"".format_with(InstallTokens.LANGUAGE);
+            LogFile = "/f2\"{0}\\MSI.Install.log\"".FormatWith(InstallTokens.PackageLocation);
+            CustomInstallLocation = "/v\"INSTALLDIR=\\\"{0}\\\"".FormatWith(InstallTokens.CustomInstallLocation);
+            Language = "/l\"{0}\"".FormatWith(InstallTokens.Language);
             OtherInstallOptions = "/sms"; // pause
-            UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            UninstallExecutable = "\"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             SilentUninstall = "/uninst /s";
             OtherUninstallOptions = "/sms";
             // http://helpnet.installshield.com/installshield18helplib/IHelpSetup_EXEErrors.htm

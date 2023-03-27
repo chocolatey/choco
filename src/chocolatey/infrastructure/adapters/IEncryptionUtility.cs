@@ -18,8 +18,8 @@ namespace chocolatey.infrastructure.adapters
 {
     public interface IEncryptionUtility
     {
-        string encrypt_string(string cleartextValue);
-        string decrypt_string(string encryptedString);
-        string generate_unique_token(string caseInsensitiveKey);
+        string EncryptString(string cleartextValue);
+        string DecryptString(string encryptedString);
+        string GenerateUniqueToken(string caseInsensitiveKey);
     }
 }

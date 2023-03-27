@@ -25,6 +25,6 @@ namespace chocolatey.infrastructure.app.services
     /// <returns><c>true</c> if reboot is required; otherwise <c>false</c>.</returns>
     public interface IPendingRebootService
     {
-        bool is_pending_reboot(ChocolateyConfiguration config);
+        bool IsRebootPending(ChocolateyConfiguration config);
     }
 }

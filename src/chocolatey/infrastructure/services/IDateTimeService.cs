@@ -26,6 +26,6 @@ namespace chocolatey.infrastructure.services
         /// <summary>
         ///   Gets the current date time.
         /// </summary>
-        DateTime? get_current_date_time();
+        DateTime? GetCurrentDateTime();
     }
 }

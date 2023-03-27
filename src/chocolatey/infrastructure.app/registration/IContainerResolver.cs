@@ -20,10 +20,10 @@ namespace chocolatey.infrastructure.app.registration
 
     public interface IContainerResolver
     {
-        TService resolve<TService>()
+        TService Resolve<TService>()
             where TService : class;
 
-        IEnumerable<TService> resolve_all<TService>()
+        IEnumerable<TService> ResolveAll<TService>()
             where TService : class;
     }
 }

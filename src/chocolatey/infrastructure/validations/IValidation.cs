@@ -31,6 +31,6 @@ namespace chocolatey.infrastructure.validations
         /// </summary>
         /// <param name="config">The current Chocolatey Configuration</param>
         /// <returns>The validation results</returns>
-        ICollection<ValidationResult> validate(ChocolateyConfiguration config);
+        ICollection<ValidationResult> Validate(ChocolateyConfiguration config);
     }
 }

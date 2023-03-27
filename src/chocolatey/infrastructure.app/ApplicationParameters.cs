@@ -35,48 +35,48 @@ namespace chocolatey.infrastructure.app
 
 #if FORCE_CHOCOLATEY_OFFICIAL_KEY
         // always look at the official location of the machine installation
-        public static readonly string InstallLocation = System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) ?? _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path());
-        public static readonly string LicensedAssemblyLocation = _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
+        public static readonly string InstallLocation = System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) ?? _fileSystem.GetDirectoryName(_fileSystem.GetCurrentAssemblyPath());
+        public static readonly string LicensedAssemblyLocation = _fileSystem.CombinePaths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
 #elif DEBUG
         // Install location is choco.exe or chocolatey.dll
-        public static readonly string InstallLocation = _fileSystem.get_directory_name(_fileSystem.get_current_assembly_path());
+        public static readonly string InstallLocation = _fileSystem.GetDirectoryName(_fileSystem.GetCurrentAssemblyPath());
         // when being used as a reference, start by looking next to Chocolatey, then in a subfolder.
-        public static readonly string LicensedAssemblyLocation = _fileSystem.file_exists(_fileSystem.combine_paths(InstallLocation, "chocolatey.licensed.dll")) ? _fileSystem.combine_paths(InstallLocation, "chocolatey.licensed.dll") : _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
+        public static readonly string LicensedAssemblyLocation = _fileSystem.FileExists(_fileSystem.CombinePaths(InstallLocation, "chocolatey.licensed.dll")) ? _fileSystem.CombinePaths(InstallLocation, "chocolatey.licensed.dll") : _fileSystem.CombinePaths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
 #else
-        // Install locations is chocolatey.dll or choco.exe - In Release mode
+        // Install locations is Chocolatey.dll or choco.exe - In Release mode
         // we might be testing on a server or in the local debugger. Either way,
         // start from the assembly location and if unfound, head to the machine
         // locations instead. This is a merge of official and Debug modes.
         private static IAssembly _assemblyForLocation = Assembly.GetEntryAssembly().UnderlyingType != null ? Assembly.GetEntryAssembly() : Assembly.GetExecutingAssembly();
-        public static readonly string InstallLocation = _fileSystem.file_exists(_fileSystem.combine_paths(_fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace(Platform.get_platform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)), "chocolatey.dll")) ||
-                                                        _fileSystem.file_exists(_fileSystem.combine_paths(_fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace(Platform.get_platform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)), "choco.exe")) ?
-                _fileSystem.get_directory_name(_assemblyForLocation.CodeBase.Replace(Platform.get_platform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)) :
+        public static readonly string InstallLocation = _fileSystem.FileExists(_fileSystem.CombinePaths(_fileSystem.GetDirectoryName(_assemblyForLocation.CodeBase.Replace(Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)), "chocolatey.dll")) ||
+                                                        _fileSystem.FileExists(_fileSystem.CombinePaths(_fileSystem.GetDirectoryName(_assemblyForLocation.CodeBase.Replace(Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)), "choco.exe")) ?
+                _fileSystem.GetDirectoryName(_assemblyForLocation.CodeBase.Replace(Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)) :
                 !string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName)) ?
                     System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) :
                     @"C:\ProgramData\Chocolatey"
             ;
 
         // when being used as a reference, start by looking next to Chocolatey, then in a subfolder.
-        public static readonly string LicensedAssemblyLocation = _fileSystem.file_exists(_fileSystem.combine_paths(InstallLocation, "chocolatey.licensed.dll")) ? _fileSystem.combine_paths(InstallLocation, "chocolatey.licensed.dll") : _fileSystem.combine_paths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
+        public static readonly string LicensedAssemblyLocation = _fileSystem.FileExists(_fileSystem.CombinePaths(InstallLocation, "chocolatey.licensed.dll")) ? _fileSystem.CombinePaths(InstallLocation, "chocolatey.licensed.dll") : _fileSystem.CombinePaths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
 #endif
 
-        public static readonly string CommonAppDataChocolatey = _fileSystem.combine_paths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData), Name);
-        public static readonly string LoggingLocation = _fileSystem.combine_paths(InstallLocation, "logs");
+        public static readonly string CommonAppDataChocolatey = _fileSystem.CombinePaths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData), Name);
+        public static readonly string LoggingLocation = _fileSystem.CombinePaths(InstallLocation, "logs");
         public static readonly string LoggingFile = @"chocolatey.log";
         public static readonly string LoggingSummaryFile = @"choco.summary.log";
         public static readonly string Log4NetConfigurationAssembly = @"chocolatey";
         public static string Log4NetConfigurationResource = @"chocolatey.infrastructure.logging.log4net.config.xml";
         public static readonly string ChocolateyFileResources = "chocolatey.resources";
         public static readonly string ChocolateyConfigFileResource = @"chocolatey.infrastructure.app.configuration.chocolatey.config";
-        public static readonly string GlobalConfigFileLocation = _fileSystem.combine_paths(InstallLocation, "config", "chocolatey.config");
-        public static readonly string LicenseFileLocation = _fileSystem.combine_paths(InstallLocation, "license", "chocolatey.license.xml");
+        public static readonly string GlobalConfigFileLocation = _fileSystem.CombinePaths(InstallLocation, "config", "chocolatey.config");
+        public static readonly string LicenseFileLocation = _fileSystem.CombinePaths(InstallLocation, "license", "chocolatey.license.xml");
         public static readonly string UserProfilePath = !string.IsNullOrWhiteSpace(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)) ?
               System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)
             : CommonAppDataChocolatey;
-        public static readonly string HttpCacheUserLocation = _fileSystem.combine_paths(UserProfilePath, ".chocolatey", "http-cache");
-        public static readonly string HttpCacheLocation = get_http_cache_location();
+        public static readonly string HttpCacheUserLocation = _fileSystem.CombinePaths(UserProfilePath, ".chocolatey", "http-cache");
+        public static readonly string HttpCacheLocation = GetHttpCacheLocation();
 
-        public static readonly string UserLicenseFileLocation = _fileSystem.combine_paths(UserProfilePath, "chocolatey.license.xml");
+        public static readonly string UserLicenseFileLocation = _fileSystem.CombinePaths(UserProfilePath, "chocolatey.license.xml");
         public static readonly string LicensedChocolateyAssemblySimpleName = "chocolatey.licensed";
         public static readonly string LicensedComponentRegistry = @"chocolatey.licensed.infrastructure.app.registration.ContainerBinding";
         public static readonly string LicensedConfigurationBuilder = @"chocolatey.licensed.infrastructure.app.builders.ConfigurationBuilder";
@@ -85,14 +85,14 @@ namespace chocolatey.infrastructure.app
         public static readonly string UnofficialChocolateyPublicKey = "fd112f53c3ab578c";
         public static readonly string OfficialChocolateyPublicKey = "79d02ea9cad655eb";
 
-        public static string PackagesLocation = _fileSystem.combine_paths(InstallLocation, "lib");
-        public static readonly string PackageFailuresLocation = _fileSystem.combine_paths(InstallLocation, "lib-bad");
-        public static readonly string PackageBackupLocation = _fileSystem.combine_paths(InstallLocation, "lib-bkp");
-        public static readonly string ShimsLocation = _fileSystem.combine_paths(InstallLocation, "bin");
-        public static readonly string ChocolateyPackageInfoStoreLocation = _fileSystem.combine_paths(InstallLocation, ".chocolatey");
-        public static readonly string ExtensionsLocation = _fileSystem.combine_paths(InstallLocation, "extensions");
-        public static readonly string TemplatesLocation = _fileSystem.combine_paths(InstallLocation, "templates");
-        public static readonly string HooksLocation = _fileSystem.combine_paths(InstallLocation, "hooks");
+        public static string PackagesLocation = _fileSystem.CombinePaths(InstallLocation, "lib");
+        public static readonly string PackageFailuresLocation = _fileSystem.CombinePaths(InstallLocation, "lib-bad");
+        public static readonly string PackageBackupLocation = _fileSystem.CombinePaths(InstallLocation, "lib-bkp");
+        public static readonly string ShimsLocation = _fileSystem.CombinePaths(InstallLocation, "bin");
+        public static readonly string ChocolateyPackageInfoStoreLocation = _fileSystem.CombinePaths(InstallLocation, ".chocolatey");
+        public static readonly string ExtensionsLocation = _fileSystem.CombinePaths(InstallLocation, "extensions");
+        public static readonly string TemplatesLocation = _fileSystem.CombinePaths(InstallLocation, "templates");
+        public static readonly string HooksLocation = _fileSystem.CombinePaths(InstallLocation, "hooks");
         public static readonly string HookPackageIdExtension = ".hook";
         public static readonly string ChocolateyCommunityFeedPushSourceOld = "https://chocolatey.org/";
         public static readonly string ChocolateyCommunityFeedPushSource = "https://push.chocolatey.org/";
@@ -103,14 +103,14 @@ namespace chocolatey.infrastructure.app
         public static readonly string UserAgent = "Chocolatey Command Line";
         public static readonly string RegistryValueInstallLocation = "InstallLocation";
         public static readonly string AllPackages = "all";
-        public static readonly string PowerShellModulePathProcessProgramFiles = _fileSystem.combine_paths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles), "WindowsPowerShell\\Modules");
-        public static readonly string PowerShellModulePathProcessDocuments = _fileSystem.combine_paths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "WindowsPowerShell\\Modules");
+        public static readonly string PowerShellModulePathProcessProgramFiles = _fileSystem.CombinePaths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ProgramFiles), "WindowsPowerShell\\Modules");
+        public static readonly string PowerShellModulePathProcessDocuments = _fileSystem.CombinePaths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "WindowsPowerShell\\Modules");
         public static readonly string LocalSystemSidString = "S-1-5-18";
         public static readonly SecurityIdentifier LocalSystemSid = new SecurityIdentifier(LocalSystemSidString);
 
-        private static string get_http_cache_location()
+        private static string GetHttpCacheLocation()
         {
-            if (ProcessInformation.process_is_elevated() || string.IsNullOrEmpty(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)))
+            if (ProcessInformation.IsElevated() || string.IsNullOrEmpty(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)))
             {
                 // CommonAppDataChocolatey is always set to ProgramData\Chocolatey.
                 // So we append HttpCache to that name if it is possible.
@@ -131,7 +131,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string SystemUserName = "SYSTEM";
             public static readonly string Username = "USERNAME";
             public static readonly string ProcessorArchitecture = "PROCESSOR_ARCHITECTURE";
-            public const string ARM64_PROCESSOR_ARCHITECTURE = "ARM64";
+            public const string Arm64ProcessorArchitecture = "ARM64";
             public static readonly string EnvironmentSeparator = ";";
 
             public static readonly string ChocolateyToolsLocation = "ChocolateyToolsLocation";
@@ -178,7 +178,7 @@ namespace chocolatey.infrastructure.app
 
         public static class Tools
         {
-            public static readonly string ShimGenExe = _fileSystem.combine_paths(InstallLocation, "tools", "shimgen.exe");
+            public static readonly string ShimGenExe = _fileSystem.CombinePaths(InstallLocation, "tools", "shimgen.exe");
         }
 
         public static class ConfigSettings
@@ -233,26 +233,14 @@ namespace chocolatey.infrastructure.app
             public static readonly string NugetEventActionHeader = "Nuget called an event";
         }
 
-        private static T try_get_config<T>(Func<T> func, T defaultValue)
-        {
-            try
-            {
-                return func.Invoke();
-            }
-            catch (Exception)
-            {
-                return defaultValue;
-            }
-        }
-
-        public static bool is_debug_mode_cli_primitive()
+        public static bool IsDebugModeCliPrimitive()
         {
             var args = System.Environment.GetCommandLineArgs();
             var isDebug = false;
             // no access to the good stuff here, need to go a bit primitive in parsing args
-            foreach (var arg in args.or_empty_list_if_null())
+            foreach (var arg in args.OrEmpty())
             {
-                if (arg.contains("-debug") || arg.is_equal_to("-d") || arg.is_equal_to("/d"))
+                if (arg.ContainsSafe("-debug") || arg.IsEqualTo("-d") || arg.IsEqualTo("/d"))
                 {
                     isDebug = true;
                     break;
@@ -261,13 +249,5 @@ namespace chocolatey.infrastructure.app
 
             return isDebug;
         }
-
-        ///// <summary>
-        /////   Are we in Debug Mode?
-        ///// </summary>
-        //public static bool IsDebug
-        //{
-        //    get { return TryGetConfig(() => Config.GetConfigurationSettings().Debug, false); }
-        //}
     }
 }

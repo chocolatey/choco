@@ -34,6 +34,6 @@ namespace chocolatey.infrastructure.app.registration
         /// </summary>
         /// <returns>The initial configuration for the settings.</returns>
         /// <remarks>This is not used, and is only a placeholder for the future.</remarks>
-        object create_initial_extension_configuration();
+        object CreateInitialExtensionConfiguration();
     }
 }

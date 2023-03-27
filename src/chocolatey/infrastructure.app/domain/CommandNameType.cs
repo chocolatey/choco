@@ -18,9 +18,9 @@ namespace chocolatey.infrastructure.app.domain
 {
     public enum CommandNameType
     {
-        list,
-        install,
-        upgrade,
-        uninstall,
+        List,
+        Install,
+        Upgrade,
+        Uninstall,
     }
 }

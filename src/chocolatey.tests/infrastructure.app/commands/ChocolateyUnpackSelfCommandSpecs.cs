@@ -40,11 +40,11 @@ namespace chocolatey.tests.infrastructure.app.commands
             public override void Context()
             {
                 command = new ChocolateyUnpackSelfCommand(fileSystem.Object);
-                command.initialize_with(new Lazy<IAssembly>(() => assembly.Object));
+                command.InitializeWith(new Lazy<IAssembly>(() => assembly.Object));
             }
         }
 
-        public class when_implementing_command_for : ChocolateyUnpackSelfCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyUnpackSelfCommandSpecsBase
         {
             private List<string> results;
 
@@ -54,47 +54,47 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_unpackself()
+            public void Should_implement_unpackself()
             {
                 results.ShouldContain("unpackself");
             }
         }
 
-        public class when_noop_is_called : ChocolateyUnpackSelfCommandSpecsBase
+        public class When_noop_is_called : ChocolateyUnpackSelfCommandSpecsBase
         {
             public override void Because()
             {
-                command.noop(configuration);
+                command.DryRun(configuration);
             }
 
             [Fact]
-            public void should_log_a_message()
+            public void Should_log_a_message()
             {
                 MockLogger.Verify(l => l.Info(It.IsAny<string>()), Times.Once);
             }
 
             [Fact]
-            public void should_log_one_message()
+            public void Should_log_one_message()
             {
                 MockLogger.Messages.Count.ShouldEqual(1);
             }
 
             [Fact]
-            public void should_log_a_message_about_what_it_would_have_done()
+            public void Should_log_a_message_about_what_it_would_have_done()
             {
                 MockLogger.MessagesFor(LogLevel.Info).FirstOrDefault().ShouldContain("This would have unpacked");
             }
         }
 
-        public class when_run_is_called : ChocolateyUnpackSelfCommandSpecsBase
+        public class When_run_is_called : ChocolateyUnpackSelfCommandSpecsBase
         {
             public override void Because()
             {
-                command.run(configuration);
+                command.Run(configuration);
             }
 
             [Fact]
-            public void should_call_assembly_file_extractor()
+            public void Should_call_assembly_file_extractor()
             {
                 assembly.Verify(a => a.GetManifestResourceNames(), Times.Once);
             }

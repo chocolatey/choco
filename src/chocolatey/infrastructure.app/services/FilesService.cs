@@ -40,28 +40,28 @@ namespace chocolatey.infrastructure.app.services
             _hashProvider = hashProvider;
         }
 
-        public PackageFiles read_from_file(string filePath)
+        public PackageFiles ReadPackageSnapshot(string filePath)
         {
-            if (!_fileSystem.file_exists(filePath)) return null;
+            if (!_fileSystem.FileExists(filePath)) return null;
 
-            return _xmlService.deserialize<PackageFiles>(filePath);
+            return _xmlService.Deserialize<PackageFiles>(filePath);
         }
 
-        private string get_package_install_directory(PackageResult packageResult)
+        private string GetPackageInstallDirectory(PackageResult packageResult)
         {
             if (packageResult == null) return null;
 
             var installDirectory = packageResult.InstallLocation;
-            return package_install_directory_is_correct(installDirectory, logMessage => packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage))) ? installDirectory : null;
+            return PackageInstallDirectoryIsCorrect(installDirectory, logMessage => packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage))) ? installDirectory : null;
         }
 
-        private bool package_install_directory_is_correct(string directory, Action<string> errorAction = null)
+        private bool PackageInstallDirectoryIsCorrect(string directory, Action<string> errorAction = null)
         {
-            if (directory.to_string().is_equal_to(string.Empty)) return false;
+            if (directory.ToStringSafe().IsEqualTo(string.Empty)) return false;
 
-            if (directory.is_equal_to(ApplicationParameters.InstallLocation) || directory.is_equal_to(ApplicationParameters.PackagesLocation))
+            if (directory.IsEqualTo(ApplicationParameters.InstallLocation) || directory.IsEqualTo(ApplicationParameters.PackagesLocation))
             {
-                var logMessage = "Install location is not specific enough:{0} Erroneous install location captured as '{1}'".format_with(Environment.NewLine, directory);
+                var logMessage = "Install location is not specific enough:{0} Erroneous install location captured as '{1}'".FormatWith(Environment.NewLine, directory);
                 if (errorAction != null) errorAction.Invoke(logMessage);
                 this.Log().Error(logMessage);
                 return false;
@@ -70,67 +70,67 @@ namespace chocolatey.infrastructure.app.services
             return true;
         }
 
-        public void save_to_file(PackageFiles snapshot, string filePath)
+        public void SavePackageSnapshot(PackageFiles snapshot, string filePath)
         {
             if (snapshot == null) return;
 
-            _xmlService.serialize(snapshot, filePath);
+            _xmlService.Serialize(snapshot, filePath);
         }
 
-        public void ensure_compatible_file_attributes(PackageResult packageResult, ChocolateyConfiguration config)
+        public void EnsureCompatibleFileAttributes(PackageResult packageResult, ChocolateyConfiguration config)
         {
             if (packageResult == null) return;
-            var installDirectory = get_package_install_directory(packageResult);
+            var installDirectory = GetPackageInstallDirectory(packageResult);
             if (installDirectory == null) return;
 
-            ensure_compatible_file_attributes(installDirectory, config);
+            EnsureCompatibleFileAttributes(installDirectory, config);
         }
 
-        public void ensure_compatible_file_attributes(string directory, ChocolateyConfiguration config)
+        public void EnsureCompatibleFileAttributes(string directory, ChocolateyConfiguration config)
         {
-            if (!package_install_directory_is_correct(directory)) return;
+            if (!PackageInstallDirectoryIsCorrect(directory)) return;
 
-            foreach (var file in _fileSystem.get_files(directory, "*.*", SearchOption.AllDirectories))
+            foreach (var file in _fileSystem.GetFiles(directory, "*.*", SearchOption.AllDirectories))
             {
-                var filePath = _fileSystem.get_full_path(file);
-                var fileInfo = _fileSystem.get_file_info_for(filePath);
+                var filePath = _fileSystem.GetFullPath(file);
+                var fileInfo = _fileSystem.GetFileInfoFor(filePath);
 
-                if (_fileSystem.is_system_file(fileInfo)) _fileSystem.ensure_file_attribute_removed(filePath, FileAttributes.System);
-                if (_fileSystem.is_readonly_file(fileInfo)) _fileSystem.ensure_file_attribute_removed(filePath, FileAttributes.ReadOnly);
-                if (_fileSystem.is_hidden_file(fileInfo)) _fileSystem.ensure_file_attribute_removed(filePath, FileAttributes.Hidden);
+                if (_fileSystem.IsSystemFile(fileInfo)) _fileSystem.EnsureFileAttributeRemoved(filePath, FileAttributes.System);
+                if (_fileSystem.IsReadOnlyFile(fileInfo)) _fileSystem.EnsureFileAttributeRemoved(filePath, FileAttributes.ReadOnly);
+                if (_fileSystem.IsHiddenFile(fileInfo)) _fileSystem.EnsureFileAttributeRemoved(filePath, FileAttributes.Hidden);
             }
         }
 
-        public PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config)
+        public PackageFiles CaptureSnapshot(PackageResult packageResult, ChocolateyConfiguration config)
         {
             if (packageResult == null) return new PackageFiles();
-            var installDirectory = get_package_install_directory(packageResult);
+            var installDirectory = GetPackageInstallDirectory(packageResult);
             if (installDirectory == null) return null;
 
-            return capture_package_files(installDirectory, config);
+            return CaptureSnapshot(installDirectory, config);
         }
 
-        public PackageFiles capture_package_files(string directory, ChocolateyConfiguration config)
+        public PackageFiles CaptureSnapshot(string directory, ChocolateyConfiguration config)
         {
             var packageFiles = new PackageFiles();
 
-            if (!package_install_directory_is_correct(directory)) return packageFiles;
+            if (!PackageInstallDirectoryIsCorrect(directory)) return packageFiles;
 
-            this.Log().Debug(() => "Capturing package files in '{0}'".format_with(directory));
+            this.Log().Debug(() => "Capturing package files in '{0}'".FormatWith(directory));
             //gather all files in the folder
-            var files = _fileSystem.get_files(directory, pattern: "*.*", option: SearchOption.AllDirectories);
-            foreach (string file in files.or_empty_list_if_null().Where(f => !f.EndsWith(ApplicationParameters.PackagePendingFileName)))
+            var files = _fileSystem.GetFiles(directory, pattern: "*.*", option: SearchOption.AllDirectories);
+            foreach (string file in files.OrEmpty().Where(f => !f.EndsWith(ApplicationParameters.PackagePendingFileName)))
             {
-                packageFiles.Files.Add(get_package_file(file));
+                packageFiles.Files.Add(GetPackageFile(file));
             }
 
             return packageFiles;
         }
 
-        public PackageFile get_package_file(string file)
+        public PackageFile GetPackageFile(string file)
         {
-            var hash = _hashProvider.hash_file(file);
-            this.Log().Debug(ChocolateyLoggers.Verbose, () => " Found '{0}'{1}  with checksum '{2}'".format_with(file, Environment.NewLine, hash));
+            var hash = _hashProvider.ComputeFileHash(file);
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => " Found '{0}'{1}  with checksum '{2}'".FormatWith(file, Environment.NewLine, hash));
 
             return new PackageFile { Path = file, Checksum = hash };
         }

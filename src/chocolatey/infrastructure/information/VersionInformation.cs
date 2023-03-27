@@ -21,7 +21,7 @@ namespace chocolatey.infrastructure.information
 
     public sealed class VersionInformation
     {
-        public static string get_current_assembly_version(IAssembly assembly = null)
+        public static string GetCurrentAssemblyVersion(IAssembly assembly = null)
         {
             string version = null;
             if (assembly == null) assembly = Assembly.GetExecutingAssembly();
@@ -37,9 +37,9 @@ namespace chocolatey.infrastructure.information
                 var attributes= assembly.UnderlyingType.GetCustomAttributesData();
                 foreach (var attribute in attributes)
                 {
-                    if (attribute.to_string().Contains("AssemblyFileVersion"))
+                    if (attribute.ToStringSafe().Contains("AssemblyFileVersion"))
                     {
-                        version = attribute.ConstructorArguments[0].Value.to_string();
+                        version = attribute.ConstructorArguments[0].Value.ToStringSafe();
                         break;
                     }
                 }
@@ -48,7 +48,7 @@ namespace chocolatey.infrastructure.information
             return version;
         }
 
-        public static string get_current_informational_version(IAssembly assembly = null)
+        public static string GetCurrentInformationalVersion(IAssembly assembly = null)
         {
             string version = null;
             if (assembly == null) assembly = Assembly.GetExecutingAssembly();
@@ -64,9 +64,9 @@ namespace chocolatey.infrastructure.information
                 var attributes = assembly.UnderlyingType.GetCustomAttributesData();
                 foreach (var attribute in attributes)
                 {
-                    if (attribute.to_string().Contains("AssemblyInformationalVersion"))
+                    if (attribute.ToStringSafe().Contains("AssemblyInformationalVersion"))
                     {
-                        version = attribute.ConstructorArguments[0].Value.to_string();
+                        version = attribute.ConstructorArguments[0].Value.ToStringSafe();
                         break;
                     }
                 }
@@ -75,16 +75,16 @@ namespace chocolatey.infrastructure.information
             return version;
         }
 
-        public static string get_minimum_chocolatey_version(IAssembly assembly = null)
+        public static string GetMinimumChocolateyVersion(IAssembly assembly = null)
         {
             if (assembly == null) assembly = Assembly.GetExecutingAssembly();
 
             var attributeData = assembly.UnderlyingType.GetCustomAttributesData();
             foreach (var attribute in attributeData)
             {
-                if (attribute.to_string().Contains("MinimumChocolateyVersion"))
+                if (attribute.ToStringSafe().Contains("MinimumChocolateyVersion"))
                 {
-                    return attribute.ConstructorArguments[0].Value.to_string();
+                    return attribute.ConstructorArguments[0].Value.ToStringSafe();
                 }
             }
 

@@ -23,11 +23,11 @@ namespace chocolatey.infrastructure.app.rules
 
     internal sealed class RepositoryMetadataRule : MetadataRuleBase
     {
-        public override IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             var metadataNode = reader.Xml.Root.Elements().FirstOrDefault(e => StringComparer.Ordinal.Equals(e.Name.LocalName, "metadata"));
 
-            if (has_element(reader, "repository"))
+            if (HasElement(reader, "repository"))
             {
                 yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<repository> elements are not supported in Chocolatey CLI, use <packageSourceUrl> instead.");
             }

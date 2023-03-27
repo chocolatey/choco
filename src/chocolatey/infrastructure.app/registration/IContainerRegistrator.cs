@@ -21,20 +21,20 @@ namespace chocolatey.infrastructure.app.registration
     {
         bool RegistrationFailed { get; }
 
-        void register_validator(Func<Type, bool> validation_func);
+        void RegisterValidator(Func<Type, bool> validation_func);
 
-        void register_service<TService, TImplementation>(bool transient = false)
+        void RegisterService<TService, TImplementation>(bool transient = false)
             where TImplementation : class, TService;
 
-        void register_service<TService>(params Type[] types);
+        void RegisterService<TService>(params Type[] types);
 
-        void register_instance<TImplementation>(Func<TImplementation> instance)
+        void RegisterInstance<TImplementation>(Func<TImplementation> instance)
             where TImplementation : class;
 
-        void register_instance<TService, TImplementation>(Func<TImplementation> instance)
+        void RegisterInstance<TService, TImplementation>(Func<TImplementation> instance)
             where TImplementation : class, TService;
 
-        void register_instance<TService, TImplementation>(Func<IContainerResolver, TImplementation> instance)
+        void RegisterInstance<TService, TImplementation>(Func<IContainerResolver, TImplementation> instance)
             where TImplementation : class, TService;
     }
 }

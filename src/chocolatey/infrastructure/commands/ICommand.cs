@@ -30,39 +30,39 @@ namespace chocolatey.infrastructure.commands
         /// </summary>
         /// <param name="optionSet">The option set.</param>
         /// <param name="configuration">The configuration.</param>
-        void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration);
+        void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration);
 
         /// <summary>
         ///   Handle the arguments that were not parsed by the argument parser and/or do additional parsing work
         /// </summary>
         /// <param name="unparsedArguments">The unparsed arguments.</param>
         /// <param name="configuration">The configuration.</param>
-        void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration);
+        void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration);
 
-        void handle_validation(ChocolateyConfiguration configuration);
+        void Validate(ChocolateyConfiguration configuration);
 
         /// <summary>
         ///   The specific help message for a particular command.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        void help_message(ChocolateyConfiguration configuration);
+        void HelpMessage(ChocolateyConfiguration configuration);
 
         /// <summary>
         ///   Runs in no op mode, which means it doesn't actually make any changes.
         /// </summary>
         /// <param name="configuration">The configuration.</param>
-        void noop(ChocolateyConfiguration configuration);
+        void DryRun(ChocolateyConfiguration configuration);
 
         /// <summary>
         ///   Runs the command.
         /// </summary>
         /// <param name="config">The configuration.</param>
-        void run(ChocolateyConfiguration config);
+        void Run(ChocolateyConfiguration config);
 
         /// <summary>
         ///   This command may require admin rights
         /// </summary>
         /// <returns></returns>
-        bool may_require_admin_access();
+        bool MayRequireAdminAccess();
     }
 }

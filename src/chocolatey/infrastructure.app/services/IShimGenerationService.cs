@@ -22,17 +22,17 @@ namespace chocolatey.infrastructure.app.services
     public interface IShimGenerationService
     {
         /// <summary>
-        ///   Installs shimgens for the package
+        ///   Installs shims for the package
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="packageResult">The package result.</param>
-        void install(ChocolateyConfiguration configuration, PackageResult packageResult);
+        void Install(ChocolateyConfiguration configuration, PackageResult packageResult);
 
         /// <summary>
-        ///   Uninstalls shimgens for the package
+        ///   Uninstalls shims for the package
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="packageResult">The package result.</param>
-        void uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
+        void Uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
     }
 }

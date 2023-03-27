@@ -28,7 +28,7 @@ namespace chocolatey
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>true if meets criteria for system type</returns>
-        public static bool is_built_in_system_type(this Type type)
+        public static bool IsBuiltinType(this Type type)
         {
             if (type == null) return false;
 
@@ -44,10 +44,11 @@ namespace chocolatey
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>true if enumerable</returns>
-        public static bool is_collections_type(this Type type)
+        public static bool IsCollectionType(this Type type)
         {
             if (type == null) return false;
 
+            // Surely we can do a check around "is ICollection" / "is ICollection<>" here?
             return type.IsArray
                    || type.Namespace.Contains("System.Collections");
         }

@@ -18,8 +18,8 @@ namespace chocolatey.infrastructure.app.domain
 {
     public enum TemplateCommandType
     {
-        unknown,
-        list,
-        info
+        Unknown,
+        List,
+        Info
     }
 }

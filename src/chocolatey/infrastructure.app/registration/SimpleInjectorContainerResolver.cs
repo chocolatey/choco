@@ -28,13 +28,13 @@ namespace chocolatey.infrastructure.app.registration
             _container = container;
         }
 
-        public TService resolve<TService>()
+        public TService Resolve<TService>()
             where TService : class
         {
             return _container.GetInstance<TService>();
         }
 
-        public IEnumerable<TService> resolve_all<TService>()
+        public IEnumerable<TService> ResolveAll<TService>()
             where TService : class
         {
             return _container.GetAllInstances<TService>();

@@ -26,6 +26,6 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="packageResult">The package result.</param>
         /// <param name="config">The configuration.</param>
-        void run(PackageResult packageResult, ChocolateyConfiguration config);
+        void Run(PackageResult packageResult, ChocolateyConfiguration config);
     }
 }

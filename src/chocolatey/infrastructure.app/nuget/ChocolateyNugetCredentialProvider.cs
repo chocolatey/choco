@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.app.nuget
     {
         private readonly ChocolateyConfiguration _config;
 
-        private const string INVALID_URL = "http://somewhere123zzaafasd.invalid";
+        private const string InvalidUrl = "http://somewhere123zzaafasd.invalid";
 
         /// <summary>
         /// Unique identifier of this credential provider
@@ -59,13 +59,13 @@ namespace chocolatey.infrastructure.app.nuget
                 this.Log().Warn("Invalid credentials specified.");
             }
 
-            var configSourceUri = new Uri(INVALID_URL);
+            var configSourceUri = new Uri(InvalidUrl);
 
-            this.Log().Debug(ChocolateyLoggers.Verbose, "Attempting to gather credentials for '{0}'".format_with(uri.OriginalString));
+            this.Log().Debug(ChocolateyLoggers.Verbose, "Attempting to gather credentials for '{0}'".FormatWith(uri.OriginalString));
             try
             {
                 // the source to validate against is typically passed in
-                var firstSpecifiedSource = _config.Sources.to_string().Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault().to_string();
+                var firstSpecifiedSource = _config.Sources.ToStringSafe().Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries).FirstOrDefault().ToStringSafe();
                 if (!string.IsNullOrWhiteSpace(firstSpecifiedSource))
                 {
                     configSourceUri = new Uri(firstSpecifiedSource);
@@ -73,11 +73,11 @@ namespace chocolatey.infrastructure.app.nuget
             }
             catch (Exception ex)
             {
-                this.Log().Warn("Cannot determine uri from specified source:{0} {1}".format_with(Environment.NewLine, ex.Message));
+                this.Log().Warn("Cannot determine uri from specified source:{0} {1}".FormatWith(Environment.NewLine, ex.Message));
             }
 
             // did the user pass credentials and a source?
-            if (_config.Sources.TrimEnd('/').is_equal_to(uri.OriginalString.TrimEnd('/')) || configSourceUri.Host.is_equal_to(uri.Host))
+            if (_config.Sources.TrimEnd('/').IsEqualTo(uri.OriginalString.TrimEnd('/')) || configSourceUri.Host.IsEqualTo(uri.Host))
             {
                 if (!string.IsNullOrWhiteSpace(_config.SourceCommand.Username) && !string.IsNullOrWhiteSpace(_config.SourceCommand.Password))
                 {
@@ -97,13 +97,13 @@ namespace chocolatey.infrastructure.app.nuget
                     try
                     {
                         var sourceUri = new Uri(sourceUrl);
-                        return sourceUri.Host.is_equal_to(uri.Host)
+                        return sourceUri.Host.IsEqualTo(uri.Host)
                             && !string.IsNullOrWhiteSpace(s.Username)
                             && !string.IsNullOrWhiteSpace(s.EncryptedPassword);
                     }
                     catch (Exception)
                     {
-                        this.Log().Error("Source '{0}' is not a valid Uri".format_with(sourceUrl));
+                        this.Log().Error("Source '{0}' is not a valid Uri".FormatWith(sourceUrl));
                     }
 
                     return false;
@@ -120,12 +120,12 @@ namespace chocolatey.infrastructure.app.nuget
             else if (candidateSources.Count > 1)
             {
                 // find the source that is the closest match
-                foreach (var candidateSource in candidateSources.or_empty_list_if_null())
+                foreach (var candidateSource in candidateSources.OrEmpty())
                 {
                     var candidateRegEx = new Regex(Regex.Escape(candidateSource.Key.TrimEnd('/')),RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
                     if (candidateRegEx.IsMatch(uri.OriginalString.TrimEnd('/')))
                     {
-                        this.Log().Debug("Source selected will be '{0}'".format_with(candidateSource.Key.TrimEnd('/')));
+                        this.Log().Debug("Source selected will be '{0}'".FormatWith(candidateSource.Key.TrimEnd('/')));
                         source = candidateSource;
                         break;
                     }
@@ -135,15 +135,15 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     // use the first source. If it fails, fall back to grabbing credentials from the user
                     var candidateSource = candidateSources.First();
-                    this.Log().Debug("Evaluated {0} candidate sources but was unable to find a match, using {1}".format_with(candidateSources.Count, candidateSource.Key.TrimEnd('/')));
+                    this.Log().Debug("Evaluated {0} candidate sources but was unable to find a match, using {1}".FormatWith(candidateSources.Count, candidateSource.Key.TrimEnd('/')));
                     source = candidateSource;
                 }
             }
 
             if (source == null)
             {
-                this.Log().Debug("Asking user for credentials for '{0}'".format_with(uri.OriginalString));
-                return Task.FromResult(new CredentialResponse(get_credentials_from_user(uri, proxy, credentialType)));
+                this.Log().Debug("Asking user for credentials for '{0}'".FormatWith(uri.OriginalString));
+                return Task.FromResult(new CredentialResponse(GetUserCredentials(uri, proxy, credentialType)));
             }
             else
             {
@@ -154,7 +154,7 @@ namespace chocolatey.infrastructure.app.nuget
         }
 
 
-        public ICredentials get_credentials_from_user(Uri uri, IWebProxy proxy, CredentialRequestType credentialType)
+        public ICredentials GetUserCredentials(Uri uri, IWebProxy proxy, CredentialRequestType credentialType)
         {
             if (!_config.Information.IsInteractive)
             {
@@ -165,13 +165,13 @@ namespace chocolatey.infrastructure.app.nuget
 
             string message = credentialType == CredentialRequestType.Proxy ?
                                  "Please provide proxy credentials:" :
-                                 "Please provide credentials for: {0}".format_with(uri.OriginalString);
+                                 "Please provide credentials for: {0}".FormatWith(uri.OriginalString);
             this.Log().Info(ChocolateyLoggers.Important, message);
 
             Console.Write("User name: ");
             string username = Console.ReadLine();
             Console.Write("Password: ");
-            var password = InteractivePrompt.get_password(_config.PromptForConfirmation);
+            var password = InteractivePrompt.GetPassword(_config.PromptForConfirmation);
 
             if (string.IsNullOrWhiteSpace(password))
             {
@@ -188,6 +188,4 @@ namespace chocolatey.infrastructure.app.nuget
             return credentials;
         }
     }
-
-    // ReSharper restore InconsistentNaming
 }

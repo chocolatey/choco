@@ -16,8 +16,6 @@
 
 namespace chocolatey.infrastructure.adapters
 {
-    // ReSharper disable InconsistentNaming
-
     public interface IDateTime
     {
         /// <summary>
@@ -38,6 +36,4 @@ namespace chocolatey.infrastructure.adapters
         /// <filterpriority>1</filterpriority>
         System.DateTime UtcNow { get; }
     }
-
-    // ReSharper restore InconsistentNaming
 }

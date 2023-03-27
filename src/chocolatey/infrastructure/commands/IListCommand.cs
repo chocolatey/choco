@@ -21,11 +21,11 @@ namespace chocolatey.infrastructure.commands
 
     public interface IListCommand : ICommand
     {
-        int count(ChocolateyConfiguration config);
+        int Count(ChocolateyConfiguration config);
     }
 
     public interface IListCommand<out T> : IListCommand
     {
-        IEnumerable<T> list(ChocolateyConfiguration config);
+        IEnumerable<T> List(ChocolateyConfiguration config);
     }
 }

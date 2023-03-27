@@ -20,7 +20,7 @@ namespace chocolatey.infrastructure.filesystem
 
     public static class FileSystem
     {
-        public static byte[] read_binary_file_into_byte_array(string filePath)
+        public static byte[] ReadFileBytes(string filePath)
         {
             byte[] fileBytes = null;
             using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))

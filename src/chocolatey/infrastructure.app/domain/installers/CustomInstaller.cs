@@ -22,14 +22,14 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public CustomInstaller()
         {
-            InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
+            InstallExecutable = "\"{0}\"".FormatWith(InstallTokens.InstallerLocation);
             SilentInstall = "/S";
             NoReboot = "";
             LogFile = "";
             CustomInstallLocation = "";
             Language = "";
             OtherInstallOptions = "";
-            UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            UninstallExecutable = "\"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             SilentUninstall = "/S";
             OtherUninstallOptions = "";
             ValidInstallExitCodes = new List<long> { 0 };
@@ -41,7 +41,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             get { return InstallerType.Custom; }
         }
 
-        public override string build_install_command_arguments(bool logFile, bool customInstallLocation, bool languageRequested)
+        public override string BuildInstallCommandArguments(bool logFile, bool customInstallLocation, bool languageRequested)
         {
             if (customInstallLocation) this.Log().Warn("CustomInstaller doesn't support custom install locations.");
             if (languageRequested) this.Log().Warn("CustomInstaller doesn't support custom language options.");
@@ -49,7 +49,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             return string.Empty;
         }
 
-        public override string build_uninstall_command_arguments()
+        public override string BuildUninstallCommandArguments()
         {
             return string.Empty;
         }

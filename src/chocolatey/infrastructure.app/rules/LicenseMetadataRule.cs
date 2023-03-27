@@ -22,7 +22,7 @@ namespace chocolatey.infrastructure.app.rules
 
     internal sealed class LicenseMetadataRule : IMetadataRule
     {
-        public IEnumerable<RuleResult> validate(NuspecReader reader)
+        public IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             if (!(reader.GetLicenseMetadata() is null))
             {

@@ -38,14 +38,14 @@ namespace chocolatey.infrastructure.commandline
         {
             _backgroundResponseReset = new AutoResetEvent(false);
             _foregroundResponseReset = new AutoResetEvent(false);
-            _responseThread = new Thread(console_read)
+            _responseThread = new Thread(ConsoleRead)
             {
                 IsBackground = true
             };
             _responseThread.Start();
         }
 
-        private void console_read()
+        private void ConsoleRead()
         {
             while (true)
             {
@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.commandline
             }
         }
 
-        public static string read(int timeoutMilliseconds)
+        public static string Read(int timeoutMilliseconds)
         {
             using (var readLine = new ReadLineTimeout())
             {

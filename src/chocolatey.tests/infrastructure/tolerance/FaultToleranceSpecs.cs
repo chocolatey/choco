@@ -31,22 +31,22 @@ namespace chocolatey.tests.infrastructure.tolerance
 
             protected void reset()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
         }
 
-        public class when_retrying_an_action : FaultToleranceSpecsBase
+        public class When_retrying_an_action : FaultToleranceSpecsBase
         {
             public override void Because()
             {
             }
 
             [Fact]
-            public void should_not_allow_the_number_of_retries_to_be_zero()
+            public void Should_not_allow_the_number_of_retries_to_be_zero()
             {
                 reset();
 
-                Action m = () => FaultTolerance.retry(
+                Action m = () => FaultTolerance.Retry(
                     0,
                     () =>
                     {
@@ -56,23 +56,23 @@ namespace chocolatey.tests.infrastructure.tolerance
             }
 
             [Fact]
-            public void should_throw_an_error_if_retries_are_reached()
+            public void Should_throw_an_error_if_retries_are_reached()
             {
                 reset();
 
-                Action m = () => FaultTolerance.retry(2, () => { throw new Exception("YIKES"); }, waitDurationMilliseconds: 0);
+                Action m = () => FaultTolerance.Retry(2, () => { throw new Exception("YIKES"); }, waitDurationMilliseconds: 0);
 
                 m.ShouldThrow<Exception>();
             }
 
             [Fact]
-            public void should_log_warning_each_time()
+            public void Should_log_warning_each_time()
             {
                 reset();
 
                 try
                 {
-                    FaultTolerance.retry(3, () => { throw new Exception("YIKES"); }, waitDurationMilliseconds: 0);
+                    FaultTolerance.Retry(3, () => { throw new Exception("YIKES"); }, waitDurationMilliseconds: 0);
                 }
                 catch
                 {
@@ -83,14 +83,14 @@ namespace chocolatey.tests.infrastructure.tolerance
             }
 
             [Fact]
-            public void should_retry_the_number_of_times_specified()
+            public void Should_retry_the_number_of_times_specified()
             {
                 reset();
 
                 var i = 0;
                 try
                 {
-                    FaultTolerance.retry(
+                    FaultTolerance.Retry(
                         10,
                         () =>
                         {
@@ -108,12 +108,12 @@ namespace chocolatey.tests.infrastructure.tolerance
             }
 
             [Fact]
-            public void should_return_immediately_when_successful()
+            public void Should_return_immediately_when_successful()
             {
                 reset();
 
                 var i = 0;
-                FaultTolerance.retry(3, () => { i += 1; }, waitDurationMilliseconds: 0);
+                FaultTolerance.Retry(3, () => { i += 1; }, waitDurationMilliseconds: 0);
 
                 i.ShouldEqual(1);
 
@@ -121,18 +121,18 @@ namespace chocolatey.tests.infrastructure.tolerance
             }
         }
 
-        public class when_wrapping_a_function_with_try_catch : FaultToleranceSpecsBase
+        public class When_wrapping_a_function_with_try_catch : FaultToleranceSpecsBase
         {
             public override void Because()
             {
             }
 
             [Fact]
-            public void should_log_an_error_message()
+            public void Should_log_an_error_message()
             {
                 reset();
 
-                FaultTolerance.try_catch_with_logging_exception(
+                FaultTolerance.TryCatchWithLoggingException(
                     () => { throw new Exception("This is the message"); },
                     "You have an error"
                 );
@@ -141,24 +141,24 @@ namespace chocolatey.tests.infrastructure.tolerance
             }
 
             [Fact]
-            public void should_log_the_expected_error_message()
+            public void Should_log_the_expected_error_message()
             {
                 reset();
 
-                FaultTolerance.try_catch_with_logging_exception(
+                FaultTolerance.TryCatchWithLoggingException(
                     () => { throw new Exception("This is the message"); },
                     "You have an error"
                 );
 
-                MockLogger.MessagesFor(LogLevel.Error)[0].ShouldEqual("You have an error:{0} This is the message".format_with(Environment.NewLine));
+                MockLogger.MessagesFor(LogLevel.Error)[0].ShouldEqual("You have an error:{0} This is the message".FormatWith(Environment.NewLine));
             }
 
             [Fact]
-            public void should_log_a_warning_message_when_set_to_warn()
+            public void Should_log_a_warning_message_when_set_to_warn()
             {
                 reset();
 
-                FaultTolerance.try_catch_with_logging_exception(
+                FaultTolerance.TryCatchWithLoggingException(
                     () => { throw new Exception("This is the message"); },
                     "You have an error",
                     logWarningInsteadOfError: true
@@ -168,11 +168,11 @@ namespace chocolatey.tests.infrastructure.tolerance
             }
 
             [Fact]
-            public void should_throw_an_error_if_throwError_set_to_true()
+            public void Should_throw_an_error_if_throwError_set_to_true()
             {
                 reset();
 
-                Action m = () => FaultTolerance.try_catch_with_logging_exception(
+                Action m = () => FaultTolerance.TryCatchWithLoggingException(
                     () => { throw new Exception("This is the message"); },
                     "You have an error",
                     throwError: true
@@ -182,11 +182,11 @@ namespace chocolatey.tests.infrastructure.tolerance
             }
 
             [Fact]
-            public void should_still_throw_an_error_when_warn_is_set_if_throwError_set_to_true()
+            public void Should_still_throw_an_error_when_warn_is_set_if_throwError_set_to_true()
             {
                 reset();
 
-                Action m = () => FaultTolerance.try_catch_with_logging_exception(
+                Action m = () => FaultTolerance.TryCatchWithLoggingException(
                     () => { throw new Exception("This is the message"); },
                     "You have an error",
                     logWarningInsteadOfError: true,

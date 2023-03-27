@@ -21,7 +21,7 @@ namespace chocolatey.infrastructure.app.rules
 
     internal sealed class RequireLicenseAcceptanceMetadataRule : IMetadataRule
     {
-        public IEnumerable<RuleResult> validate(NuspecReader reader)
+        public IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             if (string.IsNullOrWhiteSpace(reader.GetLicenseUrl()) && reader.GetRequireLicenseAcceptance())
             {

@@ -30,6 +30,6 @@ namespace chocolatey.infrastructure.services
         /// <param name="pattern">The pattern.</param>
         /// <param name="matchEvaluator">The match evaluator.</param>
         /// <returns></returns>
-        string replace(string input, string pattern, MatchEvaluator matchEvaluator);
+        string Replace(string input, string pattern, MatchEvaluator matchEvaluator);
     }
 }

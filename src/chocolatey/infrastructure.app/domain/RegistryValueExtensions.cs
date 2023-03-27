@@ -21,14 +21,14 @@ namespace chocolatey.infrastructure.app.domain
 
     public static class RegistryValueExtensions
     {
-        public static string get_value_as_string(this RegistryKey key, string name)
+        public static string AsXmlSafeString(this RegistryKey key, string name)
         {
             if (key == null) return string.Empty;
 
             // Since it is possible that registry keys contain characters that are not valid
             // in XML files, ensure that all content is escaped, prior to serialization
             // https://docs.microsoft.com/en-us/dotnet/api/system.security.securityelement.escape?view=netframework-4.0
-            return SecurityElement.Escape(key.GetValue(name).to_string()).to_string()
+            return SecurityElement.Escape(key.GetValue(name).ToStringSafe()).ToStringSafe()
                                   .Replace("&quot;", "\"")
                                   .Replace("&apos;", "'")
                                   .Replace("\0", string.Empty);

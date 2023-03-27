@@ -27,43 +27,43 @@ namespace chocolatey.infrastructure.app.services
         ///   Get outdated packages
         /// </summary>
         /// <param name="config">The configuration.</param>
-        ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config);
+        ConcurrentDictionary<string, PackageResult> GetOutdated(ChocolateyConfiguration config);
 
         /// <summary>
         ///   Run pack in noop mode.
         /// </summary>
         /// <param name="config">The configuration.</param>
-        void pack_noop(ChocolateyConfiguration config);
+        void PackDryRun(ChocolateyConfiguration config);
 
         /// <summary>
         ///   Packages up a nuspec into a compiled nupkg.
         /// </summary>
         /// <param name="config">The configuration.</param>
-        void pack_run(ChocolateyConfiguration config);
+        void Pack(ChocolateyConfiguration config);
 
         /// <summary>
         ///   Push_noops the specified configuration.
         /// </summary>
         /// <param name="config">The configuration.</param>
-        void push_noop(ChocolateyConfiguration config);
+        void PushDryRun(ChocolateyConfiguration config);
 
         /// <summary>
         ///   Push_runs the specified configuration.
         /// </summary>
         /// <param name="config">The configuration.</param>
-        void push_run(ChocolateyConfiguration config);
+        void Push(ChocolateyConfiguration config);
 
         /// <summary>
         ///   Remove the rollback directory for a package if it exists
         /// </summary>
         /// <param name="packageName">Name of the package.</param>
-        void remove_rollback_directory_if_exists(string packageName);
+        void EnsureBackupDirectoryRemoved(string packageName);
 
 
         /// <summary>
         ///   Get all installed packages
         /// </summary>
         /// <param name="config">The configuration</param>
-        IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config);
+        IEnumerable<PackageResult> GetInstalledPackages(ChocolateyConfiguration config);
     }
 }

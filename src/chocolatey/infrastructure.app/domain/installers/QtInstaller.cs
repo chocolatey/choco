@@ -29,7 +29,7 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public QtInstaller()
         {
-            InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
+            InstallExecutable = "\"{0}\"".FormatWith(InstallTokens.InstallerLocation);
             SilentInstall = "";
             NoReboot = "";
             LogFile = "";
@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             CustomInstallLocation = "";
             Language = "";
             OtherInstallOptions = "";
-            UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            UninstallExecutable = "\"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             SilentUninstall = "";
             OtherUninstallOptions = "";
             ValidInstallExitCodes = new List<long>

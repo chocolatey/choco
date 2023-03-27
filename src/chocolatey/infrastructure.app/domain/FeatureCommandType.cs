@@ -18,9 +18,9 @@ namespace chocolatey.infrastructure.app.domain
 {
     public enum FeatureCommandType
     {
-        unknown,
-        list,
-        enable,
-        disable,
+        Unknown,
+        List,
+        Enable,
+        Disable,
     }
 }

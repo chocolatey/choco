@@ -39,7 +39,7 @@ namespace chocolatey.tests.infrastructure.cryptography
             }
         }
 
-        public class when_HashProvider_provides_a_hash : CryptoHashProviderSpecsBase
+        public class When_HashProvider_provides_a_hash : CryptoHashProviderSpecsBase
         {
             private string result;
             private readonly string filePath = "c:\\path\\does\\not\\matter.txt";
@@ -48,17 +48,17 @@ namespace chocolatey.tests.infrastructure.cryptography
             public override void Context()
             {
                 base.Context();
-                FileSystem.Setup(x => x.file_exists(It.IsAny<string>())).Returns(true);
-                FileSystem.Setup(x => x.read_file_bytes(filePath)).Returns(byteArray);
+                FileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
+                FileSystem.Setup(x => x.ReadFileBytes(filePath)).Returns(byteArray);
             }
 
             public override void Because()
             {
-                result = Provider.hash_file(filePath);
+                result = Provider.ComputeFileHash(filePath);
             }
 
             [Fact]
-            public void should_provide_the_correct_hash_based_on_a_checksum()
+            public void Should_provide_the_correct_hash_based_on_a_checksum()
             {
                 var expected = BitConverter.ToString(SHA256.Create().ComputeHash(byteArray)).Replace("-", string.Empty);
 
@@ -66,7 +66,7 @@ namespace chocolatey.tests.infrastructure.cryptography
             }
         }
 
-        public class when_HashProvider_attempts_to_provide_a_hash_for_a_file_over_2GB : CryptoHashProviderSpecsBase
+        public class When_HashProvider_attempts_to_provide_a_hash_for_a_file_over_2GB : CryptoHashProviderSpecsBase
         {
             private string result;
             private readonly string filePath = "c:\\path\\does\\not\\matter.txt";
@@ -78,30 +78,30 @@ namespace chocolatey.tests.infrastructure.cryptography
                 base.Context();
                 Provider = new CryptoHashProvider(FileSystem.Object, _hashAlgorithm.Object);
 
-                FileSystem.Setup(x => x.file_exists(It.IsAny<string>())).Returns(true);
-                FileSystem.Setup(x => x.read_file_bytes(filePath)).Returns(byteArray);
+                FileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
+                FileSystem.Setup(x => x.ReadFileBytes(filePath)).Returns(byteArray);
                 _hashAlgorithm.Setup(x => x.ComputeHash(byteArray)).Throws<IOException>(); //IO.IO_FileTooLong2GB (over Int32.MaxValue)
             }
 
             public override void Because()
             {
-                result = Provider.hash_file(filePath);
+                result = Provider.ComputeFileHash(filePath);
             }
 
             [Fact]
-            public void should_log_a_warning()
+            public void Should_log_a_warning()
             {
                 MockLogger.MessagesFor(LogLevel.Warn).Count.ShouldEqual(1);
             }
 
             [Fact]
-            public void should_not_throw_an_error_itself()
+            public void Should_not_throw_an_error_itself()
             {
                 //this handles itself
             }
 
             [Fact]
-            public void should_provide_an_unchanging_hash_for_a_file_too_big_to_hash()
+            public void Should_provide_an_unchanging_hash_for_a_file_too_big_to_hash()
             {
                 result.ShouldEqual(ApplicationParameters.HashProviderFileTooBig);
             }

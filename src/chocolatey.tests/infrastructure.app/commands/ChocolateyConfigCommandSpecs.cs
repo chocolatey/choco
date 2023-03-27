@@ -43,7 +43,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_implementing_command_for : ChocolateyConfigCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyConfigCommandSpecsBase
         {
             private List<string> results;
 
@@ -53,13 +53,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_config()
+            public void Should_implement_config()
             {
                 results.ShouldContain("config");
             }
         }
 
-        public class when_configurating_the_argument_parser : ChocolateyConfigCommandSpecsBase
+        public class When_configurating_the_argument_parser : ChocolateyConfigCommandSpecsBase
         {
             private OptionSet optionSet;
 
@@ -71,75 +71,75 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                command.configure_argument_parser(optionSet, configuration);
+                command.ConfigureArgumentParser(optionSet, configuration);
             }
 
             [Fact]
-            public void should_add_name_to_the_option_set()
+            public void Should_add_name_to_the_option_set()
             {
                 optionSet.Contains("name").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_value_to_the_option_set()
+            public void Should_add_value_to_the_option_set()
             {
                 optionSet.Contains("value").ShouldBeTrue();
             }
         }
 
-        public class when_noop_is_called : ChocolateyConfigCommandSpecsBase
+        public class When_noop_is_called : ChocolateyConfigCommandSpecsBase
         {
             public override void Because()
             {
-                command.noop(configuration);
+                command.DryRun(configuration);
             }
 
             [Fact]
-            public void should_call_service_noop()
+            public void Should_call_service_noop()
             {
-                configSettingsService.Verify(c => c.noop(configuration), Times.Once);
+                configSettingsService.Verify(c => c.DryRun(configuration), Times.Once);
             }
         }
 
-        public class when_run_is_called : ChocolateyConfigCommandSpecsBase
+        public class When_run_is_called : ChocolateyConfigCommandSpecsBase
         {
             private Action because;
 
             public override void Because()
             {
-                because = () => command.run(configuration);
+                because = () => command.Run(configuration);
             }
 
             [Fact]
-            public void should_call_service_source_list_when_command_is_list()
+            public void Should_call_service_source_list_when_command_is_list()
             {
-                configuration.ConfigCommand.Command = ConfigCommandType.list;
+                configuration.ConfigCommand.Command = ConfigCommandType.List;
                 because();
-                configSettingsService.Verify(c => c.config_list(configuration), Times.Once);
+                configSettingsService.Verify(c => c.ListConfig(configuration), Times.Once);
             }
 
             [Fact]
-            public void should_call_service_source_disable_when_command_is_disable()
+            public void Should_call_service_source_disable_when_command_is_disable()
             {
-                configuration.ConfigCommand.Command = ConfigCommandType.get;
+                configuration.ConfigCommand.Command = ConfigCommandType.Get;
                 because();
-                configSettingsService.Verify(c => c.config_get(configuration), Times.Once);
+                configSettingsService.Verify(c => c.GetConfig(configuration), Times.Once);
             }
 
             [Fact]
-            public void should_call_service_source_enable_when_command_is_enable()
+            public void Should_call_service_source_enable_when_command_is_enable()
             {
-                configuration.ConfigCommand.Command = ConfigCommandType.set;
+                configuration.ConfigCommand.Command = ConfigCommandType.Set;
                 because();
-                configSettingsService.Verify(c => c.config_set(configuration), Times.Once);
+                configSettingsService.Verify(c => c.SetConfig(configuration), Times.Once);
             }
 
             [Fact]
-            public void should_call_service_source_unset_when_command_is_unset()
+            public void Should_call_service_source_unset_when_command_is_unset()
             {
-                configuration.ConfigCommand.Command = ConfigCommandType.unset;
+                configuration.ConfigCommand.Command = ConfigCommandType.Unset;
                 because();
-                configSettingsService.Verify(c => c.config_unset(configuration), Times.Once);
+                configSettingsService.Verify(c => c.UnsetConfig(configuration), Times.Once);
             }
         }
     }

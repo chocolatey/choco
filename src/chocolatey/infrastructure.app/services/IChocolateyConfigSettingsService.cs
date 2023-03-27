@@ -22,21 +22,21 @@ namespace chocolatey.infrastructure.app.services
 
     public interface IChocolateyConfigSettingsService
     {
-        void noop(ChocolateyConfiguration configuration);
-        IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration);
-        void source_add(ChocolateyConfiguration configuration);
-        void source_remove(ChocolateyConfiguration configuration);
-        void source_disable(ChocolateyConfiguration configuration);
-        void source_enable(ChocolateyConfiguration configuration);
-        void feature_list(ChocolateyConfiguration configuration);
-        void feature_disable(ChocolateyConfiguration configuration);
-        void feature_enable(ChocolateyConfiguration configuration);
-        string get_api_key(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction);
-        void set_api_key(ChocolateyConfiguration configuration);
-        void remove_api_key(ChocolateyConfiguration configuration);
-        void config_list(ChocolateyConfiguration configuration);
-        void config_get(ChocolateyConfiguration configuration);
-        void config_set(ChocolateyConfiguration configuration);
-        void config_unset(ChocolateyConfiguration configuration);
+        void DryRun(ChocolateyConfiguration configuration);
+        IEnumerable<ChocolateySource> ListSources(ChocolateyConfiguration configuration);
+        void AddSource(ChocolateyConfiguration configuration);
+        void RemoveSource(ChocolateyConfiguration configuration);
+        void DisableSource(ChocolateyConfiguration configuration);
+        void EnableSource(ChocolateyConfiguration configuration);
+        void ListFeatures(ChocolateyConfiguration configuration);
+        void DisableFeature(ChocolateyConfiguration configuration);
+        void EnableFeature(ChocolateyConfiguration configuration);
+        string GetApiKey(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction);
+        void SetApiKey(ChocolateyConfiguration configuration);
+        void RemoveApiKey(ChocolateyConfiguration configuration);
+        void ListConfig(ChocolateyConfiguration configuration);
+        void GetConfig(ChocolateyConfiguration configuration);
+        void SetConfig(ChocolateyConfiguration configuration);
+        void UnsetConfig(ChocolateyConfiguration configuration);
     }
 }

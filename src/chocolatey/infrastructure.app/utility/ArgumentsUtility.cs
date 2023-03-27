@@ -20,27 +20,27 @@ namespace chocolatey.infrastructure.app.utility
 
     public static class ArgumentsUtility
     {
-        public static bool arguments_contain_sensitive_information(string commandArguments)
+        public static bool SensitiveArgumentsProvided(string commandArguments)
         {
             //todo: #2561 this check is naive, we should switch to regex
             //this picks up cases where arguments are passed with '-' and '--'
-            return commandArguments.contains("-install-arguments-sensitive")
-             || commandArguments.contains("-package-parameters-sensitive")
-             || commandArguments.contains("apikey ")
-             || commandArguments.contains("config ")
-             || commandArguments.contains("push ") // push can be passed w/out parameters, it's fine to log it then
-             || commandArguments.contains("-p ")
-             || commandArguments.contains("-p=")
-             || commandArguments.contains("-password")
-             || commandArguments.contains("-cp ")
-             || commandArguments.contains("-cp=")
-             || commandArguments.contains("-certpassword")
-             || commandArguments.contains("-k ")
-             || commandArguments.contains("-k=")
-             || commandArguments.contains("-key ")
-             || commandArguments.contains("-key=")
-             || commandArguments.contains("-apikey")
-             || commandArguments.contains("-api-key")
+            return commandArguments.ContainsSafe("-install-arguments-sensitive")
+             || commandArguments.ContainsSafe("-package-parameters-sensitive")
+             || commandArguments.ContainsSafe("apikey ")
+             || commandArguments.ContainsSafe("config ")
+             || commandArguments.ContainsSafe("push ") // push can be passed w/out parameters, it's fine to log it then
+             || commandArguments.ContainsSafe("-p ")
+             || commandArguments.ContainsSafe("-p=")
+             || commandArguments.ContainsSafe("-password")
+             || commandArguments.ContainsSafe("-cp ")
+             || commandArguments.ContainsSafe("-cp=")
+             || commandArguments.ContainsSafe("-certpassword")
+             || commandArguments.ContainsSafe("-k ")
+             || commandArguments.ContainsSafe("-k=")
+             || commandArguments.ContainsSafe("-key ")
+             || commandArguments.ContainsSafe("-key=")
+             || commandArguments.ContainsSafe("-apikey")
+             || commandArguments.ContainsSafe("-api-key")
             ;
         }
     }

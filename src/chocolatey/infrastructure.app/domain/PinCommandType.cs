@@ -18,9 +18,9 @@ namespace chocolatey.infrastructure.app.domain
 {
     public enum PinCommandType
     {
-        unknown,
-        list,
-        add,
-        remove,
+        Unknown,
+        List,
+        Add,
+        Remove,
     }
 }

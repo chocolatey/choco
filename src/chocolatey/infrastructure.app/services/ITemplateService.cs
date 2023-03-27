@@ -20,9 +20,9 @@ namespace chocolatey.infrastructure.app.services
 
     public interface ITemplateService
     {
-        void generate_noop(ChocolateyConfiguration configuration);
-        void generate(ChocolateyConfiguration configuration);
-        void list_noop(ChocolateyConfiguration configuration);
-        void list(ChocolateyConfiguration configuration);
+        void GenerateDryRun(ChocolateyConfiguration configuration);
+        void Generate(ChocolateyConfiguration configuration);
+        void ListDryRun(ChocolateyConfiguration configuration);
+        void List(ChocolateyConfiguration configuration);
     }
 }

@@ -30,12 +30,12 @@ namespace chocolatey.infrastructure.app.configuration
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void initialize_with(Lazy<IConsole> console)
+        public static void InitializeWith(Lazy<IConsole> console)
         {
             _console = console;
         }
 
-        public static void reset_options()
+        public static void ClearOptions()
         {
             _optionSet.Clear();
         }
@@ -61,7 +61,7 @@ namespace chocolatey.infrastructure.app.configuration
         /// <param name="afterParse">Actions to take after parsing</param>
         /// <param name="validateConfiguration">Validate the configuration</param>
         /// <param name="helpMessage">The help message.</param>
-        public static void parse_arguments_and_update_configuration(ICollection<string> args,
+        public static void ParseArgumentsAndUpdateConfiguration(ICollection<string> args,
                                                                     ChocolateyConfiguration configuration,
                                                                     Action<OptionSet> setOptions,
                                                                     Action<IList<string>> afterParse,
@@ -90,7 +90,7 @@ namespace chocolatey.infrastructure.app.configuration
             }
             catch (OptionException)
             {
-                show_help(_optionSet, helpMessage);
+                ShowHelp(_optionSet, helpMessage);
                 configuration.UnsuccessfulParsing = true;
             }
 
@@ -102,7 +102,7 @@ namespace chocolatey.infrastructure.app.configuration
                 {
                     configuration.CommandName = commandName;
                 }
-                else if (commandName.is_equal_to("-v") || commandName.is_equal_to("--version"))
+                else if (commandName.IsEqualTo("-v") || commandName.IsEqualTo("--version"))
                 {
                     // skip help menu
                 }
@@ -120,7 +120,7 @@ namespace chocolatey.infrastructure.app.configuration
 
             if (configuration.HelpRequested)
             {
-                show_help(_optionSet, helpMessage);
+                ShowHelp(_optionSet, helpMessage);
             }
             else
             {
@@ -136,7 +136,7 @@ namespace chocolatey.infrastructure.app.configuration
         /// </summary>
         /// <param name="optionSet">The option_set.</param>
         /// <param name="helpMessage">The action that displays the message</param>
-        private static void show_help(OptionSet optionSet, Action helpMessage)
+        private static void ShowHelp(OptionSet optionSet, Action helpMessage)
         {
             if (helpMessage != null)
             {

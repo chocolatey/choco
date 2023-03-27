@@ -25,18 +25,18 @@ namespace chocolatey
     public static class ObjectExtensions
     {
         /// <summary>
-        ///   A null safe variant of ToString().
+        ///   A null safe variant of <see cref="object.ToString"/>.
         /// </summary>
         /// <param name="input">The input.</param>
-        /// <returns>String.Empty if input is null, otherwise input.ToString()</returns>
-        public static string to_string(this object input)
+        /// <returns><see cref="string.Empty"/> if <paramref name="input"/> is null, otherwise <paramref name="input"/>.ToString()</returns>
+        public static string ToStringSafe(this object input)
         {
             if (input == null) return string.Empty;
 
             return input.ToString();
         }
 
-        public static T deep_copy<T>(this T other)
+        public static T DeepCopy<T>(this T other)
         {
             using (var ms = new MemoryStream())
             {

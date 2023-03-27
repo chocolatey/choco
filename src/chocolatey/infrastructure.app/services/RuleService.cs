@@ -34,15 +34,15 @@ namespace chocolatey.infrastructure.app.services
             _rules = rules;
         }
 
-        public IEnumerable<RuleResult> validate_rules(string filePath)
+        public IEnumerable<RuleResult> ValidateRules(string filePath)
         {
-            Ensure.that(() => filePath)
-                .is_not_null_or_whitespace()
-                .has_any_extension(NuGetConstants.PackageExtension, NuGetConstants.ManifestExtension);
+            Ensure.That(() => filePath)
+                .NotNullOrWhitespace()
+                .HasExtension(NuGetConstants.PackageExtension, NuGetConstants.ManifestExtension);
 
             var rules = filePath.EndsWith(NuGetConstants.PackageExtension)
-                ? get_rules_from_package_async(filePath).GetAwaiter().GetResult()
-                : get_rules_from_metadata(filePath);
+                ? GetRulesFromPackageAsync(filePath).GetAwaiter().GetResult()
+                : GetRulesFromMetadata(filePath);
 
             return rules
                 .OrderBy(r => r.Severity)
@@ -50,7 +50,7 @@ namespace chocolatey.infrastructure.app.services
                 .ThenBy(r => r.Message);
         }
 
-        private async Task<IEnumerable<RuleResult>> get_rules_from_package_async(string filePath, CancellationToken token = default)
+        private async Task<IEnumerable<RuleResult>> GetRulesFromPackageAsync(string filePath, CancellationToken token = default)
         {
             using (var packageReader = new PackageArchiveReader(filePath))
             {
@@ -59,22 +59,22 @@ namespace chocolatey.infrastructure.app.services
                 // We add ToList here to ensure that the package
                 // reader hasn't been disposed of before we return
                 // any results.
-                return validate_nuspec(nuspecReader, _rules).ToList();
+                return ValidateNuspec(nuspecReader, _rules).ToList();
             }
         }
 
-        private IEnumerable<RuleResult> get_rules_from_metadata(string filePath)
+        private IEnumerable<RuleResult> GetRulesFromMetadata(string filePath)
         {
             var nuspecReader = new NuspecReader(filePath);
 
-            return validate_nuspec(nuspecReader, _rules);
+            return ValidateNuspec(nuspecReader, _rules);
         }
 
-        private static IEnumerable<RuleResult> validate_nuspec(NuspecReader reader, IMetadataRule[] rules)
+        private static IEnumerable<RuleResult> ValidateNuspec(NuspecReader reader, IMetadataRule[] rules)
         {
             foreach (var rule in rules)
             {
-                var validationResults = rule.validate(reader);
+                var validationResults = rule.Validate(reader);
 
                 foreach (var result in validationResults.Where(v => v.Severity != RuleType.None))
                 {

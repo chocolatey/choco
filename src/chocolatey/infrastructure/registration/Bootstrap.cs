@@ -32,7 +32,7 @@ namespace chocolatey.infrastructure.registration
         /// <summary>
         ///   Initializes this instance.
         /// </summary>
-        public static void initialize()
+        public static void Initialize()
         {
             Log.InitializeWith<Log4NetLog>();
             _logger.Debug("XmlConfiguration is now operational");
@@ -41,7 +41,7 @@ namespace chocolatey.infrastructure.registration
         /// <summary>
         ///   Startups this instance.
         /// </summary>
-        public static void startup()
+        public static void Startup()
         {
             AppDomain.CurrentDomain.UnhandledException += DomainUnhandledException;
         }
@@ -75,7 +75,7 @@ namespace chocolatey.infrastructure.registration
         /// <summary>
         ///   Shutdowns this instance.
         /// </summary>
-        public static void shutdown()
+        public static void Shutdown()
         {
         }
     }

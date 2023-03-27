@@ -42,9 +42,9 @@ namespace chocolatey.infrastructure.app.services
         private readonly INugetService _nugetService;
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
-        private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
-        private const string INSTALL_ROOT_TOKEN = "{{installroot}}";
-        public const string CYGWIN_PACKAGE = "cygwin";
+        private const string PackageNameToken = "{{packagename}}";
+        private const string InstallRootToken = "{{installroot}}";
+        private const string CygwinPackage = "cygwin";
 
         private string _rootDirectory;
         private string RootDirectory
@@ -53,17 +53,17 @@ namespace chocolatey.infrastructure.app.services
             {
                 if (string.IsNullOrWhiteSpace(_rootDirectory))
                 {
-                    _rootDirectory = get_root_directory();
+                    _rootDirectory = GetRootDirectory();
                 }
 
                 return _rootDirectory;
             }
         }
 
-        private const string APP_NAME = "Cygwin";
-        public const string PACKAGE_NAME_GROUP = "PkgName";
-        public static readonly Regex InstalledRegex = new Regex(@"Extracting from file", RegexOptions.Compiled);
-        public static readonly Regex PackageNameRegex = new Regex(@"/(?<{0}>[^/]*).tar.".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
+        private const string AppName = "Cygwin";
+        private const string PackageNameGroup = "PkgName";
+        private static readonly Regex _installedRegex = new Regex(@"Extracting from file", RegexOptions.Compiled);
+        private static readonly Regex _packageNameRegex = new Regex(@"/(?<{0}>[^/]*).tar.".FormatWith(PackageNameGroup), RegexOptions.Compiled);
 
         private readonly IDictionary<string, ExternalCommandArgument> _installArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -73,21 +73,21 @@ namespace chocolatey.infrastructure.app.services
             _nugetService = nugetService;
             _fileSystem = fileSystem;
             _registryService = registryService;
-            set_cmd_args_dictionaries();
+            StoreCommandArgs();
         }
 
         /// <summary>
         ///   Set any command arguments dictionaries necessary for the service
         /// </summary>
-        private void set_cmd_args_dictionaries()
+        private void StoreCommandArgs()
         {
-            set_install_dictionary(_installArguments);
+            InitializeInstallDictionary(_installArguments);
         }
 
         /// <summary>
         ///   Sets install dictionary
         /// </summary>
-        private void set_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
+        private void InitializeInstallDictionary(IDictionary<string, ExternalCommandArgument> args)
         {
             //args.Add("_cmd_c_", new ExternalCommandArgument { ArgumentOption = "/c", Required = true });
             //args.Add("_app_", new ExternalCommandArgument
@@ -104,14 +104,14 @@ namespace chocolatey.infrastructure.app.services
             args.Add("_root_", new ExternalCommandArgument
             {
                 ArgumentOption = "--root ",
-                ArgumentValue = INSTALL_ROOT_TOKEN,
+                ArgumentValue = InstallRootToken,
                 QuoteValue = false,
                 Required = true
             });
             args.Add("_local_pkgs_dir_", new ExternalCommandArgument
             {
                 ArgumentOption = "--local-package-dir ",
-                ArgumentValue = "{0}\\packages".format_with(INSTALL_ROOT_TOKEN),
+                ArgumentValue = "{0}\\packages".FormatWith(InstallRootToken),
                 QuoteValue = false,
                 Required = true
             });
@@ -127,7 +127,7 @@ namespace chocolatey.infrastructure.app.services
             args.Add("_package_name_", new ExternalCommandArgument
             {
                 ArgumentOption = "--packages ",
-                ArgumentValue = PACKAGE_NAME_TOKEN,
+                ArgumentValue = PackageNameToken,
                 QuoteValue = false,
                 Required = true
             });
@@ -135,12 +135,12 @@ namespace chocolatey.infrastructure.app.services
 
         public string SourceType
         {
-            get { return SourceTypes.CYGWIN; }
+            get { return SourceTypes.Cygwin; }
         }
 
-        public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
+        public void EnsureSourceAppInstalled(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
         {
-            if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+            if (Platform.GetPlatform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
 
             var runnerConfig = new ChocolateyConfiguration
             {
@@ -157,120 +157,107 @@ namespace chocolatey.infrastructure.app.services
             };
             runnerConfig.ListCommand.LocalOnly = true;
 
-            var localPackages = _nugetService.list_run(runnerConfig);
+            var localPackages = _nugetService.List(runnerConfig);
 
-            if (!localPackages.Any(p => p.Name.is_equal_to(CYGWIN_PACKAGE)))
+            if (!localPackages.Any(p => p.Name.IsEqualTo(CygwinPackage)))
             {
-                runnerConfig.PackageNames = CYGWIN_PACKAGE;
+                runnerConfig.PackageNames = CygwinPackage;
                 runnerConfig.Sources = ApplicationParameters.ChocolateyCommunityFeedSource;
 
                 var prompt = config.PromptForConfirmation;
                 config.PromptForConfirmation = false;
-                _nugetService.install_run(runnerConfig, ensureAction.Invoke);
+                _nugetService.Install(runnerConfig, ensureAction.Invoke);
                 config.PromptForConfirmation = prompt;
             }
         }
 
-        public int count_run(ChocolateyConfiguration config)
+        public int Count(ChocolateyConfiguration config)
         {
             throw new NotImplementedException("Count is not supported for this source runner.");
         }
 
-        [Obsolete("This method does not need to be called publicly and may be made private or removed in a later version.")]
-        public void set_root_dir_if_not_set()
+        private string GetRootDirectory()
         {
-            if (!string.IsNullOrWhiteSpace(_rootDirectory))
-            {
-                return;
-            }
-
-            _rootDirectory = get_root_directory();
-        }
-
-        private string get_root_directory()
-        {
-            var setupKey = _registryService.get_key(RegistryHive.LocalMachine, "SOFTWARE\\Cygwin\\setup");
+            var setupKey = _registryService.GetKey(RegistryHive.LocalMachine, "SOFTWARE\\Cygwin\\setup");
             if (setupKey != null)
             {
-                return setupKey.GetValue("rootdir", string.Empty).to_string();
+                return setupKey.GetValue("rootdir", string.Empty).ToStringSafe();
             }
 
             var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
             if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
 
-            return _fileSystem.combine_paths(binRoot, "cygwin");
+            return _fileSystem.CombinePaths(binRoot, "cygwin");
         }
 
-        [Obsolete("This method does not need to be called publicly and may be made private or removed in a later version.")]
-        public string get_exe(string rootpath)
+        private string GetCygwinPath(string rootpath)
         {
-            return _fileSystem.combine_paths(rootpath, "cygwinsetup.exe");
+            return _fileSystem.CombinePaths(rootpath, "cygwinsetup.exe");
         }
 
-        public void list_noop(ChocolateyConfiguration config)
+        public void ListDryRun(ChocolateyConfiguration config)
         {
-            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement list".format_with(APP_NAME));
+            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement list".FormatWith(AppName));
         }
 
-        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
+        public IEnumerable<PackageResult> List(ChocolateyConfiguration config)
         {
-            throw new NotImplementedException("{0} does not implement list".format_with(APP_NAME));
+            throw new NotImplementedException("{0} does not implement list".FormatWith(AppName));
         }
 
-        [Obsolete("This method does not need to be called publicly and may be made private or removed in a later version.")]
-        public string build_args(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
+        private string BuildArgs(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
         {
-            var args = ExternalCommandArgsBuilder.build_arguments(config, argsDictionary);
+            var args = ExternalCommandArgsBuilder.BuildArguments(config, argsDictionary);
 
-            args = args.Replace(INSTALL_ROOT_TOKEN, RootDirectory);
+            args = args.Replace(InstallRootToken, RootDirectory);
 
             return args;
         }
 
-        public void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+        public void InstallDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
-            var args = build_args(config, _installArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(get_exe(RootDirectory).escape_curly_braces(), args.escape_curly_braces()));
+            var args = BuildArgs(config, _installArguments);
+            this.Log().Info("Would have run '{0} {1}'".FormatWith(GetCygwinPath(RootDirectory).EscapeCurlyBraces(), args.EscapeCurlyBraces()));
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+        public ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
-            return install_run(config, continueAction, beforeModifyAction: null);
+            return Install(config, continueAction, beforeModifyAction: null);
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
+        public ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
         {
-            var args = build_args(config, _installArguments);
+            var args = BuildArgs(config, _installArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (var packageToInstall in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries))
             {
-                var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
+                var argsForPackage = args.Replace(PackageNameToken, packageToInstall);
 
-                var exitCode = _commandExecutor.execute(
-                    get_exe(RootDirectory),
+                var exitCode = _commandExecutor.Execute(
+                    GetCygwinPath(RootDirectory),
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
-                    _fileSystem.get_current_directory(),
+                    _fileSystem.GetCurrentDirectory(),
                     (s, e) =>
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+                            this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
-                            if (InstalledRegex.IsMatch(logMessage))
+                            if (_installedRegex.IsMatch(logMessage))
                             {
-                                var packageName = get_value_from_output(logMessage, PackageNameRegex, PACKAGE_NAME_GROUP);
+                                var packageName = GetValueFromOutput(logMessage, PackageNameRegex, PackageNameGroup);
                                 var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                                 results.Messages.Add(new ResultMessage(ResultType.Note, packageName));
-                                this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
+                                this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".FormatWith(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
                             }
                         },
                     (s, e) =>
                         {
                             var logMessage = e.Data;
                             if (string.IsNullOrWhiteSpace(logMessage)) return;
-                            this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+                            this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
                         },
                     updateProcessPath: false,
                     allowUseWindow: true
@@ -285,25 +272,25 @@ namespace chocolatey.infrastructure.app.services
             return packageResults;
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+        public ConcurrentDictionary<string, PackageResult> UpgradeDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
-            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement upgrade".format_with(APP_NAME));
+            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement upgrade".FormatWith(AppName));
             return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null)
+        public ConcurrentDictionary<string, PackageResult> Upgrade(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null)
         {
-            throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
+            throw new NotImplementedException("{0} does not implement upgrade".FormatWith(AppName));
         }
 
-        public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+        public void UninstallDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
-            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement uninstall".format_with(APP_NAME));
+            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement uninstall".FormatWith(AppName));
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
+        public ConcurrentDictionary<string, PackageResult> Uninstall(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
         {
-            throw new NotImplementedException("{0} does not implement upgrade".format_with(APP_NAME));
+            throw new NotImplementedException("{0} does not implement upgrade".FormatWith(AppName));
         }
 
         /// <summary>
@@ -313,7 +300,7 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="regex">The regex.</param>
         /// <param name="groupName">Name of the group.</param>
         /// <returns></returns>
-        private static string get_value_from_output(string output, Regex regex, string groupName)
+        private static string GetValueFromOutput(string output, Regex regex, string groupName)
         {
             var matchGroup = regex.Match(output).Groups[groupName];
             if (matchGroup != null)

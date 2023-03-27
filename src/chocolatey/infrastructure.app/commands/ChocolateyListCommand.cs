@@ -59,7 +59,7 @@ namespace chocolatey.infrastructure.app.commands
             _packageService = packageService ?? throw new ArgumentNullException(nameof(packageService));
         }
 
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("idonly|id-only",
@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.ListCommand.IncludeRegistryPrograms = option != null)
                 .Add("version=",
                      "Version - Specific version of a package to return.",
-                     option => configuration.Version = option.remove_surrounding_quotes())
+                     option => configuration.Version = option.UnquoteSafe())
                 .Add("page=",
                      "Page - the 'page' of results to return. Defaults to return all results. Available in 0.9.10+.",
                      option =>
@@ -111,15 +111,15 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.Verbose = option != null);
         }
 
-        public virtual int count(ChocolateyConfiguration config)
+        public virtual int Count(ChocolateyConfiguration config)
         {
             config.ListCommand.LocalOnly = true;
             config.QuietOutput = true;
 
-            return _packageService.count_run(config);
+            return _packageService.Count(config);
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             var argumentsWithoutLocalOnly = new List<string>(unparsedArguments.Count);
 
@@ -139,12 +139,12 @@ UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported fo
             configuration.Input = string.Join(" ", argumentsWithoutLocalOnly);
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
             // There is nothing to validate.
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "List Command");
             this.Log().Info(string.Empty);
@@ -152,7 +152,7 @@ UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported fo
             this.Log().Info(ChocolateyLoggers.Important, "Usage");
             this.Log().Info(@"
     choco {0} <filter> [<options/switches>]
-".format_with(configuration.CommandName));
+".FormatWith(configuration.CommandName));
 
             this.Log().Info(ChocolateyLoggers.Important, "Examples");
             this.Log().Info(@"
@@ -162,7 +162,7 @@ UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported fo
 NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
-".format_with(configuration.CommandName));
+".FormatWith(configuration.CommandName));
 
             this.Log().Info(ChocolateyLoggers.Important, "Exit Codes");
             this.Log().Info(@"
@@ -185,37 +185,37 @@ If you find other exit codes that we have not yet documented, please
  file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
-".format_with(ApplicationParameters.Features.UseEnhancedExitCodes));
+".FormatWith(ApplicationParameters.Features.UseEnhancedExitCodes));
 
             this.Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public virtual IEnumerable<PackageResult> list(ChocolateyConfiguration config)
+        public virtual IEnumerable<PackageResult> List(ChocolateyConfiguration config)
         {
             config.ListCommand.LocalOnly = true;
             config.QuietOutput = true;
 
-            return _packageService.list_run(config);
+            return _packageService.List(config);
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
             return false;
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
             configuration.ListCommand.LocalOnly = true;
 
-            _packageService.list_noop(configuration);
+            _packageService.ListDryRun(configuration);
         }
 
-        public virtual void run(ChocolateyConfiguration config)
+        public virtual void Run(ChocolateyConfiguration config)
         {
             config.ListCommand.LocalOnly = true;
 
             // note: you must leave the .ToList() here or else the method won't be evaluated!
-            var packageResults = _packageService.list_run(config).ToList();
+            var packageResults = _packageService.List(config).ToList();
 
             // if there are no results, exit with a 2 if enhanced exit codes is enabled.
             if (config.Features.UseEnhancedExitCodes && packageResults.Count == 0 && Environment.ExitCode == 0)

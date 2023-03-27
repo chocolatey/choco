@@ -43,13 +43,13 @@ namespace chocolatey.tests.infrastructure.app.commands
                 command = new ChocolateyTemplateCommand(templateService.Object);
             }
 
-            public void reset()
+            public void Reset()
             {
                 templateService.ResetCalls();
             }
         }
 
-        public class when_implementing_command_for : ChocolateyTemplateCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyTemplateCommandSpecsBase
         {
             private List<string> results;
 
@@ -59,14 +59,14 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_help()
+            public void Should_implement_help()
             {
                 results.ShouldContain("template");
                 results.ShouldContain("templates");
             }
         }
 
-        public class when_configurating_the_argument_parser : ChocolateyTemplateCommandSpecsBase
+        public class When_configurating_the_argument_parser : ChocolateyTemplateCommandSpecsBase
         {
             private OptionSet optionSet;
 
@@ -78,55 +78,55 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                command.configure_argument_parser(optionSet, configuration);
+                command.ConfigureArgumentParser(optionSet, configuration);
             }
 
             [Fact]
-            public void should_add_name_to_the_option_set()
+            public void Should_add_name_to_the_option_set()
             {
                 optionSet.Contains("name").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_name_to_the_option_set()
+            public void Should_add_short_version_of_name_to_the_option_set()
             {
                 optionSet.Contains("n").ShouldBeTrue();
             }
         }
 
 
-        public class when_handling_additional_argument_parsing : ChocolateyTemplateCommandSpecsBase
+        public class When_handling_additional_argument_parsing : ChocolateyTemplateCommandSpecsBase
         {
             private readonly IList<string> unparsedArgs = new List<string>();
             private Action because;
 
             public override void Because()
             {
-                because = () => command.handle_additional_argument_parsing(unparsedArgs, configuration);
+                because = () => command.ParseAdditionalArguments(unparsedArgs, configuration);
             }
 
-            public new void reset()
+            public new void Reset()
             {
                 configuration.TemplateCommand.Name = string.Empty;
-                configuration.TemplateCommand.Command = TemplateCommandType.unknown;
+                configuration.TemplateCommand.Command = TemplateCommandType.Unknown;
                 unparsedArgs.Clear();
-                base.reset();
+                base.Reset();
             }
 
             [Fact]
-            public void should_use_the_first_unparsed_arg_as_the_subcommand()
+            public void Should_use_the_first_unparsed_arg_as_the_subcommand()
             {
-                reset();
+                Reset();
                 unparsedArgs.Add("list");
                 because();
 
-                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.list);
+                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.List);
             }
 
             [Fact]
-            public void should_throw_when_more_than_one_unparsed_arg_is_passed()
+            public void Should_throw_when_more_than_one_unparsed_arg_is_passed()
             {
-                reset();
+                Reset();
                 unparsedArgs.Add("badcommand");
                 unparsedArgs.Add("bbq");
                 var errorred = false;
@@ -149,104 +149,104 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_accept_list_as_the_subcommand()
+            public void Should_accept_list_as_the_subcommand()
             {
-                reset();
+                Reset();
                 unparsedArgs.Add("list");
                 because();
 
-                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.list);
+                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.List);
             }
 
             [Fact]
-            public void should_accept_uppercase_list_as_the_subcommand()
+            public void Should_accept_uppercase_list_as_the_subcommand()
             {
-                reset();
+                Reset();
                 unparsedArgs.Add("LIST");
                 because();
 
-                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.list);
+                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.List);
             }
 
             [Fact]
-            public void should_accept_info_as_the_subcommand()
+            public void Should_accept_info_as_the_subcommand()
             {
-                reset();
+                Reset();
                 unparsedArgs.Add("info");
                 because();
 
-                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.info);
+                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.Info);
             }
 
             [Fact]
-            public void should_accept_uppercase_info_as_the_subcommand()
+            public void Should_accept_uppercase_info_as_the_subcommand()
             {
-                reset();
+                Reset();
                 unparsedArgs.Add("INFO");
                 because();
 
-                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.info);
+                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.Info);
             }
 
             [Fact]
-            public void should_set_unrecognized_values_to_list_as_the_subcommand()
+            public void Should_set_unrecognized_values_to_list_as_the_subcommand()
             {
-                reset();
+                Reset();
                 unparsedArgs.Add("badcommand");
                 because();
 
-                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.list);
+                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.List);
             }
 
             [Fact]
-            public void should_default_to_list_as_the_subcommand()
+            public void Should_default_to_list_as_the_subcommand()
             {
-                reset();
+                Reset();
                 because();
 
-                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.list);
+                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.List);
             }
 
             [Fact]
-            public void should_handle_passing_in_an_empty_string()
+            public void Should_handle_passing_in_an_empty_string()
             {
-                reset();
+                Reset();
                 unparsedArgs.Add(" ");
                 because();
 
-                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.list);
+                configuration.TemplateCommand.Command.ShouldEqual(TemplateCommandType.List);
             }
         }
 
-        public class when_handling_validation : ChocolateyTemplateCommandSpecsBase
+        public class When_validating : ChocolateyTemplateCommandSpecsBase
         {
             private Action because;
 
             public override void Because()
             {
-                because = () => command.handle_validation(configuration);
+                because = () => command.Validate(configuration);
             }
 
             [Fact]
-            public void should_continue_when_command_is_list_and_name_is_set()
+            public void Should_continue_when_command_is_list_and_name_is_set()
             {
-                configuration.TemplateCommand.Command = TemplateCommandType.list;
+                configuration.TemplateCommand.Command = TemplateCommandType.List;
                 configuration.TemplateCommand.Name = "bob";
                 because();
             }
 
             [Fact]
-            public void should_continue_when_command_is_list_and_name_is_not_set()
+            public void Should_continue_when_command_is_list_and_name_is_not_set()
             {
-                configuration.TemplateCommand.Command = TemplateCommandType.list;
+                configuration.TemplateCommand.Command = TemplateCommandType.List;
                 configuration.TemplateCommand.Name = "";
                 because();
             }
 
             [Fact]
-            public void should_throw_when_command_is_info_and_name_is_not_set()
+            public void Should_throw_when_command_is_info_and_name_is_not_set()
             {
-                configuration.TemplateCommand.Command = TemplateCommandType.info;
+                configuration.TemplateCommand.Command = TemplateCommandType.Info;
                 configuration.TemplateCommand.Name = "";
                 var errorred = false;
                 Exception error = null;
@@ -264,45 +264,45 @@ namespace chocolatey.tests.infrastructure.app.commands
                 errorred.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldEqual("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.TemplateCommand.Command.to_string()));
+                error.Message.ShouldEqual("When specifying the subcommand '{0}', you must also specify --name.".FormatWith(configuration.TemplateCommand.Command.ToStringSafe().ToLower()));
             }
 
             [Fact]
-            public void should_continue_when_command_info_and_name_is_set()
+            public void Should_continue_when_command_info_and_name_is_set()
             {
-                configuration.TemplateCommand.Command = TemplateCommandType.info;
+                configuration.TemplateCommand.Command = TemplateCommandType.Info;
                 configuration.TemplateCommand.Name = "bob";
                 because();
             }
         }
 
-        public class when_noop_is_called : ChocolateyTemplateCommandSpecsBase
+        public class When_noop_is_called : ChocolateyTemplateCommandSpecsBase
         {
             public override void Because()
             {
-                configuration.TemplateCommand.Command = TemplateCommandType.list;
-                command.noop(configuration);
+                configuration.TemplateCommand.Command = TemplateCommandType.List;
+                command.DryRun(configuration);
             }
 
             [Fact]
-            public void should_call_service_list_noop()
+            public void Should_call_service_list_noop()
             {
-                templateService.Verify(c => c.list_noop(configuration), Times.Once);
+                templateService.Verify(c => c.ListDryRun(configuration), Times.Once);
             }
         }
 
-        public class when_run_is_called : ChocolateyTemplateCommandSpecsBase
+        public class When_run_is_called : ChocolateyTemplateCommandSpecsBase
         {
             public override void Because()
             {
-                configuration.TemplateCommand.Command = TemplateCommandType.list;
-                command.run(configuration);
+                configuration.TemplateCommand.Command = TemplateCommandType.List;
+                command.Run(configuration);
             }
 
             [Fact]
-            public void should_call_service_list()
+            public void Should_call_service_list()
             {
-                templateService.Verify(c => c.list(configuration), Times.Once);
+                templateService.Verify(c => c.List(configuration), Times.Once);
             }
         }
     }

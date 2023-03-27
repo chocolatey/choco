@@ -33,7 +33,7 @@ namespace chocolatey.infrastructure.licensing
         public DateTime? ExpirationDate { get; set; }
         public bool IsCompatible { get; set; }
 
-        public bool is_licensed_version()
+        public bool IsLicensedVersion()
         {
             return IsValid
                    && LicenseType != ChocolateyLicenseType.Unknown

@@ -20,6 +20,6 @@ namespace chocolatey.infrastructure.app.registration
 
     public interface IExtensionModule
     {
-        void register_dependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration);
+        void RegisterDependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration);
     }
 }

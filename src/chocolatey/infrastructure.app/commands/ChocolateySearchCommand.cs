@@ -38,12 +38,12 @@ namespace chocolatey.infrastructure.app.commands
             _packageService = packageService;
         }
 
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("s=|source=",
                      "Source - Source location for install. Can use special 'windowsfeatures', 'ruby', 'cygwin', or 'python' sources. Defaults to sources.",
-                     option => configuration.Sources = option.remove_surrounding_quotes())
+                     option => configuration.Sources = option.UnquoteSafe())
                 .Add("idonly|id-only",
                      "Id Only - Only return Package Ids in the list results. Available in 0.10.6+.",
                      option => configuration.ListCommand.IdOnly = option != null)
@@ -58,19 +58,19 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.AllVersions = option != null)
                 .Add("version=",
                      "Version - Specific version of a package to return.",
-                     option => configuration.Version = option.remove_surrounding_quotes())
+                     option => configuration.Version = option.UnquoteSafe())
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
-                     option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
+                     option => configuration.SourceCommand.Username = option.UnquoteSafe())
                 .Add("p=|password=",
                      "Password - the user's password to the source. Defaults to empty.",
-                     option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
+                     option => configuration.SourceCommand.Password = option.UnquoteSafe())
                 .Add("cert=",
                      "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty. Available in 0.9.10+.",
-                     option => configuration.SourceCommand.Certificate = option.remove_surrounding_quotes())
+                     option => configuration.SourceCommand.Certificate = option.UnquoteSafe())
                 .Add("cp=|certpassword=",
                      "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
-                     option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
+                     option => configuration.SourceCommand.CertificatePassword = option.UnquoteSafe())
                 .Add("page=",
                      "Page - the 'page' of results to return. Defaults to return all results. Available in 0.9.10+.",
                      option =>
@@ -120,8 +120,8 @@ namespace chocolatey.infrastructure.app.commands
                      "Detailed - Alias for verbose. Available in 0.9.10+.",
                      option => configuration.Verbose = option != null)
                   .Add("disable-repository-optimizations|disable-package-repository-optimizations",
-                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".format_with
-                        (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.to_string()),
+                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".FormatWith
+                        (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.ToStringSafe()),
                     option =>
                     {
                         if (option != null)
@@ -132,28 +132,28 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
             if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.Username) && string.IsNullOrWhiteSpace(configuration.SourceCommand.Password))
             {
-                this.Log().Debug(ChocolateyLoggers.LogFileOnly, "Username '{0}' provided. Asking for password.".format_with(configuration.SourceCommand.Username));
-                System.Console.Write("User name '{0}' provided. Password: ".format_with(configuration.SourceCommand.Username));
-                configuration.SourceCommand.Password = InteractivePrompt.get_password(configuration.PromptForConfirmation);
+                this.Log().Debug(ChocolateyLoggers.LogFileOnly, "Username '{0}' provided. Asking for password.".FormatWith(configuration.SourceCommand.Username));
+                System.Console.Write("User name '{0}' provided. Password: ".FormatWith(configuration.SourceCommand.Username));
+                configuration.SourceCommand.Password = InteractivePrompt.GetPassword(configuration.PromptForConfirmation);
             }
 
             if (configuration.ListCommand.PageSize < 1 || configuration.ListCommand.PageSize > 100)
             {
-                var message = "The page size has been specified to be {0:N0} packages. The page size cannot be lower than 1 package, and no larger than 100 packages.".format_with(configuration.ListCommand.PageSize);
+                var message = "The page size has been specified to be {0:N0} packages. The page size cannot be lower than 1 package, and no larger than 100 packages.".FormatWith(configuration.ListCommand.PageSize);
                 throw new ApplicationException(message);
             }
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Search Command");
             this.Log().Info(@"
@@ -207,28 +207,28 @@ If you find other exit codes that we have not yet documented, please
  file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
-".format_with(ApplicationParameters.Features.UseEnhancedExitCodes));
+".FormatWith(ApplicationParameters.Features.UseEnhancedExitCodes));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
 choco {0}: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_search.gif
 
-".format_with(configuration.CommandName));
+".FormatWith(configuration.CommandName));
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Alternative Sources");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
-            _packageService.list_noop(configuration);
+            _packageService.ListDryRun(configuration);
         }
 
-        public virtual void run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
-            _packageService.ensure_source_app_installed(configuration);
+            _packageService.EnsureSourceAppInstalled(configuration);
             // note: you must leave the .ToList() here or else the method won't be evaluated!
-            var packageResults = _packageService.list_run(configuration).ToList();
+            var packageResults = _packageService.List(configuration).ToList();
 
             // if there are no results, exit with a 2.
             if (configuration.Features.UseEnhancedExitCodes && packageResults.Count == 0 && Environment.ExitCode == 0)
@@ -237,20 +237,20 @@ choco {0}: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/c
             }
         }
 
-        public virtual IEnumerable<PackageResult> list(ChocolateyConfiguration configuration)
+        public virtual IEnumerable<PackageResult> List(ChocolateyConfiguration configuration)
         {
             configuration.QuietOutput = true;
             // here it's up to the caller to enumerate the results
-            return _packageService.list_run(configuration);
+            return _packageService.List(configuration);
         }
 
-        public virtual int count(ChocolateyConfiguration config)
+        public virtual int Count(ChocolateyConfiguration config)
         {
             config.QuietOutput = true;
-            return _packageService.count_run(config);
+            return _packageService.Count(config);
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
             return false;
         }

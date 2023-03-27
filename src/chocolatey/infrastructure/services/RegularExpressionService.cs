@@ -23,7 +23,7 @@ namespace chocolatey.infrastructure.services
     /// </summary>
     public class RegularExpressionService : IRegularExpressionService
     {
-        public string replace(string input, string pattern, MatchEvaluator matchEvaluator)
+        public string Replace(string input, string pattern, MatchEvaluator matchEvaluator)
         {
             var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
             return regex.Replace(input, matchEvaluator);

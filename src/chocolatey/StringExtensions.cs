@@ -30,12 +30,12 @@ namespace chocolatey
     public static class StringExtensions
     {
         /// <summary>
-        ///   Formats string with the formatting passed in. This is a shortcut to string.Format().
+        ///   Formats string with the formatting passed in. This is a null-safe wrapper for <see cref="string.Format(string, object[])"/>.
         /// </summary>
         /// <param name="input">The input.</param>
         /// <param name="formatting">The formatting.</param>
-        /// <returns>A formatted string.</returns>
-        public static string format_with(this string input, params object[] formatting)
+        /// <returns>A formatted string, or <see cref="string.Empty"/> if <paramref name="input"/> is null.</returns>
+        public static string FormatWith(this string input, params object[] formatting)
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
@@ -55,7 +55,7 @@ namespace chocolatey
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
-        public static string trim_safe(this string input)
+        public static string TrimSafe(this string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
@@ -67,7 +67,7 @@ namespace chocolatey
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
-        public static string to_lower(this string input)
+        public static string ToLowerSafe(this string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
@@ -79,7 +79,7 @@ namespace chocolatey
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
-        public static string to_string(this string input)
+        public static string ToStringSafe(this string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
@@ -91,7 +91,7 @@ namespace chocolatey
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
-        public static SecureString to_secure_string(this string input)
+        public static SecureString ToSecureStringSafe(this string input)
         {
             var secureString = new SecureString();
 
@@ -105,7 +105,7 @@ namespace chocolatey
             return secureString;
         }
 
-        public static string from_secure_string(this SecureString input)
+        public static string FromSecureStringSafe(this SecureString input)
         {
             if (input == null) return string.Empty;
 
@@ -128,13 +128,13 @@ namespace chocolatey
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
-        public static string wrap_spaces_in_quotes(this string input)
+        public static string QuoteIfContainsSpaces(this string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return input;
 
             if (_spacePattern.IsMatch(input))
             {
-                return "\"{0}\"".format_with(input);
+                return "\"{0}\"".FormatWith(input);
             }
 
             return input;
@@ -146,7 +146,7 @@ namespace chocolatey
         /// <param name="input">The input.</param>
         /// <param name="other">The value to compare to</param>
         /// <returns>True if these are the same</returns>
-        public static bool is_equal_to(this string input, string other)
+        public static bool IsEqualTo(this string input, string other)
         {
             return string.Compare(input, other, ignoreCase: true, culture: CultureInfo.InvariantCulture) == 0;
         }
@@ -158,9 +158,9 @@ namespace chocolatey
         /// <param name="search">The value to search for.</param>
         /// <param name="comparison">The comparison.</param>
         /// <returns>True if the value to search for is in the input string</returns>
-        public static bool contains(this string input, string search, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+        public static bool ContainsSafe(this string input, string search, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
         {
-            return input.to_string().IndexOf(search, 0, comparison) >= 0;
+            return input.ToStringSafe().IndexOf(search, 0, comparison) >= 0;
         }
 
         /// <summary>
@@ -168,13 +168,13 @@ namespace chocolatey
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns></returns>
-        public static string remove_surrounding_quotes(this string input)
+        public static string UnquoteSafe(this string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
             if (input.StartsWith(" "))
             {
-                input = input.trim_safe();
+                input = input.TrimSafe();
             }
 
             if ((input.StartsWith("\"") && input.EndsWith("\""))
@@ -186,14 +186,14 @@ namespace chocolatey
             return input;
         }
 
-        private static Regex open_brace_regex = new Regex("(?<!{){(?!{)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
-        private static Regex close_brace_regex = new Regex("(?<!})}(?!})", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
+        private static readonly Regex _openBraceRegex = new Regex("(?<!{){(?!{)", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
+        private static readonly Regex _closeBraceRegex = new Regex("(?<!})}(?!})", RegexOptions.IgnoreCase | RegexOptions.Multiline | RegexOptions.Compiled);
 
-        public static string escape_curly_braces(this string input)
+        public static string EscapeCurlyBraces(this string input)
         {
             if (string.IsNullOrWhiteSpace(input)) return string.Empty;
 
-            return open_brace_regex.Replace(close_brace_regex.Replace(input,"}}"),"{{");
+            return _openBraceRegex.Replace(_closeBraceRegex.Replace(input,"}}"),"{{");
         }
 
         /// <summary>
@@ -201,11 +201,11 @@ namespace chocolatey
         /// </summary>
         /// <param name="input">The input.</param>
         /// <returns>The input, but with double quotes if there is a pipe character found in the string.</returns>
-        public static string quote_if_pipe_found(this string input)
+        public static string QuoteIfContainsPipe(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input)) return input.to_string();
+            if (string.IsNullOrWhiteSpace(input)) return input.ToStringSafe();
 
-            if (input.contains("|")) return "\"{0}\"".format_with(input);
+            if (input.ContainsSafe("|")) return "\"{0}\"".FormatWith(input);
 
             return input;
         }

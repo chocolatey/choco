@@ -21,8 +21,8 @@ namespace chocolatey.infrastructure.app.services
 
     public interface IChocolateyPackageInformationService
     {
-        ChocolateyPackageInformation get_package_information(IPackageMetadata package);
-        void save_package_information(ChocolateyPackageInformation packageInformation);
-        void remove_package_information(IPackageMetadata package);
+        ChocolateyPackageInformation Get(IPackageMetadata package);
+        void Save(ChocolateyPackageInformation packageInformation);
+        void Remove(IPackageMetadata package);
     }
 }

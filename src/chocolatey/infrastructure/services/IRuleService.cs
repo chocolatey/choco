@@ -20,6 +20,6 @@ namespace chocolatey.infrastructure.services
 
     public interface IRuleService
     {
-        IEnumerable<RuleResult> validate_rules(string filePath);
+        IEnumerable<RuleResult> ValidateRules(string filePath);
     }
 }

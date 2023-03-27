@@ -21,10 +21,10 @@ namespace chocolatey.infrastructure.commands
 
     public interface ICommandExecutor
     {
-        int execute(string process, string arguments, int waitForExitInSeconds);
-        int execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory);
+        int Execute(string process, string arguments, int waitForExitInSeconds);
+        int Execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory);
 
-        int execute(
+        int Execute(
             string process,
             string arguments,
             int waitForExitInSeconds,
@@ -33,7 +33,7 @@ namespace chocolatey.infrastructure.commands
             bool updateProcessPath
             );
 
-        int execute(
+        int Execute(
             string process,
             string arguments,
             int waitForExitInSeconds,
@@ -44,7 +44,7 @@ namespace chocolatey.infrastructure.commands
             bool allowUseWindow
             );
 
-        int execute(
+        int Execute(
             string process,
             string arguments,
             int waitForExitInSeconds,

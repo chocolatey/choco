@@ -21,8 +21,6 @@ namespace chocolatey.infrastructure.adapters
     using System.IO;
     using System.Reflection;
 
-    // ReSharper disable InconsistentNaming
-
     public sealed class Assembly : IAssembly
     {
         private readonly System.Reflection.Assembly _assembly;
@@ -130,7 +128,7 @@ namespace chocolatey.infrastructure.adapters
             return new Assembly(System.Reflection.Assembly.GetEntryAssembly());
         }
 
-        public static IAssembly set_assembly(System.Reflection.Assembly value)
+        public static IAssembly SetAssembly(System.Reflection.Assembly value)
         {
             return new Assembly(value);
         }
@@ -140,6 +138,4 @@ namespace chocolatey.infrastructure.adapters
             return new Assembly(value);
         }
     }
-
-    // ReSharper restore InconsistentNaming
 }

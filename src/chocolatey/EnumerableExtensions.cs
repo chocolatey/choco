@@ -31,9 +31,9 @@ namespace chocolatey
         /// <typeparam name="T"></typeparam>
         /// <param name="source">The source.</param>
         /// <returns>
-        ///   Source if not null; otherwise Enumerable.Empty&lt;<see cref="or_empty_list_if_null{T}" />&gt;
+        ///   Source if not null; otherwise Enumerable.Empty&lt;<see cref="OrEmpty{T}" />&gt;
         /// </returns>
-        public static IEnumerable<T> or_empty_list_if_null<T>(this IEnumerable<T> source)
+        public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T> source)
         {
             return source ?? Enumerable.Empty<T>();
         }
@@ -43,7 +43,7 @@ namespace chocolatey
         /// </summary>
         /// <param name="source">The source.</param>
         /// <returns>Source if not null; otherwise new ArrayList</returns>
-        public static IEnumerable or_empty_list_if_null(this IEnumerable source)
+        public static IEnumerable OrEmpty(this IEnumerable source)
         {
             return source ?? new ArrayList();
         }
@@ -54,7 +54,7 @@ namespace chocolatey
         /// <param name="source">The source.</param>
         /// <param name="separator">The value to put in between elements</param>
         /// <returns></returns>
-        public static string join(this IEnumerable<string> source, string separator)
+        public static string Join(this IEnumerable<string> source, string separator)
         {
             return string.Join(separator, source);
         }
@@ -63,7 +63,7 @@ namespace chocolatey
         ///   Returns a distinct set of elements using the comparer specified. This implementation will pick the last occurrence
         ///   of each element instead of picking the first. This method assumes that similar items occur in order.
         /// </summary>
-        public static IEnumerable<T> distinct_last<T>(this IEnumerable<T> source, IEqualityComparer<T> equalityComparer, IComparer<T> comparer)
+        public static IEnumerable<T> LastDistinct<T>(this IEnumerable<T> source, IEqualityComparer<T> equalityComparer, IComparer<T> comparer)
         {
             bool first = true;
             bool maxElementHasValue = false;
@@ -109,7 +109,7 @@ namespace chocolatey
         /// <remarks>
         ///   Taken from here: https://stackoverflow.com/a/30758270/671491
         /// </remarks>
-        public static int get_sequence_hash_code<T>(this IEnumerable<T> source)
+        public static int SequenceHashCode<T>(this IEnumerable<T> source)
         {
             const int seed = 487;
             const int modifier = 31;

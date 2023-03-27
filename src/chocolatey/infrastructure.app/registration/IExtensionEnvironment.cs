@@ -30,6 +30,6 @@ namespace chocolatey.infrastructure.app.registration
         /// <param name="config">The configuration used for the entire chocolatey ecosystem.</param>
         /// <returns>The configuration values that needs to be set as environment variables.</returns>
         /// <remarks>This is not used, and is only a placeholder for the future.</remarks>
-        IDictionary<string, string> get_environment_configuration(ChocolateyConfiguration config);
+        IDictionary<string, string> GetEnvironmentConfiguration(ChocolateyConfiguration config);
     }
 }

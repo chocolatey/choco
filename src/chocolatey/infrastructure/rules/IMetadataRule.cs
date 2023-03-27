@@ -22,6 +22,6 @@ namespace chocolatey.infrastructure.rules
     [MultiService]
     public interface IMetadataRule
     {
-        IEnumerable<RuleResult> validate(NuspecReader reader);
+        IEnumerable<RuleResult> Validate(NuspecReader reader);
     }
 }

@@ -28,11 +28,11 @@ namespace chocolatey.infrastructure.tasks
         ///   Initializes a task. This should be initialized to run on a schedule, a trigger, a subscription to event messages,
         ///   etc, or some combination of the above.
         /// </summary>
-        void initialize();
+        void Initialize();
 
         /// <summary>
         ///   Shuts down a task that is in a waiting state. Turns off all schedules, triggers or subscriptions.
         /// </summary>
-        void shutdown();
+        void Shutdown();
     }
 }
