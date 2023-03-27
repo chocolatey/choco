@@ -186,6 +186,46 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             & powershell.exe -Version 2 -noprofile -command $command
             $LastExitCode | Should -BeExactly 0
         }
+
+        Context "chocolateyScriptRunner.ps1" {
+            BeforeAll {
+                $Command = @'
+& "$env:ChocolateyInstall\helpers\chocolateyScriptRunner.ps1" -packageScript '{0}' -installArguments '' -packageParameters '' -preRunHookScripts '{1}' -postRunHookScripts '{2}'
+exit $error.count
+'@
+            'Write-Host "packageScript"' > packageScript.ps1
+            'Write-Host "preRunHookScript"' > preRunHookScript.ps1
+            'Write-Host "postRunHookScript"' > postRunHookScript.ps1
+            }
+
+            It "Handles just a packageScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", $null, $null
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('packageScript') -Because ($output -join ([Environment]::NewLine))
+            }
+
+            It "Handles a packageScript with a preRunHookScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", "$PWD/preRunHookScript.ps1", $null
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('preRunHookScript','packageScript') -Because ($output -join ([Environment]::NewLine))
+            }
+
+            It "Handles a packageScript with a preRunHookScript and postRunHookScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", "$PWD/preRunHookScript.ps1", "$PWD/postRunHookScript.ps1"
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('preRunHookScript','packageScript', 'postRunHookScript') -Because ($output -join ([Environment]::NewLine))
+            }
+
+            It "Handles a packageScript with and postRunHookScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", $null, "$PWD/postRunHookScript.ps1"
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('packageScript', 'postRunHookScript') -Because ($output -join ([Environment]::NewLine))
+            }
+        }
     }
 
     # This is skipped when not run in CI because it modifies the local system.
