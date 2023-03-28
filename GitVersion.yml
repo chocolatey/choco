@@ -8,7 +8,7 @@ branches:
     regex: ^support[/-]
     source-branches:
     - master
-    tracks-release-branches: true
+    tracks-release-branches: false
     is-release-branch: false
     is-mainline: false
     pre-release-weight: 55000
