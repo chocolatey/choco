@@ -27,5 +27,11 @@ namespace chocolatey.infrastructure.services
         {
             return DateTime.UtcNow;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public DateTime? get_current_date_time()
+            => GetCurrentDateTime();
+#pragma warning restore IDE1006
     }
 }

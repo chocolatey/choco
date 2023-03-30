@@ -377,5 +377,31 @@ namespace chocolatey.infrastructure.registration
 
             return null;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IAssembly resolve_or_load_assembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation)
+            => ResolveOrLoadAssembly(assemblySimpleName, publicKeyToken, assemblyFileLocation);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IAssembly resolve_or_load_assembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation, bool ignoreExisting = false)
+            => ResolveOrLoadAssembly(assemblySimpleName, publicKeyToken, assemblyFileLocation, ignoreExisting);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IAssembly load_assembly(string assemblySimpleName, string assemblyFileLocation, params string[] publicKeyTokens)
+            => LoadAssembly(assemblySimpleName, assemblyFileLocation, publicKeyTokens);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IAssembly resolve_existing_assembly(string assemblySimpleName, params string[] publicKeyTokens)
+            => ResolveExistingAssembly(assemblySimpleName, publicKeyTokens);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IAssembly load_extension(string assemblySimpleName)
+            => LoadExtension(assemblySimpleName);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static System.Reflection.Assembly resolve_extension_or_merged_assembly(object sender, ResolveEventArgs args)
+            => ResolveExtensionOrMergedAssembly(sender, args);
+#pragma warning restore IDE1006
     }
 }

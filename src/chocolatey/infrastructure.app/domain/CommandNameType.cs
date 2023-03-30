@@ -16,11 +16,24 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
+    using System;
+
     public enum CommandNameType
     {
         List,
         Install,
         Upgrade,
         Uninstall,
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        list = List,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        install = Install,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        upgrade = Upgrade,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        uninstall = Uninstall,
+#pragma warning restore IDE1006
     }
 }

@@ -144,5 +144,12 @@ namespace chocolatey.infrastructure.registration
                         ));
             }
         }
+
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void add_component_registry_class(Type componentType)
+            => AddComponentRegistryClass(componentType);
+#pragma warning restore IDE1006
     }
 }

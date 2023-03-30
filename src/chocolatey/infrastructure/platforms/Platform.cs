@@ -206,5 +206,24 @@ namespace chocolatey.infrastructure.platforms
         private static extern bool GetVersionEx(ref OSVERSIONINFOEX osVersionInfo);
 
         // ReSharper restore InconsistentNaming
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IEnvironment> environment, Lazy<IFileSystem> file_system)
+            => InitializeWith(environment, file_system);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static PlatformType get_platform()
+            => GetPlatform();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static Version get_version()
+            => GetVersion();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_name()
+            => GetName();
+#pragma warning restore IDE1006
     }
 }

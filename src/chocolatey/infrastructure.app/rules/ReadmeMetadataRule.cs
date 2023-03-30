@@ -19,9 +19,9 @@ namespace chocolatey.infrastructure.app.rules
     using chocolatey.infrastructure.rules;
     using NuGet.Packaging;
 
-    internal sealed class ReadmeMetadataRule : IMetadataRule
+    internal sealed class ReadmeMetadataRule : MetadataRuleBase
     {
-        public IEnumerable<RuleResult> Validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             if (!(reader.GetReadme() is null))
             {

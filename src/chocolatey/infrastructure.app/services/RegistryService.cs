@@ -515,6 +515,51 @@ namespace chocolatey.infrastructure.app.services
 
             return value;
         }
-    }
 
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public Registry get_installer_keys()
+            => GetInstallerKeys();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void evaluate_keys(RegistryKey key, Registry snapshot)
+            => UpdateSnapshot(key, snapshot);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public Registry get_installer_key_differences(Registry before, Registry after)
+            => GetInstallerKeysChanged(before, after);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void save_to_file(Registry snapshot, string filePath)
+            => SaveRegistrySnapshot(snapshot, filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public bool installer_value_exists(string keyPath, string value)
+            => InstallerKeyExists(keyPath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public Registry read_from_file(string filePath)
+            => ReadRegistrySnapshot(filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public IEnumerable<GenericRegistryValue> get_environment_values()
+            => GetEnvironmentValues();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public IEnumerable<GenericRegistryValue> get_added_changed_environment_differences(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after)
+            => GetNewAndModifiedEnvironmentValues(before, after);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public IEnumerable<GenericRegistryValue> get_removed_environment_differences(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after)
+            => GetRemovedEnvironmentValues(before, after);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public RegistryKey get_key(RegistryHive hive, string subKeyPath)
+            => GetKey(hive, subKeyPath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static GenericRegistryValue get_value(RegistryHiveType hive, string subKeyPath, string registryValue)
+            => GetRegistryValue(hive, subKeyPath, registryValue);
+#pragma warning restore IDE1006
+    }
 }

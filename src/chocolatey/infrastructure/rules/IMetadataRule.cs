@@ -15,6 +15,7 @@
 
 namespace chocolatey.infrastructure.rules
 {
+    using System;
     using System.Collections.Generic;
     using chocolatey.infrastructure.app.attributes;
     using NuGet.Packaging;
@@ -23,5 +24,10 @@ namespace chocolatey.infrastructure.rules
     public interface IMetadataRule
     {
         IEnumerable<RuleResult> Validate(NuspecReader reader);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        IEnumerable<RuleResult> validate(NuspecReader reader);
+#pragma warning restore IDE1006
     }
 }

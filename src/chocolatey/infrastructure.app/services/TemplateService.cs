@@ -411,5 +411,43 @@ List of Parameters:
 
             return parametersList;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void generate_noop(ChocolateyConfiguration configuration)
+            => GenerateDryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void generate(ChocolateyConfiguration configuration)
+            => Generate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void generate_file_from_template(ChocolateyConfiguration configuration, TemplateValues tokens, string template, string fileLocation, Encoding encoding)
+            => GenerateFileFromTemplate(configuration, tokens, template, fileLocation, encoding);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void list_noop(ChocolateyConfiguration configuration)
+            => ListDryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void list(ChocolateyConfiguration configuration)
+            => List(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected void list_custom_template_info(ChocolateyConfiguration configuration)
+            => ListCustomTemplateInformation(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected void list_built_in_template_info(ChocolateyConfiguration configuration, bool isOverridden, bool isDefault)
+            => ListBuiltinTemplateInformation(configuration, isOverridden, isDefault);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected IEnumerable<string> get_template_parameters(ChocolateyConfiguration configuration, bool templateInstalledViaPackage)
+            => GetTemplateParameters(configuration, templateInstalledViaPackage);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected HashSet<string> get_template_parameters_from_files(ChocolateyConfiguration configuration)
+            => GetTemplateParametersFromFiles(configuration);
+#pragma warning restore IDE1006
     }
 }

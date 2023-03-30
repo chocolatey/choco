@@ -304,5 +304,70 @@ namespace chocolatey.infrastructure.app.services
 
             return string.Empty;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string RUBY_PORTABLE_PACKAGE = "ruby.portable";
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string RUBY_PACKAGE = "ruby";
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string PACKAGE_NAME_GROUP = "PkgName";
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex InstallingRegex = _installingRegex;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex InstalledRegex = _installedRegex;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex ErrorNotFoundRegex = _errorNotFoundRegex;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex PackageNameFetchingRegex = _packageNameFetchingRegex;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex PackageNameInstalledRegex = _packageNameInstalledRegex;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex PackageNameErrorRegex = _packageNameErrorRegex;
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
+            => EnsureSourceAppInstalled(config, ensureAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public int count_run(ChocolateyConfiguration config)
+            => Count(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void list_noop(ChocolateyConfiguration config)
+            => ListDryRun(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
+            => List(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+            => InstallDryRun(config, continueAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+            => Install(config, continueAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
+            => Install(config, continueAction, beforeModifyAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+            => UpgradeDryRun(config, continueAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null)
+            => Upgrade(config, continueAction, beforeUpgradeAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+            => UninstallDryRun(config, continueAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
+            => Uninstall(config, continueAction, beforeUninstallAction);
+#pragma warning restore IDE1006
     }
 }

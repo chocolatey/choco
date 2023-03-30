@@ -487,5 +487,43 @@ namespace chocolatey.infrastructure.app.registration
                 ValidateReplacePermissions();
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_assembly_commands(IAssembly assembly)
+            => RegisterAssemblyCommands(assembly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_command(Type commandType)
+            => RegisterCommand(commandType);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_instance<TService, TImplementation>(Func<TImplementation> instance)
+            where TImplementation : class, TService
+            => RegisterInstance<TService, TImplementation>(instance);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_instance<TService, TImplementation>(Func<IContainerResolver, TImplementation> instance)
+            where TImplementation : class, TService
+            => RegisterInstance<TService, TImplementation>(instance);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_instance<TImplementation>(Func<TImplementation> instance)
+            where TImplementation : class
+            => RegisterInstance(instance);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_service<TImplementation>(params Type[] types)
+            => RegisterService<TImplementation>(types);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_service<TService, TImplementation>(bool transient = false)
+            where TImplementation : class, TService
+            => RegisterService<TService, TImplementation>(transient);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_validator(Func<Type, bool> validation_func)
+            => RegisterValidator(validation_func);
+#pragma warning restore IDE1006
     }
 }

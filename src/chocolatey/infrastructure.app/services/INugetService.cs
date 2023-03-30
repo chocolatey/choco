@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using configuration;
@@ -65,5 +66,22 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The configuration</param>
         IEnumerable<PackageResult> GetInstalledPackages(ChocolateyConfiguration config);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void pack_noop(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void pack_run(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void push_noop(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void push_run(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void remove_rollback_directory_if_exists(string packageName);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config);
+#pragma warning restore IDE1006
     }
 }

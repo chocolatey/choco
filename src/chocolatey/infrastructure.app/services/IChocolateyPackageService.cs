@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using configuration;
@@ -127,5 +128,39 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="config">The configuration.</param>
         /// <returns>results of upgrades</returns>
         ConcurrentDictionary<string, PackageResult> Uninstall(ChocolateyConfiguration config);
+
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void ensure_source_app_installed(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        int count_run(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void list_noop(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void pack_noop(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void pack_run(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void push_noop(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void push_run(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void install_noop(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void outdated_noop(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void outdated_run(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void upgrade_noop(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void uninstall_noop(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config);
+#pragma warning restore IDE1006
     }
 }

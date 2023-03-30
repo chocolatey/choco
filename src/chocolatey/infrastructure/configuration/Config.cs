@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.configuration
 {
+    using System;
     using System.ComponentModel;
     using app.configuration;
 
@@ -51,5 +52,15 @@ namespace chocolatey.infrastructure.configuration
         {
             return _configuration;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void initialize_with(ChocolateyConfiguration configuration)
+            => InitializeWith(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static ChocolateyConfiguration get_configuration_settings()
+            => GetConfigurationSettings();
+#pragma warning restore IDE1006
     }
 }

@@ -59,5 +59,20 @@ namespace chocolatey.infrastructure.app.domain
         /// alternative source runner.
         /// </summary>
         public const string WindowsFeatures = "windowsfeatures";
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string CYGWIN = Cygwin;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string NORMAL = Normal;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string PYTHON = Python;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string RUBY = Ruby;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string WINDOWS_FEATURE = WindowsFeature;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string WINDOWS_FEATURES = WindowsFeatures;
+#pragma warning restore IDE1006
     }
 }

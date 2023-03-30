@@ -225,5 +225,27 @@ namespace chocolatey.infrastructure.information
             TokenElevationTypeFull,
             TokenElevationTypeLimited
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool user_is_administrator()
+            => UserIsAdministrator();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool process_is_elevated()
+            => IsElevated();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool user_is_terminal_services()
+            => UserIsTerminalServices();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool user_is_remote()
+            => UserIsRemote();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool user_is_system()
+            => UserIsSystem();
+#pragma warning restore IDE1006
     }
 }

@@ -175,5 +175,35 @@ Config shown in action: https://raw.githubusercontent.com/wiki/chocolatey/choco/
 
             return config.ConfigCommand.Command != ConfigCommandType.List;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+#pragma warning restore IDE1006
     }
 }

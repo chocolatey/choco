@@ -298,5 +298,19 @@ namespace chocolatey.infrastructure.app.services
 
             return installer;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void run(PackageResult packageResult, ChocolateyConfiguration config)
+            => Run(packageResult, config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void remove(RegistryApplicationKey key, ChocolateyConfiguration config, PackageResult packageResult, string packageCacheLocation)
+            => Remove(key, config, packageResult, packageCacheLocation);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual IInstaller get_installer_type(RegistryApplicationKey key, string uninstallExe, string uninstallArgs)
+            => GetInstallerType(key, uninstallExe, uninstallArgs);
+#pragma warning restore IDE1006
     }
 }

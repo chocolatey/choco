@@ -91,5 +91,19 @@ Anything encrypted as CurrentUser can only be decrypted by your current user.");
 
             return Convert.ToBase64String(hashProvider.CalculateHash(pathBytes)).ToUpperInvariant();
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string encrypt_string(string cleartextValue)
+            => EncryptString(cleartextValue);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string decrypt_string(string encryptedString)
+            => DecryptString(encryptedString);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string generate_unique_token(string caseInsensitiveKey)
+            => GenerateUniqueToken(caseInsensitiveKey);
+#pragma warning restore IDE1006
     }
 }

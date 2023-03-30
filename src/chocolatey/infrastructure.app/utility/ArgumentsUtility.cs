@@ -16,6 +16,8 @@
 
 namespace chocolatey.infrastructure.app.utility
 {
+    using System;
+
     //todo: #2560 maybe find a better name/location for this
 
     public static class ArgumentsUtility
@@ -43,5 +45,11 @@ namespace chocolatey.infrastructure.app.utility
              || commandArguments.ContainsSafe("-api-key")
             ;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool arguments_contain_sensitive_information(string commandArguments)
+            => SensitiveArgumentsProvided(commandArguments);
+#pragma warning restore IDE1006
     }
 }

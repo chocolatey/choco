@@ -138,5 +138,31 @@ namespace chocolatey
 
             return result;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_manifest_string(this IAssembly assembly, string manifestResourceStreamLocation)
+            => GetManifestString(assembly, manifestResourceStreamLocation);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static Stream get_manifest_stream(this IAssembly assembly, string manifestResourceStreamLocation)
+            => GetManifestStream(assembly, manifestResourceStreamLocation);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_public_key_token(this IAssembly assembly)
+            => GetPublicKeyToken(assembly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_public_key_token(this AssemblyName assemblyName)
+            => GetPublicKeyTokenString(assemblyName);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IEnumerable<Type> get_loadable_types(this IAssembly assembly)
+            => GetLoadableTypes(assembly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IEnumerable<IExtensionModule> get_extension_modules(this IAssembly assembly)
+            => GetExtensionModules(assembly);
+#pragma warning restore IDE1006
     }
 }

@@ -331,5 +331,27 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
                 }
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void fail_when_license_is_missing_or_invalid_if_requested(ChocolateyConfiguration config)
+            => FailOnMissingOrInvalidLicenseIfFeatureSet(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void run(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+            => Run(config, container, isConsole, parseArgs);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public IEnumerable<T> list<T>(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+            => List<T>(config, container, isConsole, parseArgs);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public int count(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
+            => Count(config, container, isConsole, parseArgs);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
+            => WarnIfAdminAndNeedsElevation(config);
+#pragma warning restore IDE1006
     }
 }

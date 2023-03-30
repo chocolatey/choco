@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.domain.installers
 {
+    using System;
     using System.Collections.Generic;
 
     public class CustomInstaller : InstallerBase

@@ -52,5 +52,6 @@ namespace chocolatey.infrastructure.app.rules
                 }
             }
         }
+
     }
 }

@@ -254,5 +254,19 @@ A corrupt .registry file exists at {0}.
             if (_config.RegularOutput) this.Log().Info("Removing Package Information for {0}".FormatWith(pkgStorePath));
             _fileSystem.DeleteDirectoryChecked(pkgStorePath, recursive: true);
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ChocolateyPackageInformation get_package_information(IPackageMetadata package)
+            => Get(package);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void save_package_information(ChocolateyPackageInformation packageInformation)
+            => Save(packageInformation);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void remove_package_information(IPackageMetadata package)
+            => Remove(package);
+#pragma warning restore IDE1006
     }
 }

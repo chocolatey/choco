@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.registration
 {
+    using System;
     using System.Collections.Generic;
     using SimpleInjector;
 
@@ -39,5 +40,17 @@ namespace chocolatey.infrastructure.app.registration
         {
             return _container.GetAllInstances<TService>();
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public TService resolve<TService>()
+            where TService : class
+            => Resolve<TService>();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public IEnumerable<TService> resolve_all<TService>()
+            where TService : class
+            => ResolveAll<TService>();
+#pragma warning restore IDE1006
     }
 }

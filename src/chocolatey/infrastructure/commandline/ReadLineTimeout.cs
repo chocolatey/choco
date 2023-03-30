@@ -78,5 +78,12 @@ namespace chocolatey.infrastructure.commandline
             _foregroundResponseReset.Close();
             _foregroundResponseReset.Dispose();
         }
+
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string read(int timeoutMilliseconds)
+            => Read(timeoutMilliseconds);
+#pragma warning restore IDE1006
     }
 }

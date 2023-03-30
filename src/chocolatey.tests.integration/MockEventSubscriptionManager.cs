@@ -44,5 +44,15 @@ namespace chocolatey.tests.integration
         {
             return new Subject<Event>();
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void publish<Event>(Event eventMessage) where Event : class, IMessage
+            => Publish(eventMessage);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
+            => Subscribe(handleEvent, handleError, filter);
+#pragma warning disable IDE1006
     }
 }

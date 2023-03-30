@@ -488,5 +488,91 @@ namespace chocolatey.infrastructure.app.services
                 throw new ApplicationException("Feature '{0}' is not supported.".FormatWith(feature.Name));
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool skip_source(ConfigFileSourceSetting source, ChocolateyConfiguration configuration)
+            => SkipSource(source, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration)
+            => ListSources(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void source_add(ChocolateyConfiguration configuration)
+            => AddSource(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void source_remove(ChocolateyConfiguration configuration)
+            => RemoveSource(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void source_disable(ChocolateyConfiguration configuration)
+            => DisableSource(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void source_enable(ChocolateyConfiguration configuration)
+            => EnableSource(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void feature_list(ChocolateyConfiguration configuration)
+            => ListFeatures(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void feature_disable(ChocolateyConfiguration configuration)
+            => DisableFeature(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void feature_enable(ChocolateyConfiguration configuration)
+            => EnableFeature(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string get_api_key(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction)
+            => GetApiKey(configuration, keyAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void set_api_key(ChocolateyConfiguration configuration)
+            => SetApiKey(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void remove_api_key(ChocolateyConfiguration configuration)
+            => RemoveApiKey(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void config_list(ChocolateyConfiguration configuration)
+            => ListConfig(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void config_get(ChocolateyConfiguration configuration)
+            => GetConfig(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConfigFileConfigSetting config_get(string configKeyName)
+            => GetConfigValue(configKeyName);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void config_set(ChocolateyConfiguration configuration)
+            => SetConfig(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void config_unset(ChocolateyConfiguration configuration)
+            => UnsetConfig(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected void add_known_features_from_static_class(Type classType)
+            => AddKnownFeaturesFromStaticClass(classType);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected void add_known_feature(string name)
+            => AddKnownFeature(name);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected void validate_supported_feature(ConfigFileFeatureSetting feature)
+            => ValidateSupportedFeature(feature);
+#pragma warning disable IDE1006
     }
 }

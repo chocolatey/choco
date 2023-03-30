@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.tokens
 {
+    using System;
     using System.Collections.Generic;
     using System.Reflection;
     using System.Text.RegularExpressions;
@@ -72,5 +73,15 @@ namespace chocolatey.infrastructure.tokens
                 yield return regexMatch.Groups["key"].ToStringSafe();
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string replace_tokens<TConfig>(TConfig configuration, string textToReplace, string tokenPrefix = "[[", string tokenSuffix = "]]")
+            => ReplaceTokens(configuration, textToReplace, tokenPrefix, tokenSuffix);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IEnumerable<string> get_tokens(string textWithTokens, string tokenPrefix = "[[", string tokenSuffix = "]]")
+            => GetTokens(textWithTokens, tokenPrefix, tokenSuffix);
+#pragma warning restore IDE1006
     }
 }

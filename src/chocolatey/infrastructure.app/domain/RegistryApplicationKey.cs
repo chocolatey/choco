@@ -122,5 +122,11 @@ namespace chocolatey.infrastructure.app.domain
                    && KeyPath.IsEqualTo(other.KeyPath)
                 ;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public bool is_in_programs_and_features()
+            => IsInProgramsAndFeatures();
+#pragma warning restore IDE1006
     }
 }

@@ -16,6 +16,7 @@
 
 namespace chocolatey
 {
+    using System;
     using System.IO;
     using System.Runtime.Serialization.Formatters.Binary;
 
@@ -46,5 +47,15 @@ namespace chocolatey
                 return (T)formatter.Deserialize(ms);
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string to_string(this object input)
+            => ToStringSafe(input);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static T deep_copy<T>(this T other)
+            => DeepCopy(other);
+#pragma warning restore IDE1006
     }
 }

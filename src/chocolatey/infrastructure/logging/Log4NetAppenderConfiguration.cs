@@ -415,5 +415,31 @@ namespace chocolatey.infrastructure.logging
                 }
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void initialize_with(Lazy<IConsole> console)
+            => InitializeWith(console);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void configure(string outputDirectory = null, params string[] excludeLoggerNames)
+            => Configure(outputDirectory, excludeLoggerNames);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void set_logging_level_debug_when_debug(bool enableDebug, params string[] excludeAppenderNames)
+            => EnableDebugLoggingIf(enableDebug, excludeAppenderNames);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void set_verbose_logger_when_verbose(bool enableVerbose, bool enableDebug, string verboseLoggerName)
+            => EnableVerboseLoggingIf(enableVerbose, enableDebug, verboseLoggerName);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void set_trace_logger_when_trace(bool enableTrace, string traceLoggerName)
+            => EnableTraceLoggingIf(enableTrace, traceLoggerName);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void configure_additional_log_file(string logFileLocation)
+            => SetupAdditionalLogFile(logFileLocation);
+#pragma warning restore IDE1006
     }
 }

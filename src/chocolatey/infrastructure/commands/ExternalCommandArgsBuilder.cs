@@ -125,5 +125,19 @@ namespace chocolatey.infrastructure.commands
 
             return argument.ArgumentValue;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string build_arguments(object properties, IDictionary<string, ExternalCommandArgument> configToArgNames)
+            => BuildArguments(properties, configToArgNames);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        private static void fill_args_dictionary(Dictionary<string, string> propertyValues, IEnumerable<PropertyInfo> properties, IDictionary<string, ExternalCommandArgument> configToArgNames, object obj, string prepend)
+            => FillArgsDictionary(propertyValues, properties, configToArgNames, obj, prepend);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        private static string quote_arg_value_if_required(ExternalCommandArgument argument)
+            => QuoteArgumentValueIfRequired(argument);
+#pragma warning restore IDE1006
     }
 }

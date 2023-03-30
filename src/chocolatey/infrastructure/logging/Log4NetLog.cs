@@ -116,5 +116,10 @@ namespace chocolatey.infrastructure.logging
             _logger.Logger.Log(_declaringType, level, message.FormatWith(formatting), null);
         }
 
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string decorate_message_with_audit_information(string message)
+            => DecorateMessageWithAuditInformation(message);
+#pragma warning restore IDE1006
     }
 }

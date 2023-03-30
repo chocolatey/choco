@@ -193,5 +193,23 @@ namespace chocolatey.infrastructure.tolerance
 
             return returnValue;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
+            => Retry(numberOfTries, action, waitDurationMilliseconds, increaseRetryByMilliseconds, isSilent);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static T retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
+            => Retry(numberOfTries, function, waitDurationMilliseconds, increaseRetryByMilliseconds, isSilent);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void try_catch_with_logging_exception(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
+            => TryCatchWithLoggingException(action, errorMessage, throwError, logWarningInsteadOfError, logDebugInsteadOfError, isSilent);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static T try_catch_with_logging_exception<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
+            => TryCatchWithLoggingException(function, errorMessage, throwError, logWarningInsteadOfError, logDebugInsteadOfError, isSilent);
+#pragma warning restore IDE1006
     }
 }

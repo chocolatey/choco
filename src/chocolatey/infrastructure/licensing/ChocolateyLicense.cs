@@ -17,6 +17,7 @@
 namespace chocolatey.infrastructure.licensing
 {
     using adapters;
+    using System;
     using DateTime = System.DateTime;
 
     public sealed class ChocolateyLicense
@@ -40,5 +41,11 @@ namespace chocolatey.infrastructure.licensing
                    && LicenseType != ChocolateyLicenseType.Foss
                 ;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public bool is_licensed_version()
+            => IsLicensedVersion();
+#pragma warning restore IDE1006
     }
 }

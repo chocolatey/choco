@@ -145,5 +145,25 @@ namespace chocolatey.infrastructure.app.configuration
 
             optionSet.WriteOptionDescriptions(Console.Out);
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IConsole> console)
+            => InitializeWith(console);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void reset_options()
+            => ClearOptions();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void parse_arguments_and_update_configuration(ICollection<string> args,
+                                                                    ChocolateyConfiguration configuration,
+                                                                    Action<OptionSet> setOptions,
+                                                                    Action<IList<string>> afterParse,
+                                                                    Action validateConfiguration,
+                                                                    Action helpMessage)
+            => ParseArgumentsAndUpdateConfiguration(args, configuration, setOptions, afterParse, validateConfiguration, helpMessage);
+#pragma warning restore IDE1006
     }
 }

@@ -99,5 +99,15 @@ namespace chocolatey.infrastructure.app.tasks
                 FaultTolerance.Retry(2, () => _fileSystem.DeleteDirectoryChecked(packageFolder, recursive: true, overrideAttributes: true, isSilent: true), 500, isSilent: true);
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void initialize()
+            => Initialize();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void shutdown()
+            => Shutdown();
+#pragma warning restore IDE1006
     }
 }

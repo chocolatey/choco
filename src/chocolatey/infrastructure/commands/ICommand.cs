@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.commands
 {
+    using System;
     using System.Collections.Generic;
     using app.configuration;
     using commandline;
@@ -64,5 +65,28 @@ namespace chocolatey.infrastructure.commands
         /// </summary>
         /// <returns></returns>
         bool MayRequireAdminAccess();
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void handle_validation(ChocolateyConfiguration configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void help_message(ChocolateyConfiguration configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void noop(ChocolateyConfiguration configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void run(ChocolateyConfiguration config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        bool may_require_admin_access();
+#pragma warning restore IDE1006
     }
 }

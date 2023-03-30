@@ -142,5 +142,34 @@ namespace chocolatey.infrastructure.cryptography
              return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
 
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void set_hash_algorithm(CryptoHashProviderType algorithmType)
+            => SetHashAlgorithm(algorithmType);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        private static IHashAlgorithm get_hash_algorithm_static(CryptoHashProviderType algorithmType)
+            => GetHashAlgorithmStatic(algorithmType);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string hash_file(string filePath)
+            => ComputeFileHash(filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string hash_byte_array(byte[] buffer)
+            => ComputeByteArrayHash(buffer);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string hash_stream(Stream inputStream)
+            => ComputeStreamHash(inputStream);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        private static bool file_is_locked(Exception exception)
+            => IsFileLocked(exception);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string hash_value(string originalText, CryptoHashProviderType providerType)
+            => ComputeStringHash(originalText, providerType);
+#pragma warning restore IDE1006
     }
 }

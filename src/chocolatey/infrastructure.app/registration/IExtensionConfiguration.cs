@@ -35,5 +35,10 @@ namespace chocolatey.infrastructure.app.registration
         /// <returns>The initial configuration for the settings.</returns>
         /// <remarks>This is not used, and is only a placeholder for the future.</remarks>
         object CreateInitialExtensionConfiguration();
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        object create_initial_extension_configuration();
+#pragma warning restore IDE1006
     }
 }

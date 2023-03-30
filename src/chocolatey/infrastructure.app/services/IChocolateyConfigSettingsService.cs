@@ -38,5 +38,40 @@ namespace chocolatey.infrastructure.app.services
         void GetConfig(ChocolateyConfiguration configuration);
         void SetConfig(ChocolateyConfiguration configuration);
         void UnsetConfig(ChocolateyConfiguration configuration);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void noop(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void source_add(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void source_remove(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void source_disable(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void source_enable(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void feature_list(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void feature_disable(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void feature_enable(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_api_key(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void set_api_key(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void remove_api_key(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void config_list(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void config_get(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void config_set(ChocolateyConfiguration configuration);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void config_unset(ChocolateyConfiguration configuration);
+#pragma warning restore IDE1006
     }
 }

@@ -16,6 +16,7 @@
 
 namespace chocolatey
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
@@ -120,5 +121,27 @@ namespace chocolatey
                     (current*modifier) + item.GetHashCode());
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IEnumerable<T> or_empty_list_if_null<T>(this IEnumerable<T> source)
+            => OrEmpty(source);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IEnumerable or_empty_list_if_null(this IEnumerable source)
+            => OrEmpty(source);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string join(this IEnumerable<string> source, string separator)
+            => Join(source, separator);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IEnumerable<T> distinct_last<T>(this IEnumerable<T> source, IEqualityComparer<T> equalityComparer, IComparer<T> comparer)
+            => LastDistinct(source, equalityComparer, comparer);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static int get_sequence_hash_code<T>(this IEnumerable<T> source)
+            => SequenceHashCode<T>(source);
+#pragma warning restore IDE1006
     }
 }

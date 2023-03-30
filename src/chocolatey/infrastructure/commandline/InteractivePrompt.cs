@@ -194,5 +194,21 @@ namespace chocolatey.infrastructure.commandline
 
             return password;
         }
+
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IConsole> console)
+            => InitializeWith(console);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string prompt_for_confirmation(string prompt, IEnumerable<string> choices, string defaultChoice, bool requireAnswer, bool allowShortAnswer = true, bool shortPrompt = false, int repeat = 10, int timeoutInSeconds = 0)
+            => PromptForConfirmation(prompt, choices, defaultChoice, requireAnswer, allowShortAnswer, shortPrompt, repeat, timeoutInSeconds);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_password(bool interactive)
+            => GetPassword(interactive);
+#pragma warning restore IDE1006
     }
 }

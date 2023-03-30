@@ -420,5 +420,167 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="path">The path.</param>
         /// <param name="attributes">The attributes.</param>
         void EnsureFileAttributeRemoved(string path, FileAttributes attributes);
+
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string combine_paths(string leftItem, params string[] rightItems);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_full_path(string path);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_temp_path();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        char get_path_directory_separator_char();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_executable_path(string executableName);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_current_assembly_path();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        IEnumerable<string> get_files(string directoryPath, string pattern = "*.*", SearchOption option = SearchOption.TopDirectoryOnly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        IEnumerable<string> get_files(string directoryPath, string[] extensions, SearchOption option = SearchOption.TopDirectoryOnly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        bool file_exists(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_file_name(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_file_name_without_extension(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_file_extension(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        dynamic get_file_info_for(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        DateTime get_file_modified_date(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        long get_file_size(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_file_version_for(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        bool is_system_file(dynamic file);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        bool is_readonly_file(dynamic file);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        bool is_hidden_file(dynamic file);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        bool is_encrypted_file(dynamic file);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_file_date(dynamic file);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void move_file(string filePath, string newFilePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void copy_file(string sourceFilePath, string destinationFilePath, bool overwriteExisting);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        bool copy_file_unsafe(string sourceFilePath, string destinationFilePath, bool overwriteExisting);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void replace_file(string sourceFilePath, string destinationFilePath, string backupFilePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void delete_file(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        FileStream create_file(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string read_file(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        byte[] read_file_bytes(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        FileStream open_file_readonly(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        FileStream open_file_exclusive(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void write_file(string filePath, string fileText);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void write_file(string filePath, string fileText, Encoding encoding);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void write_file(string filePath, Func<Stream> getStream);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_current_directory();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        IEnumerable<string> get_directories(string directoryPath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        IEnumerable<string> get_directories(string directoryPath, string pattern, SearchOption option = SearchOption.TopDirectoryOnly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        bool directory_exists(string directoryPath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string get_directory_name(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        dynamic get_directory_info_for(string directoryPath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        dynamic get_directory_info_from_file_path(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void create_directory(string directoryPath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void move_directory(string directoryPath, string newDirectoryPath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void copy_directory(string sourceDirectoryPath, string destinationDirectoryPath, bool overwriteExisting);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void create_directory_if_not_exists(string directoryPath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void delete_directory(string directoryPath, bool recursive);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void delete_directory(string directoryPath, bool recursive, bool overrideAttributes);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void delete_directory(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void delete_directory_if_exists(string directoryPath, bool recursive);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void delete_directory_if_exists(string directoryPath, bool recursive, bool overrideAttributes);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void delete_directory_if_exists(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void ensure_file_attribute_set(string path, FileAttributes attributes);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void ensure_file_attribute_removed(string path, FileAttributes attributes);
+#pragma warning restore IDE1006
     }
 }

@@ -400,6 +400,12 @@ namespace chocolatey.infrastructure.app.nuget
             //If no packages found, then return nothing
             return null;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static ISet<IPackageSearchMetadata> find_all_package_versions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
+            => FindAllPackageVersions(packageName, config, nugetLogger, cacheContext, resources);
+#pragma warning restore IDE1006
     }
 
     public class ComparePackageSearchMetadataIdOnly: IEqualityComparer<IPackageSearchMetadata>

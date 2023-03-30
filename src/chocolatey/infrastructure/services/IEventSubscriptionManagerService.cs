@@ -40,5 +40,13 @@ namespace chocolatey.infrastructure.services
         /// <param name="filter">The message filter.</param>
         /// <returns>The subscription as Disposable</returns>
         IDisposable Subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage;
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void publish<Event>(Event eventMessage) where Event : class, IMessage;
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage;
+#pragma warning restore IDE1006
     }
 }

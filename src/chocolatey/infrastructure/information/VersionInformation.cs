@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.information
 {
+    using System;
     using System.Diagnostics;
     using adapters;
 
@@ -93,5 +94,19 @@ namespace chocolatey.infrastructure.information
             // attribute on the assembly to say what the minimum required Chocolatey version is.
             return "1.0.0";
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_current_assembly_version(IAssembly assembly = null)
+            => GetCurrentAssemblyVersion(assembly = null);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_current_informational_version(IAssembly assembly = null)
+            => GetCurrentInformationalVersion(assembly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_minimum_chocolatey_version(IAssembly assembly = null)
+            => GetMinimumChocolateyVersion(assembly);
+#pragma warning restore IDE1006
     }
 }

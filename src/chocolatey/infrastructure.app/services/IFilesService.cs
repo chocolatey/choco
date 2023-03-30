@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.services
     using configuration;
     using domain;
     using results;
+    using System;
 
     /// <summary>
     /// The files service for capturing and handling file snapshots.
@@ -75,5 +76,22 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="file">The file.</param>
         /// <returns>PackageFile object</returns>
         PackageFile GetPackageFile(string file);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        PackageFiles read_from_file(string filepath);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void save_to_file(PackageFiles snapshot, string filePath);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void ensure_compatible_file_attributes(PackageResult packageResult, ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void ensure_compatible_file_attributes(string directory, ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        PackageFiles capture_package_files(string directory, ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        PackageFile get_package_file(string file);
+#pragma warning restore IDE1006
     }
 }

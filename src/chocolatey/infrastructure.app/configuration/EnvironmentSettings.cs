@@ -309,5 +309,24 @@ namespace chocolatey.infrastructure.app.configuration
 
             return additionalItems.ToStringSafe();
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IEnvironment> environment)
+            => InitializeWith(environment);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void reset_environment_variables(ChocolateyConfiguration config)
+            => ResetEnvironmentVariables(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void set_environment_variables(ChocolateyConfiguration config)
+            => SetEnvironmentVariables(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void update_environment_variables()
+            => UpdateEnvironmentVariables();
+#pragma warning restore IDE1006
     }
 }

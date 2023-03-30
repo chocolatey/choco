@@ -70,7 +70,13 @@ Choco prefers to use TLS v1.2 if it is available, but this client is
             {
                 "chocolatey".Log().Warn("Error resetting ServerCertificateValidationCallback: {0}".FormatWith(ex.Message));
             }
-
         }
+
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void set_protocol(ChocolateyConfiguration config, bool provideWarning)
+            => SetProtocol(provideWarning);
+#pragma warning restore IDE1006
     }
 }

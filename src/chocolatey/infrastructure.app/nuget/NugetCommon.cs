@@ -56,13 +56,17 @@ namespace chocolatey.infrastructure.app.nuget
     {
         private static readonly ConcurrentDictionary<string, SourceRepository> _repositories = new ConcurrentDictionary<string, SourceRepository>();
 
+        [Obsolete("This member is unused and should probably be removed.")]
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
 
+#pragma warning disable IDE1006
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void InitializeWith(Lazy<IConsole> console)
+        [Obsolete("This member is unused and should probably be removed.")]
+        public static void initialize_with(Lazy<IConsole> console)
         {
             _console = console;
         }
+#pragma warning restore IDE1006
 
         [Obsolete("This member is unused and should probably be removed.")]
         private static IConsole Console
@@ -425,6 +429,5 @@ var source = sourceValue;
                 }
             }
         }
-
     }
 }

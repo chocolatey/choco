@@ -117,5 +117,30 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="beforeUninstallAction">The action (if any) to run on any currently installed package before triggering the uninstall.</param>
         /// <returns>results of installs</returns>
         ConcurrentDictionary<string, PackageResult> Uninstall(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        int count_run(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void list_noop(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        IEnumerable<PackageResult> list_run(ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null);
+#pragma warning restore IDE1006
     }
 }

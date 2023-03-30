@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.extractors
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Text;
@@ -116,5 +117,19 @@ namespace chocolatey.infrastructure.extractors
                 ExtractBinaryFileFromAssembly(fileSystem, assembly, resourceName, filePath, overwriteExisting, throwError);
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void extract_text_file_from_assembly(IFileSystem fileSystem, IAssembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false)
+            => ExtractTextFileFromAssembly(fileSystem, assembly, manifestLocation, filePath, overwriteExisting);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void extract_binary_file_from_assembly(IFileSystem fileSystem, IAssembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false, bool throwError = true)
+            => ExtractBinaryFileFromAssembly(fileSystem, assembly, manifestLocation, filePath, overwriteExisting, throwError);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void extract_all_resources_to_relative_directory(IFileSystem fileSystem, IAssembly assembly, string directoryPath, IList<string> relativeDirectories, string resourcesToInclude, bool overwriteExisting = false, bool logOutput = false, bool throwError = true)
+            => ExtractAssemblyResourcesToRelativeDirectory(fileSystem, assembly, directoryPath, relativeDirectories, resourcesToInclude, overwriteExisting, logOutput, throwError);
+#pragma warning restore IDE1006
     }
 }

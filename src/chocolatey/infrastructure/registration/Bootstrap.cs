@@ -78,5 +78,19 @@ namespace chocolatey.infrastructure.registration
         public static void Shutdown()
         {
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void initialize()
+            => Initialize();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void startup()
+            => Startup();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void shutdown()
+            => Shutdown();
+#pragma warning restore IDE1006
     }
 }

@@ -210,5 +210,54 @@ namespace chocolatey
             return input;
         }
 
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string format_with(this string input, params object[] formatting)
+            => FormatWith(input, formatting);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string trim_safe(this string input)
+            => TrimSafe(input);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string to_lower(this string input)
+            => ToLowerSafe(input);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string to_string(this string input)
+            => ToStringSafe(input);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static SecureString to_secure_string(this string input)
+            => ToSecureStringSafe(input);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string from_secure_string(this SecureString input)
+            => FromSecureStringSafe(input);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string wrap_spaces_in_quotes(this string input)
+            => QuoteIfContainsSpaces(input);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool is_equal_to(this string input, string other)
+            => IsEqualTo(input, other);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool contains(this string input, string search, StringComparison comparison = StringComparison.OrdinalIgnoreCase)
+            => ContainsSafe(input, search, comparison);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string remove_surrounding_quotes(this string input)
+            => UnquoteSafe(input);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string escape_curly_braces(this string input)
+            => EscapeCurlyBraces(input);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string quote_if_pipe_found(this string input)
+            => QuoteIfContainsPipe(input);
+#pragma warning restore IDE1006
     }
 }

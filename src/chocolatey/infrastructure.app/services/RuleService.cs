@@ -15,6 +15,7 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading;
@@ -82,5 +83,11 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public IEnumerable<RuleResult> validate_rules(string filePath)
+            => ValidateRules(filePath);
+#pragma warning restore IDE1006
     }
 }

@@ -1681,5 +1681,99 @@ ATTENTION: You must take manual action to remove {1} from
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void ensure_source_app_installed(ChocolateyConfiguration config)
+            => EnsureSourceAppInstalled(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual int count_run(ChocolateyConfiguration config)
+            => Count(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void list_noop(ChocolateyConfiguration config)
+            => ListDryRun(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
+            => List(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void pack_noop(ChocolateyConfiguration config)
+            => PackDryRun(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void pack_run(ChocolateyConfiguration config)
+            => Pack(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void push_noop(ChocolateyConfiguration config)
+            => PushDryRun(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void push_run(ChocolateyConfiguration config)
+            => Push(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void install_noop(ChocolateyConfiguration config)
+            => InstallDryRun(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void randomly_notify_about_pro_business(ChocolateyConfiguration config, string message = null)
+            => RandomlyNotifyAboutLicensedFeatures(config, message);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_package_result(PackageResult packageResult, ChocolateyConfiguration config, CommandNameType commandName)
+            => HandlePackageResult(packageResult, config, commandName);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected virtual ChocolateyPackageInformation get_package_information(PackageResult packageResult, ChocolateyConfiguration config)
+            => GetPackageInformation(packageResult, config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected virtual void update_package_information(ChocolateyPackageInformation pkgInfo)
+            => UpdatePackageInformation(pkgInfo);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config)
+            => Install(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void outdated_noop(ChocolateyConfiguration config)
+            => OutdatedDryRun(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void outdated_run(ChocolateyConfiguration config)
+            => Outdated(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void upgrade_noop(ChocolateyConfiguration config)
+            => UpgradeDryRun(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config)
+            => Upgrade(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void uninstall_noop(ChocolateyConfiguration config)
+            => UninstallDryRun(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config)
+            => Uninstall(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_package_uninstall(PackageResult packageResult, ChocolateyConfiguration config)
+            => HandlePackageUninstall(packageResult, config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void set_pending(PackageResult packageResult, ChocolateyConfiguration config)
+            => MarkPackagePending(packageResult, config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)
+            => UnmarkPackagePending(packageResult, config);
+#pragma warning restore IDE1006
     }
 }

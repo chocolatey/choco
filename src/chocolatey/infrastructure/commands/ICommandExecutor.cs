@@ -55,5 +55,47 @@ namespace chocolatey.infrastructure.commands
             bool allowUseWindow,
             bool waitForExit
             );
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        int execute(string process, string arguments, int waitForExitInSeconds);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        int execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        int execute(
+            string process,
+            string arguments,
+            int waitForExitInSeconds,
+            Action<object, DataReceivedEventArgs> stdOutAction,
+            Action<object, DataReceivedEventArgs> stdErrAction,
+            bool updateProcessPath
+            );
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        int execute(
+            string process,
+            string arguments,
+            int waitForExitInSeconds,
+            string workingDirectory,
+            Action<object, DataReceivedEventArgs> stdOutAction,
+            Action<object, DataReceivedEventArgs> stdErrAction,
+            bool updateProcessPath,
+            bool allowUseWindow
+            );
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        int execute(
+            string process,
+            string arguments,
+            int waitForExitInSeconds,
+            string workingDirectory,
+            Action<object, DataReceivedEventArgs> stdOutAction,
+            Action<object, DataReceivedEventArgs> stdErrAction,
+            bool updateProcessPath,
+            bool allowUseWindow,
+            bool waitForExit
+            );
+#pragma warning restore IDE1006
     }
 }

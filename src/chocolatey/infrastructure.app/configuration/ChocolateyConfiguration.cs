@@ -468,6 +468,16 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
         public TemplateCommandConfiguration TemplateCommand { get; set; }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void start_backup()
+            => CreateBackup();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void reset_config(bool removeBackup = false)
+            => RevertChanges(removeBackup);
+#pragma warning restore IDE1006
     }
 
     [Serializable]

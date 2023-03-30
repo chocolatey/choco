@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.commands
 {
+    using System;
     using System.Collections.Generic;
     using attributes;
     using commandline;

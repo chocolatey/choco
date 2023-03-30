@@ -27,5 +27,10 @@ namespace chocolatey.infrastructure.services
         ///   Gets the current date time.
         /// </summary>
         DateTime? GetCurrentDateTime();
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        DateTime? get_current_date_time();
+#pragma warning restore IDE1006
     }
 }
