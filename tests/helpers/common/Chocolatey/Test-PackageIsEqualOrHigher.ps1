@@ -8,13 +8,13 @@ function Test-PackageIsEqualOrHigher {
         [NuGet.Versioning.SemanticVersion]$Version,
         [switch]$AllowMissingPackage
     )
-    if (-not ${script:Chocolatey Installed Packages}) {
-        ${script:Chocolatey Installed Packages} = (Invoke-Choco list --local-only --limitoutput).Lines |
+    if (-not $script:ChocolateyInstalledPackages) {
+        $script:ChocolateyInstalledPackages = (Invoke-Choco list --local-only --limitoutput).Lines |
         Where-Object { $_ -notmatch 'please upgrade' } |
         ConvertFrom-ChocolateyOutput -Command List
     }
 
-    $package = ${script:Chocolatey Installed Packages} | Where-Object Name -EQ $PackageName
+    $package = $script:ChocolateyInstalledPackages | Where-Object Name -EQ $PackageName
 
     if (-not $package) {
         return $AllowMissingPackage.IsPresent

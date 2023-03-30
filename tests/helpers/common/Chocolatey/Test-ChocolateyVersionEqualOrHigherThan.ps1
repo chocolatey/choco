@@ -10,9 +10,9 @@ function Test-ChocolateyVersionEqualOrHigherThan {
     param(
         [NuGet.Versioning.SemanticVersion]$Version
     )
-    if (-not ${script:Chocolatey Installed Version}) {
-        ${script:Chocolatey Installed Version} = ((Invoke-Choco list -lo -r).Lines | ConvertFrom-ChocolateyOutput -Command List | Where-Object Name -EQ 'chocolatey').Version
+    if (-not $script:ChocolateyInstalledVersion) {
+        $script:ChocolateyInstalledVersion = ((Invoke-Choco list -lo -r).Lines | ConvertFrom-ChocolateyOutput -Command List | Where-Object Name -EQ 'chocolatey').Version
     }
 
-    return Test-VersionEqualOrHigher -InstalledVersion ${script:Chocolatey Installed Version} -CompareVersion $Version
+    return Test-VersionEqualOrHigher -InstalledVersion $script:ChocolateyInstalledVersion -CompareVersion $Version
 }
