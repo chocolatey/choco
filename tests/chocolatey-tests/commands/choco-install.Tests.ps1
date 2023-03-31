@@ -1723,8 +1723,6 @@ To install a local, or remote file, you may use:
             $nuspec | Set-Content -Path $nuspecPath
             "readme content" | Set-Content -Path "$tempPath/$packageName/readme.md"
 
-            Enable-ChocolateySource -Name hermes-setup
-
             $null = Invoke-Choco install nuget.commandline
             $null = & "$env:ChocolateyInstall/bin/nuget.exe" pack $nuspecPath
 
