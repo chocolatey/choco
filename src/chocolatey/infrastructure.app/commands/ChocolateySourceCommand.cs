@@ -58,22 +58,22 @@ namespace chocolatey.infrastructure.app.commands
                      "Password - the user's password to the source. Encrypted in chocolatey.config file.",
                      option => configuration.SourceCommand.Password = option.UnquoteSafe())
                 .Add("cert=",
-                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty. Available in 0.9.10+.",
+                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty.",
                      option => configuration.SourceCommand.Certificate = option.UnquoteSafe())
                 .Add("cp=|certpassword=",
-                     "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
+                     "Certificate Password - the client certificate's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.CertificatePassword = option.UnquoteSafe())
                 .Add("priority=",
-                     "Priority - The priority order of this source as compared to other sources, lower is better. Defaults to 0 (no priority). All priorities above 0 will be evaluated first, then zero-based values will be evaluated in config file order. Available in 0.9.9.9+.",
+                     "Priority - The priority order of this source as compared to other sources, lower is better. Defaults to 0 (no priority). All priorities above 0 will be evaluated first, then zero-based values will be evaluated in config file order.",
                      option => configuration.SourceCommand.Priority = int.Parse(option.UnquoteSafe()))
                  .Add("bypassproxy|bypass-proxy",
-                     "Bypass Proxy - Should this source explicitly bypass any explicitly or system configured proxies? Defaults to false. Available in 0.10.4+.",
+                     "Bypass Proxy - Should this source explicitly bypass any explicitly or system configured proxies? Defaults to false.",
                      option => configuration.SourceCommand.BypassProxy = option != null)
                  .Add("allowselfservice|allow-self-service",
-                     "Allow Self-Service - Should this source be allowed to be used with self-service? Requires business edition (v1.10.0+) with feature 'useBackgroundServiceWithSelfServiceSourcesOnly' turned on. Defaults to false. Available in 0.10.4+.",
+                     "Allow Self-Service - Should this source be allowed to be used with self-service? Requires business edition (v1.10.0+) with feature 'useBackgroundServiceWithSelfServiceSourcesOnly' turned on. Defaults to false.",
                      option => configuration.SourceCommand.AllowSelfService = option != null)
                  .Add("adminonly|admin-only",
-                     "Visible to Administrators Only - Should this source be visible to non-administrators? Requires business edition (v1.12.2+). Defaults to false. Available in 0.10.8+.",
+                     "Visible to Administrators Only - Should this source be visible to non-administrators? Requires business edition (v1.12.2+). Defaults to false.",
                      option => configuration.SourceCommand.VisibleToAdminsOnly = option != null)
                 ;
         }
@@ -124,12 +124,6 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Source Command");
             this.Log().Info(@"
 Chocolatey will allow you to interact with sources.
-
-NOTE: Mostly compatible with older chocolatey client (0.9.8.x and
- below) with options and switches. When enabling, disabling or removing
- a source, use `-name` in front of the option now. In most cases you
- can still pass options and switches with one dash (`-`). For more
- details, see the command reference (`choco -?`).
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");

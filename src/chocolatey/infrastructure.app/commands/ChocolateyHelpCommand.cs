@@ -99,7 +99,7 @@ namespace chocolatey.infrastructure.app.commands
 
             "chocolatey".Log().Info(@"
  -v, --version
-     Version - Prints out the Chocolatey version. Available in 0.9.9+.
+     Version - Prints out the Chocolatey version.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");

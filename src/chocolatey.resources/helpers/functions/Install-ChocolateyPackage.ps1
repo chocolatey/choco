@@ -191,28 +191,28 @@ https://support.microsoft.com/en-us/kb/811833 for more details.
 The recommendation is to use at least SHA256.
 
 .PARAMETER Options
-OPTIONAL - Specify custom headers. Available in 0.9.10+.
+OPTIONAL - Specify custom headers.
 
 .PARAMETER File
-Will be used for Url if Url is empty. Available in 0.10.7+.
+Will be used for Url if Url is empty.
 
 This parameter provides compatibility, but should not be used directly
 and not with the community package repository until January 2018.
 
 .PARAMETER File64
-Will be used for Url64bit if Url64bit is empty. Available in 0.10.7+.
+Will be used for Url64bit if Url64bit is empty.
 
 This parameter provides compatibility, but should not be used directly
 and not with the community package repository until January 2018.
 
 .PARAMETER UseOnlyPackageSilentArguments
 Do not allow choco to provide/merge additional silent arguments and only
-use the ones available with the package. Available in 0.9.10+.
+use the ones available with the package.
 
 .PARAMETER UseOriginalLocation
 Do not download the resources. This is typically passed if Url/Url64bit
 are pointed to local files or files on a share and those files should
-be used in place. Available in 0.10.1+.
+be used in place.
 
 NOTE: You can also use `Install-ChocolateyInstallPackage` for the same
 functionality (see links).
@@ -222,7 +222,6 @@ Allows splatting with arguments that do not apply. Do not use directly.
 
 .PARAMETER BeforeInstall Script
 Specifies the commands to run after download has completed but before install steps have begun.
-Available in 0.11.0+.
 
 Use this for starting an auxiliary process such as AutoHotkey, so that any timeouts are not
 affected by the time to download.

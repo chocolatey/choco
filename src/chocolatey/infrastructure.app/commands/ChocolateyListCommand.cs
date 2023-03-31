@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             optionSet
                 .Add("idonly|id-only",
-                     "Id Only - Only return Package Ids in the list results. Available in 0.10.6+.",
+                     "Id Only - Only return Package Ids in the list results.",
                      option => configuration.ListCommand.IdOnly = option != null)
                 .Add("pre|prerelease",
                      "Prerelease - Include Prereleases? Defaults to false.",
@@ -75,7 +75,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Version - Specific version of a package to return.",
                      option => configuration.Version = option.UnquoteSafe())
                 .Add("page=",
-                     "Page - the 'page' of results to return. Defaults to return all results. Available in 0.9.10+.",
+                     "Page - the 'page' of results to return. Defaults to return all results.",
                      option =>
                      {
                          if (int.TryParse(option, out var page))
@@ -88,26 +88,26 @@ namespace chocolatey.infrastructure.app.commands
                          }
                      })
                 .Add("page-size=", // Does it make sense to have paging on local packages?
-                     "Page Size - the amount of package results to return per page. Defaults to 25. Available in 0.9.10+.",
+                     "Page Size - the amount of package results to return per page. Defaults to 25.",
                      option =>
                      {
                          configuration.ListCommand.PageSize = int.Parse(option);
                          configuration.ListCommand.ExplicitPageSize = true;
                      })
                 .Add("e|exact",
-                     "Exact - Only return packages with this exact name. Available in 0.9.10+.",
+                     "Exact - Only return packages with this exact name.",
                      option => configuration.ListCommand.Exact = option != null)
                 .Add("by-id-only",
-                     "ByIdOnly - Only return packages where the id contains the search filter. Available in 0.9.10+.",
+                     "ByIdOnly - Only return packages where the id contains the search filter.",
                      option => configuration.ListCommand.ByIdOnly = option != null)
                  .Add("by-tag-only|by-tags-only",
-                     "ByTagOnly - Only return packages where the search filter matches on the tags. Available in 0.10.6+.",
+                     "ByTagOnly - Only return packages where the search filter matches on the tags.",
                      option => configuration.ListCommand.ByTagOnly = option != null)
                  .Add("id-starts-with",
-                     "IdStartsWith - Only return packages where the id starts with the search filter. Available in 0.9.10+.",
+                     "IdStartsWith - Only return packages where the id starts with the search filter.",
                      option => configuration.ListCommand.IdStartsWith = option != null)
                  .Add("detail|detailed",
-                     "Detailed - Alias for verbose. Available in 0.9.10+.",
+                     "Detailed - Alias for verbose.",
                      option => configuration.Verbose = option != null);
         }
 
@@ -177,8 +177,8 @@ Enhanced:
  - -1 or 1: an error has occurred
  - 2: no results (enhanced)
 
-NOTE: Starting in v0.10.12, if you have the feature '{0}'
- turned on, then choco will provide enhanced exit codes that allow
+NOTE: If you have the feature '{0}' turned on,
+ then choco will provide enhanced exit codes that allow
  better integration and scripting.
 
 If you find other exit codes that we have not yet documented, please

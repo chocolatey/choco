@@ -94,15 +94,11 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Config Command");
             this.Log().Info(@"
 Chocolatey will allow you to interact with the configuration file settings.
-
-NOTE: Available in 0.9.9.9+.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco config [list]|get|set|unset [<options/switches>]
-
-NOTE: `Unset` subcommand available in 0.9.10+.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Examples");

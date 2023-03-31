@@ -59,13 +59,13 @@ namespace chocolatey.infrastructure.app.commands
                     "Password - the user's password to the source. Defaults to empty.",
                     option => configuration.SourceCommand.Password = option.UnquoteSafe())
                 .Add("cert=",
-                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty. Available in 0.9.10+.",
+                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty.",
                      option => configuration.SourceCommand.Certificate = option.UnquoteSafe())
                 .Add("cp=|certpassword=",
-                     "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
+                     "Certificate Password - the client certificate's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.CertificatePassword = option.UnquoteSafe())
                 .Add("disable-repository-optimizations|disable-package-repository-optimizations",
-                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When used, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".FormatWith
+                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When used, this makes queries similar to the way they were done in earlier versions of Chocolatey. Overrides the default feature '{0}' set to '{1}'.".FormatWith
                         (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.ToStringSafe()),
                     option =>
                     {
@@ -91,8 +91,6 @@ namespace chocolatey.infrastructure.app.commands
 Chocolatey will perform a search for a package local or remote and provide
  detailed information about that package. This is a synonym for
  `choco search <pkgname> --exact --detailed`.
-
-NOTE: New as of 0.9.10.0.
 
 ");
 
@@ -124,8 +122,8 @@ Enhanced:
  - -1 or 1: an error has occurred
  - 2: no results (enhanced)
 
-NOTE: Starting in v0.10.12, if you have the feature '{0}'
- turned on, then choco will provide enhanced exit codes that allow
+NOTE: If you have the feature '{0}' turned on,
+ then choco will provide enhanced exit codes that allow
  better integration and scripting.
 
 If you find other exit codes that we have not yet documented, please

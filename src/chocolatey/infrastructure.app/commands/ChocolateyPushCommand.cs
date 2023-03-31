@@ -138,11 +138,6 @@ NOTE: For chocolatey.org, you must update the source to be secure.".FormatWith(c
             this.Log().Info(@"
 Chocolatey will attempt to push a compiled nupkg to a package feed.
 
-NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
- with options and switches. In most cases you can still pass options and
- switches with one dash (`-`). For more details, see
- the command reference (`choco -?`).
-
 A feed can be a local folder, a file share, the community feed
  ({0}), or a custom/private feed. For web
  feeds, it has a requirement that it implements the proper OData

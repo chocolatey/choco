@@ -26,7 +26,6 @@ Uses several techniques to determine the original file name of the file
 based on the url for the file.
 
 .NOTES
-Available in 0.9.10+.
 Falls back to DefaultName when the name cannot be determined.
 
 Chocolatey works best when the packages contain the software it is
