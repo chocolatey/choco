@@ -171,8 +171,6 @@ Creating Chocolatey folders if they do not already exist.
 
 "@ | Write-Output
 
-    Write-ChocolateyWarning "You can safely ignore errors related to missing log files when `n  upgrading from a version of Chocolatey less than 0.9.9. `n  'Batch file could not be found' is also safe to ignore. `n  'The system cannot find the file specified' - also safe."
-
     #create the base structure if it doesn't exist
     Create-DirectoryIfNotExists $chocolateyExePath
     Create-DirectoryIfNotExists $chocolateyLibPath
