@@ -1320,7 +1320,7 @@ To install a local, or remote file, you may use:
 
     Context "Installing commercial package with custom commandlets" -Tag FossOnly {
         BeforeAll {
-            New-ChocolateyInstallSnapshot
+            Restore-ChocolateyInstallSnapshot
 
             $Output = Invoke-Choco install get-chocolateyunzip-licensed --confirm
         }
@@ -1332,7 +1332,8 @@ To install a local, or remote file, you may use:
 
     Context "Installing license only package on open source" -Tag FossOnly {
         BeforeAll {
-            New-ChocolateyInstallSnapshot
+            Restore-ChocolateyInstallSnapshot
+            Enable-ChocolateySource -Name hermes-setup
 
             $Output = Invoke-Choco install business-only-license --confirm
         }
@@ -1456,7 +1457,6 @@ To install a local, or remote file, you may use:
     Context "Installing package that makes use of new Get Chocolatey Path helper" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
-            Enable-ChocolateySource -Name 'local'
 
             $Output = Invoke-Choco install test-chocolateypath -y
         }
@@ -1725,6 +1725,8 @@ To install a local, or remote file, you may use:
 
             $null = Invoke-Choco install nuget.commandline
             $null = & "$env:ChocolateyInstall/bin/nuget.exe" pack $nuspecPath
+
+            Disable-ChocolateySource -Name hermes-setup
 
             $Output = Invoke-Choco install $packageName --source .
         }
