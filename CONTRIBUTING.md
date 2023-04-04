@@ -11,7 +11,7 @@ The Chocolatey team has very explicit information here regarding the process for
   - [Package Request? Package Missing?](#package-request-package-missing)
   - [Submitting an Enhancement / Feature Request?](#submitting-an-enhancement--feature-request)
     - [Submitting an Enhancement For Choco](#submitting-an-enhancement-for-choco)
-- [Contributing](#contributing)
+- [Code Contributions](#code-contributions)
   - [Prerequisites](#prerequisites)
     - [Definition of Trivial Contributions](#definition-of-trivial-contributions)
     - [Is the CLA Really Required?](#is-the-cla-really-required)
@@ -64,7 +64,7 @@ If this is for choco (the CLI tool), this is the right place. See below. Otherwi
 
 Log a github issue. There are fewer constraints on this versus reporting issues.
 
-## Contributing
+## Code Contributions
 
 The process for contributions is roughly as follows:
 
@@ -116,7 +116,7 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
 
 ### Set Up Your Environment
 
-- Visual Studio 2010+ is recommended for code contributions.
+- Visual Studio 2019+ is recommended for code contributions.
 - For git specific information:
     1. Create a fork of chocolatey/choco under your GitHub account. See [forks](https://help.github.com/articles/working-with-forks/) for more information.
     1. [Clone your fork](https://help.github.com/articles/cloning-a-repository/) locally.
@@ -141,6 +141,7 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
     1. See [Submit Pull Request (PR)](#submit-pull-request-pr).
 - Please also observe the following:
   - Unless specifically requested, do not reformat the code. It makes it very difficult to see the change you've made.
+    - If you must reformat the code, apply the formatting changes in a separate commit to the actual changes so that we can more easily review your work.
   - Do not change files that are not specific to the feature.
   - More covered below in the [**Prepare commits**](#prepare-commits) section.
 - Test your changes and please help us out by updating and implementing some automated tests. It is recommended that all contributors spend some time looking over the tests in the source code. You can't go wrong emulating one of the existing tests and then changing it specific to the behavior you are testing.
@@ -151,12 +152,12 @@ Start with [Prerequisites](#prerequisites) and make sure you can sign the Contri
 
 #### CSharp
 
-- If you are using ReSharper, all of this is already in the shared resharper settings.
-- Class names and Properties are `PascalCase` - this is nearly the only time you start with uppercase.
+These standards are enforced via the `.editorconfig` file in the repository.
+
+- Class names and almost all members (methods, constants, fields, and properties) are `PascalCase`
+- `private` fields are `_camelCase` with an underscore prefix
 - Namespaces (and their representative folders) are lowercase.
-- Methods and functions are lowercase. Breaks between words in functions are typically met with an underscore (`_`, e.g. `run_actual()`).
-- Variables and parameters are `camelCase`.
-- Constants are `UPPER_CASE`.
+- Method parameters, local variables, and functions are `camelCase`
 - There are some adapters over the .NET Framework to ensure some additional functionality works and is consistent. Sometimes this is completely seamless that you are using these (e.g. `Console`).
 
 #### PowerShell
