@@ -21,9 +21,9 @@ namespace chocolatey.infrastructure.app.rules
 
     internal sealed class PackageTypesMetadataRule : MetadataRuleBase
     {
-        public override IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
-            if (has_element(reader, "packageTypes"))
+            if (HasElement(reader, "packageTypes"))
             {
                 yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<packageTypes> elements are not supported in Chocolatey CLI.");
             }

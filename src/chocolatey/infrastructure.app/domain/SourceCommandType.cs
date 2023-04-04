@@ -16,13 +16,30 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
+    using System;
+
     public enum SourceCommandType
     {
-        unknown,
-        list,
-        add,
-        remove,
-        enable,
-        disable,
+        Unknown,
+        List,
+        Add,
+        Remove,
+        Enable,
+        Disable,
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        unknown = Unknown,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        list = List,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        add = Add,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        remove = Remove,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        enable = Enable,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        disable = Disable,
+#pragma warning restore IDE1006
     }
 }

@@ -44,7 +44,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_implementing_command_for : ChocolateyUpgradeCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyUpgradeCommandSpecsBase
         {
             private List<string> results;
 
@@ -54,13 +54,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_upgrade()
+            public void Should_implement_upgrade()
             {
-                results.ShouldContain(CommandNameType.upgrade.to_string());
+                results.ShouldContain("upgrade");
             }
         }
 
-        public class when_configurating_the_argument_parser : ChocolateyUpgradeCommandSpecsBase
+        public class When_configurating_the_argument_parser : ChocolateyUpgradeCommandSpecsBase
         {
             private OptionSet optionSet;
 
@@ -72,173 +72,173 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                command.configure_argument_parser(optionSet, configuration);
+                command.ConfigureArgumentParser(optionSet, configuration);
             }
 
             [Fact]
-            public void should_add_source_to_the_option_set()
+            public void Should_add_source_to_the_option_set()
             {
                 optionSet.Contains("source").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_source_to_the_option_set()
+            public void Should_add_short_version_of_source_to_the_option_set()
             {
                 optionSet.Contains("s").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_version_to_the_option_set()
+            public void Should_add_version_to_the_option_set()
             {
                 optionSet.Contains("version").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_prerelease_to_the_option_set()
+            public void Should_add_prerelease_to_the_option_set()
             {
                 optionSet.Contains("prerelease").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_prerelease_to_the_option_set()
+            public void Should_add_short_version_of_prerelease_to_the_option_set()
             {
                 optionSet.Contains("pre").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_installargs_to_the_option_set()
+            public void Should_add_installargs_to_the_option_set()
             {
                 optionSet.Contains("installarguments").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_installargs_to_the_option_set()
+            public void Should_add_short_version_of_installargs_to_the_option_set()
             {
                 optionSet.Contains("ia").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_overrideargs_to_the_option_set()
+            public void Should_add_overrideargs_to_the_option_set()
             {
                 optionSet.Contains("overridearguments").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_overrideargs_to_the_option_set()
+            public void Should_add_short_version_of_overrideargs_to_the_option_set()
             {
                 optionSet.Contains("o").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_notsilent_to_the_option_set()
+            public void Should_add_notsilent_to_the_option_set()
             {
                 optionSet.Contains("notsilent").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_packageparameters_to_the_option_set()
+            public void Should_add_packageparameters_to_the_option_set()
             {
                 optionSet.Contains("packageparameters").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_packageparameters_to_the_option_set()
+            public void Should_add_short_version_of_packageparameters_to_the_option_set()
             {
                 optionSet.Contains("params").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_applyPackageParametersToDependencies_to_the_option_set()
+            public void Should_add_applyPackageParametersToDependencies_to_the_option_set()
             {
                 optionSet.Contains("apply-package-parameters-to-dependencies").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_applyInstallArgumentsToDependencies_to_the_option_set()
+            public void Should_add_applyInstallArgumentsToDependencies_to_the_option_set()
             {
                 optionSet.Contains("apply-install-arguments-to-dependencies").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_ignoredependencies_to_the_option_set()
+            public void Should_add_ignoredependencies_to_the_option_set()
             {
                 optionSet.Contains("ignoredependencies").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_ignoredependencies_to_the_option_set()
+            public void Should_add_short_version_of_ignoredependencies_to_the_option_set()
             {
                 optionSet.Contains("i").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_skippowershell_to_the_option_set()
+            public void Should_add_skippowershell_to_the_option_set()
             {
                 optionSet.Contains("skippowershell").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_skippowershell_to_the_option_set()
+            public void Should_add_short_version_of_skippowershell_to_the_option_set()
             {
                 optionSet.Contains("n").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_user_to_the_option_set()
+            public void Should_add_user_to_the_option_set()
             {
                 optionSet.Contains("user").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_user_to_the_option_set()
+            public void Should_add_short_version_of_user_to_the_option_set()
             {
                 optionSet.Contains("u").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_password_to_the_option_set()
+            public void Should_add_password_to_the_option_set()
             {
                 optionSet.Contains("password").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_password_to_the_option_set()
+            public void Should_add_short_version_of_password_to_the_option_set()
             {
                 optionSet.Contains("p").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_pin_to_the_option_set()
+            public void Should_add_pin_to_the_option_set()
             {
                 optionSet.Contains("pinpackage").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_long_version_of_pin_to_the_option_set()
+            public void Should_add_long_version_of_pin_to_the_option_set()
             {
                 optionSet.Contains("pin-package").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_pin_to_the_option_set()
+            public void Should_add_short_version_of_pin_to_the_option_set()
             {
                 optionSet.Contains("pin").ShouldBeTrue();
             }
-            
+
             [Fact]
-            public void should_add_skip_hooks_to_the_option_set()
+            public void Should_add_skip_hooks_to_the_option_set()
             {
                 optionSet.Contains("skip-hooks").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_skip_hooks_to_the_option_set()
+            public void Should_add_short_version_of_skip_hooks_to_the_option_set()
             {
                 optionSet.Contains("skiphooks").ShouldBeTrue();
             }
         }
 
-        public class when_handling_additional_argument_parsing : ChocolateyUpgradeCommandSpecsBase
+        public class When_handling_additional_argument_parsing : ChocolateyUpgradeCommandSpecsBase
         {
             private readonly IList<string> unparsedArgs = new List<string>();
 
@@ -251,24 +251,24 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                command.handle_additional_argument_parsing(unparsedArgs, configuration);
+                command.ParseAdditionalArguments(unparsedArgs, configuration);
             }
 
             [Fact]
-            public void should_set_unparsed_arguments_to_the_package_names()
+            public void Should_set_unparsed_arguments_to_the_package_names()
             {
                 configuration.PackageNames.ShouldEqual("pkg1;pkg2");
             }
         }
 
-        public class when_handling_validation : ChocolateyUpgradeCommandSpecsBase
+        public class When_validating : ChocolateyUpgradeCommandSpecsBase
         {
             public override void Because()
             {
             }
 
             [Fact]
-            public void should_throw_when_packagenames_is_not_set()
+            public void Should_throw_when_packagenames_is_not_set()
             {
                 configuration.PackageNames = "";
                 var errored = false;
@@ -276,7 +276,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
                 try
                 {
-                    command.handle_validation(configuration);
+                    command.Validate(configuration);
                 }
                 catch (Exception ex)
                 {
@@ -290,38 +290,38 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_continue_when_packagenames_is_set()
+            public void Should_continue_when_packagenames_is_set()
             {
                 configuration.PackageNames = "bob";
-                command.handle_validation(configuration);
+                command.Validate(configuration);
             }
         }
 
-        public class when_noop_is_called : ChocolateyUpgradeCommandSpecsBase
+        public class When_noop_is_called : ChocolateyUpgradeCommandSpecsBase
         {
             public override void Because()
             {
-                command.noop(configuration);
+                command.DryRun(configuration);
             }
 
             [Fact]
-            public void should_call_service_upgrade_noop()
+            public void Should_call_service_upgrade_noop()
             {
-                packageService.Verify(c => c.upgrade_noop(configuration), Times.Once);
+                packageService.Verify(c => c.UpgradeDryRun(configuration), Times.Once);
             }
         }
 
-        public class when_run_is_called : ChocolateyUpgradeCommandSpecsBase
+        public class When_run_is_called : ChocolateyUpgradeCommandSpecsBase
         {
             public override void Because()
             {
-                command.run(configuration);
+                command.Run(configuration);
             }
 
             [Fact]
-            public void should_call_service_upgrade_run()
+            public void Should_call_service_upgrade_run()
             {
-                packageService.Verify(c => c.upgrade_run(configuration), Times.Once);
+                packageService.Verify(c => c.Upgrade(configuration), Times.Once);
             }
         }
     }

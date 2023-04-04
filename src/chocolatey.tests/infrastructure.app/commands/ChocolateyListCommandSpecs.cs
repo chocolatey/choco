@@ -41,7 +41,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_implementing_command_for : ChocolateyListCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyListCommandSpecsBase
         {
             private List<string> results;
 
@@ -51,24 +51,24 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_list()
+            public void Should_implement_list()
             {
                 results.ShouldContain("list");
             }
 
             [Fact]
-            public void should_not_implement_search()
+            public void Should_not_implement_search()
             {
                 results.ShouldNotContain("search");
             }
 
             [Fact]
-            public void should_not_implement_find()
+            public void Should_not_implement_find()
             {
                 results.ShouldNotContain("find");
             }
 
-            public class when_configurating_the_argument_parser : ChocolateyListCommandSpecsBase
+            public class When_configurating_the_argument_parser : ChocolateyListCommandSpecsBase
             {
                 private OptionSet optionSet;
 
@@ -80,14 +80,14 @@ namespace chocolatey.tests.infrastructure.app.commands
 
                 public override void Because()
                 {
-                    command.configure_argument_parser(optionSet, configuration);
+                    command.ConfigureArgumentParser(optionSet, configuration);
                 }
 
                 [NUnit.Framework.TestCase("prerelease")]
                 [NUnit.Framework.TestCase("pre")]
                 [NUnit.Framework.TestCase("includeprograms")]
                 [NUnit.Framework.TestCase("i")]
-                public void should_add_to_option_set(string option)
+                public void Should_add_to_option_set(string option)
                 {
                     optionSet.Contains(option).ShouldBeTrue();
                 }
@@ -102,13 +102,13 @@ namespace chocolatey.tests.infrastructure.app.commands
                 [NUnit.Framework.TestCase("p")]
                 [NUnit.Framework.TestCase("allversions")]
                 [NUnit.Framework.TestCase("a")]
-                public void should_not_add_to_option_set(string option)
+                public void Should_not_add_to_option_set(string option)
                 {
                     optionSet.Contains(option).ShouldBeFalse();
                 }
             }
 
-            public class when_handling_additional_argument_parsing : ChocolateyListCommandSpecsBase
+            public class When_handling_additional_argument_parsing : ChocolateyListCommandSpecsBase
             {
                 private readonly IList<string> unparsedArgs = new List<string>();
                 private readonly string source = "https://somewhereoutthere";
@@ -127,11 +127,11 @@ namespace chocolatey.tests.infrastructure.app.commands
 
                 public override void Because()
                 {
-                    because = () => command.handle_additional_argument_parsing(unparsedArgs, configuration);
+                    because = () => command.ParseAdditionalArguments(unparsedArgs, configuration);
                 }
 
                 [Fact]
-                public void should_set_unparsed_arguments_to_configuration_input()
+                public void Should_set_unparsed_arguments_to_configuration_input()
                 {
                     because();
                     configuration.Input.ShouldEqual("pkg1 pkg2");
@@ -140,16 +140,16 @@ namespace chocolatey.tests.infrastructure.app.commands
                 [NUnit.Framework.TestCase("-l")]
                 [NUnit.Framework.TestCase("--local-only")]
                 [NUnit.Framework.TestCase("--localonly")]
-                public void should_output_warning_message_about_unsupported_argument(string argument)
+                public void Should_output_warning_message_about_unsupported_argument(string argument)
                 {
                     because();
                     MockLogger.Messages.Keys.ShouldContain("Warn");
                     MockLogger.Messages["Warn"].ShouldContain(@"
-UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!".format_with(argument));
+UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!".FormatWith(argument));
                 }
             }
 
-            public class when_noop_is_called_with_list_command : ChocolateyListCommandSpecsBase
+            public class When_noop_is_called_with_list_command : ChocolateyListCommandSpecsBase
             {
                 public override void Context()
                 {
@@ -160,23 +160,23 @@ UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported fo
 
                 public override void Because()
                 {
-                    command.noop(configuration);
+                    command.DryRun(configuration);
                 }
 
                 [Fact]
-                public void should_call_service_list_noop()
+                public void Should_call_service_list_noop()
                 {
-                    packageService.Verify(c => c.list_noop(configuration), Times.Once);
+                    packageService.Verify(c => c.ListDryRun(configuration), Times.Once);
                 }
 
                 [Fact]
-                public void should_not_report_any_warning_messages()
+                public void Should_not_report_any_warning_messages()
                 {
                     MockLogger.Messages.Keys.ShouldNotContain("Warn");
                 }
             }
 
-            public class when_run_is_called_with_search_command_and_local_only : ChocolateyListCommandSpecsBase
+            public class When_run_is_called_with_search_command_and_local_only : ChocolateyListCommandSpecsBase
             {
                 public override void Context()
                 {
@@ -186,17 +186,17 @@ UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported fo
 
                 public override void Because()
                 {
-                    command.run(configuration);
+                    command.Run(configuration);
                 }
 
                 [Fact]
-                public void should_call_service_list_run()
+                public void Should_call_service_list_run()
                 {
-                    packageService.Verify(c => c.list_run(configuration), Times.Once);
+                    packageService.Verify(c => c.List(configuration), Times.Once);
                 }
 
                 [Fact]
-                public void should_not_report_any_warning_messages()
+                public void Should_not_report_any_warning_messages()
                 {
                     MockLogger.Messages.Keys.ShouldNotContain("Warn");
                 }

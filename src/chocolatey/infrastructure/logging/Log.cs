@@ -18,8 +18,6 @@ namespace chocolatey.infrastructure.logging
 {
     using System;
 
-    // ReSharper disable InconsistentNaming
-
     /// <summary>
     ///   Logger type initialization
     /// </summary>
@@ -75,6 +73,4 @@ namespace chocolatey.infrastructure.logging
             return logger;
         }
     }
-
-    // ReSharper restore InconsistentNaming
 }

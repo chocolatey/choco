@@ -40,16 +40,16 @@ namespace chocolatey.infrastructure.app.nuget
             switch (level)
             {
                 case MessageLevel.Debug:
-                    _logger.LogDebug(message.format_with(args));
+                    _logger.LogDebug(message.FormatWith(args));
                     break;
                 case MessageLevel.Info:
-                    _logger.LogInformation(message.format_with(args));
+                    _logger.LogInformation(message.FormatWith(args));
                     break;
                 case MessageLevel.Warning:
-                    _logger.LogWarning(message.format_with(args));
+                    _logger.LogWarning(message.FormatWith(args));
                     break;
                 case MessageLevel.Error:
-                    _logger.LogError(message.format_with(args));
+                    _logger.LogError(message.FormatWith(args));
                     break;
             }
         }
@@ -71,7 +71,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public FileConflictAction ResolveFileConflict(string message)
         {
-            _logger.LogWarning("File conflict, overwriting all: {0}".format_with(message));
+            _logger.LogWarning("File conflict, overwriting all: {0}".FormatWith(message));
             return FileConflictAction.OverwriteAll;
         }
 

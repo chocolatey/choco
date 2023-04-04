@@ -55,16 +55,16 @@ namespace chocolatey.infrastructure.results
             PackageMetadata = metadata;
             SearchMetadata = search;
             Name = metadata.Id;
-            Version = metadata.Version.to_string();
+            Version = metadata.Version.ToStringSafe();
         }
 
-        public PackageResult(IPackageMetadata packageMetadata, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.to_string(), installLocation)
+        public PackageResult(IPackageMetadata packageMetadata, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.ToStringSafe(), installLocation)
         {
             PackageMetadata = packageMetadata;
             Source = source;
         }
 
-        public PackageResult(IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageSearch.Identity.Id, packageSearch.Identity.Version.to_string(), installLocation)
+        public PackageResult(IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageSearch.Identity.Id, packageSearch.Identity.Version.ToStringSafe(), installLocation)
         {
             SearchMetadata = packageSearch;
             Source = source;
@@ -78,13 +78,13 @@ namespace chocolatey.infrastructure.results
                 }
                 catch (Exception ex)
                 {
-                    this.Log().Debug("Unable to determine sources from '{0}'. Using value as is.{1} {2}".format_with(source, Environment.NewLine, ex.to_string()));
+                    this.Log().Debug("Unable to determine sources from '{0}'. Using value as is.{1} {2}".FormatWith(source, Environment.NewLine, ex.ToStringSafe()));
                     // source is already set above
                     return;
                 }
             }
 
-            Source = sources.FirstOrDefault(uri => uri.IsFile || uri.IsUnc).to_string();
+            Source = sources.FirstOrDefault(uri => uri.IsFile || uri.IsUnc).ToStringSafe();
             /*
             var rp = Package as DataServicePackage;
             if (rp != null && rp.DownloadUrl != null)
@@ -103,7 +103,7 @@ namespace chocolatey.infrastructure.results
             */
         }
 
-        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.to_string(), installLocation)
+        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.ToStringSafe(), installLocation)
         {
             SearchMetadata = packageSearch;
             PackageMetadata = packageMetadata;
@@ -116,13 +116,13 @@ namespace chocolatey.infrastructure.results
                 }
                 catch (Exception ex)
                 {
-                    this.Log().Debug("Unable to determine sources from '{0}'. Using value as is.{1} {2}".format_with(source, Environment.NewLine, ex.to_string()));
+                    this.Log().Debug("Unable to determine sources from '{0}'. Using value as is.{1} {2}".FormatWith(source, Environment.NewLine, ex.ToStringSafe()));
                     // source is already set above
                     return;
                 }
             }
 
-            Source = sources.FirstOrDefault(uri => uri.IsFile || uri.IsUnc).to_string();
+            Source = sources.FirstOrDefault(uri => uri.IsFile || uri.IsUnc).ToStringSafe();
         }
 
         public PackageResult(string name, string version, string installLocation, string source = null)

@@ -33,9 +33,9 @@ namespace chocolatey.infrastructure.registration
     /// </summary>
     public static class SimpleInjectorContainer
     {
-        private static readonly Lazy<Container> _container = new Lazy<Container>(initialize);
+        private static readonly Lazy<Container> _container = new Lazy<Container>(Initialize);
         private static readonly IList<Type> _componentRegistries = new List<Type>();
-        private const string REGISTER_COMPONENTS_METHOD = "RegisterComponents";
+        private const string RegisterComponentsMethod = "RegisterComponents";
 
 #if DEBUG
         private static bool _verifyContainer = true;
@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.registration
         ///   and a parameterless constructor.
         /// </summary>
         /// <param name="componentType">Type of the component.</param>
-        public static void add_component_registry_class(Type componentType)
+        public static void AddComponentRegistryClass(Type componentType)
         {
             _componentRegistries.Add(componentType);
         }
@@ -68,7 +68,7 @@ namespace chocolatey.infrastructure.registration
         /// <summary>
         ///   Initializes the container
         /// </summary>
-        private static Container initialize()
+        private static Container Initialize()
         {
             var container = new Container();
             container.Options.AllowOverridingRegistrations = true;
@@ -82,7 +82,7 @@ namespace chocolatey.infrastructure.registration
 
             foreach (var componentRegistry in _componentRegistries)
             {
-                load_component_registry(componentRegistry, container, extensions);
+                LoadComponentRegistry(componentRegistry, container, extensions);
             }
 
             if (_verifyContainer) container.Verify();
@@ -96,11 +96,11 @@ namespace chocolatey.infrastructure.registration
         /// <param name="componentRegistry">The component registry.</param>
         /// <param name="container">The container.</param>
         /// <param name="extensions">Any extension libraries</param>
-        private static void load_component_registry(Type componentRegistry, Container container, IEnumerable<ExtensionInformation> extensions)
+        private static void LoadComponentRegistry(Type componentRegistry, Container container, IEnumerable<ExtensionInformation> extensions)
         {
             if (componentRegistry == null)
             {
-                if (!extensions.Any(e => e.Name.is_equal_to("chocolatey.licensed")))
+                if (!extensions.Any(e => e.Name.IsEqualTo("chocolatey.licensed")))
                 {
                     "chocolatey".Log().Warn(ChocolateyLoggers.Important,
     @"Unable to register licensed components. This is likely related to a
@@ -110,14 +110,14 @@ namespace chocolatey.infrastructure.registration
             }
             try
             {
-                if (!extensions.Any(e => e.Name.is_equal_to(componentRegistry.Assembly.GetName().Name)))
+                if (!extensions.Any(e => e.Name.IsEqualTo(componentRegistry.Assembly.GetName().Name)))
                 {
                     var registrations = container.GetCurrentRegistrations();
 
                     object componentClass = Activator.CreateInstance(componentRegistry);
 
                     componentRegistry.InvokeMember(
-                        REGISTER_COMPONENTS_METHOD,
+                        RegisterComponentsMethod,
                         BindingFlags.InvokeMethod,
                         null,
                         componentClass,
@@ -127,22 +127,29 @@ namespace chocolatey.infrastructure.registration
             }
             catch (Exception ex)
             {
-                var isDebug = ApplicationParameters.is_debug_mode_cli_primitive();
+                var isDebug = ApplicationParameters.IsDebugModeCliPrimitive();
                 var message = isDebug ? ex.ToString() : ex.Message;
 
                 if (isDebug && ex.InnerException != null)
                 {
-                    message += "{0}{1}".format_with(Environment.NewLine, ex.InnerException.ToString());
+                    message += "{0}{1}".FormatWith(Environment.NewLine, ex.InnerException.ToString());
                 }
 
                 "chocolatey".Log().Error(
                     ChocolateyLoggers.Important,
-                    @"Error when registering components for '{0}':{1} {2}".format_with(
+                    @"Error when registering components for '{0}':{1} {2}".FormatWith(
                         componentRegistry.FullName,
                         Environment.NewLine,
                         message
                         ));
             }
         }
+
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void add_component_registry_class(Type componentType)
+            => AddComponentRegistryClass(componentType);
+#pragma warning restore IDE1006
     }
 }

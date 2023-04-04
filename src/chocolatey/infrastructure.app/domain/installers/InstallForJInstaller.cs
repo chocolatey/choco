@@ -30,14 +30,14 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public InstallForJInstaller()
         {
-            InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
+            InstallExecutable = "\"{0}\"".FormatWith(InstallTokens.InstallerLocation);
             SilentInstall = "-q";
             NoReboot = "";
             LogFile = ""; //logging is done automatically to i4j_nlog_* file in temp directory - http://resources.ej-technologies.com/install4j/help/doc/helptopics/installers/errors.html
-            CustomInstallLocation = "-dir \"{0}\"".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
+            CustomInstallLocation = "-dir \"{0}\"".FormatWith(InstallTokens.CustomInstallLocation);
             Language = "";
             OtherInstallOptions = "-overwrite"; // -wait 60
-            UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            UninstallExecutable = "\"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             SilentUninstall = "-q";
             OtherUninstallOptions = "";
             ValidInstallExitCodes = new List<long>

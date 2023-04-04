@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.services
     {
         private readonly IFileSystem _fileSystem;
         private readonly IHashProvider _hashProvider;
-        private const int MUTEX_TIMEOUT = 2000;
+        private const int MutexTimeout = 2000;
 
         public XmlService(IFileSystem fileSystem, IHashProvider hashProvider)
         {
@@ -42,23 +42,23 @@ namespace chocolatey.infrastructure.services
             _hashProvider = hashProvider;
         }
 
-        public XmlType deserialize<XmlType>(string xmlFilePath)
+        public XmlType Deserialize<XmlType>(string xmlFilePath)
         {
-            return deserialize<XmlType>(xmlFilePath, 3);
+            return Deserialize<XmlType>(xmlFilePath, 3);
         }
 
-        public XmlType deserialize<XmlType>(string xmlFilePath, int retryCount)
+        public XmlType Deserialize<XmlType>(string xmlFilePath, int retryCount)
         {
-            return FaultTolerance.retry(retryCount, () => GlobalMutex.enter(
+            return FaultTolerance.Retry(retryCount, () => GlobalMutex.Enter(
                () =>
                {
-                   this.Log().Trace("Entered mutex to deserialize '{0}'".format_with(xmlFilePath));
+                   this.Log().Trace("Entered mutex to deserialize '{0}'".FormatWith(xmlFilePath));
 
-                   return FaultTolerance.try_catch_with_logging_exception(
+                   return FaultTolerance.TryCatchWithLoggingException(
                    () =>
                    {
                        var xmlSerializer = new XmlSerializer(typeof(XmlType));
-                       using (var fileStream = _fileSystem.open_file_readonly(xmlFilePath))
+                       using (var fileStream = _fileSystem.OpenFileReadonly(xmlFilePath))
                        using (var fileReader = new StreamReader(fileStream))
                        using (var xmlReader = XmlReader.Create(fileReader))
                        {
@@ -78,9 +78,9 @@ namespace chocolatey.infrastructure.services
                                if (ex.Message.Contains("There is an error in XML document"))
                                {
                                    // If so, check for a backup file and try an parse that.
-                                   if (_fileSystem.file_exists(xmlFilePath + ".backup"))
+                                   if (_fileSystem.FileExists(xmlFilePath + ".backup"))
                                    {
-                                       using (var backupStream = _fileSystem.open_file_readonly(xmlFilePath + ".backup"))
+                                       using (var backupStream = _fileSystem.OpenFileReadonly(xmlFilePath + ".backup"))
                                        using (var backupReader = new StreamReader(backupStream))
                                        using (var backupXmlReader = XmlReader.Create(backupReader))
                                        {
@@ -91,7 +91,7 @@ namespace chocolatey.infrastructure.services
                                            {
                                                // Close fileReader so that we can copy the file without it being locked.
                                                fileReader.Close();
-                                               _fileSystem.copy_file(xmlFilePath + ".backup", xmlFilePath, overwriteExisting: true);
+                                               _fileSystem.CopyFile(xmlFilePath + ".backup", xmlFilePath, overwriteExisting: true);
                                            }
 
                                            return validConfig;
@@ -104,11 +104,11 @@ namespace chocolatey.infrastructure.services
                            }
                            finally
                            {
-                               foreach (var updateFile in _fileSystem.get_files(_fileSystem.get_directory_name(xmlFilePath), "*.update").or_empty_list_if_null())
+                               foreach (var updateFile in _fileSystem.GetFiles(_fileSystem.GetDirectoryName(xmlFilePath), "*.update").OrEmpty())
                                {
-                                   this.Log().Debug("Removing '{0}'".format_with(updateFile));
-                                   FaultTolerance.try_catch_with_logging_exception(
-                                       () => _fileSystem.delete_file(updateFile),
+                                   this.Log().Debug("Removing '{0}'".FormatWith(updateFile));
+                                   FaultTolerance.TryCatchWithLoggingException(
+                                       () => _fileSystem.DeleteFile(updateFile),
                                        errorMessage: "Unable to remove update file",
                                        logDebugInsteadOfError: true,
                                        isSilent: true
@@ -117,28 +117,28 @@ namespace chocolatey.infrastructure.services
                            }
                        }
                    },
-                   "Error deserializing response of type {0}".format_with(typeof(XmlType)),
+                   "Error deserializing response of type {0}".FormatWith(typeof(XmlType)),
                    throwError: true);
 
-               }, MUTEX_TIMEOUT),
+               }, MutexTimeout),
                 waitDurationMilliseconds: 200,
                 increaseRetryByMilliseconds: 200);
         }
 
-        public void serialize<XmlType>(XmlType xmlType, string xmlFilePath)
+        public void Serialize<XmlType>(XmlType xmlType, string xmlFilePath)
         {
-            serialize(xmlType, xmlFilePath, isSilent: false);
+            Serialize(xmlType, xmlFilePath, isSilent: false);
         }
 
-        public void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent)
+        public void Serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent)
         {
-            _fileSystem.create_directory_if_not_exists(_fileSystem.get_directory_name(xmlFilePath));
+            _fileSystem.EnsureDirectoryExists(_fileSystem.GetDirectoryName(xmlFilePath));
 
-            FaultTolerance.retry(3, () => GlobalMutex.enter(
+            FaultTolerance.Retry(3, () => GlobalMutex.Enter(
                 () =>
                 {
-                    this.Log().Trace("Entered mutex to serialize '{0}'".format_with(xmlFilePath));
-                    FaultTolerance.try_catch_with_logging_exception(
+                    this.Log().Trace("Entered mutex to serialize '{0}'".FormatWith(xmlFilePath));
+                    FaultTolerance.TryCatchWithLoggingException(
                     () =>
                     {
                         var xmlSerializer = new XmlSerializer(typeof(XmlType));
@@ -154,18 +154,18 @@ namespace chocolatey.infrastructure.services
                             streamWriter.Flush();
 
                             // Grab the hash of both files and compare them.
-                            this.Log().Trace("Hashing original file at '{0}'".format_with(xmlFilePath));
-                            var originalFileHash = _hashProvider.hash_file(xmlFilePath);
+                            this.Log().Trace("Hashing original file at '{0}'".FormatWith(xmlFilePath));
+                            var originalFileHash = _hashProvider.ComputeFileHash(xmlFilePath);
                             memoryStream.Position = 0;
-                            if (!originalFileHash.is_equal_to(_hashProvider.hash_stream(memoryStream)))
+                            if (!originalFileHash.IsEqualTo(_hashProvider.ComputeStreamHash(memoryStream)))
                             {
                                 this.Log().Trace("The hashes were different.");
                                 // If there wasn't a file there in the first place, just write the new one out directly.
                                 if (string.IsNullOrEmpty(originalFileHash))
                                 {
-                                    this.Log().Debug("There was no original file at '{0}'".format_with(xmlFilePath));
+                                    this.Log().Debug("There was no original file at '{0}'".FormatWith(xmlFilePath));
                                     memoryStream.Position = 0;
-                                    _fileSystem.write_file(xmlFilePath, () => memoryStream);
+                                    _fileSystem.WriteFile(xmlFilePath, () => memoryStream);
 
                                     this.Log().Trace("Closing xml memory stream.");
                                     memoryStream.Close();
@@ -176,25 +176,43 @@ namespace chocolatey.infrastructure.services
 
                                 // Otherwise, create an update file, and resiliently move it into place.
                                 var tempUpdateFile = xmlFilePath + "." + Process.GetCurrentProcess().Id + ".update";
-                                this.Log().Trace("Creating a temp file at '{0}'".format_with(tempUpdateFile));
+                                this.Log().Trace("Creating a temp file at '{0}'".FormatWith(tempUpdateFile));
                                 memoryStream.Position = 0;
-                                this.Log().Trace("Writing file '{0}'".format_with(tempUpdateFile));
-                                _fileSystem.write_file(tempUpdateFile, () => memoryStream);
+                                this.Log().Trace("Writing file '{0}'".FormatWith(tempUpdateFile));
+                                _fileSystem.WriteFile(tempUpdateFile, () => memoryStream);
 
                                 memoryStream.Close();
                                 streamWriter.Close();
 
-                                this.Log().Trace("Replacing file '{0}' with '{1}'.".format_with(xmlFilePath, tempUpdateFile));
-                                _fileSystem.replace_file(tempUpdateFile, xmlFilePath, xmlFilePath + ".backup");
+                                this.Log().Trace("Replacing file '{0}' with '{1}'.".FormatWith(xmlFilePath, tempUpdateFile));
+                                _fileSystem.ReplaceFile(tempUpdateFile, xmlFilePath, xmlFilePath + ".backup");
                             }
                         }
                     },
-                    errorMessage: "Error serializing type {0}".format_with(typeof(XmlType)),
+                    errorMessage: "Error serializing type {0}".FormatWith(typeof(XmlType)),
                     throwError: true,
                     isSilent: isSilent);
-                }, MUTEX_TIMEOUT),
+                }, MutexTimeout),
                 waitDurationMilliseconds: 200,
                 increaseRetryByMilliseconds: 200);
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public XmlType deserialize<XmlType>(string xmlFilePath)
+            => Deserialize<XmlType>(xmlFilePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public XmlType deserialize<XmlType>(string xmlFilePath, int retryCount)
+            => Deserialize<XmlType>(xmlFilePath, retryCount);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void serialize<XmlType>(XmlType xmlType, string xmlFilePath)
+            => Serialize<XmlType>(xmlType, xmlFilePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent)
+            => Serialize<XmlType>(xmlType, xmlFilePath, isSilent);
+#pragma warning restore IDE1006
     }
 }

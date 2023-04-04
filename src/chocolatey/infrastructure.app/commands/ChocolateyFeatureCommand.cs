@@ -39,18 +39,18 @@ namespace chocolatey.infrastructure.app.commands
             _configSettingsService = configSettingsService;
         }
 
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             configuration.Sources = string.Empty;
 
             optionSet
                 .Add("n=|name=",
                      "Name - the name of the source. Required with actions other than list. Defaults to empty.",
-                     option => configuration.FeatureCommand.Name = option.remove_surrounding_quotes())
+                     option => configuration.FeatureCommand.Name = option.UnquoteSafe())
                 ;
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
 
@@ -59,27 +59,27 @@ namespace chocolatey.infrastructure.app.commands
                 throw new ApplicationException("A single features command must be listed. Please see the help menu for those commands");
             }
 
-            var command = FeatureCommandType.unknown;
+            var command = FeatureCommandType.Unknown;
             string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
             Enum.TryParse(unparsedCommand, true, out command);
-            if (command == FeatureCommandType.unknown)
+            if (command == FeatureCommandType.Unknown)
             {
-                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
-                command = FeatureCommandType.list;
+                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                command = FeatureCommandType.List;
             }
 
             configuration.FeatureCommand.Command = command;
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
-            if (configuration.FeatureCommand.Command != FeatureCommandType.list && string.IsNullOrWhiteSpace(configuration.FeatureCommand.Name))
+            if (configuration.FeatureCommand.Command != FeatureCommandType.List && string.IsNullOrWhiteSpace(configuration.FeatureCommand.Name))
             {
-                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.FeatureCommand.Command.to_string()));
+                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".FormatWith(configuration.FeatureCommand.Command.ToStringSafe().ToLower()));
             }
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Feature Command");
             this.Log().Info(@"
@@ -120,33 +120,63 @@ If you find other exit codes that we have not yet documented, please
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
-            _configSettingsService.noop(configuration);
+            _configSettingsService.DryRun(configuration);
         }
 
-        public virtual void run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
             switch (configuration.FeatureCommand.Command)
             {
-                case FeatureCommandType.list:
-                    _configSettingsService.feature_list(configuration);
+                case FeatureCommandType.List:
+                    _configSettingsService.ListFeatures(configuration);
                     break;
-                case FeatureCommandType.disable:
-                    _configSettingsService.feature_disable(configuration);
+                case FeatureCommandType.Disable:
+                    _configSettingsService.DisableFeature(configuration);
                     break;
-                case FeatureCommandType.enable:
-                    _configSettingsService.feature_enable(configuration);
+                case FeatureCommandType.Enable:
+                    _configSettingsService.EnableFeature(configuration);
                     break;
             }
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
-            var config = Config.get_configuration_settings();
+            var config = Config.GetConfigurationSettings();
             if (config == null) return true;
 
-            return config.FeatureCommand.Command != FeatureCommandType.list;
+            return config.FeatureCommand.Command != FeatureCommandType.List;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+#pragma warning restore IDE1006
     }
 }

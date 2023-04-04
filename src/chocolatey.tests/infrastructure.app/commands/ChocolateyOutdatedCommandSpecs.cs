@@ -42,7 +42,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_implementing_command_for : ChocolateyOutdatedCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyOutdatedCommandSpecsBase
         {
             private List<string> results;
 
@@ -52,13 +52,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_outdated()
+            public void Should_implement_outdated()
             {
                 results.ShouldContain("outdated");
             }
         }
 
-        public class when_configurating_the_argument_parser : ChocolateyOutdatedCommandSpecsBase
+        public class When_configurating_the_argument_parser : ChocolateyOutdatedCommandSpecsBase
         {
             private OptionSet optionSet;
 
@@ -70,77 +70,77 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                command.configure_argument_parser(optionSet, configuration);
+                command.ConfigureArgumentParser(optionSet, configuration);
             }
 
             [Fact]
-            public void should_add_source_to_the_option_set()
+            public void Should_add_source_to_the_option_set()
             {
                 optionSet.Contains("source").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_source_to_the_option_set()
+            public void Should_add_short_version_of_source_to_the_option_set()
             {
                 optionSet.Contains("s").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_user_to_the_option_set()
+            public void Should_add_user_to_the_option_set()
             {
                 optionSet.Contains("user").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_user_to_the_option_set()
+            public void Should_add_short_version_of_user_to_the_option_set()
             {
                 optionSet.Contains("u").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_password_to_the_option_set()
+            public void Should_add_password_to_the_option_set()
             {
                 optionSet.Contains("password").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_password_to_the_option_set()
+            public void Should_add_short_version_of_password_to_the_option_set()
             {
                 optionSet.Contains("p").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_ignore_pinned_to_the_option_set()
+            public void Should_add_ignore_pinned_to_the_option_set()
             {
                 optionSet.Contains("ignore-pinned").ShouldBeTrue();
             }
         }
 
-        public class when_noop_is_called : ChocolateyOutdatedCommandSpecsBase
+        public class When_noop_is_called : ChocolateyOutdatedCommandSpecsBase
         {
             public override void Because()
             {
-                command.noop(configuration);
+                command.DryRun(configuration);
             }
 
             [Fact]
-            public void should_call_service_outdated_noop()
+            public void Should_call_service_outdated_noop()
             {
-                packageService.Verify(c => c.outdated_noop(configuration), Times.Once);
+                packageService.Verify(c => c.OutdatedDryRun(configuration), Times.Once);
             }
         }
 
-        public class when_run_is_called : ChocolateyOutdatedCommandSpecsBase
+        public class When_run_is_called : ChocolateyOutdatedCommandSpecsBase
         {
             public override void Because()
             {
-                command.run(configuration);
+                command.Run(configuration);
             }
 
             [Fact]
-            public void should_call_service_outdated_run()
+            public void Should_call_service_outdated_run()
             {
-                packageService.Verify(c => c.outdated_run(configuration), Times.Once);
+                packageService.Verify(c => c.Outdated(configuration), Times.Once);
             }
         }
     }

@@ -21,9 +21,9 @@ namespace chocolatey.infrastructure.app.rules
 
     internal sealed class FrameWorkReferencesMetadataRule : MetadataRuleBase
     {
-        public override IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
-            if (has_element(reader, "frameworkReferences"))
+            if (HasElement(reader, "frameworkReferences"))
             {
                 yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<frameworkReferences> elements are not supported in Chocolatey CLI.");
             }

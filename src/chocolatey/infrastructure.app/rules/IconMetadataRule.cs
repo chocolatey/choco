@@ -19,9 +19,9 @@ namespace chocolatey.infrastructure.app.rules
     using chocolatey.infrastructure.rules;
     using NuGet.Packaging;
 
-    internal sealed class IconMetadataRule : IMetadataRule
+    internal sealed class IconMetadataRule : MetadataRuleBase
     {
-        public IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             if (!(reader.GetIcon() is null))
             {

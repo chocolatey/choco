@@ -15,11 +15,17 @@
 
 namespace chocolatey.infrastructure.services
 {
+    using System;
     using System.Collections.Generic;
     using chocolatey.infrastructure.rules;
 
     public interface IRuleService
     {
+        IEnumerable<RuleResult> ValidateRules(string filePath);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         IEnumerable<RuleResult> validate_rules(string filePath);
+#pragma warning restore IDE1006
     }
 }

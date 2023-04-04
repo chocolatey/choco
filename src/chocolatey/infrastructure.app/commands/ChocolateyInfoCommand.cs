@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.commands
 {
+    using System;
     using System.Collections.Generic;
     using attributes;
     using commandline;
@@ -31,20 +32,20 @@ namespace chocolatey.infrastructure.app.commands
         {
         }
 
-        public override void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public override void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add(
                     "s=|source=",
                     "Source - Source location for install. Can use special 'windowsfeatures', 'ruby', 'cygwin', or 'python' sources. Defaults to configured sources.",
-                    option => configuration.Sources = option.remove_surrounding_quotes())
+                    option => configuration.Sources = option.UnquoteSafe())
                 .Add(
                     "l|lo|localonly|local-only",
                     "LocalOnly - Only search against local machine items.",
                     option => configuration.ListCommand.LocalOnly = option != null)
                 .Add("version=",
                      "Version - Specific version of a package to return.",
-                     option => configuration.Version = option.remove_surrounding_quotes())
+                     option => configuration.Version = option.UnquoteSafe())
                 .Add(
                     "pre|prerelease",
                     "Prerelease - Include Prereleases? Defaults to false.",
@@ -52,20 +53,20 @@ namespace chocolatey.infrastructure.app.commands
                 .Add(
                     "u=|user=",
                     "User - used with authenticated feeds. Defaults to empty.",
-                    option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
+                    option => configuration.SourceCommand.Username = option.UnquoteSafe())
                 .Add(
                     "p=|password=",
                     "Password - the user's password to the source. Defaults to empty.",
-                    option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
+                    option => configuration.SourceCommand.Password = option.UnquoteSafe())
                 .Add("cert=",
                      "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty. Available in 0.9.10+.",
-                     option => configuration.SourceCommand.Certificate = option.remove_surrounding_quotes())
+                     option => configuration.SourceCommand.Certificate = option.UnquoteSafe())
                 .Add("cp=|certpassword=",
                      "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
-                     option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
+                     option => configuration.SourceCommand.CertificatePassword = option.UnquoteSafe())
                 .Add("disable-repository-optimizations|disable-package-repository-optimizations",
-                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When used, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".format_with
-                        (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.to_string()),
+                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When used, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".FormatWith
+                        (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.ToStringSafe()),
                     option =>
                     {
                         if (option != null)
@@ -76,14 +77,14 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public override void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public override void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             configuration.Verbose = true;
             configuration.ListCommand.Exact = true;
         }
 
-        public override void help_message(ChocolateyConfiguration configuration)
+        public override void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Info Command");
             this.Log().Info(@"
@@ -131,7 +132,7 @@ If you find other exit codes that we have not yet documented, please
  file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
-".format_with(ApplicationParameters.Features.UseEnhancedExitCodes));
+".FormatWith(ApplicationParameters.Features.UseEnhancedExitCodes));
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
     }

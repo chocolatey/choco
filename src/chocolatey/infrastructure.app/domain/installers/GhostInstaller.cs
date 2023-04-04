@@ -30,14 +30,14 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public GhostInstaller()
         {
-            InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
+            InstallExecutable = "\"{0}\"".FormatWith(InstallTokens.InstallerLocation);
             SilentInstall = "-s";
             NoReboot = "";
             LogFile = "";
             CustomInstallLocation = "";
             Language = "";
             OtherInstallOptions = "";
-            UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            UninstallExecutable = "\"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             SilentUninstall = "-u -s";
             OtherUninstallOptions = "";
             ValidInstallExitCodes = new List<long> { 0 };

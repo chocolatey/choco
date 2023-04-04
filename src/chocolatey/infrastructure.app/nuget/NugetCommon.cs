@@ -52,20 +52,23 @@ namespace chocolatey.infrastructure.app.nuget
     using Environment = adapters.Environment;
     using System.Collections.Concurrent;
 
-    // ReSharper disable InconsistentNaming
-
     public sealed class NugetCommon
     {
         private static readonly ConcurrentDictionary<string, SourceRepository> _repositories = new ConcurrentDictionary<string, SourceRepository>();
 
+        [Obsolete("This member is unused and should probably be removed.")]
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
 
+#pragma warning disable IDE1006
         [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This member is unused and should probably be removed.")]
         public static void initialize_with(Lazy<IConsole> console)
         {
             _console = console;
         }
+#pragma warning restore IDE1006
 
+        [Obsolete("This member is unused and should probably be removed.")]
         private static IConsole Console
         {
             get { return _console.Value; }
@@ -94,14 +97,14 @@ namespace chocolatey.infrastructure.app.nuget
         public static IEnumerable<SourceRepository> GetRemoteRepositories(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
             // Set user agent for all NuGet library calls. Should not affect any HTTP calls that Chocolatey itself would make.
-            UserAgent.SetUserAgentString(new UserAgentStringBuilder("{0}/{1} via NuGet Client".format_with(ApplicationParameters.UserAgent, configuration.Information.ChocolateyProductVersion)));
+            UserAgent.SetUserAgentString(new UserAgentStringBuilder("{0}/{1} via NuGet Client".FormatWith(ApplicationParameters.UserAgent, configuration.Information.ChocolateyProductVersion)));
 
             // ensure credentials can be grabbed from configuration
             SetHttpHandlerCredentialService(configuration);
 
             if (!string.IsNullOrWhiteSpace(configuration.Proxy.Location))
             {
-                "chocolatey".Log().Debug("Using proxy server '{0}'.".format_with(configuration.Proxy.Location));
+                "chocolatey".Log().Debug("Using proxy server '{0}'.".FormatWith(configuration.Proxy.Location));
                 var proxy = new System.Net.WebProxy(configuration.Proxy.Location, true);
 
                 if (!String.IsNullOrWhiteSpace(configuration.Proxy.User) && !String.IsNullOrWhiteSpace(configuration.Proxy.EncryptedPassword))
@@ -111,7 +114,7 @@ namespace chocolatey.infrastructure.app.nuget
 
                 if (!string.IsNullOrWhiteSpace(configuration.Proxy.BypassList))
                 {
-                    "chocolatey".Log().Debug("Proxy has a bypass list of '{0}'.".format_with(configuration.Proxy.BypassList.escape_curly_braces()));
+                    "chocolatey".Log().Debug("Proxy has a bypass list of '{0}'.".FormatWith(configuration.Proxy.BypassList.EscapeCurlyBraces()));
                     proxy.BypassList = configuration.Proxy.BypassList.Replace("*",".*").Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 }
 
@@ -124,12 +127,12 @@ namespace chocolatey.infrastructure.app.nuget
                 ProxyCache.Instance.Override(new System.Net.WebProxy());
             }
 
-            IEnumerable<string> sources = configuration.Sources.to_string().Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+            IEnumerable<string> sources = configuration.Sources.ToStringSafe().Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
 
             IList<SourceRepository> repositories = new List<SourceRepository>();
 
             var updatedSources = new StringBuilder();
-            foreach (var sourceValue in sources.or_empty_list_if_null())
+            foreach (var sourceValue in sources.OrEmpty())
             {
 var source = sourceValue;
                 var bypassProxy = false;
@@ -137,37 +140,37 @@ var source = sourceValue;
                 var sourceClientCertificates = new List<X509Certificate>();
                 if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.Certificate))
                 {
-                    "chocolatey".Log().Debug("Using passed in certificate for source {0}".format_with(source));
+                    "chocolatey".Log().Debug("Using passed in certificate for source {0}".FormatWith(source));
                     sourceClientCertificates.Add(new X509Certificate2(configuration.SourceCommand.Certificate, configuration.SourceCommand.CertificatePassword));
                 }
 
-                if (configuration.MachineSources.Any(m => m.Name.is_equal_to(source) || m.Key.is_equal_to(source)))
+                if (configuration.MachineSources.Any(m => m.Name.IsEqualTo(source) || m.Key.IsEqualTo(source)))
                 {
                     try
                     {
-                        var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Key.is_equal_to(source));
+                        var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Key.IsEqualTo(source));
                         if (machineSource == null)
                         {
-                            machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.is_equal_to(source));
-                            "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".format_with(sourceValue, machineSource.Key.to_string()));
+                            machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.IsEqualTo(source));
+                            "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".FormatWith(sourceValue, machineSource.Key.ToStringSafe()));
                             source = machineSource.Key;
                         }
 
                         if (machineSource != null)
                         {
                             bypassProxy = machineSource.BypassProxy;
-                            if (bypassProxy) "chocolatey".Log().Debug("Source '{0}' is configured to bypass proxies.".format_with(source));
+                            if (bypassProxy) "chocolatey".Log().Debug("Source '{0}' is configured to bypass proxies.".FormatWith(source));
 
                             if (!string.IsNullOrWhiteSpace(machineSource.Certificate))
                             {
-                                "chocolatey".Log().Debug("Using configured certificate for source {0}".format_with(source));
+                                "chocolatey".Log().Debug("Using configured certificate for source {0}".FormatWith(source));
                                 sourceClientCertificates.Add(new X509Certificate2(machineSource.Certificate, NugetEncryptionUtility.DecryptString(machineSource.EncryptedCertificatePassword)));
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        "chocolatey".Log().Warn("Attempted to use a source name {0} to get default source but failed:{1} {2}".format_with(sourceValue, System.Environment.NewLine, ex.Message));
+                        "chocolatey".Log().Warn("Attempted to use a source name {0} to get default source but failed:{1} {2}".FormatWith(sourceValue, System.Environment.NewLine, ex.Message));
                     }
                 }
 
@@ -188,7 +191,7 @@ var source = sourceValue;
                         string fullsource;
                         try
                         {
-                            fullsource = filesystem.get_full_path(source);
+                            fullsource = filesystem.GetFullPath(source);
                         }
                         catch
                         {
@@ -199,10 +202,10 @@ var source = sourceValue;
 
                         if (!nugetSource.IsLocal)
                         {
-                            throw new ApplicationException("Source '{0}' is unable to be parsed".format_with(source));
+                            throw new ApplicationException("Source '{0}' is unable to be parsed".FormatWith(source));
                         }
 
-                        "chocolatey".Log().Debug("Updating Source path from {0} to {1}".format_with(source, fullsource));
+                        "chocolatey".Log().Debug("Updating Source path from {0} to {1}".FormatWith(source, fullsource));
                         updatedSources.AppendFormat("{0};", fullsource);
                     }
                     else
@@ -229,7 +232,7 @@ var source = sourceValue;
 
             if (updatedSources.Length != 0)
             {
-                configuration.Sources = updatedSources.Remove(updatedSources.Length - 1, 1).to_string();
+                configuration.Sources = updatedSources.Remove(updatedSources.Length - 1, 1).ToStringSafe();
             }
 
             return repositories;
@@ -242,7 +245,7 @@ var source = sourceValue;
                 var resource = repository.GetResource<T>();
                 if (resource is null)
                 {
-                    "chocolatey".Log().Warn(ChocolateyLoggers.LogFileOnly, "The source {0} failed to get a {1} resource".format_with(repository.PackageSource.Source, typeof(T)));
+                    "chocolatey".Log().Warn(ChocolateyLoggers.LogFileOnly, "The source {0} failed to get a {1} resource".FormatWith(repository.PackageSource.Source, typeof(T)));
                 }
                 else
                 {
@@ -426,8 +429,5 @@ var source = sourceValue;
                 }
             }
         }
-
     }
-
-    // ReSharper restore InconsistentNaming
 }

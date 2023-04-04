@@ -24,10 +24,10 @@ namespace chocolatey.infrastructure.licensing
 
     public sealed class LicenseValidation
     {
-        private const string PUBLIC_KEY =
+        private const string PublicKey =
             @"<RSAKeyValue><Modulus>rznyhs3OslLqL7A7qav9bSHYGQmgWVsP/L47dWU7yF3EHsiYZuJNLlq8tQkPql/LB1FfLihiGsOKKUF1tmxihcRUrDaYkK1IYY3A+uJWkBglDUOUjnoDboI1FgF3wmXSb07JC8JCVYWjchq+h6MV9aDZaigA5MqMKNj9FE14f68=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
 
-        public static ChocolateyLicense validate()
+        public static ChocolateyLicense Validate()
         {
             var chocolateyLicense = new ChocolateyLicense
             {
@@ -35,7 +35,7 @@ namespace chocolatey.infrastructure.licensing
                 IsCompatible = true
             };
 
-            var regularLogOutput = determine_if_regular_output_for_logging();
+            var regularLogOutput = ShouldLogErrorsToConsole();
 
             string licenseFile = ApplicationParameters.LicenseFileLocation;
             var userLicenseFile = ApplicationParameters.UserLicenseFileLocation;
@@ -54,8 +54,8 @@ namespace chocolatey.infrastructure.licensing
                     if (Directory.GetFiles(licenseDirectory).Length != 0)
                     {
                         "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, @"Files found in directory '{0}' but not a
- valid license file. License should be named '{1}'.".format_with(licenseDirectory, licenseFileName));
-                        "chocolatey".Log().Warn(ChocolateyLoggers.Important,@" Rename license file to '{0}' to allow commercial features.".format_with(licenseFileName));
+ valid license file. License should be named '{1}'.".FormatWith(licenseDirectory, licenseFileName));
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important,@" Rename license file to '{0}' to allow commercial features.".FormatWith(licenseFileName));
                     }
                 }
 
@@ -64,16 +64,16 @@ namespace chocolatey.infrastructure.licensing
                 if (File.Exists(Path.Combine(ApplicationParameters.InstallLocation, licenseFileName)) || File.Exists(Path.Combine(ApplicationParameters.InstallLocation, licenseFileName + ".txt")))
                 {
                     "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, @"Chocolatey license found in the wrong location. File must be located at
- '{0}'.".format_with(ApplicationParameters.LicenseFileLocation));
-                    "chocolatey".Log().Warn(regularLogOutput ? ChocolateyLoggers.Important : ChocolateyLoggers.LogFileOnly, @" Move license file to '{0}' to allow commercial features.".format_with(ApplicationParameters.LicenseFileLocation));
+ '{0}'.".FormatWith(ApplicationParameters.LicenseFileLocation));
+                    "chocolatey".Log().Warn(regularLogOutput ? ChocolateyLoggers.Important : ChocolateyLoggers.LogFileOnly, @" Move license file to '{0}' to allow commercial features.".FormatWith(ApplicationParameters.LicenseFileLocation));
                 }
             }
 
             // no IFileSystem at this point
             if (File.Exists(licenseFile))
             {
-                "chocolatey".Log().Debug("Evaluating license file found at '{0}'".format_with(licenseFile));
-                var license = new LicenseValidator(PUBLIC_KEY, licenseFile);
+                "chocolatey".Log().Debug("Evaluating license file found at '{0}'".FormatWith(licenseFile));
+                var license = new LicenseValidator(PublicKey, licenseFile);
 
                 try
                 {
@@ -91,21 +91,21 @@ namespace chocolatey.infrastructure.licensing
                 {
                     chocolateyLicense.IsValid = false;
                     chocolateyLicense.InvalidReason = e.Message;
-                    "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, "A license was not found for a licensed version of Chocolatey:{0} {1}{0} {2}".format_with(Environment.NewLine, e.Message,
-                        "A license was also not found in the user profile: '{0}'.".format_with(ApplicationParameters.UserLicenseFileLocation)));
+                    "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, "A license was not found for a licensed version of Chocolatey:{0} {1}{0} {2}".FormatWith(Environment.NewLine, e.Message,
+                        "A license was also not found in the user profile: '{0}'.".FormatWith(ApplicationParameters.UserLicenseFileLocation)));
                 }
                 catch (Exception e)
                 {
                     //license may be invalid
                     chocolateyLicense.IsValid = false;
                     chocolateyLicense.InvalidReason = e.Message;
-                    "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, "A license was found for a licensed version of Chocolatey, but is invalid:{0} {1}".format_with(Environment.NewLine, e.Message));
+                    "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, "A license was found for a licensed version of Chocolatey, but is invalid:{0} {1}".FormatWith(Environment.NewLine, e.Message));
                 }
 
                 var chocolateyLicenseType = ChocolateyLicenseType.Unknown;
                 try
                 {
-                    Enum.TryParse(license.LicenseType.to_string(), true, out chocolateyLicenseType);
+                    Enum.TryParse(license.LicenseType.ToStringSafe(), true, out chocolateyLicenseType);
                 }
                 catch (Exception)
                 {
@@ -124,7 +124,7 @@ namespace chocolatey.infrastructure.licensing
                 chocolateyLicense.LicenseType = chocolateyLicenseType;
                 chocolateyLicense.ExpirationDate = license.ExpirationDate;
                 chocolateyLicense.Name = license.Name;
-                chocolateyLicense.Id = license.UserId.to_string();
+                chocolateyLicense.Id = license.UserId.ToStringSafe();
             }
             else
             {
@@ -135,15 +135,22 @@ namespace chocolatey.infrastructure.licensing
             return chocolateyLicense;
         }
 
-        private static bool determine_if_regular_output_for_logging()
+        private static bool ShouldLogErrorsToConsole()
         {
             var args = Environment.GetCommandLineArgs();
+            // I think this check is incorrect??? if --version is supposed to return false, it can return true at this point?
             if (args == null || args.Length < 2) return true;
 
-            var firstArg = args[1].to_string();
-            if (firstArg.is_equal_to("-v") || firstArg.is_equal_to("--version")) return false;
+            var firstArg = args[1].ToStringSafe();
+            if (firstArg.IsEqualTo("-v") || firstArg.IsEqualTo("--version")) return false;
 
             return true;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static ChocolateyLicense validate()
+            => Validate();
+#pragma warning restore IDE1006
     }
 }

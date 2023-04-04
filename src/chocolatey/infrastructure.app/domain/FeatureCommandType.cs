@@ -16,11 +16,24 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
+    using System;
+
     public enum FeatureCommandType
     {
-        unknown,
-        list,
-        enable,
-        disable,
+        Unknown,
+        List,
+        Enable,
+        Disable,
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        unknown = Unknown,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        list = List,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        enable = Enable,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        disable = Disable,
+#pragma warning restore IDE1006
     }
 }

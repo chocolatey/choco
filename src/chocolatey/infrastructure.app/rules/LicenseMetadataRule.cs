@@ -20,9 +20,9 @@ namespace chocolatey.infrastructure.app.rules
     using chocolatey.infrastructure.rules;
     using NuGet.Packaging;
 
-    internal sealed class LicenseMetadataRule : IMetadataRule
+    internal sealed class LicenseMetadataRule : MetadataRuleBase
     {
-        public IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             if (!(reader.GetLicenseMetadata() is null))
             {

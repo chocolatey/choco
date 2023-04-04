@@ -24,10 +24,10 @@ namespace chocolatey.infrastructure.licensing
 
     public static class License
     {
-        public static ChocolateyLicense validate_license()
+        public static ChocolateyLicense ValidateLicense()
         {
-            var license = LicenseValidation.validate();
-            if (license.is_licensed_version())
+            var license = LicenseValidation.Validate();
+            if (license.IsLicensedVersion())
             {
                 try
                 {
@@ -36,7 +36,7 @@ namespace chocolatey.infrastructure.licensing
 #else
                     var chocolateyPublicKey = ApplicationParameters.UnofficialChocolateyPublicKey;
 #endif
-                    var licensedAssembly = AssemblyResolution.load_extension(ApplicationParameters.LicensedChocolateyAssemblySimpleName);
+                    var licensedAssembly = AssemblyResolution.LoadExtension(ApplicationParameters.LicensedChocolateyAssemblySimpleName);
 
                     if (licensedAssembly == null)
                     {
@@ -45,16 +45,16 @@ namespace chocolatey.infrastructure.licensing
 
                     license.AssemblyLoaded = true;
                     license.Assembly = licensedAssembly;
-                    license.Version = VersionInformation.get_current_informational_version(licensedAssembly);
+                    license.Version = VersionInformation.GetCurrentInformationalVersion(licensedAssembly);
 
                     // The licensed assembly is installed, check its supported Chocolatey versions and/or the assembly
                     // version so we can attempt to determine whether it's compatible with this version of Chocolatey.
-                    var minimumChocolateyVersionString = VersionInformation.get_minimum_chocolatey_version(licensedAssembly);
-                    "chocolatey".Log().Debug("Minimum Chocolatey Version: '{0}'".format_with(minimumChocolateyVersionString));
-                    var currentChocolateyVersionString = VersionInformation.get_current_assembly_version();
-                    "chocolatey".Log().Debug("Current Chocolatey Version: '{0}'".format_with(currentChocolateyVersionString));
-                    var currentChocolateyLicensedVersionString = VersionInformation.get_current_assembly_version(licensedAssembly);
-                    "chocolatey".Log().Debug("Current Chocolatey Licensed Version: '{0}'".format_with(currentChocolateyLicensedVersionString));
+                    var minimumChocolateyVersionString = VersionInformation.GetMinimumChocolateyVersion(licensedAssembly);
+                    "chocolatey".Log().Debug("Minimum Chocolatey Version: '{0}'".FormatWith(minimumChocolateyVersionString));
+                    var currentChocolateyVersionString = VersionInformation.GetCurrentAssemblyVersion();
+                    "chocolatey".Log().Debug("Current Chocolatey Version: '{0}'".FormatWith(currentChocolateyVersionString));
+                    var currentChocolateyLicensedVersionString = VersionInformation.GetCurrentAssemblyVersion(licensedAssembly);
+                    "chocolatey".Log().Debug("Current Chocolatey Licensed Version: '{0}'".FormatWith(currentChocolateyLicensedVersionString));
 
                     var minimumChocolateyVersion = new Version(minimumChocolateyVersionString);
                     var currentChocolateyVersion = new Version(currentChocolateyVersionString);
@@ -68,7 +68,7 @@ namespace chocolatey.infrastructure.licensing
                     }
 
                     Type licensedComponent = licensedAssembly.GetType(ApplicationParameters.LicensedComponentRegistry, throwOnError: false, ignoreCase: true);
-                    SimpleInjectorContainer.add_component_registry_class(licensedComponent);
+                    SimpleInjectorContainer.AddComponentRegistryClass(licensedComponent);
                 }
                 catch (Exception ex)
                 {
@@ -76,7 +76,7 @@ namespace chocolatey.infrastructure.licensing
                         @"A valid Chocolatey license was found, but the chocolatey.licensed.dll assembly could not be loaded:
   {0}
 Ensure that the chocolatey.licensed.dll exists at the following path:
- '{1}'".format_with(ex.Message, ApplicationParameters.LicensedAssemblyLocation));
+ '{1}'".FormatWith(ex.Message, ApplicationParameters.LicensedAssemblyLocation));
 
                     "chocolatey".Log().Warn(
                         ChocolateyLoggers.Important,
@@ -87,5 +87,11 @@ Ensure that the chocolatey.licensed.dll exists at the following path:
 
             return license;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static ChocolateyLicense validate_license()
+            => ValidateLicense();
+#pragma warning restore IDE1006
     }
 }

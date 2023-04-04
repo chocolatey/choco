@@ -38,17 +38,17 @@ namespace chocolatey.infrastructure.app.commands
             _configSettingsService = configSettingsService;
         }
 
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             configuration.Sources = null;
 
             optionSet
                 .Add("s=|source=",
-                     "Source - The source we are pushing the package to. Use {0} to push to community feed.".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource),
-                     option => configuration.Sources = option.remove_surrounding_quotes())
+                     "Source - The source we are pushing the package to. Use {0} to push to community feed.".FormatWith(ApplicationParameters.ChocolateyCommunityFeedPushSource),
+                     option => configuration.Sources = option.UnquoteSafe())
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The API key for the source. If not specified (and not local file source), does a lookup. If not specified and one is not found for an https source, push will fail.",
-                     option => configuration.PushCommand.Key = option.remove_surrounding_quotes())
+                     option => configuration.PushCommand.Key = option.UnquoteSafe())
                 //.Add("b|disablebuffering|disable-buffering",
                 //    "DisableBuffering -  Disable buffering when pushing to an HTTP(S) server to decrease memory usage. Note that when this option is enabled, integrated windows authentication might not work.",
                 //    option => configuration.PushCommand.DisableBuffering = option)
@@ -56,7 +56,7 @@ namespace chocolatey.infrastructure.app.commands
             //todo: #2569 push command - allow disable buffering?
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments); // path to .nupkg - assume relative
 
@@ -68,7 +68,7 @@ namespace chocolatey.infrastructure.app.commands
                 }
                 else
                 {
-                    throw new ApplicationException("Default push source configuration is not set. Please pass a source to push to, such as --source={0}".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+                    throw new ApplicationException("Default push source configuration is not set. Please pass a source to push to, such as --source={0}".FormatWith(ApplicationParameters.ChocolateyCommunityFeedPushSource));
                 }
             }
 
@@ -81,10 +81,10 @@ namespace chocolatey.infrastructure.app.commands
                     throw new ApplicationException("Multiple sources are not support by push command.");
                 }
 
-                var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.is_equal_to(configuration.Sources));
+                var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.IsEqualTo(configuration.Sources));
                 if (machineSource != null)
                 {
-                    "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".format_with(configuration.Sources, machineSource.Key.to_string()));
+                    "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".FormatWith(configuration.Sources, machineSource.Key.ToStringSafe()));
 
                     configuration.Sources = machineSource.Key;
                 }
@@ -93,27 +93,27 @@ namespace chocolatey.infrastructure.app.commands
                 if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
                 {
                     // perform a lookup
-                    configuration.PushCommand.Key = _configSettingsService.get_api_key(configuration, null);
+                    configuration.PushCommand.Key = _configSettingsService.GetApiKey(configuration, null);
                 }
             }
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.Sources))
             {
-                throw new ApplicationException("Source is required. Please pass a source to push to, such as --source={0}".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+                throw new ApplicationException("Source is required. Please pass a source to push to, such as --source={0}".FormatWith(ApplicationParameters.ChocolateyCommunityFeedPushSource));
             }
 
             var remoteSource = new Uri(configuration.Sources);
 
             if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
             {
-                throw new ApplicationException("An API key was not found for '{0}'. You must either set an API key with the apikey command or specify one with --api-key.".format_with(configuration.Sources));
+                throw new ApplicationException("An API key was not found for '{0}'. You must either set an API key with the apikey command or specify one with --api-key.".FormatWith(configuration.Sources));
             }
 
             // security advisory
-            if (!configuration.Force || configuration.Sources.to_lower().Contains("chocolatey.org"))
+            if (!configuration.Force || configuration.Sources.ToLowerSafe().Contains("chocolatey.org"))
             {
                 if (remoteSource.Scheme == "http" && remoteSource.Host != "localhost")
                 {
@@ -126,13 +126,13 @@ namespace chocolatey.infrastructure.app.commands
  accessing an internal feed. If you are however doing this against an
  internet feed, then the choco gods think you are crazy. ;-)
 
-NOTE: For chocolatey.org, you must update the source to be secure.".format_with(configuration.Sources);
+NOTE: For chocolatey.org, you must update the source to be secure.".FormatWith(configuration.Sources);
                     throw new ApplicationException(errorMessage);
                 }
             }
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Push Command");
             this.Log().Info(@"
@@ -147,7 +147,7 @@ A feed can be a local folder, a file share, the community feed
  ({0}), or a custom/private feed. For web
  feeds, it has a requirement that it implements the proper OData
  endpoints required for NuGet packages.
-".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+".FormatWith(ApplicationParameters.ChocolateyCommunityFeedPushSource));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
@@ -166,7 +166,7 @@ NOTE: If there is more than one nupkg file in the folder, the command
 NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
-".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+".FormatWith(ApplicationParameters.ChocolateyCommunityFeedPushSource));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Troubleshooting");
             "chocolatey".Log().Info(() => @"
@@ -184,7 +184,7 @@ A common error is `Failed to process request. 'The specified API key
  You can verify by going to {0}packages/packageName.
  Please contact the administrators of {0} if you see this
  and you don't see a good reason for it.
-".format_with(ApplicationParameters.ChocolateyCommunityGalleryUrl));
+".FormatWith(ApplicationParameters.ChocolateyCommunityGalleryUrl));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
             "chocolatey".Log().Info(@"
@@ -203,19 +203,49 @@ If you find other exit codes that we have not yet documented, please
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
-            _packageService.push_noop(configuration);
+            _packageService.PushDryRun(configuration);
         }
 
-        public virtual void run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
-            _packageService.push_run(configuration);
+            _packageService.Push(configuration);
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
             return false;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+#pragma warning restore IDE1006
     }
 }

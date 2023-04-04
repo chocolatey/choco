@@ -24,16 +24,16 @@ namespace chocolatey.infrastructure.app.rules
 
     public abstract class MetadataRuleBase : IMetadataRule
     {
-        public abstract IEnumerable<RuleResult> validate(NuspecReader reader);
+        public abstract IEnumerable<RuleResult> Validate(NuspecReader reader);
 
-        protected static bool has_element(NuspecReader reader, string name)
+        protected static bool HasElement(NuspecReader reader, string name)
         {
             var metadataNode = reader.Xml.Root.Elements().FirstOrDefault(e => StringComparer.Ordinal.Equals(e.Name.LocalName, "metadata"));
 
             return !(metadataNode is null || metadataNode.Elements(XName.Get(name, metadataNode.GetDefaultNamespace().NamespaceName)).FirstOrDefault() is null);
         }
 
-        protected static string get_element_value(NuspecReader reader, string name)
+        protected static string GetElementValue(NuspecReader reader, string name)
         {
             var metadataNode = reader.Xml.Root.Elements().FirstOrDefault(e => StringComparer.Ordinal.Equals(e.Name.LocalName, "metadata"));
 
@@ -51,5 +51,19 @@ namespace chocolatey.infrastructure.app.rules
 
             return element.Value;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual IEnumerable<RuleResult> validate(NuspecReader reader)
+            => Validate(reader);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected static bool has_element(NuspecReader reader, string name)
+            => HasElement(reader, name);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected static string get_element_value(NuspecReader reader, string name)
+            => GetElementValue(reader, name);
+#pragma warning restore IDE1006
     }
 }
