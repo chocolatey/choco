@@ -197,6 +197,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     # This is skipped when not run in CI because it modifies the local system.
     Context 'License warning is worded properly' -Tag FossOnly,ListCommand,License -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $null = Enable-ChocolateySource 'hermes-setup'
             $null = Invoke-Choco install chocolatey-license-business -y
             $Output = Invoke-Choco list
         }
@@ -216,10 +218,12 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     # This is skipped when not run in CI because it modifies the local system.
     Context 'PowerShell Profile comments updated correctly' -Tag ListCommand, Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
             Remove-Item $Profile.CurrentUserCurrentHost -ErrorAction Ignore
             New-Item $Profile.CurrentUserCurrentHost -Force
             $chocolatey = (Invoke-Choco list chocolatey -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
             Enable-ChocolateySource -Name local
+            Enable-ChocolateySource -Name hermes-setup
             $null = Invoke-Choco install chocolatey -f --version $chocolatey.Version
         }
 
@@ -243,6 +247,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     # This is skipped when not run in CI because it modifies the local system.
     Context 'PowerShell Profile properly updated when Windows thinks a 5 byte file is signed' -Tag ListCommand, Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
             New-Item $Profile.CurrentUserCurrentHost -Force
             "" | Set-Content -Path $Profile.CurrentUserCurrentHost -Encoding UTF8
             $chocolatey = (Invoke-Choco list chocolatey -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
@@ -278,6 +283,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     ) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
             $chocolatey = (Invoke-Choco list chocolatey -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
 
             foreach ($shim in $RemovedShims) {
@@ -292,6 +298,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             }
 
             Enable-ChocolateySource -Name local
+            Enable-ChocolateySource -Name hermes-setup
             $Output = Invoke-Choco install chocolatey -f --version $chocolatey.Version --no-progress
         }
 
@@ -310,6 +317,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
 
     Context 'Ensure a corrupted config file does not cause errors' -Tag ConfigFile -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0')) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
             $ChocolateyConfigLocation = "$env:ChocolateyInstall/config/chocolatey.config"
             $BadContent = "<chocolatey></chocolatey>BadFile"
             # Make sure we have a chocolatey config file
@@ -333,7 +341,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         'powershell'
     ) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
         BeforeAll {
-            New-ChocolateyInstallSnapshot
+            Restore-ChocolateyInstallSnapshot
+            Enable-ChocolateySource -Name hermes-setup
             $pwshInstall = Invoke-Choco install $_ -y
             $ChocoUnzipped = "$(Get-TempDirectory)$(New-Guid)"
             $modulePath = "$ChocoUnzipped/tools/chocolateySetup.psm1"
@@ -363,7 +372,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             if (Test-Path $ChocoUnzipped) {
                 Remove-Item $ChocoUnzipped -Force -Recurse
             }
-            $null = Invoke-Choco uninstall $_ -y -s https://community.chocolatey.org/api/v2/ --force-dependencies
+            $null = Invoke-Choco uninstall $_ -y --force-dependencies
             Remove-ChocolateyInstallSnapshot
         }
 
