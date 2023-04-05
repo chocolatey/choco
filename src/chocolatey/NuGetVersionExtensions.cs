@@ -22,8 +22,7 @@ namespace chocolatey
     /// Helper methods for dealing with the the nuget version returned by
     /// the NuGet.Client libraries to ensure they can be easily used.
     /// </summary>
-    /// <remarks>The class is marked as internal on purpose to ensure it will not be part of the public API</remarks>
-    internal static class NuGetVersionExtensions
+    public static class NuGetVersionExtensions
     {
 #pragma warning disable RS0030 // Do not used banned APIs
         /// <summary>
