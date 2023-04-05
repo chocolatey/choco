@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -29,9 +29,6 @@ namespace chocolatey.infrastructure.app.services
     using tokens;
     using nuget;
     using NuGet.Common;
-    using NuGet.PackageManagement;
-    using NuGet.Protocol.Core.Types;
-    using NuGet.Versioning;
     using IFileSystem = filesystem.IFileSystem;
 
     public class TemplateService : ITemplateService
@@ -274,15 +271,14 @@ namespace chocolatey.infrastructure.app.services
 
         protected void ListCustomTemplateInformation(ChocolateyConfiguration configuration)
         {
-            var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, _nugetLogger, _fileSystem);
+            var packageResources = NugetCommon.GetRepositoryResources(configuration, _nugetLogger, _fileSystem);
             var sourceCacheContext = new ChocolateySourceCacheContext(configuration);
             var pkg = NugetList.FindPackage(
                     "{0}.template".FormatWith(configuration.TemplateCommand.Name),
                     configuration,
                     _nugetLogger,
                     sourceCacheContext,
-                    NugetCommon.GetRepositoryResource<PackageMetadataResource>(packageRepositories),
-                    NugetCommon.GetRepositoryResource<ListResource>(packageRepositories));
+                    packageResources);
 
             var templateInstalledViaPackage = (pkg != null);
 
