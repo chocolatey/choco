@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,7 +36,7 @@ namespace chocolatey.infrastructure.app.services
 
     public class TemplateService : ITemplateService
     {
-        private readonly UTF8Encoding utf8WithoutBOM = new UTF8Encoding(false);
+        private readonly UTF8Encoding _utf8WithoutBOM = new UTF8Encoding(false);
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _nugetLogger;
         private readonly IXmlService _xmlService;
@@ -142,7 +142,7 @@ namespace chocolatey.infrastructure.app.services
             var defaultTemplateOverride = _fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation, "default");
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.TemplateName) && (!_fileSystem.DirectoryExists(defaultTemplateOverride) || configuration.NewCommand.UseOriginalTemplate))
             {
-                GenerateFileFromTemplate(configuration, tokens, NuspecTemplate.Template, _fileSystem.CombinePaths(packageLocation, "{0}.nuspec".FormatWith(tokens.PackageNameLower)), utf8WithoutBOM);
+                GenerateFileFromTemplate(configuration, tokens, NuspecTemplate.Template, _fileSystem.CombinePaths(packageLocation, "{0}.nuspec".FormatWith(tokens.PackageNameLower)), _utf8WithoutBOM);
                 GenerateFileFromTemplate(configuration, tokens, ChocolateyInstallTemplate.Template, _fileSystem.CombinePaths(packageToolsLocation, "chocolateyinstall.ps1"), Encoding.UTF8);
                 GenerateFileFromTemplate(configuration, tokens, ChocolateyBeforeModifyTemplate.Template, _fileSystem.CombinePaths(packageToolsLocation, "chocolateybeforemodify.ps1"), Encoding.UTF8);
                 GenerateFileFromTemplate(configuration, tokens, ChocolateyUninstallTemplate.Template, _fileSystem.CombinePaths(packageToolsLocation, "chocolateyuninstall.ps1"), Encoding.UTF8);
@@ -176,7 +176,7 @@ namespace chocolatey.infrastructure.app.services
                     if (fileExtension.IsEqualTo(".nuspec"))
                     {
                         packageFileLocation = _fileSystem.CombinePaths(packageLocation, "{0}.nuspec".FormatWith(tokens.PackageNameLower));
-                        GenerateFileFromTemplate(configuration, tokens, _fileSystem.ReadFile(file), packageFileLocation, utf8WithoutBOM);
+                        GenerateFileFromTemplate(configuration, tokens, _fileSystem.ReadFile(file), packageFileLocation, _utf8WithoutBOM);
                     }
                     else if (_templateBinaryExtensions.Contains(fileExtension))
                     {
