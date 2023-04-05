@@ -389,6 +389,21 @@ namespace chocolatey.tests.integration
             return config;
         }
 
+        public static ChocolateyConfiguration proxy()
+        {
+            return baseline_configuration();
+        }
+
+        public static void set_configuration_file_setting(string name, string value)
+        {
+            var config = baseline_configuration();
+            config.ConfigCommand.Name = name;
+            config.ConfigCommand.ConfigValue = value;
+            config.ConfigCommand.Command = ConfigCommandType.Set;
+            var configService = NUnitSetup.Container.GetInstance<IChocolateyConfigSettingsService>();
+            configService.SetConfig(config);
+        }
+
         private static void delete_test_package_directories()
         {
             var topDirectory = get_top_level();

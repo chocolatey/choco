@@ -1,4 +1,4 @@
-﻿// Copyright © 2023-Present Chocolatey Software, Inc
+// Copyright © 2023-Present Chocolatey Software, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -138,7 +138,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_only_have_messages_related_to_package_information()
             {
-                var count = MockLogger.Messages.SelectMany(messageLevel => messageLevel.Value.OrEmpty()).Count();
+                var count = MockLogger.MessagesFor(LogLevel.Info).OrEmpty().Count();
                 count.ShouldEqual(2);
             }
 
