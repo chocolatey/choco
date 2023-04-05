@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -368,8 +368,21 @@ var source = sourceValue;
 
             foreach (var dependencyInfoResource in dependencyInfoResources)
             {
-                var dependencyInfo = await dependencyInfoResource.ResolvePackage(
-                    package, framework, cacheContext, logger, CancellationToken.None);
+                SourcePackageDependencyInfo dependencyInfo = null;
+
+                try
+                {
+                    dependencyInfo = await dependencyInfoResource.ResolvePackage(
+                        package, framework, cacheContext, logger, CancellationToken.None);
+                }
+                catch (AggregateException ex) when (!(ex.InnerException is null))
+                {
+                    "chocolatey".Log().Warn(ex.InnerException.Message);
+                }
+                catch (Exception ex)
+                {
+                    "chocolatey".Log().Warn(ex.InnerException.Message);
+                }
 
                 if (dependencyInfo == null) continue;
 
@@ -397,8 +410,21 @@ var source = sourceValue;
 
             foreach (var dependencyInfoResource in dependencyInfoResources)
             {
-                var dependencyInfos = await dependencyInfoResource.ResolvePackages(
-                    packageId, configuration.Prerelease, framework, cacheContext, logger, CancellationToken.None);
+                IEnumerable<SourcePackageDependencyInfo> dependencyInfos = Array.Empty<SourcePackageDependencyInfo>();
+
+                try
+                {
+                    dependencyInfos = await dependencyInfoResource.ResolvePackages(
+                        packageId, configuration.Prerelease, framework, cacheContext, logger, CancellationToken.None);
+                }
+                catch (AggregateException ex) when (!(ex.InnerException is null))
+                {
+                    "chocolatey".Log().Warn(ex.InnerException.Message);
+                }
+                catch (Exception ex)
+                {
+                    "chocolatey".Log().Warn(ex.InnerException.Message);
+                }
 
                 if (!dependencyInfos.Any()) continue;
 
