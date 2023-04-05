@@ -85,7 +85,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Skip PowerShell - Do not run chocolateyUninstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 .Add("ignorepackagecodes|ignorepackageexitcodes|ignore-package-codes|ignore-package-exit-codes",
-                     "IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-success, no matter what package scripts provide for exit codes. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.ToStringSafe()),
+                     "IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-success, no matter what package scripts provide for exit codes. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.ToStringSafe()),
                      option =>
                      {
                          if (option != null)
@@ -94,15 +94,15 @@ namespace chocolatey.infrastructure.app.commands
                          }
                      })
                  .Add("usepackagecodes|usepackageexitcodes|use-package-codes|use-package-exit-codes",
-                     "UsePackageExitCodes - Package scripts can provide exit codes. Use those for choco's exit code when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.ToStringSafe()),
+                     "UsePackageExitCodes - Package scripts can provide exit codes. Use those for choco's exit code when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.ToStringSafe()),
                      option => configuration.Features.UsePackageExitCodes = option != null
                      )
                  .Add("autouninstaller|use-autouninstaller",
-                     "UseAutoUninstaller - Use auto uninstaller service when uninstalling. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".FormatWith(ApplicationParameters.Features.AutoUninstaller, configuration.Features.AutoUninstaller.ToStringSafe()),
+                     "UseAutoUninstaller - Use auto uninstaller service when uninstalling. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.AutoUninstaller, configuration.Features.AutoUninstaller.ToStringSafe()),
                      option => configuration.Features.AutoUninstaller = option != null
                      )
                  .Add("skipautouninstaller|skip-autouninstaller",
-                     "SkipAutoUninstaller - Skip auto uninstaller service when uninstalling. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".FormatWith(ApplicationParameters.Features.AutoUninstaller, configuration.Features.AutoUninstaller.ToStringSafe()),
+                     "SkipAutoUninstaller - Skip auto uninstaller service when uninstalling. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.AutoUninstaller, configuration.Features.AutoUninstaller.ToStringSafe()),
                      option =>
                      {
                          if (option != null)
@@ -111,11 +111,11 @@ namespace chocolatey.infrastructure.app.commands
                          }
                      })
                  .Add("failonautouninstaller|fail-on-autouninstaller",
-                     "FailOnAutoUninstaller - Fail the package uninstall if the auto uninstaller reports and error. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".FormatWith(ApplicationParameters.Features.FailOnAutoUninstaller, configuration.Features.FailOnAutoUninstaller.ToStringSafe()),
+                     "FailOnAutoUninstaller - Fail the package uninstall if the auto uninstaller reports and error. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.FailOnAutoUninstaller, configuration.Features.FailOnAutoUninstaller.ToStringSafe()),
                      option => configuration.Features.FailOnAutoUninstaller = option != null
                      )
                  .Add("ignoreautouninstallerfailure|ignore-autouninstaller-failure",
-                     "Ignore Auto Uninstaller Failure - Do not fail the package if auto uninstaller reports an error. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".FormatWith(ApplicationParameters.Features.FailOnAutoUninstaller, configuration.Features.FailOnAutoUninstaller.ToStringSafe()),
+                     "Ignore Auto Uninstaller Failure - Do not fail the package if auto uninstaller reports an error. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.FailOnAutoUninstaller, configuration.Features.FailOnAutoUninstaller.ToStringSafe()),
                      option =>
                      {
                          if (option != null)
@@ -124,16 +124,16 @@ namespace chocolatey.infrastructure.app.commands
                          }
                      })
                  .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
-                     "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".FormatWith(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.ToStringSafe()),
+                     "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.ToStringSafe()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
                      )
                  .Add("exitwhenrebootdetected|exit-when-reboot-detected",
-                     "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}.  Overrides the default feature '{3}' set to '{4}'.  Available in 0.10.12+.".FormatWith
+                     "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}.  Overrides the default feature '{3}' set to '{4}'.".FormatWith
                          (ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend, ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.ToStringSafe()),
                      option => configuration.Features.ExitOnRebootDetected = option != null
                      )
                  .Add("ignoredetectedreboot|ignore-detected-reboot",
-                     "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'.  Available in 0.10.12+.".FormatWith
+                     "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'.".FormatWith
                          (ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.ToStringSafe()),
                      option =>
                      {
@@ -174,12 +174,7 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(@"
 Uninstalls a package or a list of packages.
 
-NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
- with options and switches. Add `-y` for previous behavior with no
- prompt. In most cases you can still pass options and switches with one
- dash (`-`). For more details, see the command reference (`choco -?`).
-
-Choco 0.9.9+ automatically tracks registry changes for ""Programs and
+Chocolatey automatically tracks registry changes for ""Programs and
  Features"" of the underlying software's native installers when
  installing packages. The ""Automatic Uninstaller"" (auto uninstaller)
  service is a feature that can use that information to automatically
@@ -203,11 +198,6 @@ With auto uninstaller turned off, a chocolateyUninstall.ps1 is required
 NOTE: A package with a failing uninstall can be removed with the
 `-n --skipautouninstaller` flags. This will remove the package from
 chocolatey without attempting to uninstall the program.
-
-NOTE: Starting in 0.9.10+, the Automatic Uninstaller (AutoUninstaller)
- is turned on by default. To turn it off, run the following command:
-
-    choco feature disable -n autoUninstaller
 
 NOTE: Chocolatey Pro / Business automatically synchronizes with
  Programs and Features, ensuring manually removed apps are
@@ -265,7 +255,7 @@ Package Exit Codes:
 
 In addition to normal exit codes, packages are allowed to exit
  with their own codes when the feature '{0}' is
- turned on. Available in v0.9.10+.
+ turned on.
 
 Reboot Exit Codes:
  - 350: pending reboot detected, no action has occurred
@@ -274,7 +264,6 @@ Reboot Exit Codes:
 In addition to the above exit codes, you may also see reboot exit codes
  when the feature '{1}' is turned on. It typically requires
  the feature '{0}' to also be turned on to work properly.
- Available in v0.10.12+.
 ".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");

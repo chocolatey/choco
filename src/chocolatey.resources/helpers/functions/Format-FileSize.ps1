@@ -23,8 +23,6 @@ DO NOT USE. Not part of the public API.
 Formats file size into a human readable format.
 
 .NOTES
-Available in 0.9.10+.
-
 This function is not part of the API.
 
 .INPUTS

@@ -60,7 +60,7 @@ remove this parameter.
 
 Prefer HTTPS when available. Can be HTTP, FTP, or File URIs.
 
-In 0.10.1+, `Url64` is an alias for Url64bit.
+`Url64` is an alias for Url64bit.
 
 .PARAMETER Checksum
 The checksum hash value of the Url resource. This allows a checksum to
@@ -124,17 +124,15 @@ https://support.microsoft.com/en-us/kb/811833 for more details.
 The recommendation is to use at least SHA256.
 
 .PARAMETER Options
-OPTIONAL - Specify custom headers. Available in 0.9.10+.
+OPTIONAL - Specify custom headers.
 
 .PARAMETER GetOriginalFileName
 OPTIONAL switch to allow Chocolatey to determine the original file name
-from the url resource. Available in 0.9.10+.
+from the url resource.
 
 .PARAMETER ForceDownload
 OPTIONAL switch to force download of file every time, even if the file
 already exists.
-
-Available in 0.10.1+.
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.

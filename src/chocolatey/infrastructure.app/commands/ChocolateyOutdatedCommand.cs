@@ -48,22 +48,22 @@ namespace chocolatey.infrastructure.app.commands
                      "Password - the user's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.Password = option.UnquoteSafe())
                 .Add("cert=",
-                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty. Available in 0.9.10+.",
+                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty.",
                      option => configuration.SourceCommand.Certificate = option.UnquoteSafe())
                 .Add("cp=|certpassword=",
-                     "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
+                     "Certificate Password - the client certificate's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.CertificatePassword = option.UnquoteSafe())
                 .Add("pre|prerelease",
-                    "Prerelease - Include Prereleases? Defaults to false. Available in 0.10.14+.",
+                    "Prerelease - Include Prereleases? Defaults to false.",
                     option => configuration.Prerelease = option != null)
                 .Add("ignore-pinned",
-                     "Ignore Pinned - Ignore pinned packages. Defaults to false. Available in 0.10.6+.",
+                     "Ignore Pinned - Ignore pinned packages. Defaults to false.",
                      option => configuration.OutdatedCommand.IgnorePinned = option != null)
                 .Add("ignore-unfound",
-                    "Ignore Unfound Packages - Ignore packages that are not found on the sources used (or the defaults). Overrides the default feature '{0}' set to '{1}'. Available in 0.10.9+.".FormatWith(ApplicationParameters.Features.IgnoreUnfoundPackagesOnUpgradeOutdated, configuration.Features.IgnoreUnfoundPackagesOnUpgradeOutdated.ToStringSafe()),
+                    "Ignore Unfound Packages - Ignore packages that are not found on the sources used (or the defaults). Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.IgnoreUnfoundPackagesOnUpgradeOutdated, configuration.Features.IgnoreUnfoundPackagesOnUpgradeOutdated.ToStringSafe()),
                     option => configuration.Features.IgnoreUnfoundPackagesOnUpgradeOutdated = option != null)
                 .Add("disable-repository-optimizations|disable-package-repository-optimizations",
-                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".FormatWith
+                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in earlier versions of Chocolatey. Overrides the default feature '{0}' set to '{1}'.".FormatWith
                         (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.ToStringSafe()),
                     option =>
                     {
@@ -96,8 +96,6 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Outdated Command");
             this.Log().Info(@"
 Returns a list of outdated packages.
-
-NOTE: Available with 0.9.9.6+.
 
 ");
 
@@ -134,8 +132,8 @@ Enhanced:
  - -1 or 1: an error has occurred
  - 2: outdated packages have been found
 
-NOTE: Starting in v0.10.12, if you have the feature '{0}'
- turned on, then choco will provide enhanced exit codes that allow
+NOTE: If you have the feature '{0}' turned on,
+ then choco will provide enhanced exit codes that allow
  better integration and scripting.
 
 If you find other exit codes that we have not yet documented, please

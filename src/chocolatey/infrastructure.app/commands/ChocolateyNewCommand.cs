@@ -44,7 +44,7 @@ namespace chocolatey.infrastructure.app.commands
                      "AutomaticPackage - Generate automatic package instead of normal. Defaults to false",
                      option => configuration.NewCommand.AutomaticPackage = option != null)
                 .Add("t=|template=|template-name=",
-                     "TemplateName - Use a named template in {0}\\templates\\templatename instead of built-in template. Available in 0.9.9.9+. Manage templates as packages in 0.9.10+.".FormatWith(ApplicationParameters.InstallLocation),
+                     "TemplateName - Use a named template in {0}\\templates\\templatename instead of built-in template.".FormatWith(ApplicationParameters.InstallLocation),
                      option => configuration.NewCommand.TemplateName = option.UnquoteSafe())
                 .Add("name=",
                      "Name [Required]- the name of the package. Can be passed as first parameter without \"--name=\".",
@@ -60,10 +60,10 @@ namespace chocolatey.infrastructure.app.commands
                      "Maintainer - the name of the maintainer. Can also be passed as the property MaintainerName=somevalue",
                      option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.MaintainerPropertyName, option.UnquoteSafe()))
                 .Add("out=|outdir=|outputdirectory=|output-directory=",
-                    "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory. Available in 0.9.10+.",
+                    "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory.",
                     option => configuration.OutputDirectory = option.UnquoteSafe())
                 .Add("built-in|built-in-template|originaltemplate|original-template|use-original-template|use-built-in-template",
-                    "BuiltInTemplate - Use the original built-in template instead of any override. Available in 0.9.10+.",
+                    "BuiltInTemplate - Use the original built-in template instead of any override.",
                     option => configuration.NewCommand.UseOriginalTemplate = option != null)
                 ;
         }
@@ -136,7 +136,7 @@ Possible properties to pass:
     url64
     silentargs
 
-NOTE: Starting in 0.9.10, you can pass arbitrary property value pairs
+NOTE: You can pass arbitrary property value pairs
  through to templates. This really unlocks your ability to create
  packages automatically!
 

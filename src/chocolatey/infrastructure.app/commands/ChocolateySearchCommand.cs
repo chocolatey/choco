@@ -45,7 +45,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Source - Source location for install. Can use special 'windowsfeatures', 'ruby', 'cygwin', or 'python' sources. Defaults to sources.",
                      option => configuration.Sources = option.UnquoteSafe())
                 .Add("idonly|id-only",
-                     "Id Only - Only return Package Ids in the list results. Available in 0.10.6+.",
+                     "Id Only - Only return Package Ids in the list results.",
                      option => configuration.ListCommand.IdOnly = option != null)
                 .Add("pre|prerelease",
                      "Prerelease - Include Prereleases? Defaults to false.",
@@ -66,13 +66,13 @@ namespace chocolatey.infrastructure.app.commands
                      "Password - the user's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.Password = option.UnquoteSafe())
                 .Add("cert=",
-                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty. Available in 0.9.10+.",
+                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty.",
                      option => configuration.SourceCommand.Certificate = option.UnquoteSafe())
                 .Add("cp=|certpassword=",
-                     "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
+                     "Certificate Password - the client certificate's password to the source. Defaults to empty.",
                      option => configuration.SourceCommand.CertificatePassword = option.UnquoteSafe())
                 .Add("page=",
-                     "Page - the 'page' of results to return. Defaults to return all results. Available in 0.9.10+.",
+                     "Page - the 'page' of results to return. Defaults to return all results.",
                      option =>
                          {
                              int page;
@@ -86,41 +86,41 @@ namespace chocolatey.infrastructure.app.commands
                              }
                          })
                 .Add("page-size=",
-                     "Page Size - the amount of package results to return per page. Defaults to 25. Available in 0.9.10+.",
+                     "Page Size - the amount of package results to return per page. Defaults to 25.",
                      option =>
                      {
                          configuration.ListCommand.PageSize = int.Parse(option);
                          configuration.ListCommand.ExplicitPageSize = true;
                      })
                 .Add("e|exact",
-                     "Exact - Only return packages with this exact name. Available in 0.9.10+.",
+                     "Exact - Only return packages with this exact name.",
                      option => configuration.ListCommand.Exact = option != null)
                  .Add("by-id-only",
-                     "ByIdOnly - Only return packages where the id contains the search filter. Available in 0.9.10+.",
+                     "ByIdOnly - Only return packages where the id contains the search filter.",
                      option => configuration.ListCommand.ByIdOnly = option != null)
                  .Add("by-tag-only|by-tags-only",
-                     "ByTagOnly - Only return packages where the search filter matches on the tags. Available in 0.10.6+.",
+                     "ByTagOnly - Only return packages where the search filter matches on the tags.",
                      option => configuration.ListCommand.ByTagOnly = option != null)
                  .Add("id-starts-with",
-                     "IdStartsWith - Only return packages where the id starts with the search filter. Available in 0.9.10+.",
+                     "IdStartsWith - Only return packages where the id starts with the search filter.",
                      option => configuration.ListCommand.IdStartsWith = option != null)
                  .Add("order-by-popularity",
-                     "OrderByPopularity - Sort by package results by popularity. Available in 0.9.10+.",
+                     "OrderByPopularity - Sort by package results by popularity.",
                      option => configuration.ListCommand.OrderByPopularity = option != null)
                  .Add("approved-only",
-                    "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository. Available in 0.9.10+.",
+                    "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository.",
                      option => configuration.ListCommand.ApprovedOnly = option != null)
                  .Add("download-cache|download-cache-only",
-                     "DownloadCacheAvailable - Only return packages that have a download cache available - this option will filter out results not from the community repository. Available in 0.9.10+.",
+                     "DownloadCacheAvailable - Only return packages that have a download cache available - this option will filter out results not from the community repository.",
                      option => configuration.ListCommand.DownloadCacheAvailable = option != null)
                  .Add("not-broken",
-                     "NotBroken - Only return packages that are not failing testing - this option only filters out failing results from the community feed. It will not filter against other sources. Available in 0.9.10+.",
+                     "NotBroken - Only return packages that are not failing testing - this option only filters out failing results from the community feed. It will not filter against other sources.",
                      option => configuration.ListCommand.NotBroken = option != null)
                   .Add("detail|detailed",
-                     "Detailed - Alias for verbose. Available in 0.9.10+.",
+                     "Detailed - Alias for verbose.",
                      option => configuration.Verbose = option != null)
                   .Add("disable-repository-optimizations|disable-package-repository-optimizations",
-                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".FormatWith
+                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in earlier versions of Chocolatey. Overrides the default feature '{0}' set to '{1}'.".FormatWith
                         (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.ToStringSafe()),
                     option =>
                     {
@@ -158,11 +158,6 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(ChocolateyLoggers.Important, "Search Command");
             this.Log().Info(@"
 Chocolatey will perform a search for a package local or remote.
-
-NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
- with options and switches. In most cases you can still pass options
- and switches  with one dash (`-`). For more details, see
- the command reference (`choco -?`).
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
@@ -199,8 +194,8 @@ Enhanced:
  - -1 or 1: an error has occurred
  - 2: no results (enhanced)
 
-NOTE: Starting in v0.10.12, if you have the feature '{0}'
- turned on, then choco will provide enhanced exit codes that allow
+NOTE: If you have the feature '{0}' turned on,
+ then choco will provide enhanced exit codes that allow
  better integration and scripting.
 
 If you find other exit codes that we have not yet documented, please

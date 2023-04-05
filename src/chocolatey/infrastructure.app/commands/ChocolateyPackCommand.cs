@@ -83,11 +83,6 @@ namespace chocolatey.infrastructure.app.commands
             this.Log().Info(@"
 Chocolatey will attempt to package a nuspec into a compiled nupkg.
 
-NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
- with options and switches. In most cases you can still pass options
- and switches with one dash (`-`). For more details, see
- the command reference (`choco -?`).
-
 NOTE: You can pass arbitrary property value pairs through to nuspecs.
  These will replace variables formatted as `$property$` with the value passed.
 ");
