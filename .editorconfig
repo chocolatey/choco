@@ -65,7 +65,7 @@ csharp_style_var_elsewhere = false:suggestion
 
 dotnet_naming_rule.interface_should_be_begins_with_i.severity = error
 dotnet_naming_rule.interface_should_be_begins_with_i.symbols = interface
-dotnet_naming_rule.interface_should_be_begins_with_i.style = pascal_case
+dotnet_naming_rule.interface_should_be_begins_with_i.style = begins_with_i
 
 dotnet_naming_rule.types_should_be_pascal_case.severity = error
 dotnet_naming_rule.types_should_be_pascal_case.symbols = types
@@ -75,36 +75,74 @@ dotnet_naming_rule.non_field_members_should_be_pascal_case.severity = error
 dotnet_naming_rule.non_field_members_should_be_pascal_case.symbols = non_field_members
 dotnet_naming_rule.non_field_members_should_be_pascal_case.style = pascal_case
 
+dotnet_naming_rule.private_fields_should_be_camel_case_underscore_prefix.severity = error
+dotnet_naming_rule.private_fields_should_be_camel_case_underscore_prefix.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case_underscore_prefix.style = camel_case_underscore_prefix
+
+dotnet_naming_rule.non_private_fields_should_be_pascal_case.severity = error
+dotnet_naming_rule.non_private_fields_should_be_pascal_case.symbols = non_private_fields
+dotnet_naming_rule.non_private_fields_should_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.local_variables_should_be_camel_case.severity = error
+dotnet_naming_rule.local_variables_should_be_camel_case.symbols = local_variables
+dotnet_naming_rule.local_variables_should_be_camel_case.style = camel_case
+
+dotnet_naming_rule.constant_fields_should_be_pascal_case.severity = error
+dotnet_naming_rule.constant_fields_should_be_pascal_case.symbols = constant_fields
+dotnet_naming_rule.constant_fields_should_be_pascal_case.style = pascal_case
+
 # Symbol specifications
 
 dotnet_naming_symbols.interface.applicable_kinds = interface
 dotnet_naming_symbols.interface.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
-dotnet_naming_symbols.interface.required_modifiers = 
+dotnet_naming_symbols.interface.required_modifiers =
+
+dotnet_naming_symbols.non_private_fields.applicable_kinds = field
+dotnet_naming_symbols.non_private_fields.applicable_accessibilities = public, internal, protected, protected_internal
+dotnet_naming_symbols.non_private_fields.required_modifiers =
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private, private_protected
+dotnet_naming_symbols.private_fields.required_modifiers =
 
 dotnet_naming_symbols.types.applicable_kinds = class, struct, interface, enum
 dotnet_naming_symbols.types.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
-dotnet_naming_symbols.types.required_modifiers = 
+dotnet_naming_symbols.types.required_modifiers =
 
 dotnet_naming_symbols.non_field_members.applicable_kinds = property, event, method
 dotnet_naming_symbols.non_field_members.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
-dotnet_naming_symbols.non_field_members.required_modifiers = 
+dotnet_naming_symbols.non_field_members.required_modifiers =
+
+dotnet_naming_symbols.local_variables.applicable_kinds = parameter, local
+dotnet_naming_symbols.local_variables.applicable_accessibilities = local
+dotnet_naming_symbols.local_variables.required_modifiers =
+
+dotnet_naming_symbols.constant_fields.applicable_kinds = field
+dotnet_naming_symbols.constant_fields.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
+dotnet_naming_symbols.constant_fields.required_modifiers = const
 
 # Naming styles
 
+dotnet_naming_style.pascal_case.required_prefix =
+dotnet_naming_style.pascal_case.required_suffix =
+dotnet_naming_style.pascal_case.word_separator =
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+
+dotnet_naming_style.camel_case.required_prefix =
+dotnet_naming_style.camel_case.required_suffix =
+dotnet_naming_style.camel_case.word_separator =
+dotnet_naming_style.camel_case.capitalization = camel_case
+
 dotnet_naming_style.begins_with_i.required_prefix = I
-dotnet_naming_style.begins_with_i.required_suffix = 
-dotnet_naming_style.begins_with_i.word_separator = 
+dotnet_naming_style.begins_with_i.required_suffix =
+dotnet_naming_style.begins_with_i.word_separator =
 dotnet_naming_style.begins_with_i.capitalization = pascal_case
 
-dotnet_naming_style.pascal_case.required_prefix = 
-dotnet_naming_style.pascal_case.required_suffix = 
-dotnet_naming_style.pascal_case.word_separator = 
-dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.camel_case_underscore_prefix.required_prefix = _
+dotnet_naming_style.camel_case_underscore_prefix.required_suffix =
+dotnet_naming_style.camel_case_underscore_prefix.word_separator =
+dotnet_naming_style.camel_case_underscore_prefix.capitalization = camel_case
 
-dotnet_naming_style.pascal_case.required_prefix = 
-dotnet_naming_style.pascal_case.required_suffix = 
-dotnet_naming_style.pascal_case.word_separator = 
-dotnet_naming_style.pascal_case.capitalization = pascal_case
 dotnet_style_operator_placement_when_wrapping = beginning_of_line
 tab_width = 4
 indent_size = 4
