@@ -430,6 +430,28 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
     }
 
+    Context "Searching for package when invalid package source is being used" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Invoke-Choco source add -n "invalid" -s "https://invalid.chocolatey.org/api/v2/"
+
+            $Output = Invoke-Choco search dependency
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Outputs warning about unable to load service index' {
+            $Output.Lines | Should -Match "Not able to contact source 'https://invalid.chocolatey.org.com/api/v2/'."
+        }
+
+        It 'Outputs the results of the search' {
+            $Output.Lines | Should -Contain 'hasrebootdependency 1.0.0'
+        }
+    }
+
 
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths

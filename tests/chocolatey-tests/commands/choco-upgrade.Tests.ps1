@@ -259,6 +259,136 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     }
 
 
-    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+            $PackageUnderTest = "installpackage"
+
+            New-ChocolateyTestPackage `
+                -TestPath "$PSScriptRoot\testpackages" `
+                -Name $PackageUnderTest `
+                -Version "1.0.0"
+
+            $PackagePath = "$($snapshotPath.PackagesPath)\$PackageUnderTest.1.0.0.nupkg"
+
+            $Output = Invoke-Choco upgrade $PackagePath --confirm --params '/ParameterOne:FirstOne /ParameterTwo:AnotherOne'
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1
+        }
+
+        It "Not Installed a package to the lib directory" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Not Installed a package to the lib bad directory" {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Not Installed a package to the lib backup directory" {
+            "$env:ChocolateyInstall\lib-backup\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Outputs expected error message" {
+            $Output.String | Should -Match @"
+Package name cannot be a path to a file on a remote, or local file system.
+
+To upgrade a local, or remote file, you may use:
+  choco upgrade $packageUnderTest --version="1.0.0" --source="$([regex]::Escape($snapshotPath.PackagesPath))
+"@
+        }
+    }
+
+    # We are marking this test as internal, as the package we need to make use
+    # of downloads a zip archive from a internal server, and the package is also
+    # only located on an internal feed.
+    Context "Upgrading non-existing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
+        BeforeAll {
+            $paths = Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco upgrade install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePathLong)" --no-progress
+        }
+
+        AfterAll {
+            $null = Invoke-Choco uninstall install-chocolateyzip --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Runs under background Service' -Tag Background {
+            $Output.Lines | Should -Contain 'Running in background mode' -Because $Output.String
+        }
+
+        It 'Outputs downloading 64bit package' {
+            $Output.Lines | Should -Contain 'Downloading install-chocolateyzip 64 bit' -Because $Output.String
+        }
+
+        It 'Outputs download completed' {
+            $testMessage = if ($features.License) {
+                "Download of 'cmake-3.21.2-windows-x86_64.zip' (36.01 MB) completed."
+            } else {
+                "Download of cmake-3.21.2-windows-x86_64.zip (36.01 MB) completed."
+            }
+            $Output.Lines | Should -Contain $testMessage -Because $Output.String
+        }
+
+        It 'Outputs extracting correct archive' {
+            $testMessage = if ($features.License) {
+                "Extracting cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+            } else {
+                "Extracting $($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+            }
+            $Output.Lines | Should -Contain $testMessage -Because $Output.String
+        }
+
+        It 'Created shim for <_>' -ForEach 'cmake-gui.exe', 'cmake.exe', 'cmcldeps.exe', 'cpack.exe', 'ctest.exe' {
+            $Output.Lines | Should -Contain "ShimGen has successfully created a shim for $_"
+            "$env:ChocolateyInstall\bin\$_" | Should -Exist
+        }
+
+        It 'Outputs upgrading was successful' {
+            $Output.Lines | Should -Contain 'The upgrade of install-chocolateyzip was successful.' -Because $Output.String
+        }
+
+        It 'Outputs software installation directory' {
+            $Output.Lines | Should -Contain "Software installed to '$env:ChocolateyInstall\lib\install-chocolateyzip\tools'" -Because $Output.String
+        }
+
+        It 'Should have cached installed directory in custom cache' {
+            # Need to be verified, but the file may not exist on licensed edition
+            "$($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip" | Should -Exist
+        }
+
+        It 'Installed software to expected directory' {
+            "$env:ChocolateyInstall\lib\install-chocolateyzip\tools\cmake-3.21.2-windows-x86_64\bin\cmake.exe" | Should -Exist
+        }
+    }
+
+    Context "Upgrading a package when invalid package source is being used" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Invoke-Choco install upgradepackage --version 1.0.0 --confirm
+
+            $null = Invoke-Choco source add -n "invalid" -s "https://invalid.chocolatey.org/api/v2/"
+
+            $Output = Invoke-Choco upgrade upgradepackage --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Outputs warning about unable to load service index' {
+            $Output.Lines | Should -Contain 'Unable to load the service index for source https://invalid.com/api/v2/.'
+        }
+
+        It 'Outputs successful installation of single package' {
+            $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.'
+        }
+    }
+
+    # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.
+    # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths
 }
