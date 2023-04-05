@@ -51,7 +51,7 @@ $7zip = Join-Path $chocoTools '7z.exe'
 $ShimGen = Join-Path $chocoTools 'shimgen.exe'
 $checksumExe = Join-Path $chocoTools 'checksum.exe'
 
-if ($PSBoundParameters.ContainsKey('preRunHookScripts')) {
+if ($preRunHookScripts) {
     foreach ($prehookscript in $preRunHookScripts) {
         Write-Debug "Running Pre-Run Hook '$prehookscript'";
         & "$prehookscript"
@@ -86,7 +86,7 @@ if ($exitCode -ne $null -and $exitCode -ne '' -and $exitCode -ne 0) {
     Set-PowerShellExitCode $exitCode
 }
 
-if ($PSBoundParameters.ContainsKey('postRunHookScripts')) {
+if ($postRunHookScripts) {
     foreach ($posthookscript in $postRunHookScripts) {
         Write-Debug "Running Post-Run Hook '$posthookscript'";
         & "$posthookscript"
