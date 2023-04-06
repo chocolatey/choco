@@ -1677,6 +1677,28 @@ To install a local, or remote file, you may use:
         }
     }
 
+    Context "Installing a package when invalid package source is being used" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Invoke-Choco source add -n "invalid" -s "https://invalid.chocolatey.org/api/v2/"
+
+            $Output = Invoke-Choco install installpackage --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Outputs warning about unable to load service index' {
+            $Output.Lines | Should -Contain 'Unable to load the service index for source https://invalid.com/api/v2/.'
+        }
+
+        It 'Outputs successful installation of single package' {
+            $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.'
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

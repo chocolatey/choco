@@ -218,7 +218,9 @@ var source = sourceValue;
 
                     if (nugetSource.IsHttp || nugetSource.IsHttps)
                     {
+#pragma warning disable RS0030 // Do not used banned APIs
                         var httpSourceResource = repo.GetResource<HttpSourceResource>();
+#pragma warning restore RS0030 // Do not used banned APIs
                         if (httpSourceResource != null)
                         {
                             httpSourceResource.HttpSource.HttpCacheDirectory = ApplicationParameters.HttpCacheLocation;
@@ -238,39 +240,15 @@ var source = sourceValue;
             return repositories;
         }
 
-        public static IEnumerable<T> GetRepositoryResource<T>(IEnumerable<SourceRepository> packageRepositories) where T : class, INuGetResource
+        public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-            foreach (var repository in packageRepositories)
-            {
-                var resource = repository.GetResource<T>();
-                if (resource is null)
-                {
-                    "chocolatey".Log().Warn(ChocolateyLoggers.LogFileOnly, "The source {0} failed to get a {1} resource".FormatWith(repository.PackageSource.Source, typeof(T)));
-                }
-                else
-                {
-                    yield return resource;
-                }
-            }
+            IEnumerable<SourceRepository> remoteRepositories = GetRemoteRepositories(configuration, nugetLogger, filesystem);
+            return GetRepositoryResources(remoteRepositories);
         }
 
-        // TODO: Refactor this to not use a tuple, or make private method.
-        public static IEnumerable<(SourceRepository repository,
-                PackageSearchResource searchResource,
-                FindPackageByIdResource findPackageByIdResource,
-                PackageMetadataResource packageMetadataResource,
-                ListResource listResource
-                )> GetRepositoryResources(IEnumerable<SourceRepository> packageRepositories)
+        public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(IEnumerable<SourceRepository> packageRepositories)
         {
-            foreach (var repository in packageRepositories)
-            {
-                yield return (
-                    repository,
-                    repository.GetResource<PackageSearchResource>(),
-                    repository.GetResource<FindPackageByIdResource>(),
-                    repository.GetResource<PackageMetadataResource>(),
-                    repository.GetResource<ListResource>());
-            }
+            return NuGetEndpointResources.GetResourcesBySource(packageRepositories).ToList();
         }
 
         public static void SetHttpHandlerCredentialService(ChocolateyConfiguration configuration)
@@ -359,17 +337,32 @@ var source = sourceValue;
             NuGetFramework framework,
             SourceCacheContext cacheContext,
             ILogger logger,
-            IEnumerable<DependencyInfoResource> dependencyInfoResources,
+            IEnumerable<NuGetEndpointResources> resources,
             ISet<SourcePackageDependencyInfo> availablePackages,
             ISet<PackageDependency> dependencyCache,
             ChocolateyConfiguration configuration)
         {
             if (availablePackages.Contains(package)) return;
 
+            var dependencyInfoResources = resources.DependencyInfoResources();
+
             foreach (var dependencyInfoResource in dependencyInfoResources)
             {
-                var dependencyInfo = await dependencyInfoResource.ResolvePackage(
-                    package, framework, cacheContext, logger, CancellationToken.None);
+                SourcePackageDependencyInfo dependencyInfo = null;
+
+                try
+                {
+                    dependencyInfo = await dependencyInfoResource.ResolvePackage(
+                        package, framework, cacheContext, logger, CancellationToken.None);
+                }
+                catch (AggregateException ex) when (!(ex.InnerException is null))
+                {
+                    "chocolatey".Log().Warn(ex.InnerException.Message);
+                }
+                catch (Exception ex)
+                {
+                    "chocolatey".Log().Warn(ex.InnerException.Message);
+                }
 
                 if (dependencyInfo == null) continue;
 
@@ -379,7 +372,7 @@ var source = sourceValue;
                     if (dependencyCache.Contains(dependency)) continue;
                     dependencyCache.Add(dependency);
                     await GetPackageDependencies(
-                        dependency.Id, framework, cacheContext, logger, dependencyInfoResources, availablePackages, dependencyCache, configuration);
+                        dependency.Id, framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration);
                 }
             }
         }
@@ -388,17 +381,32 @@ var source = sourceValue;
             NuGetFramework framework,
             SourceCacheContext cacheContext,
             ILogger logger,
-            IEnumerable<DependencyInfoResource> dependencyInfoResources,
+            IEnumerable<NuGetEndpointResources> resources,
             ISet<SourcePackageDependencyInfo> availablePackages,
             ISet<PackageDependency> dependencyCache,
             ChocolateyConfiguration configuration)
         {
             //if (availablePackages.Contains(packageID)) return;
 
+            var dependencyInfoResources = resources.DependencyInfoResources();
+
             foreach (var dependencyInfoResource in dependencyInfoResources)
             {
-                var dependencyInfos = await dependencyInfoResource.ResolvePackages(
-                    packageId, configuration.Prerelease, framework, cacheContext, logger, CancellationToken.None);
+                IEnumerable<SourcePackageDependencyInfo> dependencyInfos = Array.Empty<SourcePackageDependencyInfo>();
+
+                try
+                {
+                    dependencyInfos = await dependencyInfoResource.ResolvePackages(
+                        packageId, configuration.Prerelease, framework, cacheContext, logger, CancellationToken.None);
+                }
+                catch (AggregateException ex) when (!(ex.InnerException is null))
+                {
+                    "chocolatey".Log().Warn(ex.InnerException.Message);
+                }
+                catch (Exception ex)
+                {
+                    "chocolatey".Log().Warn(ex.InnerException.Message);
+                }
 
                 if (!dependencyInfos.Any()) continue;
 
@@ -410,7 +418,7 @@ var source = sourceValue;
 
                     // Recursion is fun, kids
                     await GetPackageDependencies(
-                        dependency.Id, framework, cacheContext, logger, dependencyInfoResources, availablePackages, dependencyCache, configuration);
+                        dependency.Id, framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration);
                 }
             }
         }

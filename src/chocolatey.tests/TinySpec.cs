@@ -45,10 +45,6 @@ namespace chocolatey.tests
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
         }
 
-        public virtual void before_everything()
-        {
-        }
-
         [OneTimeTearDown]
         public void AfterEverything()
         {

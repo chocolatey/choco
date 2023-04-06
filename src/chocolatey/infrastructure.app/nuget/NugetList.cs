@@ -17,22 +17,15 @@
 namespace chocolatey.infrastructure.app.nuget
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO.Packaging;
     using System.Linq;
-    using System.Runtime.CompilerServices;
     using System.Threading;
     using System.Threading.Tasks;
     using configuration;
     using filesystem;
     using NuGet.Common;
-    using NuGet.Configuration;
-    using NuGet.PackageManagement;
     using NuGet.Packaging;
     using NuGet.Packaging.Core;
-    using NuGet.Protocol;
     using NuGet.Protocol.Core.Types;
     using NuGet.Versioning;
 
@@ -49,8 +42,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-            var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger, filesystem);
-            var packageRepositoriesResources = NugetCommon.GetRepositoryResources(packageRepositories);
+            var packageRepositoriesResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem);
             string searchTermLower = configuration.Input.ToLowerSafe();
 
             SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
@@ -58,14 +50,9 @@ namespace chocolatey.infrastructure.app.nuget
 
 
             int totalCount = 0;
-            foreach (var repositoryResources in packageRepositoriesResources)
+            foreach (var searchResource in packageRepositoriesResources.SearchResources())
             {
-                if (repositoryResources.searchResource == null)
-                {
-                    continue;
-                }
-
-                totalCount += repositoryResources.searchResource.SearchCountAsync(searchTermLower, searchFilter, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
+                totalCount += searchResource.SearchCountAsync(searchTermLower, searchFilter, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
             }
 
             return totalCount;
@@ -76,8 +63,7 @@ namespace chocolatey.infrastructure.app.nuget
             ThresholdHit = false;
             LowerThresholdHit = false;
 
-            var packageRepositories = NugetCommon.GetRemoteRepositories(configuration, nugetLogger, filesystem);
-            var packageRepositoriesResources = NugetCommon.GetRepositoryResources(packageRepositories);
+            var packageRepositoryResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem);
             string searchTermLower = configuration.Input.ToLowerSafe();
 
             SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
@@ -139,7 +125,7 @@ namespace chocolatey.infrastructure.app.nuget
 
             if (!configuration.ListCommand.Exact)
             {
-                foreach (var repositoryResources in packageRepositoriesResources)
+                foreach (var repositoryResources in packageRepositoryResources)
                 {
                     var skipNumber = 0;
 
@@ -148,7 +134,7 @@ namespace chocolatey.infrastructure.app.nuget
                         skipNumber = configuration.ListCommand.PageSize * configuration.ListCommand.Page.GetValueOrDefault(0);
                     }
 
-                    if (repositoryResources.searchResource != null && version == null)
+                    if ((version == null || repositoryResources.ListResource == null) && repositoryResources.SearchResource != null)
                     {
                         var takeNumber = GetTakeAmount(configuration);
 
@@ -166,7 +152,7 @@ namespace chocolatey.infrastructure.app.nuget
                             }
 
                             partResults.Clear();
-                            partResults.AddRange(await repositoryResources.searchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
+                            partResults.AddRange(await repositoryResources.SearchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
                             skipNumber += takeNumber;
                             perSourceThresholdLimit -= partResults.Count;
                             perSourceThresholdMinLimit -= partResults.Count;
@@ -185,7 +171,7 @@ namespace chocolatey.infrastructure.app.nuget
                                     if (versionInfo.PackageSearchMetadata == null)
                                     {
                                         //This is horribly inefficient, having to get the metadata again but that is the NuGet resources for you
-                                        results.Add(await repositoryResources.packageMetadataResource.GetMetadataAsync(new PackageIdentity(result.Identity.Id, versionInfo.Version), cacheContext, nugetLogger, CancellationToken.None));
+                                        results.Add(await repositoryResources.PackageMetadataResource.GetMetadataAsync(new PackageIdentity(result.Identity.Id, versionInfo.Version), cacheContext, nugetLogger, CancellationToken.None));
                                     }
                                     else
                                     {
@@ -199,12 +185,12 @@ namespace chocolatey.infrastructure.app.nuget
                             results.AddRange(latestResults);
                         }
                     }
-                    else
+                    else if (repositoryResources.ListResource != null)
                     {
                         configuration.Prerelease = configuration.Prerelease || (version != null && version.IsPrerelease);
                         configuration.AllVersions = configuration.AllVersions || (version != null);
 
-                        var tempResults = await repositoryResources.listResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, CancellationToken.None);
+                        var tempResults = await repositoryResources.ListResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, CancellationToken.None);
                         var enumerator = tempResults.GetEnumeratorAsync();
 
                         var perSourceThresholdLimit = thresholdLimit;
@@ -244,15 +230,15 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 if (configuration.AllVersions)
                 {
-                    foreach (var repositoryResources in packageRepositoriesResources)
+                    foreach (var repositoryResources in packageRepositoryResources)
                     {
-                        results.AddRange(await repositoryResources.packageMetadataResource.GetMetadataAsync(
+                        results.AddRange(await repositoryResources.PackageMetadataResource.GetMetadataAsync(
                             searchTermLower, configuration.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None));
                     }
                 }
                 else
                 {
-                    var exactPackage = FindPackage(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoriesResources.Select(x => x.packageMetadataResource), packageRepositoriesResources.Select(x => x.listResource), version);
+                    var exactPackage = FindPackage(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoryResources, version);
 
                     if (exactPackage == null) return new List<IPackageSearchMetadata>().AsQueryable();
 
@@ -318,10 +304,25 @@ namespace chocolatey.infrastructure.app.nuget
             return 30;
         }
 
+        [Obsolete("Will be removed in v3, use overload with NuGetEndpointResources instead!")]
         public static ISet<IPackageSearchMetadata> FindAllPackageVersions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
         {
             var metadataList = new HashSet<IPackageSearchMetadata>();
             foreach (var resource in resources)
+            {
+                metadataList.AddRange(resource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
+            }
+            return metadataList;
+        }
+
+        public static ISet<IPackageSearchMetadata> FindAllPackageVersions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<NuGetEndpointResources> resources)
+        {
+            // Currently this method is a duplicate of its overload,
+            // but using NuGetEndpointResources here gives us more flexibility in the future
+            // if we need to call one of the other methods if it is possible.
+            var metadataList = new HashSet<IPackageSearchMetadata>();
+
+            foreach (PackageMetadataResource resource in resources.MetadataResources())
             {
                 metadataList.AddRange(resource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
             }
@@ -334,8 +335,7 @@ namespace chocolatey.infrastructure.app.nuget
         /// <param name="packageName">Name of package to search for</param>
         /// <param name="config">Chocolatey configuration used to help supply the search parameters</param>
         /// <param name="nugetLogger">The nuget logger</param>
-        /// <param name="packageMetadataResources">The PackageMetaDataResources that should be queried</param>
-        /// <param name="listResources">The ListResources that should be queried</param>
+        /// <param name="resources">The resources that should be queried</param>
         /// <param name="version">Version to search for</param>
         /// <param name="cacheContext">Settings for caching of results from sources</param>
         /// <returns>One result or nothing</returns>
@@ -344,13 +344,13 @@ namespace chocolatey.infrastructure.app.nuget
             ChocolateyConfiguration config,
             ILogger nugetLogger,
             ChocolateySourceCacheContext cacheContext,
-            IEnumerable<PackageMetadataResource> packageMetadataResources,
-            IEnumerable<ListResource> listResources,
+            IEnumerable<NuGetEndpointResources> resources,
             NuGetVersion version = null)
         {
             // We can only use the optimized ListResource query when the user has asked us to, via the UsePackageRepositoryOptimizations
             // feature, as well as when a ListResource exists for the feed in question.  Some technologies, such as Sleet or Baget, only
             // offer V3 feeds, not V2, and as a result, no ListResource is available.
+            var listResources = resources.ListResources().ToList();
             if (config.Features.UsePackageRepositoryOptimizations && listResources.Any())
             {
                 if (version is null)
@@ -378,7 +378,7 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     var metadataList = new HashSet<IPackageSearchMetadata>();
 
-                    foreach (var packageMetadataResource in packageMetadataResources)
+                    foreach (var packageMetadataResource in resources.MetadataResources())
                     {
                         metadataList.AddRange(packageMetadataResource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
                     }
@@ -387,7 +387,7 @@ namespace chocolatey.infrastructure.app.nuget
                 }
             }
 
-            foreach (var resource in packageMetadataResources)
+            foreach (var resource in resources.MetadataResources())
             {
                 var metadata = resource.GetMetadataAsync(new PackageIdentity(packageName, version), cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
 

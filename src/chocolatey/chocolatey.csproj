@@ -210,6 +210,8 @@
     <Compile Include="infrastructure.app\commands\ChocolateyExportCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyHelpCommand.cs" />
+    <Compile Include="infrastructure.app\nuget\NuGetEndpointResources.cs" />
+    <Compile Include="infrastructure.app\nuget\NuGetEndpointResourcesExtensions.cs" />
     <Compile Include="infrastructure.app\registration\ChocolateyRegistrationModule.cs" />
     <Compile Include="infrastructure.app\registration\IContainerRegistrator.cs" />
     <Compile Include="infrastructure.app\registration\IContainerResolver.cs" />

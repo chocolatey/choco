@@ -3,3 +3,5 @@ M:Chocolatey.NuGet.Versioning.SemanticVersion.ToFullString();Use ToFullStringChe
 M:NuGet.Versioning.SemanticVersion.ToNormalizedString;Use ToNormalizedStringChecked() extension method instead.
 M:Chocolatey.NuGet.Versioning.SemanticVersion.ToNormalizedString();Use ToNormalizedStringChecked() extension method instead.
 M:System.StringComparer.InvariantCultureIgnoreCase;Use OrdinalIgnoreCase comparer instead.
+M:NuGet.Protocol.Core.Types.SourceRepository.GetResource`1;Get the NuGet cached endpoint.
+M:NuGet.Protocol.Core.Types.SourceRepository.GetResourceAsync`1;Get the NuGet cached endpoint.
