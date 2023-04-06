@@ -48,13 +48,14 @@ Vagrant.configure("2") do |config|
     Import-Module $env:ChocolateyInstall/helpers/chocolateyProfile.psm1
     Update-SessionEnvironment
     Write-Host "Done installing software, now copying files"
-    $null = robocopy c:/chocoRoot c:/code/choco /mir
+    # If you try to build on macOS, then run this, there are attributes on some files that cause the build to fail inside of the vagrant environment.
+    $null = robocopy c:/chocoRoot c:/code/choco /mir /copy:dt
     Push-Location c:/code/choco
     Write-Host "Files have been copied, beginning build process."
     $CakeOutput = ./build.bat 2>&1
     if ($LastExitCode -ne 0) {
-      Set-Content c:/chocoRoot/buildOutput.txt -Value $CakeOutput
-      Write-Host "The build has failed. Please see the buildOutput.txt file at the root of the repository for details"
+      Set-Content c:/vagrant/buildOutput.log -Value $CakeOutput
+      Write-Host "The build has failed. Please see the buildOutput.log file for details"
       exit $LastExitCode
     }
 
@@ -62,5 +63,6 @@ Vagrant.configure("2") do |config|
     # $env:TEST_KITCHEN = 1
     $env:VM_RUNNING = 1
     ./Invoke-Tests.ps1
+    Copy-Item $env:ALLUSERSPROFILE/chocolatey/logs/testInvocations.log C:/vagrant
   SHELL
 end
