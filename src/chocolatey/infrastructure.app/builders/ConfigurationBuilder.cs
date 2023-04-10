@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -32,8 +32,10 @@ namespace chocolatey.infrastructure.app.builders
     using infrastructure.services;
     using licensing;
     using logging;
+    using Microsoft.Win32;
     using nuget;
     using platforms;
+    using services;
     using tolerance;
     using Assembly = adapters.Assembly;
     using Container = SimpleInjector.Container;
@@ -87,6 +89,7 @@ namespace chocolatey.infrastructure.app.builders
             SetGlobalOptions(args, config, container);
             SetEnvironmentOptions(config);
             EnvironmentSettings.SetEnvironmentVariables(config);
+            SetProxyOptions(config, container);
             // must be done last for overrides
             SetLicensedOptions(config, license, configFileSettings);
             // save all changes if there are any
@@ -455,6 +458,21 @@ namespace chocolatey.infrastructure.app.builders
                 {
                     ChocolateyHelpCommand.DisplayHelpMessage(container);
                 });
+        }
+
+        private static void SetProxyOptions(ChocolateyConfiguration config, Container container)
+        {
+            // Evaluation order of Proxy settings: System Set -> Environment Variable Set -> Chocolatey Configuration File Set -> CLI Passed in Argument
+            // If we don't yet have a Proxy Location, check if the system has one configured in the registry
+            if (string.IsNullOrWhiteSpace(config.Proxy.Location) && Platform.GetPlatform() == PlatformType.Windows)
+            {
+                var registryService = container.GetInstance<IRegistryService>();
+                var internetSettingsRegKey = registryService.GetKey(RegistryHive.CurrentUser, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings");
+                if (internetSettingsRegKey.GetValue("ProxyEnable").ToStringSafe().IsEqualTo("1"))
+                {
+                    config.Proxy.Location = internetSettingsRegKey.GetValue("ProxyServer").ToStringSafe();
+                }
+            }
         }
 
         private static void SetEnvironmentOptions(ChocolateyConfiguration config)

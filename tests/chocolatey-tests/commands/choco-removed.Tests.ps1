@@ -135,7 +135,7 @@ exit $command.Count
         }
     }
 
-    Context 'Ensure --allow-multiple removed from Chocolatey' -Tag InstallCommand, UpgradeCommand, UninstallCommand, AllowMultiple -Foreach @(
+    Context 'Ensure --allow-multiple removed from Chocolatey <Command> command' -Tag InstallCommand, UpgradeCommand, UninstallCommand, AllowMultiple, cory -Foreach @(
         @{ Command = 'install' }
         @{ Command = 'upgrade' }
         @{ Command = 'uninstall' }
@@ -156,11 +156,13 @@ exit $command.Count
             $Output = Invoke-Choco $Command $package @options
         }
 
-        It 'Exits with Success (0)' {
+        # Skipping on Upgrade as that exits with -1 due to the BeforeModify script.
+        It 'Exits with Success (0)' -Skip:($Command -eq 'upgrade') {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        It 'Does not use a versioned package folder' -Skip:($Command -eq 'upgrade') {
+        # Skipping on uninstall because there shouldn't be a folder after uninstall.
+        It 'Does not use a versioned package folder' -Skip:($Command -eq 'uninstall') {
             $expectedPath = Join-Path $env:ChocolateyInstall -ChildPath 'lib' |
                 Join-Path -ChildPath $package
 
