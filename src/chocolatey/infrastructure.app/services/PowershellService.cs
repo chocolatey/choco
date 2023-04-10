@@ -260,6 +260,21 @@ namespace chocolatey.infrastructure.app.services
 
                 if (!string.IsNullOrEmpty(chocoPowerShellScript))
                 {
+
+                    this.Log().Info(ChocolateyLoggers.Important, () => "The package {0} wants to run '{1}'.".format_with(package.Id, _fileSystem.get_file_name(chocoPowerShellScript)));
+                    this.Log().Info(ChocolateyLoggers.Important, () => "Note: If you don't run this script, the installation will fail.");
+                    this.Log().Info(ChocolateyLoggers.Important, () => @"Note: To confirm automatically next time, use '-y' or consider:");
+                    this.Log().Info(ChocolateyLoggers.Important, () => @"choco feature enable -n allowGlobalConfirmation");
+
+                    var selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run the script?",
+                        new[] { "yes", "all - yes to all", "no", "print" },
+                        defaultChoice: null,
+                        requireAnswer: true,
+                        allowShortAnswer: true,
+                        shortPrompt: true,
+                        timeoutInSeconds: 30
+                        );
+
                     this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".format_with(chocoPowerShellScript));
                     string chocoPowerShellScriptContents = _fileSystem.read_file(chocoPowerShellScript);
                     // leave this way, doesn't take it through formatting.
@@ -277,6 +292,7 @@ namespace chocolatey.infrastructure.app.services
                             defaultChoice: null,
                             requireAnswer: true,
                             allowShortAnswer: true,
+                            timeoutInSeconds: 30
                             shortPrompt: true
                         );
 

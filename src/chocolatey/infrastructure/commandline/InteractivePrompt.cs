@@ -147,6 +147,10 @@ namespace chocolatey.infrastructure.commandline
                 if (!selectionFound)
                 {
                     "chocolatey".Log().Error(ChocolateyLoggers.Important, "Timeout or your choice of '{0}' is not a valid selection.".format_with(selection.escape_curly_braces()));
+                    if (requireAnswer && timeoutInSeconds > 0)
+                    {
+                        return choiceDictionary[3];
+                    }
                     if (requireAnswer)
                     {
                         "chocolatey".Log().Warn(ChocolateyLoggers.Important, "You must select an answer");
