@@ -38,6 +38,7 @@ src/_dotTrace.chocolatey/
 src/chocolatey.sln.GhostDoc.xml
 
 chocolatey.official.snk
+chocolatey.license.xml
 
 docs/generated
 
