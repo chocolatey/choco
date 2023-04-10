@@ -283,6 +283,28 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
+    Context "Upgrading package should not downgrade existing package" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $DependentPackageName = 'isdependency'
+
+            $null = Invoke-Choco install $DependentPackageName --version 1.1.0 --confirm
+            $null = Invoke-Choco install hasdependency --version 1.0.0 --confirm
+
+            $Output = Invoke-Choco upgrade hasdependency
+            $Packages = (Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List
+            $DependentPackage = $Packages | Where-Object Name -EQ $DependentPackageName
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'should not have downgraded isdependency' {
+            Test-VersionEqualOrHigher -InstalledVersion $DependentPackage.Version -CompareVersion 1.1.0 | Should -BeTrue
+        }
+    }
+
     # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths
