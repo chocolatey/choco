@@ -205,6 +205,14 @@ NOTE: Hiding sensitive configuration data! Please double and triple
                         AppendOutput(propertyValues, output);
                     }
                 }
+                else if (objectValue is null)
+                {
+                    var output = "{0}{1}={{null}}".FormatWith(
+                        string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
+                        propertyInfo.Name);
+
+                    AppendOutput(propertyValues, output);
+                }
                 else
                 {
                     OutputToString(propertyValues, propertyInfo.PropertyType.GetProperties(), objectValue, propertyInfo.Name);
