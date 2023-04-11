@@ -35,7 +35,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -65,7 +65,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -91,7 +91,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed a package to the lib directory" {
@@ -173,7 +173,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1), due to the missing 'missingpackage'" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Installs the package '<_>' in the Lib directory" -ForEach @("InstallPackage"; "HasDependency"; "IsDependency"; "UpgradePackage") {
@@ -334,7 +334,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should still have a package in the lib directory" {
@@ -371,7 +371,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should install the package in the lib directory" {
@@ -410,7 +410,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should install the package in the lib directory" {
@@ -459,7 +459,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Has successfully retained an install of the original package" {
@@ -522,7 +522,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Has successfully retained an install of the original package" {
@@ -570,7 +570,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -592,7 +592,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -614,7 +614,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (-1)" {
-            $Output.ExitCode | Should -Be -1
+            $Output.ExitCode | Should -Be -1 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -642,7 +642,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed a package to the lib directory" {
@@ -672,7 +672,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -698,7 +698,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -732,7 +732,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -771,7 +771,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -821,7 +821,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -870,7 +870,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -908,7 +908,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -934,7 +934,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Has installed a package to the lib directory" {
@@ -968,7 +968,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -1007,7 +1007,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Has not installed the package to the lib directory" {
@@ -1030,7 +1030,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Has installed the package to the lib directory" {
@@ -1059,7 +1059,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Has not installed the package to the lib directory" {
@@ -1098,7 +1098,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Has installed the package to the lib directory" {
@@ -1133,7 +1133,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Not Installed a package to the lib directory" {
@@ -1167,7 +1167,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs a message showing that installation was successful" {
@@ -1197,7 +1197,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Outputs a message indicating that there were no sources enabled" {
@@ -1221,7 +1221,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays package files install completed" {
@@ -1240,7 +1240,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays package files install completed" {
@@ -1267,7 +1267,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         # TODO: Background service only works with Chocolatey Licensed Extension. Assess moving this test to CLE test suite
@@ -1303,7 +1303,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         # TODO: Background service only works with Chocolatey Licensed Extension. Assess moving this test to CLE test suite
@@ -1328,7 +1328,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Failure (-1)" {
-            $Output.ExitCode | Should -Be -1
+            $Output.ExitCode | Should -Be -1 -Because $Output.String
         }
     }
 
@@ -1341,7 +1341,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Failure (-1)" {
-            $Output.ExitCode | Should -Be -1
+            $Output.ExitCode | Should -Be -1 -Because $Output.String
         }
 
         It "Outputs warning message about needing commercial edition" {
@@ -1363,7 +1363,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs string defined in before installation block" {
@@ -1384,8 +1384,8 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Failure (1)" {
-            $result1.ExitCode | Should -Be 1
-            $result2.ExitCode | Should -Be 1
+            $result1.ExitCode | Should -Be 1 -Because $result1.String
+            $result2.ExitCode | Should -Be 1 -Because $result2.String
         }
 
         It "should identify a circular dependency" {
@@ -1433,7 +1433,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Does not output extracted file path '<_>'" -ForEach @('tools\'; 'tools\chocolateybeforemodify.ps1'; 'tools\chocolateyinstall.ps1'; 'tools\chocolateyuninstall.ps1'; 'zip-log-disable-test.nuspec') {
@@ -1449,7 +1449,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Does not output extracted file path '<_>'" -ForEach @('tools\'; 'tools\chocolateybeforemodify.ps1'; 'tools\chocolateyinstall.ps1'; 'tools\chocolateyuninstall.ps1'; 'zip-log-disable-test.nuspec') {
@@ -1489,7 +1489,7 @@ To install a local, or remote file, you may use:
         }
 
         It "Installs successfully and exits with success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the packages to the lib directory" {
@@ -1581,7 +1581,7 @@ To install a local, or remote file, you may use:
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Installs package to expected directory' {
@@ -1607,7 +1607,7 @@ To install a local, or remote file, you may use:
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Installs package to expected directory' {
@@ -1633,7 +1633,7 @@ To install a local, or remote file, you may use:
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Installs package to expected directory' {
@@ -1659,7 +1659,7 @@ To install a local, or remote file, you may use:
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Installs package to expected directory' {
@@ -1680,18 +1680,18 @@ To install a local, or remote file, you may use:
     Context "Installing a package when invalid package source is being used" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
-
-            $null = Invoke-Choco source add -n "invalid" -s "https://invalid.chocolatey.org/api/v2/"
+            $InvalidSource = "https://invalid.chocolatey.org/api/v2/"
+            $null = Invoke-Choco source add -n "invalid" -s $InvalidSource
 
             $Output = Invoke-Choco install installpackage --confirm
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Outputs warning about unable to load service index' {
-            $Output.Lines | Should -Contain 'Unable to load the service index for source https://invalid.com/api/v2/.'
+            $Output.Lines | Should -Contain "Unable to load the service index for source $InvalidSource."
         }
 
         It 'Outputs successful installation of single package' {
@@ -1761,7 +1761,7 @@ To install a local, or remote file, you may use:
         }
 
         It 'Installs successfully and exits with success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Shows a warning about the unsupported nuspec metadata element "<_>"' -TestCases $testCases {

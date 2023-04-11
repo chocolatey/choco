@@ -45,6 +45,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
             Restore-ChocolateyInstallSnapshot
 
             $null = Enable-ChocolateyFeature useRememberedArgumentsForUpgrades
+            Enable-ChocolateySource -Name hermes-setup
             $null = Invoke-Choco install curl --package-parameters="'/CurlOnlyParam'" --version="7.77.0" --ia="'/CurlIAParam'" --x86 -y
             $null = Invoke-Choco install wget --version=1.21.1 -y
 
@@ -81,6 +82,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
             Restore-ChocolateyInstallSnapshot
 
             $null = Enable-ChocolateyFeature useRememberedArgumentsForUpgrades
+            Enable-ChocolateySource -Name hermes-setup
             $null = Invoke-Choco install curl --package-parameters="'/CurlOnlyParam'" --version="7.77.0" --ia="'/CurlIAParam'" --forcex86 -y
             $null = Invoke-Choco install wget --version=1.21.1 -y --forcex86
             $null = Invoke-Choco install firefox --version=99.0.1 --package-parameters="'/l=eu'" -y --ia="'/RemoveDistributionDir=true'"
@@ -264,8 +266,8 @@ To upgrade a local, or remote file, you may use:
             Restore-ChocolateyInstallSnapshot
 
             $null = Invoke-Choco install upgradepackage --version 1.0.0 --confirm
-
-            $null = Invoke-Choco source add -n "invalid" -s "https://invalid.chocolatey.org/api/v2/"
+            $InvalidSource = "https://invalid.chocolatey.org/api/v2/"
+            $null = Invoke-Choco source add -n "invalid" -s $InvalidSource
 
             $Output = Invoke-Choco upgrade upgradepackage --confirm
         }
@@ -275,11 +277,11 @@ To upgrade a local, or remote file, you may use:
         }
 
         It 'Outputs warning about unable to load service index' {
-            $Output.Lines | Should -Contain 'Unable to load the service index for source https://invalid.com/api/v2/.'
+            $Output.Lines | Should -Contain "Unable to load the service index for source $InvalidSource."
         }
 
         It 'Outputs successful installation of single package' {
-            $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.'
+            $Output.Lines | Should -Contain 'Chocolatey upgraded 1/1 packages.'
         }
     }
 
