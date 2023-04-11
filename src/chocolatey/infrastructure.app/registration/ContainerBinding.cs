@@ -205,7 +205,10 @@ choco feature enable --name=""disableCompatibilityChecks""",
                 return false;
             }
 
-            var methodImpl = instanceType.GetMethod("supports_chocolatey", BindingFlags.Static | BindingFlags.Public);
+            // NOTE: This method, SupportsChocolatey, does not currently exist anywhere in our code bases.
+            // This validation check was put in place for future proofing the interaction between Chocolatey
+            // and its consumers.
+            var methodImpl = instanceType.GetMethod("SupportsChocolatey", BindingFlags.Static | BindingFlags.Public);
 
             if (methodImpl == null)
             {
