@@ -27,7 +27,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Output should include pinned package" {
@@ -52,7 +52,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Outputs running curl script with correct arguments' {
@@ -93,7 +93,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Outputs running curl script with correct arguments' {
@@ -140,7 +140,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Installs successfully and exits with success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the packages to the lib directory" {
@@ -167,7 +167,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Not Installed a package to the lib directory" {
@@ -271,7 +271,7 @@ To upgrade a local, or remote file, you may use:
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Outputs warning about unable to load service index' {
@@ -280,6 +280,28 @@ To upgrade a local, or remote file, you may use:
 
         It 'Outputs successful installation of single package' {
             $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.'
+        }
+    }
+
+    Context "Upgrading package should not downgrade existing package" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $DependentPackageName = 'isdependency'
+
+            $null = Invoke-Choco install $DependentPackageName --version 1.1.0 --confirm
+            $null = Invoke-Choco install hasdependency --version 1.0.0 --confirm
+
+            $Output = Invoke-Choco upgrade hasdependency
+            $Packages = (Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List
+            $DependentPackage = $Packages | Where-Object Name -EQ $DependentPackageName
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'should not have downgraded isdependency' {
+            Test-VersionEqualOrHigher -InstalledVersion $DependentPackage.Version -CompareVersion 1.1.0 | Should -BeTrue
         }
     }
 
@@ -343,7 +365,7 @@ To upgrade a local, or remote file, you may use:
         }
 
         It 'Installs successfully and exits with success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Shows a warning about the unsupported nuspec metadata element "<_>"' -TestCases $testCases {
