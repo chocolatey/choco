@@ -444,25 +444,25 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Uses search term '--local-only'" {
-            $Output.String | Should -BeLike "*searchTerm='--local-only'*"
+            $Output.String | Should -Match "searchTerm='--local-only'|q=--local-only"
         }
     }
 
     Context "Searching for package when invalid package source is being used" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
-
-            $null = Invoke-Choco source add -n "invalid" -s "https://invalid.chocolatey.org/api/v2/"
+            $InvalidSource = "https://invalid.chocolatey.org/api/v2/"
+            $null = Invoke-Choco source add -n "invalid" -s $InvalidSource
 
             $Output = Invoke-Choco search dependency
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Outputs warning about unable to load service index' {
-            $Output.Lines | Should -Contain 'Unable to load the service index for source https://invalid.com/api/v2/.'
+            $Output.Lines | Should -Contain "Unable to load the service index for source $InvalidSource." -Because $Output.String
         }
 
         It 'Outputs the results of the search' {

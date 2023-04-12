@@ -29,7 +29,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays <Title> with value <Value>" -ForEach $infoItems  {
@@ -72,7 +72,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         It "Exists with Failure (<ExitCode>)" {
-            $Output.ExitCode | Should -Be $ExitCode
+            $Output.ExitCode | Should -Be $ExitCode -Because $Output.String
         }
 
         It "Displays no packages could be found" {
@@ -102,7 +102,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the package mvcmusicstore-db 1.2.0" {
@@ -135,7 +135,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the package mvcmusicstore-db 1.2.0" {
@@ -150,18 +150,18 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
     Context "Listing package information when invalid package source is being used" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
-
-            $null = Invoke-Choco source add -n "invalid" -s "https://invalid.chocolatey.org/api/v2/"
+            $InvalidSource = "https://invalid.chocolatey.org/api/v2/"
+            $null = Invoke-Choco source add -n "invalid" -s $InvalidSource
 
             $Output = Invoke-Choco info chocolatey
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Outputs warning about unable to load service index' {
-            $Output.Lines | Should -Contain 'Unable to load the service index for source https://invalid.com/api/v2/.'
+            $Output.Lines | Should -Contain "Unable to load the service index for source $InvalidSource."
         }
 
         It 'Output information about the package' {

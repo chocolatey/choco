@@ -6,6 +6,7 @@ Describe "Python Source" -Tag Chocolatey, UpgradeCommand, PythonSource, ProxySki
     BeforeAll {
         Initialize-ChocolateyTestInstall
         New-ChocolateyInstallSnapshot
+        Enable-ChocolateySource -Name hermes-setup
         $null = Invoke-Choco install python3
     }
 
