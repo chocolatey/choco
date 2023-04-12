@@ -666,7 +666,7 @@ namespace chocolatey.tests.infrastructure.commandline
             public override void Context()
             {
                 base.Context();
-                choices.Add("all - yes to all");
+                choices.Add("all");
             }
 
             public override void Because()
@@ -683,9 +683,9 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void should_return_all_when_full_all_answer_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("all - yes to all");
+                console.Setup(c => c.ReadLine()).Returns("all");
                 var result = prompt();
-                result.ShouldEqual("all - yes to all");
+                result.ShouldEqual("all");
             }
 
             [Fact]
@@ -693,7 +693,7 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 console.Setup(c => c.ReadLine()).Returns("all");
                 var result = prompt();
-                result.ShouldEqual("all - yes to all");
+                result.ShouldEqual("all");
             }
         }
     }

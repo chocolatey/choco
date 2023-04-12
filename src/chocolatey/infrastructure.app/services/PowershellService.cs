@@ -273,7 +273,7 @@ namespace chocolatey.infrastructure.app.services
                         this.Log().Info(ChocolateyLoggers.Important, () => @"choco feature enable -n allowGlobalConfirmation");
 
                         var selection = InteractivePrompt.prompt_for_confirmation(@"Do you want to run the script?",
-                            new[] { "yes", "all - yes to all", "no", "print" },
+                            new[] { "yes", "all", "no", "print" },
                             defaultChoice: null,
                             requireAnswer: true,
                             allowShortAnswer: true,
