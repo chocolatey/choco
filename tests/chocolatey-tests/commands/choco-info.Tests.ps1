@@ -80,6 +80,34 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
     }
 
+    Context "Listing package information when more than one package ID is provided" {
+        BeforeAll {
+            $Output = Invoke-Choco info foo bar
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It "Reports a package ID is required" {
+            $Output.Lines | Should -Contain 'Only a single package name can be passed to the choco info command.'
+        }
+    }
+
+    Context "Listing package information when no package ID is provided" {
+        BeforeAll {
+            $Output = Invoke-Choco info
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It "Reports a package ID is required" {
+            $Output.Lines | Should -Contain 'A single package name is required to run the choco info command.'
+        }
+    }
+
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
     # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
     Context "Listing package information when using proxy and proxy bypass list in config" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
