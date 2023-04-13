@@ -6,6 +6,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
     }
 
@@ -23,7 +24,6 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         BeforeAll {
-            Remove-NuGetPaths
             $Output = Invoke-Choco info mvcmusicstore-web
             $Output.Lines = $Output.Lines
         }
