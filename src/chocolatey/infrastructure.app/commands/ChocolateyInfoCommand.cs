@@ -84,6 +84,24 @@ namespace chocolatey.infrastructure.app.commands
             configuration.ListCommand.Exact = true;
         }
 
+        public override void Validate(ChocolateyConfiguration configuration)
+        {
+            base.Validate(configuration);
+
+            if (string.IsNullOrWhiteSpace(configuration.Input))
+            {
+                throw new ApplicationException("A single package name is required to run the choco info command.");
+            }
+
+            // Validate only a single package has been passed to info
+            // TODO: Provide ability to get info on a list of packages. See https://github.com/chocolatey/choco/issues/2905
+            var input = configuration.Input.Split(' ');
+            if (input.Length > 1)
+            {
+                throw new ApplicationException("Only a single package name can be passed to the choco info command.");
+            }
+        }
+
         public override void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Info Command");

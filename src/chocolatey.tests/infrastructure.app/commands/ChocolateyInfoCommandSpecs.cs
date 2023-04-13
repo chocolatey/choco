@@ -135,6 +135,61 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
+        public class When_handling_validation : ChocolateyInfoCommandSpecsBase
+        {
+            private Exception _error = null;
+            private Action _because;
+
+            public override void Context()
+            {
+                base.Context();
+            }
+
+            public override void Because()
+            {
+                _because = () => Command.Validate(Configuration);
+            }
+
+            [Fact]
+            public void Show_throw_when_package_id_is_not_set()
+            {
+                Configuration.Input = "";
+                _error = null;
+
+                try
+                {
+                    _because();
+                }
+                catch (Exception ex)
+                {
+                    _error = ex;
+                }
+
+                _error.ShouldNotBeNull();
+                _error.ShouldBeType<ApplicationException>();
+                _error.Message.ShouldContain("A single package name is required to run the choco info command.");
+            }
+
+            [Fact]
+            public void Should_throw_when_multiple_package_ids_set()
+            {
+                Configuration.Input = "foo bar";
+                _error = null;
+
+                try
+                {
+                    _because();
+                }
+                catch (Exception ex)
+                {
+                    _error = ex;
+                }
+
+                _error.ShouldNotBeNull();
+                _error.ShouldBeType<ApplicationException>();
+                _error.Message.ShouldContain("Only a single package name can be passed to the choco info command.");
+            }
+        }
         public class When_handling_additional_argument_parsing : ChocolateyInfoCommandSpecsBase
         {
             private readonly IList<string> _unparsedArgs = new List<string>();
