@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.app.services
         public virtual IEnumerable<ChocolateySource> ListSources(ChocolateyConfiguration configuration)
         {
             var list = new List<ChocolateySource>();
-            foreach (var source in ConfigFileSettings.Sources)
+            foreach (var source in ConfigFileSettings.Sources.OrEmpty().OrderBy(s => s.Id))
             {
                 if (SkipSource(source, configuration)) continue;
 
@@ -218,7 +218,7 @@ namespace chocolatey.infrastructure.app.services
 
         public void ListFeatures(ChocolateyConfiguration configuration)
         {
-            foreach (var feature in ConfigFileSettings.Features)
+            foreach (var feature in ConfigFileSettings.Features.OrEmpty().OrderBy(f => f.Name))
             {
                 if (configuration.RegularOutput)
                 {
@@ -305,7 +305,7 @@ namespace chocolatey.infrastructure.app.services
             }
             else
             {
-                foreach (var apiKey in ConfigFileSettings.ApiKeys.OrEmpty())
+                foreach (var apiKey in ConfigFileSettings.ApiKeys.OrEmpty().OrderBy(a => a.Source))
                 {
                     var keyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).ToStringSafe();
                     if (keyAction != null)
@@ -365,7 +365,7 @@ namespace chocolatey.infrastructure.app.services
 
         public void ListConfig(ChocolateyConfiguration configuration)
         {
-            foreach (var config in ConfigFileSettings.ConfigSettings)
+            foreach (var config in ConfigFileSettings.ConfigSettings.OrEmpty().OrderBy(c => c.Key))
             {
                 if (configuration.RegularOutput)
                 {

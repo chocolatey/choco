@@ -317,5 +317,146 @@
                 }).Message.ShouldEqual("Feature '{0}' is not supported.".FormatWith(FeatureName));
             }
         }
+
+        public class When_ChocolateyConfigSettingsService_list_feature : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true
+                };
+
+                Service.ListFeatures(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Features = new HashSet<ConfigFileFeatureSetting>()
+                        {
+                            new ConfigFileFeatureSetting()
+                            {
+                                Name = ApplicationParameters.Features.VirusCheck,
+                            },
+                            new ConfigFileFeatureSetting()
+                            {
+                                Name = ApplicationParameters.Features.AllowEmptyChecksums
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_output_features_in_alphabetical_order()
+            {
+                MockLogger.Messages.Keys.ShouldContain("Info");
+
+                var infoMessages = MockLogger.Messages["Info"];
+                infoMessages.Count.ShouldEqual(2);
+                infoMessages[0].ShouldContain("allowEmptyChecksums");
+                infoMessages[1].ShouldContain("virusCheck");
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_list_config : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true
+                };
+
+                Service.ListConfig(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        ConfigSettings = new HashSet<ConfigFileConfigSetting>()
+                        {
+                            new ConfigFileConfigSetting()
+                            {
+                                Key = ApplicationParameters.ConfigSettings.WebRequestTimeoutSeconds
+                            },
+                            new ConfigFileConfigSetting()
+                            {
+                                Key = ApplicationParameters.ConfigSettings.CacheLocation
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_output_config_in_alphabetical_order()
+            {
+                MockLogger.Messages.Keys.ShouldContain("Info");
+
+                var infoMessages = MockLogger.Messages["Info"];
+                infoMessages.Count.ShouldEqual(2);
+                infoMessages[0].ShouldContain("cacheLocation");
+                infoMessages[1].ShouldContain("webRequestTimeoutSeconds");
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_list_source : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true
+                };
+
+                Service.ListSources(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Sources = new HashSet<ConfigFileSourceSetting>()
+                        {
+                            new ConfigFileSourceSetting()
+                            {
+                                Id = "beta"
+                            },
+                            new ConfigFileSourceSetting()
+                            {
+                                Id = "alpha"
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_output_sources_in_alphabetical_order()
+            {
+                MockLogger.Messages.Keys.ShouldContain("Info");
+
+                var infoMessages = MockLogger.Messages["Info"];
+                infoMessages.Count.ShouldEqual(2);
+                infoMessages[0].ShouldContain("alpha");
+                infoMessages[1].ShouldContain("beta");
+            }
+        }
     }
 }
