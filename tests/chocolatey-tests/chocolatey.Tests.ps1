@@ -444,4 +444,29 @@ exit $error.count
             $Output.Lines | Should -Contain '.NET 4.8 is not installed or may need a reboot to complete installation.'
         }
     }
+
+
+    Context 'Chocolatey lib directory missing' {
+        BeforeAll {
+            New-ChocolateyInstallSnapshot
+            Remove-Item -Path $env:ChocolateyInstall/lib/ -Recurse -Force
+            $Output = Invoke-Choco list
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It 'Exits with success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Emits a warning about the missing directory' {
+            $Output.Lines | Should -Contain "Directory '$($env:ChocolateyInstall)\lib' does not exist." -Because $Output.String
+        }
+
+        It 'Does not emit a NuGet error for the missing directory and fall over' {
+            $Output.Lines | Should -Not -Contain "The path '$($env:ChocolateyInstall)\lib' for the selected source could not be resolved."
+        }
+    }
 }
