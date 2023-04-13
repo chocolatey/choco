@@ -63,7 +63,7 @@ $commandOptions = @{
 $commandOptions['find'] = $commandOptions['search']
 
 try {
-    $licenseFile = Get-Item -Path "$env:ChocolateyInstall\license\chocolatey.license.xml" -ErrorAction Ignore
+    $licenseFile = Get-Item -Path "$env:ChocolateyInstall\license\chocolatey.license.xml" -ErrorAction SilentlyContinue
 
     if ($licenseFile) {
         # Add pro-only commands
@@ -94,6 +94,7 @@ try {
             # Add business-only commands
             $script:chocoCommands = @(
                 $script:chocoCommands
+                'support'
                 'sync'
             )
 
@@ -117,7 +118,7 @@ foreach ($key in @($commandOptions.Keys)) {
 }
 
 # Consistent ordering for commands so the added pro commands aren't weirdly out of order
-$script:chocoCommands = $script:chocoCommands | Sort-Object -Property { $_ -replace '[^a-z]' }
+$script:chocoCommands = $script:chocoCommands | Sort-Object -Property { $_ -replace '[^a-z](.*$)', '$1--' }
 
 function script:chocoCommands($filter) {
     $cmdList = @()
