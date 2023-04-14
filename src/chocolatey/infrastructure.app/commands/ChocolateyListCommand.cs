@@ -180,13 +180,13 @@ UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported fo
 
             this.Log().Info(ChocolateyLoggers.Important, "Examples");
             this.Log().Info(@"
-    choco {0} --local-only
-    choco {0} --local-only --include-programs
+    choco list -i
+    choco list --include-programs
 
 NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
-".FormatWith(configuration.CommandName));
+");
 
             this.Log().Info(ChocolateyLoggers.Important, "Exit Codes");
             this.Log().Info(@"
