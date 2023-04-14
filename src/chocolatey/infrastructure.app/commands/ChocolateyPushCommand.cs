@@ -59,7 +59,10 @@ namespace chocolatey.infrastructure.app.commands
         public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments); // path to .nupkg - assume relative
+        }
 
+        public virtual void Validate(ChocolateyConfiguration configuration)
+        {
             if (string.IsNullOrWhiteSpace(configuration.Sources))
             {
                 if (!string.IsNullOrWhiteSpace(configuration.PushCommand.DefaultSource))
@@ -72,44 +75,30 @@ namespace chocolatey.infrastructure.app.commands
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(configuration.Sources))
+            IEnumerable<string> sources = configuration.Sources.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (sources.Count() > 1)
             {
-                IEnumerable<string> sources = configuration.Sources.Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
-
-                if (sources.Count() > 1)
-                {
-                    throw new ApplicationException("Multiple sources are not support by push command.");
-                }
-
-                var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.IsEqualTo(configuration.Sources));
-                if (machineSource != null)
-                {
-                    "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".FormatWith(configuration.Sources, machineSource.Key.ToStringSafe()));
-
-                    configuration.Sources = machineSource.Key;
-                }
-
-                var remoteSource = new Uri(configuration.Sources);
-                if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
-                {
-                    // perform a lookup
-                    configuration.PushCommand.Key = _configSettingsService.GetApiKey(configuration, null);
-                }
+                throw new ApplicationException("Multiple sources are not support by push command.");
             }
-        }
 
-        public virtual void Validate(ChocolateyConfiguration configuration)
-        {
-            if (string.IsNullOrWhiteSpace(configuration.Sources))
+            var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.IsEqualTo(configuration.Sources));
+            if (machineSource != null)
             {
-                throw new ApplicationException("Source is required. Please pass a source to push to, such as --source={0}".FormatWith(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+                "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".FormatWith(configuration.Sources, machineSource.Key.ToStringSafe()));
+
+                configuration.Sources = machineSource.Key;
             }
 
             var remoteSource = new Uri(configuration.Sources);
-
             if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key) && !remoteSource.IsUnc && !remoteSource.IsFile)
             {
-                throw new ApplicationException("An API key was not found for '{0}'. You must either set an API key with the apikey command or specify one with --api-key.".FormatWith(configuration.Sources));
+                // perform a lookup
+                configuration.PushCommand.Key = _configSettingsService.GetApiKey(configuration, null);
+                if (string.IsNullOrWhiteSpace(configuration.PushCommand.Key))
+                {
+                    throw new ApplicationException("An API key was not found for '{0}'. You must either set an API key with the apikey command or specify one with --api-key.".FormatWith(configuration.Sources));
+                }
             }
 
             // security advisory
