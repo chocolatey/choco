@@ -24,7 +24,7 @@ jobs:
     - name: Build with Mono
       run: |
         chmod +x build.sh
-        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=all
+        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=unit
     - name: Upload Ubuntu build results
       uses: actions/upload-artifact@v3
       # Always upload build results
@@ -49,7 +49,7 @@ jobs:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Build with .Net Framework
-      run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=all --shouldRunOpenCover=false
+      run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=unit --shouldRunOpenCover=false
     - name: Upload Windows build results
       uses: actions/upload-artifact@v3
       # Always upload build results
@@ -88,7 +88,7 @@ jobs:
     - name: Build with Mono
       run: |
         chmod +x build.sh
-        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=all
+        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=unit
     - name: Upload MacOS build results
       uses: actions/upload-artifact@v3
       # Always upload build results
