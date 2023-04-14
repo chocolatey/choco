@@ -1,6 +1,6 @@
 ﻿param(
     # Which help command to test
-    [string[]]$Command = @(
+    [string[]]$HelpOptions = @(
         "--help"
         "-?"
         "-help"
@@ -17,11 +17,11 @@
 Import-Module helpers/common-helpers
 
 BeforeDiscovery {
-    $AllTopLevelCommands = (Invoke-Choco $Command[0]).Lines -match " \* (?<Command>\w+) -" -replace " \* (?<Command>\w+) -.+", '$1'
-    $TopLevelCommands = $AllTopLevelCommands.Where{$_ -notin $SkipCommand}
+    $AllTopLevelCommands = (Invoke-Choco $HelpOptions[0]).Lines -match "\* (?<Command>\w+) -" -replace "\* (?<Command>\w+) -.+", '${Command}'
+    $TopLevelCommands = $AllTopLevelCommands.Where{ $_ -notin $SkipCommand }
 }
 
-Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolatey, HelpCommand {
+Describe "choco help sections with option <_>" -ForEach $HelpOptions -Tag Chocolatey, HelpCommand {
     BeforeDiscovery {
         $helpArgument = $_
     }
@@ -30,7 +30,9 @@ Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolate
         Remove-NuGetPaths
         $helpArgument = $_
         Initialize-ChocolateyTestInstall
-        New-ChocolateyInstallSnapshot
+
+        # We're just testing help output here, we don't need to copy config/package files
+        New-ChocolateyInstallSnapshot -NoSnapshotCopy
     }
 
     AfterAll {
@@ -39,7 +41,7 @@ Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolate
 
     Context "Top Level Help" {
         BeforeAll {
-            $Output = Invoke-Choco $_ $helpArgument
+            $Output = Invoke-Choco $_
         }
 
         It "Exits with Success (0)" {
