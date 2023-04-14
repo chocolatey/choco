@@ -54,6 +54,24 @@ namespace chocolatey.infrastructure.app.commands
             "--order-by-popularity"
         };
 
+        /// <summary>
+        /// These options have been chosen since these are the examples that were listed on docs.chocolatey.org
+        /// - choco list -li
+        /// - choco list -lai
+        /// </summary>
+        [Obsolete("Remove unsupported argument in V3!")]
+        private readonly string[] _unsupportedIncludeRegistryProgramsArguments = new[]
+        {
+            "-li",
+            "-il",
+            "-lai",
+            "-lia",
+            "-ali",
+            "-ail",
+            "-ial",
+            "-ila"
+        };
+
         public ChocolateyListCommand(IChocolateyPackageService packageService)
         {
             _packageService = packageService ?? throw new ArgumentNullException(nameof(packageService));
@@ -130,6 +148,12 @@ namespace chocolatey.infrastructure.app.commands
                     this.Log().Warn(ChocolateyLoggers.Important, @"
 UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!", argument);
                 }
+                else if (_unsupportedIncludeRegistryProgramsArguments.Contains(argument, StringComparer.OrdinalIgnoreCase))
+                {
+                    this.Log().Warn(ChocolateyLoggers.Important, @"
+UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!", argument);
+                    configuration.ListCommand.IncludeRegistryPrograms = true;
+                }
                 else
                 {
                     argumentsWithoutLocalOnly.Add(argument);
@@ -156,13 +180,13 @@ UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported fo
 
             this.Log().Info(ChocolateyLoggers.Important, "Examples");
             this.Log().Info(@"
-    choco {0} --local-only
-    choco {0} --local-only --include-programs
+    choco list -i
+    choco list --include-programs
 
 NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 
-".FormatWith(configuration.CommandName));
+");
 
             this.Log().Info(ChocolateyLoggers.Important, "Exit Codes");
             this.Log().Info(@"
