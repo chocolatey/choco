@@ -458,5 +458,115 @@
                 infoMessages[1].ShouldContain("beta");
             }
         }
+
+        public class When_ChocolateyConfigSettingsService_get_unknown_feature : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            private Exception _error = null;
+            private Action _because;
+
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    FeatureCommand = new FeatureCommandConfiguration()
+                    {
+                        Name = "unknown",
+                        Command = chocolatey.infrastructure.app.domain.FeatureCommandType.Get
+                    }
+                };
+
+                _because = () => Service.GetFeature(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Features = new HashSet<ConfigFileFeatureSetting>()
+                        {
+                            new ConfigFileFeatureSetting()
+                            {
+                                Name = ApplicationParameters.Features.VirusCheck,
+                                Enabled = true
+                            },
+                            new ConfigFileFeatureSetting()
+                            {
+                                Name = ApplicationParameters.Features.ChecksumFiles,
+                                Enabled = false
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_throw_when_unknown_feature_name()
+            {
+                try
+                {
+                    _because();
+                }
+                catch (Exception ex)
+                {
+                    _error = ex;
+                }
+
+                _error.ShouldNotBeNull();
+                _error.ShouldBeType<ApplicationException>();
+                _error.Message.ShouldContain("No feature value by the name 'unknown'");
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_get_existing_feature : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    FeatureCommand = new FeatureCommandConfiguration()
+                    {
+                        Name = ApplicationParameters.Features.VirusCheck,
+                        Command = chocolatey.infrastructure.app.domain.FeatureCommandType.Get
+                    }
+                };
+
+                Service.GetFeature(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Features = new HashSet<ConfigFileFeatureSetting>()
+                        {
+                            new ConfigFileFeatureSetting()
+                            {
+                                Name = ApplicationParameters.Features.VirusCheck,
+                                Enabled = true
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_feature_status()
+            {
+                MockLogger.Messages.Keys.ShouldContain("Info");
+                var infoMessages = MockLogger.Messages["Info"];
+                infoMessages.Count.ShouldEqual(1);
+                infoMessages[0].ShouldContain("Enabled");
+            }
+        }
     }
 }

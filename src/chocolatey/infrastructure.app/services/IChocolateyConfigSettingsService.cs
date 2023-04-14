@@ -29,6 +29,7 @@ namespace chocolatey.infrastructure.app.services
         void DisableSource(ChocolateyConfiguration configuration);
         void EnableSource(ChocolateyConfiguration configuration);
         void ListFeatures(ChocolateyConfiguration configuration);
+        void GetFeature(ChocolateyConfiguration configuration);
         void DisableFeature(ChocolateyConfiguration configuration);
         void EnableFeature(ChocolateyConfiguration configuration);
         string GetApiKey(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction);

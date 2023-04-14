@@ -275,8 +275,14 @@ namespace chocolatey.tests.infrastructure.app.commands
                 Configuration.FeatureCommand.Command = FeatureCommandType.List;
                 _because();
                 ConfigSettingsService.Verify(c => c.ListFeatures(Configuration), Times.Once);
+            }
+
+            [Fact]
+            public void Should_call_service_feature_get_when_command_is_get()
+            {
+                Configuration.FeatureCommand.Command = FeatureCommandType.Get;
                 _because();
-                configSettingsService.Verify(c => c.ListFeatures(configuration), Times.Once);
+                ConfigSettingsService.Verify(c => c.GetFeature(Configuration), Times.Once);
             }
 
             [Fact]
