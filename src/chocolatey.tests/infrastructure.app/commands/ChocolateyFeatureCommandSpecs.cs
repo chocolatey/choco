@@ -33,106 +33,106 @@ namespace chocolatey.tests.infrastructure.app.commands
         [ConcernFor("feature")]
         public abstract class ChocolateyFeatureCommandSpecsBase : TinySpec
         {
-            protected ChocolateyFeatureCommand command;
-            protected Mock<IChocolateyConfigSettingsService> configSettingsService = new Mock<IChocolateyConfigSettingsService>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateyFeatureCommand Command;
+            protected Mock<IChocolateyConfigSettingsService> ConfigSettingsService = new Mock<IChocolateyConfigSettingsService>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                configuration.Sources = "https://localhost/somewhere/out/there";
-                command = new ChocolateyFeatureCommand(configSettingsService.Object);
+                Configuration.Sources = "https://localhost/somewhere/out/there";
+                Command = new ChocolateyFeatureCommand(ConfigSettingsService.Object);
             }
         }
 
         public class When_implementing_command_for : ChocolateyFeatureCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void Should_implement_feature()
             {
-                results.ShouldContain("feature");
+                _results.ShouldContain("feature");
             }
 
             [Fact]
             public void Should_implement_features()
             {
-                results.ShouldContain("features");
+                _results.ShouldContain("features");
             }
         }
 
         public class When_configurating_the_argument_parser : ChocolateyFeatureCommandSpecsBase
         {
-            private OptionSet optionSet;
+            private OptionSet _optionSet;
 
             public override void Context()
             {
                 base.Context();
-                optionSet = new OptionSet();
-                configuration.Sources = "https://localhost/somewhere/out/there";
+                _optionSet = new OptionSet();
+                Configuration.Sources = "https://localhost/somewhere/out/there";
             }
 
             public override void Because()
             {
-                command.ConfigureArgumentParser(optionSet, configuration);
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
             }
 
             [Fact]
             public void Should_add_name_to_the_option_set()
             {
-                optionSet.Contains("name").ShouldBeTrue();
+                _optionSet.Contains("name").ShouldBeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_name_to_the_option_set()
             {
-                optionSet.Contains("n").ShouldBeTrue();
+                _optionSet.Contains("n").ShouldBeTrue();
             }
         }
 
         public class When_handling_additional_argument_parsing : ChocolateyFeatureCommandSpecsBase
         {
-            private readonly IList<string> unparsedArgs = new List<string>();
-            private Action because;
+            private readonly IList<string> _unparsedArgs = new List<string>();
+            private Action _because;
 
             public override void Because()
             {
-                because = () => command.ParseAdditionalArguments(unparsedArgs, configuration);
+                _because = () => Command.ParseAdditionalArguments(_unparsedArgs, Configuration);
             }
 
             public void Reset()
             {
-                unparsedArgs.Clear();
-                configSettingsService.ResetCalls();
+                _unparsedArgs.Clear();
+                ConfigSettingsService.ResetCalls();
             }
 
             [Fact]
             public void Should_use_the_first_unparsed_arg_as_the_subcommand()
             {
                 Reset();
-                unparsedArgs.Add("list");
-                because();
+                _unparsedArgs.Add("list");
+                _because();
 
-                configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
+                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
             }
 
             [Fact]
             public void Should_throw_when_more_than_one_unparsed_arg_is_passed()
             {
                 Reset();
-                unparsedArgs.Add("wtf");
-                unparsedArgs.Add("bbq");
+                _unparsedArgs.Add("wtf");
+                _unparsedArgs.Add("bbq");
                 var errored = false;
                 Exception error = null;
 
                 try
                 {
-                    because();
+                    _because();
                 }
                 catch (Exception ex)
                 {
@@ -150,72 +150,72 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_accept_enable_as_the_subcommand()
             {
                 Reset();
-                unparsedArgs.Add("enable");
-                because();
+                _unparsedArgs.Add("enable");
+                _because();
 
-                configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.Enable);
+                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.Enable);
             }
 
             [Fact]
             public void Should_accept_disable_as_the_subcommand()
             {
                 Reset();
-                unparsedArgs.Add("disable");
-                because();
+                _unparsedArgs.Add("disable");
+                _because();
 
-                configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.Disable);
+                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.Disable);
             }
 
             [Fact]
             public void Should_set_unrecognized_values_to_list_as_the_subcommand()
             {
                 Reset();
-                unparsedArgs.Add("wtf");
-                because();
+                _unparsedArgs.Add("wtf");
+                _because();
 
-                configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
+                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
             }
 
             [Fact]
             public void Should_default_to_list_as_the_subcommand()
             {
                 Reset();
-                because();
+                _because();
 
-                configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
+                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
             }
 
             [Fact]
             public void Should_handle_passing_in_an_empty_string()
             {
                 Reset();
-                unparsedArgs.Add(" ");
-                because();
+                _unparsedArgs.Add(" ");
+                _because();
 
-                configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
+                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
             }
         }
 
         public class When_validating : ChocolateyFeatureCommandSpecsBase
         {
-            private Action because;
+            private Action _because;
 
             public override void Because()
             {
-                because = () => command.Validate(configuration);
+                _because = () => Command.Validate(Configuration);
             }
 
             [Fact]
             public void Should_throw_when_command_is_not_list_and_name_is_not_set()
             {
-                configuration.FeatureCommand.Command = FeatureCommandType.Unknown;
-                configuration.FeatureCommand.Name = "";
+                Configuration.FeatureCommand.Command = FeatureCommandType.Unknown;
+                Configuration.FeatureCommand.Name = "";
                 var errored = false;
                 Exception error = null;
 
                 try
                 {
-                    because();
+                    _because();
                 }
                 catch (Exception ex)
                 {
@@ -226,23 +226,23 @@ namespace chocolatey.tests.infrastructure.app.commands
                 errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldEqual("When specifying the subcommand '{0}', you must also specify --name.".FormatWith(configuration.FeatureCommand.Command.ToStringSafe().ToLower()));
+                error.Message.ShouldEqual("When specifying the subcommand '{0}', you must also specify --name.".FormatWith(Configuration.FeatureCommand.Command.ToStringSafe().ToLower()));
             }
 
             [Fact]
             public void Should_continue_when_command_is_list_and_name_is_not_set()
             {
-                configuration.FeatureCommand.Command = FeatureCommandType.List;
-                configuration.SourceCommand.Name = "";
-                because();
+                Configuration.FeatureCommand.Command = FeatureCommandType.List;
+                Configuration.SourceCommand.Name = "";
+                _because();
             }
 
             [Fact]
             public void Should_continue_when_command_is_not_list_and_name_is_set()
             {
-                configuration.FeatureCommand.Command = FeatureCommandType.List;
-                configuration.SourceCommand.Name = "bob";
-                because();
+                Configuration.FeatureCommand.Command = FeatureCommandType.List;
+                Configuration.SourceCommand.Name = "bob";
+                _because();
             }
         }
 
@@ -250,13 +250,13 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.DryRun(configuration);
+                Command.DryRun(Configuration);
             }
 
             [Fact]
             public void Should_call_service_noop()
             {
-                configSettingsService.Verify(c => c.DryRun(configuration), Times.Once);
+                ConfigSettingsService.Verify(c => c.DryRun(Configuration), Times.Once);
             }
         }
 
@@ -266,31 +266,39 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                _because = () => command.Run(configuration);
+                _because = () => Command.Run(Configuration);
             }
 
             [Fact]
-            public void Should_call_service_source_list_when_command_is_list()
+            public void Should_call_service_feature_list_when_command_is_list()
             {
-                configuration.FeatureCommand.Command = FeatureCommandType.List;
+                Configuration.FeatureCommand.Command = FeatureCommandType.List;
                 _because();
-                configSettingsService.Verify(c => c.ListFeatures(configuration), Times.Once);
+                ConfigSettingsService.Verify(c => c.ListFeatures(Configuration), Times.Once);
             }
 
             [Fact]
-            public void Should_call_service_source_disable_when_command_is_disable()
+            public void Should_call_service_feature_get_when_command_is_get()
             {
-                configuration.FeatureCommand.Command = FeatureCommandType.Disable;
+                Configuration.FeatureCommand.Command = FeatureCommandType.Get;
                 _because();
-                configSettingsService.Verify(c => c.DisableFeature(configuration), Times.Once);
+                ConfigSettingsService.Verify(c => c.GetFeature(Configuration), Times.Once);
             }
 
             [Fact]
-            public void Should_call_service_source_enable_when_command_is_enable()
+            public void Should_call_service_feature_disable_when_command_is_disable()
             {
-                configuration.FeatureCommand.Command = FeatureCommandType.Enable;
+                Configuration.FeatureCommand.Command = FeatureCommandType.Disable;
                 _because();
-                configSettingsService.Verify(c => c.EnableFeature(configuration), Times.Once);
+                ConfigSettingsService.Verify(c => c.DisableFeature(Configuration), Times.Once);
+            }
+
+            [Fact]
+            public void Should_call_service_feature_enable_when_command_is_enable()
+            {
+                Configuration.FeatureCommand.Command = FeatureCommandType.Enable;
+                _because();
+                ConfigSettingsService.Verify(c => c.EnableFeature(Configuration), Times.Once);
             }
         }
     }

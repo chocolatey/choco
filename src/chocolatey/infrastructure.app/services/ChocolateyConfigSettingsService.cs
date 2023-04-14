@@ -231,6 +231,28 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
+        public void GetFeature(ChocolateyConfiguration configuration)
+        {
+            var feature = GetFeatureValue(configuration.FeatureCommand.Name);
+            if (feature == null)
+            {
+                throw new ApplicationException("No feature value by the name '{0}'".FormatWith(configuration.FeatureCommand.Name));
+            }
+
+            this.Log().Info("{0}".FormatWith(feature.Enabled ? "Enabled" : "Disabled"));
+        }
+
+        public ConfigFileFeatureSetting GetFeatureValue(string featureName)
+        {
+            var feature = ConfigFileSettings.Features.FirstOrDefault(f => f.Name.IsEqualTo(featureName));
+            if (feature == null)
+            {
+                return null;
+            }
+
+            return feature;
+        }
+
         public void DisableFeature(ChocolateyConfiguration configuration)
         {
             var feature = ConfigFileSettings.Features.FirstOrDefault(p => p.Name.IsEqualTo(configuration.FeatureCommand.Name));

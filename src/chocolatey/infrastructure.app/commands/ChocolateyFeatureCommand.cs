@@ -54,11 +54,6 @@ namespace chocolatey.infrastructure.app.commands
         {
             configuration.Input = string.Join(" ", unparsedArguments);
 
-            if (unparsedArguments.Count > 1)
-            {
-                throw new ApplicationException("A single features command must be listed. Please see the help menu for those commands");
-            }
-
             var command = FeatureCommandType.Unknown;
             string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
             Enum.TryParse(unparsedCommand, true, out command);
@@ -69,6 +64,19 @@ namespace chocolatey.infrastructure.app.commands
             }
 
             configuration.FeatureCommand.Command = command;
+
+            if ((configuration.FeatureCommand.Command == FeatureCommandType.List
+                 || !string.IsNullOrWhiteSpace(configuration.FeatureCommand.Name)
+                )
+                && unparsedArguments.Count > 1)
+            {
+                throw new ApplicationException("A single features command must be listed. Please see the help menu for those commands");
+            }
+
+            if (string.IsNullOrWhiteSpace(configuration.FeatureCommand.Name) && unparsedArguments.Count >= 2)
+            {
+                configuration.FeatureCommand.Name = unparsedArguments[1];
+            }
         }
 
         public virtual void Validate(ChocolateyConfiguration configuration)
@@ -95,8 +103,10 @@ Chocolatey will allow you to interact with features.
             "chocolatey".Log().Info(@"
     choco feature
     choco feature list
-    choco feature disable -n=bob
-    choco feature enable -n=bob
+    choco feature get checksumFiles
+    choco feature get --name=checksumFiles
+    choco feature disable --name=checksumFiles
+    choco feature enable --name=checksumFiles
 
 NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
@@ -131,6 +141,9 @@ If you find other exit codes that we have not yet documented, please
             {
                 case FeatureCommandType.List:
                     _configSettingsService.ListFeatures(configuration);
+                    break;
+                case FeatureCommandType.Get:
+                    _configSettingsService.GetFeature(configuration);
                     break;
                 case FeatureCommandType.Disable:
                     _configSettingsService.DisableFeature(configuration);

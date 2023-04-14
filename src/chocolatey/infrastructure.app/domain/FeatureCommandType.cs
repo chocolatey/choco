@@ -22,6 +22,7 @@ namespace chocolatey.infrastructure.app.domain
     {
         Unknown,
         List,
+        Get,
         Enable,
         Disable,
 
