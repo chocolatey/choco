@@ -118,7 +118,6 @@ namespace chocolatey.tests.infrastructure.app.commands
         public class When_handling_additional_argument_parsing : ChocolateyPushCommandSpecsBase
         {
             private readonly IList<string> _unparsedArgs = new List<string>();
-            private const string ApiKey = "bobdaf";
             private Action _because;
 
             public override void Because()
@@ -141,33 +140,46 @@ namespace chocolatey.tests.infrastructure.app.commands
                 _because();
                 Configuration.Input.ShouldEqual(nupkgPath);
             }
+        }
 
-            [Fact]
-            public void Should_set_the_source_to_defaultpushsource_if_set_and_no_explicit_source()
+        public class When_validating : ChocolateyPushCommandSpecsBase
+        {
+            private Action _because;
+            private string _apiKey = "abcdef";
+
+            public override void Because()
             {
-                Reset();
-                Configuration.Sources = "";
-                Configuration.PushCommand.DefaultSource = "https://localhost/default/source";
-                _because();
-
-                Configuration.Sources.ShouldEqual("https://localhost/default/source");
+                _because = () => Command.Validate(Configuration);
             }
 
             [Fact]
             public void Should_not_override_explicit_source_if_defaultpushsource_is_set()
             {
-                Reset();
                 Configuration.Sources = "https://localhost/somewhere/out/there";
+                Configuration.PushCommand.Key = _apiKey;
                 Configuration.PushCommand.DefaultSource = "https://localhost/default/source";
                 _because();
 
                 Configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
             }
 
+
+            [Fact]
+            public void Should_set_the_source_to_defaultpushsource_if_set_and_no_explicit_source()
+            {
+                Configuration.Sources = "";
+                Configuration.PushCommand.DefaultSource = "https://localhost/default/source";
+                ConfigSettingsService.Setup(s => s.GetApiKey(It.Is<ChocolateyConfiguration>(c => c.Sources == "https://localhost/default/source"), null))
+                    .Returns(() => _apiKey);
+
+                _because();
+
+                Configuration.Sources.ShouldEqual("https://localhost/default/source");
+            }
+
             [Fact]
             public void Should_throw_when_defaultpushsource_is_not_set_and_no_explicit_sources()
             {
-                Reset();
                 Configuration.PushCommand.DefaultSource = "";
                 Configuration.Sources = "";
 
@@ -193,42 +205,53 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_continue_when_defaultpushsource_is_not_set_and_explicit_sources_passed()
             {
-                Reset();
                 Configuration.Sources = "https://somewhere/out/there";
-                Configuration.PushCommand.Key = "bob";
+                Configuration.PushCommand.Key = _apiKey;
                 Configuration.PushCommand.DefaultSource = "";
                 _because();
             }
 
             [Fact]
-            public void Should_not_set_the_apiKey_if_source_is_not_found()
+            public void Should_throw_if_apikey_is_not_found_for_source()
             {
-                Reset();
                 ConfigSettingsService.Setup(c => c.GetApiKey(Configuration, null)).Returns("");
                 Configuration.PushCommand.Key = "";
                 Configuration.Sources = "https://localhost/somewhere/out/there";
-                _because();
 
-                Configuration.PushCommand.Key.ShouldEqual("");
+                var errorred = false;
+                Exception error = null;
+
+                try
+                {
+                    _because();
+                }
+                catch (Exception ex)
+                {
+                    errorred = true;
+                    error = ex;
+                }
+
+                errorred.ShouldBeTrue();
+                error.ShouldNotBeNull();
+                error.ShouldBeType<ApplicationException>();
+                error.Message.ShouldContain($"An API key was not found for '{Configuration.Sources}'");
             }
 
             [Fact]
             public void Should_not_try_to_determine_the_key_if_passed_in_as_an_argument()
             {
-                Reset();
                 ConfigSettingsService.Setup(c => c.GetApiKey(Configuration, null)).Returns("");
-                Configuration.PushCommand.Key = "bob";
+                Configuration.PushCommand.Key = _apiKey;
                 Configuration.Sources = "https://localhost/somewhere/out/there";
                 _because();
 
-                Configuration.PushCommand.Key.ShouldEqual("bob");
+                Configuration.PushCommand.Key.ShouldEqual(_apiKey);
                 ConfigSettingsService.Verify(c => c.GetApiKey(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
             }
 
             [Fact]
             public void Should_not_try_to_determine_the_key_if_source_is_set_for_a_local_source()
             {
-                Reset();
                 Configuration.Sources = "c:\\packages";
                 Configuration.PushCommand.Key = "";
                 _because();
@@ -239,7 +262,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_not_try_to_determine_the_key_if_source_is_set_for_an_unc_source()
             {
-                Reset();
                 Configuration.Sources = "\\\\someserver\\packages";
                 Configuration.PushCommand.Key = "";
                 _because();
@@ -250,7 +272,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_throw_if_multiple_sources_are_passed()
             {
-                Reset();
                 Configuration.Sources = "https://localhost/somewhere/out/there;https://localhost/somewhere/out/there";
 
                 Assert.Throws<ApplicationException>(() => _because(), "Multiple sources are not support by push command.");
@@ -259,7 +280,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_update_source_if_alias_is_passed()
             {
-                Reset();
                 Configuration.Sources = "chocolatey";
                 Configuration.MachineSources = new List<MachineSourceConfiguration>
                 {
@@ -277,7 +297,6 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_update_source_if_alias_is_passed_via_defaultpushsource()
             {
-                Reset();
                 Configuration.Sources = "";
                 Configuration.PushCommand.DefaultSource = "myrepo";
                 Configuration.MachineSources = new List<MachineSourceConfiguration>
@@ -291,39 +310,6 @@ namespace chocolatey.tests.infrastructure.app.commands
                 _because();
 
                 Configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
-            }
-        }
-
-        public class When_validating : ChocolateyPushCommandSpecsBase
-        {
-            private Action _because;
-
-            public override void Because()
-            {
-                _because = () => Command.Validate(Configuration);
-            }
-
-            [Fact]
-            public void Should_throw_when_source_is_not_set()
-            {
-                Configuration.Sources = "";
-                var errored = false;
-                Exception error = null;
-
-                try
-                {
-                    _because();
-                }
-                catch (Exception ex)
-                {
-                    errored = true;
-                    error = ex;
-                }
-
-                errored.ShouldBeTrue();
-                error.ShouldNotBeNull();
-                error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldContain("Source is required.");
             }
 
             [Fact]
@@ -354,7 +340,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_continue_when_source_and_apikey_is_set_for_a_https_source()
             {
                 Configuration.Sources = "https://somewhere/out/there";
-                Configuration.PushCommand.Key = "bob";
+                Configuration.PushCommand.Key = _apiKey;
                 _because();
             }
 
@@ -378,7 +364,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_throw_when_source_is_http_and_not_secure()
             {
                 Configuration.Sources = "http://somewhere/out/there";
-                Configuration.PushCommand.Key = "bob";
+                Configuration.PushCommand.Key = _apiKey;
                 Configuration.Force = false;
                 var errored = false;
                 Exception error = null;
@@ -403,7 +389,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_continue_when_source_is_http_and_not_secure_if_force_is_passed()
             {
                 Configuration.Sources = "http://somewhere/out/there";
-                Configuration.PushCommand.Key = "bob";
+                Configuration.PushCommand.Key = _apiKey;
                 Configuration.Force = true;
 
                 _because();
