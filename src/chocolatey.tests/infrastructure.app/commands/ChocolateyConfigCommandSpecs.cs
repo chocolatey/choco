@@ -111,7 +111,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void Should_call_service_source_list_when_command_is_list()
+            public void Should_call_service_config_list_when_command_is_list()
             {
                 Configuration.ConfigCommand.Command = ConfigCommandType.List;
                 _because();
@@ -119,7 +119,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void Should_call_service_source_disable_when_command_is_disable()
+            public void Should_call_service_config_get_when_command_is_get()
             {
                 Configuration.ConfigCommand.Command = ConfigCommandType.Get;
                 _because();
@@ -127,7 +127,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void Should_call_service_source_enable_when_command_is_enable()
+            public void Should_call_service_config_set_when_command_is_set()
             {
                 Configuration.ConfigCommand.Command = ConfigCommandType.Set;
                 _because();
@@ -135,7 +135,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void Should_call_service_source_unset_when_command_is_unset()
+            public void Should_call_service_config_unset_when_command_is_unset()
             {
                 Configuration.ConfigCommand.Command = ConfigCommandType.Unset;
                 _because();

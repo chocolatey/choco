@@ -270,7 +270,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void Should_call_service_source_list_when_command_is_list()
+            public void Should_call_service_feature_list_when_command_is_list()
             {
                 Configuration.FeatureCommand.Command = FeatureCommandType.List;
                 _because();
@@ -280,7 +280,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void Should_call_service_source_disable_when_command_is_disable()
+            public void Should_call_service_feature_disable_when_command_is_disable()
             {
                 Configuration.FeatureCommand.Command = FeatureCommandType.Disable;
                 _because();
@@ -288,7 +288,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void Should_call_service_source_enable_when_command_is_enable()
+            public void Should_call_service_feature_enable_when_command_is_enable()
             {
                 Configuration.FeatureCommand.Command = FeatureCommandType.Enable;
                 _because();
