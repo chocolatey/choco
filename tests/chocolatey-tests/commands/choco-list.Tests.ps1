@@ -99,7 +99,7 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
     }
 
-    Context "Listing local packages with unsupported argument outputs warning" -ForEach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions') {
+    Context "Listing local packages with unsupported argument outputs warning" -ForEach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
         BeforeAll {
             $Output = Invoke-Choco list $_
         }

@@ -54,6 +54,24 @@ namespace chocolatey.infrastructure.app.commands
             "--order-by-popularity"
         };
 
+        /// <summary>
+        /// These options have been chosen since these are the examples that were listed on docs.chocolatey.org
+        /// - choco list -li
+        /// - choco list -lai
+        /// </summary>
+        [Obsolete("Remove unsupported argument in V3!")]
+        private readonly string[] _unsupportedIncludeRegistryProgramsArguments = new[]
+        {
+            "-li",
+            "-il",
+            "-lai",
+            "-lia",
+            "-ali",
+            "-ail",
+            "-ial",
+            "-ila"
+        };
+
         public ChocolateyListCommand(IChocolateyPackageService packageService)
         {
             _packageService = packageService ?? throw new ArgumentNullException(nameof(packageService));
@@ -129,6 +147,12 @@ namespace chocolatey.infrastructure.app.commands
                 {
                     this.Log().Warn(ChocolateyLoggers.Important, @"
 UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!", argument);
+                }
+                else if (_unsupportedIncludeRegistryProgramsArguments.Contains(argument, StringComparer.OrdinalIgnoreCase))
+                {
+                    this.Log().Warn(ChocolateyLoggers.Important, @"
+UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!", argument);
+                    configuration.ListCommand.IncludeRegistryPrograms = true;
                 }
                 else
                 {
