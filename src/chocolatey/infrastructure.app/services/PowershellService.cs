@@ -345,6 +345,7 @@ namespace chocolatey.infrastructure.app.services
                     if (configuration.Features.UsePowerShellHost)
                     {
                         RemoveAssemblyResolver();
+                        HttpsSecurity.Reset();
                     }
 
                     if (result.StandardErrorWritten && configuration.Features.FailOnStandardError)
@@ -540,7 +541,7 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            SecurityProtocol.SetProtocol(provideWarning: false);
+            HttpsSecurity.Reset();
         }
 
         private ResolveEventHandler _handler = null;
