@@ -272,6 +272,7 @@
     <Compile Include="infrastructure\logging\LogMessage.cs" />
     <Compile Include="infrastructure\logging\LogSinkLog.cs" />
     <Compile Include="infrastructure\registration\AssemblyResolution.cs" />
+    <Compile Include="infrastructure\registration\HttpsSecurity.cs" />
     <Compile Include="infrastructure\rules\IMetadataRule.cs" />
     <Compile Include="infrastructure\rules\RuleResult.cs" />
     <Compile Include="infrastructure\rules\RuleType.cs" />
