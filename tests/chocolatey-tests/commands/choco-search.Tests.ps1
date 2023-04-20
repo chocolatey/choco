@@ -1,4 +1,4 @@
-﻿<#
+<#
     .Synopsis
         Tests for `choco search` and aliases
 
@@ -18,6 +18,7 @@ Import-Module helpers/common-helpers
 Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindCommand {
     BeforeDiscovery {
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
+        $hasEnabledV3Feed = Test-HasNuGetV3Source
     }
 
     BeforeAll {
@@ -35,7 +36,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         Remove-ChocolateyTestInstall
     }
 
-    Context "Searching packages with no filter (Happy Path)" {
+    # Skip when searching against a v3 source as our current source is not returning consistent results.
+    Context "Searching packages with no filter (Happy Path)" -Skip:$hasEnabledV3Feed {
         BeforeAll {
             $Output = Invoke-Choco $_
         }
@@ -84,7 +86,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
     }
 
-    Context "Searching all available packages" {
+    # Skip when searching against a v3 source as our current source is not returning consistent results.
+    Context "Searching all available packages" -Skip:$hasEnabledV3Feed {
         BeforeAll {
             $Output = Invoke-Choco $_ --AllVersions
         }
@@ -154,7 +157,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
     }
 
-    Context "Searching packages with Verbose" {
+    # Skip when searching against a v3 source as our current source is not returning consistent results.
+    Context "Searching packages with Verbose" -Skip:$hasEnabledV3Feed {
         BeforeAll {
             $Output = Invoke-Choco $_ --Verbose
         }
