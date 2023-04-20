@@ -170,7 +170,7 @@ Describe "Proxy configuration (<Name>)" -Tag Proxy, ProxySkip -ForEach $TestCase
         $CliArgumentSet = "CliArgumentSetProxy"
 
         if ($ConfigurationsToTest.System) {
-            Set-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -name ProxyServer -Value $SystemSet
+            Set-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -name ProxyServer -Value "http=none;https=$SystemSet;"
             Set-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -name ProxyEnable -Value 1
         }
 
