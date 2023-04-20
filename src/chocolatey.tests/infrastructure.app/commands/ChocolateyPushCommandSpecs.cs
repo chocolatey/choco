@@ -278,6 +278,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
+            [Pending("This functionality is not yet implemented. See https://github.com/chocolatey/choco/issues/63")]
             public void Should_update_source_if_alias_is_passed()
             {
                 Configuration.Sources = "chocolatey";
@@ -295,6 +296,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
+            [Pending("This functionality is not yet implemented. See https://github.com/chocolatey/choco/issues/63")]
             public void Should_update_source_if_alias_is_passed_via_defaultpushsource()
             {
                 Configuration.Sources = "";
