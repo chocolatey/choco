@@ -2,147 +2,147 @@ Import-Module helpers/common-helpers
 
 $TestCases = @(
     @{
-        Name = 'None'
+        Name                 = 'None'
         ConfigurationsToTest = @{
-            System = $false
+            System              = $false
             EnvironmentVariable = $false
-            ConfigFile = $false
-            CliArgument = $false
+            ConfigFile          = $false
+            CliArgument         = $false
         }
     }
     @{
-        Name = 'System'
+        Name                 = 'System'
         ConfigurationsToTest = @{
-            System = $true
+            System              = $true
             EnvironmentVariable = $false
-            ConfigFile = $false
-            CliArgument = $false
+            ConfigFile          = $false
+            CliArgument         = $false
         }
     }
     @{
-        Name = 'SystemConfig'
+        Name                 = 'SystemConfig'
         ConfigurationsToTest = @{
-            System = $true
+            System              = $true
             EnvironmentVariable = $false
-            ConfigFile = $true
-            CliArgument = $false
+            ConfigFile          = $true
+            CliArgument         = $false
         }
     }
     @{
-        Name = 'SystemEnvironmentVariable'
+        Name                 = 'SystemEnvironmentVariable'
         ConfigurationsToTest = @{
-            System = $true
+            System              = $true
             EnvironmentVariable = $true
-            ConfigFile = $false
-            CliArgument = $false
+            ConfigFile          = $false
+            CliArgument         = $false
         }
     }
     @{
-        Name = 'SystemCliArgument'
+        Name                 = 'SystemCliArgument'
         ConfigurationsToTest = @{
-            System = $true
+            System              = $true
             EnvironmentVariable = $true
-            ConfigFile = $false
-            CliArgument = $false
+            ConfigFile          = $false
+            CliArgument         = $false
         }
     }
     @{
-        Name = 'SystemConfigFileEnvironmentVariable'
+        Name                 = 'SystemConfigFileEnvironmentVariable'
         ConfigurationsToTest = @{
-            System = $true
+            System              = $true
             EnvironmentVariable = $true
-            ConfigFile = $true
-            CliArgument = $false
+            ConfigFile          = $true
+            CliArgument         = $false
         }
     }
     @{
-        Name = 'SystemConfigFileCliArgument'
+        Name                 = 'SystemConfigFileCliArgument'
         ConfigurationsToTest = @{
-            System = $true
+            System              = $true
             EnvironmentVariable = $false
-            ConfigFile = $true
-            CliArgument = $true
+            ConfigFile          = $true
+            CliArgument         = $true
         }
     }
     @{
-        Name = 'SystemEnvironmentVariableCliAgrument'
+        Name                 = 'SystemEnvironmentVariableCliAgrument'
         ConfigurationsToTest = @{
-            System = $true
+            System              = $true
             EnvironmentVariable = $true
-            ConfigFile = $false
-            CliArgument = $true
+            ConfigFile          = $false
+            CliArgument         = $true
         }
     }
     @{
-        Name = 'SystemConfigFileEnvironmentVariableCliArgument'
+        Name                 = 'SystemConfigFileEnvironmentVariableCliArgument'
         ConfigurationsToTest = @{
-            System = $true
+            System              = $true
             EnvironmentVariable = $true
-            ConfigFile = $true
-            CliArgument = $true
+            ConfigFile          = $true
+            CliArgument         = $true
         }
     }
     @{
-        Name = 'ConfigFile'
+        Name                 = 'ConfigFile'
         ConfigurationsToTest = @{
-            System = $false
+            System              = $false
             EnvironmentVariable = $false
-            ConfigFile = $true
-            CliArgument = $false
+            ConfigFile          = $true
+            CliArgument         = $false
         }
     }
     @{
-        Name = 'ConfigFileEnvironmentVariable'
+        Name                 = 'ConfigFileEnvironmentVariable'
         ConfigurationsToTest = @{
-            System = $false
+            System              = $false
             EnvironmentVariable = $true
-            ConfigFile = $true
-            CliArgument = $false
+            ConfigFile          = $true
+            CliArgument         = $false
         }
     }
     @{
-        Name = 'ConfigFileCliArgument'
+        Name                 = 'ConfigFileCliArgument'
         ConfigurationsToTest = @{
-            System = $false
+            System              = $false
             EnvironmentVariable = $false
-            ConfigFile = $true
-            CliArgument = $true
+            ConfigFile          = $true
+            CliArgument         = $true
         }
     }
     @{
-        Name = 'ConfigFileEnvironmentVariableCliArgument'
+        Name                 = 'ConfigFileEnvironmentVariableCliArgument'
         ConfigurationsToTest = @{
-            System = $false
+            System              = $false
             EnvironmentVariable = $true
-            ConfigFile = $true
-            CliArgument = $true
+            ConfigFile          = $true
+            CliArgument         = $true
         }
     }
     @{
-        Name = 'EnvironmentVariable'
+        Name                 = 'EnvironmentVariable'
         ConfigurationsToTest = @{
-            System = $false
+            System              = $false
             EnvironmentVariable = $true
-            ConfigFile = $false
-            CliArgument = $false
+            ConfigFile          = $false
+            CliArgument         = $false
         }
     }
     @{
-        Name = 'EnvironmentVariableCliArgument'
+        Name                 = 'EnvironmentVariableCliArgument'
         ConfigurationsToTest = @{
-            System = $false
+            System              = $false
             EnvironmentVariable = $true
-            ConfigFile = $false
-            CliArgument = $true
+            ConfigFile          = $false
+            CliArgument         = $true
         }
     }
     @{
-        Name = 'CliArgument'
+        Name                 = 'CliArgument'
         ConfigurationsToTest = @{
-            System = $false
+            System              = $false
             EnvironmentVariable = $false
-            ConfigFile = $false
-            CliArgument = $true
+            ConfigFile          = $false
+            CliArgument         = $true
         }
     }
 )
@@ -170,8 +170,8 @@ Describe "Proxy configuration (<Name>)" -Tag Proxy, ProxySkip -ForEach $TestCase
         $CliArgumentSet = "CliArgumentSetProxy"
 
         if ($ConfigurationsToTest.System) {
-            Set-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -name ProxyServer -Value "http=none;https=$SystemSet;"
-            Set-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -name ProxyEnable -Value 1
+            Set-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -Name ProxyServer -Value "https=$SystemSet;ftp=someFtp;socks=socksProxy"
+            Set-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -Name ProxyEnable -Value 1
         }
 
         if ($ConfigurationsToTest.ConfigFile) {
@@ -191,8 +191,8 @@ Describe "Proxy configuration (<Name>)" -Tag Proxy, ProxySkip -ForEach $TestCase
 
     AfterAll {
         Remove-ChocolateyTestInstall
-        Remove-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -name ProxyServer -ErrorAction Ignore
-        Remove-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -name ProxyEnable -ErrorAction Ignore
+        Remove-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -Name ProxyServer -ErrorAction Ignore
+        Remove-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -Name ProxyEnable -ErrorAction Ignore
         $env:https_proxy = $null
     }
 
