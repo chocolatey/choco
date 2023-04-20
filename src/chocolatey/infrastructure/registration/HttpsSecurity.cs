@@ -7,13 +7,13 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    internal static class HttpsSecurity
+    public static class HttpsSecurity
     {
         /// <summary>
         /// Resets the <see cref="ServicePointManager.SecurityProtocol"/> and <see cref="ServicePointManager.ServerCertificateValidationCallback"/> for HTTPS connections
         /// in order to ensure that PowerShell scripts we run can't have a persistent effect on these settings across the whole process after they're done running.
         /// </summary>
-        internal static void Reset()
+        public static void Reset()
         {
             // SystemDefault is used because:
             // 1. Most supported operating systems default to / require TLS 1.2 anyway.
