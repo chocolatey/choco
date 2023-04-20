@@ -476,28 +476,35 @@ namespace chocolatey.infrastructure.app.builders
             var registryService = container.GetInstance<IRegistryService>();
             var internetSettingsRegKey = registryService.GetKey(RegistryHive.CurrentUser, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings");
 
-            if (internetSettingsRegKey.GetValue("ProxyEnable").ToStringSafe().IsEqualTo("1"))
+            if (!internetSettingsRegKey.GetValue("ProxyEnable").ToStringSafe().IsEqualTo("1"))
             {
-                var proxySetting = internetSettingsRegKey.GetValue("ProxyServer").ToStringSafe();
+                return;
+            }
+
+            var proxySetting = internetSettingsRegKey.GetValue("ProxyServer").ToStringSafe();
+
+            if (string.IsNullOrWhiteSpace(proxySetting))
+            {
+                return;
+            }
+
+            if (proxySetting.IndexOf(';') != -1)
+            {
+                var allProxies = proxySetting.Split(';');
+                proxySetting = allProxies.FirstOrDefault(s => s.TrimSafe().StartsWith("https="));
 
                 if (string.IsNullOrWhiteSpace(proxySetting))
                 {
-                    return;
+                    proxySetting = allProxies.FirstOrDefault(s => s.TrimSafe().StartsWith("http="));
                 }
-
-                if (proxySetting.IndexOf(';') != -1)
-                {
-                    var allProxies = proxySetting.Split(';');
-                    proxySetting = allProxies.FirstOrDefault(s => s.TrimSafe().StartsWith("https="))?.Replace("https=", string.Empty);
-
-                    if (string.IsNullOrWhiteSpace(proxySetting))
-                    {
-                        proxySetting = allProxies.FirstOrDefault(s => s.TrimSafe().StartsWith("http="))?.Replace("http=", string.Empty);
-                    }
-                }
-
-                config.Proxy.Location = proxySetting;
             }
+
+            if (proxySetting?.IndexOf('=') != -1 && !proxySetting.StartsWith("http"))
+            {
+                return;
+            }
+
+            config.Proxy.Location = proxySetting.Split('=').LastOrDefault();
         }
 
         private static void SetEnvironmentOptions(ChocolateyConfiguration config)
