@@ -113,7 +113,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
     }
 
-    Context "Searching all available packages (allowing prerelease)" -Tag Testing {
+    Context "Searching all available packages (allowing prerelease)" {
         BeforeAll {
             $Output = Invoke-Choco $_ --AllVersions --PreRelease
         }
