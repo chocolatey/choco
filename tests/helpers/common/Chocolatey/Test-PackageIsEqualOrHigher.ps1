@@ -9,7 +9,7 @@ function Test-PackageIsEqualOrHigher {
         [switch]$AllowMissingPackage
     )
     if (-not $script:ChocolateyInstalledPackages) {
-        $script:ChocolateyInstalledPackages = (Invoke-Choco list --local-only --limitoutput).Lines |
+        $script:ChocolateyInstalledPackages = (Invoke-Choco list --limitoutput).Lines |
         Where-Object { $_ -notmatch 'please upgrade' } |
         ConvertFrom-ChocolateyOutput -Command List
     }

@@ -42,8 +42,8 @@ $allcommands = " --debug --verbose --trace --noop --help -? --accept-license --c
 
 $commandOptions = @{
     list      = "--id-only --pre --exact --by-id-only --id-starts-with --detailed --prerelease --include-programs --page='' --page-size=''"
-    search    = "--lo --id-only --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --local-only --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations"
-    info      = "--pre --lo --source='' --user='' --password='' --local-only --prerelease --disable-package-repository-optimizations"
+    search    = "--id-only --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations"
+    info      = "--pre --source='' --user='' --password='' --prerelease --disable-package-repository-optimizations"
     install   = "-y -whatif --pre --version= --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --user='' --password='' --prerelease --forcex86 --not-silent --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --allow-downgrade --force-dependencies --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --stop-on-first-package-failure --disable-package-repository-optimizations --pin"
     pin       = "--name='' --version=''"
     outdated  = "--source='' --user='' --password='' --ignore-pinned --ignore-unfound --pre --prerelease --disable-package-repository-optimizations"
