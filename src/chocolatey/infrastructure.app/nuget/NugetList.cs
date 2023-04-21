@@ -47,7 +47,7 @@ namespace chocolatey.infrastructure.app.nuget
 
             SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
             searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
-
+            searchFilter.OrderBy = SearchOrderBy.DownloadCount;
 
             int totalCount = 0;
             foreach (var searchResource in packageRepositoriesResources.SearchResources())
