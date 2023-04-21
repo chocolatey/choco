@@ -648,6 +648,11 @@ namespace chocolatey.infrastructure.filesystem
 
         public void MoveDirectory(string directoryPath, string newDirectoryPath)
         {
+            MoveDirectory(directoryPath, newDirectoryPath, useFileMoveFallback: true, isSilent: false);
+        }
+
+        public void MoveDirectory(string directoryPath, string newDirectoryPath, bool useFileMoveFallback, bool isSilent)
+        {
             if (string.IsNullOrWhiteSpace(directoryPath) || string.IsNullOrWhiteSpace(newDirectoryPath)) throw new ApplicationException("You must provide a directory to move from or to.");
 
             // Linux / macOS do not have a SystemDrive environment variable, instead, everything is under "/"
@@ -668,25 +673,31 @@ namespace chocolatey.infrastructure.filesystem
                         {
                             Alphaleonis.Win32.Filesystem.Directory.Move(directoryPath, newDirectoryPath);
                         }
-                    });
+                    }, isSilent: isSilent);
             }
             catch (Exception ex)
             {
+                // If we don't want to use the fallback, we will just rethrow the exception.
+                if (!useFileMoveFallback)
+                {
+                    throw;
+                }
+
                 this.Log().Warn(ChocolateyLoggers.Verbose, "Move failed with message:{0} {1}{0} Attempting backup move method.".FormatWith(Environment.NewLine, ex.Message));
 
                 EnsureDirectoryExists(newDirectoryPath, ignoreError: true);
                 foreach (var file in GetFiles(directoryPath, "*.*", SearchOption.AllDirectories).OrEmpty())
                 {
                     var destinationFile = file.Replace(directoryPath, newDirectoryPath);
-                    if (FileExists(destinationFile)) DeleteFile(destinationFile);
+                    if (FileExists(destinationFile)) DeleteFile(destinationFile, isSilent);
 
                     EnsureDirectoryExists(GetDirectoryName(destinationFile), ignoreError: true);
                     this.Log().Debug(ChocolateyLoggers.Verbose, "Moving '{0}'{1} to '{2}'".FormatWith(file, Environment.NewLine, destinationFile));
-                    MoveFile(file, destinationFile);
+                    MoveFile(file, destinationFile, isSilent);
                 }
 
                 Thread.Sleep(1000); // let the moving files finish up
-                DeleteDirectoryChecked(directoryPath, recursive: true);
+                DeleteDirectoryChecked(directoryPath, recursive: true, overrideAttributes: false, isSilent: isSilent);
             }
 
             Thread.Sleep(2000); // sleep for enough time to allow the folder to be cleared

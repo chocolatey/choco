@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -338,10 +338,23 @@ namespace chocolatey.infrastructure.filesystem
 
         /// <summary>
         ///   Moves a specified directory to a new location, providing the option to specify a new directory name.
+        ///   Will fall back to do a file move until the first file is unable to be moved.
         /// </summary>
         /// <param name="directoryPath">The path of the directory to move.</param>
         /// <param name="newDirectoryPath">The new path for the directory.</param>
         void MoveDirectory(string directoryPath, string newDirectoryPath);
+
+        /// <summary>
+        ///   Moves a specified directory to a new location, providing the option to specify a new directory name.
+        ///   Will fall back to do a file move until the firlst file is unable to be moved if <paramref name="useFileMoveFallback"/>
+        ///   is <c>true</c>
+        /// </summary>
+        /// <param name="directoryPath">The path of the directory to move.</param>
+        /// <param name="newDirectoryPath">The new path for the directory.</param>
+        /// <param name="useFileMoveFallback">Whether a fallback to move each individual files should be used if directory move fails.</param>
+        /// <param name="isSilent">Whether we should log retries or not.</param>
+        /// <remarks>Any underlying exception will be rethrown if <paramref name="useFileMoveFallback"/> is set to <c>false</c>.</remarks>
+        void MoveDirectory(string directoryPath, string newDirectoryPath, bool useFileMoveFallback, bool isSilent);
 
         /// <summary>
         ///   Copies an existing directory to a new directory. Overwriting a directory of the same name is allowed.
