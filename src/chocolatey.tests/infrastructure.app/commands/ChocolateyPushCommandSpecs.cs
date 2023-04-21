@@ -274,7 +274,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 Configuration.Sources = "https://localhost/somewhere/out/there;https://localhost/somewhere/out/there";
 
-                Assert.Throws<ApplicationException>(() => _because(), "Multiple sources are not support by push command.");
+                Assert.Throws<ApplicationException>(() => _because(), "Multiple sources are not supported by push command.");
             }
 
             [Fact]

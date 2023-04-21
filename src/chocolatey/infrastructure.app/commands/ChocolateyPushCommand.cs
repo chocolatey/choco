@@ -79,7 +79,7 @@ namespace chocolatey.infrastructure.app.commands
 
             if (sources.Count() > 1)
             {
-                throw new ApplicationException("Multiple sources are not support by push command.");
+                throw new ApplicationException("Multiple sources are not supported by push command.");
             }
 
             var remoteSource = new Uri(configuration.Sources);
