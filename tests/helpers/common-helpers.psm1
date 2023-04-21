@@ -10,7 +10,7 @@ $script:snapshotStack = @()
 $script:ChocoCommandHeaders = @{
     "List"       = @("Name", "Version")
     "PinList"    = @("Name", "Version")
-    "SourceList" = @("Name", "Url", "1", "2", "3", "Priority", "BypassProxy", "SelfService", "AdminOnly")
+    "SourceList" = @("Name", "Url", "Disabled", "Username", "Certificate", "Priority", "BypassProxy", "SelfService", "AdminOnly")
     "Feature"    = @("Name", "State", "Description")
 }
 $script:features = $null
