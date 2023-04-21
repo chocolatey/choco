@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -189,12 +189,29 @@ namespace chocolatey.infrastructure.filesystem
         void MoveFile(string filePath, string newFilePath);
 
         /// <summary>
+        ///   Moves a specified file to a new location, providing the option to specify a new file name.
+        /// </summary>
+        /// <param name="filePath">The name of the file to move. </param>
+        /// <param name="newFilePath">The new path for the file. </param>
+        /// <param name="isSilent">Whether we should log retries or not.</param>
+        void MoveFile(string filePath, string newFilePath, bool isSilent);
+
+        /// <summary>
         ///   Copies an existing file to a new file. Overwriting a file of the same name is allowed.
         /// </summary>
         /// <param name="sourceFilePath">The source file path. The file to copy.</param>
         /// <param name="destinationFilePath">The destination file path.</param>
         /// <param name="overwriteExisting">true if the destination file can be overwritten; otherwise, false.</param>
         void CopyFile(string sourceFilePath, string destinationFilePath, bool overwriteExisting);
+
+        /// <summary>
+        ///   Copies an existing file to a new file. Overwriting a file of the same name is allowed.
+        /// </summary>
+        /// <param name="sourceFilePath">The source file path. The file to copy.</param>
+        /// <param name="destinationFilePath">The destination file path.</param>
+        /// <param name="overwriteExisting">true if the destination file can be overwritten; otherwise, false.</param>
+        /// <param name="isSilent">Whether we should log retries or not.</param>
+        void CopyFile(string sourceFilePath, string destinationFilePath, bool overwriteExisting, bool isSilent);
 
         /// <summary>
         ///   Copies a file from one directory to another using FFI
@@ -363,6 +380,15 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="destinationDirectoryPath">The destination directory path.</param>
         /// <param name="overwriteExisting">true if the destination directory can be overwritten; otherwise, false.</param>
         void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool overwriteExisting);
+
+        /// <summary>
+        ///   Copies an existing directory to a new directory. Overwriting a directory of the same name is allowed.
+        /// </summary>
+        /// <param name="sourceDirectoryPath">The source file directory. The directory to copy.</param>
+        /// <param name="destinationDirectoryPath">The destination directory path.</param>
+        /// <param name="overwriteExisting">true if the destination directory can be overwritten; otherwise, false.</param>
+        /// <param name="isSilent">Whether we should log retries or not.</param>
+        void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool overwriteExisting, bool isSilent);
 
         /// <summary>
         ///   Creates all directories and subdirectories in the specified path if they have not already been created.

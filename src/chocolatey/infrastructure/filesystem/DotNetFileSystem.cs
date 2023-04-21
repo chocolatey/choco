@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -336,6 +336,11 @@ namespace chocolatey.infrastructure.filesystem
 
         public void MoveFile(string filePath, string newFilePath)
         {
+            MoveFile(filePath, newFilePath, isSilent: false);
+        }
+        
+        public void MoveFile(string filePath, string newFilePath, bool isSilent)
+        {
             EnsureDirectoryExists(GetDirectoryName(newFilePath), ignoreError: true);
 
             AllowRetries(
@@ -349,11 +354,16 @@ namespace chocolatey.infrastructure.filesystem
                     {
                         Alphaleonis.Win32.Filesystem.File.Move(filePath, newFilePath);
                     }
-                });
+                }, isSilent: isSilent);
             //Thread.Sleep(10);
         }
 
         public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
+        {
+            CopyFile(sourceFilePath, destinationFilePath, overwriteExisting, isSilent: false);
+        }
+
+        public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwriteExisting, bool isSilent)
         {
             this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to copy \"{0}\"{1} to \"{2}\".".FormatWith(sourceFilePath, Environment.NewLine, destinationFilePath));
             EnsureDirectoryExists(GetDirectoryName(destinationFilePath), ignoreError: true);
@@ -369,7 +379,7 @@ namespace chocolatey.infrastructure.filesystem
                     {
                         Alphaleonis.Win32.Filesystem.File.Copy(sourceFilePath, destinationFilePath, overwriteExisting);
                     }
-                });
+                }, isSilent: isSilent);
         }
 
         public bool CopyFileUnsafe(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
@@ -470,6 +480,11 @@ namespace chocolatey.infrastructure.filesystem
 
         public void DeleteFile(string filePath)
         {
+            DeleteFile(filePath, isSilent: false);
+        }
+
+        public void DeleteFile(string filePath, bool isSilent)
+        {
             this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to delete file \"{0}\".".FormatWith(filePath));
             if (FileExists(filePath))
             {
@@ -484,7 +499,7 @@ namespace chocolatey.infrastructure.filesystem
                         {
                             Alphaleonis.Win32.Filesystem.File.Delete(filePath);
                         }
-                    });
+                    }, isSilent: isSilent);
             }
         }
 
@@ -705,17 +720,41 @@ namespace chocolatey.infrastructure.filesystem
 
         public void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool overwriteExisting)
         {
+            CopyDirectory(sourceDirectoryPath, destinationDirectoryPath, overwriteExisting, isSilent: false);
+        }
+
+        public void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool overwriteExisting, bool isSilent)
+        {
             EnsureDirectoryExists(destinationDirectoryPath, ignoreError: true);
+
+            var exceptions = new List<Exception>();
 
             foreach (var file in GetFiles(sourceDirectoryPath, "*.*", SearchOption.AllDirectories).OrEmpty())
             {
                 var destinationFile = file.Replace(sourceDirectoryPath, destinationDirectoryPath);
                 EnsureDirectoryExists(GetDirectoryName(destinationFile), ignoreError: true);
                 //this.Log().Debug(ChocolateyLoggers.Verbose, "Copying '{0}' {1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
-                CopyFile(file, destinationFile, overwriteExisting);
+                
+                try
+                {
+                    CopyFile(file, destinationFile, overwriteExisting, isSilent);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
             }
 
             Thread.Sleep(1500); // sleep for enough time to allow the folder to finish copying
+
+            if (exceptions.Count > 1)
+            {
+                throw new AggregateException("An exception occurred while copying files to '{0}'".FormatWith(destinationDirectoryPath), exceptions);
+            }
+            else if (exceptions.Count == 1)
+            {
+                throw exceptions[0];
+            }
         }
 
         public void EnsureDirectoryExists(string directoryPath)
