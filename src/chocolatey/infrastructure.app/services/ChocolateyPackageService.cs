@@ -1193,8 +1193,10 @@ The recent package changes indicate a reboot is necessary.
             }
             else
             {
+                var oldPrompt = config.PromptForConfirmation;
+
                 this.Log().Error(ChocolateyLoggers.Important, "{0} {1} not successful.".FormatWith(packageResult.Name, "uninstall"));
-                HandleFailedOperation(config, packageResult, movePackageToFailureLocation: false, attemptRollback: false);
+                HandleFailedOperation(config, packageResult, movePackageToFailureLocation: true, attemptRollback: true);
             }
 
             if (_rebootExitCodes.Contains(packageResult.ExitCode))
@@ -1437,9 +1439,13 @@ ATTENTION: You must take manual action to remove {1} from
 
             if (!string.IsNullOrWhiteSpace(packageResult.InstallLocation) && _fileSystem.DirectoryExists(packageResult.InstallLocation))
             {
-                FaultTolerance.TryCatchWithLoggingException(
-                 () => _fileSystem.MoveDirectory(packageResult.InstallLocation, packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation)),
-                 "Could not move the bad package to the failure directory. It will show as installed.{0} {1}{0} The error".FormatWith(Environment.NewLine, packageResult.InstallLocation));
+                var normalizedVersion = new NuGetVersion(packageResult.Version).ToNormalizedStringChecked();
+                var failuresFolder = _fileSystem.CombinePaths(ApplicationParameters.PackageFailuresLocation, packageResult.Name, normalizedVersion);
+
+                if (_filesService.MovePackageUsingBackupStrategy(packageResult.InstallLocation, failuresFolder, restoreSource: false))
+                {
+                    this.Log().Error("Could not move the bad package to the failure directory. It may show as installed.{0} {1}{0}", Environment.NewLine, packageResult.InstallLocation);
+                }
             }
         }
 
@@ -1447,11 +1453,21 @@ ATTENTION: You must take manual action to remove {1} from
         {
             if (packageResult.InstallLocation == null) return;
 
-            var rollbackDirectory = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
+            var normalizedVersion = new NuGetVersion(packageResult.Version).ToNormalizedStringChecked();
+
+            var rollbackDirectory = _fileSystem.CombinePaths(ApplicationParameters.PackageBackupLocation, packageResult.Name, normalizedVersion);
+
             if (!_fileSystem.DirectoryExists(rollbackDirectory))
             {
                 //search for folder
-                var possibleRollbacks = _fileSystem.GetDirectories(ApplicationParameters.PackageBackupLocation, packageResult.Name + "*");
+                var path = _fileSystem.CombinePaths(ApplicationParameters.PackageBackupLocation, packageResult.Name);
+                var possibleRollbacks = _fileSystem.GetDirectories(path, normalizedVersion);
+
+                if (possibleRollbacks == null || possibleRollbacks.Count() == 0)
+                {
+                    possibleRollbacks = _fileSystem.GetDirectories(path, "*");
+                }
+
                 if (possibleRollbacks != null && possibleRollbacks.Count() != 0)
                 {
                     rollbackDirectory = possibleRollbacks.OrderByDescending(p => p).DefaultIfEmpty(string.Empty).FirstOrDefault();
@@ -1491,7 +1507,8 @@ ATTENTION: You must take manual action to remove {1} from
 
             if (rollback)
             {
-                _fileSystem.MoveDirectory(rollbackDirectory, rollbackDirectory.Replace(ApplicationParameters.PackageBackupLocation, ApplicationParameters.PackagesLocation));
+             var destination = _fileSystem.CombinePaths(ApplicationParameters.PackagesLocation, packageResult.Identity.Id);
+                _filesService.MovePackageUsingBackupStrategy(rollbackDirectory, destination, restoreSource: false);
             }
 
             RemoveBackupIfExists(packageResult);

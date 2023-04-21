@@ -1779,51 +1779,23 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         protected virtual void BackupCurrentVersion(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
         {
-            _fileSystem.EnsureDirectoryExists(ApplicationParameters.PackageBackupLocation);
-
             var pkgInstallPath = GetInstallDirectory(packageInfo.Package);
+            var backupLocation = _fileSystem.CombinePaths(
+                pkgInstallPath.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation),
+                packageInfo.Package.Version.ToNormalizedStringChecked());
 
-            if (_fileSystem.DirectoryExists(pkgInstallPath))
+            var errored = _filesService.MovePackageUsingBackupStrategy(pkgInstallPath, backupLocation, restoreSource: true);
+            RemoveOldPackageScriptsBeforeUpgrade(pkgInstallPath, config.CommandName);
+
+            BackupChangedFiles(pkgInstallPath, config, packageInfo);
+
+            if (errored)
             {
-                this.Log().Debug("Backing up existing {0} prior to operation.".FormatWith(packageInfo.Package.Id));
-
-                var backupLocation = pkgInstallPath.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
-
-                var errored = false;
-                try
-                {
-                    _fileSystem.MoveDirectory(pkgInstallPath, backupLocation);
-                }
-                catch (Exception ex)
-                {
-                    errored = true;
-                    this.Log().Error("Error during backup (move phase):{0} {1}".FormatWith(Environment.NewLine, ex.Message));
-                }
-                finally
-                {
-                    try
-                    {
-                        _fileSystem.CopyDirectory(backupLocation, pkgInstallPath, overwriteExisting: true);
-
-                        RemoveOldPackageScriptsBeforeUpgrade(pkgInstallPath, config.CommandName);
-                    }
-                    catch (Exception ex)
-                    {
-                        errored = true;
-                        this.Log().Error("Error during backup (reset phase):{0} {1}".FormatWith(Environment.NewLine, ex.Message));
-                    }
-                }
-
-                BackupChangedFiles(pkgInstallPath, config, packageInfo);
-
-                if (errored)
-                {
-                    this.Log().Warn(ChocolateyLoggers.Important,
-                                    @"There was an error accessing files. This could mean there is a
+                this.Log().Warn(ChocolateyLoggers.Important,
+                                @"There was an error accessing files. This could mean there is a
  process locking the folder or files. Please make sure nothing is
  running that would lock the files or folders in this directory prior
- to upgrade. If the package fails to upgrade, this is likely the cause.");
-                }
+ to upgrade or uninstall. If the package fails to upgrade or uninstall, this is likely the cause.");
             }
         }
 
@@ -2189,14 +2161,18 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     {
                                         //It does not throw or return false if it fails to delete something...
                                         //var ableToDelete = nugetProject.DeletePackage(packageToUninstall.Identity, projectContext, CancellationToken.None, shouldDeleteDirectory: false).GetAwaiter().GetResult();
+
+                                        // If we have gotten here, it means we may only have files left to remove.
                                         RemoveInstallationFilesUnsafe(packageToUninstall.PackageMetadata, pkgInfo);
                                     }
                                     catch (Exception ex)
                                     {
-                                        string errorlogMessage = "{0}:{1} {2}".FormatWith("Unable to remove existing package", Environment.NewLine, ex.Message);
+                                        string errorlogMessage = "{0}:{1} {2}".FormatWith("Unable to delete all existing package files. There will be leftover files requiring manual cleanup", Environment.NewLine, ex.Message);
                                         this.Log().Warn(logMessage);
                                         packageResult.Messages.Add(new ResultMessage(ResultType.Error, errorlogMessage));
-                                        if (continueAction != null) continueAction.Invoke(packageResult, config);
+
+                                        // Do not call continueAction again here as it has already been called once.
+                                        //if (continueAction != null) continueAction.Invoke(packageResult, config);
                                         continue;
                                     }
                                 }
@@ -2354,6 +2330,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             if (_fileSystem.DirectoryExists(installDir) && pkgInfo != null && pkgInfo.FilesSnapshot != null)
             {
+                var exceptions = new List<Exception>();
+
                 foreach (var file in _fileSystem.GetFiles(installDir, "*.*", SearchOption.AllDirectories).OrEmpty())
                 {
                     var fileSnapshot = pkgInfo.FilesSnapshot.Files.FirstOrDefault(f => f.Path.IsEqualTo(file));
@@ -2363,15 +2341,32 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                     if (filesystemFileChecksum == ApplicationParameters.HashProviderFileLocked)
                     {
-                        throw new IOException("File {0} is locked".FormatWith(file));
+                        exceptions.Add(new IOException("File {0} is locked".FormatWith(file)));
+                        continue;
                     }
 
                     if (fileSnapshot.Checksum == filesystemFileChecksum)
                     {
                         if (!_fileSystem.FileExists(file)) continue;
 
-                        _fileSystem.DeleteFile(file);
+                        try
+                        {
+                            _fileSystem.DeleteFile(file);
+                        }
+                        catch (Exception ex)
+                        {
+                            exceptions.Add(ex);
+                        }
                     }
+                }
+
+                if (exceptions.Count > 1)
+                {
+                    throw new AggregateException(exceptions);
+                }
+                else if (exceptions.Count == 1)
+                {
+                    throw exceptions[0];
                 }
             }
 

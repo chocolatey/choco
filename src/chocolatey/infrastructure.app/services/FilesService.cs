@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.IO;
     using System.Linq;
+    using System.Runtime.ConstrainedExecution;
     using configuration;
     using cryptography;
     using domain;
@@ -133,6 +134,100 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Debug(ChocolateyLoggers.Verbose, () => " Found '{0}'{1}  with checksum '{2}'".FormatWith(file, Environment.NewLine, hash));
 
             return new PackageFile { Path = file, Checksum = hash };
+        }
+
+        public bool MovePackageUsingBackupStrategy(string sourceFolder, string destinationFolder, bool restoreSource)
+        {
+            var errored = false;
+
+            try
+            {
+                _fileSystem.DeleteDirectoryChecked(destinationFolder, recursive: true, overrideAttributes: true, isSilent: true);
+            }
+            catch (Exception ex)
+            {
+                // We will ignore any exceptions that occur.
+                this.Log().Debug("Failed to delete directory '{0}', will retry for each file.{0} {1}", destinationFolder, Environment.NewLine, ex.Message);
+
+                foreach (var file in _fileSystem.GetFiles(destinationFolder, pattern: "*", option: SearchOption.AllDirectories))
+                {
+                    try
+                    {
+                        _fileSystem.DeleteFile(file);
+                    }
+                    catch (Exception fex)
+                    {
+                        this.Log().Warn("Unable to delete file '{0}' This may cause further executions to fail.{1} {2}", file, Environment.NewLine, fex.Message);
+                    }
+                }
+            }
+
+            _fileSystem.EnsureDirectoryExists(_fileSystem.GetDirectoryName(destinationFolder));
+
+            if (_fileSystem.DirectoryExists(sourceFolder))
+            {
+                this.Log().Debug("Moving {0} to {1}", sourceFolder, destinationFolder);
+
+                try
+                {
+                    _fileSystem.MoveDirectory(sourceFolder, destinationFolder, useFileMoveFallback: false, isSilent: true);
+                }
+                catch (Exception ex)
+                {
+                    this.Log().Warn("Unable to move directory '{0}':{1} {2}", sourceFolder, Environment.NewLine, ex.Message);
+                    this.Log().Warn("Retrying by moving individual files");
+
+                    foreach (var file in _fileSystem.GetFiles(sourceFolder, pattern: "*", option: SearchOption.AllDirectories))
+                    {
+                        var newLocation = file.Replace(sourceFolder, destinationFolder);
+                        if (_fileSystem.FileExists(newLocation))
+                        {
+                            continue;
+                        }
+
+                        try
+                        {
+                            _fileSystem.MoveFile(file, newLocation, isSilent: true);
+                        }
+                        catch (Exception e)
+                        {
+                            this.Log().Warn("Unable to move file '{0}':{1} {2}", file, Environment.NewLine, e.Message);
+
+                            try
+                            {
+                                _fileSystem.CopyFile(file, newLocation, overwriteExisting: true);
+                            }
+                            catch (Exception cex)
+                            {
+                                errored = true;
+                                this.Log().Error("Unable to copy file '{0}':{1} {2}", file, Environment.NewLine, cex.Message);
+                            }
+                        }
+                    }
+                }
+
+                if (!restoreSource)
+                {
+                    return errored;
+                }
+
+                try
+                {
+                    _fileSystem.CopyDirectory(destinationFolder, sourceFolder, overwriteExisting: true, isSilent: true);
+                }
+                catch (AggregateException ex)
+                {
+                    errored = true;
+                    this.Log().Error("Error during package reset phase:{0} {1}", Environment.NewLine, string.Join(Environment.NewLine + " ", ex.InnerExceptions));
+                }
+                catch (Exception ex)
+                {
+                    errored = true;
+                    this.Log().Error("Error during package reset phase:{0} {1}", Environment.NewLine, ex.Message);
+                }
+            }
+
+            return errored;
         }
 
 #pragma warning disable IDE1006
