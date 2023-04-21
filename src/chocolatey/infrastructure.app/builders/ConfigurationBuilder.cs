@@ -463,16 +463,48 @@ namespace chocolatey.infrastructure.app.builders
         private static void SetProxyOptions(ChocolateyConfiguration config, Container container)
         {
             // Evaluation order of Proxy settings: System Set -> Environment Variable Set -> Chocolatey Configuration File Set -> CLI Passed in Argument
-            // If we don't yet have a Proxy Location, check if the system has one configured in the registry
-            if (string.IsNullOrWhiteSpace(config.Proxy.Location) && Platform.GetPlatform() == PlatformType.Windows)
+            var proxyAlreadySet = !string.IsNullOrWhiteSpace(config.Proxy.Location);
+            var onWindows = Platform.GetPlatform() == PlatformType.Windows;
+
+            // Only Windows has a registry provider, if it's already set, or we're not on Windows we don't need to continue.
+            if (proxyAlreadySet || !onWindows)
             {
-                var registryService = container.GetInstance<IRegistryService>();
-                var internetSettingsRegKey = registryService.GetKey(RegistryHive.CurrentUser, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings");
-                if (internetSettingsRegKey.GetValue("ProxyEnable").ToStringSafe().IsEqualTo("1"))
+                return;
+            }
+
+            // We don't yet have a Proxy Location, check if the system has one configured in the registry
+            var registryService = container.GetInstance<IRegistryService>();
+            var internetSettingsRegKey = registryService.GetKey(RegistryHive.CurrentUser, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings");
+
+            if (!internetSettingsRegKey.GetValue("ProxyEnable").ToStringSafe().IsEqualTo("1"))
+            {
+                return;
+            }
+
+            var proxySetting = internetSettingsRegKey.GetValue("ProxyServer").ToStringSafe();
+
+            if (string.IsNullOrWhiteSpace(proxySetting))
+            {
+                return;
+            }
+
+            if (proxySetting.IndexOf(';') != -1)
+            {
+                var allProxies = proxySetting.Split(';');
+                proxySetting = allProxies.FirstOrDefault(s => s.TrimSafe().StartsWith("https="));
+
+                if (string.IsNullOrWhiteSpace(proxySetting))
                 {
-                    config.Proxy.Location = internetSettingsRegKey.GetValue("ProxyServer").ToStringSafe();
+                    proxySetting = allProxies.FirstOrDefault(s => s.TrimSafe().StartsWith("http="));
                 }
             }
+
+            if (proxySetting?.IndexOf('=') != -1 && !proxySetting.StartsWith("http"))
+            {
+                return;
+            }
+
+            config.Proxy.Location = proxySetting.Split('=').LastOrDefault();
         }
 
         private static void SetEnvironmentOptions(ChocolateyConfiguration config)
