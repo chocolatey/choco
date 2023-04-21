@@ -19,13 +19,13 @@ namespace chocolatey.infrastructure.app.rules
     using chocolatey.infrastructure.rules;
     using NuGet.Packaging;
 
-    internal sealed class ReadmeMetadataRule : MetadataRuleBase
+    internal sealed class ReadmeMetadataRule : FrameWorkReferencesMetadataRule
     {
         public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             if (!(reader.GetReadme() is null))
             {
-                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<readme> elements are not supported in Chocolatey CLI.");
+                yield return GetRule(RuleIdentifiers.UnsupportedElementUsed, "<readme> elements are not supported in Chocolatey CLI.");
             }
         }
     }

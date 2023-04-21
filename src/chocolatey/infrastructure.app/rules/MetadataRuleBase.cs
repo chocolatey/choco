@@ -24,7 +24,35 @@ namespace chocolatey.infrastructure.app.rules
 
     public abstract class MetadataRuleBase : IMetadataRule
     {
+        private IDictionary<string, ImmutableRule> _cachedRules;
+
         public abstract IEnumerable<RuleResult> Validate(NuspecReader reader);
+
+        public IReadOnlyList<ImmutableRule> GetAvailableRules()
+        {
+            if (_cachedRules is null || _cachedRules.Count == 0)
+            {
+                _cachedRules = GetRules().ToDictionary(r => r.Id, r => r);
+            }
+
+            return _cachedRules.Values.ToList().AsReadOnly();
+        }
+
+        protected RuleResult GetRule(string id, string summary = null)
+        {
+            if (_cachedRules is null || _cachedRules.Count == 0)
+            {
+                // Just to populate the cached dictionary
+                GetAvailableRules();
+            }
+
+            if (!_cachedRules.TryGetValue(id, out ImmutableRule result))
+            {
+                throw new ArgumentOutOfRangeException(nameof(id), "No rule with the identifier {0} could be found!".FormatWith(id));
+            }
+
+            return RuleResult.FromImmutableRule(result, summary);
+        }
 
         protected static bool HasElement(NuspecReader reader, string name)
         {
@@ -51,6 +79,8 @@ namespace chocolatey.infrastructure.app.rules
 
             return element.Value;
         }
+
+        protected abstract IEnumerable<ImmutableRule> GetRules();
 
 #pragma warning disable IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]

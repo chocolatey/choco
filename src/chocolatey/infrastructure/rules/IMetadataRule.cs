@@ -25,6 +25,8 @@ namespace chocolatey.infrastructure.rules
     {
         IEnumerable<RuleResult> Validate(NuspecReader reader);
 
+        IReadOnlyList<ImmutableRule> GetAvailableRules();
+
 #pragma warning disable IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         IEnumerable<RuleResult> validate(NuspecReader reader);

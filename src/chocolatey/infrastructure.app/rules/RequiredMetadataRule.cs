@@ -35,9 +35,14 @@ namespace chocolatey.infrastructure.app.rules
             {
                 if (string.IsNullOrWhiteSpace(GetElementValue(reader, item)))
                 {
-                    yield return new RuleResult(RuleType.Error, RuleIdentifiers.EmptyRequiredElement, "{0} is a required element in the package nuspec file.".FormatWith(item));
+                    yield return GetRule(RuleIdentifiers.EmptyRequiredElement, "{0} is a required element in the package nuspec file.".FormatWith(item));
                 }
             }
+        }
+
+        protected override IEnumerable<ImmutableRule> GetRules()
+        {
+            yield return new ImmutableRule(RuleType.Error, RuleIdentifiers.EmptyRequiredElement, "A required element is missing or has no content in the package nuspec file.");
         }
     }
 }
