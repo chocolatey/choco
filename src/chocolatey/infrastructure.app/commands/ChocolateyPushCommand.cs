@@ -79,15 +79,7 @@ namespace chocolatey.infrastructure.app.commands
 
             if (sources.Count() > 1)
             {
-                throw new ApplicationException("Multiple sources are not support by push command.");
-            }
-
-            var machineSource = configuration.MachineSources.FirstOrDefault(m => m.Name.IsEqualTo(configuration.Sources));
-            if (machineSource != null)
-            {
-                "chocolatey".Log().Debug("Switching source name {0} to actual source value '{1}'.".FormatWith(configuration.Sources, machineSource.Key.ToStringSafe()));
-
-                configuration.Sources = machineSource.Key;
+                throw new ApplicationException("Multiple sources are not supported by push command.");
             }
 
             var remoteSource = new Uri(configuration.Sources);
