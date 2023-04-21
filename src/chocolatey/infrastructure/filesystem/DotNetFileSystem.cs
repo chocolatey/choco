@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,15 +39,15 @@ namespace chocolatey.infrastructure.filesystem
     /// <remarks>Normally we avoid regions, however this has so many methods that we are making an exception.</remarks>
     public sealed class DotNetFileSystem : IFileSystem
     {
-        private readonly int TIMES_TO_TRY_OPERATION = 3;
-        private static Lazy<IEnvironment> environment_initializer = new Lazy<IEnvironment>(() => new Environment());
+        private readonly int _timesToTryOperation = 3;
+        private static Lazy<IEnvironment> _environmentInitializer = new Lazy<IEnvironment>(() => new Environment());
         private const int MaxPathFile = 255;
         private const int MaxPathDirectory = 248;
 
         private void AllowRetries(Action action, bool isSilent = false)
         {
             FaultTolerance.Retry(
-                TIMES_TO_TRY_OPERATION,
+                _timesToTryOperation,
                 action,
                 waitDurationMilliseconds: 200,
                 increaseRetryByMilliseconds: 100,
@@ -57,12 +57,12 @@ namespace chocolatey.infrastructure.filesystem
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void InitializeWith(Lazy<IEnvironment> environment)
         {
-            environment_initializer = environment;
+            _environmentInitializer = environment;
         }
 
         private static IEnvironment Environment
         {
-            get { return environment_initializer.Value; }
+            get { return _environmentInitializer.Value; }
         }
 
         #region Path
