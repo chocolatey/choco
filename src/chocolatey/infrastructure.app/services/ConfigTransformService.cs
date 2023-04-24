@@ -68,7 +68,12 @@ namespace chocolatey.infrastructure.app.services
                     GlobalMutex.Enter(
                         () =>
                         {
-                            var backupTargetFile = targetFile.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageBackupLocation);
+                            // TODO: ONce we have information about package being upgraded from, we can use this
+                            // information instead of doing a naive resolving of the backup directory.
+
+                            var backupDirectory = Path.Combine(ApplicationParameters.PackageBackupLocation, packageResult.Name);
+
+                            var backupTargetFile = FindBackupTargetFile(targetFile, installDirectory, backupDirectory, packageResult.Version);
 
                             FaultTolerance.TryCatchWithLoggingException(
                                 () =>
@@ -162,6 +167,30 @@ namespace chocolatey.infrastructure.app.services
                         }, MutexTimeoutMs);
                 }
             }
+        }
+
+        private string FindBackupTargetFile(string targetFile, string installDirectory, string backupDirectory, string version)
+        {
+            foreach (var directory in _fileSystem.GetDirectories(backupDirectory))
+            {
+                var directoryName = _fileSystem.GetFileName(directory);
+
+                if (string.IsNullOrEmpty(directoryName) || directoryName.IsEqualTo(version))
+                {
+                    continue;
+                }
+
+                var filePath = targetFile.Replace(installDirectory, directory);
+
+                if (_fileSystem.FileExists(filePath))
+                {
+                    return filePath;
+                }
+            }
+
+            // We will fall back to old location in pre-v2 if the file was
+            // not found in new backup directories.
+            return targetFile.Replace(installDirectory, backupDirectory);
         }
 
 #pragma warning disable IDE1006
