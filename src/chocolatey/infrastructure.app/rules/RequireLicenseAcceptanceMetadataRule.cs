@@ -25,8 +25,13 @@ namespace chocolatey.infrastructure.app.rules
         {
             if (string.IsNullOrWhiteSpace(reader.GetLicenseUrl()) && reader.GetRequireLicenseAcceptance())
             {
-                yield return new RuleResult(RuleType.Error, RuleIdentifiers.MissingElementOnRequiringLicenseAcceptance, "Enabling license acceptance requires a license url.");
+                yield return GetRule(RuleIdentifiers.MissingElementOnRequiringLicenseAcceptance);
             }
+        }
+
+        protected override IEnumerable<ImmutableRule> GetRules()
+        {
+            yield return new ImmutableRule(RuleType.Error, RuleIdentifiers.MissingElementOnRequiringLicenseAcceptance, "Enabling license acceptance requires a license url.");
         }
     }
 }

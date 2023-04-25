@@ -19,13 +19,13 @@ namespace chocolatey.infrastructure.app.rules
     using chocolatey.infrastructure.rules;
     using NuGet.Packaging;
 
-    internal sealed class PackageTypesMetadataRule : MetadataRuleBase
+    internal sealed class PackageTypesMetadataRule : FrameWorkReferencesMetadataRule
     {
         public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             if (HasElement(reader, "packageTypes"))
             {
-                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<packageTypes> elements are not supported in Chocolatey CLI.");
+                yield return GetRule(RuleIdentifiers.UnsupportedElementUsed, "<packageTypes> elements are not supported in Chocolatey CLI.");
             }
         }
     }

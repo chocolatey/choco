@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.app.services
     using NuGet.Configuration;
     using NuGet.Packaging;
 
-    public sealed class RuleService : IRuleService
+    public class RuleService : IRuleService
     {
         private readonly IMetadataRule[] _rules;
 
@@ -35,7 +35,17 @@ namespace chocolatey.infrastructure.app.services
             _rules = rules;
         }
 
-        public IEnumerable<RuleResult> ValidateRules(string filePath)
+        public virtual IReadOnlyList<ImmutableRule> GetAllAvailableRules()
+        {
+            return _rules.SelectMany(r => r.GetAvailableRules())
+                .Distinct(new RuleIdEqualityComparer())
+                .OrderBy(r => r.Severity)
+                .ThenBy(r => r.Id)
+                .ToList()
+                .AsReadOnly();
+        }
+
+        public virtual IEnumerable<RuleResult> ValidateRules(string filePath)
         {
             Ensure.That(() => filePath)
                 .NotNullOrWhitespace()
@@ -89,5 +99,18 @@ namespace chocolatey.infrastructure.app.services
         public IEnumerable<RuleResult> validate_rules(string filePath)
             => ValidateRules(filePath);
 #pragma warning restore IDE1006
+
+        private class RuleIdEqualityComparer : IEqualityComparer<ImmutableRule>
+        {
+            public bool Equals(ImmutableRule x, ImmutableRule y)
+            {
+                return ReferenceEquals(x, y) || string.Equals(x.Id, x.Id);
+            }
+
+            public int GetHashCode(ImmutableRule obj)
+            {
+                return obj.Id.GetHashCode();
+            }
+        }
     }
 }

@@ -274,6 +274,7 @@
     <Compile Include="infrastructure\registration\AssemblyResolution.cs" />
     <Compile Include="infrastructure\registration\HttpsSecurity.cs" />
     <Compile Include="infrastructure\rules\IMetadataRule.cs" />
+    <Compile Include="infrastructure\rules\ImmutableRule.cs" />
     <Compile Include="infrastructure\rules\RuleResult.cs" />
     <Compile Include="infrastructure\rules\RuleType.cs" />
     <Compile Include="infrastructure\services\IRuleService.cs" />

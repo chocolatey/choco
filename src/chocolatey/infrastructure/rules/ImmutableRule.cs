@@ -13,20 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.infrastructure.app.rules
+namespace chocolatey.infrastructure.rules
 {
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.rules;
-    using NuGet.Packaging;
-
-    internal sealed class IconMetadataRule : FrameWorkReferencesMetadataRule
+    public readonly struct ImmutableRule
     {
-        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
+        public ImmutableRule(RuleType severity, string id, string summary, string helpUrl = null)
         {
-            if (!(reader.GetIcon() is null))
-            {
-                yield return GetRule(RuleIdentifiers.UnsupportedElementUsed, "<icon> elements are not supported in Chocolatey CLI, use <iconUrl> instead.");
-            }
+            Severity = severity;
+            Id = id;
+            Summary = summary;
+            HelpUrl = helpUrl;
         }
+
+        public readonly RuleType Severity;
+        public readonly string Id;
+        public readonly string Summary;
+        public readonly string HelpUrl;
     }
 }

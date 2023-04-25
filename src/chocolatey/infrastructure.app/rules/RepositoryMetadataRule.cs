@@ -21,7 +21,7 @@ namespace chocolatey.infrastructure.app.rules
     using chocolatey.infrastructure.rules;
     using NuGet.Packaging;
 
-    internal sealed class RepositoryMetadataRule : MetadataRuleBase
+    internal sealed class RepositoryMetadataRule : FrameWorkReferencesMetadataRule
     {
         public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
@@ -29,7 +29,7 @@ namespace chocolatey.infrastructure.app.rules
 
             if (HasElement(reader, "repository"))
             {
-                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<repository> elements are not supported in Chocolatey CLI, use <packageSourceUrl> instead.");
+                yield return GetRule(RuleIdentifiers.UnsupportedElementUsed, "<repository> elements are not supported in Chocolatey CLI, use <packageSourceUrl> instead.");
             }
         }
     }
