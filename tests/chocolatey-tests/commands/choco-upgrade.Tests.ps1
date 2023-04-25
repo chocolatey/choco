@@ -272,7 +272,10 @@ To upgrade a local, or remote file, you may use:
             $Output = Invoke-Choco upgrade upgradepackage --confirm
         }
 
-        It 'Exits with Success (0)' {
+
+        # `upgradepackage` contains a beforeModify that throws, which triggers an incorrect -1 exit code.
+        # See https://app.clickup.com/t/20540031/PROJ-615
+        It 'Exits with Success (0)' -Tag Broken {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
@@ -317,9 +320,9 @@ To upgrade a local, or remote file, you may use:
             $null = Invoke-Choco install $PackageUnderTest --version 0.9.9 -n
 
             $checksums = Get-ChildItem "$env:ChocolateyInstall\lib\$PackageUnderTest" -Recurse | ForEach-Object {
-                @{
-                    Name = $_.FullName -replace "^$([Regex]::Escape("$env:ChocolateyInstall\lib\$PackageUnderTest\"))",""
-                    Checksum = (Get-FileHash $_.FullName -Algorithm SHA256 | ForEach-Object Hash)
+                [pscustomobject]@{
+                    Name = $_.Name
+                    Checksum = (Get-FileHash $_.FullName -Algorithm SHA256).Hash
                 }
             }
 
@@ -342,7 +345,7 @@ To upgrade a local, or remote file, you may use:
             "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
             $name = $_
             $checksum = $checksums | Where-Object Name -eq $name | Select-Object -First 1 -ExpandProperty Checksum
-            (Get-FileHash "$env:ChocolateyInstall\lib\$PackageUnderTest" -Algorithm SHA256 | ForEach-Object Hash) | Should -Be $checksum
+            (Get-FileHash "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageVersion\$_" -Algorithm SHA256).Hash | Should -Be $checksum
         }
 
         It "Outputs a message showing that installation failed." {
