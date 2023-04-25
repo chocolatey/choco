@@ -39,15 +39,15 @@ namespace chocolatey.infrastructure.filesystem
     /// <remarks>Normally we avoid regions, however this has so many methods that we are making an exception.</remarks>
     public sealed class DotNetFileSystem : IFileSystem
     {
-        private readonly int TIMES_TO_TRY_OPERATION = 3;
-        private static Lazy<IEnvironment> environment_initializer = new Lazy<IEnvironment>(() => new Environment());
+        private readonly int _timesToTryOperation = 3;
+        private static Lazy<IEnvironment> _environmentInitializer = new Lazy<IEnvironment>(() => new Environment());
         private const int MaxPathFile = 255;
         private const int MaxPathDirectory = 248;
 
         private void AllowRetries(Action action, bool isSilent = false)
         {
             FaultTolerance.Retry(
-                TIMES_TO_TRY_OPERATION,
+                _timesToTryOperation,
                 action,
                 waitDurationMilliseconds: 200,
                 increaseRetryByMilliseconds: 100,
@@ -57,12 +57,12 @@ namespace chocolatey.infrastructure.filesystem
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void InitializeWith(Lazy<IEnvironment> environment)
         {
-            environment_initializer = environment;
+            _environmentInitializer = environment;
         }
 
         private static IEnvironment Environment
         {
-            get { return environment_initializer.Value; }
+            get { return _environmentInitializer.Value; }
         }
 
         #region Path
@@ -336,6 +336,11 @@ namespace chocolatey.infrastructure.filesystem
 
         public void MoveFile(string filePath, string newFilePath)
         {
+            MoveFile(filePath, newFilePath, isSilent: false);
+        }
+        
+        public void MoveFile(string filePath, string newFilePath, bool isSilent)
+        {
             EnsureDirectoryExists(GetDirectoryName(newFilePath), ignoreError: true);
 
             AllowRetries(
@@ -349,11 +354,16 @@ namespace chocolatey.infrastructure.filesystem
                     {
                         Alphaleonis.Win32.Filesystem.File.Move(filePath, newFilePath);
                     }
-                });
+                }, isSilent: isSilent);
             //Thread.Sleep(10);
         }
 
         public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
+        {
+            CopyFile(sourceFilePath, destinationFilePath, overwriteExisting, isSilent: false);
+        }
+
+        public void CopyFile(string sourceFilePath, string destinationFilePath, bool overwriteExisting, bool isSilent)
         {
             this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to copy \"{0}\"{1} to \"{2}\".".FormatWith(sourceFilePath, Environment.NewLine, destinationFilePath));
             EnsureDirectoryExists(GetDirectoryName(destinationFilePath), ignoreError: true);
@@ -369,7 +379,7 @@ namespace chocolatey.infrastructure.filesystem
                     {
                         Alphaleonis.Win32.Filesystem.File.Copy(sourceFilePath, destinationFilePath, overwriteExisting);
                     }
-                });
+                }, isSilent: isSilent);
         }
 
         public bool CopyFileUnsafe(string sourceFilePath, string destinationFilePath, bool overwriteExisting)
@@ -470,6 +480,11 @@ namespace chocolatey.infrastructure.filesystem
 
         public void DeleteFile(string filePath)
         {
+            DeleteFile(filePath, isSilent: false);
+        }
+
+        public void DeleteFile(string filePath, bool isSilent)
+        {
             this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to delete file \"{0}\".".FormatWith(filePath));
             if (FileExists(filePath))
             {
@@ -484,7 +499,7 @@ namespace chocolatey.infrastructure.filesystem
                         {
                             Alphaleonis.Win32.Filesystem.File.Delete(filePath);
                         }
-                    });
+                    }, isSilent: isSilent);
             }
         }
 
@@ -648,6 +663,11 @@ namespace chocolatey.infrastructure.filesystem
 
         public void MoveDirectory(string directoryPath, string newDirectoryPath)
         {
+            MoveDirectory(directoryPath, newDirectoryPath, useFileMoveFallback: true, isSilent: false);
+        }
+
+        public void MoveDirectory(string directoryPath, string newDirectoryPath, bool useFileMoveFallback, bool isSilent)
+        {
             if (string.IsNullOrWhiteSpace(directoryPath) || string.IsNullOrWhiteSpace(newDirectoryPath)) throw new ApplicationException("You must provide a directory to move from or to.");
 
             // Linux / macOS do not have a SystemDrive environment variable, instead, everything is under "/"
@@ -668,25 +688,31 @@ namespace chocolatey.infrastructure.filesystem
                         {
                             Alphaleonis.Win32.Filesystem.Directory.Move(directoryPath, newDirectoryPath);
                         }
-                    });
+                    }, isSilent: isSilent);
             }
             catch (Exception ex)
             {
+                // If we don't want to use the fallback, we will just rethrow the exception.
+                if (!useFileMoveFallback)
+                {
+                    throw;
+                }
+
                 this.Log().Warn(ChocolateyLoggers.Verbose, "Move failed with message:{0} {1}{0} Attempting backup move method.".FormatWith(Environment.NewLine, ex.Message));
 
                 EnsureDirectoryExists(newDirectoryPath, ignoreError: true);
                 foreach (var file in GetFiles(directoryPath, "*.*", SearchOption.AllDirectories).OrEmpty())
                 {
                     var destinationFile = file.Replace(directoryPath, newDirectoryPath);
-                    if (FileExists(destinationFile)) DeleteFile(destinationFile);
+                    if (FileExists(destinationFile)) DeleteFile(destinationFile, isSilent);
 
                     EnsureDirectoryExists(GetDirectoryName(destinationFile), ignoreError: true);
                     this.Log().Debug(ChocolateyLoggers.Verbose, "Moving '{0}'{1} to '{2}'".FormatWith(file, Environment.NewLine, destinationFile));
-                    MoveFile(file, destinationFile);
+                    MoveFile(file, destinationFile, isSilent);
                 }
 
                 Thread.Sleep(1000); // let the moving files finish up
-                DeleteDirectoryChecked(directoryPath, recursive: true);
+                DeleteDirectoryChecked(directoryPath, recursive: true, overrideAttributes: false, isSilent: isSilent);
             }
 
             Thread.Sleep(2000); // sleep for enough time to allow the folder to be cleared
@@ -694,17 +720,41 @@ namespace chocolatey.infrastructure.filesystem
 
         public void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool overwriteExisting)
         {
+            CopyDirectory(sourceDirectoryPath, destinationDirectoryPath, overwriteExisting, isSilent: false);
+        }
+
+        public void CopyDirectory(string sourceDirectoryPath, string destinationDirectoryPath, bool overwriteExisting, bool isSilent)
+        {
             EnsureDirectoryExists(destinationDirectoryPath, ignoreError: true);
+
+            var exceptions = new List<Exception>();
 
             foreach (var file in GetFiles(sourceDirectoryPath, "*.*", SearchOption.AllDirectories).OrEmpty())
             {
                 var destinationFile = file.Replace(sourceDirectoryPath, destinationDirectoryPath);
                 EnsureDirectoryExists(GetDirectoryName(destinationFile), ignoreError: true);
                 //this.Log().Debug(ChocolateyLoggers.Verbose, "Copying '{0}' {1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
-                CopyFile(file, destinationFile, overwriteExisting);
+                
+                try
+                {
+                    CopyFile(file, destinationFile, overwriteExisting, isSilent);
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(ex);
+                }
             }
 
             Thread.Sleep(1500); // sleep for enough time to allow the folder to finish copying
+
+            if (exceptions.Count > 1)
+            {
+                throw new AggregateException("An exception occurred while copying files to '{0}'".FormatWith(destinationDirectoryPath), exceptions);
+            }
+            else if (exceptions.Count == 1)
+            {
+                throw exceptions[0];
+            }
         }
 
         public void EnsureDirectoryExists(string directoryPath)

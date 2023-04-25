@@ -436,6 +436,51 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
+    Context "Force Installing a Package that is already installed (with a delete locked file)" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "installpackage"
+
+            Invoke-Choco install $PackageUnderTest --confirm
+
+            $LockedFile = [System.IO.File]::Open(
+                "$env:ChocolateyInstall\lib\$PackageUnderTest\tools\chocolateyInstall.ps1",
+                "OpenOrCreate",
+                "ReadWrite",
+                "Delete"
+            )
+
+            $Output = Invoke-Choco install installpackage --force --confirm
+        }
+
+        AfterAll {
+            $LockedFile.Close()
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Has successfully retained an install of the original package" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\"
+        }
+
+        It "Has successfully retained the original version" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+
+        It "Should not have been able to delete the rollback" {
+            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
+        }
+
+        It "Outputs a message showing that installation succeeded." {
+            $Output.String | Should -Match "Chocolatey installed 1/1 packages\."
+        }
+    }
+
     Context "Force Installing a Package that is already installed (with a read/delete locked file)" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
@@ -482,22 +527,9 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Force Installing a Package that is already installed (with an exclusively locked file)" -Tag Broken {
+    Context "Force Installing a Package that is already installed (with an exclusively locked file)" {
         BeforeDiscovery {
             $PackageUnderTest = "installpackage"
-            $expectedFiles = @(
-                "$PackageUnderTest.nuspec"
-                "$PackageUnderTest.nupkg"
-                'tools\casemismatch.exe'
-                'tools\chocolateyinstall.ps1'
-                'tools\chocolateyuninstall.ps1'
-                'console.exe'
-                'graphical.exe'
-                'graphical.exe.gui'
-                'not.installed.exe'
-                'not.installed.exe.ignored'
-                'simplefile.txt'
-            )
         }
 
         BeforeAll {
@@ -535,15 +567,9 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $XML.package.metadata.version | Should -Be "1.0.0"
         }
 
-        It "Should not have been able to delete the rollback" -Tag Broken {
-            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
-        }
-
-        It "Should have kept file in rollback folder (<_>)" -ForEach $expectedFiles {
-            "$env:ChocolateyInstall\lib-bkp\$_" | Should -Exist
-        }
-
-        It "Should have been able to delete the rollback" -Tag Licensed {
+        It "Should have been able to delete the rollback" {
+            # It is important to know that the behavior may be different on different operating
+            # systems. It depends on how the operating system implements locking of files.
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
         }
 
@@ -551,11 +577,44 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             "$env:ChocolateyInstall\lib-bad\$PackageUnderTest" | Should -Exist
         }
 
-        It "Should have stored file in bad folder (<_>)" -ForEach $expectedFiles {
-            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$_" | Should -Exist
+        It "Should have stored pending file in bad folder" {
+            # Because the package itself fails to extract, due to the install script being locked.
+            # The only file in the original package that could be copied over is the pending file (can't copy the exclusively locked file either).
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\1.0.0\.chocolateyPending" | Should -Exist
         }
 
-        It "Outputs a message showing that installation succeeded." {
+        It "Outputs a message showing that installation failed." {
+            $Output.String | Should -Match "Chocolatey installed 0/1 packages\."
+        }
+    }
+
+    Context "Installing a failing package created backup in lib-bad" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "failingdependency"
+            $PackageVersion = '0.9.9'
+
+            $Output = Invoke-Choco install $PackageUnderTest --version $PackageVersion --confirm
+        }
+
+        It "Exits with Failure (15608)" {
+            $Output.ExitCode | Should -Be 15608 -Because $Output.String
+        }
+
+        It "Doesn't install the package to lib directory" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Doesn't keep a package backup in lib-bkp" {
+            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Creates backup of file '<_>' in lib-bad" -ForEach @('failingdependency.nupkg', 'failingdependency.nuspec', '.chocolateyPending', 'tools\chocolateyinstall.ps1', 'tools\test-file.txt') {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
+        }
+
+        It "Outputs a message showing that installation failed." {
             $Output.String | Should -Match "Chocolatey installed 0/1 packages\."
         }
     }

@@ -11,7 +11,7 @@ function Test-ChocolateyVersionEqualOrHigherThan {
         [NuGet.Versioning.NuGetVersion]$Version
     )
     if (-not $script:ChocolateyInstalledVersion) {
-        $script:ChocolateyInstalledVersion = ((Invoke-Choco list -lo -r).Lines | ConvertFrom-ChocolateyOutput -Command List | Where-Object Name -EQ 'chocolatey').Version
+        $script:ChocolateyInstalledVersion = ((Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List | Where-Object Name -EQ 'chocolatey').Version
     }
 
     return Test-VersionEqualOrHigher -InstalledVersion $script:ChocolateyInstalledVersion -CompareVersion $Version

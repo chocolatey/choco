@@ -16,10 +16,10 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using configuration;
     using domain;
     using results;
-    using System;
 
     /// <summary>
     /// The files service for capturing and handling file snapshots.
@@ -76,6 +76,8 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="file">The file.</param>
         /// <returns>PackageFile object</returns>
         PackageFile GetPackageFile(string file);
+
+        bool MovePackageUsingBackupStrategy(string sourceFolder, string destinationFolder, bool restoreSource);
 
 #pragma warning disable IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]

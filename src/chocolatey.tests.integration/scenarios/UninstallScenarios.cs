@@ -539,11 +539,35 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_contain_old_files_in_directory()
+            public void Should_not_contain_old_files_in_directory()
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                FileAssert.Exists(shimFile);
+                FileAssert.DoesNotExist(shimFile);
+            }
+
+            [Fact]
+            public void Should_keep_locked_file_in_directory()
+            {
+                var lockedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+
+                FileAssert.Exists(lockedFile);
+            }
+
+            [Fact]
+            public void Should_contain_a_message_about_not_all_files_are_removed()
+            {
+                bool expectedMessage = false;
+
+                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).OrEmpty())
+                {
+                    if (message.Contains("Unable to delete all existing package files. There will be leftover files requiring manual cleanup"))
+                    {
+                        expectedMessage = true;
+                    }
+                }
+
+                expectedMessage.ShouldBeTrue();
             }
 
             [Fact]
@@ -996,19 +1020,19 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_put_the_package_in_the_lib_bad_directory()
+            public void Should_put_the_package_in_the_lib_bad_directory()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                DirectoryAssert.Exists(packageDir);
             }
 
             [Fact]
-            public void Should_not_delete_the_rollback()
+            public void Should_delete_the_rollback()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.Exists(packageDir);
+                DirectoryAssert.DoesNotExist(packageDir);
             }
 
             [Fact]

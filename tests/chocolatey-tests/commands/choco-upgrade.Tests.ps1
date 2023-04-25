@@ -307,6 +307,200 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
+    Context "Upgrading a failing package creates creates bad backup and rolls back lib directory" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "failingdependency"
+            $PackageVersion = '1.0.0'
+
+            $null = Invoke-Choco install $PackageUnderTest --version 0.9.9 -n
+
+            $checksums = Get-ChildItem "$env:ChocolateyInstall\lib\$PackageUnderTest" -Recurse | ForEach-Object {
+                @{
+                    Name = $_.FullName -replace "^$([Regex]::Escape("$env:ChocolateyInstall\lib\$PackageUnderTest\"))",""
+                    Checksum = (Get-FileHash $_.FullName -Algorithm SHA256 | ForEach-Object Hash)
+                }
+            }
+
+            $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm
+        }
+
+        It "Exits with Failure (15608)" {
+            $Output.ExitCode | Should -Be 15608 -Because $Output.String
+        }
+
+        It "Doesn't keep a package backup in lib-bkp" {
+            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Creates backup of file '<_>' in lib-bad" -ForEach @('failingdependency.nupkg', 'failingdependency.nuspec', '.chocolateyPending', 'tools\chocolateyinstall.ps1') {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
+        }
+
+        It "Rollsback file '<_>' for the previously installed package" -ForEach @('failingdependency.nupkg', 'failingdependency.nuspec', 'tools\chocolateyinstall.ps1') {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
+            $name = $_
+            $checksum = $checksums | Where-Object Name -eq $name | Select-Object -First 1 -ExpandProperty Checksum
+            (Get-FileHash "$env:ChocolateyInstall\lib\$PackageUnderTest" -Algorithm SHA256 | ForEach-Object Hash) | Should -Be $checksum
+        }
+
+        It "Outputs a message showing that installation failed." {
+            $Output.String | Should -Match "Chocolatey upgraded 0/1 packages\."
+        }
+    }
+
+    Context "Upgrading a package when installer is locked" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "hasinnoinstaller"
+            $PackageVersion   = '6.2.0.3'
+
+            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress
+
+            $LockedFile = [System.IO.File]::Open("$env:ChocolateyInstall\lib\$PackageUnderTest\tools\helloworld-1.0.0.exe", 'Open', 'Read',
+            'Read')
+
+            $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress
+        }
+
+        AfterAll {
+            $LockedFile.Dispose()
+            $null = Invoke-Choco uninstall $PackageUnderTest --confirm
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It "Keeps file '<_>' in the lib directory" -ForEach @('hasinnoinstaller.nuspec', 'hasinnoinstaller.nupkg', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\helloworld-1.0.0.exe', 'tools\helloworld-1.0.0.exe.ignore') {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\$_" | Should -Exist
+        }
+
+        It "Doesn't keep a package backup in lib-bkp" {
+            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        # Only two files are backed up as we was not able to download and extract the new package
+        It "Creates backup of file '<_>' in lib-bad" -ForEach @('.chocolateyPending', 'tools\helloworld-1.0.0.exe') {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
+        }
+
+        It "Outputs a message showing that installation failed." {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 0/1 packages. 1 packages failed."
+        }
+    }
+
+    Context "Upgrading a package when non-package file is locked before initial installation" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "hasinnoinstaller"
+            $PackageVersion   = '6.2.0.3'
+
+            mkdir "$env:ChocolateyInstall\lib\$PackageUnderTest\tools"
+            $LockedFile = [System.IO.File]::Open("$env:ChocolateyInstall\lib\$PackageUnderTest\tools\a-locked-file.txt", 'OpenOrCreate', 'Read',
+            'Read')
+
+            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress
+
+            $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress
+        }
+
+        AfterAll {
+            $LockedFile.Dispose()
+            $null = Invoke-Choco uninstall $PackageUnderTest --confirm
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It "Keeps file '<_>' in the lib directory" -ForEach @('hasinnoinstaller.nuspec', 'hasinnoinstaller.nupkg', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\helloworld-1.0.0.exe', 'tools\helloworld-1.0.0.exe.ignore') {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\$_" | Should -Exist
+        }
+
+        It "Doesn't keep a package backup in lib-bkp" {
+            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        # Only two files are backed up as we was not able to download and extract the new package
+        It "Creates backup of file '<_>' in lib-bad" -ForEach @('.chocolateyPending', 'tools\a-locked-file.txt') {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
+        }
+
+        It "Did not create backup of file '<_>' in lib-bad" -ForEach @('hasinnoinstaller.nuspec', 'hasinnoinstaller.nupkg', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\helloworld-1.0.0.exe', 'helloworld-1.0.0.exe.ignore') {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Not -Exist
+        }
+
+        It "Outputs a message showing that installation failed." {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 0/1 packages. 1 packages failed."
+        }
+    }
+
+    Context "Upgrading a package when non-package file is locked after initial installation" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "hasinnoinstaller"
+            $PackageVersion   = '6.2.0.3'
+
+            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress
+
+            $LockedFile = [System.IO.File]::Open("$env:ChocolateyInstall\lib\$PackageUnderTest\a-locked-file.txt", 'OpenOrCreate', 'Read',
+            'Read')
+
+            $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress
+        }
+
+        AfterAll {
+            $LockedFile.Dispose()
+            $null = Invoke-Choco uninstall $PackageUnderTest --confirm
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Keeps have file '<_>' in the lib directory" -ForEach @('hasinnoinstaller.nuspec', 'hasinnoinstaller.nupkg', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\helloworld-1.0.0.exe', 'tools\helloworld-1.0.0.exe.ignore') {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\$_" | Should -Exist
+        }
+
+        It "Doesn't keep a package backup in lib-bkp" {
+            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Doesn't keep a package backup in lib-bad" {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Outputs a message showing that package was upgraded." {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 1/1 packages." -Because $Output.String
+        }
+    }
+
+    Context "Upgrading a package where beforeModify fails still succeeds the installation" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = 'upgradepackage'
+
+            $null = Invoke-Choco install upgradepackage --version 1.0.0 --confirm
+
+            $Output = Invoke-Choco upgrade upgradepackage --confirm
+        }
+
+        # This was broken in v1.3.1
+        It "Exits with Success (0)" -Tag Broken {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Outputs a message showing that installation was successful" {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 1/1 packages."
+        }
+    }
+
     # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

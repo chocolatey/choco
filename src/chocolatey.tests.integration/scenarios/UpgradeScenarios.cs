@@ -2607,7 +2607,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_the_erroring_upgraded_package_in_the_lib_bad_directory()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames, "2.0.0", Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
