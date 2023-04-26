@@ -63,7 +63,7 @@ $commandOptions = @{
 $commandOptions['find'] = $commandOptions['search']
 
 try {
-    $licenseFile = Get-Item -Path "$env:ChocolateyInstall\license\chocolatey.license.xml" -ErrorAction SilentlyContinue
+    $licenseFile = Get-Item -Path "$env:ChocolateyInstall\license\chocolatey.license.xml" -ErrorAction Stop
 
     if ($licenseFile) {
         # Add pro-only commands
@@ -86,7 +86,7 @@ try {
         $commandOptions.pin += " --note=''"
 
         # Add Business-only commands and options if the license is a Business or Trial license
-        [xml]$xml = Get-Content -Path $licenseFile.FullName
+        [xml]$xml = Get-Content -Path $licenseFile.FullName -ErrorAction Stop
         $licenseType = $xml.license.type
 
         if ('Business', 'BusinessTrial' -contains $licenseType) {
@@ -111,6 +111,9 @@ try {
     }
 }
 catch {
+    # Remove the error that last occurred from $error so it doesn't cause any
+    # issues for users, as we're deliberately ignoring it.
+    $error.RemoveAt(0)
 }
 
 foreach ($key in @($commandOptions.Keys)) {
