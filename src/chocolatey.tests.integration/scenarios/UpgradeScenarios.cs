@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -1978,10 +1978,20 @@ namespace chocolatey.tests.integration.scenarios
                 }
             }
 
-            [Fact]
-            [Pending("Does not work under .Net 4.8, See issue #2690")]
-            [Broken]
-            public void Should_not_be_able_delete_the_rollback()
+            // Locking is inconsistent between client and server operating systems in .NET 4.8.
+            // On a server, if a file is Read and delete locked it can't be deleted, but on client systems it can.
+            [Fact, Platform(Exclude = "WindowsServer10")]
+            public void Should_have_deleted_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            // Locking is inconsistent between client and server operating systems in .NET 4.8.
+            // On a server, if a file is Read and delete locked it can't be deleted, but on client systems it can.
+            [Fact, Platform("WindowsServer10")]
+            public void Should_not_have_deleted_the_rollback_on_server()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 

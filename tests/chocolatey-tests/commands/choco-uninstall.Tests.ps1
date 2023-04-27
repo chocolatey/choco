@@ -37,8 +37,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
         }
     }
 
-    # Broken in latest Chocolatey CLI v2.0.0-beta
-    Context "Uninstalling a package when chocolateyBeforeModify fails" -Tag Broken {
+    Context "Uninstalling a package when chocolateyBeforeModify fails" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -47,7 +46,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $Output = Invoke-Choco uninstall upgradepackage --confirm
         }
 
-        # Broken since v1.3.1
+        # Broken since v1.0.0
         It "Exits with Success (0)" -Tag Broken {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
