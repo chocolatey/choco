@@ -113,7 +113,9 @@ try {
 catch {
     # Remove the error that last occurred from $error so it doesn't cause any
     # issues for users, as we're deliberately ignoring it.
-    $error.RemoveAt(0)
+    if ($error.Count -gt 0) {
+        $error.RemoveAt(0)
+    }
 }
 
 foreach ($key in @($commandOptions.Keys)) {

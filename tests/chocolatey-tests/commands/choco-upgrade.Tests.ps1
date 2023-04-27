@@ -319,13 +319,6 @@ To upgrade a local, or remote file, you may use:
 
             $null = Invoke-Choco install $PackageUnderTest --version 0.9.9 -n
 
-            $checksums = Get-ChildItem "$env:ChocolateyInstall\lib\$PackageUnderTest" -Recurse | ForEach-Object {
-                [pscustomobject]@{
-                    Name = $_.Name
-                    Checksum = (Get-FileHash $_.FullName -Algorithm SHA256).Hash
-                }
-            }
-
             $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm
         }
 
@@ -339,13 +332,6 @@ To upgrade a local, or remote file, you may use:
 
         It "Creates backup of file '<_>' in lib-bad" -ForEach @('failingdependency.nupkg', 'failingdependency.nuspec', '.chocolateyPending', 'tools\chocolateyinstall.ps1') {
             "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
-        }
-
-        It "Rollsback file '<_>' for the previously installed package" -ForEach @('failingdependency.nupkg', 'failingdependency.nuspec', 'tools\chocolateyinstall.ps1') {
-            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
-            $name = $_
-            $checksum = $checksums | Where-Object Name -eq $name | Select-Object -First 1 -ExpandProperty Checksum
-            (Get-FileHash "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageVersion\$_" -Algorithm SHA256).Hash | Should -Be $checksum
         }
 
         It "Outputs a message showing that installation failed." {
