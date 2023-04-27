@@ -2137,7 +2137,27 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     null,
                                     null)));
                         var uninstallationContext = new UninstallationContext(removeDependencies: config.ForceDependencies, forceRemove: config.Force);
-                        var resolvedPackages = UninstallResolver.GetPackagesToBeUninstalled(installedPackage.Identity, localPackagesDependencyInfos, allPackagesIdentities, uninstallationContext);
+
+                    ICollection<PackageIdentity> resolvedPackages = null;
+                    try
+                    {
+                        resolvedPackages = UninstallResolver.GetPackagesToBeUninstalled(installedPackage.Identity, localPackagesDependencyInfos, allPackagesIdentities, uninstallationContext);
+                    }
+                    catch (Exception ex)
+                    {
+                        this.Log().Warn("[NuGet]: {0}", ex.Message);
+                        var result = packageResultsToReturn.GetOrAdd(installedPackage.Name + "." + installedPackage.Version, (key) => new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
+                        result.Messages.Add(new ResultMessage(ResultType.Error, ex.Message));
+                        continue;
+                    }
+
+                    if (resolvedPackages is null)
+                    {
+                        var result = packageResultsToReturn.GetOrAdd(installedPackage.Name + "." + installedPackage.Version, (key) => new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
+                        result.Messages.Add(new ResultMessage(ResultType.Error, "Unable to resolve dependency context. Not able to uninstall package."));
+                        continue;
+                    }
+
                         packagesToUninstall.AddRange(allLocalPackages.Where(p => resolvedPackages.Contains(p.Identity)));
 
                         foreach (var packageToUninstall in packagesToUninstall)
