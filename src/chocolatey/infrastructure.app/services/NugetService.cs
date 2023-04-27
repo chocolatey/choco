@@ -2164,6 +2164,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         {
                             try
                             {
+                            this.Log().Info(ChocolateyLoggers.Important, @"
+{0} v{1}", packageToUninstall.Name, packageToUninstall.Identity.Version.ToNormalizedStringChecked());
+
                                 var uninstallPkgInfo = _packageInfoService.Get(packageToUninstall.PackageMetadata);
                                 BackupAndRunBeforeModify(packageToUninstall, uninstallPkgInfo, config, beforeUninstallAction);
 
