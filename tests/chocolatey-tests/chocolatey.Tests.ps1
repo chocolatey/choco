@@ -146,9 +146,9 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         # This is FossOnly for now as there are some undetermined errors here that do not seem to present inside of Chocolatey. https://gitlab.com/chocolatey/build-automation/chocolatey-test-kitchen/-/issues/39
         It "Should be able to run the script in AllSigned mode" -Skip:($_ -notin $PowerShellFiles) -Tag FossOnly {
             $expectedErrors = 0
-            $command = "Import-Module $FileUnderTest -ErrorAction SilentlyContinue; exit `$error.count"
-            & powershell.exe -noprofile -ExecutionPolicy AllSigned -command $command 2>$null
-            $LastExitCode | Should -BeExactly $expectedErrors
+            $command = "Import-Module $FileUnderTest -ErrorAction SilentlyContinue; `$error;exit `$error.count"
+            $result = & powershell.exe -noprofile -ExecutionPolicy AllSigned -command $command *>&1
+            $LastExitCode | Should -BeExactly $expectedErrors -Because $result
         }
     }
 
@@ -182,15 +182,15 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         # This is Foss only as PowerShell running under version 2 doesn't have .net available and can't import the Licensed DLL.
         # Tests on Windows 7 show no issues with running Chocolatey under Windows 7 with PowerShell v2 aside from issues surrounding TLS versions that we cannot resolve without an upgrade to Windows 7.
         It "Imports ChocolateyInstaller module successfully in PowerShell v2" -Tag FossOnly {
-            $command = 'Import-Module $env:ChocolateyInstall\helpers\chocolateyInstaller.psm1;exit $error.count'
-            & powershell.exe -Version 2 -noprofile -command $command
-            $LastExitCode | Should -BeExactly 0
+            $command = 'Import-Module $env:ChocolateyInstall\helpers\chocolateyInstaller.psm1; $error; exit $error.count'
+            $result = & powershell.exe -Version 2 -noprofile -command $command
+            $LastExitCode | Should -BeExactly 0 -Because $result
         }
 
         It "Imports ChocolateyProfile module successfully in PowerShell v2" {
-            $command = 'Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1;exit $error.count'
-            & powershell.exe -Version 2 -noprofile -command $command
-            $LastExitCode | Should -BeExactly 0
+            $command = 'Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1; $error; exit $error.count'
+            $result = & powershell.exe -Version 2 -noprofile -command $command
+            $LastExitCode | Should -BeExactly 0 -Because $result
         }
 
         Context "chocolateyScriptRunner.ps1" {
