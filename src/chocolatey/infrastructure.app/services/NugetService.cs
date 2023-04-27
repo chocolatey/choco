@@ -2034,6 +2034,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             config.CreateBackup();
 
+            var packageVersionsToRemove = new SortedSet<PackageResult>(PackageResultDependencyComparer.Instance);
+
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
             {
                 // We need to ensure we are using a clean configuration file
@@ -2061,7 +2063,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     continue;
                 }
 
-                var packageVersionsToRemove = installedPackageVersions.ToList();
+                packageVersionsToRemove.AddRange(installedPackageVersions);
+
                 if (!config.AllVersions && installedPackageVersions.Count > 1)
                 {
                     if (config.PromptForConfirmation)
@@ -2092,7 +2095,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         if (selection.IsEqualTo(abortChoice)) continue;
                         if (selection.IsEqualTo(allVersionsChoice))
                         {
-                            packageVersionsToRemove = installedPackageVersions.ToList();
+                            packageVersionsToRemove.AddRange(installedPackageVersions.ToList());
                             if (config.RegularOutput) this.Log().Info(() => "You selected to remove all versions of {0}".FormatWith(packageName));
                         }
                         else
@@ -2103,40 +2106,41 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                     }
                 }
+            }
 
-                foreach (var installedPackage in packageVersionsToRemove)
+            foreach (var installedPackage in packageVersionsToRemove)
+            {
+                //Need to get this again for dependency resolution
+                allLocalPackages = GetInstalledPackages(config);
+                var packagesToUninstall = new HashSet<PackageResult>();
+                var localPackagesDependencyInfos = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
+                var pathResolver = NugetCommon.GetPathResolver(_fileSystem);
+                var nugetProject = new FolderNuGetProject(ApplicationParameters.PackagesLocation, pathResolver, NuGetFramework.AnyFramework);
+
+                var pkgInfo = _packageInfoService.Get(installedPackage.PackageMetadata);
+                if (pkgInfo != null && pkgInfo.IsPinned)
                 {
-                    //Need to get this again for dependency resolution
-                    allLocalPackages = GetInstalledPackages(config);
-                    var packagesToUninstall = new HashSet<PackageResult>();
-                    var localPackagesDependencyInfos = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
-                    var pathResolver = NugetCommon.GetPathResolver(_fileSystem);
-                    var nugetProject = new FolderNuGetProject(ApplicationParameters.PackagesLocation, pathResolver, NuGetFramework.AnyFramework);
+                    var logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(installedPackage.Name);
+                    var pinnedResult = packageResultsToReturn.GetOrAdd(installedPackage.Name, new PackageResult(installedPackage.Name, null, null));
+                    pinnedResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                    pinnedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                    if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                    continue;
+                }
 
-                    var pkgInfo = _packageInfoService.Get(installedPackage.PackageMetadata);
-                    if (pkgInfo != null && pkgInfo.IsPinned)
-                    {
-                        string logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
-                        var pinnedResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(packageName, null, null));
-                        pinnedResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                        pinnedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
-                        continue;
-                    }
-
-                    if (performAction)
-                    {
-                        var allPackagesIdentities = allLocalPackages.Where(p => !p.Identity.Equals(installedPackage)).Select(p => p.SearchMetadata.Identity).ToList();
-                        localPackagesDependencyInfos.AddRange(allLocalPackages
-                            .Select(
-                                p => new SourcePackageDependencyInfo(
-                                    p.SearchMetadata.Identity,
-                                    p.PackageMetadata.DependencyGroups.SelectMany(x => x.Packages).ToList(),
-                                    true,
-                                    localRepositorySource,
-                                    null,
-                                    null)));
-                        var uninstallationContext = new UninstallationContext(removeDependencies: config.ForceDependencies, forceRemove: config.Force);
+                if (performAction)
+                {
+                    var allPackagesIdentities = allLocalPackages.Where(p => !p.Identity.Equals(installedPackage)).Select(p => p.SearchMetadata.Identity).ToList();
+                    localPackagesDependencyInfos.AddRange(allLocalPackages
+                        .Select(
+                            p => new SourcePackageDependencyInfo(
+                                p.SearchMetadata.Identity,
+                                p.PackageMetadata.DependencyGroups.SelectMany(x => x.Packages).ToList(),
+                                true,
+                                localRepositorySource,
+                                null,
+                                null)));
+                    var uninstallationContext = new UninstallationContext(removeDependencies: config.ForceDependencies, forceRemove: config.Force);
 
                     ICollection<PackageIdentity> resolvedPackages = null;
                     try
@@ -2158,17 +2162,17 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         continue;
                     }
 
-                        packagesToUninstall.AddRange(allLocalPackages.Where(p => resolvedPackages.Contains(p.Identity)));
+                    packagesToUninstall.AddRange(allLocalPackages.Where(p => resolvedPackages.Contains(p.Identity)));
 
-                        foreach (var packageToUninstall in packagesToUninstall)
+                    foreach (var packageToUninstall in packagesToUninstall)
+                    {
+                        try
                         {
-                            try
-                            {
                             this.Log().Info(ChocolateyLoggers.Important, @"
 {0} v{1}", packageToUninstall.Name, packageToUninstall.Identity.Version.ToNormalizedStringChecked());
 
-                                var uninstallPkgInfo = _packageInfoService.Get(packageToUninstall.PackageMetadata);
-                                BackupAndRunBeforeModify(packageToUninstall, uninstallPkgInfo, config, beforeUninstallAction);
+                            var uninstallPkgInfo = _packageInfoService.Get(packageToUninstall.PackageMetadata);
+                            BackupAndRunBeforeModify(packageToUninstall, uninstallPkgInfo, config, beforeUninstallAction);
 
                             var key = packageToUninstall.Name + "." + packageToUninstall.Version.ToStringSafe();
 
@@ -2189,61 +2193,61 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 packageResult.Messages.RemoveAll(m => m.MessageType == ResultType.Error);
                             }
 
-                                packageResult.InstallLocation = packageToUninstall.InstallLocation;
-                                string logMessage = "{0}{1} v{2}{3}".FormatWith(Environment.NewLine, packageToUninstall.Name, packageToUninstall.Version.ToStringSafe(), config.Force ? " (forced)" : string.Empty);
-                                packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
+                            packageResult.InstallLocation = packageToUninstall.InstallLocation;
+                            var logMessage = "{0}{1} v{2}{3}".FormatWith(Environment.NewLine, packageToUninstall.Name, packageToUninstall.Version.ToStringSafe(), config.Force ? " (forced)" : string.Empty);
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                                if (continueAction != null) continueAction.Invoke(packageResult, config);
+                            if (continueAction != null) continueAction.Invoke(packageResult, config);
 
-                                if (packageToUninstall != null)
-                                {
-                                    packageToUninstall.InstallLocation = pathResolver.GetInstallPath(packageToUninstall.Identity);
-                                    try
-                                    {
-                                        //It does not throw or return false if it fails to delete something...
-                                        //var ableToDelete = nugetProject.DeletePackage(packageToUninstall.Identity, projectContext, CancellationToken.None, shouldDeleteDirectory: false).GetAwaiter().GetResult();
-
-                                        // If we have gotten here, it means we may only have files left to remove.
-                                        RemoveInstallationFilesUnsafe(packageToUninstall.PackageMetadata, pkgInfo);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        string errorlogMessage = "{0}:{1} {2}".FormatWith("Unable to delete all existing package files. There will be leftover files requiring manual cleanup", Environment.NewLine, ex.Message);
-                                        this.Log().Warn(logMessage);
-                                        packageResult.Messages.Add(new ResultMessage(ResultType.Error, errorlogMessage));
-
-                                        // Do not call continueAction again here as it has already been called once.
-                                        //if (continueAction != null) continueAction.Invoke(packageResult, config);
-                                        continue;
-                                    }
-                                }
-
-                                this.Log().Info(ChocolateyLoggers.Important, " {0} has been successfully uninstalled.".FormatWith(packageToUninstall.Name));
-
-                                EnsureNupkgRemoved(packageToUninstall.PackageMetadata);
-                                RemoveInstallationFiles(packageToUninstall.PackageMetadata, uninstallPkgInfo);
-                            }
-                            catch (Exception ex)
+                            if (packageToUninstall != null)
                             {
-                                var logMessage = "{0} not uninstalled. An error occurred during uninstall:{1} {2}".FormatWith(packageName, Environment.NewLine, ex.Message);
-                                this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                                var result = packageResultsToReturn.GetOrAdd(packageToUninstall.Name + "." + packageToUninstall.Version.ToStringSafe(), new PackageResult(packageToUninstall.PackageMetadata, pathResolver.GetInstallPath(packageToUninstall.PackageMetadata.Id)));
-                                result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                                if (result.ExitCode == 0) result.ExitCode = 1;
-                                if (config.Features.StopOnFirstPackageFailure)
+                                packageToUninstall.InstallLocation = pathResolver.GetInstallPath(packageToUninstall.Identity);
+                                try
                                 {
-                                    throw new ApplicationException("Stopping further execution as {0} has failed uninstallation".FormatWith(packageToUninstall.Name));
+                                    //It does not throw or return false if it fails to delete something...
+                                    //var ableToDelete = nugetProject.DeletePackage(packageToUninstall.Identity, projectContext, CancellationToken.None, shouldDeleteDirectory: false).GetAwaiter().GetResult();
+
+                                    // If we have gotten here, it means we may only have files left to remove.
+                                    RemoveInstallationFilesUnsafe(packageToUninstall.PackageMetadata, pkgInfo);
                                 }
-                                // do not call continueAction - will result in multiple passes
+                                catch (Exception ex)
+                                {
+                                    var errorlogMessage = "{0}:{1} {2}".FormatWith("Unable to delete all existing package files. There will be leftover files requiring manual cleanup", Environment.NewLine, ex.Message);
+                                    this.Log().Warn(logMessage);
+                                    packageResult.Messages.Add(new ResultMessage(ResultType.Error, errorlogMessage));
+
+                                    // Do not call continueAction again here as it has already been called once.
+                                    //if (continueAction != null) continueAction.Invoke(packageResult, config);
+                                    continue;
+                                }
                             }
+
+                            this.Log().Info(ChocolateyLoggers.Important, " {0} has been successfully uninstalled.".FormatWith(packageToUninstall.Name));
+
+                            EnsureNupkgRemoved(packageToUninstall.PackageMetadata);
+                            RemoveInstallationFiles(packageToUninstall.PackageMetadata, uninstallPkgInfo);
+                        }
+                        catch (Exception ex)
+                        {
+                            var logMessage = "{0} not uninstalled. An error occurred during uninstall:{1} {2}".FormatWith(installedPackage.Name, Environment.NewLine, ex.Message);
+                            this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                            var result = packageResultsToReturn.GetOrAdd(packageToUninstall.Name + "." + packageToUninstall.Version.ToStringSafe(), new PackageResult(packageToUninstall.PackageMetadata, pathResolver.GetInstallPath(packageToUninstall.PackageMetadata.Id)));
+                            result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            if (result.ExitCode == 0) result.ExitCode = 1;
+
+                            if (config.Features.StopOnFirstPackageFailure)
+                            {
+                                throw new ApplicationException("Stopping further execution as {0} has failed uninstallation".FormatWith(packageToUninstall.Name));
+                            }
+                            // do not call continueAction - will result in multiple passes
                         }
                     }
-                    else
-                    {
-                        // continue action won't be found b/c we are not actually uninstalling (this is noop)
-                        var result = packageResultsToReturn.GetOrAdd(installedPackage.Name + "." + installedPackage.Version.ToStringSafe(), new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
-                        if (continueAction != null) continueAction.Invoke(result, config);
-                    }
+                }
+                else
+                {
+                    // continue action won't be found b/c we are not actually uninstalling (this is noop)
+                    var result = packageResultsToReturn.GetOrAdd(installedPackage.Name + "." + installedPackage.Version.ToStringSafe(), new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
+                    if (continueAction != null) continueAction.Invoke(result, config);
                 }
             }
 
@@ -2680,5 +2684,47 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         public IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config)
             => GetInstalledPackages(config);
 #pragma warning restore IDE1006
+
+        private class PackageResultDependencyComparer : IComparer<PackageResult>
+        {
+            private PackageResultDependencyComparer()
+            {
+            }
+
+            public static IComparer<PackageResult> Instance { get; } = new PackageResultDependencyComparer();
+
+            public int Compare(PackageResult x, PackageResult y)
+            {
+                if (ReferenceEquals(x, y))
+                {
+                    return 0;
+                }
+
+                foreach (PackageDependency dependency in x.PackageMetadata?.DependencyGroups.SelectMany(d => d.Packages).OrEmpty())
+                {
+                    if (y.Name.IsEqualTo(dependency.Id))
+                    {
+                        return -1;
+                    }
+                }
+
+                foreach (PackageDependency dependency in y.PackageMetadata?.DependencyGroups.SelectMany(d => d.Packages).OrEmpty())
+                {
+                    if (x.Name.IsEqualTo(dependency.Id))
+                    {
+                        return 1;
+                    }
+                }
+
+                var result = string.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
+
+                if (result == 0)
+                {
+                    return x.Identity.Version.CompareTo(y.Identity.Version);
+                }
+
+                return result;
+            }
+        }
     }
 }
