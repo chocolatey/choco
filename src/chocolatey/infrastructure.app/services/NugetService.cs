@@ -2167,7 +2167,25 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 var uninstallPkgInfo = _packageInfoService.Get(packageToUninstall.PackageMetadata);
                                 BackupAndRunBeforeModify(packageToUninstall, uninstallPkgInfo, config, beforeUninstallAction);
 
-                                var packageResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name + "." + packageToUninstall.Version.ToStringSafe(), packageToUninstall);
+                            var key = packageToUninstall.Name + "." + packageToUninstall.Version.ToStringSafe();
+
+                            if (packageResultsToReturn.TryRemove(key, out PackageResult removedPackage))
+                            {
+                                // If we are here, we have already tried this package, as such we need
+                                // to remove the package but keep any messages. This is required as
+                                // Search Metadata may be null which is required later.
+                                packageToUninstall.Messages.AddRange(removedPackage.Messages);
+                            }
+
+                            var packageResult = packageResultsToReturn.GetOrAdd(key, packageToUninstall);
+
+                            if (!packageResult.Success)
+                            {
+                                // Remove any previous error messages, otherwise the uninstall may show
+                                // up as failing.
+                                packageResult.Messages.RemoveAll(m => m.MessageType == ResultType.Error);
+                            }
+
                                 packageResult.InstallLocation = packageToUninstall.InstallLocation;
                                 string logMessage = "{0}{1} v{2}{3}".FormatWith(Environment.NewLine, packageToUninstall.Name, packageToUninstall.Version.ToStringSafe(), config.Force ? " (forced)" : string.Empty);
                                 packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
