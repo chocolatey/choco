@@ -443,7 +443,8 @@ To upgrade a local, or remote file, you may use:
         # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
         # The result is that versioned backup files of each file in the package is created, instead of the package being
         # removed. Consider the test partially broken.
-        It "Outputs a message showing that installation failed." -TagFossOnly {
+        It "Outputs a message showing that installation failed." -Tag FossOnly {
+
             $Output.Lines | Should -Contain "Chocolatey upgraded 0/1 packages. 1 packages failed." -Because $Output.String
         }
     }
