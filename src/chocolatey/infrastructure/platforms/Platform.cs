@@ -134,18 +134,6 @@ namespace chocolatey.infrastructure.platforms
                 case "6.1":
                     name = isServer ? "Windows Server 2008 R2" : "Windows 7";
                     break;
-                case "6.0":
-                    name = isServer ? "Windows Server 2008" : "Windows Vista";
-                    break;
-                case "5.2":
-                    name = isServer ? "Windows Server 2003" : "Windows XP";
-                    break;
-                case "5.1":
-                    name = "Windows XP";
-                    break;
-                case "5.0":
-                    name = "Windows 2000";
-                    break;
             }
 
             return name;
