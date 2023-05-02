@@ -185,8 +185,8 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_searching_for_non_normalized_exact_package : CommandScenariosBase
         {
-            private string NonNormalizedVersion = "004.0.01.0";
-            private string NormalizedVersion = "4.0.1";
+            private const string NonNormalizedVersion = "004.0.01.0";
+            private const string NormalizedVersion = "4.0.1";
 
             public override void Context()
             {
@@ -226,8 +226,8 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_searching_for_non_normalized_exact_package_with_version_specified : CommandScenariosBase
         {
-            private string NonNormalizedVersion = "004.0.01.0";
-            private string NormalizedVersion = "4.0.1";
+            private const string NonNormalizedVersion = "004.0.01.0";
+            private const string NormalizedVersion = "4.0.1";
 
             public override void Context()
             {
@@ -269,8 +269,8 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_searching_for_non_normalized_exact_package_with_non_normalized_version_specified : CommandScenariosBase
         {
-            private string NonNormalizedVersion = "004.0.01.0";
-            private string NormalizedVersion = "4.0.1";
+            private const string NonNormalizedVersion = "004.0.01.0";
+            private const string NormalizedVersion = "4.0.1";
 
             public override void Context()
             {

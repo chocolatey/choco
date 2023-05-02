@@ -1087,7 +1087,7 @@ If a package is failing because it is a dependency of another package
 
         private int ReportActionSummary(ConcurrentDictionary<string, PackageResult> packageResults, string actionName)
         {
-            var successes = packageResults.OrEmpty().Where(p => p.Value.Success && !p.Value.Inconclusive);
+            var successes = packageResults.OrEmpty().Where(p => p.Value.Success && !p.Value.Inconclusive).OrderBy(p => p.Value.Name);
             var failures = packageResults.Count(p => !p.Value.Success);
             var warnings = packageResults.Count(p => p.Value.Warning);
             var rebootPackages = packageResults.Count(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode));
@@ -1117,7 +1117,7 @@ If a package is failing because it is a dependency of another package
             {
                 this.Log().Info("");
                 this.Log().Warn("Warnings:");
-                foreach (var warning in packageResults.Where(p => p.Value.Warning).OrEmpty())
+                foreach (var warning in packageResults.Where(p => p.Value.Warning).OrderBy(p => p.Value.Name).OrEmpty())
                 {
                     var warningMessage = warning.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Warn);
                     this.Log().Warn(" - {0}{1}".FormatWith(warning.Value.Name, warningMessage != null ? " - {0}".FormatWith(warningMessage.Message) : string.Empty));
@@ -1128,7 +1128,7 @@ If a package is failing because it is a dependency of another package
             {
                 this.Log().Info("");
                 this.Log().Warn("Packages requiring reboot:");
-                foreach (var reboot in packageResults.Where(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode)).OrEmpty())
+                foreach (var reboot in packageResults.Where(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode)).OrderBy(p => p.Value.Name).OrEmpty())
                 {
                     this.Log().Warn(" - {0}{1}".FormatWith(reboot.Value.Name, reboot.Value.ExitCode != 0 ? " (exit code {0})".FormatWith(reboot.Value.ExitCode) : string.Empty));
                 }
@@ -1141,7 +1141,7 @@ The recent package changes indicate a reboot is necessary.
             {
                 this.Log().Info("");
                 this.Log().Error("Failures");
-                foreach (var failure in packageResults.Where(p => !p.Value.Success).OrEmpty())
+                foreach (var failure in packageResults.Where(p => !p.Value.Success).OrderBy(p => p.Value.Name).OrEmpty())
                 {
                     var errorMessage = failure.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Error);
                     this.Log().Error(

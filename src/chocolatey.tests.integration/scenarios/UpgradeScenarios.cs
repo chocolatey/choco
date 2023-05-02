@@ -1932,20 +1932,20 @@ namespace chocolatey.tests.integration.scenarios
         {
             private PackageResult _packageResult;
 
-            private FileStream fileStream;
+            private FileStream _fileStream;
 
             public override void Context()
             {
                 base.Context();
                 var fileToOpen = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
-                fileStream = new FileStream(fileToOpen, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete);
+                _fileStream = new FileStream(fileToOpen, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete);
             }
 
             public override void AfterObservations()
             {
                 base.AfterObservations();
-                fileStream.Close();
-                fileStream.Dispose();
+                _fileStream.Close();
+                _fileStream.Dispose();
             }
 
             public override void Because()
@@ -1978,10 +1978,20 @@ namespace chocolatey.tests.integration.scenarios
                 }
             }
 
-            [Fact]
-            [Pending("Does not work under .Net 4.8, See issue #2690")]
-            [Broken]
-            public void Should_not_be_able_delete_the_rollback()
+            // Locking is inconsistent between client and server operating systems in .NET 4.8.
+            // On a server, if a file is Read and delete locked it can't be deleted, but on client systems it can.
+            [Fact, Platform(Exclude = "WindowsServer10")]
+            public void Should_have_deleted_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            // Locking is inconsistent between client and server operating systems in .NET 4.8.
+            // On a server, if a file is Read and delete locked it can't be deleted, but on client systems it can.
+            [Fact, Platform("WindowsServer10")]
+            public void Should_not_have_deleted_the_rollback_on_server()
             {
                 var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
 
@@ -2045,20 +2055,20 @@ namespace chocolatey.tests.integration.scenarios
         {
             private PackageResult _packageResult;
 
-            private FileStream fileStream;
+            private FileStream _fileStream;
 
             public override void Context()
             {
                 base.Context();
                 var fileToOpen = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
-                fileStream = new FileStream(fileToOpen, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
+                _fileStream = new FileStream(fileToOpen, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
             }
 
             public override void AfterObservations()
             {
                 base.AfterObservations();
-                fileStream.Close();
-                fileStream.Dispose();
+                _fileStream.Close();
+                _fileStream.Dispose();
             }
 
             public override void Because()
@@ -2306,7 +2316,7 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_upgrading_a_package_that_does_not_exist : ScenariosBase
         {
-            private PackageResult packageResult;
+            private PackageResult _packageResult;
 
             public override void Context()
             {
@@ -2317,7 +2327,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Because()
             {
                 Results = Service.Upgrade(Configuration);
-                packageResult = Results.FirstOrDefault().Value;
+                _packageResult = Results.FirstOrDefault().Value;
             }
 
             [Fact]
@@ -2355,26 +2365,26 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                _packageResult.Success.ShouldBeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.ShouldBeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.ShouldBeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
                 bool errorFound = false;
-                foreach (var message in packageResult.Messages)
+                foreach (var message in _packageResult.Messages)
                 {
                     if (message.MessageType == ResultType.Error)
                     {
@@ -2389,7 +2399,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_have_expected_error_in_package_result()
             {
                 bool errorFound = false;
-                foreach (var message in packageResult.Messages)
+                foreach (var message in _packageResult.Messages)
                 {
                     if (message.MessageType == ResultType.Error)
                     {
@@ -2564,7 +2574,7 @@ namespace chocolatey.tests.integration.scenarios
         [Platform(Exclude = "Mono")]
         public class When_upgrading_a_package_that_errors : ScenariosBase
         {
-            private PackageResult packageResult;
+            private PackageResult _packageResult;
 
             public override void Context()
             {
@@ -2575,7 +2585,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Because()
             {
                 Results = Service.Upgrade(Configuration);
-                packageResult = Results.FirstOrDefault().Value;
+                _packageResult = Results.FirstOrDefault().Value;
             }
 
             [Fact]
@@ -2637,26 +2647,26 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                _packageResult.Success.ShouldBeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.ShouldBeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.ShouldBeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
                 bool errorFound = false;
-                foreach (var message in packageResult.Messages)
+                foreach (var message in _packageResult.Messages)
                 {
                     if (message.MessageType == ResultType.Error)
                     {
@@ -2671,7 +2681,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_have_expected_error_in_package_result()
             {
                 bool errorFound = false;
-                foreach (var message in packageResult.Messages)
+                foreach (var message in _packageResult.Messages)
                 {
                     if (message.MessageType == ResultType.Error)
                     {
