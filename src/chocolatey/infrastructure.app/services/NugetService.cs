@@ -1419,6 +1419,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 var upgradePackageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath));
                                 upgradePackageResult.ResetMetadata(packageMetadata, packageRemoteMetadata);
                                 upgradePackageResult.InstallLocation = installedPath;
+
                                 upgradePackageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
                                 var elementsList = _ruleService.ValidateRules(manifestPath)
@@ -1434,6 +1435,17 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 }
 
                                 if (continueAction != null) continueAction.Invoke(upgradePackageResult, config);
+
+                                if (packageToUninstall != null)
+                                {
+                                    // Add any warning messages from when we uninstalled the previous package, so
+                                    // these can be propagated to the warning list at the end.
+                                    // We add these as the last elements otherwise warnings in the current/new
+                                    // package may not show up as expected.
+                                    upgradePackageResult.Messages.AddRange(packageToUninstall.Messages
+                                        .Where(p => p.MessageType == ResultType.Warn)
+                                        .Select(p => new ResultMessage(p.MessageType, "v{0} - {1}".FormatWith(packageToUninstall.Version, p.Message))));
+                                }
                             }
                             catch (Exception ex)
                             {
@@ -2299,7 +2311,29 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     if (beforeModifyAction != null)
                     {
                         "chocolatey".Log().Debug("Running beforeModify step for '{0}'", packageResult.PackageMetadata.Id);
-                        beforeModifyAction(packageResult, config);
+
+                        var packageResultCopy = new PackageResult(packageResult.PackageMetadata, packageResult.SearchMetadata, packageResult.InstallLocation, packageResult.Source);
+
+                        beforeModifyAction(packageResultCopy, config);
+
+                        packageResult.Messages.AddRange(packageResultCopy.Messages.Select(m =>
+                        {
+                            if (m.MessageType == ResultType.Error)
+                            {
+                                // We don't want any errors to stop execution when running before modify
+                                // scripts. As such we will re-add this message as a warning instead.
+                                if (m.Message.ContainsSafe("Error while running"))
+                                {
+                                    return new ResultMessage(ResultType.Warn, "Error while running the 'chocolateyBeforeModify.ps1'.");
+                                }
+                                else
+                                {
+                                    return new ResultMessage(ResultType.Warn, m.Message);
+                                }
+                            }
+
+                            return m;
+                        }));
                     }
 
                     "chocolatey".Log().Debug("Backing up package files for '{0}'", packageResult.PackageMetadata.Id);

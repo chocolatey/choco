@@ -509,6 +509,10 @@ To upgrade a local, or remote file, you may use:
         It "Outputs a message showing that installation was successful" {
             $Output.Lines | Should -Contain "Chocolatey upgraded 1/1 packages."
         }
+
+        It "Outputs additiontal warning about before modify script" {
+            $Output.Lines | Should -Contain "- upgradepackage - v1.0.0 - Error while running the 'chocolateyBeforeModify.ps1'." -Because $Output.String
+        }
     }
 
     # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.

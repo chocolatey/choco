@@ -70,6 +70,10 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
         It "Outputs Successful uninstall" {
             $Output.Lines | Should -Contain "Chocolatey uninstalled 1/1 packages."
         }
+
+        It "Outputs additiontal warning about before modify script" {
+            $Output.Lines | Should -Contain "- upgradepackage - Error while running the 'chocolateyBeforeModify.ps1'." -Because $Output.String
+        }
     }
 
     Context "Uninstalling a package with a failing uninstall script" {
