@@ -100,6 +100,19 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 because();
 
                 config.HelpRequested.ShouldBeTrue();
+                config.ShowOnlineHelp.ShouldBeFalse();
+            }
+
+            [Fact]
+            public void Should_show_online_help_menu_when_help_is_requested()
+            {
+                args.Add("-h");
+                args.Add("--online");
+
+                because();
+
+                config.HelpRequested.ShouldBeTrue();
+                config.ShowOnlineHelp.ShouldBeTrue();
             }
 
             [Fact]

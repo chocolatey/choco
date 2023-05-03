@@ -448,8 +448,12 @@ namespace chocolatey.infrastructure.app.builders
                 {
                     if (!string.IsNullOrWhiteSpace(config.CommandName))
                     {
-                        // save help for next menu
+                        // This method is called twice each run, once when setting the command name and global options (here), and then to set all the
+                        // command-specific options and actually execute the command.
+                        // To ensure correct operation, we need to reset the help options to false in the first execution, to then have them
+                        // parsed correctly in the second iteration.
                         config.HelpRequested = false;
+                        config.ShowOnlineHelp = false;
                         config.UnsuccessfulParsing = false;
                     }
                 },

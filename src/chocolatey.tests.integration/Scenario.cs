@@ -285,6 +285,7 @@ namespace chocolatey.tests.integration
             config.ForceDependencies = false;
             config.ForceX86 = false;
             config.HelpRequested = false;
+            config.ShowOnlineHelp = false;
             config.UnsuccessfulParsing = false;
             config.UnsuccessfulParsing = false;
             config.IgnoreDependencies = false;
