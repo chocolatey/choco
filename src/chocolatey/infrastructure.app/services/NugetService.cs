@@ -161,6 +161,22 @@ install them.
                 }
             }
 
+            if ((config.ListCommand.ApprovedOnly || config.ListCommand.DownloadCacheAvailable || config.ListCommand.NotBroken) && config.RegularOutput)
+            {
+                // This warning has been added here, to provide context to the user, and a follow up issue
+
+                // has been added here: https://github.com/chocolatey/choco/issues/3139 to address the actual
+                // issue that causes this warning to be required.
+                this.Log().Warn(@"
+Starting vith Chocolatey CLI v2.0.0, changes have been made to the
+`choco search` command which means that filtering of packages using the
+`--approved-only`, `--download-cache`, and `--not-broken` options are
+now performed within Chocolatey CLI. Previously, this filtering would
+have been performed on the Chocolatey Community Repository. As a result,
+it is possible that incomplete package lists are returned from a command
+that uses these options.");
+            }
+
             if (config.RegularOutput) this.Log().Debug(() => "Running list with the following filter = '{0}'".FormatWith(config.Input));
             if (config.RegularOutput) this.Log().Debug(ChocolateyLoggers.Verbose, () => "--- Start of List ---");
             foreach (var pkg in NugetList.GetPackages(config, _nugetLogger, _fileSystem))
