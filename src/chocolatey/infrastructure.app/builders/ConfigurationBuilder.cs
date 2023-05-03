@@ -448,9 +448,10 @@ namespace chocolatey.infrastructure.app.builders
                 {
                     if (!string.IsNullOrWhiteSpace(config.CommandName))
                     {
-                        // The setOptions lambda above is called twice, once to set the command name, and then to execute the command with all options.
-                        // To ensure correct option of the help options, we need to reset them to false in the first execution, to then have them parsed correctly in the second
-                        // iteration.
+                        // This method is called twice each run, once when setting the command name and global options (here), and then to set all the
+                        // command-specific options and actually execute the command.
+                        // To ensure correct operation, we need to reset the help options to false in the first execution, to then have them
+                        // parsed correctly in the second iteration.
                         config.HelpRequested = false;
                         config.ShowOnlineHelp = false;
                         config.UnsuccessfulParsing = false;
