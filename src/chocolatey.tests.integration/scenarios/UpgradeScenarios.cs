@@ -289,9 +289,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
@@ -629,9 +632,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
@@ -784,9 +790,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
@@ -1600,9 +1609,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
@@ -1920,9 +1932,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
         }
 
@@ -2043,9 +2058,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
         }
 
@@ -2222,9 +2240,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
@@ -2302,9 +2323,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
@@ -3745,9 +3769,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
@@ -3845,9 +3872,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
@@ -4164,9 +4194,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
@@ -4486,9 +4519,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
@@ -4986,9 +5022,12 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void Should_not_have_warning_package_result()
+            public void Should_not_have_warning_package_result_other_than_before_modify_failures()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                // For before modify scripts that fail, we add a warning message.
+                // So we will ignore any such warnings.
+                var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
+                messages.ShouldBeEmpty();
             }
 
             [Fact]
