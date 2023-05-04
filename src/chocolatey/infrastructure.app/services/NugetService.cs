@@ -2062,7 +2062,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             config.CreateBackup();
 
-            var packageVersionsToRemove = new SortedSet<PackageResult>(PackageResultDependencyComparer.Instance);
+            var packageVersionsToRemove = new List<PackageResult>();
 
             foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
             {
@@ -2136,7 +2136,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 }
             }
 
-            foreach (var installedPackage in packageVersionsToRemove)
+            foreach (var installedPackage in GetUninstallOrder(packageVersionsToRemove))
             {
                 //Need to get this again for dependency resolution
                 allLocalPackages = GetInstalledPackages(config);
@@ -2285,6 +2285,41 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             config.RevertChanges(removeBackup: true);
 
             return packageResultsToReturn;
+        }
+
+        private IEnumerable<PackageResult> GetUninstallOrder(List<PackageResult> packageVersionsToRemove)
+        {
+            var newResults = new List<PackageResult>();
+
+            foreach (var package in packageVersionsToRemove)
+            {
+                var insertIndex = -1;
+
+                foreach (var dependency in package.PackageMetadata.DependencyGroups.SelectMany(d => d.Packages))
+                {
+                    var existingPackage = newResults.FirstOrDefault(p => p.Name.IsEqualTo(dependency.Id));
+
+                    if (existingPackage != null)
+                    {
+                        var index = newResults.IndexOf(existingPackage);
+                        if (index > -1 && (index < insertIndex || insertIndex == -1))
+                        {
+                            insertIndex = index;
+                        }
+                    }
+                }
+
+                if (insertIndex >= 0)
+                {
+                    newResults.Insert(insertIndex, package);
+                }
+                else
+                {
+                    newResults.Add(package);
+                }
+            }
+
+            return newResults;
         }
 
         /// <summary>
@@ -2734,47 +2769,5 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         public IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config)
             => GetInstalledPackages(config);
 #pragma warning restore IDE1006
-
-        private class PackageResultDependencyComparer : IComparer<PackageResult>
-        {
-            private PackageResultDependencyComparer()
-            {
-            }
-
-            public static IComparer<PackageResult> Instance { get; } = new PackageResultDependencyComparer();
-
-            public int Compare(PackageResult x, PackageResult y)
-            {
-                if (ReferenceEquals(x, y))
-                {
-                    return 0;
-                }
-
-                foreach (PackageDependency dependency in x.PackageMetadata?.DependencyGroups.SelectMany(d => d.Packages).OrEmpty())
-                {
-                    if (y.Name.IsEqualTo(dependency.Id))
-                    {
-                        return -1;
-                    }
-                }
-
-                foreach (PackageDependency dependency in y.PackageMetadata?.DependencyGroups.SelectMany(d => d.Packages).OrEmpty())
-                {
-                    if (x.Name.IsEqualTo(dependency.Id))
-                    {
-                        return 1;
-                    }
-                }
-
-                var result = string.Compare(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
-
-                if (result == 0)
-                {
-                    return x.Identity.Version.CompareTo(y.Identity.Version);
-                }
-
-                return result;
-            }
-        }
     }
 }
