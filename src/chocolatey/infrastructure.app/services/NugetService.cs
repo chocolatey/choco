@@ -2168,12 +2168,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 localRepositorySource,
                                 null,
                                 null)));
-                    var uninstallationContext = new UninstallationContext(removeDependencies: config.ForceDependencies, forceRemove: config.Force);
+                    var uninstallationContext = new UninstallationContext(removeDependencies: config.ForceDependencies, forceRemove: config.Force, warnDependencyResolvingFailure: true);
 
                     ICollection<PackageIdentity> resolvedPackages = null;
                     try
                     {
-                        resolvedPackages = UninstallResolver.GetPackagesToBeUninstalled(installedPackage.Identity, localPackagesDependencyInfos, allPackagesIdentities, uninstallationContext);
+                        resolvedPackages = UninstallResolver.GetPackagesToBeUninstalled(installedPackage.Identity, localPackagesDependencyInfos, allPackagesIdentities, uninstallationContext, _nugetLogger);
                     }
                     catch (Exception ex)
                     {
