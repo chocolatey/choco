@@ -404,6 +404,45 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
         }
     }
 
+    Context "When uninstalling a package, forcing dependencies to uninstall and dependency is referenced by other packages" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Invoke-Choco install hasdependency --version 1.0.0 --confirm
+            $null = Invoke-Choco install toplevelhasexactversiondependency --confirm
+
+            $Output = Invoke-Choco uninstall hasdependency --force-dependencies --confirm
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
+        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
+        # The result is that versioned backup files of each file in the package is created, instead of the package being
+        # removed. Consider the test partially broken.
+        It "Should have removed <_>" -ForEach @('hasdependency', 'isdependency') {
+            "$env:ChocolateyInstall\lib\$_" | Should -Not -Exist -Because $Output.String
+        }
+
+        It "Should not have removed <_>" -ForEach @('isexactversiondependency', 'childdependencywithlooserversiondependency', 'toplevelhasexactversiondependency') {
+            "$env:ChocolateyInstall\lib\$_" | Should -Exist -Because $Output.String
+        }
+
+        It "Outputs <_> was successfully uninstalled" -ForEach @('hasdependency', 'isdependency') {
+            $Output.Lines | Should -Contain "$_ has been successfully uninstalled." -Because $Output.String
+        }
+
+        It "Outputs warning about dependency being skipped" {
+            $Output.Lines | Should -Contain "[NuGet] 'isexactversiondependency 1.0.0' skipped, because it is in use by 'childdependencywithlooserversiondependency 1.0.0,toplevelhasexactversiondependency 1.0.0'." -Because $Output.String
+        }
+
+        It "Outputs 2/2 packages uninstalled" {
+            $Output.Lines | Should -Contain "Chocolatey uninstalled 2/2 packages."
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths
 }
