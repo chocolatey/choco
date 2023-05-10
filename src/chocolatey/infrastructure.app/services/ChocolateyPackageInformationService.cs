@@ -257,20 +257,6 @@ A corrupt .registry file exists at {0}.
             _fileSystem.DeleteDirectoryChecked(pkgStorePath, recursive: true);
         }
 
-#pragma warning disable IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public ChocolateyPackageInformation get_package_information(IPackageMetadata package)
-            => Get(package);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void save_package_information(ChocolateyPackageInformation packageInformation)
-            => Save(packageInformation);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void remove_package_information(IPackageMetadata package)
-            => Remove(package);
-#pragma warning restore IDE1006
-
         private static string GetStorePath(IFileSystem fileSystem, string id, NuGetVersion version)
         {
             var preferredStorePath = fileSystem.CombinePaths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".FormatWith(id, version.ToNormalizedStringChecked()));
@@ -316,5 +302,19 @@ A corrupt .registry file exists at {0}.
 
             return preferredStorePath;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ChocolateyPackageInformation get_package_information(IPackageMetadata package)
+            => Get(package);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void save_package_information(ChocolateyPackageInformation packageInformation)
+            => Save(packageInformation);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void remove_package_information(IPackageMetadata package)
+            => Remove(package);
+#pragma warning restore IDE1006
     }
 }
