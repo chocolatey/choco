@@ -74,7 +74,8 @@ namespace chocolatey.infrastructure.app.services
                 return packageInformation;
             }
 
-            var pkgStorePath = _fileSystem.CombinePaths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".FormatWith(package.Id, package.Version.ToStringSafe()));
+            var pkgStorePath = GetStorePath(_fileSystem, package.Id, package.Version);
+
             if (!_fileSystem.DirectoryExists(pkgStorePath))
             {
                 return packageInformation;
@@ -176,7 +177,8 @@ A corrupt .registry file exists at {0}.
                 return;
             }
 
-            var pkgStorePath = _fileSystem.CombinePaths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".FormatWith(packageInformation.Package.Id, packageInformation.Package.Version.ToStringSafe()));
+            var pkgStorePath = GetStorePath(_fileSystem, packageInformation.Package.Id, packageInformation.Package.Version);
+
             _fileSystem.EnsureDirectoryExists(pkgStorePath);
 
             if (packageInformation.RegistrySnapshot != null)
@@ -250,7 +252,7 @@ A corrupt .registry file exists at {0}.
 
         public void Remove(IPackageMetadata package)
         {
-            var pkgStorePath = _fileSystem.CombinePaths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".FormatWith(package.Id, package.Version.ToStringSafe()));
+            var pkgStorePath = GetStorePath(_fileSystem, package.Id, package.Version);
             if (_config.RegularOutput) this.Log().Info("Removing Package Information for {0}".FormatWith(pkgStorePath));
             _fileSystem.DeleteDirectoryChecked(pkgStorePath, recursive: true);
         }
@@ -268,5 +270,51 @@ A corrupt .registry file exists at {0}.
         public void remove_package_information(IPackageMetadata package)
             => Remove(package);
 #pragma warning restore IDE1006
+
+        private static string GetStorePath(IFileSystem fileSystem, string id, NuGetVersion version)
+        {
+            var preferredStorePath = fileSystem.CombinePaths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".FormatWith(id, version.ToNormalizedStringChecked()));
+
+            if (fileSystem.DirectoryExists(preferredStorePath))
+            {
+                return preferredStorePath;
+            }
+
+            var pkgStorePath = fileSystem.CombinePaths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".FormatWith(id, version.ToStringSafe()));
+
+            if (fileSystem.DirectoryExists(pkgStorePath))
+            {
+                return pkgStorePath;
+            }
+
+            // Legacy handling for package version that was installed originally as 4.0.0.0
+
+            var versionFull = version.IsPrerelease
+                ? "{0}-{1}".FormatWith(version.Version.ToStringSafe(), version.Release)
+                : version.Version.ToStringSafe();
+            pkgStorePath = fileSystem.CombinePaths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".FormatWith(id, versionFull));
+
+            if (fileSystem.DirectoryExists(pkgStorePath))
+            {
+                return pkgStorePath;
+            }
+
+            // Legacy handling for package versions that was installed originally as "4.2"
+
+            if (version.Version.Revision == 0 && version.Version.Build == 0)
+            {
+                versionFull = version.IsPrerelease
+                    ? "{0}.{1}-{2}".FormatWith(version.Major, version.Minor, version.Release)
+                    : "{0}.{1}".FormatWith(version.Major, version.Minor);
+                pkgStorePath = fileSystem.CombinePaths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".FormatWith(id, versionFull));
+
+                if (fileSystem.DirectoryExists(pkgStorePath))
+                {
+                    return pkgStorePath;
+                }
+            }
+
+            return preferredStorePath;
+        }
     }
 }
