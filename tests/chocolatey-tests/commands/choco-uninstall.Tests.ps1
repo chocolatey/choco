@@ -51,11 +51,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Should have removed lib package directory" -Tag FossOnly {
+        It "Should have removed lib package directory" {
             "$env:ChocolateyInstall\lib\upgradepackage" | Should -Not -Exist
         }
 
@@ -131,11 +127,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             "$env:ChocolateyInstall\lib\installpackage\a-locked-file.txt" | Should -Exist
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Should have removed file '<_>' in lib directory" -ForEach @('installpackage.nupkg', 'installpackage.nuspec', 'tools\casemismatch.exe', 'tools\Casemismatch.exe.ignore', 'tools\chocolateyBeforeModify.ps1', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\console.exe', 'tools\graphical.exe', 'tools\graphical.exe.gui', 'tools\not.installed.exe', 'tools\not.installed.exe.ignore', 'tools\simplefile.txt') -Tag FossOnly {
+        It "Should have removed file '<_>' in lib directory" -ForEach @('installpackage.nupkg', 'installpackage.nuspec', 'tools\casemismatch.exe', 'tools\Casemismatch.exe.ignore', 'tools\chocolateyBeforeModify.ps1', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\console.exe', 'tools\graphical.exe', 'tools\graphical.exe.gui', 'tools\not.installed.exe', 'tools\not.installed.exe.ignore', 'tools\simplefile.txt') {
             "$env:ChocolateyInstall\lib\installpackage\$_" | Should -Not -Exist
         }
 
@@ -172,23 +164,15 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $LockedFile.Dispose()
         }
 
-        It "Exits with Failure (1)" -Tag FossOnly {
+        It "Exits with Failure (1)" {
             $Output.ExitCode | Should -Be 1 -Because $Output.String
-        }
-
-        It "Exits with Success (0)" -Tag Licensed {
-            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should have kept locked file in lib directory" {
             "$env:ChocolateyInstall\lib\installpackage\a-locked-file.txt" | Should -Exist
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Should have removed file '<_>' in lib directory" -ForEach @('installpackage.nupkg', 'installpackage.nuspec', 'tools\casemismatch.exe', 'tools\Casemismatch.exe.ignore', 'tools\chocolateyBeforeModify.ps1', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\console.exe', 'tools\graphical.exe', 'tools\graphical.exe.gui', 'tools\not.installed.exe', 'tools\not.installed.exe.ignore', 'tools\simplefile.txt') -Tag FossOnly {
+        It "Should have removed file '<_>' in lib directory" -ForEach @('installpackage.nupkg', 'installpackage.nuspec', 'tools\casemismatch.exe', 'tools\Casemismatch.exe.ignore', 'tools\chocolateyBeforeModify.ps1', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\console.exe', 'tools\graphical.exe', 'tools\graphical.exe.gui', 'tools\not.installed.exe', 'tools\not.installed.exe.ignore', 'tools\simplefile.txt') {
             "$env:ChocolateyInstall\lib\installpackage\$_" | Should -Not -Exist
         }
 
@@ -200,11 +184,11 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             "$env:ChocolateyInstall\lib-bkp\upgradepackage" | Should -Not -Exist
         }
 
-        It "Reports no package uninstalled" -Tag FossOnly {
+        It "Reports no package uninstalled" {
             $Output.Lines | Should -Contain "Chocolatey uninstalled 0/1 packages. 1 packages failed."
         }
 
-        It "Outputs not able to remove all package files" -Tag FossOnly {
+        It "Outputs not able to remove all package files" {
             $Output.String | Should -Match "installpackage - Unable to delete all existing package files. There will be leftover files requiring manual cleanup"
         }
     }
@@ -222,11 +206,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        # When a file exists before initial installation, it will be considered as part of the
-        # package files. This is NuGet behavior. This happens during existing files for upgrades as well.
-        # We might want to rollback files in this case, but it is not possible as the backup has been removed before
-        # any locked files are being tried to be removed.
-        It "Should have removed <_>" -ForEach @('isdependency', 'hasdependency') -Tag FossOnly {
+        It "Should have removed <_>" -ForEach @('isdependency', 'hasdependency') {
             "$env:ChocolateyInstall\lib\$_" | Should -Not -Exist -Because $Output.String
         }
 
@@ -234,7 +214,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             "$env:ChocolateyInstall\lib\isexactversiondependency" | Should -Exist -Because $Output.String
         }
 
-        It "Outputs <_> was succcesfully uninstalled" -ForEach @('isdependency', 'hasdependency') -Tag FossOnly {
+        It "Outputs <_> was succcesfully uninstalled" -ForEach @('isdependency', 'hasdependency') {
             $Output.Lines | Should -Contain "$_ has been successfully uninstalled." -Because $Output.String
         }
 
@@ -260,11 +240,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Should have removed <_>" -ForEach @('isdependency', 'hasdependency', 'isexactversiondependency') -Tag FossOnly {
+        It "Should have removed <_>" -ForEach @('isdependency', 'hasdependency', 'isexactversiondependency') {
             "$env:ChocolateyInstall\lib\$_" | Should -Not -Exist -Because $Output.String
         }
 
@@ -299,19 +275,11 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $Output.String | Should -Match "- uninstallfailure \(exited -1\) - Error while running"
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Should have uninstall package installpackage" -Tag FossOnly {
+        It "Should have uninstall package installpackage" {
             "$env:ChocolateyInstall\lib\installpackage" | Should -Not -Exist -Because $Output.String
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Outputs successful uninstall of installpackage" -Tag FossOnly {
+        It "Outputs successful uninstall of installpackage" {
             $Output.Lines | Should -Contain "installpackage has been successfully uninstalled." -Because $Output.String
         }
 
@@ -333,11 +301,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Should have removed package toplevelwithnesteddependencies" -Tag FossOnly {
+        It "Should have removed package toplevelwithnesteddependencies" {
             "$env:ChocolateyInstall\lib\toplevelwithnesteddependencies" | Should -Not -Exist -Because $Output.String
         }
 
@@ -379,11 +343,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Should have removed <_>" -ForEach @('hasdependency', 'hasnesteddependency', 'isdependency', 'isexactversiondependency', 'toplevelhasexactversiondependency', 'toplevelwithnesteddependencies') -Tag FossOnly {
+        It "Should have removed <_>" -ForEach @('hasdependency', 'hasnesteddependency', 'isdependency', 'isexactversiondependency', 'toplevelhasexactversiondependency', 'toplevelwithnesteddependencies') {
             "$env:ChocolateyInstall\lib\$_" | Should -Not -Exist -Because $Output.String
         }
 
@@ -418,10 +378,6 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
         It "Should have removed <_>" -ForEach @('hasdependency', 'isdependency') {
             "$env:ChocolateyInstall\lib\$_" | Should -Not -Exist -Because $Output.String
         }

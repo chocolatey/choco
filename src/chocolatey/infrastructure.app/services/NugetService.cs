@@ -1389,6 +1389,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                         continue;
                                     }
+
+                                    // We need to remove the nupkg file explicitly in case it has
+                                    // been modified.
+                                    EnsureNupkgRemoved(oldPkgInfo.Package);
                                 }
 
                                 var endpoint = NuGetEndpointResources.GetResourcesBySource(packageDependencyInfo.Source);
@@ -2244,6 +2248,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     this.Log().Warn(logMessage);
                                     packageResult.Messages.Add(new ResultMessage(ResultType.Error, errorlogMessage));
 
+                                    // As the only reason we failed the uninstall is due to left over files, let us
+                                    // be good citizens and ensure that the nupkg file is removed so the package will
+                                    // not be listed as installed. This is needed to do manually as the package may
+                                    // have been optimized by licensed edition of Chocolatey CLI.
+                                    EnsureNupkgRemoved(packageToUninstall.PackageMetadata, throwError: false);
+
                                     // Do not call continueAction again here as it has already been called once.
                                     //if (continueAction != null) continueAction.Invoke(packageResult, config);
                                     continue;
@@ -2418,7 +2428,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         /// Ensure that the package is deleted or throw an error.
         /// </summary>
         /// <param name="removedPackage">The installed package.</param>
-        private void EnsureNupkgRemoved(IPackageMetadata removedPackage)
+        /// <param name="throwError">Whether failing to remove the nuget package should throw an exception or not.</param>
+        private void EnsureNupkgRemoved(IPackageMetadata removedPackage, bool throwError = true)
         {
             this.Log().Debug(ChocolateyLoggers.Verbose, "Removing nupkg if it still exists.");
 
@@ -2431,7 +2442,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             FaultTolerance.TryCatchWithLoggingException(
                 () => _fileSystem.DeleteFile(nupkg),
                 "Error deleting nupkg file",
-                throwError: true);
+                throwError: throwError);
         }
 
         protected void NormalizeNuspecCasing(IPackageSearchMetadata packageMetadata, string packageLocation)

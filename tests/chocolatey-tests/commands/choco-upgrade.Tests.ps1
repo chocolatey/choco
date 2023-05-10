@@ -339,23 +339,19 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-    # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-    # The result is that versioned backup files of each file in the package is created, instead of the package being
-    # removed. Consider the test partially broken.
-    Context "Upgrading a package when installer is locked" -Tag FossOnly {
+    Context "Upgrading a package when installer is locked" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
             $PackageUnderTest = "hasinnoinstaller"
             $PackageVersion   = '6.2.0.3'
 
-            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress
+            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress --no-reduce
 
             $LockedFile = [System.IO.File]::Open("$env:ChocolateyInstall\lib\$PackageUnderTest\tools\helloworld-1.0.0.exe", 'Open', 'Read',
             'Read')
 
-            $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress
+            $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress --no-reduce
         }
 
         AfterAll {
@@ -396,7 +392,7 @@ To upgrade a local, or remote file, you may use:
             $LockedFile = [System.IO.File]::Open("$env:ChocolateyInstall\lib\$PackageUnderTest\tools\a-locked-file.txt", 'OpenOrCreate', 'Read',
             'Read')
 
-            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress
+            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress --no-reduce
 
             $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress
         }
@@ -406,19 +402,11 @@ To upgrade a local, or remote file, you may use:
             $null = Invoke-Choco uninstall $PackageUnderTest --confirm
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Exits with Failure (1)" -Tag FossOnly {
+        It "Exits with Failure (1)" {
             $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Keeps file '<_>' in the lib directory" -ForEach @('hasinnoinstaller.nuspec', 'hasinnoinstaller.nupkg', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\helloworld-1.0.0.exe', 'tools\helloworld-1.0.0.exe.ignore') -Tag FossOnly {
+        It "Keeps file '<_>' in the lib directory" -ForEach @('hasinnoinstaller.nuspec', 'hasinnoinstaller.nupkg', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\helloworld-1.0.0.exe', 'tools\helloworld-1.0.0.exe.ignore') {
             "$env:ChocolateyInstall\lib\$PackageUnderTest\$_" | Should -Exist
         }
 
@@ -426,12 +414,7 @@ To upgrade a local, or remote file, you may use:
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
         }
 
-        # Only two files are backed up as we was not able to download and extract the new package
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Creates backup of file '<_>' in lib-bad" -ForEach @('.chocolateyPending', 'tools\a-locked-file.txt') -Tag FossOnly {
+        It "Creates backup of file '<_>' in lib-bad" -ForEach @('.chocolateyPending', 'tools\a-locked-file.txt') {
             "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
         }
 
@@ -439,11 +422,7 @@ To upgrade a local, or remote file, you may use:
             "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Not -Exist
         }
 
-        # This does not work as expected when runnning in test kitchen and with Chocolatey Licensed Extension installed.
-        # It is believed to be a problem with test kitchen, or the VM that we are using that is causing the issue.
-        # The result is that versioned backup files of each file in the package is created, instead of the package being
-        # removed. Consider the test partially broken.
-        It "Outputs a message showing that installation failed." -Tag FossOnly {
+        It "Outputs a message showing that installation failed." {
 
             $Output.Lines | Should -Contain "Chocolatey upgraded 0/1 packages. 1 packages failed." -Because $Output.String
         }
