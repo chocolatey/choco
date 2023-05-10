@@ -346,13 +346,12 @@ To upgrade a local, or remote file, you may use:
             $PackageUnderTest = "hasinnoinstaller"
             $PackageVersion   = '6.2.0.3'
 
-            # We'll Need to not reduce the nupkg file if we are running a licensed edition
-            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress --reduce-nupkg-only
+            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress --no-reduce
 
             $LockedFile = [System.IO.File]::Open("$env:ChocolateyInstall\lib\$PackageUnderTest\tools\helloworld-1.0.0.exe", 'Open', 'Read',
             'Read')
 
-            $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress --reduce-nupkg-only
+            $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress --no-reduce
         }
 
         AfterAll {
@@ -393,7 +392,7 @@ To upgrade a local, or remote file, you may use:
             $LockedFile = [System.IO.File]::Open("$env:ChocolateyInstall\lib\$PackageUnderTest\tools\a-locked-file.txt", 'OpenOrCreate', 'Read',
             'Read')
 
-            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress --reduce-nupkg-only
+            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress --no-reduce
 
             $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress
         }
@@ -419,12 +418,8 @@ To upgrade a local, or remote file, you may use:
             "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
         }
 
-        It "Did not create backup of file '<_>' in lib-bad" -ForEach @('hasinnoinstaller.nuspec', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\helloworld-1.0.0.exe', 'helloworld-1.0.0.exe.ignore') {
+        It "Did not create backup of file '<_>' in lib-bad" -ForEach @('hasinnoinstaller.nuspec', 'hasinnoinstaller.nupkg', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\helloworld-1.0.0.exe', 'helloworld-1.0.0.exe.ignore') {
             "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Not -Exist
-        }
-
-        It "Did not create backup of file 'hasinnoinstaller.nupkg' in lib-bad" -Tag FossOnly {
-            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Not Exist
         }
 
         It "Outputs a message showing that installation failed." {
