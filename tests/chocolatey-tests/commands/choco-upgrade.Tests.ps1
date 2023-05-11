@@ -346,12 +346,17 @@ To upgrade a local, or remote file, you may use:
             $PackageUnderTest = "hasinnoinstaller"
             $PackageVersion   = '6.2.0.3'
 
-            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress --no-reduce
+            # We are purposely using the --reduce-nupkg-only option (both here and in the next call to Invoke-Choco), to make the 
+            # test as close to default operation, when running both in the context of OSS and CLE. It was found during testing, that
+            # the Package Optimizer would remove the application installer, which is the file that is being locked during the test,
+            # which means then that the test doesn't actually test what we want it to. We are locking the exe here instead of say a
+            # PowerShell script, is to simulate the exe being used when the test is running.
+            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress --reduce-nupkg-only
 
             $LockedFile = [System.IO.File]::Open("$env:ChocolateyInstall\lib\$PackageUnderTest\tools\helloworld-1.0.0.exe", 'Open', 'Read',
             'Read')
 
-            $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress --no-reduce
+            $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress --reduce-nupkg-only
         }
 
         AfterAll {
@@ -392,7 +397,10 @@ To upgrade a local, or remote file, you may use:
             $LockedFile = [System.IO.File]::Open("$env:ChocolateyInstall\lib\$PackageUnderTest\tools\a-locked-file.txt", 'OpenOrCreate', 'Read',
             'Read')
 
-            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress --no-reduce
+            # We are purposely using the --reduce-nupkg-only option here to make the test as close to default operation, when running
+            # both in the context of OSS and CLE. It was found during testing, that the Package Optimizer can remove files that are
+            # normally left in place, and this test is specifically for testing the back-up/restore process.
+            $null = Invoke-Choco install $PackageUnderTest --version 6.2.0.0 --confirm --no-progress --reduce-nupkg-only
 
             $Output = Invoke-Choco upgrade $PackageUnderTest --version $PackageVersion --confirm --no-progress
         }
@@ -418,12 +426,15 @@ To upgrade a local, or remote file, you may use:
             "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
         }
 
-        It "Did not create backup of file '<_>' in lib-bad" -ForEach @('hasinnoinstaller.nuspec', 'hasinnoinstaller.nupkg', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\helloworld-1.0.0.exe', 'helloworld-1.0.0.exe.ignore') {
+        It "Did not create backup of file '<_>' in lib-bad" -ForEach @('hasinnoinstaller.nuspec', 'tools\chocolateyinstall.ps1', 'tools\chocolateyuninstall.ps1', 'tools\helloworld-1.0.0.exe', 'helloworld-1.0.0.exe.ignore') {
             "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Not -Exist
         }
 
-        It "Outputs a message showing that installation failed." {
+        It "Did not create backup of file 'hasinnoinstaller.nupkg' in lib-bad" -Tag FossOnly {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\hasinnoinstaller.nupkg" | Should -Not Exist
+        }
 
+        It "Outputs a message showing that installation failed." {
             $Output.Lines | Should -Contain "Chocolatey upgraded 0/1 packages. 1 packages failed." -Because $Output.String
         }
     }
