@@ -83,6 +83,7 @@
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyZipPackage.ps1" />
     <EmbeddedResource Include="helpers\functions\Start-ChocolateyProcessAsAdmin.ps1" />
     <EmbeddedResource Include="helpers\functions\Uninstall-ChocolateyPackage.ps1" />
+    <EmbeddedResource Include="helpers\functions\Uninstall-ChocolateyPath.ps1" />
     <EmbeddedResource Include="helpers\functions\UnInstall-ChocolateyZipPackage.ps1" />
     <EmbeddedResource Include="helpers\functions\Update-SessionEnvironment.ps1" />
     <EmbeddedResource Include="redirects\choco.exe.ignore" />
@@ -114,6 +115,7 @@
     <EmbeddedResource Include="redirects\RefreshEnv.cmd" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="helpers\functions\EnvPathFunctions.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-EnvironmentVariable.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-EnvironmentVariableNames.ps1" />
   </ItemGroup>
