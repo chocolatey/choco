@@ -4,7 +4,7 @@ issue-labels-include:
 - Feature
 - C4B Feature
 - Bug
-- Enhancement
+- Improvement
 - Documentation
 issue-labels-exclude:
 - Internal Refactoring
