@@ -431,7 +431,7 @@ To upgrade a local, or remote file, you may use:
         }
 
         It "Did not create backup of file 'hasinnoinstaller.nupkg' in lib-bad" -Tag FossOnly {
-            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\hasinnoinstaller.nupkg" | Should -Not Exist
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\hasinnoinstaller.nupkg" | Should -Not -Exist
         }
 
         It "Outputs a message showing that installation failed." {
