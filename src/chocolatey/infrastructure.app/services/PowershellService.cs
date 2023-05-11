@@ -185,7 +185,7 @@ namespace chocolatey.infrastructure.app.services
             // many issues in existing packages, including upgrading
             // Chocolatey from older POSH client due to log errors
             //$ErrorActionPreference = 'Stop';
-            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = ''; & import-module -name '{0}';{2} & '{1}' {3}"
+            return "[System.Threading.Thread]::CurrentThread.CurrentCulture = '';[System.Threading.Thread]::CurrentThread.CurrentUICulture = '';[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::SystemDefault; & import-module -name '{0}';{2} & '{1}' {3}"
                 .FormatWith(
                     installerModule,
                     scriptRunner,
