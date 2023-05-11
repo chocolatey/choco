@@ -185,7 +185,10 @@ Task("Build-ChocolateyNo7zip")
 
     if (BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows)
     {
-        var msbuildSettings = new MSBuildSettings()
+        var msbuildSettings = new MSBuildSettings
+        {
+            ToolPath = ToolSettings.MSBuildToolPath
+        }
             .SetPlatformTarget(ToolSettings.BuildPlatformTarget)
             .UseToolVersion(ToolSettings.BuildMSBuildToolVersion)
             .WithProperty("OutputPath", MakeAbsolute(new DirectoryPath(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/")).FullPath)
