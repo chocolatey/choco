@@ -1,4 +1,4 @@
-﻿#Requires -Module @{ ModuleName = 'pester'; ModuleVersion = '5.3.1' }
+#Requires -Module @{ ModuleName = 'pester'; ModuleVersion = '5.3.1' }
 #Requires -RunAsAdministrator
 <#
     .SYNOPSIS
@@ -50,7 +50,8 @@ else {
 if (-not (Test-Path "$TestPath/packages") -or -not $SkipPackaging) {
     $null = New-Item -Path "$TestPath/packages" -ItemType Directory -Force
     # Get and pack packages
-    $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages -Recurse | Where-Object Name -Like '*.nuspec'
+    $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages -Recurse -Include *.nuspec
+    Get-ChildItem -Path $PSScriptRoot/tests/packages -Recurse -Include *.nupkg | Copy-Item -Destination "$TestPath/packages"
 
     foreach ($file in $nuspecs) {
         Write-Host "Packaging $file"
