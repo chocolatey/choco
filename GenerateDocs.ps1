@@ -363,16 +363,8 @@ function Generate-CommandReference($commandName, $order) {
     $commandOutput += @("---")
     $commandOutput += @("Order: $order")
     $commandOutput += @("xref: choco-command-$commandNameLower")
-
-    if ($commandName -eq 'List') {
-        $commandOutput += @("Title: $commandName/Search")
-        $commandOutput += @("Description: $commandName/Search Command (choco $commandNameLower)")
-    }
-    else {
-        $commandOutput += @("Title: $commandName")
-        $commandOutput += @("Description: $commandName Command (choco $commandNameLower)")
-    }
-
+    $commandOutput += @("Title: $commandName")
+    $commandOutput += @("Description: $commandName Command (choco $commandNameLower)")
     $commandOutput += @("RedirectFrom:")
     $commandOutput += @("  - docs/commands$commandNameLower")
     $commandOutput += @("  - docs/commands-$commandNameLower")
