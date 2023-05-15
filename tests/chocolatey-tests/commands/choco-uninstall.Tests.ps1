@@ -1,5 +1,3 @@
-Import-Module helpers/common-helpers
-
 Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
     BeforeAll {
         Remove-NuGetPaths

@@ -1,8 +1,9 @@
-﻿Import-Module helpers/common-helpers
 
-$successPack = @('basic'; 'basic-dependencies'; "cdata"; "full")
-# Required elements, that can also not be empty
-$missingFailures = @('id'; 'version'; 'authors'; 'description')
+Describe "choco pack" -Tag Chocolatey, PackCommand {
+    BeforeDiscovery {
+        $successPack = @('basic'; 'basic-dependencies'; "cdata"; "full")
+        # Required elements, that can also not be empty
+        $missingFailures = @('id'; 'version'; 'authors'; 'description')
 # Elements that can not be set to an empty string, but are not required
 $emptyFailures = @(
     "projectUrl"
@@ -24,11 +25,11 @@ $invalidFailures = @(
     @{id = 'licenseUrl'; message = "ERROR: CHCU0001: 'invalid license url' is not a valid URL for the licenseUrl element in the package nuspec file." }
     @{id = "version"; message = "ERROR: CHCU0001: 'INVALID' is not a valid version string in the package nuspec file." }
     @{id = "no-content"; message = "Cannot create a package that has no dependencies nor content." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
-    @{id = "id"; message = "The package ID 'invalid id' contains invalid characters. Examples of valid package IDs include 'MyPackage' and 'MyPackage.Sample'." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
-    @{id = "requirelicenseacceptance"; message = "ERROR: CHCR0002: Enabling license acceptance requires a license url." }
-)
+            @{id = "id"; message = "The package ID 'invalid id' contains invalid characters. Examples of valid package IDs include 'MyPackage' and 'MyPackage.Sample'." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
+            @{id = "requirelicenseacceptance"; message = "ERROR: CHCR0002: Enabling license acceptance requires a license url." }
+        )
+    }
 
-Describe "choco pack" -Tag Chocolatey, PackCommand {
     BeforeAll {
         Remove-NuGetPaths
         $testPackageLocation = "$(Get-TempDirectory)ChocolateyTests\packages"

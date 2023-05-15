@@ -1,7 +1,3 @@
-﻿Import-Module helpers/common-helpers
-
-# https://github.com/chocolatey/choco/blob/master/src/chocolatey.tests.integration/scenarios/InstallScenarios.cs
-
 Describe "choco install" -Tag Chocolatey, InstallCommand {
     BeforeDiscovery {
         $isLicensed30OrMissingVersion = Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-beta' -AllowMissingPackage

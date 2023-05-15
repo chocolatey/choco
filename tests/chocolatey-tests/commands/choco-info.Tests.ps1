@@ -1,5 +1,3 @@
-﻿Import-Module helpers/common-helpers
-
 Describe "choco info" -Tag Chocolatey, InfoCommand {
     BeforeDiscovery {
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage

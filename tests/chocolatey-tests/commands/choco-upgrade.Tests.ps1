@@ -1,5 +1,3 @@
-Import-Module helpers/common-helpers
-
 Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     BeforeAll {
         Remove-NuGetPaths
