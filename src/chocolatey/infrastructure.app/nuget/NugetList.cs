@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.app.nuget
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using chocolatey.infrastructure.tolerance;
     using configuration;
     using filesystem;
     using NuGet.Common;
@@ -347,58 +348,56 @@ namespace chocolatey.infrastructure.app.nuget
             IEnumerable<NuGetEndpointResources> resources,
             NuGetVersion version = null)
         {
-            // We can only use the optimized ListResource query when the user has asked us to, via the UsePackageRepositoryOptimizations
-            // feature, as well as when a ListResource exists for the feed in question.  Some technologies, such as Sleet or Baget, only
-            // offer V3 feeds, not V2, and as a result, no ListResource is available.
-            var listResources = resources.ListResources().ToList();
-            if (config.Features.UsePackageRepositoryOptimizations && listResources.Any())
+            var packagesList = new HashSet<IPackageSearchMetadata>();
+            var packageNameLower = packageName.ToLowerSafe();
+
+            foreach (var resource in resources)
             {
                 if (version is null)
                 {
-                    // We only need to force a lower case package name when we
-                    // are using our own repository optimization queries.
-                    var packageNameLower = packageName.ToLowerSafe();
-                    var metadataList = new HashSet<IPackageSearchMetadata>();
-
-                    foreach (var listResource in listResources)
+                    // We can only use the optimized ListResource query when the user has asked us to, via the UsePackageRepositoryOptimizations
+                    // feature, as well as when a ListResource exists for the feed in question.  Some technologies, such as Sleet or Baget, only
+                    // offer V3 feeds, not V2, and as a result, no ListResource is available.
+                    if (config.Features.UsePackageRepositoryOptimizations && resource.ListResource != null)
                     {
-                        var package = listResource.PackageAsync(packageNameLower, config.Prerelease, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
-                        if (package != null)
+                        var package = FaultTolerance.TryCatchWithLoggingException(
+                            () => resource.ListResource.PackageAsync(packageNameLower, config.Prerelease, nugetLogger, CancellationToken.None).GetAwaiter().GetResult(),
+                            errorMessage: "Unable to connect to source '{0}'".FormatWith(resource.Source.PackageSource.Source),
+                            throwError: false,
+                            logWarningInsteadOfError: true);
+
+                        if (!(package is null))
                         {
-                            metadataList.Add(package);
+                            packagesList.Add(package);
                         }
                     }
-
-                    return metadataList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
-                }
-            }
-            else
-            {
-                if (version is null)
-                {
-                    var metadataList = new HashSet<IPackageSearchMetadata>();
-
-                    foreach (var packageMetadataResource in resources.MetadataResources())
+                    else
                     {
-                        metadataList.AddRange(packageMetadataResource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
+                        var packages = FaultTolerance.TryCatchWithLoggingException(
+                            () => resource.PackageMetadataResource.GetMetadataAsync(packageNameLower, config.Prerelease, includeUnlisted: false, sourceCacheContext: cacheContext, log: nugetLogger, token: CancellationToken.None).GetAwaiter().GetResult(),
+                            errorMessage: "Unable to connect to source '{0}'".FormatWith(resource.Source.PackageSource.Source),
+                            throwError: false,
+                            logWarningInsteadOfError: true).OrEmpty();
+
+                        packagesList.AddRange(packages);
                     }
-
-                    return metadataList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
                 }
-            }
-
-            foreach (var resource in resources.MetadataResources())
-            {
-                var metadata = resource.GetMetadataAsync(new PackageIdentity(packageName, version), cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
-
-                if (metadata != null)
+                else
                 {
-                    return metadata;
+                    var package = FaultTolerance.TryCatchWithLoggingException(
+                        () => resource.PackageMetadataResource.GetMetadataAsync(new PackageIdentity(packageNameLower, version), cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult(),
+                        errorMessage: "Unable to connect to source '{0}'".FormatWith(resource.Source.PackageSource.Source),
+                        throwError: false,
+                        logWarningInsteadOfError: true);
+
+                    if (!(package is null))
+                    {
+                        packagesList.Add(package);
+                    }
                 }
             }
 
-            //If no packages found, then return nothing
-            return null;
+            return packagesList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
         }
 
 #pragma warning disable IDE1006
