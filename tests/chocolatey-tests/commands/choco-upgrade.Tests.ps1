@@ -505,6 +505,24 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
+    Context "Upgrading a package when user specifies non-conforming case and is latest available version (no-op)" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Invoke-Choco install isdependency --confirm
+
+            $Output = Invoke-Choco upgrade IsDePeNDency --noop -r
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Outputs line with package name version and old version" {
+            $Output.String | Should -MatchExactly "isdependency\|2\.1\.0\|2\.1\.0\|false"
+        }
+    }
+
     # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

@@ -5,3 +5,6 @@ M:Chocolatey.NuGet.Versioning.SemanticVersion.ToNormalizedString();Use ToNormali
 M:System.StringComparer.InvariantCultureIgnoreCase;Use OrdinalIgnoreCase comparer instead.
 M:NuGet.Protocol.Core.Types.SourceRepository.GetResource`1;Get the NuGet cached endpoint.
 M:NuGet.Protocol.Core.Types.SourceRepository.GetResourceAsync`1;Get the NuGet cached endpoint.
+M:System.String.Equals(System.String); Use extension method IsEqualTo to make case insensitive comparison.
+M:System.String.Equals(System.String,System.String); Use overload to pass in StringComparison, or use IsEqualTo overload for case insensitive comparison.
+M:System.String.Compare(System.String,System.String); Use overload to pass in StringComparison.

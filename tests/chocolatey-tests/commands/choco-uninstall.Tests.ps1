@@ -399,6 +399,28 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
         }
     }
 
+    Context "Uninstalling package when user specifies non-confirming package id" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Invoke-Choco install isdependency --confirm
+
+            $Output = Invoke-Choco uninstall IsDePeNDency --confirm
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Uninstall package successfully" {
+            $Output.Lines | Should -Contain "isdependency 2.1.0 Uninstalled" -Because $Output.String
+        }
+
+        It "Removed package successfully from lib directory" {
+            "$env:ChocolateyInstall\lib\isdependency" | Should -Not -Exist
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths
 }

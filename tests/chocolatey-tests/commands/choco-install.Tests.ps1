@@ -1758,6 +1758,26 @@ To install a local, or remote file, you may use:
         }
     }
 
+    Context "Installing a package when the user specifies a non-conforming casing of the id" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install InstAlLpAckaGe --confirm
+        }
+
+        It 'Exits with Success' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Outputs successful installation of single package' {
+            $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.' -Because $Output.String
+        }
+
+        It 'Installed package to expected location' {
+            "$env:ChocolateyInstall\lib\installpackage" | Should -Exist
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

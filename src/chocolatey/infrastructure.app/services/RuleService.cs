@@ -104,7 +104,7 @@ namespace chocolatey.infrastructure.app.services
         {
             public bool Equals(ImmutableRule x, ImmutableRule y)
             {
-                return ReferenceEquals(x, y) || string.Equals(x.Id, x.Id);
+                return ReferenceEquals(x, y) || x.Id.IsEqualTo(x.Id);
             }
 
             public int GetHashCode(ImmutableRule obj)
