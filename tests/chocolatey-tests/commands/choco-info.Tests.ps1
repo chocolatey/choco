@@ -177,8 +177,8 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
             $Output.ExitCode | Should -Be 0
         }
 
-        It 'Outputs warning about unable to load service index' {
-            $Output.Lines | Should -Contain 'Error retrieving packages from source 'https://invalid.chocolatey.org/api/v2/':'
+        It 'Outputs warning about unable to retrieve packages from source' {
+            $Output.String | Should -Match 'Error retrieving packages from source 'https://invalid.chocolatey.org/api/v2/':'
         }
 
         It 'Output information about the package' {

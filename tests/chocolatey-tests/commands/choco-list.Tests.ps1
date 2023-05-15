@@ -443,8 +443,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
             $Output.ExitCode | Should -Be 0
         }
 
-        It 'Outputs warning about unable to load service index' {
-            $Output.Lines | Should -Match "Not able to contact source 'https://invalid.chocolatey.org.com/api/v2/'."
+        It 'Outputs warning about unable to contact source' {
+            $Output.String | Should -Match "Not able to contact source 'https://invalid.chocolatey.org/api/v2/'." -Because $Output.String
         }
 
         It 'Outputs the results of the search' {

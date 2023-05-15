@@ -20,10 +20,17 @@
 
         # Location to store the built package(s)
         [ValidateNotNullOrEmpty()]
-        [string]$Destination = $env:CHOCOLATEY_TEST_PACKAGES_PATH
+        [string]$Destination = $env:CHOCOLATEY_TEST_PACKAGES_PATH,
+
+        [Parameter()]
+        [string]$AddedVersion
     )
     process {
         $NuspecFile = Get-Item "$TestPath\$Name\$Version\$Name.nuspec"
+
+        if ($AddedVersion) {
+            $Version = "$Version-$AddedVersion"
+        }
 
         Write-Verbose "Building '$($NuspecFile.Count)' packages"
 
@@ -32,12 +39,14 @@
             $ExpectedPackage = Join-Path $Destination "$Name.$Version.nupkg"
 
             if (-not (Test-Path $ExpectedPackage)) {
-                $BuildOutput = Invoke-Choco pack $Package.FullName --outputdirectory $Destination
+                $BuildOutput = Invoke-Choco pack $Package.FullName --outputdirectory $Destination --version $Version
 
                 if ($BuildOutput.ExitCode -ne 0) {
                     throw $BuildOutput.String
                 }
             }
+
+            $ExpectedPackage
         }
     }
 }

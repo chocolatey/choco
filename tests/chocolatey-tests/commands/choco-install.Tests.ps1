@@ -1467,6 +1467,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     Context "Installing license only package on open source" -Tag FossOnly {
         BeforeAll {
             New-ChocolateyInstallSnapshot
+            Enable-ChocolateySource -Name hermes-setup
 
             $Output = Invoke-Choco install business-only-license --confirm
         }
@@ -1645,7 +1646,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         BeforeAll {
             $paths = Restore-ChocolateyInstallSnapshot
 
-            $Output = Invoke-Choco install install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePathLong)" --no-progress
+            $Output = Invoke-Choco install install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePath)" --no-progress
         }
 
         AfterAll {
@@ -1677,7 +1678,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $testMessage = if ($features.License) {
                 "Extracting cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
             } else {
-                "Extracting $($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+                "Extracting $($paths.CachePath)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
             }
             $Output.Lines | Should -Contain $testMessage -Because $Output.String
         }
@@ -1697,7 +1698,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
 
         It 'Should have cached installed directory in custom cache' {
             # Need to be verified, but the file may not exist on licensed edition
-            "$($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip" | Should -Exist
+            "$($paths.CachePath)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip" | Should -Exist
         }
 
         It 'Installed software to expected directory' {
@@ -1823,7 +1824,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It 'Outputs warning about unable to load service index' {
-            $Output.Lines | Should -Contain 'Unable to load the service index for source https://invalid.com/api/v2/.'
+            $Output.String | Should -Match "Error retrieving packages from source 'https://invalid.chocolatey.org/api/v2/':"
         }
 
         It 'Outputs successful installation of single package' {
