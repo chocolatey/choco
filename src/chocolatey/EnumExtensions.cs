@@ -57,7 +57,7 @@ namespace chocolatey
             foreach (var fieldInfo in type.GetFields())
             {
                 var attr = fieldInfo.GetCustomAttributes(typeof (DescriptionAttribute), false).Cast<DescriptionAttribute>().SingleOrDefault();
-                if (attr != null && attr.Description.Equals(description))
+                if (attr != null && attr.Description.Equals(description, StringComparison.Ordinal))
                 {
                     return (TEnum) fieldInfo.GetValue(null);
                 }

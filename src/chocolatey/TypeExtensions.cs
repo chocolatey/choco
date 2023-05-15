@@ -36,7 +36,7 @@ namespace chocolatey
             return type.IsPrimitive
                    || type.IsValueType
                    || (type == typeof (string))
-                   || type.Namespace.Equals("System");
+                   || type.Namespace.Equals("System", StringComparison.Ordinal);
         }
 
         /// <summary>

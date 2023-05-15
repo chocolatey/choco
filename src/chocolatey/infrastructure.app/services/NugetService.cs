@@ -549,7 +549,7 @@ folder.");
                 var sourcePackageDependencyInfos = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
                 var localPackageToRemoveDependencyInfos = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
 
-                var installedPackage = allLocalPackages.FirstOrDefault(p => p.Name.Equals(packageName));
+                var installedPackage = allLocalPackages.FirstOrDefault(p => p.Name.IsEqualTo(packageName));
 
                 if (Platform.GetPlatform() != PlatformType.Windows && !packageName.EndsWith(".template"))
                 {
@@ -981,7 +981,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 config.RevertChanges();
 
                 var allLocalPackages = GetInstalledPackages(config).ToList();
-                var installedPackage = allLocalPackages.FirstOrDefault(p => p.Name.Equals(packageName));
+                var installedPackage = allLocalPackages.FirstOrDefault(p => p.Name.IsEqualTo(packageName));
                 var packagesToInstall = new List<IPackageSearchMetadata>();
                 var packagesToUninstall = new HashSet<PackageResult>();
                 var sourcePackageDependencyInfos = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
@@ -1666,14 +1666,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (removedAvailablePackage == null)
                 {
-                    removedAvailablePackage = packagesToRemove.FirstOrDefault(p => p.Id.Equals(availablePackage.Identity.Id) && p.Version == availablePackage.Identity.Version);
+                    removedAvailablePackage = packagesToRemove.FirstOrDefault(p => p.Id.IsEqualTo(availablePackage.Identity.Id) && p.Version == availablePackage.Identity.Version);
                 }
 
                 sourcePackageDependencyInfos.RemoveWhere(s => packagesToRemove.Contains(s));
                 removedSources.AddRange(packagesToRemove);
             }
 
-            if (removedAvailablePackage != null && !sourcePackageDependencyInfos.Any(s => s.Id.Equals(removedAvailablePackage.Id)))
+            if (removedAvailablePackage != null && !sourcePackageDependencyInfos.Any(s => s.Id.IsEqualTo(removedAvailablePackage.Id)))
             {
                 removedSources.Remove(removedAvailablePackage);
                 sourcePackageDependencyInfos.Add(removedAvailablePackage);
