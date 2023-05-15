@@ -344,7 +344,7 @@ To upgrade a local, or remote file, you may use:
             $PackageUnderTest = "hasinnoinstaller"
             $PackageVersion   = '6.2.0.3'
 
-            # We are purposely using the --reduce-nupkg-only option (both here and in the next call to Invoke-Choco), to make the 
+            # We are purposely using the --reduce-nupkg-only option (both here and in the next call to Invoke-Choco), to make the
             # test as close to default operation, when running both in the context of OSS and CLE. It was found during testing, that
             # the Package Optimizer would remove the application installer, which is the file that is being locked during the test,
             # which means then that the test doesn't actually test what we want it to. We are locking the exe here instead of say a
@@ -518,6 +518,40 @@ To upgrade a local, or remote file, you may use:
 
         It "Outputs line with package name version and old version" {
             $Output.String | Should -MatchExactly "isdependency\|2\.1\.0\|2\.1\.0\|false"
+        }
+    }
+
+    Context "Upgrading a package with a non-normalized version number"  {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            Push-Location (New-Item "$(Get-TempDirectory)/$(New-Guid)" -ItemType Directory)
+            $PackageUnderTest = 'nonnormalizedversions'
+            $VersionUnderTest = '004.0.01.0'
+            $ExpectedPackageVersion = '4.0.1'
+            $null = Invoke-Choco install $PackageUnderTest --version 1.0.0
+            $Output = Invoke-Choco upgrade $PackageUnderTest
+        }
+
+        AfterAll {
+            Pop-Location
+        }
+
+        It "Should exit with success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should report successful upgrade" {
+            $Output.Lines | Should -Contain "$PackageUnderTest v$ExpectedPackageVersion" -Because $Output.String
+            $Output.Lines | Should -Contain 'Chocolatey upgraded 1/1 packages.' -Because $Output.String
+        }
+
+        It "Should have upgraded the correct files" {
+            $ExpectedNupkg = "${env:ChocolateyInstall}/lib/$PackageUnderTest/$PackageUnderTest.nupkg"
+            $ExpectedNupkg | Should -Exist -Because $Output.String
+            Expand-ZipArchive -Source $ExpectedNupkg -Destination "$PWD/$PackageUnderTest-expanded"
+            $NuspecContents = [xml](Get-Content "$PWD/$PackageUnderTest-expanded/$PackageUnderTest.nuspec")
+            Remove-Item -Path "$PWD/$PackageUnderTest-expanded" -Recurse -Force
+            $NuspecContents.package.metadata.version | Should -Be $VersionUnderTest
         }
     }
 

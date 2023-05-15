@@ -1774,6 +1774,43 @@ To install a local, or remote file, you may use:
         }
     }
 
+    Context "Installing a package with a non-normalized version number" -ForEach @(
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0.0' ; NuspecVersion = '01.0.0.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '4.0.1' ; NuspecVersion = '004.0.01.0' }
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' ; NuspecVersion = '01.0.0.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '004.0.01.0' ; NuspecVersion = '004.0.01.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '0000004.00000.00001.0000' ; NuspecVersion = '004.0.01.0' }
+    )  {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            Push-Location (New-Item "$(Get-TempDirectory)/$(New-Guid)" -ItemType Directory)
+            $PackageUnderTest = 'nonnormalizedversions'
+            $Output = Invoke-Choco install $PackageUnderTest --Version $SearchVersion
+        }
+
+        AfterAll {
+            Pop-Location
+        }
+
+        It "Should exit with success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should report successful installation" {
+            $Output.Lines | Should -Contain "$PackageUnderTest v$ExpectedPackageVersion" -Because $Output.String
+            $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.' -Because $Output.String
+        }
+
+        It "Should have installed the correct files" {
+            $ExpectedNupkg = "${env:ChocolateyInstall}/lib/$PackageUnderTest/$PackageUnderTest.nupkg"
+            $ExpectedNupkg | Should -Exist -Because $Output.String
+            Expand-ZipArchive -Source $ExpectedNupkg -Destination "${env:TEMP}/$PackageUnderTest-expanded"
+            $NuspecContents = [xml](Get-Content "${env:TEMP}/$PackageUnderTest-expanded/$PackageUnderTest.nuspec")
+            Remove-Item -Path "${env:TEMP}/$PackageUnderTest-expanded" -Recurse -Force
+            $NuspecContents.package.metadata.version | Should -Be $NuspecVersion
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths
