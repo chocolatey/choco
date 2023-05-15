@@ -80,6 +80,9 @@ namespace chocolatey.infrastructure.app.commands
         public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
+                .Add("s=|source=",
+                     "Source - Source location for install. Can use special 'windowsfeatures', 'ruby', 'cygwin', or 'python' sources. Defaults to sources.",
+                     option => configuration.Sources = option.UnquoteSafe())
                 .Add("idonly|id-only",
                      "Id Only - Only return Package Ids in the list results.",
                      option => configuration.ListCommand.IdOnly = option != null)

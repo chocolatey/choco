@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.app.services
     /// <summary>
     ///   Alternative Source for Installing Python packages
     /// </summary>
-    public sealed class PythonService : ISourceRunner
+    public sealed class PythonService : ISourceRunner, IBootstrappableSourceRunner, IListSourceRunner, IInstallSourceRunner, IUpgradeSourceRunner, IUninstallSourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
         private readonly INugetService _nugetService;

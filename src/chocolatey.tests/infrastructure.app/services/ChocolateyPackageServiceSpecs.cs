@@ -72,9 +72,9 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_ChocolateyPackageService_install_from_package_config_with_custom_sources : ChocolateyPackageServiceSpecsBase
         {
-            protected Mock<ISourceRunner> FeaturesRunner = new Mock<ISourceRunner>();
-            protected Mock<ISourceRunner> NormalRunner = new Mock<ISourceRunner>();
-            private ConcurrentDictionary<string, PackageResult> result;
+            protected Mock<IInstallSourceRunner> FeaturesRunner = new Mock<IInstallSourceRunner>().As<IInstallSourceRunner>();
+            protected Mock<IInstallSourceRunner> NormalRunner = new Mock<IInstallSourceRunner>().As<IInstallSourceRunner>();
+            private ConcurrentDictionary<string, PackageResult> _result;
 
             public override void Context()
             {
@@ -83,8 +83,8 @@ namespace chocolatey.tests.infrastructure.app.services
                 Configuration.PackageNames = @"C:\test\packages.config";
                 Configuration.Sources = @"C:\test";
 
-                NormalRunner.Setup(r => r.SourceType).Returns(SourceTypes.Normal);
-                FeaturesRunner.Setup(r => r.SourceType).Returns(SourceTypes.WindowsFeatures);
+                NormalRunner.As<ISourceRunner>().Setup(r => r.SourceType).Returns(SourceTypes.Normal);
+                FeaturesRunner.As<ISourceRunner>().Setup(r => r.SourceType).Returns(SourceTypes.WindowsFeatures);
 
                 var package = new Mock<IPackageMetadata>();
                 var expectedResult = new ConcurrentDictionary<string, PackageResult>();
@@ -94,7 +94,7 @@ namespace chocolatey.tests.infrastructure.app.services
                     .Returns(expectedResult);
                 NormalRunner.Setup(r => r.Install(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()))
                     .Returns(new ConcurrentDictionary<string, PackageResult>());
-                SourceRunners.AddRange(new[] { NormalRunner.Object, FeaturesRunner.Object });
+                SourceRunners.AddRange(new[] { NormalRunner.Object as ISourceRunner, FeaturesRunner.Object as ISourceRunner });
 
                 FileSystem.Setup(f => f.GetFullPath(Configuration.PackageNames)).Returns(Configuration.PackageNames);
                 FileSystem.Setup(f => f.FileExists(Configuration.PackageNames)).Returns(true);
@@ -115,19 +115,21 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                result = Service.Install(Configuration);
+                _result = Service.Install(Configuration);
             }
 
             [Test]
             public void Should_return_package_that_should_have_been_installed()
             {
-                result.Keys.ShouldContain("test-feature");
+                _result.Keys.ShouldContain("test-feature");
             }
 
             [Test]
             public void Should_have_called_runner_for_windows_features_source()
             {
-                FeaturesRunner.Verify(r => r.Install(It.Is<ChocolateyConfiguration>(c => c.PackageNames == "test-feature"), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()), Times.Once);
+                FeaturesRunner
+                    .As<IInstallSourceRunner>()
+                    .Verify(r => r.Install(It.Is<ChocolateyConfiguration>(c => c.PackageNames == "test-feature"), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()), Times.Once);
             }
 
             [Test]

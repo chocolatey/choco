@@ -128,12 +128,25 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public virtual void EnsureSourceAppInstalled(ChocolateyConfiguration config)
         {
-            PerformSourceRunnerAction(config, r => r.EnsureSourceAppInstalled(config, (packageResult, configuration) => HandlePackageResult(packageResult, configuration, CommandNameType.Install)));
+            PerformSourceRunnerAction(
+                config,
+                runner => 
+                {
+                    if (runner is IBootstrappableSourceRunner sr)
+                    {
+                        sr.EnsureSourceAppInstalled(config, (packageResult, configuration) => HandlePackageResult(packageResult, configuration, CommandNameType.Install));
+                    }
+                }
+            );
         }
 
         public virtual int Count(ChocolateyConfiguration config)
         {
-            return PerformSourceRunnerFunction(config, r => r.Count(config));
+            return PerformSourceRunnerFunction(
+                config,
+                runner => runner is ICountSourceRunner sr 
+                    ? sr.Count(config)
+                    : throw new NotSupportedException("The '{0}' source does not support counting packages.".FormatWith(runner.SourceType)));
         }
 
         private void PerformSourceRunnerAction(ChocolateyConfiguration config, Action<ISourceRunner> action)
@@ -163,7 +176,21 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public void ListDryRun(ChocolateyConfiguration config)
         {
-            PerformSourceRunnerAction(config, r => r.ListDryRun(config));
+            PerformSourceRunnerAction(
+                config,
+                runner =>
+                {
+                    if (runner is IListSourceRunner sr)
+                    {
+                        sr.ListDryRun(config);
+                    }
+                    else
+                    {
+                       this.Log().Warn(ChocolateyLoggers.Important, "The '{0}' source does not support listing packages.", runner.SourceType);
+                    }
+                }
+            );
+
             RandomlyNotifyAboutLicensedFeatures(config, ProBusinessListMessage);
         }
 
@@ -181,7 +208,15 @@ Did you know Pro / Business automatically syncs with Programs and
 
             var packages = new List<PackageResult>();
 
-            foreach (PackageResult package in PerformSourceRunnerFunction(config, r => r.List(config)))
+            var results = PerformSourceRunnerFunction(
+                config,
+                runner => runner is IListSourceRunner sr
+                    ? string.IsNullOrWhiteSpace(config.Input) || sr is ISearchableSourceRunner
+                        ? sr.List(config)
+                        : throw new NotSupportedException("The '{0}' source does not support searching for specific packages.".FormatWith(runner.SourceType))
+                    : throw new NotSupportedException("The '{0}' source does not support listing or searching for packages.".FormatWith(runner.SourceType)));
+
+            foreach (PackageResult package in results)
             {
                 if (config.SourceType.IsEqualTo(SourceTypes.Normal))
                 {
@@ -301,7 +336,20 @@ Did you know Pro / Business automatically syncs with Programs and
                     action = (pkg,configuration) => _powershellService.InstallDryRun(pkg);
                 }
 
-                PerformSourceRunnerAction(packageConfig, r => r.InstallDryRun(packageConfig, action));
+                PerformSourceRunnerAction(
+                    packageConfig,
+                    runner =>
+                    {
+                        if (runner is IInstallSourceRunner sr)
+                        {
+                            sr.InstallDryRun(packageConfig, action);
+                        }
+                        else
+                        {
+                            this.Log().Warn(ChocolateyLoggers.Important, "The '{0}' source doesn't support installing packages.", runner.SourceType);
+                        }
+                    }
+                );
             }
 
             RandomlyNotifyAboutLicensedFeatures(config);
@@ -604,7 +652,11 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
                     }
 
                     var beforeModifyAction = new Action<PackageResult, ChocolateyConfiguration>((packageResult, configuration) => BeforeModifyAction(packageResult, configuration));
-                    var results = PerformSourceRunnerFunction(packageConfig, r => r.Install(packageConfig, action, beforeModifyAction));
+                    var results = PerformSourceRunnerFunction(
+                        packageConfig,
+                        runner => runner is IInstallSourceRunner sr
+                            ? sr.Install(packageConfig, action, beforeModifyAction)
+                            : throw new NotSupportedException("The '{0}' source does not support installing packages.".FormatWith(runner.SourceType)));
 
                     foreach (var result in results)
                     {
@@ -802,7 +854,22 @@ Would have determined packages that are out of date based on what is
                 action = (pkg, configuration) => _powershellService.InstallDryRun(pkg);
             }
 
-            var noopUpgrades = PerformSourceRunnerFunction(config, r => r.UpgradeDryRun(config, action));
+            var noopUpgrades = PerformSourceRunnerFunction(
+                config,
+                runner =>
+                {
+                    if (runner is IUpgradeSourceRunner sr)
+                    {
+                        return runner.UpgradeDryRun(config, action);
+                    }
+                    else
+                    {
+                        this.Log().Warn(ChocolateyLoggers.Important, "The '{0}' source does not support upgrading packages.", runner.SourceType);
+                        return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
+                    }
+                }
+            );
+
             if (config.RegularOutput)
             {
                 var noopFailures = ReportActionSummary(noopUpgrades, "can upgrade");
@@ -846,7 +913,11 @@ Would have determined packages that are out of date based on what is
                 GetInitialEnvironment(config, allowLogging: true);
 
                 var beforeUpgradeAction = new Action<PackageResult, ChocolateyConfiguration>((packageResult, configuration) => BeforeModifyAction(packageResult, configuration));
-                var results = PerformSourceRunnerFunction(config, r => r.Upgrade(config, action, beforeUpgradeAction));
+                var results = PerformSourceRunnerFunction(
+                    config,
+                    runner => runner is IUpgradeSourceRunner sr
+                        ? sr.Upgrade(config, action, beforeUpgradeAction)
+                        : throw new NotSupportedException("The '{0}' source does not support upgrading packages.".FormatWith(runner.SourceType)));
 
                 foreach (var result in results)
                 {
@@ -891,7 +962,21 @@ Would have determined packages that are out of date based on what is
                 };
             }
 
-            PerformSourceRunnerAction(config, r => r.UninstallDryRun(config, action));
+            PerformSourceRunnerAction(
+                config,
+                runner =>
+                {
+                    if (runner is IUninstallSourceRunner sr)
+                    {
+                        runner.UninstallDryRun(config, action);
+                    }
+                    else
+                    {
+                        this.Log().Warn(ChocolateyLoggers.Important, "The '{0}' source does not support uninstall packages.", runner.SourceType);
+                    }
+                }
+            );
+
             RandomlyNotifyAboutLicensedFeatures(config);
         }
 
@@ -917,7 +1002,11 @@ Would have determined packages that are out of date based on what is
 
                 var environmentBefore = GetInitialEnvironment(config);
                 var beforeUninstallAction = new Action<PackageResult, ChocolateyConfiguration>(BeforeModifyAction);
-                var results = PerformSourceRunnerFunction(config, r => r.Uninstall(config, action, beforeUninstallAction));
+                var results = PerformSourceRunnerFunction(
+                    config,
+                    runner => runner is IUninstallSourceRunner sr
+                        ? sr.Uninstall(config, action, beforeUninstallAction)
+                        : throw new NotSupportedException("The '{0}' source does not support uninstalling packages.".FormatWith(runner.SourceType)));
 
                 foreach (var result in results)
                 {

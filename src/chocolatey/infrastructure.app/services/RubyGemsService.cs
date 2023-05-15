@@ -28,7 +28,7 @@ namespace chocolatey.infrastructure.app.services
     using results;
     using platforms;
 
-    public sealed class RubyGemsService : ISourceRunner
+    public sealed class RubyGemsService : ISourceRunner, IBootstrappableSourceRunner, IListSourceRunner, IInstallSourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
         private readonly INugetService _nugetService;

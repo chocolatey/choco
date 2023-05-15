@@ -36,7 +36,7 @@ namespace chocolatey.infrastructure.app.services
     /// <remarks>
     ///   https://cygwin.com/faq/faq.html#faq.setup.cli
     /// </remarks>
-    public sealed class CygwinService : ISourceRunner
+    public sealed class CygwinService : ISourceRunner, IBootstrappableSourceRunner, IInstallSourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
         private readonly INugetService _nugetService;

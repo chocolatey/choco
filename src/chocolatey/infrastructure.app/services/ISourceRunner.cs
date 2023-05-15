@@ -143,4 +143,114 @@ namespace chocolatey.infrastructure.app.services
         ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null);
 #pragma warning restore IDE1006
     }
+
+    public interface IBootstrappableSourceRunner
+    {
+        /// <summary>
+        ///   Ensures the application that controls a source is installed
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="ensureAction">The action to continue with as part of the install</param>
+        void EnsureSourceAppInstalled(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction);
+    }
+
+    public interface ICountSourceRunner
+    {
+        /// <summary>
+        ///     Retrieve the listed packages from the source feed cout
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <returns>Packages count</returns>
+        int Count(ChocolateyConfiguration config);
+    }
+
+    public interface IListSourceRunner
+    {
+        /// <summary>
+        ///   Run list in noop mode
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        void ListDryRun(ChocolateyConfiguration config);
+
+        /// <summary>
+        ///   Lists/searches for packages from the source feed
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <returns></returns>
+        IEnumerable<PackageResult> List(ChocolateyConfiguration config);
+    }
+
+    /// <summary>
+    /// This interface is a 'marker' type that indicates that the List action on the current source runner
+    /// supports searching for specific packages.
+    /// </summary>
+    public interface ISearchableSourceRunner : IListSourceRunner
+    {
+    }
+
+    public interface IInstallSourceRunner
+    {
+        /// <summary>
+        ///   Run install in noop mode
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="continueAction">The action to continue with for each noop test install.</param>
+        void InstallDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
+
+        /// <summary>
+        ///   Installs packages from the source feed
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="continueAction">The action to continue with when install is successful.</param>
+        /// <returns>results of installs</returns>
+        ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
+
+        /// <summary>
+        ///   Installs packages from the source feed
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="continueAction">The action to continue with when install is successful.</param>
+        /// <param name="beforeModifyAction">The action (if any) to run on any currently installed package dependencies before triggering the install or updating those dependencies.</param>
+        /// <returns>results of installs</returns>
+        ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction);
+    }
+
+    public interface IUpgradeSourceRunner
+    {
+        /// <summary>
+        ///   Run upgrade in noop mode
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="continueAction">The action to continue with for each noop test upgrade.</param>
+        ConcurrentDictionary<string, PackageResult> UpgradeDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
+
+        /// <summary>
+        ///   Upgrades packages from NuGet related feeds
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
+        /// <param name="beforeUpgradeAction">The action (if any) to run on any currently installed package or its dependencies before triggering the upgrade.</param>
+        /// <returns>results of installs</returns>
+        ConcurrentDictionary<string, PackageResult> Upgrade(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null);
+    }
+
+    public interface IUninstallSourceRunner
+    {
+        /// <summary>
+        ///   Run uninstall in noop mode
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="continueAction">The action to continue with for each noop test upgrade.</param>
+        void UninstallDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
+
+        /// <summary>
+        ///   Uninstalls packages from NuGet related feeds
+        /// </summary>
+        /// <param name="config">The configuration.</param>
+        /// <param name="continueAction">The action to continue with when upgrade is successful.</param>
+        /// <param name="beforeUninstallAction">The action (if any) to run on any currently installed package before triggering the uninstall.</param>
+        /// <returns>results of installs</returns>
+        ConcurrentDictionary<string, PackageResult> Uninstall(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null);
+
+    }
 }

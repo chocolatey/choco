@@ -53,7 +53,7 @@ namespace chocolatey.infrastructure.app.services
 
     //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 
-    public class NugetService : INugetService
+    public class NugetService : INugetService, IListSourceRunner, ISearchableSourceRunner, ICountSourceRunner, IInstallSourceRunner, IUpgradeSourceRunner, IUninstallSourceRunner
     {
         private readonly IFileSystem _fileSystem;
         private readonly ILogger _nugetLogger;

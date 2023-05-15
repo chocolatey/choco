@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.app.services
     ///   Win 7 - https://technet.microsoft.com/en-us/library/dd744311.aspx
     ///   Maybe Win2003/2008 - http://www.wincert.net/forum/files/file/8-deployment-image-servicing-and-management-dism/ | http://wincert.net/leli55PK/DISM/
     /// </remarks>
-    public sealed class WindowsFeatureService : ISourceRunner
+    public sealed class WindowsFeatureService : ISourceRunner, IBootstrappableSourceRunner, IListSourceRunner, ISearchableSourceRunner, IInstallSourceRunner, IUninstallSourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
         private readonly INugetService _nugetService;
