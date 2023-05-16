@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.commands
     using System.Linq;
     using chocolatey.infrastructure.app.attributes;
     using chocolatey.infrastructure.app.configuration;
+    using chocolatey.infrastructure.app.domain;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using chocolatey.infrastructure.commands;
@@ -80,6 +81,13 @@ namespace chocolatey.infrastructure.app.commands
         public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
+                .Add("s=|source=",
+                     "Source - Name of alternative source to use, for example 'windowsfeatures', 'ruby', 'cygwin', or 'python'.",
+                     option =>
+                     {
+                         configuration.Sources = option.UnquoteSafe();
+                         configuration.ListCommand.ExplicitSource = true;
+                     })
                 .Add("idonly|id-only",
                      "Id Only - Only return Package Ids in the list results.",
                      option => configuration.ListCommand.IdOnly = option != null)
@@ -236,6 +244,13 @@ If you find other exit codes that we have not yet documented, please
 
         public virtual void Run(ChocolateyConfiguration config)
         {
+            // Would have liked to have done this in the Validate method, but can't, since the SourceType
+            // hasn't yet been set, since the sources have not yet been parsed.
+            if (config.ListCommand.ExplicitSource && config.SourceType ==  SourceTypes.Normal)
+            {
+                throw new ApplicationException("When using the '--source' option with the 'choco list' command, only a named alternative source can be provided.");
+            }
+
             config.ListCommand.LocalOnly = true;
 
             // note: you must leave the .ToList() here or else the method won't be evaluated!

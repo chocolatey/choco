@@ -113,7 +113,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         private void SetSourceType(ChocolateyConfiguration config, Container container)
         {
-            var sourceRunner = container.GetAllInstances<ISourceRunner>()
+            var sourceRunner = container.GetAllInstances<IAlternativeSourceRunner>()
                 .FirstOrDefault(s => s.SourceType.IsEqualTo(config.Sources) || s.SourceType.IsEqualTo(config.Sources + "s"));
 
             var sourceType = SourceTypes.Normal;

@@ -83,6 +83,8 @@ namespace chocolatey.tests.infrastructure.app.commands
                     Command.ConfigureArgumentParser(_optionSet, Configuration);
                 }
 
+                [NUnit.Framework.TestCase("source")]
+                [NUnit.Framework.TestCase("s")]
                 [NUnit.Framework.TestCase("prerelease")]
                 [NUnit.Framework.TestCase("pre")]
                 [NUnit.Framework.TestCase("includeprograms")]
@@ -92,8 +94,6 @@ namespace chocolatey.tests.infrastructure.app.commands
                     _optionSet.Contains(option).ShouldBeTrue();
                 }
 
-                [NUnit.Framework.TestCase("source")]
-                [NUnit.Framework.TestCase("s")]
                 [NUnit.Framework.TestCase("localonly")]
                 [NUnit.Framework.TestCase("l")]
                 [NUnit.Framework.TestCase("user")]

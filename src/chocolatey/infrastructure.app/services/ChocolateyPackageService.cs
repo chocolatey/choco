@@ -19,9 +19,11 @@ namespace chocolatey.infrastructure.app.services
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.ComponentModel.Design;
     using System.IO;
     using System.Linq;
     using System.Text;
+    using chocolatey.infrastructure.app.registration;
     using commandline;
     using configuration;
     using domain;
@@ -37,6 +39,7 @@ namespace chocolatey.infrastructure.app.services
     using NuGet.Versioning;
     using platforms;
     using results;
+    using SimpleInjector;
     using tolerance;
     using IFileSystem = filesystem.IFileSystem;
 
@@ -44,7 +47,6 @@ namespace chocolatey.infrastructure.app.services
     {
         private readonly INugetService _nugetService;
         private readonly IPowershellService _powershellService;
-        private readonly IEnumerable<ISourceRunner> _sourceRunners;
         private readonly IShimGenerationService _shimgenService;
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
@@ -53,6 +55,7 @@ namespace chocolatey.infrastructure.app.services
         private readonly IAutomaticUninstallerService _autoUninstallerService;
         private readonly IXmlService _xmlService;
         private readonly IConfigTransformService _configTransformService;
+        private readonly IContainerResolver _containerResolver;
         private readonly IDictionary<string, FileStream> _pendingLocks = new Dictionary<string, FileStream>();
 
         private readonly IList<string> _proBusinessMessages = new List<string> {
@@ -106,16 +109,21 @@ Did you know Pro / Business automatically syncs with Programs and
         // 3010 - restart required
         private readonly List<int> _rebootExitCodes = new List<int> { 1641, 3010 };
 
-        public ChocolateyPackageService(INugetService nugetService, IPowershellService powershellService,
-            IEnumerable<ISourceRunner> sourceRunners, IShimGenerationService shimgenService,
-            IFileSystem fileSystem, IRegistryService registryService,
-            IChocolateyPackageInformationService packageInfoService, IFilesService filesService,
-            IAutomaticUninstallerService autoUninstallerService, IXmlService xmlService,
-            IConfigTransformService configTransformService)
+        public ChocolateyPackageService(
+            INugetService nugetService,
+            IPowershellService powershellService,
+            IShimGenerationService shimgenService,
+            IFileSystem fileSystem,
+            IRegistryService registryService,
+            IChocolateyPackageInformationService packageInfoService,
+            IFilesService filesService,
+            IAutomaticUninstallerService autoUninstallerService,
+            IXmlService xmlService,
+            IConfigTransformService configTransformService,
+            IContainerResolver containerResolver)
         {
             _nugetService = nugetService;
             _powershellService = powershellService;
-            _sourceRunners = sourceRunners;
             _shimgenService = shimgenService;
             _fileSystem = fileSystem;
             _registryService = registryService;
@@ -124,46 +132,108 @@ Did you know Pro / Business automatically syncs with Programs and
             _autoUninstallerService = autoUninstallerService;
             _xmlService = xmlService;
             _configTransformService = configTransformService;
-        }
-
-        public virtual void EnsureSourceAppInstalled(ChocolateyConfiguration config)
-        {
-            PerformSourceRunnerAction(config, r => r.EnsureSourceAppInstalled(config, (packageResult, configuration) => HandlePackageResult(packageResult, configuration, CommandNameType.Install)));
+            _containerResolver = containerResolver;
         }
 
         public virtual int Count(ChocolateyConfiguration config)
         {
-            return PerformSourceRunnerFunction(config, r => r.Count(config));
+            return PerformSourceRunnerFunction<ICountSourceRunner, int>(
+                config,
+                runner => runner.Count(config),
+                throwOnException: true);
         }
 
-        private void PerformSourceRunnerAction(ChocolateyConfiguration config, Action<ISourceRunner> action)
+        private void PerformSourceRunnerAction<TSourceRunner>(ChocolateyConfiguration config, Action<TSourceRunner> action, bool throwOnException = false)
+            where TSourceRunner : class, IAlternativeSourceRunner
         {
-            var runner = GetSourceRunner(config.SourceType);
+            var alternativeSourceRunners = _containerResolver.ResolveAll<TSourceRunner>();
+            PerformSourceRunnerAction(config, action, alternativeSourceRunners, throwOnException);
+        }
+
+        private void PerformSourceRunnerAction<TSourceRunner>(ChocolateyConfiguration config, Action<TSourceRunner> action, IEnumerable<TSourceRunner> alternativeSourceRunners, bool throwOnException = false)
+            where TSourceRunner : class, IAlternativeSourceRunner
+        {
+            var runner = GetSourceRunner<TSourceRunner>(config.SourceType, alternativeSourceRunners);
             if (runner != null && action != null)
             {
+                if (runner is IBootstrappableSourceRunner bootstrapper)
+                {
+                    bootstrapper.EnsureSourceAppInstalled(config, (packageResult, configuration) => HandlePackageResult(packageResult, configuration, CommandNameType.Install));
+                }
+
                 action.Invoke(runner);
             }
             else
             {
-                this.Log().Warn("No runner was found that implements source type '{0}' or action was missing".FormatWith(config.SourceType));
+                if (throwOnException)
+                {
+                    throw new NotSupportedException("No runner was found that implements source type '{0}' or action was missing".FormatWith(config.SourceType));
+                }
+                else
+                {
+                    this.Log().Warn("No runner was found that implements source type '{0}' or action was missing".FormatWith(config.SourceType));
+                }
             }
         }
 
-        private T PerformSourceRunnerFunction<T>(ChocolateyConfiguration config, Func<ISourceRunner, T> function)
+        private TResult PerformSourceRunnerFunction<TSourceRunner, TResult>(ChocolateyConfiguration config, Func<TSourceRunner, TResult> function, bool throwOnException = false)
+            where TSourceRunner : class, IAlternativeSourceRunner
         {
-            var runner = GetSourceRunner(config.SourceType);
+            var alternativeSourceRunners = _containerResolver.ResolveAll<TSourceRunner>();
+            return PerformSourceRunnerFunction(config, function, alternativeSourceRunners, throwOnException);
+        }
+
+        private TResult PerformSourceRunnerFunction<TSourceRunner, TResult>(ChocolateyConfiguration config, Func<TSourceRunner, TResult> function, IEnumerable<TSourceRunner> alternativeSourceRunners, bool throwOnException = false)
+            where TSourceRunner : class, IAlternativeSourceRunner
+        {
+            var runner = GetSourceRunner<TSourceRunner>(config.SourceType, alternativeSourceRunners);
             if (runner != null && function != null)
             {
+                if (runner is IBootstrappableSourceRunner bootstrapper)
+                {
+                    bootstrapper.EnsureSourceAppInstalled(config, (packageResult, configuration) => HandlePackageResult(packageResult, configuration, CommandNameType.Install));
+                }
+
                 return function.Invoke(runner);
             }
 
-            this.Log().Warn("No runner was found that implements source type '{0}' or function was missing.".FormatWith(config.SourceType));
-            return default(T);
+            if (throwOnException)
+            {
+                throw new NotSupportedException("No runner was found that implements source type '{0}' or, it does not support requested functionality.".FormatWith(config.SourceType));
+            }
+            else
+            {
+                this.Log().Warn("No runner was found that implements source type '{0}' or, it does not support requested functionality.".FormatWith(config.SourceType));
+            }
+
+            return default(TResult);
         }
 
         public void ListDryRun(ChocolateyConfiguration config)
         {
-            PerformSourceRunnerAction(config, r => r.ListDryRun(config));
+            if (string.IsNullOrWhiteSpace(config.Sources) && !config.ListCommand.LocalOnly)
+            {
+                this.Log().Error(ChocolateyLoggers.Important, @"Unable to search for packages when there are no sources enabled for
+ packages and none were passed as arguments.");
+                Environment.ExitCode = 1;
+                return;
+            }
+
+            config.Noop = true;
+
+            if (config.ListCommand.LocalOnly && !config.SourceType.IsEqualTo(SourceTypes.Normal))
+            {
+                PerformSourceRunnerAction<IListSourceRunner>(config, runner => runner.ListDryRun(config));
+            }
+            else if (config.SourceType.IsEqualTo(SourceTypes.Normal))
+            {
+                _nugetService.ListDryRun(config);
+            }
+            else
+            {
+                PerformSourceRunnerAction<ISearchableSourceRunner>(config, runner => runner.SearchDryRun(config));
+            }
+
             RandomlyNotifyAboutLicensedFeatures(config, ProBusinessListMessage);
         }
 
@@ -181,7 +251,28 @@ Did you know Pro / Business automatically syncs with Programs and
 
             var packages = new List<PackageResult>();
 
-            foreach (PackageResult package in PerformSourceRunnerFunction(config, r => r.List(config)))
+            IEnumerable<PackageResult> results;
+
+            if (config.ListCommand.LocalOnly && !config.SourceType.IsEqualTo(SourceTypes.Normal))
+            {
+                results = PerformSourceRunnerFunction<IListSourceRunner, IEnumerable<PackageResult>>(config, runner => runner.List(config));
+            }
+            else if (config.SourceType.IsEqualTo(SourceTypes.Normal))
+            {
+                results = _nugetService.List(config).OrEmpty();
+            }
+            else
+            {
+                results = PerformSourceRunnerFunction<ISearchableSourceRunner, IEnumerable<PackageResult>>(config, runner => runner.Search(config));
+            }
+
+            if (results is null)
+            {
+                var message = config.ListCommand.LocalOnly ? "The '{0}' source does not support listing of packages".FormatWith(config.SourceType) : "The '{0}' source does not support searching for packages".FormatWith(config.SourceType);
+                throw new NotSupportedException(message);
+            }
+
+            foreach (PackageResult package in results)
             {
                 if (config.SourceType.IsEqualTo(SourceTypes.Normal))
                 {
@@ -292,16 +383,22 @@ Did you know Pro / Business automatically syncs with Programs and
         {
             ValidatePackageNames(config);
 
+            var installSourceRunners = _containerResolver.ResolveAll<IInstallSourceRunner>();
+
             // each package can specify its own configuration values
-            foreach (var packageConfig in GetConfigFromInputAndPackageConfigInput(config, new ConcurrentDictionary<string, PackageResult>()).OrEmpty())
+            foreach (var packageConfig in GetConfigFromInputAndPackageConfigInput(config, new ConcurrentDictionary<string, PackageResult>(), installSourceRunners).OrEmpty())
             {
-                Action<PackageResult, ChocolateyConfiguration> action = null;
+                config.Noop = true;
+
                 if (packageConfig.SourceType.IsEqualTo(SourceTypes.Normal))
                 {
-                    action = (pkg,configuration) => _powershellService.InstallDryRun(pkg);
+                    Action<PackageResult, ChocolateyConfiguration> action = (pkg, configuration) => _powershellService.InstallDryRun(pkg);
+                    _nugetService.InstallDryRun(packageConfig, action);
                 }
-
-                PerformSourceRunnerAction(packageConfig, r => r.InstallDryRun(packageConfig, action));
+                else
+                {
+                    PerformSourceRunnerAction(config, runner => runner.InstallDryRun(packageConfig, null), installSourceRunners);
+                }
             }
 
             RandomlyNotifyAboutLicensedFeatures(config);
@@ -593,18 +690,30 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
             GetInitialEnvironment(config, allowLogging: true);
 
+            var installSourceRunners = _containerResolver.ResolveAll<IInstallSourceRunner>();
+
             try
             {
-                foreach (var packageConfig in GetConfigFromInputAndPackageConfigInput(config, packageInstalls).OrEmpty())
+                foreach (var packageConfig in GetConfigFromInputAndPackageConfigInput(config, packageInstalls, installSourceRunners).OrEmpty())
                 {
-                    Action<PackageResult, ChocolateyConfiguration> action = null;
+                    ConcurrentDictionary<string, PackageResult> results;
+
                     if (packageConfig.SourceType.IsEqualTo(SourceTypes.Normal))
                     {
-                        action = (packageResult, configuration) => HandlePackageResult(packageResult, configuration, CommandNameType.Install);
+                        var action = new Action<PackageResult, ChocolateyConfiguration>((packageResult, configuration) => HandlePackageResult(packageResult, configuration, CommandNameType.Install));
+                        var beforeModifyAction = new Action<PackageResult, ChocolateyConfiguration>((packageResult, configuration) => BeforeModifyAction(packageResult, configuration));
+
+                        results = _nugetService.Install(packageConfig, action, beforeModifyAction);
+                    }
+                    else
+                    {
+                        results = PerformSourceRunnerFunction<IInstallSourceRunner, ConcurrentDictionary<string, PackageResult>>(packageConfig, runner => runner.Install(packageConfig, null));
                     }
 
-                    var beforeModifyAction = new Action<PackageResult, ChocolateyConfiguration>((packageResult, configuration) => BeforeModifyAction(packageResult, configuration));
-                    var results = PerformSourceRunnerFunction(packageConfig, r => r.Install(packageConfig, action, beforeModifyAction));
+                    if (results is null)
+                    {
+                        throw new NotSupportedException("The '{0}' source does not support installing packages".FormatWith(config.SourceType));
+                    }
 
                     foreach (var result in results)
                     {
@@ -683,14 +792,14 @@ Would have determined packages that are out of date based on what is
             RandomlyNotifyAboutLicensedFeatures(config);
         }
 
-        private IEnumerable<ChocolateyConfiguration> GetConfigFromInputAndPackageConfigInput(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls)
+        private IEnumerable<ChocolateyConfiguration> GetConfigFromInputAndPackageConfigInput(ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls, IEnumerable<IAlternativeSourceRunner> alternativeSourceRunners)
         {
             // if there are any .config files, split those off of the config. Then return the config without those package names.
             foreach (var packageConfigFile in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty().Where(p => p.EndsWith(".config")).ToList())
             {
                 config.PackageNames = config.PackageNames.Replace(packageConfigFile, string.Empty);
 
-                foreach (var packageConfig in GetPackagesFromConfigFile(packageConfigFile, config, packageInstalls).OrEmpty())
+                foreach (var packageConfig in GetPackagesFromConfigFile(packageConfigFile, config, packageInstalls, alternativeSourceRunners).OrEmpty())
                 {
                     yield return packageConfig;
                 }
@@ -704,7 +813,7 @@ Would have determined packages that are out of date based on what is
             return packageNames.ToStringSafe().EndsWith(".config", StringComparison.OrdinalIgnoreCase) && !packageNames.ToStringSafe().ContainsSafe(";");
         }
 
-        private IEnumerable<ChocolateyConfiguration> GetPackagesFromConfigFile(string packageConfigFile, ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls)
+        private IEnumerable<ChocolateyConfiguration> GetPackagesFromConfigFile(string packageConfigFile, ChocolateyConfiguration config, ConcurrentDictionary<string, PackageResult> packageInstalls, IEnumerable<IAlternativeSourceRunner> alternativeSourceRunners)
         {
             IList<ChocolateyConfiguration> packageConfigs = new List<ChocolateyConfiguration>();
 
@@ -735,7 +844,7 @@ Would have determined packages that are out of date based on what is
                     if (pkgSettings.ApplyInstallArgumentsToDependencies) packageConfig.ApplyInstallArgumentsToDependencies = true;
                     if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
 
-                    if (!string.IsNullOrWhiteSpace(pkgSettings.Source) && HasSourceType(pkgSettings.Source))
+                    if (!string.IsNullOrWhiteSpace(pkgSettings.Source) && HasSourceType(pkgSettings.Source, alternativeSourceRunners))
                     {
                         packageConfig.SourceType = pkgSettings.Source;
                     }
@@ -796,13 +905,22 @@ Would have determined packages that are out of date based on what is
         {
             ValidatePackageNames(config);
 
-            Action<PackageResult, ChocolateyConfiguration> action = null;
+            var upgradeSourceRunners = _containerResolver.ResolveAll<IUpgradeSourceRunner>();
+
+            config.Noop = true;
+
+            ConcurrentDictionary<string, PackageResult> noopUpgrades;
+
             if (config.SourceType.IsEqualTo(SourceTypes.Normal))
             {
-                action = (pkg, configuration) => _powershellService.InstallDryRun(pkg);
+                Action<PackageResult, ChocolateyConfiguration> action = (pkg, configuration) => _powershellService.InstallDryRun(pkg);
+                noopUpgrades = _nugetService.UpgradeDryRun(config, action);
+            }
+            else
+            {
+                noopUpgrades = PerformSourceRunnerFunction(config, runner => runner.UpgradeDryRun(config, null), upgradeSourceRunners);
             }
 
-            var noopUpgrades = PerformSourceRunnerFunction(config, r => r.UpgradeDryRun(config, action));
             if (config.RegularOutput)
             {
                 var noopFailures = ReportActionSummary(noopUpgrades, "can upgrade");
@@ -837,16 +955,26 @@ Would have determined packages that are out of date based on what is
 
             try
             {
-                Action<PackageResult, ChocolateyConfiguration> action = null;
-                if (config.SourceType.IsEqualTo(SourceTypes.Normal))
-                {
-                    action = (packageResult, configuration) => HandlePackageResult(packageResult, configuration, CommandNameType.Upgrade);
-                }
-
                 GetInitialEnvironment(config, allowLogging: true);
 
-                var beforeUpgradeAction = new Action<PackageResult, ChocolateyConfiguration>((packageResult, configuration) => BeforeModifyAction(packageResult, configuration));
-                var results = PerformSourceRunnerFunction(config, r => r.Upgrade(config, action, beforeUpgradeAction));
+                ConcurrentDictionary<string, PackageResult> results;
+
+                if (config.SourceType.IsEqualTo(SourceTypes.Normal))
+                {
+                    var action = new Action<PackageResult, ChocolateyConfiguration>((packageResult, configuration) => HandlePackageResult(packageResult, configuration, CommandNameType.Upgrade));
+                    var beforeUpgradeAction = new Action<PackageResult, ChocolateyConfiguration>((packageResult, configuration) => BeforeModifyAction(packageResult, configuration));
+
+                    results = _nugetService.Upgrade(config, action, beforeUpgradeAction);
+                }
+                else
+                {
+                    results = PerformSourceRunnerFunction<IUpgradeSourceRunner, ConcurrentDictionary<string, PackageResult>>(config, runner => runner.Upgrade(config, null));
+                }
+
+                if (results is null)
+                {
+                    throw new NotSupportedException("The '{0}' source does not support upgrading packages".FormatWith(config.SourceType));
+                }
 
                 foreach (var result in results)
                 {
@@ -881,17 +1009,24 @@ Would have determined packages that are out of date based on what is
 
         public void UninstallDryRun(ChocolateyConfiguration config)
         {
-            Action<PackageResult, ChocolateyConfiguration> action = null;
+            var uninstallSourceRunners = _containerResolver.ResolveAll<IUninstallSourceRunner>();
+
+            config.Noop = true;
+
             if (config.SourceType.IsEqualTo(SourceTypes.Normal))
             {
-                action = (pkg, configuration) =>
+                Action<PackageResult, ChocolateyConfiguration> action = (pkg, configuration) =>
                 {
                     _powershellService.BeforeModifyDryRun(pkg);
                     _powershellService.UninstallDryRun(pkg);
                 };
+                _nugetService.UninstallDryRun(config, action);
+            }
+            else
+            {
+                PerformSourceRunnerAction(config, runner => runner.UninstallDryRun(config, null), uninstallSourceRunners);
             }
 
-            PerformSourceRunnerAction(config, r => r.UninstallDryRun(config, action));
             RandomlyNotifyAboutLicensedFeatures(config);
         }
 
@@ -909,15 +1044,26 @@ Would have determined packages that are out of date based on what is
 
             try
             {
-                Action<PackageResult, ChocolateyConfiguration> action = null;
+                var environmentBefore = GetInitialEnvironment(config);
+
+                ConcurrentDictionary<string, PackageResult> results;
+
                 if (config.SourceType.IsEqualTo(SourceTypes.Normal))
                 {
-                    action = HandlePackageUninstall;
+                    var action = new Action<PackageResult, ChocolateyConfiguration>(HandlePackageUninstall);
+                    var beforeUninstallAction = new Action<PackageResult, ChocolateyConfiguration>(BeforeModifyAction);
+
+                    results = _nugetService.Uninstall(config, action, beforeUninstallAction);
+                }
+                else
+                {
+                    results = PerformSourceRunnerFunction<IUninstallSourceRunner, ConcurrentDictionary<string, PackageResult>>(config, runner => runner.Uninstall(config, null));
                 }
 
-                var environmentBefore = GetInitialEnvironment(config);
-                var beforeUninstallAction = new Action<PackageResult, ChocolateyConfiguration>(BeforeModifyAction);
-                var results = PerformSourceRunnerFunction(config, r => r.Uninstall(config, action, beforeUninstallAction));
+                if (results is null)
+                {
+                    throw new NotSupportedException("The '{0}' source does not support uninstalling packages".FormatWith(config.SourceType));
+                }
 
                 foreach (var result in results)
                 {
@@ -1428,9 +1574,9 @@ ATTENTION: You must take manual action to remove {1} from
             }
         }
 
-        private bool HasSourceType(string sourceType)
+        private bool HasSourceType(string sourceType, IEnumerable<IAlternativeSourceRunner> alternativeSourceRunners)
         {
-            return _sourceRunners.Any(s => s.SourceType == sourceType || s.SourceType == sourceType + "s");
+            return alternativeSourceRunners.Any(s => s.SourceType == sourceType || s.SourceType == sourceType + "s");
         }
 
         private void MovePackageToFailedPackagesLocation(PackageResult packageResult)
@@ -1646,11 +1792,19 @@ ATTENTION: You must take manual action to remove {1} from
             }
         }
 
-        private ISourceRunner GetSourceRunner(string sourceType)
+        private TSourceRunner GetSourceRunner<TSourceRunner>(string sourceType)
+            where TSourceRunner : class, IAlternativeSourceRunner
         {
             // We add the trailing s to the check in case of windows feature which can be specified both with and without
             // the s.
-            return _sourceRunners.FirstOrDefault(s => s.SourceType == sourceType || s.SourceType == sourceType + "s");
+            var sourceRunners = _containerResolver.ResolveAll<TSourceRunner>();
+            return GetSourceRunner(sourceType, sourceRunners);
+        }
+
+        private TSourceRunner GetSourceRunner<TSourceRunner>(string sourceType, IEnumerable<TSourceRunner> alternativeSourceRunners)
+            where TSourceRunner : class, IAlternativeSourceRunner
+        {
+            return alternativeSourceRunners.FirstOrDefault(s => s.SourceType == sourceType || s.SourceType == sourceType + "s");
         }
 
         // This should probably be split into install(/upgrade)/uninstall methods with shared logic placed in helper method(s).
@@ -1700,10 +1854,6 @@ ATTENTION: You must take manual action to remove {1} from
         }
 
 #pragma warning disable IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void ensure_source_app_installed(ChocolateyConfiguration config)
-            => EnsureSourceAppInstalled(config);
-
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual int count_run(ChocolateyConfiguration config)
             => Count(config);

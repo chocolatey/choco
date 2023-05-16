@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.app.services
     /// <summary>
     ///   Alternative Source for Installing Python packages
     /// </summary>
-    public sealed class PythonService : ISourceRunner
+    public sealed class PythonService : IBootstrappableSourceRunner, IListSourceRunner, IInstallSourceRunner, IUpgradeSourceRunner, IUninstallSourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
         private readonly INugetService _nugetService;
@@ -208,11 +208,6 @@ namespace chocolatey.infrastructure.app.services
                     config.PromptForConfirmation = prompt;
                 }
             }
-        }
-
-        public int Count(ChocolateyConfiguration config)
-        {
-            throw new NotImplementedException("Count is not supported for this source runner.");
         }
 
         private void EnsureExecutablePathSet()
@@ -589,10 +584,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
             => EnsureSourceAppInstalled(config, ensureAction);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public int count_run(ChocolateyConfiguration config)
-            => Count(config);
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void set_executable_path_if_not_set()

@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.app.registration
     using System.Reflection;
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.app.attributes;
+    using chocolatey.infrastructure.app.services;
     using infrastructure.commands;
     using infrastructure.events;
     using infrastructure.services;
@@ -221,6 +222,61 @@ namespace chocolatey.infrastructure.app.registration
         public void RegisterValidator(Func<Type, bool> validation_func)
         {
             _validationHandlers.Add(validation_func);
+        }
+
+        public void RegisterSourceRunner<TService>() where TService : class
+        {
+            RegisterSourceRunner(typeof(TService));
+        }
+
+        public void RegisterSourceRunner(Type serviceType)
+        {
+            EnsureNotBuilt();
+
+            if (!CanRegisterService(serviceType))
+            {
+                return;
+            }
+
+            if (!typeof(IAlternativeSourceRunner).IsAssignableFrom(serviceType))
+            {
+                return;
+            }
+
+            AddToMultiServices(typeof(IAlternativeSourceRunner), serviceType);
+
+            foreach (var interfaceType in serviceType.GetInterfaces())
+            {
+                if (interfaceType == typeof(ICountSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+
+                if (interfaceType == typeof(IListSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+
+                if (interfaceType == typeof(ISearchableSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+
+                if (interfaceType == typeof(IInstallSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+
+                if (interfaceType == typeof(IUpgradeSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+
+                if (interfaceType == typeof(IUninstallSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+            }
         }
 
         internal Container BuildContainer(Container container)

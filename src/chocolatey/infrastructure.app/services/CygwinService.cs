@@ -36,7 +36,7 @@ namespace chocolatey.infrastructure.app.services
     /// <remarks>
     ///   https://cygwin.com/faq/faq.html#faq.setup.cli
     /// </remarks>
-    public sealed class CygwinService : ISourceRunner
+    public sealed class CygwinService : IBootstrappableSourceRunner, IInstallSourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
         private readonly INugetService _nugetService;
@@ -171,11 +171,6 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-        public int Count(ChocolateyConfiguration config)
-        {
-            throw new NotImplementedException("Count is not supported for this source runner.");
-        }
-
         private string GetRootDirectory()
         {
             var setupKey = _registryService.GetKey(RegistryHive.LocalMachine, "SOFTWARE\\Cygwin\\setup");
@@ -193,16 +188,6 @@ namespace chocolatey.infrastructure.app.services
         private string GetCygwinPath(string rootpath)
         {
             return _fileSystem.CombinePaths(rootpath, "cygwinsetup.exe");
-        }
-
-        public void ListDryRun(ChocolateyConfiguration config)
-        {
-            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement list".FormatWith(AppName));
-        }
-
-        public IEnumerable<PackageResult> List(ChocolateyConfiguration config)
-        {
-            throw new NotImplementedException("{0} does not implement list".FormatWith(AppName));
         }
 
         private string BuildArgs(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
@@ -272,27 +257,6 @@ namespace chocolatey.infrastructure.app.services
             return packageResults;
         }
 
-        public ConcurrentDictionary<string, PackageResult> UpgradeDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
-        {
-            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement upgrade".FormatWith(AppName));
-            return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
-        }
-
-        public ConcurrentDictionary<string, PackageResult> Upgrade(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null)
-        {
-            throw new NotImplementedException("{0} does not implement upgrade".FormatWith(AppName));
-        }
-
-        public void UninstallDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
-        {
-            this.Log().Warn(ChocolateyLoggers.Important, "{0} does not implement uninstall".FormatWith(AppName));
-        }
-
-        public ConcurrentDictionary<string, PackageResult> Uninstall(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
-        {
-            throw new NotImplementedException("{0} does not implement upgrade".FormatWith(AppName));
-        }
-
         /// <summary>
         ///   Grabs a value from the output based on the regex.
         /// </summary>
@@ -326,18 +290,6 @@ namespace chocolatey.infrastructure.app.services
             => EnsureSourceAppInstalled(config, ensureAction);
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public int count_run(ChocolateyConfiguration config)
-            => Count(config);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void list_noop(ChocolateyConfiguration config)
-            => ListDryRun(config);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
-            => List(config);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
             => InstallDryRun(config, continueAction);
 
@@ -348,22 +300,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
             => Install(config, continueAction, beforeModifyAction);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
-            => UpgradeDryRun(config, continueAction);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null)
-            => Upgrade(config, continueAction, beforeUpgradeAction);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
-            => UninstallDryRun(config, continueAction);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
-            => Uninstall(config, continueAction, beforeUninstallAction);
 #pragma warning restore IDE1006
     }
 }
