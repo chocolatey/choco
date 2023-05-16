@@ -36,6 +36,7 @@ namespace chocolatey.infrastructure.app.registration
     using chocolatey.infrastructure.app.rules;
     using System.Linq;
     using System;
+    using System.Security.AccessControl;
 
     internal class ChocolateyRegistrationModule : IExtensionModule
     {
@@ -66,12 +67,13 @@ namespace chocolatey.infrastructure.app.registration
             registrator.RegisterService<ICommandExecutor, CommandExecutor>();
             registrator.RegisterInstance(() => new adapters.CustomString(string.Empty));
 
+            registrator.RegisterSourceRunner<WindowsFeatureService>();
+            registrator.RegisterSourceRunner<CygwinService>();
+            registrator.RegisterSourceRunner<PythonService>();
+            registrator.RegisterSourceRunner<RubyGemsService>();
+
             registrator.RegisterService<ISourceRunner>(
-                typeof(INugetService),
-                typeof(WindowsFeatureService),
-                typeof(CygwinService),
-                typeof(PythonService),
-                typeof(RubyGemsService));
+                typeof(INugetService));
 
             registrator.RegisterService<IEventSubscriptionManagerService, EventSubscriptionManagerService>();
 

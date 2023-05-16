@@ -33,6 +33,7 @@ using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 namespace chocolatey.tests.infrastructure.app.services
 {
     using System.IO;
+    using chocolatey.infrastructure.app.registration;
     using NuGet.Packaging;
 
     public class ChocolateyPackageServiceSpecs
@@ -42,7 +43,6 @@ namespace chocolatey.tests.infrastructure.app.services
             protected ChocolateyPackageService Service;
             protected Mock<INugetService> NugetService = new Mock<INugetService>();
             protected Mock<IPowershellService> PowershellService = new Mock<IPowershellService>();
-            protected List<ISourceRunner> SourceRunners = new List<ISourceRunner>();
             protected Mock<IShimGenerationService> ShimGenerationService = new Mock<IShimGenerationService>();
             protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
             protected Mock<IRegistryService> RegistryService = new Mock<IRegistryService>();
@@ -51,6 +51,7 @@ namespace chocolatey.tests.infrastructure.app.services
             protected Mock<IAutomaticUninstallerService> AutomaticUninstallerService = new Mock<IAutomaticUninstallerService>();
             protected Mock<IXmlService> XmlService = new Mock<IXmlService>();
             protected Mock<IConfigTransformService> ConfigTransformService = new Mock<IConfigTransformService>();
+            protected Mock<IContainerResolver> ContainerResolver = new Mock<IContainerResolver>();
 
             protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
@@ -66,14 +67,26 @@ namespace chocolatey.tests.infrastructure.app.services
                 AutomaticUninstallerService.ResetCalls();
                 XmlService.ResetCalls();
                 ConfigTransformService.ResetCalls();
-                Service = new ChocolateyPackageService(NugetService.Object, PowershellService.Object, SourceRunners, ShimGenerationService.Object, FileSystem.Object, RegistryService.Object, ChocolateyPackageInformationService.Object, FilesService.Object, AutomaticUninstallerService.Object, XmlService.Object, ConfigTransformService.Object);
+                ContainerResolver.ResetCalls();
+                Service = new ChocolateyPackageService(
+                    NugetService.Object,
+                    PowershellService.Object,
+                    ShimGenerationService.Object,
+                    FileSystem.Object,
+                    RegistryService.Object,
+                    ChocolateyPackageInformationService.Object,
+                    FilesService.Object,
+                    AutomaticUninstallerService.Object,
+                    XmlService.Object,
+                    ConfigTransformService.Object,
+                    ContainerResolver.Object);
             }
         }
 
         public class When_ChocolateyPackageService_install_from_package_config_with_custom_sources : ChocolateyPackageServiceSpecsBase
         {
-            protected Mock<IInstallSourceRunner> FeaturesRunner = new Mock<IInstallSourceRunner>().As<IInstallSourceRunner>();
-            protected Mock<IInstallSourceRunner> NormalRunner = new Mock<IInstallSourceRunner>().As<IInstallSourceRunner>();
+            protected Mock<IInstallSourceRunner> WindowsFeaturesRunner = new Mock<IInstallSourceRunner>();
+
             private ConcurrentDictionary<string, PackageResult> _result;
 
             public override void Context()
@@ -83,18 +96,18 @@ namespace chocolatey.tests.infrastructure.app.services
                 Configuration.PackageNames = @"C:\test\packages.config";
                 Configuration.Sources = @"C:\test";
 
-                NormalRunner.As<ISourceRunner>().Setup(r => r.SourceType).Returns(SourceTypes.Normal);
-                FeaturesRunner.As<ISourceRunner>().Setup(r => r.SourceType).Returns(SourceTypes.WindowsFeatures);
+                WindowsFeaturesRunner.Setup(r => r.SourceType).Returns(SourceTypes.WindowsFeatures);
 
                 var package = new Mock<IPackageMetadata>();
                 var expectedResult = new ConcurrentDictionary<string, PackageResult>();
                 expectedResult.TryAdd("test-feature", new PackageResult(package.Object, "windowsfeatures", null));
 
-                FeaturesRunner.Setup(r => r.Install(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()))
+                WindowsFeaturesRunner.Setup(r => r.Install(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()))
                     .Returns(expectedResult);
-                NormalRunner.Setup(r => r.Install(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()))
-                    .Returns(new ConcurrentDictionary<string, PackageResult>());
-                SourceRunners.AddRange(new[] { NormalRunner.Object as ISourceRunner, FeaturesRunner.Object as ISourceRunner });
+                NugetService.Setup(n => n.Install(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()))
+                    .Returns(expectedResult);
+
+                ContainerResolver.Setup(c => c.ResolveAll<IInstallSourceRunner>()).Returns(new[] { WindowsFeaturesRunner.Object });
 
                 FileSystem.Setup(f => f.GetFullPath(Configuration.PackageNames)).Returns(Configuration.PackageNames);
                 FileSystem.Setup(f => f.FileExists(Configuration.PackageNames)).Returns(true);
@@ -127,22 +140,22 @@ namespace chocolatey.tests.infrastructure.app.services
             [Test]
             public void Should_have_called_runner_for_windows_features_source()
             {
-                FeaturesRunner
-                    .As<IInstallSourceRunner>()
-                    .Verify(r => r.Install(It.Is<ChocolateyConfiguration>(c => c.PackageNames == "test-feature"), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()), Times.Once);
+                WindowsFeaturesRunner
+                    .Verify(r => r.Install(It.Is<ChocolateyConfiguration>(c => c.PackageNames == "test-feature"), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()), Times.Once);
             }
 
             [Test]
             public void Should_not_have_called_runner_for_windows_features_source_with_other_package_names()
             {
-                FeaturesRunner.Verify(r => r.Install(It.Is<ChocolateyConfiguration>(c => c.PackageNames != "test-feature"), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()), Times.Never);
+                WindowsFeaturesRunner.Verify(r => r.Install(It.Is<ChocolateyConfiguration>(c => c.PackageNames != "test-feature"), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()), Times.Never);
+                WindowsFeaturesRunner.Verify(r => r.Install(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()), Times.Never);
             }
 
             [Test]
             public void Should_not_have_called_normal_source_runner_for_non_empty_packages()
             {
                 // The normal source runners will be called with an argument
-                NormalRunner.Verify(r => r.Install(It.Is<ChocolateyConfiguration>(c => c.PackageNames != string.Empty), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()), Times.Never);
+                NugetService.Verify(r => r.Install(It.Is<ChocolateyConfiguration>(c => c.PackageNames != string.Empty), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()), Times.Never);
             }
         }
 

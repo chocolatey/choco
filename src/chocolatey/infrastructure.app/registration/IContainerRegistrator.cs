@@ -28,6 +28,11 @@ namespace chocolatey.infrastructure.app.registration
 
         void RegisterService<TService>(params Type[] types);
 
+        void RegisterSourceRunner<TService>()
+            where TService : class;
+
+        void RegisterSourceRunner(Type serviceType);
+
         void RegisterInstance<TImplementation>(Func<TImplementation> instance)
             where TImplementation : class;
 

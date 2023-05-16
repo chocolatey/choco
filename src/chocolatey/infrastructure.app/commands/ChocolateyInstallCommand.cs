@@ -423,7 +423,6 @@ NOTE: Options and switches apply to all items passed, so if you are
 
         public virtual void Run(ChocolateyConfiguration configuration)
         {
-            _packageService.EnsureSourceAppInstalled(configuration);
             _packageService.Install(configuration);
         }
 

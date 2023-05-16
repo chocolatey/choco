@@ -572,6 +572,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool NotBroken { get; set; }
         public bool IncludeVersionOverrides { get; set; }
         public bool ExplicitPageSize { get; set; }
+        public bool ExplicitSource { get; set; }
     }
 
     [Serializable]

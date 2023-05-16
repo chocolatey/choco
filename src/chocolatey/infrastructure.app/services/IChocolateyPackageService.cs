@@ -27,13 +27,6 @@ namespace chocolatey.infrastructure.app.services
     /// </summary>
     public interface IChocolateyPackageService
     {
-
-        /// <summary>
-        ///   Ensures the application that controls a source is installed
-        /// </summary>
-        /// <param name="config">The configuration.</param>
-        void EnsureSourceAppInstalled(ChocolateyConfiguration config);
-
         /// <summary>
         ///   Retrieves the count of items that meet the search criteria.
         /// </summary>
@@ -131,8 +124,6 @@ namespace chocolatey.infrastructure.app.services
 
 
 #pragma warning disable IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void ensure_source_app_installed(ChocolateyConfiguration config);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         int count_run(ChocolateyConfiguration config);
         [Obsolete("This overload is deprecated and will be removed in v3.")]

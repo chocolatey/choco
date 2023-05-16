@@ -221,7 +221,6 @@ choco {0}: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/c
 
         public virtual void Run(ChocolateyConfiguration configuration)
         {
-            _packageService.EnsureSourceAppInstalled(configuration);
             // note: you must leave the .ToList() here or else the method won't be evaluated!
             var packageResults = _packageService.List(configuration).ToList();
 
