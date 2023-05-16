@@ -69,7 +69,7 @@ Vagrant.configure("2") do |config|
     Push-Location c:/code/choco
     # $env:TEST_KITCHEN = 1
     $env:VM_RUNNING = 1
-    ./Invoke-Tests.ps1 -SkipPackaging
+    ./Invoke-Tests.ps1
     Copy-Item $env:ALLUSERSPROFILE/chocolatey/logs/testInvocations.log C:/vagrant
   SHELL
 end

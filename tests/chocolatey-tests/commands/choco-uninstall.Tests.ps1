@@ -430,10 +430,6 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
             $Output = Invoke-Choco uninstall $PackageUnderTest
         }
 
-        AfterAll {
-            Pop-Location
-        }
-
         It "Should exit with success (0)" {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }

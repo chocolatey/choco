@@ -591,6 +591,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         @{ ExpectedPackageVersion = '1.2.4' ; ProvidedVersion = '01.02.04' }
         @{ ExpectedPackageVersion = '1.2.0' ; ProvidedVersion = '01.02' }
         @{ ExpectedPackageVersion = '1.2.3' ; ProvidedVersion = '0001.0002.0003' }
+        @{ ExpectedPackageVersion = '2.0.0' ; ProvidedVersion = '02' }
     )  {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot

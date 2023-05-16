@@ -1,4 +1,4 @@
-Describe "choco install" -Tag Chocolatey, InstallCommand {
+﻿Describe "choco install" -Tag Chocolatey, InstallCommand {
     BeforeDiscovery {
         $isLicensed30OrMissingVersion = Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-beta' -AllowMissingPackage
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
@@ -1775,6 +1775,8 @@ To install a local, or remote file, you may use:
     }
 
     Context "Installing a package with a non-normalized version number" -ForEach @(
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1' ; NuspecVersion = '01.0.0.0'}
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0' ; NuspecVersion = '01.0.0.0'}
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0.0' ; NuspecVersion = '01.0.0.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '4.0.1' ; NuspecVersion = '004.0.01.0' }
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' ; NuspecVersion = '01.0.0.0' }
@@ -1783,13 +1785,8 @@ To install a local, or remote file, you may use:
     )  {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
-            Push-Location (New-Item "$(Get-TempDirectory)/$(New-Guid)" -ItemType Directory)
             $PackageUnderTest = 'nonnormalizedversions'
             $Output = Invoke-Choco install $PackageUnderTest --Version $SearchVersion
-        }
-
-        AfterAll {
-            Pop-Location
         }
 
         It "Should exit with success (0)" {

@@ -196,6 +196,8 @@
     }
 
     Context "Listing package information for non-normalized exact package version" -ForEach @(
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1' }
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0' }
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '4.0.1' }
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' }

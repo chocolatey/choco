@@ -1,4 +1,4 @@
-Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
+﻿Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     BeforeAll {
         Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
