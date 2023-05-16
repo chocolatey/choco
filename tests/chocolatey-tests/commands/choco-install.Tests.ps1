@@ -1,8 +1,4 @@
-﻿Import-Module helpers/common-helpers
-
-# https://github.com/chocolatey/choco/blob/master/src/chocolatey.tests.integration/scenarios/InstallScenarios.cs
-
-Describe "choco install" -Tag Chocolatey, InstallCommand {
+﻿Describe "choco install" -Tag Chocolatey, InstallCommand {
     BeforeDiscovery {
         $isLicensed30OrMissingVersion = Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-beta' -AllowMissingPackage
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
@@ -1775,6 +1771,40 @@ To install a local, or remote file, you may use:
 
         It 'Installed package to expected location' {
             "$env:ChocolateyInstall\lib\installpackage" | Should -Exist
+        }
+    }
+
+    Context "Installing a package with a non-normalized version number" -ForEach @(
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1' ; NuspecVersion = '01.0.0.0'}
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0' ; NuspecVersion = '01.0.0.0'}
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0.0' ; NuspecVersion = '01.0.0.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '4.0.1' ; NuspecVersion = '004.0.01.0' }
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' ; NuspecVersion = '01.0.0.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '004.0.01.0' ; NuspecVersion = '004.0.01.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '0000004.00000.00001.0000' ; NuspecVersion = '004.0.01.0' }
+    )  {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $PackageUnderTest = 'nonnormalizedversions'
+            $Output = Invoke-Choco install $PackageUnderTest --Version $SearchVersion
+        }
+
+        It "Should exit with success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should report successful installation" {
+            $Output.Lines | Should -Contain "$PackageUnderTest v$ExpectedPackageVersion" -Because $Output.String
+            $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.' -Because $Output.String
+        }
+
+        It "Should have installed the correct files" {
+            $ExpectedNupkg = "${env:ChocolateyInstall}/lib/$PackageUnderTest/$PackageUnderTest.nupkg"
+            $ExpectedNupkg | Should -Exist -Because $Output.String
+            Expand-ZipArchive -Source $ExpectedNupkg -Destination "${env:TEMP}/$PackageUnderTest-expanded"
+            $NuspecContents = [xml](Get-Content "${env:TEMP}/$PackageUnderTest-expanded/$PackageUnderTest.nuspec")
+            Remove-Item -Path "${env:TEMP}/$PackageUnderTest-expanded" -Recurse -Force
+            $NuspecContents.package.metadata.version | Should -Be $NuspecVersion
         }
     }
 

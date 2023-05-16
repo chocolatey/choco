@@ -5,7 +5,8 @@ code_drop
 [Bb]in
 obj
 src/packages
-/.vscode/
+/.vscode/**
+!/.vscode/settings.json
 .vs
 
 *.suo

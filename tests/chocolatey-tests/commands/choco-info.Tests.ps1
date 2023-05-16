@@ -1,6 +1,4 @@
-﻿Import-Module helpers/common-helpers
-
-Describe "choco info" -Tag Chocolatey, InfoCommand {
+﻿Describe "choco info" -Tag Chocolatey, InfoCommand {
     BeforeDiscovery {
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
     }
@@ -194,6 +192,31 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
 
         It 'Output information about the package' {
             $Output.String | Should -Match "Title: Chocolatey "
+        }
+    }
+
+    Context "Listing package information for non-normalized exact package version" -ForEach @(
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1' }
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0' }
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '4.0.1' }
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '004.0.01.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '0000004.00000.00001.0000' }
+    )  {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $PackageUnderTest = 'nonnormalizedversions'
+
+            $Output = Invoke-Choco info $PackageUnderTest --version $SearchVersion
+        }
+
+        It "Should exit with success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should find and report the normalized package version" {
+            $Output.Lines | Should -Contain "$PackageUnderTest $ExpectedPackageVersion" -Because $Output.String
         }
     }
 

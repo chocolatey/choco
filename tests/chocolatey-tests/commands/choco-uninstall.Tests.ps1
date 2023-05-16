@@ -1,5 +1,3 @@
-Import-Module helpers/common-helpers
-
 Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
     BeforeAll {
         Remove-NuGetPaths
@@ -418,6 +416,35 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
 
         It "Removed package successfully from lib directory" {
             "$env:ChocolateyInstall\lib\isdependency" | Should -Not -Exist
+        }
+    }
+
+    Context "Uninstalling a package with a non-normalized version number" -ForEach @(
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '004.0.01.0' }
+    )  {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $PackageUnderTest = 'nonnormalizedversions'
+            $null = Invoke-Choco install $PackageUnderTest --Version $SearchVersion
+            $Output = Invoke-Choco uninstall $PackageUnderTest
+        }
+
+        It "Should exit with success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should report successful uninstallation" {
+            $Output.Lines | Should -Contain "$PackageUnderTest v$ExpectedPackageVersion" -Because $Output.String
+            $Output.Lines | Should -Contain 'Chocolatey uninstalled 1/1 packages.' -Because $Output.String
+        }
+
+        It "Should have removed any <Directory> directory" -ForEach @(
+            @{ Directory = 'lib' }
+            @{ Directory = 'lib-bkp' }
+            ) {
+            $InstallDirectory = "${env:ChocolateyInstall}/$Directory/$PackageUnderTest/"
+            $InstallDirectory | Should -Not -Exist -Because $Output.String
         }
     }
 
