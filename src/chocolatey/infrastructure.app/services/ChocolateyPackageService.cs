@@ -191,7 +191,10 @@ Did you know Pro / Business automatically syncs with Programs and
             {
                 if (runner is IBootstrappableSourceRunner bootstrapper)
                 {
-                    bootstrapper.EnsureSourceAppInstalled(config, (packageResult, configuration) => HandlePackageResult(packageResult, configuration, CommandNameType.Install));
+                    // NOTE: Here we are passing the original config into the HandlePackageResult method, rather than what comes out of the Action, since
+                    // that configuration could be wildly different from what was passed in, and we want to continue with what was in play before
+                    // installing the required source application.
+                    bootstrapper.EnsureSourceAppInstalled(config, (packageResult, configuration) => HandlePackageResult(packageResult, config, CommandNameType.Install));
                 }
 
                 return function.Invoke(runner);
