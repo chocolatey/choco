@@ -1782,7 +1782,7 @@ To install a local, or remote file, you may use:
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' ; NuspecVersion = '01.0.0.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '004.0.01.0' ; NuspecVersion = '004.0.01.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '0000004.00000.00001.0000' ; NuspecVersion = '004.0.01.0' }
-    )  {
+    ) -Tag VersionNormalization {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $PackageUnderTest = 'nonnormalizedversions'

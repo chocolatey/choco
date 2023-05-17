@@ -521,7 +521,7 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    Context "Upgrading a package with a non-normalized version number"  {
+    Context "Upgrading a package with a non-normalized version number" -Tag VersionNormalization {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             Push-Location (New-Item "$(Get-TempDirectory)/$(New-Guid)" -ItemType Directory)
