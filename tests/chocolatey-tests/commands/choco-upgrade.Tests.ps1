@@ -521,19 +521,14 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    Context "Upgrading a package with a non-normalized version number"  {
+    Context "Upgrading a package with a non-normalized version number" -Tag VersionNormalization {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
-            Push-Location (New-Item "$(Get-TempDirectory)/$(New-Guid)" -ItemType Directory)
             $PackageUnderTest = 'nonnormalizedversions'
             $VersionUnderTest = '004.0.01.0'
             $ExpectedPackageVersion = '4.0.1'
             $null = Invoke-Choco install $PackageUnderTest --version 1.0.0
             $Output = Invoke-Choco upgrade $PackageUnderTest
-        }
-
-        AfterAll {
-            Pop-Location
         }
 
         It "Should exit with success (0)" {
@@ -546,11 +541,9 @@ To upgrade a local, or remote file, you may use:
         }
 
         It "Should have upgraded the correct files" {
-            $ExpectedNupkg = "${env:ChocolateyInstall}/lib/$PackageUnderTest/$PackageUnderTest.nupkg"
-            $ExpectedNupkg | Should -Exist -Because $Output.String
-            Expand-ZipArchive -Source $ExpectedNupkg -Destination "$PWD/$PackageUnderTest-expanded"
-            $NuspecContents = [xml](Get-Content "$PWD/$PackageUnderTest-expanded/$PackageUnderTest.nuspec")
-            Remove-Item -Path "$PWD/$PackageUnderTest-expanded" -Recurse -Force
+            $ExpectedFiles = "${env:ChocolateyInstall}/lib/$PackageUnderTest/$PackageUnderTest"
+            "$ExpectedFiles.Nupkg" | Should -Exist -Because $Output.String
+            $NuspecContents = [xml](Get-Content "$ExpectedFiles.nuspec")
             $NuspecContents.package.metadata.version | Should -Be $VersionUnderTest
         }
     }

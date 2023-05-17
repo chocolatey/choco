@@ -203,7 +203,7 @@
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '004.0.01.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '0000004.00000.00001.0000' }
-    )  {
+    ) -Tag VersionNormalization {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $PackageUnderTest = 'nonnormalizedversions'

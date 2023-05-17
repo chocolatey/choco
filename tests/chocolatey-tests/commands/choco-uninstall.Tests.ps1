@@ -422,7 +422,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
     Context "Uninstalling a package with a non-normalized version number" -ForEach @(
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '004.0.01.0' }
-    )  {
+    ) -Tag VersionNormalization {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $PackageUnderTest = 'nonnormalizedversions'
