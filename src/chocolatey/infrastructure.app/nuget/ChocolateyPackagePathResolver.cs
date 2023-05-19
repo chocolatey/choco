@@ -18,66 +18,36 @@ namespace chocolatey.infrastructure.app.nuget
 {
     using System;
     using System.IO;
-    using NuGet;
+    using filesystem;
+    using NuGet.Configuration;
+    using NuGet.Packaging;
+    using NuGet.Packaging.Core;
+    using NuGet.ProjectManagement;
+    using NuGet.Versioning;
 
-    // ReSharper disable InconsistentNaming
-
-    public sealed class ChocolateyPackagePathResolver : DefaultPackagePathResolver
+    public sealed class ChocolateyPackagePathResolver : PackagePathResolver
     {
-        private readonly IFileSystem _nugetFileSystem;
+        public string RootDirectory { get; set; }
+        private IFileSystem _filesystem;
 
-        [Obsolete("Side by Side installations are deprecated, and is pending removal in v2.0.0")]
-        public bool UseSideBySidePaths { get; set; }
-
-        public ChocolateyPackagePathResolver(IFileSystem nugetFileSystem)
-            : this(nugetFileSystem, useSideBySidePaths: false)
+        public ChocolateyPackagePathResolver(string rootDirectory, IFileSystem filesystem)
+             : base(rootDirectory, useSideBySidePaths: false)
         {
+            RootDirectory = rootDirectory;
+            _filesystem = filesystem;
         }
 
-        [Obsolete("Initializing using side by side installation enabled is deprecated. Use overload without useSideBySidePaths instead.")]
-        public ChocolateyPackagePathResolver(IFileSystem nugetFileSystem, bool useSideBySidePaths)
-            : base(nugetFileSystem, useSideBySidePaths)
-        {
-            _nugetFileSystem = nugetFileSystem;
-            UseSideBySidePaths = useSideBySidePaths;
-        }
+        public override string GetInstallPath(PackageIdentity packageIdentity)
+            => GetInstallPath(packageIdentity.Id);
 
-        public override string GetInstallPath(IPackage package)
-        {
-            var packageVersionPath = Path.Combine(_nugetFileSystem.Root, GetPackageDirectory(package.Id,package.Version,useVersionInPath:true));
-            if (_nugetFileSystem.DirectoryExists(packageVersionPath)) return packageVersionPath;
+        public string GetInstallPath(string packageId)
+            => _filesystem.CombinePaths(RootDirectory, packageId);
 
+        [Obsolete("This overload will be removed in a future version.")]
+        public string GetInstallPath(string id, NuGetVersion version)
+            => GetInstallPath(id);
 
-            return Path.Combine(_nugetFileSystem.Root, GetPackageDirectory(package.Id, package.Version));
-        }
-
-        public override string GetPackageDirectory(string packageId, SemanticVersion version)
-        {
-            return GetPackageDirectory(packageId, version, UseSideBySidePaths);
-        }
-
-        [Obsolete("Side by Side installations are deprecated, and is pending removal in v2.0.0")]
-        public string GetPackageDirectory(string packageId, SemanticVersion version, bool useVersionInPath)
-        {
-            string directory = packageId;
-            if (useVersionInPath)
-            {
-                directory += "." + version.to_string();
-            }
-
-            return directory;
-        }
-
-        public override string GetPackageFileName(string packageId, SemanticVersion version)
-        {
-            string fileNameBase = packageId;
-            if (UseSideBySidePaths)
-            {
-                fileNameBase += "." + version.to_string();
-            }
-            return fileNameBase + Constants.PackageExtension;
-        }
+        public override string GetPackageFileName(PackageIdentity packageIdentity)
+            => packageIdentity.Id + NuGetConstants.PackageExtension;
     }
-
-    // ReSharper restore InconsistentNaming
 }

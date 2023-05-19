@@ -4,10 +4,10 @@
         [Parameter(Mandatory = $true)]
         [string[]]
         $Name,
-        [Parameter(Mandatory = $true, ParameterSetName='Enable')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Enable')]
         [switch]
         $Enable,
-        [Parameter(Mandatory = $true, ParameterSetName='Disable')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'Disable')]
         [switch]
         $Disable
     )
@@ -28,6 +28,6 @@
             $featurePlurality = 's'
         }
 
-        throw "{0} occured setting ($action) feature{1}: {2}" -f $errorCountMessage, $featurePlurality, ($failures -join ', ')
+        throw "{0} occurred setting ($action) feature{1}: {2}" -f $errorCountMessage, $featurePlurality, ($failures -join ', ')
     }
 }

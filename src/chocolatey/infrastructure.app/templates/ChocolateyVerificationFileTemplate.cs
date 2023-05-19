@@ -20,8 +20,8 @@ namespace chocolatey.infrastructure.app.templates
     {
         public static string Template = @"
 Note: Include this file if including binaries you have the right to distribute.
-Otherwise delete. this file. If you are the software author, you can change this
-mention you are the author of the software.
+Otherwise delete. this file. If you are the software author, you can mention
+this.
 
 ===DELETE ABOVE THIS LINE AND THIS LINE===
 
@@ -30,6 +30,6 @@ Verification is intended to assist the Chocolatey moderators and community
 in verifying that this package's contents are trustworthy.
 
 <Include details of how to verify checksum contents>
-<If software vendor, explain that here - checksum verification instructions are optional>";
+<If software vendor, explain that here>";
     }
 }

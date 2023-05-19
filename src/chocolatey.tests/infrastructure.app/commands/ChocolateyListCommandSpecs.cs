@@ -1,5 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
-// Copyright © 2011 - 2017 RealDimensions Software, LLC
+﻿// Copyright © 2023-Present Chocolatey Software, Inc
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,524 +26,193 @@ namespace chocolatey.tests.infrastructure.app.commands
     using Moq;
     using Should;
 
-    public class ChocolateyListCommandSpecs
+    public static class ChocolateyListCommandSpecs
     {
+        [ConcernFor("list")]
         public abstract class ChocolateyListCommandSpecsBase : TinySpec
         {
-            protected ChocolateyListCommand command;
-            protected Mock<IChocolateyPackageService> packageService = new Mock<IChocolateyPackageService>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateyListCommand Command;
+            protected Mock<IChocolateyPackageService> PackageService = new Mock<IChocolateyPackageService>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                configuration.Sources = "bob";
-                command = new ChocolateyListCommand(packageService.Object);
+                Command = new ChocolateyListCommand(PackageService.Object);
             }
         }
 
-        public class when_implementing_command_for : ChocolateyListCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyListCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
-            public void should_implement_list()
+            public void Should_implement_list()
             {
-                results.ShouldContain("list");
+                _results.ShouldContain("list");
             }
 
             [Fact]
-            public void should_implement_search()
+            public void Should_not_implement_search()
             {
-                results.ShouldContain("search");
+                _results.ShouldNotContain("search");
             }
 
             [Fact]
-            public void should_implement_find()
-            {
-                results.ShouldContain("find");
-            }
-        }
-
-        public class when_configurating_the_argument_parser_for_list_command : ChocolateyListCommandSpecsBase
-        {
-            private OptionSet optionSet;
-
-            public override void Context()
-            {
-                base.Context();
-                optionSet = new OptionSet();
-                configuration.CommandName = "list";
-            }
-
-            public override void Because()
-            {
-                command.configure_argument_parser(optionSet, configuration);
-            }
-
-            [Fact]
-            public void should_add_source_to_the_option_set()
-            {
-                optionSet.Contains("source").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_source_to_the_option_set()
-            {
-                optionSet.Contains("s").ShouldBeTrue();
-            }
-
-            [Fact, Obsolete("Local Only will be removed in v2.0.0 for the list command")]
-            public void should_add_localonly_to_the_option_set()
-            {
-                optionSet.Contains("localonly").ShouldBeTrue();
-            }
-
-            [Fact, Obsolete("Local Only will be removed in v2.0.0 for the list command")]
-            public void should_add_short_version_of_localonly_to_the_option_set()
-            {
-                optionSet.Contains("l").ShouldBeTrue();
-            }
-
-            [NUnit.Framework.Theory]
-            [NUnit.Framework.TestCase("localonly")]
-            [NUnit.Framework.TestCase("source")]
-            [NUnit.Framework.TestCase("user")]
-            [NUnit.Framework.TestCase("password")]
-            [NUnit.Framework.TestCase("cert")]
-            [NUnit.Framework.TestCase("certpassword")]
-            [NUnit.Framework.TestCase("approved-only")]
-            [NUnit.Framework.TestCase("download-cache-only")]
-            [NUnit.Framework.TestCase("disable-package-repository-optimizations")]
-            [Obsolete("Will be removed in v2.0.0 for the list command")]
-            public void should_add_deprecation_notice_to_option(string argument)
-            {
-                optionSet[argument].Description.ShouldContain("DEPRECATION NOTICE");
-            }
-
-            [Fact]
-            public void should_add_prerelease_to_the_option_set()
-            {
-                optionSet.Contains("prerelease").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_prerelease_to_the_option_set()
-            {
-                optionSet.Contains("pre").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_includeprograms_to_the_option_set()
-            {
-                optionSet.Contains("includeprograms").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_includeprograms_to_the_option_set()
-            {
-                optionSet.Contains("i").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_allversions_to_the_option_set()
-            {
-                optionSet.Contains("allversions").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_allversions_to_the_option_set()
-            {
-                optionSet.Contains("a").ShouldBeTrue();
-            }
-
-            [Fact, Obsolete("Will be removed in v2.0.0")]
-            public void should_add_user_to_the_option_set()
-            {
-                optionSet.Contains("user").ShouldBeTrue();
-            }
-
-            [Fact, Obsolete("Will be removed in v2.0.0")]
-            public void should_add_short_version_of_user_to_the_option_set()
-            {
-                optionSet.Contains("u").ShouldBeTrue();
-            }
-
-            [Fact, Obsolete("Will be removed in v2.0.0")]
-            public void should_add_password_to_the_option_set()
-            {
-                optionSet.Contains("password").ShouldBeTrue();
-            }
-
-            [Fact, Obsolete("Will be removed in v2.0.0")]
-            public void should_add_short_version_of_password_to_the_option_set()
-            {
-                optionSet.Contains("p").ShouldBeTrue();
-            }
-        }
-
-        [NUnit.Framework.TestFixture("search")]
-        [NUnit.Framework.TestFixture("find")]
-        public class when_configurating_the_argument_parser : ChocolateyListCommandSpecsBase
-        {
-            private OptionSet optionSet;
-
-            public when_configurating_the_argument_parser(string commandName)
-            {
-                configuration.CommandName = commandName;
-            }
-
-            public override void Context()
-            {
-                base.Context();
-                optionSet = new OptionSet();
-            }
-
-            public override void Because()
-            {
-                command.configure_argument_parser(optionSet, configuration);
-            }
-
-            [Fact]
-            public void should_add_source_to_the_option_set()
-            {
-                optionSet.Contains("source").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_source_to_the_option_set()
-            {
-                optionSet.Contains("s").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_localonly_to_the_option_set()
-            {
-                optionSet.Contains("localonly").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_localonly_to_the_option_set()
-            {
-                optionSet.Contains("l").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_prerelease_to_the_option_set()
-            {
-                optionSet.Contains("prerelease").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_prerelease_to_the_option_set()
-            {
-                optionSet.Contains("pre").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_includeprograms_to_the_option_set()
-            {
-                optionSet.Contains("includeprograms").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_includeprograms_to_the_option_set()
-            {
-                optionSet.Contains("i").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_allversions_to_the_option_set()
-            {
-                optionSet.Contains("allversions").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_allversions_to_the_option_set()
-            {
-                optionSet.Contains("a").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_user_to_the_option_set()
-            {
-                optionSet.Contains("user").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_user_to_the_option_set()
-            {
-                optionSet.Contains("u").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_password_to_the_option_set()
-            {
-                optionSet.Contains("password").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_password_to_the_option_set()
-            {
-                optionSet.Contains("p").ShouldBeTrue();
-            }
-
-            [NUnit.Framework.Theory]
-            [NUnit.Framework.TestCase("localonly")]
-            [NUnit.Framework.TestCase("source")]
-            [NUnit.Framework.TestCase("user")]
-            [NUnit.Framework.TestCase("password")]
-            [NUnit.Framework.TestCase("cert")]
-            [NUnit.Framework.TestCase("certpassword")]
-            [NUnit.Framework.TestCase("approved-only")]
-            [NUnit.Framework.TestCase("download-cache-only")]
-            [NUnit.Framework.TestCase("disable-package-repository-optimizations")]
-            public void should_add_deprecation_notice_to_option(string argument)
-            {
-                optionSet[argument].Description.ShouldNotContain("DEPRECATION NOTICE");
-            }
-        }
-
-        public class when_handling_additional_argument_parsing : ChocolateyListCommandSpecsBase
-        {
-            private readonly IList<string> unparsedArgs = new List<string>();
-            private readonly string source = "https://somewhereoutthere";
-            private Action because;
-
-            public override void Context()
-            {
-                base.Context();
-                unparsedArgs.Add("pkg1");
-                unparsedArgs.Add("pkg2");
-                configuration.Sources = source;
-            }
-
-            public override void Because()
-            {
-                because = () => command.handle_additional_argument_parsing(unparsedArgs, configuration);
-            }
-
-            [Fact]
-            public void should_set_unparsed_arguments_to_configuration_input()
-            {
-                because();
-                configuration.Input.ShouldEqual("pkg1 pkg2");
-            }
-
-            [Fact]
-            public void should_leave_source_as_set()
-            {
-                configuration.ListCommand.LocalOnly = false;
-                because();
-                configuration.Sources.ShouldEqual(source);
-            }
-        }
-
-        public class when_noop_is_called_with_list_command : ChocolateyListCommandSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                configuration.CommandName = "list";
-            }
-
-            public override void Because()
-            {
-                command.noop(configuration);
-            }
-
-            [Fact]
-            public void should_call_service_list_noop()
-            {
-                packageService.Verify(c => c.list_noop(configuration), Times.Once);
-            }
-
-            [Fact]
-            public void should_report_deprecation_of_remote_sources()
-            {
-                MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain(@"Using the list command with remote sources is deprecated and will be made
-to only list locally installed packages in v2.0.0. Use the search, or find,
-command to find packages on remote sources (such as the Chocolatey Community
-Repository).");
-            }
-        }
-
-        public class when_noop_is_called_with_list_command_and_local_only : ChocolateyListCommandSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                configuration.CommandName = "list";
-                configuration.ListCommand.LocalOnly = true;
-            }
-
-            public override void Because()
-            {
-                command.noop(configuration);
-            }
-
-            [Fact]
-            public void should_call_service_list_noop()
-            {
-                packageService.Verify(c => c.list_noop(configuration), Times.Once);
-            }
-
-            [Fact]
-            public void should_not_report_any_warning_messages()
-            {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
-            }
-        }
-
-        public class when_noop_is_called : ChocolateyListCommandSpecsBase
-        {
-            public override void Because()
-            {
-                command.noop(configuration);
-            }
-
-            [Fact]
-            public void should_call_service_list_noop()
-            {
-                packageService.Verify(c => c.list_noop(configuration), Times.Once);
-            }
-
-            [Fact]
-            public void should_not_report_any_warning_messages()
-            {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
-            }
-        }
-
-        public class when_run_is_called_with_list_command : ChocolateyListCommandSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                configuration.CommandName = "list";
-            }
-
-            public override void Because()
-            {
-                command.run(configuration);
-            }
-
-            [Fact]
-            public void should_call_service_list_run()
-            {
-                packageService.Verify(c => c.list_run(configuration), Times.Once);
-            }
-
-            [Fact]
-            public void should_report_deprecation_of_remote_sources()
-            {
-                MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain(@"Using the list command with remote sources is deprecated and will be made
-to only list locally installed packages in v2.0.0. Use the search, or find,
-command to find packages on remote sources (such as the Chocolatey Community
-Repository).");
-            }
-        }
-
-        public class when_run_is_called_with_list_command_and_local_only : ChocolateyListCommandSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                configuration.CommandName = "list";
-                configuration.ListCommand.LocalOnly = true;
-            }
-
-            public override void Because()
-            {
-                command.run(configuration);
-            }
-
-            [Fact]
-            public void should_call_service_list_run()
-            {
-                packageService.Verify(c => c.list_run(configuration), Times.Once);
-            }
-
-            [Fact]
-            public void should_not_report_any_warning_messages()
-            {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
-            }
-        }
-
-        public class when_run_is_called : ChocolateyListCommandSpecsBase
-        {
-            public override void Because()
-            {
-                command.run(configuration);
-            }
-
-            [Fact]
-            public void should_call_service_list_run()
-            {
-                packageService.Verify(c => c.list_run(configuration), Times.Once);
-            }
-
-            [Fact]
-            public void should_not_report_any_warning_messages()
-            {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
-            }
-        }
-
-        public class when_outputting_help_message_for_list_command : ChocolateyListCommandSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-                configuration.CommandName = "list";
-            }
-
-            public override void Because()
-            {
-                command.help_message(configuration);
-            }
-
-            [Fact, Obsolete("Will be removed in v2.0.0")]
-            public void should_output_deprecation_notice_header()
-            {
-                MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain("DEPRECATION NOTICE");
-            }
-
-            [Fact]
-            public void should_ouput_removal_in_v2_0_0()
-            {
-                MockLogger.Messages.Keys.ShouldContain("Warn");
-                MockLogger.Messages["Warn"].ShouldContain(@"
-Will be removed for the list command in v2.0.0.");
-            }
-        }
-
-        [NUnit.Framework.TestFixture("search")]
-        [NUnit.Framework.TestFixture("find")]
-        public class when_outputting_help_message : ChocolateyListCommandSpecsBase
-        {
-            public when_outputting_help_message(string commandName)
-            {
-                configuration.CommandName = commandName;
-            }
-
-            public override void Because()
-            {
-                command.help_message(configuration);
-            }
-
-            [Fact]
-            public void should_not_output_warnings()
-            {
-                MockLogger.Messages.Keys.ShouldNotContain("Warn");
+            public void Should_not_implement_find()
+            {
+                _results.ShouldNotContain("find");
+            }
+
+            public class When_configurating_the_argument_parser : ChocolateyListCommandSpecsBase
+            {
+                private OptionSet _optionSet;
+
+                public override void Context()
+                {
+                    base.Context();
+                    _optionSet = new OptionSet();
+                }
+
+                public override void Because()
+                {
+                    Command.ConfigureArgumentParser(_optionSet, Configuration);
+                }
+
+                [NUnit.Framework.TestCase("source")]
+                [NUnit.Framework.TestCase("s")]
+                [NUnit.Framework.TestCase("prerelease")]
+                [NUnit.Framework.TestCase("pre")]
+                [NUnit.Framework.TestCase("includeprograms")]
+                [NUnit.Framework.TestCase("i")]
+                public void Should_add_to_option_set(string option)
+                {
+                    _optionSet.Contains(option).ShouldBeTrue();
+                }
+
+                [NUnit.Framework.TestCase("localonly")]
+                [NUnit.Framework.TestCase("l")]
+                [NUnit.Framework.TestCase("user")]
+                [NUnit.Framework.TestCase("u")]
+                [NUnit.Framework.TestCase("password")]
+                [NUnit.Framework.TestCase("p")]
+                [NUnit.Framework.TestCase("allversions")]
+                [NUnit.Framework.TestCase("a")]
+                public void Should_not_add_to_option_set(string option)
+                {
+                    _optionSet.Contains(option).ShouldBeFalse();
+                }
+            }
+
+            public class When_handling_additional_argument_parsing : ChocolateyListCommandSpecsBase
+            {
+                private readonly IList<string> _unparsedArgs = new List<string>();
+                private readonly string _source = "https://somewhereoutthere";
+                private Action _because;
+
+                public override void Context()
+                {
+                    base.Context();
+                    _unparsedArgs.Add("pkg1");
+                    _unparsedArgs.Add("pkg2");
+                    _unparsedArgs.Add("-l");
+                    _unparsedArgs.Add("--local-only");
+                    _unparsedArgs.Add("--localonly");
+                    _unparsedArgs.Add("-li");
+                    _unparsedArgs.Add("-lai");
+                    Configuration.Sources = _source;
+                }
+
+                public override void Because()
+                {
+                    _because = () => Command.ParseAdditionalArguments(_unparsedArgs, Configuration);
+                }
+
+                [Fact]
+                public void Should_set_unparsed_arguments_to_configuration_input()
+                {
+                    _because();
+                    Configuration.Input.ShouldEqual("pkg1 pkg2");
+                }
+
+                [NUnit.Framework.TestCase("-l")]
+                [NUnit.Framework.TestCase("--local-only")]
+                [NUnit.Framework.TestCase("--localonly")]
+                public void Should_output_warning_message_about_unsupported_argument(string argument)
+                {
+                    _because();
+                    MockLogger.Messages.Keys.ShouldContain("Warn");
+                    MockLogger.Messages["Warn"].ShouldContain(@"
+UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!".FormatWith(argument));
+                }
+
+                [NUnit.Framework.TestCase("-li")]
+                [NUnit.Framework.TestCase("-lai")]
+                public void Should_output_warning_message_about_unsupported_argument_and_set_include_programs(string argument)
+                {
+                    _because();
+                    MockLogger.Messages.Keys.ShouldContain("Warn");
+                    MockLogger.Messages["Warn"].ShouldContain(@"
+UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!".FormatWith(argument));
+                    Configuration.ListCommand.IncludeRegistryPrograms.ShouldBeTrue();
+                }
+            }
+
+            public class When_noop_is_called_with_list_command : ChocolateyListCommandSpecsBase
+            {
+                public override void Context()
+                {
+                    base.Context();
+                    Configuration.CommandName = "search";
+                    Configuration.ListCommand.LocalOnly = false;
+                }
+
+                public override void Because()
+                {
+                    Command.DryRun(Configuration);
+                }
+
+                [Fact]
+                public void Should_call_service_list_noop()
+                {
+                    PackageService.Verify(c => c.ListDryRun(Configuration), Times.Once);
+                }
+
+                [Fact]
+                public void Should_not_report_any_warning_messages()
+                {
+                    MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                }
+            }
+
+            public class When_run_is_called_with_search_command_and_local_only : ChocolateyListCommandSpecsBase
+            {
+                public override void Context()
+                {
+                    base.Context();
+                    Configuration.CommandName = "list";
+                }
+
+                public override void Because()
+                {
+                    Command.Run(Configuration);
+                }
+
+                [Fact]
+                public void Should_call_service_list_run()
+                {
+                    PackageService.Verify(c => c.List(Configuration), Times.Once);
+                }
+
+                [Fact]
+                public void Should_not_report_any_warning_messages()
+                {
+                    MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                }
             }
         }
     }

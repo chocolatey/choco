@@ -16,6 +16,7 @@
 
 namespace chocolatey
 {
+    using System;
     using System.IO;
     using System.Runtime.Serialization.Formatters.Binary;
 
@@ -25,18 +26,18 @@ namespace chocolatey
     public static class ObjectExtensions
     {
         /// <summary>
-        ///   A null safe variant of ToString().
+        ///   A null safe variant of <see cref="object.ToString"/>.
         /// </summary>
         /// <param name="input">The input.</param>
-        /// <returns>String.Empty if input is null, otherwise input.ToString()</returns>
-        public static string to_string(this object input)
+        /// <returns><see cref="string.Empty"/> if <paramref name="input"/> is null, otherwise <paramref name="input"/>.ToString()</returns>
+        public static string ToStringSafe(this object input)
         {
             if (input == null) return string.Empty;
 
             return input.ToString();
         }
 
-        public static T deep_copy<T>(this T other)
+        public static T DeepCopy<T>(this T other)
         {
             using (var ms = new MemoryStream())
             {
@@ -46,5 +47,15 @@ namespace chocolatey
                 return (T)formatter.Deserialize(ms);
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string to_string(this object input)
+            => ToStringSafe(input);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static T deep_copy<T>(this T other)
+            => DeepCopy(other);
+#pragma warning restore IDE1006
     }
 }

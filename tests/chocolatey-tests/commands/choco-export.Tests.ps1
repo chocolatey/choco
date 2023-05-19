@@ -12,6 +12,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         $expectedHeader = Get-ExpectedChocolateyHeader
         Initialize-ChocolateyTestInstall
 
@@ -90,19 +91,19 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
             $Output.Lines | Should -Contain "choco export [<options/switches>]"
         }
 
-        It "Displays example '<_>'" -Foreach $examples {
+        It "Displays example '<_>'" -ForEach $examples {
             $Output.Lines | Should -Contain $_
         }
 
-        It "Displays supported exit codes" -Foreach $supportedExitCodes {
+        It "Displays supported exit codes" -ForEach $supportedExitCodes {
             $Output.Lines | Should -Contain $_
         }
 
-        It "Displays supported option and switches <Arguments>" -Foreach $supportedArguments {
+        It "Displays supported option and switches <Arguments>" -ForEach $supportedArguments {
             $Output.Lines | Should -Contain $Arguments
         }
 
-        It "Displays description of option and switches <Arguments>" -Foreach $supportedArguments {
+        It "Displays description of option and switches <Arguments>" -ForEach $supportedArguments {
             $Description -split "`n" | ForEach-Object {
                 $Output.Lines | Should -Contain $_
             }
@@ -140,12 +141,12 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Exports expected package '<_>'" -Foreach $expectedExports {
+        It "Exports expected package '<_>'" -ForEach $expectedExports {
             $expectedPath | Should -FileContentMatch "<package id=`"$([regex]::Escape($_))`" />"
         }
     }
 
-    Context "Runs export with including versions (<_>)" -Foreach @("--include-version-numbers", "--include-version") {
+    Context "Runs export with including versions (<_>)" -ForEach @("--include-version-numbers", "--include-version") {
         BeforeDiscovery {
             # TODO: Consolidate these recurring package lists - https://github.com/chocolatey/choco/issues/2691
             # We set this here, so we can reuse them between different contexts
@@ -191,7 +192,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Exports expected package '<Name>' with version '<Version>'" -Foreach $expectedExports {
+        It "Exports expected package '<Name>' with version '<Version>'" -ForEach $expectedExports {
             $expectedPath | Should -FileContentMatch "<package id=`"$([regex]::Escape($Name))`" version=`"$([regex]::Escape($Version))`" />"
         }
 
@@ -233,12 +234,12 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Exports expected package '<_>'" -Foreach $expectedExports {
+        It "Exports expected package '<_>'" -ForEach $expectedExports {
             $expectedPath | Should -FileContentMatch "<package id=`"$([regex]::Escape($_))`" />"
         }
     }
 
-    Context "Runs export with including versions (<_>)" -Foreach @("--include-version-numbers", "--include-version") {
+    Context "Runs export with including versions (<_>)" -ForEach @("--include-version-numbers", "--include-version") {
         BeforeDiscovery {
             # TODO: Consolidate these recurring package lists - https://github.com/chocolatey/choco/issues/2691
             # We set this here, so we can reuse them between different contexts
@@ -284,7 +285,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Exports expected package '<Name>' with version '<Version>'" -Foreach $expectedExports {
+        It "Exports expected package '<Name>' with version '<Version>'" -ForEach $expectedExports {
             $expectedPath | Should -FileContentMatch "<package id=`"$([regex]::Escape($Name))`" version=`"$([regex]::Escape($Version))`" />"
         }
 
@@ -294,7 +295,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
     }
 
-    Context "Runs export with output path argument '<_>" -Foreach @("--output-file-path={0}"; "-o {0}") {
+    Context "Runs export with output path argument '<_>" -ForEach @("--output-file-path={0}"; "-o {0}") {
         BeforeDiscovery {
             # TODO: Consolidate these recurring package lists - https://github.com/chocolatey/choco/issues/2691
             # We set this here, so we can reuse them between different contexts
@@ -326,12 +327,12 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Exports expected package '<_>'" -Foreach $expectedExports {
+        It "Exports expected package '<_>'" -ForEach $expectedExports {
             $expectedPath | Should -FileContentMatch "<package id=`"$([regex]::Escape($_))`" />"
         }
     }
 
-    Context "Runs export with path argument (<PathArgument>) including versions (<VersionsArgument>)" -Foreach @(
+    Context "Runs export with path argument (<PathArgument>) including versions (<VersionsArgument>)" -ForEach @(
         @{
             PathArgument     = "--output-file-path={0}"
             VersionsArgument = "--include-version-numbers"
@@ -394,7 +395,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
             $Output.Lines | Should -Contain $expectedHeader
         }
 
-        It "Exports expected package '<Name>' with version '<Version>'" -Foreach $expectedExports {
+        It "Exports expected package '<Name>' with version '<Version>'" -ForEach $expectedExports {
             $expectedPath | Should -FileContentMatch "<package id=`"$([regex]::Escape($Name))`" version=`"$([regex]::Escape($Version))`" />"
         }
 
@@ -466,4 +467,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
             $Output.Lines | Should -Contain "Export all currently installed packages to a file."
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

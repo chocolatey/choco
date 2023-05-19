@@ -14,9 +14,15 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         $RemovedShims = @(
             "\bin\cpack.exe"
             "\bin\cver.exe"
+            "\bin\chocolatey.exe"
+            "\bin\cinst.exe"
+            "\bin\clist.exe"
+            "\bin\cpush.exe"
+            "\bin\cuninst.exe"
+            "\bin\cup.exe"
         )
         $PowerShellFiles = Get-ChildItem -Path $ChocolateyDirectoriesToCheck -Include "*.ps1", "*.psm1" -Recurse -ErrorAction Ignore
-        # For certain test scenarious we run, there are additional files available in the bin directory.
+        # For certain test scenarios we run, there are additional files available in the bin directory.
         # These files should not be tested as part of the signing check.
         $ExecutableFiles = Get-ChildItem -Path $ChocolateyDirectoriesToCheck -Include "*.exe", "*.dll" -Recurse -ErrorAction Ignore | Where-Object Name -NotMatch 'driver\.exe$'
         $StrongNamingKeyFiles = Get-ChildItem -Path $StrongNamingKeyFilesToCheck -ErrorAction Ignore
@@ -48,7 +54,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             Join-Path $env:ChocolateyInstall -ChildPath "choco.exe" | Should -Exist
         }
 
-        It "has <_> available on PATH" -ForEach @("choco.exe"; "cinst.exe"; "cpush.exe") {
+        It "has <_> available on PATH" -ForEach @("choco.exe") {
             $executable = $_
             $pathList = $env:PATH -split ";"
             $found = $false
@@ -110,7 +116,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it requires signed executables.
-    Context "File signing (<_.FullName>)" -Foreach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0"))) {
+    Context "File signing (<_.FullName>)" -ForEach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0"))) {
         BeforeAll {
             $FileUnderTest = $_
             $SignerCert = (Get-AuthenticodeSignature (Get-ChocoPath)).SignerCertificate
@@ -140,13 +146,13 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         # This is FossOnly for now as there are some undetermined errors here that do not seem to present inside of Chocolatey. https://gitlab.com/chocolatey/build-automation/chocolatey-test-kitchen/-/issues/39
         It "Should be able to run the script in AllSigned mode" -Skip:($_ -notin $PowerShellFiles) -Tag FossOnly {
             $expectedErrors = 0
-            $command = "Import-Module $FileUnderTest -ErrorAction SilentlyContinue; exit `$error.count"
-            & powershell.exe -noprofile -ExecutionPolicy AllSigned -command $command 2>$null
-            $LastExitCode | Should -BeExactly $expectedErrors
+            $command = "try { `$ErrorActionPreference = 'Stop'; Import-Module $FileUnderTest } catch { $_ ; exit 1 }"
+            $result = & powershell.exe -noprofile -ExecutionPolicy AllSigned -command $command *>&1
+            $LastExitCode | Should -BeExactly $expectedErrors -Because $result
         }
     }
 
-    Context "PowerShell script formatting (<_.FullName>)" -Foreach $PowerShellFiles {
+    Context "PowerShell script formatting (<_.FullName>)" -ForEach $PowerShellFiles {
         BeforeAll {
             $FileUnderTest = $_
         }
@@ -176,23 +182,65 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         # This is Foss only as PowerShell running under version 2 doesn't have .net available and can't import the Licensed DLL.
         # Tests on Windows 7 show no issues with running Chocolatey under Windows 7 with PowerShell v2 aside from issues surrounding TLS versions that we cannot resolve without an upgrade to Windows 7.
         It "Imports ChocolateyInstaller module successfully in PowerShell v2" -Tag FossOnly {
-            $command = 'Import-Module $env:ChocolateyInstall\helpers\chocolateyInstaller.psm1;exit $error.count'
-            & powershell.exe -Version 2 -noprofile -command $command
-            $LastExitCode | Should -BeExactly 0
+            $command = 'try { $ErrorActionPreference = ''Stop''; Import-Module $env:ChocolateyInstall\helpers\chocolateyInstaller.psm1 } catch { $_ ; exit 1 }'
+            $result = & powershell.exe -Version 2 -noprofile -command $command
+            $LastExitCode | Should -BeExactly 0 -Because $result
         }
 
         It "Imports ChocolateyProfile module successfully in PowerShell v2" {
-            $command = 'Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1;exit $error.count'
-            & powershell.exe -Version 2 -noprofile -command $command
-            $LastExitCode | Should -BeExactly 0
+            $command = 'try { $ErrorActionPreference = ''Stop''; Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1 } catch { $_ ; exit 1 }'
+            $result = & powershell.exe -Version 2 -noprofile -command $command
+            $LastExitCode | Should -BeExactly 0 -Because $result
+        }
+
+        Context "chocolateyScriptRunner.ps1" {
+            BeforeAll {
+                $Command = @'
+& "$env:ChocolateyInstall\helpers\chocolateyScriptRunner.ps1" -packageScript '{0}' -installArguments '' -packageParameters '' -preRunHookScripts '{1}' -postRunHookScripts '{2}'
+exit $error.count
+'@
+            'Write-Host "packageScript"' > packageScript.ps1
+            'Write-Host "preRunHookScript"' > preRunHookScript.ps1
+            'Write-Host "postRunHookScript"' > postRunHookScript.ps1
+            }
+
+            It "Handles just a packageScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", $null, $null
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('packageScript') -Because ($output -join ([Environment]::NewLine))
+            }
+
+            It "Handles a packageScript with a preRunHookScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", "$PWD/preRunHookScript.ps1", $null
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('preRunHookScript','packageScript') -Because ($output -join ([Environment]::NewLine))
+            }
+
+            It "Handles a packageScript with a preRunHookScript and postRunHookScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", "$PWD/preRunHookScript.ps1", "$PWD/postRunHookScript.ps1"
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('preRunHookScript','packageScript', 'postRunHookScript') -Because ($output -join ([Environment]::NewLine))
+            }
+
+            It "Handles a packageScript with and postRunHookScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", $null, "$PWD/postRunHookScript.ps1"
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('packageScript', 'postRunHookScript') -Because ($output -join ([Environment]::NewLine))
+            }
         }
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'License warning is worded properly' -Tag FossOnly -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
+    Context 'License warning is worded properly' -Tag FossOnly,ListCommand,License -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $null = Enable-ChocolateySource 'hermes-setup'
             $null = Invoke-Choco install chocolatey-license-business -y
-            $Output = Invoke-Choco list -lo
+            $Output = Invoke-Choco list
         }
 
         AfterAll {
@@ -208,11 +256,14 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'PowerShell Profile comments updated correctly' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
+    Context 'PowerShell Profile comments updated correctly' -Tag ListCommand, Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
             Remove-Item $Profile.CurrentUserCurrentHost -ErrorAction Ignore
             New-Item $Profile.CurrentUserCurrentHost -Force
-            $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            $chocolatey = (Invoke-Choco list chocolatey -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            Enable-ChocolateySource -Name local
+            Enable-ChocolateySource -Name hermes-setup
             $null = Invoke-Choco install chocolatey -f --version $chocolatey.Version
         }
 
@@ -234,11 +285,12 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'PowerShell Profile properly updated when Windows thinks a 5 byte file is signed' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
+    Context 'PowerShell Profile properly updated when Windows thinks a 5 byte file is signed' -Tag ListCommand, Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
             New-Item $Profile.CurrentUserCurrentHost -Force
             "" | Set-Content -Path $Profile.CurrentUserCurrentHost -Encoding UTF8
-            $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            $chocolatey = (Invoke-Choco list chocolatey -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
         }
 
         AfterAll {
@@ -258,7 +310,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it requires signed executables
-    Context 'Ensure we <Removal> shims during upgrade' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -Foreach @(
+    Context 'Ensure we <Removal> shims during upgrade' -Tag ListCommand, Shims -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) -ForEach @(
         @{
             RemovedShims = $RemovedShims
             Signed       = $true
@@ -271,7 +323,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         }
     ) {
         BeforeAll {
-            $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
+            Restore-ChocolateyInstallSnapshot
+            $chocolatey = (Invoke-Choco list chocolatey -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
 
             foreach ($shim in $RemovedShims) {
                 $shimToRemove = "$env:ChocolateyInstall$shim"
@@ -284,6 +337,8 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
                 }
             }
 
+            Enable-ChocolateySource -Name local
+            Enable-ChocolateySource -Name hermes-setup
             $Output = Invoke-Choco install chocolatey -f --version $chocolatey.Version --no-progress
         }
 
@@ -302,6 +357,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
 
     Context 'Ensure a corrupted config file does not cause errors' -Tag ConfigFile -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0')) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
             $ChocolateyConfigLocation = "$env:ChocolateyInstall/config/chocolatey.config"
             $BadContent = "<chocolatey></chocolatey>BadFile"
             # Make sure we have a chocolatey config file
@@ -320,14 +376,14 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context 'Get-FileEncoding works under <_>' -Tag PowerShell7 -Foreach @(
+    Context 'Get-FileEncoding works under <_>' -Tag PowerShell7 -ForEach @(
         'pwsh'
         'powershell'
     ) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
         BeforeAll {
-            New-ChocolateyInstallSnapshot
-            # TODO: Internalize pwsh and powershell packages...
-            $pwshInstall = Invoke-Choco install $_ -y -s https://community.chocolatey.org/api/v2/
+            Restore-ChocolateyInstallSnapshot
+            Enable-ChocolateySource -Name hermes-setup
+            $pwshInstall = Invoke-Choco install $_ -y
             $ChocoUnzipped = "$(Get-TempDirectory)$(New-Guid)"
             $modulePath = "$ChocoUnzipped/tools/chocolateySetup.psm1"
 
@@ -356,13 +412,61 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             if (Test-Path $ChocoUnzipped) {
                 Remove-Item $ChocoUnzipped -Force -Recurse
             }
-            $null = Invoke-Choco uninstall $_ -y -s https://community.chocolatey.org/api/v2/ --force-dependencies
+            $null = Invoke-Choco uninstall $_ -y --force-dependencies
             Remove-ChocolateyInstallSnapshot
         }
 
         It 'LastExitCode should be Success (0)' {
             & $_ -NoProfile -Command $Command
             $LASTEXITCODE | Should -Be 0
+        }
+    }
+
+    # This is skipped when not run in CI because it modifies the local system.
+    Context '.Net Registry is not set' -Skip:(-not $env:TEST_KITCHEN) {
+        BeforeAll {
+            $RegistryPath = 'SOFTWARE\Wow6432Node\Microsoft\NET Framework Setup\NDP\v4\Full\'
+            Set-RegistryKeyOwner -Key $RegistryPath
+            $OriginalRelease = Get-ItemPropertyValue -Path "HKLM:\$RegistryPath" -Name Release
+            Remove-ItemProperty -Path "HKLM:\$RegistryPath" -Name Release
+            $Output = Invoke-Choco help
+        }
+
+        AfterAll {
+            New-ItemProperty -Path "HKLM:\$RegistryPath" -Name Release -Value $OriginalRelease
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It "Reports .NET Framework 4.8 is required" {
+            $Output.Lines | Should -Contain '.NET 4.8 is not installed or may need a reboot to complete installation.'
+        }
+    }
+
+
+    Context 'Chocolatey lib directory missing' {
+        BeforeAll {
+            New-ChocolateyInstallSnapshot
+            Remove-Item -Path $env:ChocolateyInstall/lib/ -Recurse -Force
+            $Output = Invoke-Choco list
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It 'Exits with success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Emits a warning about the missing directory' {
+            $Output.Lines | Should -Contain "Directory '$($env:ChocolateyInstall)\lib' does not exist." -Because $Output.String
+        }
+
+        It 'Does not emit a NuGet error for the missing directory and fall over' {
+            $Output.Lines | Should -Not -Contain "The path '$($env:ChocolateyInstall)\lib' for the selected source could not be resolved."
         }
     }
 }

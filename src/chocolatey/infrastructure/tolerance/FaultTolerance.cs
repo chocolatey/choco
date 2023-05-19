@@ -26,12 +26,12 @@ namespace chocolatey.infrastructure.tolerance
     /// </summary>
     public class FaultTolerance
     {
-        private static bool log_is_in_debug_mode()
+        private static bool InDebugMode()
         {
             var debugging = false;
             try
             {
-                debugging = Config.get_configuration_settings().Debug;
+                debugging = Config.GetConfigurationSettings().Debug;
             }
             catch
             {
@@ -49,11 +49,11 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="waitDurationMilliseconds">The wait duration in milliseconds.</param>
         /// <param name="increaseRetryByMilliseconds">The time for each try to increase the wait duration by in milliseconds.</param>
         /// <param name="isSilent">Log messages?</param>
-        public static void retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
+        public static void Retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
             if (action == null) return;
 
-            var success = retry(
+            var success = Retry(
                 numberOfTries,
                 () =>
                     {
@@ -76,13 +76,13 @@ namespace chocolatey.infrastructure.tolerance
         /// <returns>The return value from the function</returns>
         /// <exception cref="System.ApplicationException">You must specify a number of retries greater than zero.</exception>
         /// <param name="isSilent">Log messages?</param>
-        public static T retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
+        public static T Retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
             if (function == null) return default(T);
             if (numberOfTries == 0) throw new ApplicationException("You must specify a number of tries greater than zero.");
             var returnValue = default(T);
 
-            var debugging = log_is_in_debug_mode();
+            var debugging = InDebugMode();
             var logLocation = ChocolateyLoggers.Normal;
             if (isSilent) logLocation = ChocolateyLoggers.LogFileOnly;
 
@@ -97,7 +97,7 @@ namespace chocolatey.infrastructure.tolerance
                 {
                     if (i == numberOfTries)
                     {
-                        "chocolatey".Log().Error(logLocation, "Maximum tries of {0} reached. Throwing error.".format_with(numberOfTries));
+                        "chocolatey".Log().Error(logLocation, "Maximum tries of {0} reached. Throwing error.".FormatWith(numberOfTries));
                         throw;
                     }
 
@@ -105,7 +105,7 @@ namespace chocolatey.infrastructure.tolerance
 
                     var exceptionMessage = debugging ? ex.ToString() : ex.Message;
 
-                    "chocolatey".Log().Warn(logLocation, "This is try {3}/{4}. Retrying after {2} milliseconds.{0} Error converted to warning:{0} {1}".format_with(
+                    "chocolatey".Log().Warn(logLocation, "This is try {3}/{4}. Retrying after {2} milliseconds.{0} Error converted to warning:{0} {1}".FormatWith(
                         Environment.NewLine,
                         exceptionMessage,
                         retryWait,
@@ -127,11 +127,11 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="logWarningInsteadOfError">if set to <c>true</c> log as warning instead of error.</param>
         /// <param name="logDebugInsteadOfError">Log to debug</param>
         /// <param name="isSilent">Log messages?</param>
-        public static void try_catch_with_logging_exception(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
+        public static void TryCatchWithLoggingException(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
         {
             if (action == null) return;
 
-            var success = try_catch_with_logging_exception(
+            var success = TryCatchWithLoggingException(
                 () =>
                     {
                         action.Invoke();
@@ -156,7 +156,7 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="logDebugInsteadOfError">Log to debug</param>
         /// <param name="isSilent">Log messages?</param>
         /// <returns>The return value from the function</returns>
-        public static T try_catch_with_logging_exception<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
+        public static T TryCatchWithLoggingException<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
         {
             if (function == null) return default(T);
             var returnValue = default(T);
@@ -170,19 +170,19 @@ namespace chocolatey.infrastructure.tolerance
             }
             catch (Exception ex)
             {
-                var exceptionMessage = log_is_in_debug_mode() ? ex.ToString() : ex.Message;
+                var exceptionMessage = InDebugMode() ? ex.ToString() : ex.Message;
 
                 if (logDebugInsteadOfError)
                 {
-                    "chocolatey".Log().Debug(logLocation, "{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
+                    "chocolatey".Log().Debug(logLocation, "{0}:{1} {2}".FormatWith(errorMessage, Environment.NewLine, exceptionMessage));
                 }
                 else if (logWarningInsteadOfError)
                 {
-                    "chocolatey".Log().Warn(logLocation, "{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
+                    "chocolatey".Log().Warn(logLocation, "{0}:{1} {2}".FormatWith(errorMessage, Environment.NewLine, exceptionMessage));
                 }
                 else
                 {
-                    "chocolatey".Log().Error(logLocation, "{0}:{1} {2}".format_with(errorMessage, Environment.NewLine, exceptionMessage));
+                    "chocolatey".Log().Error(logLocation, "{0}:{1} {2}".FormatWith(errorMessage, Environment.NewLine, exceptionMessage));
                 }
 
                 if (throwError)
@@ -193,5 +193,23 @@ namespace chocolatey.infrastructure.tolerance
 
             return returnValue;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
+            => Retry(numberOfTries, action, waitDurationMilliseconds, increaseRetryByMilliseconds, isSilent);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static T retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
+            => Retry(numberOfTries, function, waitDurationMilliseconds, increaseRetryByMilliseconds, isSilent);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void try_catch_with_logging_exception(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
+            => TryCatchWithLoggingException(action, errorMessage, throwError, logWarningInsteadOfError, logDebugInsteadOfError, isSilent);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static T try_catch_with_logging_exception<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
+            => TryCatchWithLoggingException(function, errorMessage, throwError, logWarningInsteadOfError, logDebugInsteadOfError, isSilent);
+#pragma warning restore IDE1006
     }
 }

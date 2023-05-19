@@ -46,7 +46,7 @@ functions that you can use, these are sometimes called the helpers.
 https://chocolatey.org/docs/helpers-reference
 
 A note about a couple:
-* Get-BinRoot - this is a horribly named function that doesn't do what new folks think it does. It gets you the 'tools' root, which by default is set to 'c:\tools', not the chocolateyInstall bin folder - see https://chocolatey.org/docs/helpers-get-tools-location
+
 * Install-BinFile - used for non-exe files - executables are automatically shimmed... - see https://chocolatey.org/docs/helpers-install-bin-file
 * Uninstall-BinFile - used for non-exe files - executables are automatically shimmed - see https://chocolatey.org/docs/helpers-uninstall-bin-file
 
@@ -87,5 +87,5 @@ The following are experimental or use not recommended:
     - it's based on git describe
  * IS_ADMIN = Is the user an administrator? But doesn't tell you if the process is elevated. (0.9.9+)
  * chocolateyInstallOverride = Not for use in package automation scripts. (0.9.9+)
- * chocolateyInstallArguments = the installer arguments meant for the native installer. You should use chocolateyPackageParameters intead. (0.9.9+)
+ * chocolateyInstallArguments = the installer arguments meant for the native installer. You should use chocolateyPackageParameters instead. (0.9.9+)
 

@@ -1,6 +1,6 @@
 ﻿param(
     # Which help command to test
-    [string[]]$Command = @(
+    [string[]]$HelpOptions = @(
         "--help"
         "-?"
         "-help"
@@ -9,27 +9,28 @@
     # Commands that don't have full help
     [string[]]$SkipCommand = @(
         "unpackself"  # Out of spec
-        "version"     # Deprecated
-        "update"      # Deprecated
-        "support"     # This should be tested seperately
+        "support"     # This should be tested separately
     )
 )
 Import-Module helpers/common-helpers
 
 BeforeDiscovery {
-    $AllTopLevelCommands = (Invoke-Choco $Command[0]).Lines -match " \* (?<Command>\w+) -" -replace " \* (?<Command>\w+) -.+", '$1'
-    $TopLevelCommands = $AllTopLevelCommands.Where{$_ -notin $SkipCommand}
+    $AllTopLevelCommands = (Invoke-Choco $HelpOptions[0]).Lines -match "\* (?<Command>\w+) -" -replace "\* (?<Command>\w+) -.+", '${Command}'
+    $TopLevelCommands = $AllTopLevelCommands.Where{ $_ -notin $SkipCommand }
 }
 
-Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolatey, HelpCommand {
+Describe "choco help sections with option <_>" -ForEach $HelpOptions -Tag Chocolatey, HelpCommand {
     BeforeDiscovery {
         $helpArgument = $_
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         $helpArgument = $_
         Initialize-ChocolateyTestInstall
-        New-ChocolateyInstallSnapshot
+
+        # We're just testing help output here, we don't need to copy config/package files
+        New-ChocolateyInstallSnapshot -NoSnapshotCopy
     }
 
     AfterAll {
@@ -38,7 +39,7 @@ Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolate
 
     Context "Top Level Help" {
         BeforeAll {
-            $Output = Invoke-Choco $_ $helpArgument
+            $Output = Invoke-Choco $_
         }
 
         It "Exits with Success (0)" {
@@ -51,7 +52,7 @@ Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolate
         }
     }
 
-    Context "choco <_> $helpArgument" -Foreach $TopLevelCommands {
+    Context "choco <_> $helpArgument" -ForEach $TopLevelCommands {
         BeforeDiscovery {
             $comandsWithoutExitCodes = @(
                 "help"
@@ -90,4 +91,7 @@ Describe "choco help sections with command <_>" -ForEach $Command -Tag Chocolate
             $Output.Lines | Should -Contain "Options and Switches"
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

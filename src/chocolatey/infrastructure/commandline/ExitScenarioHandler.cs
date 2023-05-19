@@ -48,7 +48,7 @@ namespace chocolatey.infrastructure.commandline
 
         public static void SetHandler()
         {
-            if (Platform.get_platform() != PlatformType.Windows) return;
+            if (Platform.GetPlatform() != PlatformType.Windows) return;
 
             _handler += Handler;
             SetConsoleCtrlHandler(_handler, true);

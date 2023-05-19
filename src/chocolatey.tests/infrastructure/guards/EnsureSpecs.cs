@@ -31,52 +31,137 @@ namespace chocolatey.tests.infrastructure.guards
             }
         }
 
-        public class when_Ensure_is_being_set_to_a_type : EnsureSpecsBase
+        public class When_Ensure_is_being_set_to_a_type : EnsureSpecsBase
+        {
+            private object result;
+            private readonly object bob = "something";
+
+            public override void Because()
+            {
+                result = Ensure.That(() => bob);
+            }
+
+            [Fact]
+            public void Should_return_a_type_of_object_for_ensuring()
+            {
+                result.ShouldBeType<Ensure<object>>();
+            }
+
+            [Fact]
+            public void Should_have_the_value_specified()
+            {
+                var bobEnsure = result as Ensure<object>;
+                bobEnsure.Value.ShouldEqual(bob);
+            }
+        }
+
+        public class When_Ensure_is_a_string_type : EnsureSpecsBase
         {
             private object result;
             private readonly string bob = "something";
 
             public override void Because()
             {
-                result = Ensure.that(() => bob);
+                result = Ensure.That(() => bob);
             }
 
             [Fact]
-            public void should_return_a_type_of_string_for_ensuring()
+            public void Should_return_a_ensure_string_type()
             {
-                result.ShouldBeType<Ensure<string>>();
+                result.ShouldBeType<EnsureString>();
             }
 
             [Fact]
-            public void should_have_the_value_specified()
+            public void Should_have_the_value_specified()
             {
-                var bobEnsure = result as Ensure<string>;
+                var bobEnsure = result as EnsureString;
                 bobEnsure.Value.ShouldEqual(bob);
             }
         }
 
-        public class when_using_Ensure : EnsureSpecsBase
+        public class When_using_EnsureString : EnsureSpecsBase
         {
             public override void Because()
             {
             }
 
             [Fact]
-            public void when_testing_a_string_against_is_not_null_should_pass()
+            public void When_testing_a_string_against_null_value_should_fail()
             {
-                string test = "value";
-                Ensure.that(() => test).is_not_null();
+                string test = null;
+
+                Action a = () => Ensure.That(() => test).NotNullOrWhitespace();
+
+                a.ShouldThrow<ArgumentNullException>();
             }
 
             [Fact]
-            public void when_testing_a_null_string_against_is_not_null_should_throw_an_Argument_exception()
+            public void When_testing_a_string_against_an_empty_value_should_fail()
+            {
+                Action a = () => Ensure.That(() => string.Empty).NotNullOrWhitespace();
+
+                a.ShouldThrow<ArgumentException>();
+            }
+
+            [Fact]
+            public void When_testing_a_string_against_a_whitespace_value_should_fail()
+            {
+                var test = "      ";
+
+                Action a = () => Ensure.That(() => test).NotNullOrWhitespace();
+
+                a.ShouldThrow<ArgumentException>();
+            }
+
+            [Fact]
+            public void When_testing_a_string_against_a_non_empty_value_should_pass()
+            {
+                var test = "some value";
+
+                Ensure.That(() => test).NotNullOrWhitespace();
+            }
+
+            [Fact]
+            public void When_testing_a_string_without_expected_extension_should_fail()
+            {
+                var test = "some-file.png";
+
+                Action a = () => Ensure.That(() => test).HasExtension(".jpg", ".bmp", ".gif");
+
+                a.ShouldThrow<ArgumentException>();
+            }
+
+            [Fact]
+            public void When_testing_a_string_with_expected_extension_should_pass()
+            {
+                var test = "some-file.png";
+
+                Ensure.That(() => test).HasExtension(".jpg", ".bmp", ".gif", ".png");
+            }
+        }
+
+        public class When_using_Ensure : EnsureSpecsBase
+        {
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void When_testing_a_string_against_is_not_null_should_pass()
+            {
+                string test = "value";
+                Ensure.That(() => test).NotNull();
+            }
+
+            [Fact]
+            public void When_testing_a_null_string_against_is_not_null_should_throw_an_Argument_exception()
             {
                 string test = null;
                 object exceptionType = null;
                 var exceptionMessage = string.Empty;
                 try
                 {
-                    Ensure.that(() => test).is_not_null();
+                    Ensure.That(() => test).NotNull();
                 }
                 catch (Exception ex)
                 {
@@ -89,21 +174,21 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void when_testing_a_Func_against_is_not_null_should_pass()
+            public void When_testing_a_Func_against_is_not_null_should_pass()
             {
                 Func<string> test = () => "value";
-                Ensure.that(() => test).is_not_null();
+                Ensure.That(() => test).NotNull();
             }
 
             [Fact]
-            public void when_testing_a_null_Func_against_is_not_null_should_throw_an_Argument_exception()
+            public void When_testing_a_null_Func_against_is_not_null_should_throw_an_Argument_exception()
             {
                 Func<string> test = null;
                 object exceptionType = null;
                 var exceptionMessage = string.Empty;
                 try
                 {
-                    Ensure.that(() => test).is_not_null();
+                    Ensure.That(() => test).NotNull();
                 }
                 catch (Exception ex)
                 {
@@ -116,21 +201,21 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void when_testing_a_class_against_is_not_null_should_pass()
+            public void When_testing_a_class_against_is_not_null_should_pass()
             {
                 var test = new ChocolateyConfiguration();
-                Ensure.that(() => test).is_not_null();
+                Ensure.That(() => test).NotNull();
             }
 
             [Fact]
-            public void when_testing_an_uninstantiated_class_against_is_not_null_should_throw_an_Argument_exception()
+            public void When_testing_an_uninstantiated_class_against_is_not_null_should_throw_an_Argument_exception()
             {
                 ChocolateyConfiguration test = null;
                 object exceptionType = null;
                 var exceptionMessage = string.Empty;
                 try
                 {
-                    Ensure.that(() => test).is_not_null();
+                    Ensure.That(() => test).NotNull();
                 }
                 catch (Exception ex)
                 {
@@ -143,14 +228,14 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void when_testing_meets_with_null_ensureFunction_against_string_value_should_throw_ArgumentNullException_on_ensureFunction()
+            public void When_testing_meets_with_null_ensureFunction_against_string_value_should_throw_ArgumentNullException_on_ensureFunction()
             {
                 string test = "bob";
                 object exceptionType = null;
                 var exceptionMessage = string.Empty;
                 try
                 {
-                    Ensure.that(() => test).meets(
+                    Ensure.That(() => test).Meets(
                         null,
                         (name, value) => { throw new ApplicationException("this is what we throw."); });
                 }
@@ -165,14 +250,14 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void when_testing_meets_with_null_exceptionAction_against_string_value_that_passes_should_throw_ArgumentNullException_on_exceptionAction()
+            public void When_testing_meets_with_null_exceptionAction_against_string_value_that_passes_should_throw_ArgumentNullException_on_exceptionAction()
             {
                 string test = "bob";
                 object exceptionType = null;
                 var exceptionMessage = string.Empty;
                 try
                 {
-                    Ensure.that(() => test).meets(
+                    Ensure.That(() => test).Meets(
                         s => s == s.ToLower(),
                         null);
                 }
@@ -188,14 +273,14 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void when_testing_meets_with_null_exceptionAction_against_string_value_that_fails_should_throw_ArgumentNullException_on_exceptionAction()
+            public void When_testing_meets_with_null_exceptionAction_against_string_value_that_fails_should_throw_ArgumentNullException_on_exceptionAction()
             {
                 string test = "bob";
                 object exceptionType = null;
                 var exceptionMessage = string.Empty;
                 try
                 {
-                    Ensure.that(() => test).meets(
+                    Ensure.That(() => test).Meets(
                         s => s == s.ToUpper(),
                         null);
                 }
@@ -211,14 +296,14 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void when_testing_meets_with_null_ensureFunction_against_null_value_should_throw_ArgumentNullException_on_ensureFunction()
+            public void When_testing_meets_with_null_ensureFunction_against_null_value_should_throw_ArgumentNullException_on_ensureFunction()
             {
                 string test = null;
                 object exceptionType = null;
                 var exceptionMessage = string.Empty;
                 try
                 {
-                    Ensure.that(() => test).meets(
+                    Ensure.That(() => test).Meets(
                         null,
                         (name, value) => { throw new ApplicationException("this is what we throw."); });
                 }
@@ -234,14 +319,14 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void when_testing_meets_with_null_exceptionAction_against_null_value_should_throw_ArgumentNullException_on_exceptionAction()
+            public void When_testing_meets_with_null_exceptionAction_against_null_value_should_throw_ArgumentNullException_on_exceptionAction()
             {
                 string test = null;
                 object exceptionType = null;
                 var exceptionMessage = string.Empty;
                 try
                 {
-                    Ensure.that(() => test).meets(
+                    Ensure.That(() => test).Meets(
                         s => s == s.ToLower(),
                         null);
                 }
@@ -257,14 +342,14 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void when_testing_meets_with_null_everything_should_throw_ArgumentNullException_on_ensureFunction()
+            public void When_testing_meets_with_null_everything_should_throw_ArgumentNullException_on_ensureFunction()
             {
                 string test = null;
                 object exceptionType = null;
                 var exceptionMessage = string.Empty;
                 try
                 {
-                    Ensure.that(() => test).meets(
+                    Ensure.That(() => test).Meets(
                         null,
                         null);
                 }
@@ -280,7 +365,7 @@ namespace chocolatey.tests.infrastructure.guards
             }
         }
 
-        public class when_testing_Ensure_meets_against_a_string_value_that_passes : EnsureSpecsBase
+        public class When_testing_Ensure_meets_against_a_string_value_that_passes : EnsureSpecsBase
         {
             private object exceptionType;
             private string exceptionMessage = string.Empty;
@@ -292,7 +377,7 @@ namespace chocolatey.tests.infrastructure.guards
 
                 try
                 {
-                    Ensure.that(() => test).meets(
+                    Ensure.That(() => test).Meets(
                         s => s == s.ToLower(),
                         (name, value) =>
                         {
@@ -308,31 +393,31 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void should_not_invoke_the_exceptionAction()
+            public void Should_not_invoke_the_exceptionAction()
             {
                 exceptionActionInvoked.ShouldBeFalse();
             }
 
             [Fact]
-            public void should_not_return_a_specified_exception_since_there_was_no_failure()
+            public void Should_not_return_a_specified_exception_since_there_was_no_failure()
             {
                 exceptionType.ShouldBeNull();
             }
 
             [Fact]
-            public void should_not_return_the_specified_error_message()
+            public void Should_not_return_the_specified_error_message()
             {
                 exceptionMessage.ShouldNotContain("this is what we throw.");
             }
 
             [Fact]
-            public void should_not_log_an_error()
+            public void Should_not_log_an_error()
             {
                 MockLogger.Verify(l => l.Error(It.IsAny<string>()), Times.Never);
             }
         }
 
-        public class when_testing_Ensure_meets_against_a_string_value_that_fails : EnsureSpecsBase
+        public class When_testing_Ensure_meets_against_a_string_value_that_fails : EnsureSpecsBase
         {
             private object exceptionType;
             private string exceptionMessage = string.Empty;
@@ -344,7 +429,7 @@ namespace chocolatey.tests.infrastructure.guards
 
                 try
                 {
-                    Ensure.that(() => test).meets(
+                    Ensure.That(() => test).Meets(
                         s => s == s.ToLower(),
                         (name, value) =>
                         {
@@ -360,31 +445,31 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void should_invoke_the_exceptionAction()
+            public void Should_invoke_the_exceptionAction()
             {
                 exceptionActionInvoked.ShouldBeTrue();
             }
 
             [Fact]
-            public void should_return_the_specified_exception_of_type_ApplicationException()
+            public void Should_return_the_specified_exception_of_type_ApplicationException()
             {
                 exceptionType.ShouldBeType<ApplicationException>();
             }
 
             [Fact]
-            public void should_return_the_specified_error_message()
+            public void Should_return_the_specified_error_message()
             {
                 exceptionMessage.ShouldContain("this is what we throw.");
             }
 
             [Fact]
-            public void should_not_log_an_error()
+            public void Should_not_log_an_error()
             {
                 MockLogger.Verify(l => l.Error(It.IsAny<string>()), Times.Never);
             }
         }
 
-        public class when_testing_Ensure_meets_against_a_null_value_without_guarding_the_value : EnsureSpecsBase
+        public class When_testing_Ensure_meets_against_a_null_value_without_guarding_the_value : EnsureSpecsBase
         {
             private object exceptionType;
             private string exceptionMessage = string.Empty;
@@ -396,7 +481,7 @@ namespace chocolatey.tests.infrastructure.guards
 
                 try
                 {
-                    Ensure.that(() => test).meets(
+                    Ensure.That(() => test).Meets(
                         s => s == s.ToLower(),
                         (name, value) =>
                         {
@@ -412,37 +497,37 @@ namespace chocolatey.tests.infrastructure.guards
             }
 
             [Fact]
-            public void should_not_invoke_the_exceptionAction()
+            public void Should_not_invoke_the_exceptionAction()
             {
                 exceptionActionInvoked.ShouldBeFalse();
             }
 
             [Fact]
-            public void should_throw_an_error()
+            public void Should_throw_an_error()
             {
                 exceptionType.ShouldNotBeNull();
             }
 
             [Fact]
-            public void should_not_return_the_specified_exception_of_type_ApplicationException()
+            public void Should_not_return_the_specified_exception_of_type_ApplicationException()
             {
                 exceptionType.ShouldNotBeType<ApplicationException>();
             }
 
             [Fact]
-            public void should_not_return_the_specified_error_message()
+            public void Should_not_return_the_specified_error_message()
             {
                 exceptionMessage.ShouldNotContain("this is what we throw.");
             }
 
             //[Fact]
-            //public void should_log_an_error()
+            //public void Should_log_an_error()
             //{
             //    MockLogger.Verify(l => l.Error(It.IsAny<string>()), Times.Once);
             //}
 
             //    [Fact]
-            //    public void should_log_the_error_we_expect()
+            //    public void Should_log_the_error_we_expect()
             //    {
             //       var messages = MockLogger.MessagesFor(LogLevel.Error);
             //        messages.ShouldNotBeEmpty();

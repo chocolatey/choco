@@ -26,7 +26,7 @@ namespace chocolatey.tests.infrastructure.app.attributes
             protected CommandForAttribute attribute;
         }
 
-        public class when_CommandForAttribute_is_set_with_string : CommandForAttributeSpecsBase
+        public class When_CommandForAttribute_is_set_with_string : CommandForAttributeSpecsBase
         {
             private string result;
 
@@ -41,7 +41,7 @@ namespace chocolatey.tests.infrastructure.app.attributes
             }
 
             [Fact]
-            public void should_be_set_to_the_string()
+            public void Should_be_set_to_the_string()
             {
                 result.ShouldEqual("bob");
             }

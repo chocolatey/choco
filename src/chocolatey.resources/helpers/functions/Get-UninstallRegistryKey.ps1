@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Get-UninstallRegistryKey {
-<#
+    <#
 .SYNOPSIS
 Retrieve registry key(s) for system-installed applications from an
 exact or wildcard search.
@@ -27,17 +27,6 @@ chocolateyUninstall.ps1 automation script.
 
 The function also prevents `Get-ItemProperty` from failing when
 handling wrongly encoded registry keys.
-
-.NOTES
-Available in 0.9.10+. If you need to maintain compatibility with pre
-0.9.10, please add the following to your nuspec (check for minimum
-version):
-
-~~~xml
-<dependencies>
-  <dependency id="chocolatey-core.extension" version="1.1.0" />
-</dependencies>
-~~~
 
 .INPUTS
 String
@@ -105,65 +94,69 @@ Install-ChocolateyInstallPackage
 .LINK
 Uninstall-ChocolateyPackage
 #>
-[CmdletBinding()]
-param(
-  [parameter(Mandatory=$true, Position=0, ValueFromPipeline=$true)]
-  [string] $softwareName,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    [CmdletBinding()]
+    param(
+        [parameter(Mandatory = $true, Position = 0, ValueFromPipeline = $true)]
+        [string] $softwareName,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  if ($softwareName -eq $null -or $softwareName -eq '') {
-    throw "$SoftwareName cannot be empty for Get-UninstallRegistryKey"
-  }
+    if ($softwareName -eq $null -or $softwareName -eq '') {
+        throw "$SoftwareName cannot be empty for Get-UninstallRegistryKey"
+    }
 
-  $ErrorActionPreference = 'Stop'
-  $local_key       = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*'
-  $machine_key     = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'
-  $machine_key6432 = 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
+    $ErrorActionPreference = 'Stop'
+    $local_key = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*'
+    $machine_key = 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*'
+    $machine_key6432 = 'HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*'
 
-  Write-Verbose "Retrieving all uninstall registry keys"
-  [array]$keys = Get-ChildItem -Path @($machine_key6432, $machine_key, $local_key) -ErrorAction SilentlyContinue
-  Write-Debug "Registry uninstall keys on system: $($keys.Count)"
+    Write-Verbose "Retrieving all uninstall registry keys"
+    [array]$keys = Get-ChildItem -Path @($machine_key6432, $machine_key, $local_key) -ErrorAction SilentlyContinue
+    Write-Debug "Registry uninstall keys on system: $($keys.Count)"
 
-  Write-Debug "Error handling check: `'Get-ItemProperty`' fails if a registry key is encoded incorrectly."
-  [int]$maxAttempts = $keys.Count
-  for ([int]$attempt = 1; $attempt -le $maxAttempts; $attempt++) {
-    [bool]$success = $false
+    Write-Debug "Error handling check: `'Get-ItemProperty`' fails if a registry key is encoded incorrectly."
+    [int]$maxAttempts = $keys.Count
+    for ([int]$attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+        [bool]$success = $false
 
-    $keyPaths = $keys | Select-Object -ExpandProperty PSPath
-    try {
-      [array]$foundKey = Get-ItemProperty -LiteralPath $keyPaths -ErrorAction Stop | Where-Object { $_.DisplayName -like $softwareName }
-      $success = $true
-    } catch {
-      Write-Debug "Found bad key."
-      foreach ($key in $keys){
+        $keyPaths = $keys | Select-Object -ExpandProperty PSPath
         try {
-          Get-ItemProperty -LiteralPath $key.PsPath > $null
-        } catch {
-          $badKey = $key.PsPath
+            [array]$foundKey = Get-ItemProperty -LiteralPath $keyPaths -ErrorAction Stop | Where-Object { $_.DisplayName -like $softwareName }
+            $success = $true
         }
-      }
-      Write-Verbose "Skipping bad key: $badKey"
-      [array]$keys = $keys | Where-Object { $badKey -NotContains $_.PsPath }
+        catch {
+            Write-Debug "Found bad key."
+            foreach ($key in $keys) {
+                try {
+                    Get-ItemProperty -LiteralPath $key.PsPath > $null
+                }
+                catch {
+                    $badKey = $key.PsPath
+                }
+            }
+            Write-Verbose "Skipping bad key: $badKey"
+            [array]$keys = $keys | Where-Object { $badKey -NotContains $_.PsPath }
+        }
+
+        if ($success) {
+            break;
+        }
+
+        if ($attempt -ge 10) {
+            Write-Warning "Found 10 or more bad registry keys. Run command again with `'--verbose --debug`' for more info."
+            Write-Debug "Each key searched should correspond to an installed program. It is very unlikely to have more than a few programs with incorrectly encoded keys, if any at all. This may be indicative of one or more corrupted registry branches."
+        }
     }
 
-    if ($success) { break; }
-
-    if ($attempt -ge 10) {
-      Write-Warning "Found 10 or more bad registry keys. Run command again with `'--verbose --debug`' for more info."
-      Write-Debug "Each key searched should correspond to an installed program. It is very unlikely to have more than a few programs with incorrectly encoded keys, if any at all. This may be indicative of one or more corrupted registry branches."
+    if ($foundKey -eq $null -or $foundkey.Count -eq 0) {
+        Write-Warning "No registry key found based on  '$softwareName'"
     }
-  }
 
-  if ($foundKey -eq $null -or $foundkey.Count -eq 0) {
-    Write-Warning "No registry key found based on  '$softwareName'"
-  }
+    Write-Debug "Found $($foundKey.Count) uninstall registry key(s) with SoftwareName:`'$SoftwareName`'";
 
-  Write-Debug "Found $($foundKey.Count) uninstall registry key(s) with SoftwareName:`'$SoftwareName`'";
-
-  return $foundKey
+    return $foundKey
 }
 
 Set-Alias Get-InstallRegistryKey Get-UninstallRegistryKey

@@ -7,7 +7,7 @@
     <authors>Author</authors>
     <description>This metadata file contains the invalid character &.</description>
     <dependencies>
-      <dependency id="basic" />
+      <dependency id="basic" version="1.0.0" />
     </dependencies>
   </metadata>
   <files />

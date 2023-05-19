@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Install-ChocolateyZipPackage {
-<#
+    <#
 .SYNOPSIS
 Downloads file from a url and unzips it on your machine. Use
 Get-ChocolateyUnzip when local or embedded file.
@@ -137,23 +137,23 @@ https://support.microsoft.com/en-us/kb/811833 for more details.
 The recommendation is to use at least SHA256.
 
 .PARAMETER Options
-OPTIONAL - Specify custom headers. Available in 0.9.10+.
+OPTIONAL - Specify custom headers.
 
 .PARAMETER File
-Will be used for Url if Url is empty. Available in 0.10.7+.
+Will be used for Url if Url is empty.
 
 This parameter provides compatibility, but should not be used directly
 and not with the community package repository until January 2018.
 
 .PARAMETER File64
-Will be used for Url64bit if Url64bit is empty. Available in 0.10.7+.
+Will be used for Url64bit if Url64bit is empty.
 
 This parameter provides compatibility, but should not be used directly
 and not with the community package repository until January 2018.
 
 .PARAMETER DisableLogging
 OPTIONAL - This disables logging of the extracted items. It speeds up
-extraction of archives with many files. 
+extraction of archives with many files.
 
 Usage of this parameter will prevent Uninstall-ChocolateyZipPackage
 from working, extracted files will have to be cleaned up with
@@ -184,43 +184,47 @@ Get-ChocolateyWebFile
 .LINK
 Get-ChocolateyUnzip
 #>
-param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [parameter(Mandatory=$false, Position=1)][string] $url = '',
-  [parameter(Mandatory=$true, Position=2)]
-  [alias("destination")][string] $unzipLocation,
-  [parameter(Mandatory=$false, Position=3)]
-  [alias("url64")][string] $url64bit = '',
-  [parameter(Mandatory=$false)][string] $specificFolder ='',
-  [parameter(Mandatory=$false)][string] $checksum = '',
-  [parameter(Mandatory=$false)][string] $checksumType = '',
-  [parameter(Mandatory=$false)][string] $checksum64 = '',
-  [parameter(Mandatory=$false)][string] $checksumType64 = '',
-  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
-  [alias("fileFullPath")][parameter(Mandatory=$false)][string] $file = '',
-  [alias("fileFullPath64")][parameter(Mandatory=$false)][string] $file64 = '',
-  [parameter(Mandatory=$false)][switch] $disableLogging,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param(
+        [parameter(Mandatory = $true, Position = 0)][string] $packageName,
+        [parameter(Mandatory = $false, Position = 1)][string] $url = '',
+        [parameter(Mandatory = $true, Position = 2)]
+        [alias("destination")][string] $unzipLocation,
+        [parameter(Mandatory = $false, Position = 3)]
+        [alias("url64")][string] $url64bit = '',
+        [parameter(Mandatory = $false)][string] $specificFolder = '',
+        [parameter(Mandatory = $false)][string] $checksum = '',
+        [parameter(Mandatory = $false)][string] $checksumType = '',
+        [parameter(Mandatory = $false)][string] $checksum64 = '',
+        [parameter(Mandatory = $false)][string] $checksumType64 = '',
+        [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
+        [alias("fileFullPath")][parameter(Mandatory = $false)][string] $file = '',
+        [alias("fileFullPath64")][parameter(Mandatory = $false)][string] $file64 = '',
+        [parameter(Mandatory = $false)][switch] $disableLogging,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  $fileType = 'zip'
+    $fileType = 'zip'
 
-  $chocoTempDir = $env:TEMP
-  $tempDir = Join-Path $chocoTempDir "$($env:chocolateyPackageName)"
-  if ($env:chocolateyPackageVersion -ne $null) { $tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)"; }
-  $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
-  if (![System.IO.Directory]::Exists($tempDir)) { [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null }
-  $downloadFilePath = Join-Path $tempDir "$($packageName)Install.$fileType"
+    $chocoTempDir = $env:TEMP
+    $tempDir = Join-Path $chocoTempDir "$($env:chocolateyPackageName)"
+    if ($env:chocolateyPackageVersion -ne $null) {
+        $tempDir = Join-Path $tempDir "$($env:chocolateyPackageVersion)";
+    }
+    $tempDir = $tempDir -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+    if (![System.IO.Directory]::Exists($tempDir)) {
+        [System.IO.Directory]::CreateDirectory($tempDir) | Out-Null
+    }
+    $downloadFilePath = Join-Path $tempDir "$($packageName)Install.$fileType"
 
-  if ($url -eq '' -or $url -eq $null) {
-    $url = $file
-  }
-  if ($url64bit -eq '' -or $url64bit -eq $null) {
-    $url64bit = $file64
-  }
+    if ($url -eq '' -or $url -eq $null) {
+        $url = $file
+    }
+    if ($url64bit -eq '' -or $url64bit -eq $null) {
+        $url64bit = $file64
+    }
 
-  $filePath = Get-ChocolateyWebFile $packageName $downloadFilePath $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
-  Get-ChocolateyUnzip "$filePath" $unzipLocation $specificFolder $packageName -disableLogging:$disableLogging
+    $filePath = Get-ChocolateyWebFile $packageName $downloadFilePath $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
+    Get-ChocolateyUnzip "$filePath" $unzipLocation $specificFolder $packageName -disableLogging:$disableLogging
 }

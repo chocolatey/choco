@@ -1,4 +1,4 @@
-#Requires -Module @{ ModuleName = 'pester'; ModuleVersion = '5.3.1' }
+﻿#Requires -Module @{ ModuleName = 'pester'; ModuleVersion = '5.3.1' }
 #Requires -RunAsAdministrator
 <#
     .SYNOPSIS
@@ -9,7 +9,7 @@ param(
     [string]
     $TestPath = "$env:TEMP/chocolateyTests",
 
-    # Path of the nupkg to be tested. Defaults to `code_drop/nuget/chocolatey.<version>.nupkg`
+    # Path of the nupkg to be tested. Defaults to `code_drop/Packages/Chocolatey/chocolatey.<version>.nupkg`
     [ValidateScript({
             $count = (Get-Item $_).Count
             if ($count -ne 1) {
@@ -26,6 +26,19 @@ param(
 )
 $packageRegex = 'chocolatey\.\d.*\.nupkg'
 
+# Check if there are any tests that exceed Test Kitchen maximum lengths
+$TestsLocation = Join-Path $PSScriptRoot tests
+$MaxFileNameLength = 110
+$LongFiles = Get-ChildItem $TestsLocation -Recurse |
+    Where-Object { ($_.FullName.Length - $TestsLocation.Length) -gt $MaxFileNameLength } |
+        Select-Object -Property @{Name = 'RelativePath' ; Expression = { $_.FullName.Replace($TestsLocation, [string]::Empty) } }, @{ Name = 'ReductionNeeded' ; Expression = { $_.FullName.Length - $TestsLocation.Length - $MaxFileNameLength } }
+
+if ($LongFiles) {
+    Write-Host "Tests' file paths may be too long for Test Kitchen use. Please shorten file names or paths:"
+    $LongFiles | Format-List | Out-String | Out-Host
+    throw "Unable to complete tests due to long file paths"
+}
+
 # Use TstPkg as TestPackage has ValidateScript that can't be circumvented
 if (-not $TestPackage) {
     $TstPkg = Get-ChildItem $PSScriptRoot/code_drop/Packages/Chocolatey -Filter *.nupkg | Where-Object Name -Match $packageRegex
@@ -37,7 +50,8 @@ else {
 if (-not (Test-Path "$TestPath/packages") -or -not $SkipPackaging) {
     $null = New-Item -Path "$TestPath/packages" -ItemType Directory -Force
     # Get and pack packages
-    $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages -Recurse | Where-Object Name -Like '*.nuspec'
+    $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages -Recurse -Include *.nuspec
+    Get-ChildItem -Path $PSScriptRoot/tests/packages -Recurse -Include *.nupkg | Copy-Item -Destination "$TestPath/packages"
 
     foreach ($file in $nuspecs) {
         Write-Host "Packaging $file"
@@ -70,7 +84,7 @@ try {
 
     $env:ChocolateyInstall = "$TestPath/base"
     $null = Initialize-Chocolatey
-    # It seems this is getting clobbered by Intialize-Chocolatey... No idea why...
+    # It seems this is getting clobbered by Initialize-Chocolatey... No idea why...
     $env:ChocolateyInstall = "$TestPath/base"
 
     Pop-Location
@@ -105,10 +119,12 @@ try {
                 }
             )
         }
+        Should     = @{
+            ErrorAction = 'Continue'
+        }
     }
 
     Invoke-Pester -Configuration $PesterConfiguration
-
 }
 finally {
     # For some reason we need to import this again... I'm not 100% sure on why...

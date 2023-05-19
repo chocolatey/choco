@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Test-ProcessAdminRights {
-<#
+    <#
 .SYNOPSIS
 Tests whether the current process is running with administrative rights.
 
@@ -36,12 +36,12 @@ None
 System.Boolean
 #>
 
-  # do not log function call
-  ## Called from chocolateysetup.psm1 - wrap any Write-Host in try/catch
+    # do not log function call
+    ## Called from chocolateysetup.psm1 - wrap any Write-Host in try/catch
 
-  $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent([Security.Principal.TokenAccessLevels]'Query,Duplicate'))
-  $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-  Write-Debug "Test-ProcessAdminRights: returning $isAdmin"
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent([Security.Principal.TokenAccessLevels]'Query,Duplicate'))
+    $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    Write-Debug "Test-ProcessAdminRights: returning $isAdmin"
 
- return $isAdmin
+    return $isAdmin
 }

@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Uninstall-ChocolateyPackage {
-<#
+    <#
 .SYNOPSIS
 Uninstalls software from "Programs and Features".
 
@@ -23,7 +23,7 @@ Uninstalls software from "Programs and Features".
 This will uninstall software from your machine (in Programs and
 Features). This may not be necessary if Auto Uninstaller is turned on.
 
-Choco 0.9.9+ automatically tracks registry changes for "Programs and
+Chocolatey CLI automatically tracks registry changes for "Programs and
 Features" of the underlying software's native installers when
 installing packages. The "Automatic Uninstaller" (auto uninstaller)
 service is a feature that can use that information to automatically
@@ -38,8 +38,8 @@ Chocolatey but does not remove the software from your system without
 auto uninstaller.
 
 .NOTES
-May not be required. Starting in 0.9.10+, the Automatic Uninstaller
-(AutoUninstaller) is turned on by default.
+May not be required. The Automatic Uninstaller (AutoUninstaller) is
+turned on by default.
 
 .INPUTS
 None
@@ -54,8 +54,7 @@ recommended that it matches the package id.
 .PARAMETER FileType
 This is the extension of the file. This should be either exe or msi.
 
-If what is provided is empty or null, Chocolatey will use 'exe'
-starting in 0.10.1.
+If what is provided is empty or null, Chocolatey will use 'exe'.
 
 .PARAMETER SilentArgs
 OPTIONAL - These are the parameters to pass to the native uninstaller,
@@ -106,52 +105,58 @@ Uninstall-ChocolateyZipPackage
 .LINK
 Get-UninstallRegistryKey
 #>
-param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [parameter(Mandatory=$false, Position=1)]
-  [alias("installerType")][string] $fileType = 'exe',
-  [parameter(Mandatory=$false, Position=2)][string[]] $silentArgs = '',
-  [parameter(Mandatory=$false, Position=3)][string] $file,
-  [parameter(Mandatory=$false)] $validExitCodes = @(0),
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
-  [string]$silentArgs = $silentArgs -join ' '
+    param(
+        [parameter(Mandatory = $true, Position = 0)][string] $packageName,
+        [parameter(Mandatory = $false, Position = 1)]
+        [alias("installerType")][string] $fileType = 'exe',
+        [parameter(Mandatory = $false, Position = 2)][string[]] $silentArgs = '',
+        [parameter(Mandatory = $false, Position = 3)][string] $file,
+        [parameter(Mandatory = $false)] $validExitCodes = @(0),
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
+    [string]$silentArgs = $silentArgs -join ' '
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  $installMessage = "Uninstalling $packageName..."
-  write-host $installMessage
+    $installMessage = "Uninstalling $packageName..."
+    Write-Host $installMessage
 
-  $additionalInstallArgs = $env:chocolateyInstallArguments;
-  if ($additionalInstallArgs -eq $null) { $additionalInstallArgs = ''; }
-  $overrideArguments = $env:chocolateyInstallOverride;
+    $additionalInstallArgs = $env:chocolateyInstallArguments;
+    if ($additionalInstallArgs -eq $null) {
+        $additionalInstallArgs = '';
+    }
+    $overrideArguments = $env:chocolateyInstallOverride;
 
-  if ($fileType -eq $null) { $fileType = '' }
-  $installerTypeLower = $fileType.ToLower()
-  if ($installerTypeLower -ne 'msi' -and $installerTypeLower -ne 'exe') {
-    Write-Warning "FileType '$fileType' is unrecognized, using 'exe' instead."
-    $fileType = 'exe'
-  }
-
-  if ($fileType -like 'msi') {
-    $msiArgs = "/x"
-    if ($overrideArguments) {
-      $msiArgs = "$msiArgs $additionalInstallArgs";
-      write-host "Overriding package arguments with `'$additionalInstallArgs`'";
-    } else {
-      $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
+    if ($fileType -eq $null) {
+        $fileType = ''
+    }
+    $installerTypeLower = $fileType.ToLower()
+    if ($installerTypeLower -ne 'msi' -and $installerTypeLower -ne 'exe') {
+        Write-Warning "FileType '$fileType' is unrecognized, using 'exe' instead."
+        $fileType = 'exe'
     }
 
-    Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes
-  }
-  if ($fileType -like 'exe') {
-    if ($overrideArguments) {
-      Write-Host "Overriding package arguments with `'$additionalInstallArgs`'";
-      Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes
-    } else {
-      Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes
-    }
-  }
+    if ($fileType -like 'msi') {
+        $msiArgs = "/x"
+        if ($overrideArguments) {
+            $msiArgs = "$msiArgs $additionalInstallArgs";
+            Write-Host "Overriding package arguments with `'$additionalInstallArgs`'";
+        }
+        else {
+            $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
+        }
 
-  Write-Host "$packageName has been uninstalled."
+        Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes
+    }
+    if ($fileType -like 'exe') {
+        if ($overrideArguments) {
+            Write-Host "Overriding package arguments with `'$additionalInstallArgs`'";
+            Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $file -validExitCodes $validExitCodes
+        }
+        else {
+            Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $file -validExitCodes $validExitCodes
+        }
+    }
+
+    Write-Host "$packageName has been uninstalled."
 }

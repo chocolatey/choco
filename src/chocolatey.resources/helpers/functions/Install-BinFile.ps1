@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Install-BinFile {
-<#
+    <#
 .SYNOPSIS
 Creates a shim (or batch redirect) for a file that is on the PATH.
 
@@ -75,98 +75,103 @@ Install-ChocolateyShortcut
 .LINK
 Install-ChocolateyPath
 #>
-param(
-  [parameter(Mandatory=$true, Position=0)][string] $name,
-  [parameter(Mandatory=$true, Position=1)][string] $path,
-  [parameter(Mandatory=$false)]
-  [alias("isGui")][switch] $useStart,
-  [parameter(Mandatory=$false)][string] $command = '',
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param(
+        [parameter(Mandatory = $true, Position = 0)][string] $name,
+        [parameter(Mandatory = $true, Position = 1)][string] $path,
+        [parameter(Mandatory = $false)]
+        [alias("isGui")][switch] $useStart,
+        [parameter(Mandatory = $false)][string] $command = '',
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  $nugetPath = [System.IO.Path]::GetFullPath((Join-Path "$helpersPath" '..\'))
-  $nugetExePath = Join-Path "$nugetPath" 'bin'
-  $packageBatchFileName = Join-Path $nugetExePath "$name.bat"
-  $packageBashFileName = Join-Path $nugetExePath "$name"
-  $packageShimFileName = Join-Path $nugetExePath "$name.exe"
+    $nugetPath = [System.IO.Path]::GetFullPath((Join-Path "$helpersPath" '..\'))
+    $nugetExePath = Join-Path "$nugetPath" 'bin'
+    $packageBatchFileName = Join-Path $nugetExePath "$name.bat"
+    $packageBashFileName = Join-Path $nugetExePath "$name"
+    $packageShimFileName = Join-Path $nugetExePath "$name.exe"
 
-  if (Test-Path ($packageBatchFileName)) {Remove-Item $packageBatchFileName -force}
-  if (Test-Path ($packageBashFileName)) {Remove-Item $packageBashFileName -force}
-  $originalPath = $path
-  $path = $path.ToLower().Replace($nugetPath.ToLower(), "..\").Replace("\\","\")
+    if (Test-Path ($packageBatchFileName)) {
+        Remove-Item $packageBatchFileName -Force
+    }
+    if (Test-Path ($packageBashFileName)) {
+        Remove-Item $packageBashFileName -Force
+    }
+    $originalPath = $path
+    $path = $path.ToLower().Replace($nugetPath.ToLower(), "..\").Replace("\\", "\")
 
-  $ShimGenArgs = "-o `"$packageShimFileName`" -p `"$path`" -i `"$originalPath`""
-  if ($command -ne $null -and $command -ne '') {
-    $ShimGenArgs +=" -c $command"
-  }
+    $ShimGenArgs = "-o `"$packageShimFileName`" -p `"$path`" -i `"$originalPath`""
+    if ($command -ne $null -and $command -ne '') {
+        $ShimGenArgs += " -c $command"
+    }
 
-  if ($useStart) {
-    $ShimGenArgs +=" -gui"
-  }
-
-  if ($debug) {
-    $ShimGenArgs +=" -debug"
-  }
-
-  $ShimGen = Join-Path "$helpersPath" '..\tools\shimgen.exe'
-  if (!([System.IO.File]::Exists($ShimGen))) {
-	  Update-SessionEnvironment
-	  $ShimGen = Join-Path "$env:ChocolateyInstall" 'tools\shimgen.exe'
-  }
-
-  $ShimGen = [System.IO.Path]::GetFullPath($ShimGen)
-  Write-Debug "ShimGen found at `'$ShimGen`'"
-
-  Write-Debug "Calling $ShimGen $ShimGenArgs"
-
-  if (Test-Path ("$ShimGen")) {
-    #Start-Process "$ShimGen" -ArgumentList "$ShimGenArgs" -Wait -WindowStyle Hidden
-    $process = New-Object System.Diagnostics.Process
-    $process.StartInfo = new-object System.Diagnostics.ProcessStartInfo($ShimGen, $ShimGenArgs)
-    $process.StartInfo.RedirectStandardOutput = $true
-    $process.StartInfo.RedirectStandardError = $true
-    $process.StartInfo.UseShellExecute = $false
-    $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-
-    $process.Start() | Out-Null
-    $process.WaitForExit()
-  }
-
-  if (Test-Path ($packageShimFileName)) {
-    Write-Host "Added $packageShimFileName shim pointed to `'$path`'."
-  } else {
-    Write-Warning "An error occurred generating shim, using old method."
-
-    $path = "%DIR%$($path)"
-    $pathBash = $path.Replace("%DIR%..\","`$DIR/../").Replace("\","/")
-    Write-Host "Adding $packageBatchFileName and pointing to `'$path`'."
-    Write-Host "Adding $packageBashFileName and pointing to `'$path`'."
     if ($useStart) {
-      Write-Host "Setting up $name as a non-command line application."
-"@echo off
+        $ShimGenArgs += " -gui"
+    }
+
+    if ($debug) {
+        $ShimGenArgs += " -debug"
+    }
+
+    $ShimGen = Join-Path "$helpersPath" '..\tools\shimgen.exe'
+    if (!([System.IO.File]::Exists($ShimGen))) {
+        Update-SessionEnvironment
+        $ShimGen = Join-Path "$env:ChocolateyInstall" 'tools\shimgen.exe'
+    }
+
+    $ShimGen = [System.IO.Path]::GetFullPath($ShimGen)
+    Write-Debug "ShimGen found at `'$ShimGen`'"
+
+    Write-Debug "Calling $ShimGen $ShimGenArgs"
+
+    if (Test-Path ("$ShimGen")) {
+        #Start-Process "$ShimGen" -ArgumentList "$ShimGenArgs" -Wait -WindowStyle Hidden
+        $process = New-Object System.Diagnostics.Process
+        $process.StartInfo = New-Object System.Diagnostics.ProcessStartInfo($ShimGen, $ShimGenArgs)
+        $process.StartInfo.RedirectStandardOutput = $true
+        $process.StartInfo.RedirectStandardError = $true
+        $process.StartInfo.UseShellExecute = $false
+        $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+
+        $process.Start() | Out-Null
+        $process.WaitForExit()
+    }
+
+    if (Test-Path ($packageShimFileName)) {
+        Write-Host "Added $packageShimFileName shim pointed to `'$path`'."
+    }
+    else {
+        Write-Warning "An error occurred generating shim, using old method."
+
+        $path = "%DIR%$($path)"
+        $pathBash = $path.Replace("%DIR%..\", "`$DIR/../").Replace("\", "/")
+        Write-Host "Adding $packageBatchFileName and pointing to `'$path`'."
+        Write-Host "Adding $packageBashFileName and pointing to `'$path`'."
+        if ($useStart) {
+            Write-Host "Setting up $name as a non-command line application."
+            "@echo off
 SET DIR=%~dp0%
-start """" ""$path"" %*" | Out-File $packageBatchFileName -encoding ASCII
+start """" ""$path"" %*" | Out-File $packageBatchFileName -Encoding ASCII
 
-      $sw = New-Object IO.StreamWriter "$packageBashFileName"
-      $sw.Write("#!/bin/sh`nDIR=`${0%/*}`n""$pathBash"" ""`$@"" &`n")
-      $sw.Close()
-      $sw.Dispose()
-    } else {
+            $sw = New-Object IO.StreamWriter "$packageBashFileName"
+            $sw.Write("#!/bin/sh`nDIR=`${0%/*}`n""$pathBash"" ""`$@"" &`n")
+            $sw.Close()
+            $sw.Dispose()
+        }
+        else {
 
-"@echo off
+            "@echo off
 SET DIR=%~dp0%
 cmd /c """"$path"" %*""
-exit /b %ERRORLEVEL%" | Out-File $packageBatchFileName -encoding ASCII
+exit /b %ERRORLEVEL%" | Out-File $packageBatchFileName -Encoding ASCII
 
-      $sw = New-Object IO.StreamWriter "$packageBashFileName"
-      $sw.Write("#!/bin/sh`nDIR=`${0%/*}`n""$pathBash"" ""`$@""`nexit `$?`n")
-      $sw.Close()
-      $sw.Dispose()
-
+            $sw = New-Object IO.StreamWriter "$packageBashFileName"
+            $sw.Write("#!/bin/sh`nDIR=`${0%/*}`n""$pathBash"" ""`$@""`nexit `$?`n")
+            $sw.Close()
+            $sw.Dispose()
+        }
     }
-  }
 }
 
 Set-Alias Generate-BinFile Install-BinFile

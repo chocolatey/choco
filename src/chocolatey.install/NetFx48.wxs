@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) .NET Foundation and contributors. All rights reserved. Licensed under the
+Microsoft Reciprocal License. See LICENSE.TXT file in the project root for full license information. -->
+
+<!--
+This file is a part of
+https://github.com/wixtoolset/wix3/blob/a80818accbf6ee5681fa01bb1da538c7ae5a9b09/src/ext/NetFxExtension/wixlib/NetFx48.wxs
+which is licensed in the wix3 project under the Microsoft Reciprocal License (MS-RL). See
+https://github.com/wixtoolset/wix3/blob/a80818accbf6ee5681fa01bb1da538c7ae5a9b09/LICENSE.TXT
+This file can be removed, once a Wix version GREATER THAN v3.14.0.4118 ís used to build.
+-->
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <?define NetFx48MinRelease = 528040?>
+
+    <Fragment>
+        <PropertyRef Id="WIXNETFX4RELEASEINSTALLED" />
+        <Property Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" Secure="yes" />
+        <SetProperty Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" Value="1" After="AppSearch">
+            WIXNETFX4RELEASEINSTALLED >= "#$(var.NetFx48MinRelease)"
+        </SetProperty>
+    </Fragment>
+</Wix>

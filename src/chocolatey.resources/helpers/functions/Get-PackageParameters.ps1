@@ -21,7 +21,7 @@
 # used. However nearly all of the code is a different implementation.
 
 function Get-PackageParameters {
-<#
+    <#
 .SYNOPSIS
 Parses a string and returns a hash table array of those values for use
 in package scripts.
@@ -37,7 +37,7 @@ editions).
 Learn more about using this at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument
 
 .NOTES
-Available in 0.10.8+. If you need compatibility with older versions,
+If you need compatibility with older versions of Chocolatey,
 take a dependency on the `chocolatey-core.extension` package which
 also provides this functionality. If you are pushing to the community
 package repository (https://community.chocolatey.org/packages), you are required
@@ -67,8 +67,8 @@ compatibility with `chocolatey-core.extension`, use `:`.
 
 For example `-Parameters "/ITEM1:value /ITEM2:value with spaces"
 
-NOTE: In 0.10.9+, to maintain compatibility with the prior art of the
-chocolatey-core.extension method, quotes and apostrophes surrounding
+To maintain compatibility with the prior art of the chocolatey-core.extension
+function by the same name, quotes and apostrophes surrounding
 parameter values will be removed. When the param is used, those items
 can be added back if desired, but it's most important to ensure that
 existing packages are compatible on upgrade.
@@ -101,7 +101,6 @@ if (!$pp['LICENSE']) { $pp['LICENSE'] = '1234' }
 >
 $pp = Get-PackageParameters
 if (!$pp['UserName']) { $pp['UserName'] = "$env:UserName" }
-# Requires Chocolatey v0.10.8+ for Read-Host -AsSecureString
 if (!$pp['Password']) { $pp['Password'] = Read-Host "Enter password for $($pp['UserName']):" -AsSecureString}
 # fail the install/upgrade if not value is not determined
 if (!$pp['Password']) { throw "Package needs Password to install, that must be provided in params or in prompt." }
@@ -122,46 +121,54 @@ Install-ChocolateyInstallPackage
 .LINK
 Install-ChocolateyZipPackage
 #>
-param(
- [parameter(Mandatory=$false, Position=0)]
- [alias("params")][string] $parameters = '',
- [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param(
+        [parameter(Mandatory = $false, Position = 0)]
+        [alias("params")][string] $parameters = '',
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  $useDefaultParameters = $false
-  $loggingAllowed = $true
-  $paramStrings = @($parameters)
+    $useDefaultParameters = $false
+    $loggingAllowed = $true
+    $paramStrings = @($parameters)
 
-  if (!$parameters -or $parameters -eq '') {
-    $useDefaultParameters = $true
-    # if we are using default parameters, we are going to loop over two items
-    Write-Debug 'Parsing $env:ChocolateyPackageParameters and $env:ChocolateyPackageParametersSensitive for parameters'
-    $paramStrings = @("$env:ChocolateyPackageParameters","$env:ChocolateyPackageParametersSensitive")
-    if ($env:ChocolateyPackageParametersSensitive) {
-      Write-Debug "Sensitive parameters detected, no logging of parameters."
-      $loggingAllowed = $false
+    if (!$parameters -or $parameters -eq '') {
+        $useDefaultParameters = $true
+        # if we are using default parameters, we are going to loop over two items
+        Write-Debug 'Parsing $env:ChocolateyPackageParameters and $env:ChocolateyPackageParametersSensitive for parameters'
+        $paramStrings = @("$env:ChocolateyPackageParameters", "$env:ChocolateyPackageParametersSensitive")
+        if ($env:ChocolateyPackageParametersSensitive) {
+            Write-Debug "Sensitive parameters detected, no logging of parameters."
+            $loggingAllowed = $false
+        }
     }
-  }
 
-  $paramHash = @{}
+    $paramHash = @{}
 
-  foreach ($paramString in $paramStrings) {
-    if (!$paramString -or $paramString -eq '') { continue }
+    foreach ($paramString in $paramStrings) {
+        if (!$paramString -or $paramString -eq '') {
+            continue
+        }
 
-    Select-String '(?:^|\s+)\/(?<ItemKey>[^\:\=\s)]+)(?:(?:\:|=){1}(?:\''|\"){0,1}(?<ItemValue>.*?)(?:\''|\"){0,1}(?:(?=\s+\/)|$))?' -Input $paramString -AllMatches | ForEach-Object { $_.Matches } | ForEach-Object {
-      if (!$_) { continue } #Posh v2 issue?
-      $paramItemName = ($_.Groups["ItemKey"].Value).Trim()
-      $paramItemValue = ($_.Groups["ItemValue"].Value).Trim()
-      if (!$paramItemValue -or $paramItemValue -eq '') { $paramItemValue = $true }
+        Select-String '(?:^|\s+)\/(?<ItemKey>[^\:\=\s)]+)(?:(?:\:|=){1}(?:\''|\"){0,1}(?<ItemValue>.*?)(?:\''|\"){0,1}(?:(?=\s+\/)|$))?' -Input $paramString -AllMatches | ForEach-Object { $_.Matches } | ForEach-Object {
+            if (!$_) {
+                continue
+            } #Posh v2 issue?
+            $paramItemName = ($_.Groups["ItemKey"].Value).Trim()
+            $paramItemValue = ($_.Groups["ItemValue"].Value).Trim()
+            if (!$paramItemValue -or $paramItemValue -eq '') {
+                $paramItemValue = $true
+            }
 
-      if ($loggingAllowed) { Write-Debug "Adding package param '$paramItemName'='$paramItemValue'" }
-      $paramHash[$paramItemName] = $paramItemValue
+            if ($loggingAllowed) {
+                Write-Debug "Adding package param '$paramItemName'='$paramItemValue'"
+            }
+            $paramHash[$paramItemName] = $paramItemValue
+        }
     }
-  }
 
-  $paramHash
+    $paramHash
 }
 
 # override Get-PackageParameters in chocolatey-core.extension package

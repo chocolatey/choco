@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,30 +27,42 @@ namespace chocolatey.infrastructure.app.commands
     using services;
 
     [CommandFor("uninstall", "uninstalls a package")]
-    public class ChocolateyUninstallCommand : ICommand
+    public class ChocolateyUninstallCommand : ChocolateyCommandBase, ICommand
     {
         private readonly IChocolateyPackageService _packageService;
+
+        private readonly string[] _removedOptions = new[]
+        {
+            "-m",
+            "-sxs",
+            "--sidebyside",
+            "--side-by-side",
+            "--allowmultiple",
+            "--allow-multiple",
+            "--allowmultipleversions",
+            "--allow-multiple-versions",
+        };
 
         public ChocolateyUninstallCommand(IChocolateyPackageService packageService)
         {
             _packageService = packageService;
         }
 
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("s=|source=",
-                     "Source - The source to find the package(s) to install. Special sources include: ruby, webpi, cygwin, windowsfeatures, and python. Defaults to default feeds.",
-                     option => configuration.Sources = option.remove_surrounding_quotes())
+                     "Source - The source to find the package(s) to install. Special sources include: ruby, cygwin, windowsfeatures, and python. Defaults to default feeds.",
+                     option => configuration.Sources = option.UnquoteSafe())
                 .Add("version=",
                      "Version - A specific version to uninstall. Defaults to unspecified.",
-                     option => configuration.Version = option.remove_surrounding_quotes())
+                     option => configuration.Version = option.UnquoteSafe())
                 .Add("a|allversions|all-versions",
                      "AllVersions - Uninstall all versions? Defaults to false.",
                      option => configuration.AllVersions = option != null)
                 .Add("ua=|uninstallargs=|uninstallarguments=|uninstall-arguments=",
                      "UninstallArguments - Uninstall Arguments to pass to the native installer in the package. Defaults to unspecified.",
-                     option => configuration.InstallArguments = option.remove_surrounding_quotes())
+                     option => configuration.InstallArguments = option.UnquoteSafe())
                 .Add("o|override|overrideargs|overridearguments|override-arguments",
                      "OverrideArguments - Should uninstall arguments be used exclusively without appending to current package passed arguments? Defaults to false.",
                      option => configuration.OverrideArguments = option != null)
@@ -59,16 +71,13 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.NotSilent = option != null)
                 .Add("params=|parameters=|pkgparameters=|packageparameters=|package-parameters=",
                      "PackageParameters - Parameters to pass to the package. Defaults to unspecified.",
-                     option => configuration.PackageParameters = option.remove_surrounding_quotes())
+                     option => configuration.PackageParameters = option.UnquoteSafe())
                 .Add("argsglobal|args-global|installargsglobal|install-args-global|applyargstodependencies|apply-args-to-dependencies|apply-install-arguments-to-dependencies",
                      "Apply Install Arguments To Dependencies  - Should install arguments be applied to dependent packages? Defaults to false.",
                      option => configuration.ApplyInstallArgumentsToDependencies = option != null)
                 .Add("paramsglobal|params-global|packageparametersglobal|package-parameters-global|applyparamstodependencies|apply-params-to-dependencies|apply-package-parameters-to-dependencies",
                      "Apply Package Parameters To Dependencies  - Should package parameters be applied to dependent packages? Defaults to false.",
                      option => configuration.ApplyPackageParametersToDependencies = option != null)
-                .Add("m|sxs|sidebyside|side-by-side|allowmultiple|allow-multiple|allowmultipleversions|allow-multiple-versions",
-                     "AllowMultipleVersions - Should multiple versions of a package be installed? Defaults to false. (DEPRECATED)",
-                     option => configuration.AllowMultipleVersions = option != null)
                 .Add("x|forcedependencies|force-dependencies|removedependencies|remove-dependencies",
                      "RemoveDependencies - Uninstall dependencies when uninstalling package(s). Defaults to false.",
                      option => configuration.ForceDependencies = option != null)
@@ -76,7 +85,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Skip PowerShell - Do not run chocolateyUninstall.ps1. Defaults to false.",
                      option => configuration.SkipPackageInstallProvider = option != null)
                 .Add("ignorepackagecodes|ignorepackageexitcodes|ignore-package-codes|ignore-package-exit-codes",
-                     "IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-success, no matter what package scripts provide for exit codes. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
+                     "IgnorePackageExitCodes - Exit with a 0 for success and 1 for non-success, no matter what package scripts provide for exit codes. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.ToStringSafe()),
                      option =>
                      {
                          if (option != null)
@@ -85,15 +94,15 @@ namespace chocolatey.infrastructure.app.commands
                          }
                      })
                  .Add("usepackagecodes|usepackageexitcodes|use-package-codes|use-package-exit-codes",
-                     "UsePackageExitCodes - Package scripts can provide exit codes. Use those for choco's exit code when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.to_string()),
+                     "UsePackageExitCodes - Package scripts can provide exit codes. Use those for choco's exit code when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, configuration.Features.UsePackageExitCodes.ToStringSafe()),
                      option => configuration.Features.UsePackageExitCodes = option != null
                      )
                  .Add("autouninstaller|use-autouninstaller",
-                     "UseAutoUninstaller - Use auto uninstaller service when uninstalling. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.AutoUninstaller, configuration.Features.AutoUninstaller.to_string()),
+                     "UseAutoUninstaller - Use auto uninstaller service when uninstalling. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.AutoUninstaller, configuration.Features.AutoUninstaller.ToStringSafe()),
                      option => configuration.Features.AutoUninstaller = option != null
                      )
                  .Add("skipautouninstaller|skip-autouninstaller",
-                     "SkipAutoUninstaller - Skip auto uninstaller service when uninstalling. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.AutoUninstaller, configuration.Features.AutoUninstaller.to_string()),
+                     "SkipAutoUninstaller - Skip auto uninstaller service when uninstalling. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.AutoUninstaller, configuration.Features.AutoUninstaller.ToStringSafe()),
                      option =>
                      {
                          if (option != null)
@@ -102,11 +111,11 @@ namespace chocolatey.infrastructure.app.commands
                          }
                      })
                  .Add("failonautouninstaller|fail-on-autouninstaller",
-                     "FailOnAutoUninstaller - Fail the package uninstall if the auto uninstaller reports and error. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.FailOnAutoUninstaller, configuration.Features.FailOnAutoUninstaller.to_string()),
+                     "FailOnAutoUninstaller - Fail the package uninstall if the auto uninstaller reports and error. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.FailOnAutoUninstaller, configuration.Features.FailOnAutoUninstaller.ToStringSafe()),
                      option => configuration.Features.FailOnAutoUninstaller = option != null
                      )
                  .Add("ignoreautouninstallerfailure|ignore-autouninstaller-failure",
-                     "Ignore Auto Uninstaller Failure - Do not fail the package if auto uninstaller reports an error. Overrides the default feature '{0}' set to '{1}'. Available in 0.9.10+.".format_with(ApplicationParameters.Features.FailOnAutoUninstaller, configuration.Features.FailOnAutoUninstaller.to_string()),
+                     "Ignore Auto Uninstaller Failure - Do not fail the package if auto uninstaller reports an error. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.FailOnAutoUninstaller, configuration.Features.FailOnAutoUninstaller.ToStringSafe()),
                      option =>
                      {
                          if (option != null)
@@ -115,17 +124,17 @@ namespace chocolatey.infrastructure.app.commands
                          }
                      })
                  .Add("stoponfirstfailure|stop-on-first-failure|stop-on-first-package-failure",
-                     "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.4+.".format_with(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.to_string()),
+                     "Stop On First Package Failure - stop running install, upgrade or uninstall on first package failure instead of continuing with others. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.StopOnFirstPackageFailure, configuration.Features.StopOnFirstPackageFailure.ToStringSafe()),
                      option => configuration.Features.StopOnFirstPackageFailure = option != null
                      )
                  .Add("exitwhenrebootdetected|exit-when-reboot-detected",
-                     "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}.  Overrides the default feature '{3}' set to '{4}'.  Available in 0.10.12+.".format_with
-                         (ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend, ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
+                     "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}.  Overrides the default feature '{3}' set to '{4}'.".FormatWith
+                         (ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend, ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.ToStringSafe()),
                      option => configuration.Features.ExitOnRebootDetected = option != null
                      )
                  .Add("ignoredetectedreboot|ignore-detected-reboot",
-                     "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'.  Available in 0.10.12+.".format_with
-                         (ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.to_string()),
+                     "Ignore Detected Reboot - Ignore any detected reboots if found. Overrides the default feature '{0}' set to '{1}'.".FormatWith
+                         (ApplicationParameters.Features.ExitOnRebootDetected, configuration.Features.ExitOnRebootDetected.ToStringSafe()),
                      option =>
                      {
                          if (option != null)
@@ -140,13 +149,18 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
-            configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.to_string(), unparsedArguments.Where(arg => !arg.StartsWith("-")));
+            configuration.PackageNames = string.Join(ApplicationParameters.PackageNamesSeparator.ToStringSafe(), unparsedArguments.Where(arg => !arg.StartsWith("-")));
+
+            if (configuration.RegularOutput)
+            {
+                WarnForRemovedOptions(unparsedArguments.Where(arg => arg.StartsWith("-")), _removedOptions);
+            }
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.PackageNames))
             {
@@ -154,18 +168,13 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Uninstall Command");
             this.Log().Info(@"
 Uninstalls a package or a list of packages.
 
-NOTE: 100% compatible with older chocolatey client (0.9.8.32 and below)
- with options and switches. Add `-y` for previous behavior with no
- prompt. In most cases you can still pass options and switches with one
- dash (`-`). For more details, see the command reference (`choco -?`).
-
-Choco 0.9.9+ automatically tracks registry changes for ""Programs and
+Chocolatey automatically tracks registry changes for ""Programs and
  Features"" of the underlying software's native installers when
  installing packages. The ""Automatic Uninstaller"" (auto uninstaller)
  service is a feature that can use that information to automatically
@@ -190,11 +199,6 @@ NOTE: A package with a failing uninstall can be removed with the
 `-n --skipautouninstaller` flags. This will remove the package from
 chocolatey without attempting to uninstall the program.
 
-NOTE: Starting in 0.9.10+, the Automatic Uninstaller (AutoUninstaller)
- is turned on by default. To turn it off, run the following command:
-
-    choco feature disable -n autoUninstaller
-
 NOTE: Chocolatey Pro / Business automatically synchronizes with
  Programs and Features, ensuring manually removed apps are
  automatically removed from Chocolatey's repository.
@@ -207,21 +211,9 @@ NOTE: Synchronizer and AutoUninstaller enhancements in licensed
  to determine how to automatically uninstall software.
 ");
 
-            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-            "chocolatey".Log().Warn(@"
-Starting in v2.0.0 the shortcut `cuninst` will be removed and can not be used
-to uninstall packages anymore. We recommend you make sure that you always
-use the full command going forward (`choco uninstall`).
-
-Side by side installations has been deprecated and support for uninstalling such packages will be removed in v2.0.0.
-Instead of using side by side installations, distinct packages should be created
-if similar functionality is needed going forward.
-");
-
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
     choco uninstall <pkg|all> [pkg2 pkgN] [options/switches]
-    cuninst <pkg|all> [pkg2 pkgN] [options/switches] (DEPRECATED, will be removed in v2.0.0)
 
 NOTE: `all` is a special package keyword that will allow you to
  uninstall all packages.
@@ -263,7 +255,7 @@ Package Exit Codes:
 
 In addition to normal exit codes, packages are allowed to exit
  with their own codes when the feature '{0}' is
- turned on. Available in v0.9.10+.
+ turned on.
 
 Reboot Exit Codes:
  - 350: pending reboot detected, no action has occurred
@@ -272,8 +264,7 @@ Reboot Exit Codes:
 In addition to the above exit codes, you may also see reboot exit codes
  when the feature '{1}' is turned on. It typically requires
  the feature '{0}' to also be turned on to work properly.
- Available in v0.10.12+.
-".format_with(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
+".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
             "chocolatey".Log().Info(@"
@@ -285,20 +276,49 @@ NOTE: Options and switches apply to all items passed, so if you are
 ");
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
-            _packageService.uninstall_noop(configuration);
+            _packageService.UninstallDryRun(configuration);
         }
 
-        public virtual void run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
-            _packageService.ensure_source_app_installed(configuration);
-            _packageService.uninstall_run(configuration);
+            _packageService.Uninstall(configuration);
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
             return true;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+#pragma warning restore IDE1006
     }
 }

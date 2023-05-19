@@ -24,7 +24,7 @@ namespace chocolatey.infrastructure.information
         public ExtensionInformation(IAssembly assembly)
         {
             Name = assembly.GetName().Name;
-            Version = VersionInformation.get_current_informational_version(assembly);
+            Version = VersionInformation.GetCurrentInformationalVersion(assembly);
             Status = ExtensionStatus.Unknown;
         }
 
@@ -57,7 +57,7 @@ namespace chocolatey.infrastructure.information
 
         public override string ToString()
         {
-            return "{0} v{1}".format_with(Name, Version);
+            return "{0} v{1}".FormatWith(Name, Version);
         }
     }
 

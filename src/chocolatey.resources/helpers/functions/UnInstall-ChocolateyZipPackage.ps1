@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Uninstall-ChocolateyZipPackage {
-<#
+    <#
 .SYNOPSIS
 Uninstalls a previous installed zip package, may not be necessary.
 
@@ -55,30 +55,30 @@ Install-ChocolateyZipPackage
 .LINK
 Uninstall-ChocolateyPackage
 #>
-param(
-  [parameter(Mandatory=$true, Position=0)][string] $packageName,
-  [parameter(Mandatory=$true, Position=1)][string] $zipFileName,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param(
+        [parameter(Mandatory = $true, Position = 0)][string] $packageName,
+        [parameter(Mandatory = $true, Position = 1)][string] $zipFileName,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  $packagelibPath=$env:chocolateyPackageFolder
-  $zipContentFile=(join-path $packagelibPath $zipFileName) + "Install.txt"
+    $packagelibPath = $env:chocolateyPackageFolder
+    $zipContentFile = (Join-Path $packagelibPath $zipFileName) + "Install.txt"
 
-  # The Zip Content File may have previously existed under a different
-  # name.  If *Install.txt doesn't exist, check for the old name
-  if(-Not (Test-Path -Path $zipContentFile)) {
-    $zipContentFile=(Join-Path $packagelibPath -ChildPath $zipFileName) + ".txt"
-  }
-
-  if ((Test-Path -path $zipContentFile)) {
-    $zipContentFile
-    $zipContents=get-content $zipContentFile
-    foreach ($fileInZip in $zipContents) {
-      if ($fileInZip -ne $null -and $fileInZip.Trim() -ne '') {
-        Remove-Item -Path "$fileInZip" -ErrorAction SilentlyContinue -Recurse -Force
-      }
+    # The Zip Content File may have previously existed under a different
+    # name.  If *Install.txt doesn't exist, check for the old name
+    if (-Not (Test-Path -Path $zipContentFile)) {
+        $zipContentFile = (Join-Path $packagelibPath -ChildPath $zipFileName) + ".txt"
     }
-  }
+
+    if ((Test-Path -Path $zipContentFile)) {
+        $zipContentFile
+        $zipContents = Get-Content $zipContentFile
+        foreach ($fileInZip in $zipContents) {
+            if ($fileInZip -ne $null -and $fileInZip.Trim() -ne '') {
+                Remove-Item -Path "$fileInZip" -ErrorAction SilentlyContinue -Recurse -Force
+            }
+        }
+    }
 }

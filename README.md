@@ -3,9 +3,9 @@ You can just call me choco.
 
 ![Chocolatey Logo](https://rawcdn.githack.com/chocolatey/choco/14a627932c78c8baaba6bef5f749ebfa1957d28d/docs/logo/chocolateyicon.gif "Chocolatey")
 
-[![](https://img.shields.io/chocolatey/dt/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey) 
-[![](https://img.shields.io/chocolatey/v/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey) 
-[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/chocolatey/choco?label=docker&logo=docker&sort=semver)](https://hub.docker.com/r/chocolatey/choco) 
+[![](https://img.shields.io/chocolatey/dt/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey)
+[![](https://img.shields.io/chocolatey/v/chocolatey.svg)](https://community.chocolatey.org/packages/chocolatey)
+[![Docker Image Version (latest semver)](https://img.shields.io/docker/v/chocolatey/choco?label=docker&logo=docker&sort=semver)](https://hub.docker.com/r/chocolatey/choco)
 [![Project Stats](https://www.openhub.net/p/chocolatey/widgets/project_thin_badge.gif)](https://www.openhub.net/p/chocolatey)
 [![Coverage Status](https://coveralls.io/repos/github/chocolatey/choco/badge.svg?branch=develop)](https://coveralls.io/github/chocolatey/choco?branch=develop)
 
@@ -75,9 +75,11 @@ Please see the [docs](https://docs.chocolatey.org/en-us/)
 Give `choco.exe -?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
 
 ### Requirements
-* .NET Framework 4.0+
+
+* .NET Framework 4.8+
 * PowerShell 2.0+
-* Windows Server 2003+ / Windows 7+
+* Windows Server 2008 R2+ / Windows 10+
+  - See our documentation on the [support lifecycle and supported operating systems](https://docs.chocolatey.org/en-us/information/support-lifecycle) for additional information
 
 ### License / Credits
 Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.
@@ -88,7 +90,7 @@ Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICEN
  * If you are having issue with a package, please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process).
  * If you are looking for packages to be added to the community feed (aka https://community.chocolatey.org/packages), please see [Package Requests](https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process#package-request-package-missing).
 
- 1. Start with [Troubleshooting](https://github.com/chocolatey/choco/wiki/Troubleshooting) and the [FAQ](https://github.com/chocolatey/choco/wiki/ChocolateyFAQs) to see if your question or issue already has an answer.
+ 1. Start with [Troubleshooting](https://docs.chocolatey.org/en-us/troubleshooting) and the [FAQ](https://docs.chocolatey.org/en-us/faqs) to see if your question or issue already has an answer.
  1. If not found or resolved, please follow one of the following avenues:
     * If you are a licensed customer, please see [support](https://chocolatey.org/support). You can also log an issue to [Licensed Issues](https://github.com/chocolatey/chocolatey-licensed-issues) and we will submit issues to all other places on your behalf. Another avenue is to use email support to have us submit tickets and other avenues on your behalf (allowing you to maintain privacy).
     * If it is an enhancement request or issue with the website (the community package repository aka [https://community.chocolatey.org](https://community.chocolatey.org)), please submit the issue to the [Chocolatey.org repo](https://github.com/chocolatey/home).
@@ -108,7 +110,7 @@ Prerequisites:
 Submitting a ticket:
 
  * We'll need debug and verbose output, so please run and capture the log with `-dv` or `--debug --verbose`. You can submit that with the issue or create a gist and link it.
- * **Please note** that the debug/verbose output for some commands may have sensitive data (passwords or apiKeys) related to Chocolatey, so please remove those if they are there prior to submitting the issue.
+ * **Please note** that the debug/verbose output for some commands may have sensitive data (passwords or API keys) related to Chocolatey, so please remove those if they are there prior to submitting the issue.
  * choco.exe logs to a file in `$env:ChocolateyInstall\log\`. You can grab the specific log output from there so you don't have to capture or redirect screen output. Please limit the amount included to just the command run (the log is appended to with every command).
  * Please save the log output in a [gist](https://gist.github.com) (save the file as `log.sh`) and link to the gist from the issue. Feel free to create it as secret so it doesn't fill up against your public gists. Anyone with a direct link can still get to secret gists. If you accidentally include secret information in your gist, please delete it and create a new one (gist history can be seen by anyone) and update the link in the ticket (issue history is not retained except by email - deleting the gist ensures that no one can get to it). Using gists this way also keeps accidental secrets from being shared in the ticket in the first place as well.
  * We'll need the entire log output from the run, so please don't limit it down to areas you feel are relevant. You may miss some important details we'll need to know. This will help expedite issue triage.
@@ -127,9 +129,8 @@ There is a `build.bat`/`build.sh` file that creates a necessary generated file n
 #### Windows
 Prerequisites:
 
- * .NET Framework 3.5 (This is a windows feature installation).
- * .NET Framework 4+
- * Visual Studio is helpful for working on source.
+ * .NET Framework 4.8+
+ * Visual Studio 2019+
  * ReSharper is immensely helpful (and there is a `.sln.DotSettings` file to help with code conventions).
 
 Build Process:
@@ -141,35 +142,18 @@ Running the build on Windows should produce an artifact that is tested and ready
 #### Other Platforms
 ##### Prerequisites:
 
- * Install and configure Mono. Mono 5.20 or newer should work, see the Dockerfile for the currently recommended version.
-  * [Debian based](https://www.mono-project.com/docs/getting-started/install/linux/#debian-ubuntu-and-derivatives)
+ * Install and configure Mono. Mono 6.6 or newer should work, see `docker/Dockerfile.linux` for the currently recommended version of Mono.
+    * Linux systems; see [Mono install instructions for Linux](https://www.mono-project.com/download/stable/#download-lin)
+    * Mac systems; see [Mono install instructions for Mac](https://www.mono-project.com/download/stable/#download-mac)
+ * Install .NET 6.0 SDK or newer. This is used in the build scripts.
+    * Linux systems; see [Install .NET on Linux](https://learn.microsoft.com/en-us/dotnet/core/install/linux)
+    * Mac systems; see [Install .NET on macOS](https://learn.microsoft.com/en-us/dotnet/core/install/macos)
+    * This is required for some Dotnet Global Tools used during the Cake build. The .NET Frameworks equivalent builds do not work on Mono.
+ * If building from Git, then having Git 2.22+ installed is required.
+ * MonoDevelop is helpful for working on source.
 
-```sh
-# install prerequisites
-sudo apt install apt-transport-https dirmngr gnupg ca-certificates
-# add the key
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+##### Before building:
 
-# add the package repository
-# Debian 10
-echo "deb https://download.mono-project.com/repo/debian stable-buster main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-# Debian 9
-echo "deb https://download.mono-project.com/repo/debian stable-stretch main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-#Ubuntu 20.04
-echo "deb https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-# Ubuntu 18.04
-echo "deb https://download.mono-project.com/repo/ubuntu stable-bionic main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-# Ubuntu 16.04
-echo "deb https://download.mono-project.com/repo/ubuntu stable-xenial main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-
-# update package indexes
-sudo apt-get update
-# install
-sudo apt-get install mono-devel -y
-```
-
- * Other Linux systems; see [Mono install instructions for Linux](https://www.mono-project.com/download/stable/#download-lin)
- * Xamarin Studio is helpful for working on source.
  * Consider adding the following to your `~/.profile` (or other relevant dot source file):
 
 ```sh

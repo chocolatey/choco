@@ -14,7 +14,7 @@
 # limitations under the License.
 
 function Get-ToolsLocation {
-<#
+    <#
 .SYNOPSIS
 Gets the top level location for tools/software installed outside of
 package folders.
@@ -30,10 +30,6 @@ into the same directory as the tool. Having that all combined in the
 same package directory could get tricky.
 
 .NOTES
-This is the successor to the poorly named `Get-BinRoot`. Available as
-`Get-ToolsLocation` in 0.9.10+. The Alias `Get-BinRoot` will be removed
-in version 2.0.0.
-
 Sets an environment variable called `ChocolateyToolsLocation`. If the
 older `ChocolateyBinRoot` is set, it uses the value from that and
 removes the older variable.
@@ -45,53 +41,50 @@ None
 None
 #>
 
-  $invocation = $MyInvocation
-  Write-FunctionCallLogMessage -Invocation $invocation -Parameters $PSBoundParameters
+    $invocation = $MyInvocation
+    Write-FunctionCallLogMessage -Invocation $invocation -Parameters $PSBoundParameters
 
-  if ($invocation -ne $null -and $invocation.InvocationName -ne $null -and $invocation.InvocationName.ToLower() -eq 'get-binroot') {
-    Write-Warning "Get-BinRoot was deprecated in v1 and will be removed in v2. It has been replaced with Get-ToolsLocation (starting with v0.9.10), however many packages no longer require a special separate directory since package folders no longer have versions on them. Some do though and should continue to use Get-ToolsLocation."
-  }
+    $toolsLocation = $env:ChocolateyToolsLocation
 
-  $toolsLocation = $env:ChocolateyToolsLocation
+    if ($toolsLocation -eq $null) {
+        $binRoot = $env:ChocolateyBinRoot
+        $olderRoot = $env:chocolatey_bin_root
 
-  if ($toolsLocation -eq $null) {
-    $binRoot = $env:ChocolateyBinRoot
-    $olderRoot = $env:chocolatey_bin_root
-
-    if ($binRoot -eq $null -and $olderRoot -eq $null) {
-      $toolsLocation = Join-Path $env:systemdrive 'tools'
-    } else {
-      if ($olderRoot -ne $null) {
-        if ($binRoot -eq $null) {
-          $binRoot = $olderRoot
+        if ($binRoot -eq $null -and $olderRoot -eq $null) {
+            $toolsLocation = Join-Path $env:systemdrive 'tools'
         }
-        Set-EnvironmentVariable -Name "chocolatey_bin_root" -Value '' -Scope User -ErrorAction SilentlyContinue
-      }
+        else {
+            if ($olderRoot -ne $null) {
+                if ($binRoot -eq $null) {
+                    $binRoot = $olderRoot
+                }
+                Set-EnvironmentVariable -Name "chocolatey_bin_root" -Value '' -Scope User -ErrorAction SilentlyContinue
+            }
 
-      $toolsLocation = $binRoot
-      Set-EnvironmentVariable -Name "ChocolateyBinRoot" -Value '' -Scope User -ErrorAction SilentlyContinue
+            $toolsLocation = $binRoot
+            Set-EnvironmentVariable -Name "ChocolateyBinRoot" -Value '' -Scope User -ErrorAction SilentlyContinue
+        }
     }
-  }
 
-  # Add a drive letter if one doesn't exist
-  if (-not($toolsLocation -imatch "^\w:")) {
-    $toolsLocation = Join-Path $env:systemdrive $toolsLocation
-  }
-
-  if (-not($env:ChocolateyToolsLocation -eq $toolsLocation)) {
-    try {
-      Set-EnvironmentVariable -Name "ChocolateyToolsLocation" -Value $toolsLocation -Scope User
-    } catch {
-      if (Test-ProcessAdminRights) {
-        # sometimes User scope may not exist (such as with core)
-        Set-EnvironmentVariable -Name "ChocolateyToolsLocation" -Value $toolsLocation -Scope Machine
-      } else {
-        throw $_.Exception
-      }
+    # Add a drive letter if one doesn't exist
+    if (-not($toolsLocation -imatch "^\w:")) {
+        $toolsLocation = Join-Path $env:systemdrive $toolsLocation
     }
-  }
 
-  return $toolsLocation
+    if (-not($env:ChocolateyToolsLocation -eq $toolsLocation)) {
+        try {
+            Set-EnvironmentVariable -Name "ChocolateyToolsLocation" -Value $toolsLocation -Scope User
+        }
+        catch {
+            if (Test-ProcessAdminRights) {
+                # sometimes User scope may not exist (such as with core)
+                Set-EnvironmentVariable -Name "ChocolateyToolsLocation" -Value $toolsLocation -Scope Machine
+            }
+            else {
+                throw $_.Exception
+            }
+        }
+    }
+
+    return $toolsLocation
 }
-
-Set-Alias Get-BinRoot Get-ToolsLocation -Force -Scope Global -Option AllScope

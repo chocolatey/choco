@@ -15,7 +15,7 @@
 # limitations under the License.
 
 Function Format-FileSize {
-<#
+    <#
 .SYNOPSIS
 DO NOT USE. Not part of the public API.
 
@@ -23,8 +23,6 @@ DO NOT USE. Not part of the public API.
 Formats file size into a human readable format.
 
 .NOTES
-Available in 0.9.10+.
-
 This function is not part of the API.
 
 .INPUTS
@@ -46,19 +44,19 @@ Format-FileSize -Size $fileSizeBytes
 .LINK
 Get-WebFile
 #>
-param (
-  [Parameter(Mandatory=$true, Position=0)][double] $size,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param (
+        [Parameter(Mandatory = $true, Position = 0)][double] $size,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  # Do not log function call, it interrupts the single line download progress output.
+    # Do not log function call, it interrupts the single line download progress output.
 
-  Foreach ($unit in @('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB')) {
-    If ($size -lt 1024) {
-      return [string]::Format("{0:0.##} {1}", $size, $unit)
+    Foreach ($unit in @('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB')) {
+        If ($size -lt 1024) {
+            return [string]::Format("{0:0.##} {1}", $size, $unit)
+        }
+        $size /= 1024
     }
-    $size /= 1024
-  }
 
-  return [string]::Format("{0:0.##} YB", $size)
+    return [string]::Format("{0:0.##} YB", $size)
 }

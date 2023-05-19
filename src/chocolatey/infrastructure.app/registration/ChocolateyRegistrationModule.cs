@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2023 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,56 +26,79 @@ namespace chocolatey.infrastructure.app.registration
     using chocolatey.infrastructure.services;
     using chocolatey.infrastructure.tasks;
     using chocolatey.infrastructure.validations;
-    using NuGet;
     using CryptoHashProvider = cryptography.CryptoHashProvider;
     using IFileSystem = filesystem.IFileSystem;
     using IHashProvider = cryptography.IHashProvider;
+    using NuGet.Common;
+    using NuGet.PackageManagement;
+    using NuGet.Packaging;
+    using chocolatey.infrastructure.rules;
+    using chocolatey.infrastructure.app.rules;
+    using System.Linq;
+    using System;
+    using System.Security.AccessControl;
 
     internal class ChocolateyRegistrationModule : IExtensionModule
     {
-        public void register_dependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration)
+        public void RegisterDependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration)
         {
             // Should be replaced by a extension registration instead of a full configuration
             // Which would be possible to override by any extension, which we most likely do
             // not want in the long run.
-            registrator.register_service<IXmlService, XmlService>();
-            registrator.register_service<IDateTimeService, SystemDateTimeUtcService>();
+            registrator.RegisterService<IXmlService, XmlService>();
+            registrator.RegisterService<IDateTimeService, SystemDateTimeUtcService>();
 
             //nuget
-            registrator.register_service<ILogger, ChocolateyNugetLogger>();
-            registrator.register_service<INugetService, NugetService>();
-            registrator.register_service<IPackageDownloader, PackageDownloader>();
-            registrator.register_service<IPowershellService, PowershellService>();
-            registrator.register_service<IChocolateyPackageInformationService, ChocolateyPackageInformationService>();
-            registrator.register_service<IShimGenerationService, ShimGenerationService>();
-            registrator.register_service<IRegistryService, RegistryService>();
-            registrator.register_service<IPendingRebootService, PendingRebootService>();
-            registrator.register_service<IFilesService, FilesService>();
-            registrator.register_service<IConfigTransformService, ConfigTransformService>();
-            registrator.register_instance<IHashProvider, CryptoHashProvider>((resolver) => new CryptoHashProvider(resolver.resolve<IFileSystem>()));
-            registrator.register_service<ITemplateService, TemplateService>();
-            registrator.register_service<IChocolateyConfigSettingsService, ChocolateyConfigSettingsService>();
-            registrator.register_service<IChocolateyPackageService, ChocolateyPackageService>();
-            registrator.register_service<IAutomaticUninstallerService, AutomaticUninstallerService>();
-            registrator.register_service<ICommandExecutor, CommandExecutor>();
-            registrator.register_instance(() => new adapters.CustomString(string.Empty));
+            registrator.RegisterService<ILogger, ChocolateyNugetLogger>();
+            registrator.RegisterService<INugetService, NugetService>();
+            //registrator.register_service<IPackageDownloader, PackageDownloader>();
+            registrator.RegisterService<IPowershellService, PowershellService>();
+            registrator.RegisterService<IChocolateyPackageInformationService, ChocolateyPackageInformationService>();
+            registrator.RegisterService<IShimGenerationService, ShimGenerationService>();
+            registrator.RegisterService<IRegistryService, RegistryService>();
+            registrator.RegisterService<IPendingRebootService, PendingRebootService>();
+            registrator.RegisterService<IFilesService, FilesService>();
+            registrator.RegisterService<IConfigTransformService, ConfigTransformService>();
+            registrator.RegisterInstance<IHashProvider, CryptoHashProvider>((resolver) => new CryptoHashProvider(resolver.Resolve<IFileSystem>()));
+            registrator.RegisterService<ITemplateService, TemplateService>();
+            registrator.RegisterService<IChocolateyConfigSettingsService, ChocolateyConfigSettingsService>();
+            registrator.RegisterService<IChocolateyPackageService, ChocolateyPackageService>();
+            registrator.RegisterService<IAutomaticUninstallerService, AutomaticUninstallerService>();
+            registrator.RegisterService<ICommandExecutor, CommandExecutor>();
+            registrator.RegisterInstance(() => new adapters.CustomString(string.Empty));
 
-            registrator.register_service<ISourceRunner>(
-                typeof(INugetService),
-                typeof(WebPiService),
-                typeof(WindowsFeatureService),
-                typeof(CygwinService),
-                typeof(PythonService),
-                typeof(RubyGemsService));
+            registrator.RegisterSourceRunner<WindowsFeatureService>();
+            registrator.RegisterSourceRunner<CygwinService>();
+            registrator.RegisterSourceRunner<PythonService>();
+            registrator.RegisterSourceRunner<RubyGemsService>();
 
-            registrator.register_service<IEventSubscriptionManagerService, EventSubscriptionManagerService>();
+            registrator.RegisterService<ISourceRunner>(
+                typeof(INugetService));
 
-            registrator.register_service<ITask>(
+            registrator.RegisterService<IEventSubscriptionManagerService, EventSubscriptionManagerService>();
+
+            registrator.RegisterService<ITask>(
                 typeof(RemovePendingPackagesTask));
 
-            registrator.register_service<IValidation>(
+            registrator.RegisterService<IValidation>(
                 typeof(GlobalConfigurationValidation),
                 typeof(SystemStateValidation));
+
+            // Rule registrations
+            registrator.RegisterService<IRuleService, RuleService>();
+
+            var availableRules = GetType().Assembly
+                .GetTypes()
+                .Where(t => !t.IsInterface && !t.IsAbstract && typeof(IMetadataRule).IsAssignableFrom(t))
+                .ToArray();
+
+            registrator.RegisterService<IMetadataRule>(availableRules);
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_dependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration)
+            => RegisterDependencies(registrator, configuration);
+#pragma warning restore IDE1006
     }
 }

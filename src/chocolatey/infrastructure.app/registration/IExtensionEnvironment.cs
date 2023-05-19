@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.registration
 {
+    using System;
     using System.Collections.Generic;
     using chocolatey.infrastructure.app.configuration;
 
@@ -25,11 +26,16 @@ namespace chocolatey.infrastructure.app.registration
     public interface IExtensionEnvironment
     {
         /// <summary>
-        /// Returns all of the availabe configuration values that are related to the implementing Chocolatey extension.
+        /// Returns all of the available configuration values that are related to the implementing Chocolatey extension.
         /// </summary>
         /// <param name="config">The configuration used for the entire chocolatey ecosystem.</param>
         /// <returns>The configuration values that needs to be set as environment variables.</returns>
         /// <remarks>This is not used, and is only a placeholder for the future.</remarks>
+        IDictionary<string, string> GetEnvironmentConfiguration(ChocolateyConfiguration config);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         IDictionary<string, string> get_environment_configuration(ChocolateyConfiguration config);
+#pragma warning restore IDE1006
     }
 }

@@ -8,9 +8,9 @@
     [OutputType([boolean])]
     param(
         [Parameter(Mandatory)]
-        [NuGet.Versioning.SemanticVersion]$InstalledVersion,
+        [NuGet.Versioning.NuGetVersion]$InstalledVersion,
         [Parameter(Mandatory)]
-        [NuGet.Versioning.SemanticVersion]$CompareVersion
+        [NuGet.Versioning.NuGetVersion]$CompareVersion
     )
 
     if ($installedVersion -gt $CompareVersion) {

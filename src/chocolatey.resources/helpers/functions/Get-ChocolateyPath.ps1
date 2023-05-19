@@ -14,7 +14,7 @@
 # limitations under the License.
 
 function Get-ChocolateyPath {
-<#
+    <#
 .SYNOPSIS
 Retrieve the paths available to be used by maintainers of packages.
 
@@ -46,7 +46,7 @@ Allows splatting with arguments that do not apply. Do not use directly.
 $path = Get-ChocolateyPath -PathType 'PackagePath'
 #>
     param(
-        [parameter(Mandatory=$true)]
+        [parameter(Mandatory = $true)]
         [alias('type')] [string] $pathType
     )
 
@@ -56,9 +56,11 @@ $path = Get-ChocolateyPath -PathType 'PackagePath'
         'PackagePath' {
             if (Test-Path Env:\ChocolateyPackagePath) {
                 $result = "$env:ChocolateyPackagePath"
-            } elseif (Test-Path Env:\PackagePath) {
+            }
+            elseif (Test-Path Env:\PackagePath) {
                 $result = "$env:PackagePath"
-            } else {
+            }
+            else {
                 $installPath = Get-ChocolateyPath -pathType 'InstallPath'
                 $result = "$installPath\lib\$env:ChocolateyPackageName"
             }
@@ -66,9 +68,11 @@ $path = Get-ChocolateyPath -PathType 'PackagePath'
         'InstallPath' {
             if (Test-Path Env:\ChocolateyInstall) {
                 $result = "$env:ChocolateyInstall"
-            } elseif (Test-Path Env:\ProgramData) {
+            }
+            elseif (Test-Path Env:\ProgramData) {
                 $result = "$env:ProgramData\chocolatey"
-            } else {
+            }
+            else {
                 $result = "$env:SystemDrive\ProgramData\chocolatey"
             }
         }

@@ -31,7 +31,7 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public WiseInstaller()
         {
-            InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
+            InstallExecutable = "\"{0}\"".FormatWith(InstallTokens.InstallerLocation);
             SilentInstall = "/s";
             NoReboot = "";
             LogFile = "";
@@ -39,10 +39,10 @@ namespace chocolatey.infrastructure.app.domain.installers
             CustomInstallLocation = "";
             Language = "";
             OtherInstallOptions = "";
-            UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            UninstallExecutable = "\"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             SilentUninstall = "/s";
             // http://www.symantec.com/connect/blogs/wisescript-command-line-options
-            OtherUninstallOptions = "\"{0}\\Uninstall.Log\"".format_with(InstallTokens.TEMP_LOCATION);
+            OtherUninstallOptions = "\"{0}\\Uninstall.Log\"".FormatWith(InstallTokens.TempLocation);
             ValidInstallExitCodes = new List<long>
             {
                 0

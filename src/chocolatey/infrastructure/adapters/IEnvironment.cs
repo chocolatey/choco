@@ -132,8 +132,7 @@ namespace chocolatey.infrastructure.adapters
         /// An <see cref="T:System.Collections.IDictionary"/> object that contains all environment variable names and their values from the source specified by the <paramref name="target"/> parameter; otherwise, an empty dictionary if no environment variables are found.
         ///
         /// </returns>
-        /// <param name="target">One of the <see cref="T:System.EnvironmentVariableTarget"/> values.
-        ///                 </param><exception cref="T:System.Security.SecurityException">The caller does not have the required permission to perform this operation for the specified value of <paramref name="target"/>.
+        /// <exception cref="T:System.Security.SecurityException">The caller does not have the required permission to perform this operation for the specified value of <paramref name="target"/>.
         ///                 </exception><exception cref="T:System.NotSupportedException">This method cannot be used on Windows 95 or Windows 98 platforms.
         ///                 </exception><exception cref="T:System.ArgumentException"><paramref name="target"/> contains an illegal value.
         ///                 </exception><filterpriority>1</filterpriority><PermissionSet><IPermission class="System.Security.Permissions.EnvironmentPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/><IPermission class="System.Security.Permissions.RegistryPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Unrestricted="true"/><IPermission class="System.Security.Permissions.SecurityPermission, mscorlib, Version=2.0.3600.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" version="1" Flags="UnmanagedCode"/></PermissionSet>

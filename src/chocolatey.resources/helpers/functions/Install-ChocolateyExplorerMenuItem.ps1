@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Install-ChocolateyExplorerMenuItem {
-<#
+    <#
 .SYNOPSIS
 **NOTE:** Administrative Access Required.
 
@@ -81,20 +81,28 @@ Install-ChocolateyExplorerMenuItem "sublime" "Open with Sublime Text 2" $sublime
 .LINK
 Install-ChocolateyShortcut
 #>
-param(
-  [parameter(Mandatory=$true, Position=0)][string] $menuKey,
-  [parameter(Mandatory=$false, Position=1)][string] $menuLabel,
-  [parameter(Mandatory=$false, Position=2)][string] $command,
-  [parameter(Mandatory=$false, Position=3)]
-  [ValidateSet('file','directory')][string] $type = "file",
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
-try {
+    param(
+        [parameter(Mandatory = $true, Position = 0)][string] $menuKey,
+        [parameter(Mandatory = $false, Position = 1)][string] $menuLabel,
+        [parameter(Mandatory = $false, Position = 2)][string] $command,
+        [parameter(Mandatory = $false, Position = 3)]
+        [ValidateSet('file', 'directory')][string] $type = "file",
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
+    try {
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+        Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  if($type -eq "file") {$key = "*"} elseif($type -eq "directory") {$key="directory"} else{ return 1}
-  $elevated = "`
+        if ($type -eq "file") {
+            $key = "*"
+        }
+        elseif ($type -eq "directory") {
+            $key = "directory"
+        }
+        else {
+            return 1
+        }
+        $elevated = "`
     if( -not (Test-Path -path HKCR:) ) {New-PSDrive -Name HKCR -PSProvider registry -Root Hkey_Classes_Root};`
     if(!(test-path -LiteralPath 'HKCR:\$key\shell\$menuKey')) { new-item -Path 'HKCR:\$key\shell\$menuKey' };`
     Set-ItemProperty -LiteralPath 'HKCR:\$key\shell\$menuKey' -Name '(Default)'  -Value '$menuLabel';`
@@ -102,11 +110,11 @@ try {
     Set-ItemProperty -LiteralPath 'HKCR:\$key\shell\$menuKey\command' -Name '(Default)' -Value '$command \`"%1\`"';`
     return 0;"
 
-  Start-ChocolateyProcessAsAdmin $elevated
-  Write-Host "'$menuKey' explorer menu item has been created"
-}
-catch {
-    $errorMessage = "'$menuKey' explorer menu item was not created - $($_.Exception.Message)"
-	Write-Warning $errorMessage
-  }
+        Start-ChocolateyProcessAsAdmin $elevated
+        Write-Host "'$menuKey' explorer menu item has been created"
+    }
+    catch {
+        $errorMessage = "'$menuKey' explorer menu item was not created - $($_.Exception.Message)"
+        Write-Warning $errorMessage
+    }
 }

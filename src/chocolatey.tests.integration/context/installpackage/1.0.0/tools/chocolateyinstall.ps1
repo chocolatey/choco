@@ -1,5 +1,5 @@
-﻿$toolsDir = "$(Split-Path -parent $MyInvocation.MyCommand.Definition)"
-"simple file" | Out-File "$toolsDir\simplefile.txt" -force
+﻿$toolsDir = "$(Split-Path -Parent $MyInvocation.MyCommand.Definition)"
+"simple file" | Out-File "$toolsDir\simplefile.txt" -Force
 
 Write-Output "This is $packageName v$packageVersion being installed to `n $packageFolder"
 Write-Host "Ya!"

@@ -35,11 +35,11 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
             {
                 FileSystem = new DotNetFileSystem();
                 Provider = new CryptoHashProvider(FileSystem);
-                ContextDirectory = FileSystem.combine_paths(FileSystem.get_directory_name(FileSystem.get_current_assembly_path()), "context");
+                ContextDirectory = FileSystem.CombinePaths(FileSystem.GetDirectoryName(FileSystem.GetCurrentAssemblyPath()), "context");
             }
         }
 
-        public class when_HashProvider_provides_a_hash : CryptoHashProviderSpecsBase
+        public class When_HashProvider_provides_a_hash : CryptoHashProviderSpecsBase
         {
             private string result;
             private string filePath;
@@ -47,16 +47,16 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
             public override void Context()
             {
                 base.Context();
-                filePath = FileSystem.combine_paths(ContextDirectory, "testing.packages.config");
+                filePath = FileSystem.CombinePaths(ContextDirectory, "testing.packages.config");
             }
 
             public override void Because()
             {
-                result = Provider.hash_file(filePath);
+                result = Provider.ComputeFileHash(filePath);
             }
 
             [Fact]
-            public void should_provide_the_correct_hash_based_on_a_checksum()
+            public void Should_provide_the_correct_hash_based_on_a_checksum()
             {
                 var expected = BitConverter.ToString(SHA256.Create().ComputeHash(File.ReadAllBytes(filePath))).Replace("-", string.Empty);
 

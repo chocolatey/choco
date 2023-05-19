@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Install-ChocolateyInstallPackage {
-  <#
+    <#
 .SYNOPSIS
 **NOTE:** Administrative Access Required.
 
@@ -77,14 +77,13 @@ for the package to be completely unattended.
 When you are using this with an MSI, it will set up the arguments as
 follows: `"C:\Full\Path\To\msiexec.exe" /i "$fileFullPath" $silentArgs`,
 where `$fileFullPath` is `$file` or `$file64`, depending on what has been
-decided to be used. Previous to 0.10.4, it will be just `$file` as
-passing `$file64` would not have been available yet.
+decided to be used.
 
 When you use this with MSU, it is similar to MSI above in that it finds
 the right executable to run.
 
 When you use this with executable installers, the `$fileFullPath` will
-be `$file` (or `$file64` starting with 0.10.4+) and expects to be a full
+be `$file` or `$file64` and expects to be a full
 path to the file. If the file is in the package, see the parameters for
 "File" and "File64" to determine how you can get that path at runtime in
 a deterministic way. SilentArgs is everything you call against that
@@ -97,13 +96,13 @@ Full file path to native installer to run. If embedding in the package,
 you can get it to the path with
 `"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
 
-In 0.10.1+, `FileFullPath` is an alias for File.
+`FileFullPath` is an alias for File.
 
 This can be a 32-bit or 64-bit file. This is mandatory in earlier versions
 of Chocolatey, but optional if File64 has been provided.
 
 .PARAMETER File64
-Full file path to a 64-bit native installer to run. Available in 0.10.4+.
+Full file path to a 64-bit native installer to run.
 If embedding in the package, you can get it to the path with
 `"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\INSTALLER_FILE"`
 
@@ -116,7 +115,7 @@ Array of exit codes indicating success. Defaults to `@(0)`.
 
 .PARAMETER UseOnlyPackageSilentArguments
 Do not allow choco to provide/merge additional silent arguments and
-only use the ones available with the package. Available in 0.9.10+.
+only use the ones available with the package.
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
@@ -210,167 +209,175 @@ Get-UninstallRegistryKey
 .LINK
 Start-ChocolateyProcessAsAdmin
 #>
-  param(
-    [parameter(Mandatory = $true, Position = 0)][string] $packageName,
-    [parameter(Mandatory = $false, Position = 1)]
-    [alias("installerType", "installType")][string] $fileType = 'exe',
-    [parameter(Mandatory = $false, Position = 2)][string[]] $silentArgs = '',
-    [alias("fileFullPath")][parameter(Mandatory = $false, Position = 3)][string] $file,
-    [alias("fileFullPath64")][parameter(Mandatory = $false)][string] $file64,
-    [parameter(Mandatory = $false)] $validExitCodes = @(0),
-    [parameter(Mandatory = $false)]
-    [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
-    [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-  )
-  [string]$silentArgs = $silentArgs -join ' '
+    param(
+        [parameter(Mandatory = $true, Position = 0)][string] $packageName,
+        [parameter(Mandatory = $false, Position = 1)]
+        [alias("installerType", "installType")][string] $fileType = 'exe',
+        [parameter(Mandatory = $false, Position = 2)][string[]] $silentArgs = '',
+        [alias("fileFullPath")][parameter(Mandatory = $false, Position = 3)][string] $file,
+        [alias("fileFullPath64")][parameter(Mandatory = $false)][string] $file64,
+        [parameter(Mandatory = $false)] $validExitCodes = @(0),
+        [parameter(Mandatory = $false)]
+        [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
+    [string]$silentArgs = $silentArgs -join ' '
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  $bitnessMessage = ''
-  $fileFullPath = $file
-  if ((Get-OSArchitectureWidth 32) -or $env:ChocolateyForceX86 -eq 'true') {
-    if (!$file) { throw "32-bit installation is not supported for $packageName"; }
-    if ($file64) { $bitnessMessage = '32-bit '; }
-  }
-  elseif ($file64) {
-    $fileFullPath = $file64
-    $bitnessMessage = '64-bit '
-  }
+    $bitnessMessage = ''
+    $fileFullPath = $file
+    if ((Get-OSArchitectureWidth 32) -or $env:ChocolateyForceX86 -eq 'true') {
+        if (!$file) {
+            throw "32-bit installation is not supported for $packageName";
+        }
+        if ($file64) {
+            $bitnessMessage = '32-bit ';
+        }
+    }
+    elseif ($file64) {
+        $fileFullPath = $file64
+        $bitnessMessage = '64-bit '
+    }
 
-  if ($fileFullPath -eq '' -or $fileFullPath -eq $null) {
-    throw 'Package parameters incorrect, either File or File64 must be specified.'
-  }
+    if ($fileFullPath -eq '' -or $fileFullPath -eq $null) {
+        throw 'Package parameters incorrect, either File or File64 must be specified.'
+    }
 
-  Write-Host "Installing $bitnessMessage$packageName..."
+    Write-Host "Installing $bitnessMessage$packageName..."
 
-  if ($fileType -eq '' -or $fileType -eq $null) {
-    Write-Debug 'No FileType supplied. Using the file extension to determine FileType'
-    $fileType = [System.IO.Path]::GetExtension("$fileFullPath").Replace(".", "")
-  }
+    if ($fileType -eq '' -or $fileType -eq $null) {
+        Write-Debug 'No FileType supplied. Using the file extension to determine FileType'
+        $fileType = [System.IO.Path]::GetExtension("$fileFullPath").Replace(".", "")
+    }
 
-  $installerTypeLower = $fileType.ToLower()
-  if ('msi', 'exe', 'msu', 'msp' -notcontains $installerTypeLower) {
-    Write-Warning "FileType '$fileType' is unrecognized, using 'exe' instead."
-    $fileType = 'exe'
-  }
+    $installerTypeLower = $fileType.ToLower()
+    if ('msi', 'exe', 'msu', 'msp' -notcontains $installerTypeLower) {
+        Write-Warning "FileType '$fileType' is unrecognized, using 'exe' instead."
+        $fileType = 'exe'
+    }
 
-  $env:ChocolateyInstallerType = $fileType
+    $env:ChocolateyInstallerType = $fileType
 
-  $additionalInstallArgs = $env:chocolateyInstallArguments;
-  if ($additionalInstallArgs -eq $null) {
-    $additionalInstallArgs = '';
-  }
-  else {
-    #Use a Regex Or ('|') to do the match, instead of multiple '-or' clauses
-    $argPattern = @(
-      'INSTALLDIR'
-      'TARGETDIR'
-      'dir\='
-      '\/D\='
-  ) -join '|'
+    $additionalInstallArgs = $env:chocolateyInstallArguments;
+    if ($additionalInstallArgs -eq $null) {
+        $additionalInstallArgs = '';
+    }
+    else {
+        #Use a Regex Or ('|') to do the match, instead of multiple '-or' clauses
+        $argPattern = @(
+            'INSTALLDIR'
+            'TARGETDIR'
+            'dir\='
+            '\/D\='
+        ) -join '|'
 
-    if ($additionalInstallArgs -match $argPattern) {
-      @"
+        if ($additionalInstallArgs -match $argPattern) {
+            @"
 Pro / Business supports a single, ubiquitous install directory option.
  Stop the hassle of determining how to pass install directory overrides
  to install arguments for each package / installer type.
  Check out Pro / Business - https://chocolatey.org/compare"
 "@ | Write-Warning
+        }
     }
-  }
-  $overrideArguments = $env:chocolateyInstallOverride;
+    $overrideArguments = $env:chocolateyInstallOverride;
 
-  # remove \chocolatey\chocolatey\
-  # might be a slight issue here if the download path is the older
-  $silentArgs = $silentArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
-  $additionalInstallArgs = $additionalInstallArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
-  $updatedFilePath = $fileFullPath -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
-  if ([System.IO.File]::Exists($updatedFilePath)) {
-    $fileFullPath = $updatedFilePath
-  }
+    # remove \chocolatey\chocolatey\
+    # might be a slight issue here if the download path is the older
+    $silentArgs = $silentArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+    $additionalInstallArgs = $additionalInstallArgs -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+    $updatedFilePath = $fileFullPath -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
+    if ([System.IO.File]::Exists($updatedFilePath)) {
+        $fileFullPath = $updatedFilePath
+    }
 
-  $ignoreFile = $fileFullPath + '.ignore'
-  if ($env:ChocolateyInstall -and $ignoreFile -match [System.Text.RegularExpressions.Regex]::Escape($env:ChocolateyInstall)) {
+    $ignoreFile = $fileFullPath + '.ignore'
+    if ($env:ChocolateyInstall -and $ignoreFile -match [System.Text.RegularExpressions.Regex]::Escape($env:ChocolateyInstall)) {
+        try {
+            '' | Out-File $ignoreFile
+        }
+        catch {
+            Write-Warning "Unable to generate `'$ignoreFile`'"
+        }
+    }
+
+    $workingDirectory = Get-Location -PSProvider "FileSystem"
     try {
-      '' | out-file $ignoreFile
+        $workingDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
     }
     catch {
-      Write-Warning "Unable to generate `'$ignoreFile`'"
-    }
-  }
-
-  $workingDirectory = Get-Location -PSProvider "FileSystem"
-  try {
-    $workingDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
-  }
-  catch {
-    Write-Warning "Unable to set the working directory for installer to location of '$fileFullPath'"
-    $workingDirectory = $env:TEMP
-  }
-
-  try {
-    # make sure any logging folder exists
-    $pattern = "(?:['`"])([a-zA-Z]\:\\[^'`"]+)(?:[`"'])|([a-zA-Z]\:\\[\S]+)"
-    $silentArgs, $additionalInstallArgs | 
-      ForEach-Object { Select-String $pattern -input $_ -AllMatches } |
-      ForEach-Object { $_.Matches } | ForEach-Object {
-        $argDirectory = $_.Groups[1]
-        if ($argDirectory -eq $null -or $argDirectory -eq '') { continue }
-        $argDirectory = [System.IO.Path]::GetFullPath([System.IO.Path]::GetDirectoryName($argDirectory))
-        Write-Debug "Ensuring '$argDirectory' exists"
-        if (![System.IO.Directory]::Exists($argDirectory)) { [System.IO.Directory]::CreateDirectory($argDirectory) | Out-Null }
-      }
-  }
-  catch {
-    Write-Debug "Error ensuring directories exist -  $($_.Exception.Message)"
-  }
-
-  if ($fileType -like 'msi') {
-    $msiArgs = "/i `"$fileFullPath`""
-    $msiArgs = if ($overrideArguments) {
-      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')"
-      "$msiArgs $additionalInstallArgs"
-    }
-    else {
-      "$msiArgs $silentArgs $additionalInstallArgs"
+        Write-Warning "Unable to set the working directory for installer to location of '$fileFullPath'"
+        $workingDirectory = $env:TEMP
     }
 
-    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
-  }
+    try {
+        # make sure any logging folder exists
+        $pattern = "(?:['`"])([a-zA-Z]\:\\[^'`"]+)(?:[`"'])|([a-zA-Z]\:\\[\S]+)"
+        $silentArgs, $additionalInstallArgs |
+            ForEach-Object { Select-String $pattern -input $_ -AllMatches } |
+            ForEach-Object { $_.Matches } | ForEach-Object {
+                $argDirectory = $_.Groups[1]
+                if ($argDirectory -eq $null -or $argDirectory -eq '') {
+                    continue
+                }
+                $argDirectory = [System.IO.Path]::GetFullPath([System.IO.Path]::GetDirectoryName($argDirectory))
+                Write-Debug "Ensuring '$argDirectory' exists"
+                if (![System.IO.Directory]::Exists($argDirectory)) {
+                    [System.IO.Directory]::CreateDirectory($argDirectory) | Out-Null
+                }
+            }
+    }
+    catch {
+        Write-Debug "Error ensuring directories exist -  $($_.Exception.Message)"
+    }
 
-  if ($fileType -like 'msp') {
-    $msiArgs = '/update "{0}"' -f $fileFullPath
-    if ($overrideArguments) {
-      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
-      $msiArgs = "$msiArgs $additionalInstallArgs";
-    }
-    else {
-      $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
+    if ($fileType -like 'msi') {
+        $msiArgs = "/i `"$fileFullPath`""
+        $msiArgs = if ($overrideArguments) {
+            Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')"
+            "$msiArgs $additionalInstallArgs"
+        }
+        else {
+            "$msiArgs $silentArgs $additionalInstallArgs"
+        }
+
+        $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     }
 
-    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
-  }
+    if ($fileType -like 'msp') {
+        $msiArgs = '/update "{0}"' -f $fileFullPath
+        if ($overrideArguments) {
+            Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
+            $msiArgs = "$msiArgs $additionalInstallArgs";
+        }
+        else {
+            $msiArgs = "$msiArgs $silentArgs $additionalInstallArgs";
+        }
 
-  if ($fileType -like 'exe') {
-    if ($overrideArguments) {
-      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
-      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
+        $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msiArgs" "$($env:SystemRoot)\System32\msiexec.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
     }
-    else {
-      $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
-    }
-  }
 
-  if ($fileType -like 'msu') {
-    if ($overrideArguments) {
-      Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
-      $msuArgs = "`"$fileFullPath`" $additionalInstallArgs"
+    if ($fileType -like 'exe') {
+        if ($overrideArguments) {
+            Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
+            $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$additionalInstallArgs" $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
+        }
+        else {
+            $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$silentArgs $additionalInstallArgs" $fileFullPath -validExitCodes $validExitCodes -workingDirectory $workingDirectory
+        }
     }
-    else {
-      $msuArgs = "`"$fileFullPath`" $silentArgs $additionalInstallArgs"
-    }
-    $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
-  }
 
-  Write-Host "$packageName has been installed."
+    if ($fileType -like 'msu') {
+        if ($overrideArguments) {
+            Write-Host "Overriding package arguments with '$additionalInstallArgs' (replacing '$silentArgs')";
+            $msuArgs = "`"$fileFullPath`" $additionalInstallArgs"
+        }
+        else {
+            $msuArgs = "`"$fileFullPath`" $silentArgs $additionalInstallArgs"
+        }
+        $env:ChocolateyExitCode = Start-ChocolateyProcessAsAdmin "$msuArgs" "$($env:SystemRoot)\System32\wusa.exe" -validExitCodes $validExitCodes -workingDirectory $workingDirectory
+    }
+
+    Write-Host "$packageName has been installed."
 }

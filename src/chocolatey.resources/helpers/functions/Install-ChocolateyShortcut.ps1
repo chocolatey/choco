@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Install-ChocolateyShortcut {
-<#
+    <#
 .SYNOPSIS
 Creates a shortcut
 
@@ -45,8 +45,8 @@ The full absolute path to the target for new shortcut.
 OPTIONAL - The full absolute path of the Working Directory that will be
 used by the new shortcut.
 
-As of v0.10.12, the directory will be created unless it contains environment
-variable expansion like `%AppData%\FooBar`.
+The directory will be created unless it contains environment variable
+expansion like `%AppData%\FooBar`.
 
 .PARAMETER Arguments
 OPTIONAL - Additional arguments that should be passed along to the new
@@ -61,16 +61,17 @@ OPTIONAL - A text description to be associated with the new description.
 
 .PARAMETER WindowStyle
 OPTIONAL - Type of windows target application should open with.
-Available in 0.9.10+.
+
 0 = Hidden, 1 = Normal Size, 3 = Maximized, 7 - Minimized.
+
 Full list table 3.9 here: https://technet.microsoft.com/en-us/library/ee156605.aspx
 
 .PARAMETER RunAsAdmin
 OPTIONAL - Set "Run As Administrator" checkbox for the created the
-shortcut. Available in 0.9.10+.
+shortcut.
 
 .PARAMETER PinToTaskbar
-OPTIONAL - Pin the new shortcut to the taskbar. Available in 0.9.10+.
+OPTIONAL - Pin the new shortcut to the taskbar.
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
@@ -101,7 +102,6 @@ Install-ChocolateyShortcut `
 >
 # Creates a new notepad shortcut on the root of c: that starts
 # notepad.exe as Administrator. Shortcut is also pinned to taskbar.
-# These parameters are available in 0.9.10+.
 
 Install-ChocolateyShortcut `
   -ShortcutFilePath "C:\notepad.lnk" `
@@ -116,109 +116,113 @@ Install-ChocolateyExplorerMenuItem
 .LINK
 Install-ChocolateyPinnedTaskBarItem
 #>
-	param(
-    [parameter(Mandatory=$true, Position=0)][string] $shortcutFilePath,
-    [parameter(Mandatory=$true, Position=1)][string] $targetPath,
-    [parameter(Mandatory=$false, Position=2)][string] $workingDirectory,
-    [parameter(Mandatory=$false, Position=3)][string] $arguments,
-    [parameter(Mandatory=$false, Position=4)][string] $iconLocation,
-    [parameter(Mandatory=$false, Position=5)][string] $description,
-    [parameter(Mandatory=$false, Position=6)][int] $windowStyle,
-    [parameter(Mandatory=$false)][switch] $runAsAdmin,
-    [parameter(Mandatory=$false)][switch] $pinToTaskbar,
-    [parameter(ValueFromRemainingArguments = $true)][Object[]]$ignoredArguments
-	)
+    param(
+        [parameter(Mandatory = $true, Position = 0)][string] $shortcutFilePath,
+        [parameter(Mandatory = $true, Position = 1)][string] $targetPath,
+        [parameter(Mandatory = $false, Position = 2)][string] $workingDirectory,
+        [parameter(Mandatory = $false, Position = 3)][string] $arguments,
+        [parameter(Mandatory = $false, Position = 4)][string] $iconLocation,
+        [parameter(Mandatory = $false, Position = 5)][string] $description,
+        [parameter(Mandatory = $false, Position = 6)][int] $windowStyle,
+        [parameter(Mandatory = $false)][switch] $runAsAdmin,
+        [parameter(Mandatory = $false)][switch] $pinToTaskbar,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]]$ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-	# http://powershell.com/cs/blogs/tips/archive/2009/02/05/validating-a-url.aspx
-	function isURIWeb($address) {
-	  $uri = $address -as [System.URI]
-	  $uri.AbsoluteURI -ne $null -and $uri.Scheme -match '[http|https]'
-	}
-
-  if (!$shortcutFilePath) {
-    # shortcut file path could be null if someone is trying to get special
-    # paths for LocalSystem (SYSTEM).
-    Write-Warning "Unable to create shortcut. `$shortcutFilePath can not be null."
-    return
-  }
-
-	$shortcutDirectory = $([System.IO.Path]::GetDirectoryName($shortcutFilePath))
-  if (!(Test-Path($shortcutDirectory))) {
-    [System.IO.Directory]::CreateDirectory($shortcutDirectory) | Out-Null
-  }
-
-	if (!$targetPath) {
-	  throw "Install-ChocolateyShortcut - `$targetPath can not be null."
-	}
-
-	if(!(Test-Path($targetPath)) -and !(IsURIWeb($targetPath))) {
-	  Write-Warning "'$targetPath' does not exist. If it is not created the shortcut will not be valid."
-	}
-
-	if($iconLocation) {
-		if(!(Test-Path($iconLocation))) {
-		  Write-Warning "'$iconLocation' does not exist. A default icon will be used."
-		}
-	}
-
-  if ($workingDirectory) {
-    if ($workingDirectory -notmatch '%\w+%' -and !(Test-Path($workingDirectory))) {
-      [System.IO.Directory]::CreateDirectory($workingDirectory) | Out-Null
-    }
-	}
-
-	Write-Debug "Creating Shortcut..."
-	try {
-		$global:WshShell = New-Object -com "WScript.Shell"
-	    $lnk = $global:WshShell.CreateShortcut($shortcutFilePath)
-	    $lnk.TargetPath = $targetPath
-		$lnk.WorkingDirectory = $workingDirectory
-	    $lnk.Arguments = $arguments
-	    if($iconLocation) {
-	      $lnk.IconLocation = $iconLocation
-	    }
-		if ($description) {
-		  $lnk.Description = $description
-		}
-
-    if ($windowStyle) {
-      $lnk.WindowStyle = $windowStyle
+    # http://powershell.com/cs/blogs/tips/archive/2009/02/05/validating-a-url.aspx
+    function isURIWeb($address) {
+        $uri = $address -as [System.URI]
+        $uri.AbsoluteURI -ne $null -and $uri.Scheme -match '[http|https]'
     }
 
-    $lnk.Save()
+    if (!$shortcutFilePath) {
+        # shortcut file path could be null if someone is trying to get special
+        # paths for LocalSystem (SYSTEM).
+        Write-Warning "Unable to create shortcut. `$shortcutFilePath can not be null."
+        return
+    }
 
-		Write-Debug "Shortcut created."
+    $shortcutDirectory = $([System.IO.Path]::GetDirectoryName($shortcutFilePath))
+    if (!(Test-Path($shortcutDirectory))) {
+        [System.IO.Directory]::CreateDirectory($shortcutDirectory) | Out-Null
+    }
 
-    [System.IO.FileInfo]$Path = $shortcutFilePath
-    If ($runAsAdmin) {
-      #In order to enable the "Run as Admin" checkbox, this code reads the .LNK as a stream
-      #  and flips a specific bit while writing a new copy.  It then replaces the original
-      #  .LNK with the copy, similar to this example: http://poshcode.org/2513
-      $TempFileName = [IO.Path]::GetRandomFileName()
-      $TempFile = [IO.FileInfo][IO.Path]::Combine($Path.Directory, $TempFileName)
-      $Writer = New-Object System.IO.FileStream $TempFile, ([System.IO.FileMode]::Create)
-      $Reader = $Path.OpenRead()
-      While ($Reader.Position -lt $Reader.Length) {
-        $Byte = $Reader.ReadByte()
-        If ($Reader.Position -eq 22) {$Byte = 34}
-        $Writer.WriteByte($Byte)
+    if (!$targetPath) {
+        throw "Install-ChocolateyShortcut - `$targetPath can not be null."
+    }
+
+    if (!(Test-Path($targetPath)) -and !(IsURIWeb($targetPath))) {
+        Write-Warning "'$targetPath' does not exist. If it is not created the shortcut will not be valid."
+    }
+
+    if ($iconLocation) {
+        if (!(Test-Path($iconLocation))) {
+            Write-Warning "'$iconLocation' does not exist. A default icon will be used."
         }
-      $Reader.Close()
-      $Writer.Close()
-      $Path.Delete()
-      Rename-Item -Path $TempFile -NewName $Path.Name | Out-Null
     }
 
-    If ($pinToTaskbar) {
-      $scfilename = $Path.FullName
-      $pinverb = (new-object -com "shell.application").namespace($(split-path -parent $Path.FullName)).Parsename($(split-path -leaf $Path.FullName)).verbs() | 
-        Where-Object{$_.Name -eq 'Pin to Tas&kbar'}
-      If ($pinverb) { $pinverb.doit() }
+    if ($workingDirectory) {
+        if ($workingDirectory -notmatch '%\w+%' -and !(Test-Path($workingDirectory))) {
+            [System.IO.Directory]::CreateDirectory($workingDirectory) | Out-Null
+        }
     }
-	}
-	catch {
-		Write-Warning "Unable to create shortcut. Error captured was $($_.Exception.Message)."
-	}
+
+    Write-Debug "Creating Shortcut..."
+    try {
+        $global:WshShell = New-Object -com "WScript.Shell"
+        $lnk = $global:WshShell.CreateShortcut($shortcutFilePath)
+        $lnk.TargetPath = $targetPath
+        $lnk.WorkingDirectory = $workingDirectory
+        $lnk.Arguments = $arguments
+        if ($iconLocation) {
+            $lnk.IconLocation = $iconLocation
+        }
+        if ($description) {
+            $lnk.Description = $description
+        }
+
+        if ($windowStyle) {
+            $lnk.WindowStyle = $windowStyle
+        }
+
+        $lnk.Save()
+
+        Write-Debug "Shortcut created."
+
+        [System.IO.FileInfo]$Path = $shortcutFilePath
+        If ($runAsAdmin) {
+            #In order to enable the "Run as Admin" checkbox, this code reads the .LNK as a stream
+            #  and flips a specific bit while writing a new copy.  It then replaces the original
+            #  .LNK with the copy, similar to this example: http://poshcode.org/2513
+            $TempFileName = [IO.Path]::GetRandomFileName()
+            $TempFile = [IO.FileInfo][IO.Path]::Combine($Path.Directory, $TempFileName)
+            $Writer = New-Object System.IO.FileStream $TempFile, ([System.IO.FileMode]::Create)
+            $Reader = $Path.OpenRead()
+            While ($Reader.Position -lt $Reader.Length) {
+                $Byte = $Reader.ReadByte()
+                If ($Reader.Position -eq 22) {
+                    $Byte = 34
+                }
+                $Writer.WriteByte($Byte)
+            }
+            $Reader.Close()
+            $Writer.Close()
+            $Path.Delete()
+            Rename-Item -Path $TempFile -NewName $Path.Name | Out-Null
+        }
+
+        If ($pinToTaskbar) {
+            $scfilename = $Path.FullName
+            $pinverb = (New-Object -com "shell.application").namespace($(Split-Path -Parent $Path.FullName)).Parsename($(Split-Path -Leaf $Path.FullName)).verbs() |
+                Where-Object { $_.Name -eq 'Pin to Tas&kbar' }
+            If ($pinverb) {
+                $pinverb.doit()
+            }
+        }
+    }
+    catch {
+        Write-Warning "Unable to create shortcut. Error captured was $($_.Exception.Message)."
+    }
 }

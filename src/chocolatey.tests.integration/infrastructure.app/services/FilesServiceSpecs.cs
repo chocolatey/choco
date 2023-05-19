@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -46,7 +46,8 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             }
         }
 
-        public class when_FilesService_encounters_locked_files : FilesServiceSpecsBase
+        [SetCulture("en"), SetUICulture("en")]
+        public class When_FilesService_encounters_locked_files : FilesServiceSpecsBase
         {
             private PackageFiles _result;
             private readonly ChocolateyConfiguration _config = new ChocolateyConfiguration();
@@ -60,7 +61,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
                 base.Context();
                 _contextPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "infrastructure", "filesystem");
                 _theLockedFile = Path.Combine(_contextPath, "Slipsum.txt");
-                _packageResult = new PackageResult("bob", "1.2.3", FileSystem.get_directory_name(_theLockedFile));
+                _packageResult = new PackageResult("bob", "1.2.3", FileSystem.GetDirectoryName(_theLockedFile));
 
                 _fileStream = new FileStream(_theLockedFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
             }
@@ -69,21 +70,22 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             {
                 base.AfterObservations();
                 _fileStream.Close();
+                _fileStream.Dispose();
             }
 
             public override void Because()
             {
-                _result = Service.capture_package_files(_packageResult, _config);
+                _result = Service.CaptureSnapshot(_packageResult, _config);
             }
 
             [Fact]
-            public void should_not_error()
+            public void Should_not_error()
             {
                 //nothing to see here
             }
 
             [Fact]
-            public void should_log_a_warning()
+            public void Should_log_a_warning()
             {
                 MockLogger.Verify(l => l.Warn(It.IsAny<string>()), Times.AtLeastOnce);
             }
@@ -91,19 +93,13 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_log_a_warning_about_locked_files()
+            public void Should_log_a_warning_about_locked_files()
             {
-                bool lockedFiles = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).or_empty_list_if_null())
-                {
-                    if (message.Contains("The process cannot access the file")) lockedFiles = true;
-                }
-
-                lockedFiles.ShouldBeTrue();
+                MockLogger.Verify(l => l.Warn(It.Is<string>(s => s.Contains("The process cannot access the file"))), Times.Once);
             }
 
             [Fact]
-            public void should_return_a_special_code_for_locked_files()
+            public void Should_return_a_special_code_for_locked_files()
             {
                 _result.Files.FirstOrDefault(x => x.Path == _theLockedFile).Checksum.ShouldEqual(ApplicationParameters.HashProviderFileLocked);
             }

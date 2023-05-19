@@ -1,4 +1,4 @@
-﻿// ==============================================================================
+// ==============================================================================
 //
 // Fervent Coder Copyright © 2011 - Released under the Apache 2.0 License
 //
@@ -22,6 +22,8 @@ namespace chocolatey.tests
     using NUnit.Framework;
     using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.logging;
+    using System.IO;
+    using chocolatey.infrastructure.app.nuget;
 
     // ReSharper disable InconsistentNaming
 
@@ -32,7 +34,7 @@ namespace chocolatey.tests
 
         private static readonly string InstallLocationVariable = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName);
 
-        [SetUp]
+        [OneTimeSetUp]
         public virtual void BeforeEverything()
         {
             Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, string.Empty);
@@ -40,13 +42,10 @@ namespace chocolatey.tests
             Log.InitializeWith(MockLogger);
             // do not log trace messages
             ILogExtensions.LogTraceMessages = false;
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
         }
 
-        public virtual void before_everything()
-        {
-        }
-
-        [TearDown]
+        [OneTimeTearDown]
         public void AfterEverything()
         {
             Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, InstallLocationVariable);
@@ -61,11 +60,12 @@ namespace chocolatey.tests
             get { return NUnitSetup.MockLogger; }
         }
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public void Setup()
         {
-            if (MockLogger != null) MockLogger.reset();
+            if (MockLogger != null) MockLogger.Reset();
             //Log.InitializeWith(MockLogger);
+            NugetCommon.ClearRepositoriesCache();
             Context();
             Because();
         }
@@ -94,7 +94,7 @@ namespace chocolatey.tests
         {
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public void TearDown()
         {
             AfterObservations();
@@ -118,13 +118,11 @@ namespace chocolatey.tests
     }
 
 
-    public class ConcernForAttribute : Attribute
+    public class ConcernForAttribute : CategoryAttribute
     {
-        public string Name { get; set; }
-
         public ConcernForAttribute(string name)
+            : base("ConcernFor - {0}".FormatWith(name))
         {
-            Name = name;
         }
     }
 
@@ -142,7 +140,16 @@ namespace chocolatey.tests
     public class PendingAttribute : IgnoreAttribute
     {
         public PendingAttribute(string reason)
-            : base("Pending test - {0}".format_with(reason))
+            : base("Pending test - {0}".FormatWith(reason))
+        {
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+    public class BrokenAttribute : CategoryAttribute
+    {
+        public BrokenAttribute()
+            : base("Broken")
         {
         }
     }
@@ -159,21 +166,75 @@ namespace chocolatey.tests
         }
     }
 
-    public class IntegrationAttribute : CategoryAttribute
+    public static class Categories
     {
-        public IntegrationAttribute()
-            : base("Integration")
+        [AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class IntegrationAttribute : CategoryAttribute
         {
+            public IntegrationAttribute()
+                : base("Integration")
+            {
+            }
         }
-    }
 
-    public class ExpectedExceptionAttribute : NUnit.Framework.ExpectedExceptionAttribute
-    {
-        public ExpectedExceptionAttribute(Type exceptionType) : base(exceptionType)
-        {}
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class SemVer20Attribute : CategoryAttribute
+        {
+            public SemVer20Attribute()
+                : base("SemVer 2.0")
+            {
+            }
+        }
 
-        public ExpectedExceptionAttribute(string exceptionName) : base(exceptionName)
-        {}
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class LegacySemVerAttribute : CategoryAttribute
+        {
+            public LegacySemVerAttribute()
+                : base("Legacy SemVer")
+            {
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class ExceptionHandlingAttribute : CategoryAttribute
+        {
+            public ExceptionHandlingAttribute()
+                : base("Exception Handling")
+            {
+            }
+        }
+
+        /// <summary>
+        /// Attribute used to define a test class or method as belonging to source priorities.
+        /// </summary>
+        /// <remarks>This need to be changed to inherit from <see cref="CategoryAttribute"/> once we have a working implementation of source priorities.</remarks>
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class SourcePriorityAttribute : IgnoreAttribute
+        {
+            public SourcePriorityAttribute()
+                : base("Source priority is not implemented")
+            {
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class LoggingAttribute : CategoryAttribute
+        {
+            public LoggingAttribute()
+                : base("Logging")
+            {
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class UncAttribute : PlatformAttribute
+        {
+            public UncAttribute()
+                : base("Win")
+            {
+                Reason = "UNC Test paths are only available when running on Windows";
+            }
+        }
     }
 
     // ReSharper restore InconsistentNaming

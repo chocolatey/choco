@@ -17,6 +17,7 @@ $EmptyFolders = @(
 )
 Describe "choco new" -Tag Chocolatey, NewCommand {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
 
         $expectedHeader = Get-ExpectedChocolateyHeader
@@ -138,7 +139,7 @@ Describe "choco new" -Tag Chocolatey, NewCommand {
     }
 
     # https://github.com/chocolatey/choco/issues/1003
-    Context "Create new package with template containing empty folders" -Foreach @{ EmptyFolders = $EmptyFolders } {
+    Context "Create new package with template containing empty folders" -ForEach @{ EmptyFolders = $EmptyFolders } {
         BeforeAll {
             New-ChocolateyInstallSnapshot -SetWorkDir
 
@@ -157,4 +158,7 @@ Describe "choco new" -Tag Chocolatey, NewCommand {
             "$PWD\emptyfolder\$_" | Should -Exist
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

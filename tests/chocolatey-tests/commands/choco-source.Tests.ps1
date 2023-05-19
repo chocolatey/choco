@@ -10,6 +10,7 @@ Import-Module helpers/common-helpers
 
 Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SourceCommand {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
         New-ChocolateyInstallSnapshot
 
@@ -425,4 +426,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SourceCommand {
             $Output.Lines | Should -Contain "Nothing to change. Config already set."
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

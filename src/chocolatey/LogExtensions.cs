@@ -20,8 +20,6 @@ namespace chocolatey
     using System.Collections.Concurrent;
     using infrastructure.logging;
 
-    // ReSharper disable InconsistentNaming
-
     /// <summary>
     ///   Extensions to help make logging awesome
     /// </summary>
@@ -52,7 +50,7 @@ namespace chocolatey
         }
 
         /// <summary>
-        ///   Gets the logger for <see cref="T" />.
+        ///   Gets the logger for <see cref="Log{T}" />.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="type">The type to get the logger for.</param>
@@ -73,6 +71,4 @@ namespace chocolatey
             return _dictionary.Value.GetOrAdd(objectName, infrastructure.logging.Log.GetLoggerFor(objectName));
         }
     }
-
-    // ReSharper restore InconsistentNaming
 }

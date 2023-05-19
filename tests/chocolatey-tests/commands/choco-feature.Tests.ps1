@@ -14,10 +14,14 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         $CommandUnderTest = $_
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
+
+        $InitialConfiguration = ([xml](Get-Content $env:ChocolateyInstall\config\chocolatey.config)).chocolatey
+        $expectedLicenseHeader = Get-ExpectedChocolateyHeader
     }
 
     AfterAll {
@@ -66,14 +70,14 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
             # Get the features this way so we're working with the entire list, and not just what was in the config file initially.
             # We additionally want to ignore any presence of removed features
             # as these are not intended to work as expected, even when present.
-            $FeaturesToTest = (Invoke-Choco feature list -r).Lines | ConvertFrom-ChocolateyOutput -Command Feature | Where-Object Name -ne 'scriptsCheckLastExitCode'
+            $FeaturesToTest = (Invoke-Choco feature list -r).Lines | ConvertFrom-ChocolateyOutput -Command Feature | Where-Object Name -NE 'scriptsCheckLastExitCode'
         }
 
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
         }
 
-        Context "Enabling <_.Name> feature" -Foreach $FeaturesToTest {
+        Context "Enabling <_.Name> feature" -ForEach $FeaturesToTest {
             BeforeAll {
                 $Name = $_.Name
                 # Disable feature before trying to enable it.
@@ -90,7 +94,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
             }
         }
 
-        Context "Disabling <_.Name> feature" -Foreach $FeaturesToTest {
+        Context "Disabling <_.Name> feature" -ForEach $FeaturesToTest {
             BeforeAll {
                 $Name = $_.Name
                 # Enable feature before trying to enable it.
@@ -180,7 +184,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
     }
 
-    Context "Enabling a non-existant feature" {
+    Context "Enabling a non-existent feature" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -196,7 +200,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
     }
 
-    Context "Disabling a non-existant feature" {
+    Context "Disabling a non-existent feature" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -212,4 +216,59 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
             $Output.String | Should -Match "Feature 'nonExistingFeature' not found"
         }
     }
+
+    Context "Getting a feature (<_.Name>)" -ForEach $CurrentFeatures {
+        BeforeAll {
+            $Output = Invoke-Choco feature get $_.Name
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Displays chocolatey name with version" {
+            $Output.Lines | Should -Contain $expectedLicenseHeader
+        }
+
+        It "Displays value of feature" {
+            $expectedResult = If ($InitialConfiguration.SelectSingleNode("//features/feature[@name='$($_.Name)']").enabled -eq "true" ) { "Enabled" } Else { "Disabled" }
+            $Output.Lines | Should -Contain $expectedResult -Because $Output.String
+        }
+    }
+
+    Context "Getting a feature by argument (<_.Name>)" -ForEach $CurrentFeatures {
+        BeforeAll {
+            $Output = Invoke-Choco feature get --name $_.Name
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Displays chocolatey name with version" {
+            $Output.Lines | Should -Contain $expectedLicenseHeader
+        }
+
+        It "Displays value of feature" {
+            $expectedResult = If ($InitialConfiguration.SelectSingleNode("//features/feature[@name='$($_.Name)']").enabled -eq "true" ) { "Enabled" } Else { "Disabled" }
+            $Output.Lines | Should -Contain $expectedResult -Because $Output.String
+        }
+    }
+
+    Context "Getting a feature that doesn't exist" {
+        BeforeAll {
+            $Output = Invoke-Choco feature get noFeatureValue
+        }
+
+        It "Exits with failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It "Outputs an error indicating that there's no feature by that name" {
+            $Output.Lines | Should -Contain "No feature value by the name 'noFeatureValue'"
+        }
+    }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

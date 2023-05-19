@@ -22,14 +22,12 @@ namespace chocolatey.infrastructure.app.nuget
     using adapters;
     using cryptography;
 
-    // ReSharper disable InconsistentNaming
-
     public static class NugetEncryptionUtility
     {
         private static Lazy<IEncryptionUtility> _encryptionUtility = new Lazy<IEncryptionUtility>(() => new DefaultEncryptionUtility());
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void initialize_with(Lazy<IEncryptionUtility> encryptionUtility)
+        public static void InitializeWith(Lazy<IEncryptionUtility> encryptionUtility)
         {
             _encryptionUtility = encryptionUtility;
         }
@@ -41,19 +39,24 @@ namespace chocolatey.infrastructure.app.nuget
 
         public static string EncryptString(string cleartextValue)
         {
-            return EncryptionUtility.encrypt_string(cleartextValue);
+            return EncryptionUtility.EncryptString(cleartextValue);
         }
 
         public static string DecryptString(string encryptedString)
         {
-            return EncryptionUtility.decrypt_string(encryptedString);
+            return EncryptionUtility.DecryptString(encryptedString);
         }
 
         public static string GenerateUniqueToken(string caseInsensitiveKey)
         {
-            return EncryptionUtility.generate_unique_token(caseInsensitiveKey);
+            return EncryptionUtility.GenerateUniqueToken(caseInsensitiveKey);
         }
-    }
 
-    // ReSharper restore InconsistentNaming
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IEncryptionUtility> encryptionUtility)
+            => InitializeWith(encryptionUtility);
+#pragma warning restore IDE1006
+    }
 }

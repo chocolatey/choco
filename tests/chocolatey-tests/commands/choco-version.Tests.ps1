@@ -2,6 +2,7 @@
 
 Describe "choco version" -Tag Chocolatey, VersionCommand -Skip:(Test-ChocolateyVersionEqualOrHigherThan "1.0.0") {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
         New-ChocolateyInstallSnapshot
     }
@@ -29,7 +30,7 @@ Describe "choco version" -Tag Chocolatey, VersionCommand -Skip:(Test-ChocolateyV
         }
     }
 
-    Context "Help Documentation (<_>)" -Foreach @("--help", "-?", "-help") {
+    Context "Help Documentation (<_>)" -ForEach @("--help", "-?", "-help") {
         BeforeAll {
             $Output = Invoke-Choco version $_
         }
@@ -50,4 +51,7 @@ Describe "choco version" -Tag Chocolatey, VersionCommand -Skip:(Test-ChocolateyV
             $Output.String | Should -Match "has been deprecated"
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

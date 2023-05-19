@@ -84,18 +84,21 @@ namespace chocolatey.infrastructure.app.configuration
 
         public override int GetHashCode()
         {
-            return HashCode
-                .Of(Id)
-                .And(Value)
-                .And(Disabled)
-                .And(BypassProxy)
-                .And(AllowSelfService)
-                .And(VisibleToAdminsOnly)
-                .And(UserName)
-                .And(Password)
-                .And(Priority)
-                .And(Certificate)
-                .And(CertificatePassword);
+            var hash = new HashCode();
+
+            hash.Add(Id);
+            hash.Add(Value);
+            hash.Add(Disabled);
+            hash.Add(BypassProxy);
+            hash.Add(AllowSelfService);
+            hash.Add(VisibleToAdminsOnly);
+            hash.Add(UserName);
+            hash.Add(Password);
+            hash.Add(Priority);
+            hash.Add(Certificate);
+            hash.Add(CertificatePassword);
+
+            return hash.ToHashCode();
         }
     }
 }

@@ -24,7 +24,7 @@ Nulla facilisi nullam vehicula ipsum a arcu cursus vitae. Netus et malesuada fam
 
 Leo vel orci porta non pulvinar neque laoreet suspendisse. Sagittis eu volutpat odio facilisis mauris. Sollicitudin ac orci phasellus egestas tellus rutrum tellus. Tellus integer feugiat scelerisque varius morbi. Tincidunt praesent semper feugiat nibh. Enim nec dui nunc mattis enim ut. Sit amet nisl purus in mollis. Eget duis at tellus at urna condimentum mattis pellentesque. Amet mattis vulputate enim nulla aliquet porttitor lacus luctus. Porttitor lacus luctus accumsan tortor posuere ac. Tristique senectus et netus et malesuada fames. Auctor urna nunc id cursus metus aliquam eleifend. Amet porttitor eget dolor morbi non arcu risus quis. Eu non diam phasellus vestibulum lorem sed risus ultricies tristique. Facilisis gravida neque convallis a cras semper auctor neque. Praesent semper feugiat nibh sed pulvinar proin gravida hendrerit. Sit amet massa vitae tortor.</description>
     <dependencies>
-      <dependency id="chocolatey" />
+      <dependency id="chocolatey" version="0.10.15" />
     </dependencies>
   </metadata>
 </package>

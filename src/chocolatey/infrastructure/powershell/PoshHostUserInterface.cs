@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.powershell
         private readonly ChocolateyConfiguration _configuration;
         protected readonly Console Console = new Console();
         private readonly PoshHostRawUserInterface _rawUi = new PoshHostRawUserInterface();
-        private const int TIMEOUT_IN_SECONDS = 30;
+        private const int TimeoutInSeconds = 30;
 
         public bool StandardErrorWritten { get; set; }
 
@@ -55,9 +55,9 @@ namespace chocolatey.infrastructure.powershell
             if (!_configuration.PromptForConfirmation)
             {
                 this.Log().Warn(ChocolateyLoggers.Important, @"  Confirmation (`-y`) is set.
-  Respond within {0} seconds or the default selection will be chosen.".format_with(TIMEOUT_IN_SECONDS));
+  Respond within {0} seconds or the default selection will be chosen.".FormatWith(TimeoutInSeconds));
 
-                return Console.ReadLine(TIMEOUT_IN_SECONDS * 1000);
+                return Console.ReadLine(TimeoutInSeconds * 1000);
             }
 
             return Console.ReadLine();
@@ -68,17 +68,17 @@ namespace chocolatey.infrastructure.powershell
             if (!_configuration.PromptForConfirmation)
             {
                 this.Log().Warn(ChocolateyLoggers.Important, @"  Confirmation (`-y`) is set.
-  Respond within {0} seconds or the default selection will be chosen.".format_with(TIMEOUT_IN_SECONDS));
+  Respond within {0} seconds or the default selection will be chosen.".FormatWith(TimeoutInSeconds));
             }
 
-            var secureStringPlainText = InteractivePrompt.get_password(_configuration.PromptForConfirmation);
+            var secureStringPlainText = InteractivePrompt.GetPassword(_configuration.PromptForConfirmation);
 
-            return secureStringPlainText.to_secure_string();
+            return secureStringPlainText.ToSecureStringSafe();
         }
 
         public override void Write(string value)
         {
-            this.Log().Info(value.escape_curly_braces());
+            this.Log().Info(value.EscapeCurlyBraces());
             //Console.Write(value);
         }
 
@@ -90,7 +90,7 @@ namespace chocolatey.infrastructure.powershell
             System.Console.BackgroundColor = backgroundColor;
 
             Console.Write(value);
-            this.Log().Info(ChocolateyLoggers.LogFileOnly, value.escape_curly_braces());
+            this.Log().Info(ChocolateyLoggers.LogFileOnly, value.EscapeCurlyBraces());
 
             System.Console.ForegroundColor = originalForegroundColor;
             System.Console.BackgroundColor = originalBackgroundColor;
@@ -109,7 +109,7 @@ namespace chocolatey.infrastructure.powershell
             System.Console.BackgroundColor = backgroundColor;
 
             Console.WriteLine(value);
-            this.Log().Info(ChocolateyLoggers.LogFileOnly, value.escape_curly_braces());
+            this.Log().Info(ChocolateyLoggers.LogFileOnly, value.EscapeCurlyBraces());
 
             System.Console.ForegroundColor = originalForegroundColor;
             System.Console.BackgroundColor = originalBackgroundColor;
@@ -117,18 +117,18 @@ namespace chocolatey.infrastructure.powershell
 
         public override void WriteLine(string value)
         {
-            this.Log().Info(value.escape_curly_braces());
+            this.Log().Info(value.EscapeCurlyBraces());
         }
 
         public override void WriteErrorLine(string value)
         {
             StandardErrorWritten = true;
-            this.Log().Error(value.escape_curly_braces());
+            this.Log().Error(value.EscapeCurlyBraces());
         }
 
         public override void WriteDebugLine(string message)
         {
-            this.Log().Debug(message.escape_curly_braces());
+            this.Log().Debug(message.EscapeCurlyBraces());
         }
 
         private bool hasLoggedStartProgress = false;
@@ -139,42 +139,42 @@ namespace chocolatey.infrastructure.powershell
             if (!hasLoggedStartProgress)
             {
                 hasLoggedStartProgress = true;
-                this.Log().Debug(record.Activity.escape_curly_braces());
+                this.Log().Debug(record.Activity.EscapeCurlyBraces());
             }
 
             if (_configuration.Features.ShowDownloadProgress)
             {
                 // http://stackoverflow.com/a/888569/18475
-                Console.Write("\rProgress: {0}% - {1}".format_with(record.PercentComplete.to_string(), record.StatusDescription).PadRight(Console.WindowWidth));
+                Console.Write("\rProgress: {0}% - {1}".FormatWith(record.PercentComplete.ToStringSafe(), record.StatusDescription).PadRight(Console.WindowWidth));
             }
         }
 
         public override void WriteVerboseLine(string message)
         {
-            this.Log().Info(ChocolateyLoggers.Verbose, "VERBOSE: " + message.escape_curly_braces());
+            this.Log().Info(ChocolateyLoggers.Verbose, "VERBOSE: " + message.EscapeCurlyBraces());
         }
 
         public override void WriteWarningLine(string message)
         {
-            this.Log().Warn("WARNING: " + message.escape_curly_braces());
+            this.Log().Warn("WARNING: " + message.EscapeCurlyBraces());
         }
 
         public override Dictionary<string, PSObject> Prompt(string caption, string message, Collection<FieldDescription> descriptions)
         {
-            this.Log().Info(ChocolateyLoggers.Important, caption.escape_curly_braces());
+            this.Log().Info(ChocolateyLoggers.Important, caption.EscapeCurlyBraces());
             var results = new Dictionary<string, PSObject>();
             foreach (FieldDescription field in descriptions)
             {
-                if (string.IsNullOrWhiteSpace(field.Label)) this.Log().Warn(field.Name.escape_curly_braces());
+                if (string.IsNullOrWhiteSpace(field.Label)) this.Log().Warn(field.Name.EscapeCurlyBraces());
                 else
                 {
-                    string[] label = get_hotkey_and_label(field.Label);
-                    this.Log().Warn(label[1].escape_curly_braces());
+                    string[] label = GetHotkeyAndLabel(field.Label);
+                    this.Log().Warn(label[1].EscapeCurlyBraces());
                 }
 
                 dynamic selection = string.Empty;
 
-                if (field.ParameterTypeFullName.is_equal_to(typeof(SecureString).FullName))
+                if (field.ParameterTypeFullName.IsEqualTo(typeof(SecureString).FullName))
                 {
                     selection = ReadLineAsSecureString();
                 }
@@ -202,14 +202,14 @@ namespace chocolatey.infrastructure.powershell
         /// <returns>
         ///   A two dimensional array containing the parsed components.
         /// </returns>
-        private static string[] get_hotkey_and_label(string input)
+        private static string[] GetHotkeyAndLabel(string input)
         {
             var result = new[] { String.Empty, String.Empty };
             //Do not use StringSplitOptions.RemoveEmptyEntries, it causes issues here
             string[] fragments = input.Split('&');
             if (fragments.Length == 2)
             {
-                if (fragments[1].Length > 0) result[0] = fragments[1][0].to_string().ToUpper(CultureInfo.CurrentCulture);
+                if (fragments[1].Length > 0) result[0] = fragments[1][0].ToStringSafe().ToUpper(CultureInfo.CurrentCulture);
 
                 result[1] = (fragments[0] + fragments[1]).Trim();
             }
@@ -220,10 +220,10 @@ namespace chocolatey.infrastructure.powershell
 
         public override int PromptForChoice(string caption, string message, Collection<ChoiceDescription> choices, int defaultChoice)
         {
-            if (!string.IsNullOrWhiteSpace(caption)) this.Log().Warn(caption.escape_curly_braces());
-            if (!string.IsNullOrWhiteSpace(message)) this.Log().Warn(ChocolateyLoggers.Important, message.escape_curly_braces());
+            if (!string.IsNullOrWhiteSpace(caption)) this.Log().Warn(caption.EscapeCurlyBraces());
+            if (!string.IsNullOrWhiteSpace(message)) this.Log().Warn(ChocolateyLoggers.Important, message.EscapeCurlyBraces());
 
-            string[,] promptData = build_hotkeys_and_plain_labels(choices);
+            string[,] promptData = BuildHotkeysAndLabels(choices);
 
             // Format the overall choice prompt string to display.
             var choicePrompt = new StringBuilder();
@@ -243,8 +243,8 @@ namespace chocolatey.infrastructure.powershell
 
             while (true)
             {
-                this.Log().Warn(choicePrompt.ToString().escape_curly_braces());
-                string selection = ReadLine().trim_safe().ToUpper(CultureInfo.CurrentCulture);
+                this.Log().Warn(choicePrompt.ToString().EscapeCurlyBraces());
+                string selection = ReadLine().TrimSafe().ToUpper(CultureInfo.CurrentCulture);
 
                 if (selection.Length == 0) return defaultChoice;
 
@@ -253,17 +253,17 @@ namespace chocolatey.infrastructure.powershell
                     if (promptData[0, i] == selection) return i;
                 }
 
-                this.Log().Warn(ChocolateyLoggers.Important, "Invalid choice: " + selection.escape_curly_braces());
+                this.Log().Warn(ChocolateyLoggers.Important, "Invalid choice: " + selection.EscapeCurlyBraces());
             }
         }
 
-        private static string[,] build_hotkeys_and_plain_labels(Collection<ChoiceDescription> choices)
+        private static string[,] BuildHotkeysAndLabels(Collection<ChoiceDescription> choices)
         {
             var choiceSelections = new string[2, choices.Count];
 
             for (int i = 0; i < choices.Count; ++i)
             {
-                string[] hotkeyAndLabel = get_hotkey_and_label(choices[i].Label);
+                string[] hotkeyAndLabel = GetHotkeyAndLabel(choices[i].Label);
                 choiceSelections[0, i] = hotkeyAndLabel[0];
                 choiceSelections[1, i] = hotkeyAndLabel[1];
             }
@@ -278,13 +278,13 @@ namespace chocolatey.infrastructure.powershell
 
         public override PSCredential PromptForCredential(string caption, string message, string userName, string targetName, PSCredentialTypes allowedCredentialTypes, PSCredentialUIOptions options)
         {
-            if (!string.IsNullOrWhiteSpace(caption)) this.Log().Warn(caption.escape_curly_braces());
-            if (!string.IsNullOrWhiteSpace(message)) this.Log().Warn(ChocolateyLoggers.Important, message.escape_curly_braces());
+            if (!string.IsNullOrWhiteSpace(caption)) this.Log().Warn(caption.EscapeCurlyBraces());
+            if (!string.IsNullOrWhiteSpace(message)) this.Log().Warn(ChocolateyLoggers.Important, message.EscapeCurlyBraces());
 
             if (string.IsNullOrWhiteSpace(userName))
             {
                 this.Log().Warn("Please provide username:");
-                string selection = ReadLine().trim_safe().ToUpper(CultureInfo.CurrentCulture);
+                string selection = ReadLine().TrimSafe().ToUpper(CultureInfo.CurrentCulture);
 
                 if (selection.Length == 0) selection = targetName;
 
@@ -293,14 +293,14 @@ namespace chocolatey.infrastructure.powershell
 
             var password = string.Empty;
             this.Log().Warn("Please provide password:");
-            password = InteractivePrompt.get_password(_configuration.PromptForConfirmation);
+            password = InteractivePrompt.GetPassword(_configuration.PromptForConfirmation);
 
             if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
             {
                 this.Log().Warn(ChocolateyLoggers.Important, "A userName or password was not entered. This may result in future failures.");
             }
 
-            return new PSCredential(userName, password.to_secure_string());
+            return new PSCredential(userName, password.ToSecureStringSafe());
         }
 
         public override PSHostRawUserInterface RawUI { get { return _rawUi; } }

@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,14 +31,14 @@ namespace chocolatey.infrastructure.app.configuration
     public class ChocolateyConfiguration
     {
         [NonSerialized]
-        private ChocolateyConfiguration _originalConfiguration;
+        private Stack<ChocolateyConfiguration> _configurationBackups;
 
         public ChocolateyConfiguration()
         {
             RegularOutput = true;
             PromptForConfirmation = true;
             DisableCompatibilityChecks = false;
-            SourceType = SourceTypes.NORMAL;
+            SourceType = SourceTypes.Normal;
             Information = new InformationCommandConfiguration();
             Features = new FeaturesConfiguration();
             NewCommand = new NewCommandConfiguration();
@@ -65,11 +65,16 @@ namespace chocolatey.infrastructure.app.configuration
         /// Creates a backup of the current version of the configuration class.
         /// </summary>
         /// <exception cref="System.Runtime.Serialization.SerializationException">One or more objects in the class or child classes are not serializable.</exception>
-        public void start_backup()
+        public void CreateBackup()
         {
+            if (_configurationBackups == null)
+            {
+                _configurationBackups = new Stack<ChocolateyConfiguration>();
+            }
+
             // We do this the easy way to ensure that we have a clean copy
             // of the original configuration file.
-            _originalConfiguration = this.deep_copy();
+            _configurationBackups.Push(this.DeepCopy());
         }
 
         /// <summary>
@@ -84,42 +89,59 @@ namespace chocolatey.infrastructure.app.configuration
         /// This call may make quite a lot of allocations on the Gen0 heap, as such
         /// it is best to keep the calls to this method at a minimum.
         /// </remarks>
-        public void reset_config(bool removeBackup = false)
+        public void RevertChanges(bool removeBackup = false)
         {
-            if (_originalConfiguration == null)
+            if (_configurationBackups == null || _configurationBackups.Count == 0)
             {
                 if (removeBackup)
                 {
                     // If we will also be removing the backup, we do not care if it is already
                     // null or not, as that is the intended state when this method returns.
+                    this.Log().Debug("Requested removal of a configuration backup that does not exist: the backup stack is empty.");
                     return;
                 }
 
                 throw new InvalidOperationException("No backup has been created before trying to reset the current configuration, and removal of the backup was not requested.");
             }
 
+            // Runtime type lookup ensures this also fully works with derived classes (for example: licensed configuration)
+            // without needing to re-implement this method / make it overridable.
             var t = this.GetType();
+
+            var backup = removeBackup ? _configurationBackups.Pop() : _configurationBackups.Peek();
 
             foreach (var property in t.GetProperties(BindingFlags.Public | BindingFlags.Instance))
             {
+                if (property.Name == "_configurationBackups")
+                {
+                    continue;
+                }
+
                 try
                 {
-                    var originalValue = property.GetValue(_originalConfiguration, new object[0]);
+                    if (property.Name == "PromptForConfirmation")
+                    {
+                        // We do not overwrite this value between backups as it is intended to be a global setting;
+                        // if a user has selected a "[A] yes to all" prompt interactively, this option is
+                        // set and should be retained for the duration of the operations.
+                        continue;
+                    }
+
+                    var originalValue = property.GetValue(backup, new object[0]);
 
                     if (removeBackup || property.DeclaringType.IsPrimitive || property.DeclaringType.IsValueType || property.DeclaringType == typeof(string))
                     {
                         // If the property is a primitive, a value type or a string, then a copy of the value
                         // will be created by the .NET Runtime automatically, and we do not need to create a deep clone of the value.
                         // Additionally, if we will be removing the backup there is no need to create a deep copy
-                        // for any reference types, as such we also set the reference itself so it is not needed
-                        // to allocate more memory.
+                        // for any reference types. We won't have any duplicate references because the backup is being discarded.
                         property.SetValue(this, originalValue, new object[0]);
                     }
                     else if (originalValue != null)
                     {
                         // We need to do a deep copy of the value so it won't copy the reference itself,
                         // but rather the actual values we are interested in.
-                        property.SetValue(this, originalValue.deep_copy(), new object[0]);
+                        property.SetValue(this, originalValue.DeepCopy(), new object[0]);
                     }
                     else
                     {
@@ -128,16 +150,8 @@ namespace chocolatey.infrastructure.app.configuration
                 }
                 catch (Exception ex)
                 {
-                    throw new ApplicationException("Unable to restore the value for the property '{0}'.".format_with(property.Name), ex);
+                    throw new ApplicationException("Unable to restore the value for the property '{0}'.".FormatWith(property.Name), ex);
                 }
-            }
-
-            if (removeBackup)
-            {
-                // It is enough to set the original configuration to null to
-                // allow GC to clean it up the next time it runs on the stored Generation
-                // Heap Table.
-                _originalConfiguration = null;
             }
         }
 
@@ -150,67 +164,75 @@ namespace chocolatey.infrastructure.app.configuration
 NOTE: Hiding sensitive configuration data! Please double and triple
  check to be sure no sensitive data is shown, especially if copying
  output to a gist for review.");
-            output_tostring(properties, GetType().GetProperties(), this, "");
+            OutputToString(properties, GetType().GetProperties(), this, "");
             return properties.ToString();
         }
 
-        private void output_tostring(StringBuilder propertyValues, IEnumerable<PropertyInfo> properties, object obj, string prepend)
+        private void OutputToString(StringBuilder propertyValues, IEnumerable<PropertyInfo> properties, object obj, string prepend)
         {
-            foreach (var propertyInfo in properties.or_empty_list_if_null())
+            foreach (var propertyInfo in properties.OrEmpty())
             {
                 // skip sensitive data info
-                if (propertyInfo.Name.contains("password") || propertyInfo.Name.contains("sensitive") || propertyInfo.Name == "Key" || propertyInfo.Name == "ConfigValue" || propertyInfo.Name == "MachineSources")
+                if (propertyInfo.Name.ContainsSafe("password") || propertyInfo.Name.ContainsSafe("sensitive") || propertyInfo.Name == "Key" || propertyInfo.Name == "ConfigValue" || propertyInfo.Name == "MachineSources")
                 {
                     continue;
                 }
 
                 var objectValue = propertyInfo.GetValue(obj, null);
-                if (propertyInfo.PropertyType.is_built_in_system_type())
+                if (propertyInfo.PropertyType.IsBuiltinType())
                 {
-                    if (!string.IsNullOrWhiteSpace(objectValue.to_string()))
+                    if (!string.IsNullOrWhiteSpace(objectValue.ToStringSafe()))
                     {
-                        var output = "{0}{1}='{2}'|".format_with(
+                        var output = "{0}{1}='{2}'|".FormatWith(
                             string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
                             propertyInfo.Name,
-                            objectValue.to_string());
+                            objectValue.ToStringSafe());
 
-                        append_output(propertyValues, output);
+                        AppendOutput(propertyValues, output);
                     }
                 }
-                else if (propertyInfo.PropertyType.is_collections_type())
+                else if (propertyInfo.PropertyType.IsCollectionType())
                 {
                     var list = objectValue as IDictionary<string, string>;
-                    foreach (var item in list.or_empty_list_if_null())
+                    foreach (var item in list.OrEmpty())
                     {
-                        var output = "{0}{1}.{2}='{3}'|".format_with(
+                        var output = "{0}{1}.{2}='{3}'|".FormatWith(
                             string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
                             propertyInfo.Name,
                             item.Key,
                             item.Value);
 
-                        append_output(propertyValues, output);
+                        AppendOutput(propertyValues, output);
                     }
+                }
+                else if (objectValue is null)
+                {
+                    var output = "{0}{1}={{null}}".FormatWith(
+                        string.IsNullOrWhiteSpace(prepend) ? "" : prepend + ".",
+                        propertyInfo.Name);
+
+                    AppendOutput(propertyValues, output);
                 }
                 else
                 {
-                    output_tostring(propertyValues, propertyInfo.PropertyType.GetProperties(), objectValue, propertyInfo.Name);
+                    OutputToString(propertyValues, propertyInfo.PropertyType.GetProperties(), objectValue, propertyInfo.Name);
                 }
             }
         }
 
-        private const int MAX_CONSOLE_LINE_LENGTH = 72;
+        private const int MaxConsoleLineLength = 72;
         private int _currentLineLength = 0;
 
-        private void append_output(StringBuilder propertyValues, string append)
+        private void AppendOutput(StringBuilder propertyValues, string append)
         {
             _currentLineLength += append.Length;
 
             propertyValues.AppendFormat("{0}{1}{2}",
-                   _currentLineLength < MAX_CONSOLE_LINE_LENGTH ? string.Empty : Environment.NewLine,
+                   _currentLineLength < MaxConsoleLineLength ? string.Empty : Environment.NewLine,
                    append,
-                   append.Length < MAX_CONSOLE_LINE_LENGTH ? string.Empty : Environment.NewLine);
+                   append.Length < MaxConsoleLineLength ? string.Empty : Environment.NewLine);
 
-            if (_currentLineLength > MAX_CONSOLE_LINE_LENGTH)
+            if (_currentLineLength > MaxConsoleLineLength)
             {
                 _currentLineLength = append.Length;
             }
@@ -228,7 +250,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         // configuration set variables
         public string CacheLocation { get; set; }
 
-        public bool ContainsLegacyPackageInstalls { get; set; }
         public int CommandExecutionTimeoutSeconds { get; set; }
         public int WebRequestTimeoutSeconds { get; set; }
         public string DefaultTemplateName { get; set; }
@@ -242,6 +263,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         // top level commands
 
+        public bool ShowOnlineHelp { get; set; }
         public bool Debug { get; set; }
         public bool Verbose { get; set; }
         public bool Trace { get; set; }
@@ -264,7 +286,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool RegularOutput { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether console logging should be supressed.
+        /// Gets or sets a value indicating whether console logging should be suppressed.
         /// This is for use by API calls which surface results in alternate forms.
         /// </summary>
         /// <value><c>true</c> for no output; <c>false</c> for regular or limited output.</value>
@@ -317,9 +339,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ApplyPackageParametersToDependencies { get; set; }
         public bool ApplyInstallArgumentsToDependencies { get; set; }
         public bool IgnoreDependencies { get; set; }
-
-        [Obsolete("Side by Side installation is deprecated, and is pending removal in v2.0.0")]
-        public bool AllowMultipleVersions { get; set; }
 
         public bool AllowDowngrade { get; set; }
         public bool ForceDependencies { get; set; }
@@ -458,6 +477,16 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
         /// </remarks>
         public TemplateCommandConfiguration TemplateCommand { get; set; }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void start_backup()
+            => CreateBackup();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void reset_config(bool removeBackup = false)
+            => RevertChanges(removeBackup);
+#pragma warning restore IDE1006
     }
 
     [Serializable]
@@ -542,6 +571,8 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool DownloadCacheAvailable { get; set; }
         public bool NotBroken { get; set; }
         public bool IncludeVersionOverrides { get; set; }
+        public bool ExplicitPageSize { get; set; }
+        public bool ExplicitSource { get; set; }
     }
 
     [Serializable]
@@ -631,7 +662,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class ApiKeyCommandConfiguration
     {
         public string Key { get; set; }
-        public bool Remove { get; set; }
+        public ApiKeyCommandType Command { get; set; }
     }
 
     [Serializable]
@@ -643,12 +674,14 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         }
 
         public IDictionary<string, string> Properties { get; private set; }
+        public bool PackThrowOnUnsupportedElements = true;
     }
 
     [Serializable]
     public sealed class PushCommandConfiguration
     {
         public string Key { get; set; }
+        public string DefaultSource { get; set; }
         //DisableBuffering?
     }
 

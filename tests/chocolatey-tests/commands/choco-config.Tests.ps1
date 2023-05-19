@@ -2,6 +2,7 @@
 
 Describe "choco config" -Tag Chocolatey, ConfigCommand {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
         New-ChocolateyInstallSnapshot
 
@@ -11,35 +12,6 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
 
     BeforeDiscovery {
         $isLicensed = Test-PackageIsEqualOrHigher "chocolatey.extension" "0.0.0"
-
-        $TestedFeatures = @(
-            "checksumFiles"
-            "autoUninstaller"
-            "allowGlobalConfirmation"
-            "failOnAutoUninstaller"
-            "failOnStandardError"
-            "allowEmptyChecksums"
-            "allowEmptyChecksumsSecure"
-            "powershellHost"
-            "logEnvironmentValues"
-            "virusCheck"
-            "failOnInvalidOrMissingLicense"
-            "ignoreInvalidOptionsSwitches"
-            "usePackageExitCodes"
-            "useEnhancedExitCodes"
-            "exitOnRebootDetected"
-            "useFipsCompliantChecksums"
-            "showNonElevatedWarnings"
-            "showDownloadProgress"
-            "stopOnFirstPackageFailure"
-            "useRememberedArgumentsForUpgrades"
-            "ignoreUnfoundPackagesOnUpgradeOutdated"
-            "skipPackageUpgradesWhenNotInstalled"
-            "removePackageInformationOnUninstall"
-            "logWithoutColor"
-            "logValidationResultsOnWarnings"
-            "usePackageRepositoryOptimizations"
-        )
 
         $TestedConfigs = @(
             "cacheLocation"
@@ -97,63 +69,32 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
             $Output.Lines | Should -Contain $expectedLicenseHeader
         }
 
-        It "Displays Settings section" {
-            $Output.Lines | Should -Contain "Settings"
+        It "Does not display Sources section" {
+            $Output.Lines | Should  -Not -Contain "Sources"
         }
 
-        It "Displays Sources section" {
-            $Output.Lines | Should -Contain "Sources"
+        It "Does not display Features" {
+            $Output.Lines | Should -Not -Contain "Features"
         }
 
-        It "Displays Features" {
-            $Output.Lines | Should -Contain "Features"
-        }
-
-        It "Displays API Keys section" {
-            $Output.Lines | Should -Contain "API Keys"
-        }
-
-        It "Displays note about choco <_>" -ForEach @(
-            "source"
-            "feature"
-        ) {
-            $Output.Lines | Should -Contain "NOTE: Use choco $_ to interact with $($_)s."
-        }
-
-        It "Displays note about choco apikey" {
-            $Output.Lines | Should -Contain "NOTE: Api Keys are not shown through this command."
-            $Output.Lines | Should -Contain "Use choco apikey to interact with API keys."
+        It "Does not display API Keys section" {
+            $Output.Lines | Should -Not -Contain "API Keys"
         }
 
         It "Displays Available Setting <_>" -ForEach @(
-            "cacheLocation =  |"
-            "containsLegacyPackageInstalls = true |"
-            "commandExecutionTimeoutSeconds = 2700 |"
-            "proxy =  |"
-            "proxyUser =  |"
-            "proxyPassword =  |"
-            "webRequestTimeoutSeconds = 30 |"
-            "proxyBypassList =  |"
-            "proxyBypassOnLocal = true |"
-            "upgradeAllExceptions =  |"
-            "defaultTemplateName =  |"
+            "cacheLocation =  \|"
+            "containsLegacyPackageInstalls = true \|"
+            "commandExecutionTimeoutSeconds = 2700 \|"
+            "proxy = [^|]* \|"
+            "proxyUser = [^|]* \|"
+            "proxyPassword = [^|]* \|"
+            "webRequestTimeoutSeconds = 30 \|"
+            "proxyBypassList =  \|"
+            "proxyBypassOnLocal = true \|"
+            "upgradeAllExceptions =  \|"
+            "defaultTemplateName =  \|"
         ) {
-            $Output.String | Should -MatchExactly ([Regex]::Escape($_))
-        }
-
-        # Only community repository URL will be set on 0.10.16 and above
-        # Issue: https://github.com/chocolatey/choco/issues/2231
-        It "Displays Available Sources <Name> - <Source>" -ForEach @(
-            @{
-                Name   = "chocolatey"
-                Source = if (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta") { "https://community.chocolatey.org/api/v2/" } else { "https://chocolatey.org/api/v2/" }
-            }
-        ) {
-            $Output.String | Should -MatchExactly "$Name( \[Disabled\])? - $([Regex]::Escape($Source))\s*\|"
-        }
-
-        It "Displays Available Feature <_>" -ForEach $TestedFeatures {
-            $Output.String | Should -Match "\[[ x]\] $_ -"
+            $Output.String | Should -MatchExactly $_
         }
     }
 
@@ -343,4 +284,7 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
             $value | Should -HaveCount 0
         }
     }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

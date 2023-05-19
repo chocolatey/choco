@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Install-ChocolateyPowershellCommand {
-<#
+    <#
 .SYNOPSIS
 Installs a PowerShell Script as a command
 
@@ -49,7 +49,7 @@ Full file path to PowerShell file to turn into a command. If embedding
 it in the package next to the install script, the path will be like
 `"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\\Script.ps1"`
 
-In 0.10.6+, `File` and `FileFullPath` are aliases for PsFileFullPath.
+`File` and `FileFullPath` are aliases for PsFileFullPath.
 
 .PARAMETER Url
 This is the 32 bit url to download the resource from. This resource can
@@ -134,7 +134,7 @@ https://support.microsoft.com/en-us/kb/811833 for more details.
 The recommendation is to use at least SHA256.
 
 .PARAMETER Options
-OPTIONAL - Specify custom headers. Available in 0.9.10+.
+OPTIONAL - Specify custom headers.
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
@@ -176,38 +176,37 @@ Install-ChocolateyPackage
 .LINK
 Install-ChocolateyZipPackage
 #>
-param(
-  [parameter(Mandatory=$false, Position=0)][string] $packageName,
-  [alias("file","fileFullPath")][parameter(Mandatory=$true, Position=1)][string] $psFileFullPath,
-  [parameter(Mandatory=$false, Position=2)][string] $url ='',
-  [parameter(Mandatory=$false, Position=3)]
-  [alias("url64")][string] $url64bit = '',
-  [parameter(Mandatory=$false)][string] $checksum = '',
-  [parameter(Mandatory=$false)][string] $checksumType = '',
-  [parameter(Mandatory=$false)][string] $checksum64 = '',
-  [parameter(Mandatory=$false)][string] $checksumType64 = '',
-  [parameter(Mandatory=$false)][hashtable] $options = @{Headers=@{}},
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param(
+        [parameter(Mandatory = $false, Position = 0)][string] $packageName,
+        [alias("file", "fileFullPath")][parameter(Mandatory = $true, Position = 1)][string] $psFileFullPath,
+        [parameter(Mandatory = $false, Position = 2)][string] $url = '',
+        [parameter(Mandatory = $false, Position = 3)]
+        [alias("url64")][string] $url64bit = '',
+        [parameter(Mandatory = $false)][string] $checksum = '',
+        [parameter(Mandatory = $false)][string] $checksumType = '',
+        [parameter(Mandatory = $false)][string] $checksum64 = '',
+        [parameter(Mandatory = $false)][string] $checksumType64 = '',
+        [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
-  if ($url -ne '') {
-    Get-ChocolateyWebFile $packageName $psFileFullPath $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -Options $options
-  }
+    if ($url -ne '') {
+        Get-ChocolateyWebFile $packageName $psFileFullPath $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -Options $options
+    }
 
-  if ($env:chocolateyPackageName -ne $null -and $env:chocolateyPackageName -eq $env:ChocolateyInstallDirectoryPackage) {
-    Write-Warning "Install Directory override not available for PowerShell command packages."
-  }
+    if ($env:chocolateyPackageName -ne $null -and $env:chocolateyPackageName -eq $env:ChocolateyInstallDirectoryPackage) {
+        Write-Warning "Install Directory override not available for PowerShell command packages."
+    }
 
-  $nugetPath = $(Split-Path -parent $helpersPath)
-  $nugetExePath = Join-Path $nuGetPath 'bin'
+    $nugetPath = $(Split-Path -Parent $helpersPath)
+    $nugetExePath = Join-Path $nuGetPath 'bin'
 
-  $cmdName = [System.IO.Path]::GetFileNameWithoutExtension($psFileFullPath)
-  $packageBatchFileName = Join-Path $nugetExePath "$($cmdName).bat"
+    $cmdName = [System.IO.Path]::GetFileNameWithoutExtension($psFileFullPath)
+    $packageBatchFileName = Join-Path $nugetExePath "$($cmdName).bat"
 
-  Write-Host "Adding $packageBatchFileName and pointing it to powershell command $psFileFullPath"
-"@echo off
-powershell -NoProfile -ExecutionPolicy unrestricted -Command ""& `'$psFileFullPath`'  %*"""| Out-File $packageBatchFileName -encoding ASCII
-
+    Write-Host "Adding $packageBatchFileName and pointing it to powershell command $psFileFullPath"
+    "@echo off
+powershell -NoProfile -ExecutionPolicy unrestricted -Command ""& `'$psFileFullPath`'  %*"""| Out-File $packageBatchFileName -Encoding ASCII
 }

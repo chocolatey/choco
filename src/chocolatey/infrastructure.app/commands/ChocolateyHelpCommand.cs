@@ -37,40 +37,40 @@ namespace chocolatey.infrastructure.app.commands
             _container = container;
         }
 
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
-            display_help_message(_container);
+            DisplayHelpMessage(_container);
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
-            display_help_message(_container);
+            DisplayHelpMessage(_container);
         }
 
-        public virtual void run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
-            display_help_message(_container);
+            DisplayHelpMessage(_container);
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
             return false;
         }
 
-        public static void display_help_message(Container container = null)
+        public static void DisplayHelpMessage(Container container = null)
         {
             var commandsLog = new StringBuilder();
             if (null == container)
@@ -84,7 +84,7 @@ namespace chocolatey.infrastructure.app.commands
 
             IEnumerable<ICommand> commands = container.GetAllInstances<ICommand>();
 
-            foreach (var command in commands.or_empty_list_if_null().SelectMany(c =>
+            foreach (var command in commands.OrEmpty().SelectMany(c =>
             {
                 return c.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>();
             }).OrderBy(c => c.CommandName))
@@ -95,17 +95,11 @@ namespace chocolatey.infrastructure.app.commands
             "chocolatey".Log().Info(@"This is a listing of all of the different things you can pass to choco.
 ");
 
-            "chocolatey".Log().Warn(ChocolateyLoggers.Important, "DEPRECATION NOTICE");
-            "chocolatey".Log().Warn(@"
-The shims `chocolatey`, `cinst`, `clist`, `cpush`, `cuninst` and `cup` are deprecated.
-We recommend updating all scripts to use their full command equivalent as these will be
-removed in v2.0.0 of Chocolatey.
-");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
 
             "chocolatey".Log().Info(@"
  -v, --version
-     Version - Prints out the Chocolatey version. Available in 0.9.9+.
+     Version - Prints out the Chocolatey version.
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Commands");
@@ -114,7 +108,7 @@ removed in v2.0.0 of Chocolatey.
 
 Please run chocolatey with `choco command -help` for specific help on
  each command.
-".format_with(commandsLog.ToString()));
+".FormatWith(commandsLog.ToString()));
             "chocolatey".Log().Info(ChocolateyLoggers.Important, @"How To Pass Options / Switches");
             "chocolatey".Log().Info(@"
 You can pass options and switches in the following ways:
@@ -166,9 +160,7 @@ compatibility across different versions and editions of Chocolatey.
 Following this guide will ensure your experience is not frustrating
 based on choco not receiving things you think you are passing to it.
 
- * For consistency, always use `choco`, not `choco.exe`. Never use
-   shortcut commands like `cinst` or `cup` (The shortcuts `cinst`
-   and `cup` will be removed in v2.0.0).
+ * For consistency, always use `choco`, not `choco.exe`.
  * Always have the command as the first argument to `choco`. e.g.
    `choco install`, where `install` is the command.
  * If there is a subcommand, ensure that is the second argument. e.g.
@@ -266,5 +258,35 @@ Following these scripting best practices will ensure your scripts work
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Default Options and Switches");
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+#pragma warning restore IDE1006
     }
 }

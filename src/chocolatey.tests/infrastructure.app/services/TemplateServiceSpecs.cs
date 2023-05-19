@@ -28,8 +28,10 @@ namespace chocolatey.tests.infrastructure.app.services
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.services;
     using Moq;
+    using NuGet.Common;
     using NUnit.Framework;
     using Should;
+    using LogLevel = tests.LogLevel;
 
     public class TemplateServiceSpecs
     {
@@ -38,17 +40,17 @@ namespace chocolatey.tests.infrastructure.app.services
             protected TemplateService service;
             protected Mock<IFileSystem> fileSystem = new Mock<IFileSystem>();
             protected Mock<IXmlService> xmlService = new Mock<IXmlService>();
+            protected Mock<ILogger> logger = new Mock<ILogger>();
 
             public override void Context()
             {
                 fileSystem.ResetCalls();
                 xmlService.ResetCalls();
-
-                service = new TemplateService(fileSystem.Object, xmlService.Object);
+                service = new TemplateService(fileSystem.Object, xmlService.Object, logger.Object);
             }
         }
 
-        public class when_generate_noop_is_called : TemplateServiceSpecsBase
+        public class When_generate_noop_is_called : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -56,24 +58,24 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
                 config.NewCommand.Name = "Bob";
             }
 
             public override void Because()
             {
-                because = () => service.generate_noop(config);
+                because = () => service.GenerateDryRun(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
-            public void should_log_current_directory_if_no_outputdirectory()
+            public void Should_log_current_directory_if_no_outputdirectory()
             {
                 because();
 
@@ -83,7 +85,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            public void should_log_output_directory_if_outputdirectory_is_specified()
+            public void Should_log_output_directory_if_outputdirectory_is_specified()
             {
                 config.OutputDirectory = "c:\\packages";
 
@@ -95,7 +97,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_file_from_template_is_called : TemplateServiceSpecsBase
+        public class When_generate_file_from_template_is_called : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -108,7 +110,7 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.write_file(It.Is((string fl) => fl == fileLocation), It.IsAny<string>(), Encoding.UTF8))
+                fileSystem.Setup(x => x.WriteFile(It.Is((string fl) => fl == fileLocation), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => this.fileContent = fileContent);
 
                 templateValues.PackageName = "Bob";
@@ -116,16 +118,16 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate_file_from_template(config, templateValues, template, fileLocation, Encoding.UTF8);
+                because = () => service.GenerateFileFromTemplate(config, templateValues, template, fileLocation, Encoding.UTF8);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
-            public void should_write_file_withe_replaced_tokens()
+            public void Should_write_file_withe_replaced_tokens()
             {
                 because();
 
@@ -135,7 +137,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            public void should_log_info_if_regular_output()
+            public void Should_log_info_if_regular_output()
             {
                 config.RegularOutput = true;
 
@@ -151,7 +153,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called_with_existing_directory : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_existing_directory : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -161,10 +163,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(
+                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns<string>(
                     x =>
                     {
                         verifiedDirectoryPath = x;
@@ -176,16 +178,16 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
-            public void should_throw_exception()
+            public void Should_throw_exception()
             {
                 bool errored = false;
                 string errorMessage = string.Empty;
@@ -206,7 +208,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            public void should_throw_exception_even_with_outputdirectory()
+            public void Should_throw_exception_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
 
@@ -229,7 +231,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called : TemplateServiceSpecsBase
+        public class When_generate_is_called : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -241,8 +243,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns(
                         (string a, string[] b) =>
                         {
@@ -252,13 +254,13 @@ namespace chocolatey.tests.infrastructure.app.services
                             }
                             return a + "\\" + b[0];
                         });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\default"));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
+                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\default"));
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
-                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
+                fileSystem.Setup(x => x.DeleteDirectoryChecked(It.IsAny<string>(), true));
+                fileSystem.Setup(x => x.EnsureDirectoryExists(It.IsAny<string>())).Callback(
                     (string directory) =>
                     {
                         if (!string.IsNullOrWhiteSpace(directory))
@@ -266,28 +268,28 @@ namespace chocolatey.tests.infrastructure.app.services
                             directoryCreated.Add(directory);
                         }
                     });
-                fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories)).Returns(new[] { "templates\\default\\template.nuspec", "templates\\default\\random.txt" });
-                fileSystem.Setup(x => x.get_directory_name(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
-                fileSystem.Setup(x => x.get_file_extension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
-                fileSystem.Setup(x => x.read_file(It.IsAny<string>())).Returns(string.Empty);
+                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), "*.*", SearchOption.AllDirectories)).Returns(new[] { "templates\\default\\template.nuspec", "templates\\default\\random.txt" });
+                fileSystem.Setup(x => x.GetDirectoryName(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
+                fileSystem.Setup(x => x.GetFileExtension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
+                fileSystem.Setup(x => x.ReadFile(It.IsAny<string>())).Returns(string.Empty);
 
                 config.NewCommand.Name = "Bob";
             }
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
                 files.Clear();
                 directoryCreated.Clear();
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories()
+            public void Should_generate_all_files_and_directories()
             {
                 because();
 
@@ -304,7 +306,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories_even_with_outputdirectory()
+            public void Should_generate_all_files_and_directories_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
 
@@ -323,7 +325,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called_with_nested_folders : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_nested_folders : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -335,8 +337,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns(
                         (string a, string[] b) =>
                         {
@@ -346,17 +348,17 @@ namespace chocolatey.tests.infrastructure.app.services
                             }
                             return a + "\\" + b[0];
                         });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
+                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
-                fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                fileSystem.Setup(x => x.DeleteDirectoryChecked(It.IsAny<string>(), true));
+                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
                     .Returns(new[] { "templates\\test\\template.nuspec", "templates\\test\\random.txt", "templates\\test\\tools\\chocolateyInstall.ps1", "templates\\test\\tools\\lower\\another.ps1" });
-                fileSystem.Setup(x => x.get_directories(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                fileSystem.Setup(x => x.GetDirectories(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
                     .Returns(new[] { "templates\\test", "templates\\test\\tools", "templates\\test\\tools\\lower" });
-                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
+                fileSystem.Setup(x => x.EnsureDirectoryExists(It.IsAny<string>())).Callback(
                     (string directory) =>
                     {
                         if (!string.IsNullOrWhiteSpace(directory))
@@ -364,9 +366,9 @@ namespace chocolatey.tests.infrastructure.app.services
                             directoryCreated.Add(directory);
                         }
                     });
-                fileSystem.Setup(x => x.get_directory_name(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
-                fileSystem.Setup(x => x.get_file_extension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
-                fileSystem.Setup(x => x.read_file(It.IsAny<string>())).Returns(string.Empty);
+                fileSystem.Setup(x => x.GetDirectoryName(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
+                fileSystem.Setup(x => x.GetFileExtension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
+                fileSystem.Setup(x => x.ReadFile(It.IsAny<string>())).Returns(string.Empty);
 
                 config.NewCommand.Name = "Bob";
                 config.NewCommand.TemplateName = "test";
@@ -374,18 +376,18 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
                 files.Clear();
                 directoryCreated.Clear();
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories()
+            public void Should_generate_all_files_and_directories()
             {
                 because();
 
@@ -405,7 +407,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories_even_with_outputdirectory()
+            public void Should_generate_all_files_and_directories_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
 
@@ -427,7 +429,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called_with_empty_nested_folders : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_empty_nested_folders : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -439,8 +441,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns(
                         (string a, string[] b) =>
                         {
@@ -450,17 +452,17 @@ namespace chocolatey.tests.infrastructure.app.services
                             }
                             return a + "\\" + b[0];
                         });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
+                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
-                fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                fileSystem.Setup(x => x.DeleteDirectoryChecked(It.IsAny<string>(), true));
+                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
                     .Returns(new[] { "templates\\test\\template.nuspec", "templates\\test\\random.txt", "templates\\test\\tools\\chocolateyInstall.ps1", "templates\\test\\tools\\lower\\another.ps1" });
-                fileSystem.Setup(x => x.get_directories(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                fileSystem.Setup(x => x.GetDirectories(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
                     .Returns(new[] { "templates\\test", "templates\\test\\tools", "templates\\test\\tools\\lower", "templates\\test\\empty", "templates\\test\\empty\\nested" });
-                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
+                fileSystem.Setup(x => x.EnsureDirectoryExists(It.IsAny<string>())).Callback(
                     (string directory) =>
                     {
                         if (!string.IsNullOrWhiteSpace(directory))
@@ -468,9 +470,9 @@ namespace chocolatey.tests.infrastructure.app.services
                             directoryCreated.Add(directory);
                         }
                     });
-                fileSystem.Setup(x => x.get_directory_name(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
-                fileSystem.Setup(x => x.get_file_extension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
-                fileSystem.Setup(x => x.read_file(It.IsAny<string>())).Returns(string.Empty);
+                fileSystem.Setup(x => x.GetDirectoryName(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
+                fileSystem.Setup(x => x.GetFileExtension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
+                fileSystem.Setup(x => x.ReadFile(It.IsAny<string>())).Returns(string.Empty);
 
                 config.NewCommand.Name = "Bob";
                 config.NewCommand.TemplateName = "test";
@@ -478,18 +480,18 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
                 files.Clear();
                 directoryCreated.Clear();
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories()
+            public void Should_generate_all_files_and_directories()
             {
                 because();
 
@@ -511,7 +513,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories_even_with_outputdirectory()
+            public void Should_generate_all_files_and_directories_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
 
@@ -535,7 +537,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called_with_defaulttemplatename_in_configuration_but_template_folder_doesnt_exist : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_defaulttemplatename_in_configuration_but_template_folder_doesnt_exist : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -544,8 +546,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
 
                 config.NewCommand.Name = "Bob";
@@ -554,18 +556,18 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_use_null_value_for_template()
+            public void Should_use_null_value_for_template()
             {
                 because();
 
@@ -573,7 +575,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called_with_defaulttemplatename_in_configuration_and_template_folder_exists : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_defaulttemplatename_in_configuration_and_template_folder_exists : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -583,10 +585,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "msi"))).Returns<string>(
+                fileSystem.Setup(x => x.DirectoryExists(Path.Combine(ApplicationParameters.TemplatesLocation, "msi"))).Returns<string>(
                     x =>
                     {
                         verifiedDirectoryPath = x;
@@ -599,18 +601,18 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_use_template_name_from_configuration()
+            public void Should_use_template_name_from_configuration()
             {
                 because();
 
@@ -618,7 +620,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called_with_defaulttemplatename_in_configuration_and_template_name_option_set : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_defaulttemplatename_in_configuration_and_template_name_option_set : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -628,10 +630,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
+                fileSystem.Setup(x => x.DirectoryExists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
                     x =>
                     {
                         verifiedDirectoryPath = x;
@@ -645,18 +647,18 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_use_template_name_from_command_line_option()
+            public void Should_use_template_name_from_command_line_option()
             {
                 because();
 
@@ -664,11 +666,10 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called_with_built_in_option_set : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_built_in_option_set : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-            private string verifiedDirectoryPath;
 
             public override void Context()
             {
@@ -680,18 +681,18 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_use_null_value_for_template()
+            public void Should_use_null_value_for_template()
             {
                 because();
 
@@ -699,11 +700,10 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called_with_built_in_option_set_and_defaulttemplate_in_configuration : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_built_in_option_set_and_defaulttemplate_in_configuration : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-            private string verifiedDirectoryPath;
 
             public override void Context()
             {
@@ -716,18 +716,18 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_use_null_value_for_template()
+            public void Should_use_null_value_for_template()
             {
                 because();
 
@@ -735,7 +735,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called_with_built_in_option_set_and_template_name_option_set_and_template_folder_exists : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_built_in_option_set_and_template_name_option_set_and_template_folder_exists : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -745,10 +745,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
+                fileSystem.Setup(x => x.DirectoryExists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
                     x =>
                     {
                         verifiedDirectoryPath = x;
@@ -762,18 +762,18 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_use_template_name_from_command_line_option()
+            public void Should_use_template_name_from_command_line_option()
             {
                 because();
 
@@ -781,7 +781,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_is_called_with_built_in_option_set_and_template_name_option_set_and_defaulttemplatename_set_and_template_folder_exists : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_built_in_option_set_and_template_name_option_set_and_defaulttemplatename_set_and_template_folder_exists : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -791,10 +791,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
+                fileSystem.Setup(x => x.DirectoryExists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
                     x =>
                     {
                         verifiedDirectoryPath = x;
@@ -809,18 +809,18 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_use_template_name_from_command_line_option()
+            public void Should_use_template_name_from_command_line_option()
             {
                 because();
 
@@ -828,40 +828,40 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_list_noop_is_called : TemplateServiceSpecsBase
+        public class When_list_noop_is_called : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
 
             public override void Because()
             {
-                because = () => service.list_noop(config);
+                because = () => service.ListDryRun(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
-            public void should_log_template_location_if_no_template_name()
+            public void Should_log_template_location_if_no_template_name()
             {
                 because();
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
                 infos.Count.ShouldEqual(1);
-                infos[0].ShouldEqual("Would have listed templates in {0}".format_with(ApplicationParameters.TemplatesLocation));
+                infos[0].ShouldEqual("Would have listed templates in {0}".FormatWith(ApplicationParameters.TemplatesLocation));
             }
 
             [Fact]
-            public void should_log_template_name_if_template_name()
+            public void Should_log_template_name_if_template_name()
             {
                 config.TemplateCommand.Name = "msi";
                 because();
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
                 infos.Count.ShouldEqual(1);
-                infos[0].ShouldEqual("Would have listed information about {0}".format_with(config.TemplateCommand.Name));
+                infos[0].ShouldEqual("Would have listed information about {0}".FormatWith(config.TemplateCommand.Name));
             }
         }
     }

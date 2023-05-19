@@ -1,4 +1,4 @@
-﻿function Test-ChocolateyVersionEqualOrHigherThan {
+function Test-ChocolateyVersionEqualOrHigherThan {
     <#
         .Synopsis
             Helper function that can be used to assert whether the current
@@ -8,9 +8,11 @@
     [CmdletBinding()]
     [OutputType([boolean])]
     param(
-        [NuGet.Versioning.SemanticVersion]$Version
+        [NuGet.Versioning.NuGetVersion]$Version
     )
-    $installedVersion = ((Invoke-Choco list -lo -r).Lines | ConvertFrom-ChocolateyOutput -Command List | Where-Object Name -eq 'chocolatey').Version
+    if (-not $script:ChocolateyInstalledVersion) {
+        $script:ChocolateyInstalledVersion = ((Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List | Where-Object Name -EQ 'chocolatey').Version
+    }
 
-    return Test-VersionEqualOrHigher -InstalledVersion $installedVersion -CompareVersion $Version
+    return Test-VersionEqualOrHigher -InstalledVersion $script:ChocolateyInstalledVersion -CompareVersion $Version
 }

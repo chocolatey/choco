@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,45 +16,140 @@
 
 namespace chocolatey.infrastructure.app.nuget
 {
+    using System;
+    using System.IO;
+    using System.Text;
+    using System.Threading.Tasks;
     using logging;
-    using NuGet;
-
-    // ReSharper disable InconsistentNaming
+    using NuGet.Common;
 
     public sealed class ChocolateyNugetLogger : ILogger
     {
-        public FileConflictResolution ResolveFileConflict(string message)
+        public void LogDebug(string message)
         {
-            this.Log().Debug("[NuGet] {0}{1} Resolving by automatic overwrite.".format_with(message.escape_curly_braces(),System.Environment.NewLine));
-
-            return FileConflictResolution.OverwriteAll;
+            Log(LogLevel.Debug, message);
         }
 
-        public void Log(MessageLevel level, string message, params object[] args)
+        public void LogVerbose(string message)
         {
+            Log(LogLevel.Verbose, message);
+        }
+
+        public void LogWarning(string message)
+        {
+            Log(LogLevel.Warning, message);
+        }
+
+        public void LogError(string message)
+        {
+            Log(LogLevel.Error, message);
+        }
+
+        public void LogMinimal(string message)
+        {
+            // We log this as informational as we do not want
+            // the output being shown to the user by default.
+            // This includes information such as the time taken
+            // to resolve dependencies, where the package was added
+            // and so on.
+            Log(LogLevel.Information, message);
+        }
+
+        public void LogInformation(string message)
+        {
+            // We log this as informational as we do not want
+            // the output being shown to the user by default.
+            // This includes information such as the time taken
+            // to resolve dependencies, where the package was added
+            // and so on.
+            Log(LogLevel.Information, message);
+        }
+
+        public void LogInformationSummary(string message)
+        {
+            // We log it as minimal as we want the output to
+            // be shown as an informational message in this case.
+            Log(LogLevel.Minimal, message);
+        }
+
+        public void Log(LogLevel level, string message)
+        {
+            var prefixedMessage = PrefixAllLines("[NuGet]", message);
+
             switch (level)
             {
-                case MessageLevel.Debug:
-                    this.Log().Debug("[NuGet] " + message, args);
+                case LogLevel.Debug:
+                    this.Log().Debug(prefixedMessage);
                     break;
-                case MessageLevel.Info:
-                    this.Log().Info("[NuGet] " + message, args);
+                case LogLevel.Warning:
+                    this.Log().Warn(prefixedMessage);
                     break;
-                case MessageLevel.Warning:
-                    this.Log().Warn("[NuGet] " + message, args);
+                case LogLevel.Error:
+                    this.Log().Error(prefixedMessage);
                     break;
-                case MessageLevel.Error:
-                    this.Log().Error("[NuGet] " + message, args);
+                case LogLevel.Verbose:
+                    this.Log().Info(ChocolateyLoggers.Verbose, prefixedMessage);
                     break;
-                case MessageLevel.Fatal:
-                    this.Log().Fatal("[NuGet] " + message, args);
+                case LogLevel.Information:
+                    this.Log().Info(ChocolateyLoggers.Verbose, prefixedMessage);
                     break;
-                case MessageLevel.Verbose:
-                    this.Log().Info(ChocolateyLoggers.Verbose, "[NuGet] " + message, args);
+                case LogLevel.Minimal:
+                    this.Log().Info(prefixedMessage);
                     break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(level));
             }
         }
-    }
 
-    // ReSharper restore InconsistentNaming
+        public Task LogAsync(LogLevel level, string message)
+        {
+            Log(level, message);
+
+            return Task.CompletedTask;
+        }
+
+        public void Log(ILogMessage log)
+        {
+            Log(log.Level, log.Message);
+        }
+
+        public Task LogAsync(ILogMessage log)
+        {
+            return LogAsync(log.Level, log.Message);
+        }
+
+        private static string PrefixAllLines(string prefix, string message)
+        {
+            if (message == null || (string.IsNullOrWhiteSpace(message) && message.IndexOf('\n') < 0))
+            {
+                return prefix;
+            }
+            else if (message.IndexOf('\n') < 0)
+            {
+                return "{0} {1}".FormatWith(prefix, message);
+            }
+
+            var builder = new StringBuilder(message.Length);
+            using (var reader = new StringReader(message))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    builder.Append(prefix);
+
+                    if (!string.IsNullOrWhiteSpace(line))
+                    {
+                        builder.Append(' ').Append(line);
+                    }
+
+                    builder.AppendLine();
+                }
+            }
+
+            // We specify the length we want, to ensure that we doesn't add any
+            // new newlines to the output.
+            return builder.ToString(0, builder.Length - Environment.NewLine.Length);
+        }
+    }
 }

@@ -1,8 +1,4 @@
-Import-Module helpers/common-helpers
-
-# https://github.com/chocolatey/choco/blob/master/src/chocolatey.tests.integration/scenarios/InstallScenarios.cs
-
-Describe "choco install" -Tag Chocolatey, InstallCommand {
+﻿Describe "choco install" -Tag Chocolatey, InstallCommand {
     BeforeDiscovery {
         $isLicensed30OrMissingVersion = Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-beta' -AllowMissingPackage
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
@@ -14,9 +10,11 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
+        $features = Get-ChocolateyFeatures
     }
 
     AfterAll {
@@ -33,7 +31,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -63,7 +61,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -89,7 +87,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed a package to the lib directory" {
@@ -157,7 +155,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
   <package id="missingpackage" />
   <package id="upgradepackage" version="1.0.0"
            installArguments="hi"
-           packageParameters="yo" forceX86="true" allowMultipleVersions="false"
+           packageParameters="yo" forceX86="true"
            ignoreDependencies="true"
            />
 </packages>
@@ -171,7 +169,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1), due to the missing 'missingpackage'" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Installs the package '<_>' in the Lib directory" -ForEach @("InstallPackage"; "HasDependency"; "IsDependency"; "UpgradePackage") {
@@ -288,13 +286,13 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
                 @{ Option = "DownloadChecksumType" ; ExpectedValue = "downloadChecksumType" }
                 @{ Option = "DownloadChecksumType64" ; ExpectedValue = "downloadChecksumType64" }
                 # UsePackageExitCodes and IgnorePackageExitCodes set the same setting, but are opposite of each other.
-                # UsePackageExitCodes is evaluated last, so takes precidence.
+                # UsePackageExitCodes is evaluated last, so takes precedence.
                 # @{ Option = "IgnorePackageExitCodes" ; ExpectedValue = "True" }
                 @{ Option = "UsePackageExitCodes" ; ExpectedValue = "True" }
                 # StopOnFirstFailure is expanded to StopOnFirstPackageFailure
                 @{ Option = "StopOnFirstPackageFailure" ; ExpectedValue = "True" }
                 # ExitWhenRebootDetected and IgnoreDetectedReboot both set ExitOnRebootDetected.
-                # IgnoreDetectedReboot is evaluated last, so takes precidence.
+                # IgnoreDetectedReboot is evaluated last, so takes precedence.
                 # @{ Option = "ExitWhenRebootDetected" ; ExpectedValue = "True" }
                 # @{ Option = "IgnoreDetectedReboot" ; ExpectedValue = "True" }
                 @{ Option = "ExitOnRebootDetected" ; ExpectedValue = "False" }
@@ -332,7 +330,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should still have a package in the lib directory" {
@@ -369,7 +367,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should install the package in the lib directory" {
@@ -408,7 +406,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should install the package in the lib directory" {
@@ -431,6 +429,51 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
 
         It "Outputs a message indicating that it installed the package successfully" {
             $Output.Lines | Should -Contain "Chocolatey installed 1/1 packages."
+        }
+    }
+
+    Context "Force Installing a Package that is already installed (with a delete locked file)" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "installpackage"
+
+            Invoke-Choco install $PackageUnderTest --confirm
+
+            $LockedFile = [System.IO.File]::Open(
+                "$env:ChocolateyInstall\lib\$PackageUnderTest\tools\chocolateyInstall.ps1",
+                "OpenOrCreate",
+                "ReadWrite",
+                "Delete"
+            )
+
+            $Output = Invoke-Choco install installpackage --force --confirm
+        }
+
+        AfterAll {
+            $LockedFile.Close()
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Has successfully retained an install of the original package" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\"
+        }
+
+        It "Has successfully retained the original version" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+
+        It "Should not have been able to delete the rollback" {
+            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
+        }
+
+        It "Outputs a message showing that installation succeeded." {
+            $Output.String | Should -Match "Chocolatey installed 1/1 packages\."
         }
     }
 
@@ -457,7 +500,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Has successfully retained an install of the original package" {
@@ -481,6 +524,10 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     Context "Force Installing a Package that is already installed (with an exclusively locked file)" {
+        BeforeDiscovery {
+            $PackageUnderTest = "installpackage"
+        }
+
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -502,16 +549,12 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $LockedFile.Close()
         }
 
-        It "Exits with Success (0)" -Tag FossOnly {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Exits with Failure (1)" -Tag Licensed {
-            $Output.ExitCode | Should -Be 1
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Has successfully retained an install of the original package" {
-            "$env:ChocolateyInstall\lib\$PackageUnderTest\"
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\" | Should -Exist
         }
 
         It "Has successfully retained the original version" {
@@ -520,15 +563,54 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $XML.package.metadata.version | Should -Be "1.0.0"
         }
 
-        It "Should not have been able to delete the rollback" -Tag FossOnly {
-            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
-        }
-
-        It "Should have been able to delete the rollback" -Tag Licensed {
+        It "Should have been able to delete the rollback" {
+            # It is important to know that the behavior may be different on different operating
+            # systems. It depends on how the operating system implements locking of files.
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
         }
 
-        It "Outputs a message showing that installation succeeded." {
+        It "Should have created the package in lib-bad" {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest" | Should -Exist
+        }
+
+        It "Should have stored pending file in bad folder" {
+            # Because the package itself fails to extract, due to the install script being locked.
+            # The only file in the original package that could be copied over is the pending file (can't copy the exclusively locked file either).
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\1.0.0\.chocolateyPending" | Should -Exist
+        }
+
+        It "Outputs a message showing that installation failed." {
+            $Output.String | Should -Match "Chocolatey installed 0/1 packages\."
+        }
+    }
+
+    Context "Installing a failing package created backup in lib-bad" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "failingdependency"
+            $PackageVersion = '0.9.9'
+
+            $Output = Invoke-Choco install $PackageUnderTest --version $PackageVersion --confirm
+        }
+
+        It "Exits with Failure (15608)" {
+            $Output.ExitCode | Should -Be 15608 -Because $Output.String
+        }
+
+        It "Doesn't install the package to lib directory" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Doesn't keep a package backup in lib-bkp" {
+            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Creates backup of file '<_>' in lib-bad" -ForEach @('failingdependency.nupkg', 'failingdependency.nuspec', '.chocolateyPending', 'tools\chocolateyinstall.ps1', 'tools\test-file.txt') {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest\$PackageVersion\$_" | Should -Exist
+        }
+
+        It "Outputs a message showing that installation failed." {
             $Output.String | Should -Match "Chocolatey installed 0/1 packages\."
         }
     }
@@ -543,7 +625,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -565,7 +647,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -587,7 +669,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (-1)" {
-            $Output.ExitCode | Should -Be -1
+            $Output.ExitCode | Should -Be -1 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -615,7 +697,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed a package to the lib directory" {
@@ -645,7 +727,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -661,115 +743,6 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Installing a side-by-side Package" {
-        BeforeAll {
-            Restore-ChocolateyInstallSnapshot
-
-            $PackageUnderTest = "installpackage"
-
-            $Output = Invoke-Choco install $PackageUnderTest --confirm --allowmultipleversions
-        }
-
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Installed a package to the lib directory" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0" | Should -Exist
-        }
-
-        It "Installs the expected version of the package" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0\$($PackageUnderTest).1.0.0.nuspec" | Should -Exist
-            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0\$($PackageUnderTest).1.0.0.nuspec"
-            $XML.package.metadata.version | Should -Be "1.0.0"
-        }
-
-        It "Outputs a warning message about side by side installs are deprecated" {
-            $Output.Lines | Should -Contain "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0." -Because $Output.String
-        }
-
-        It "Outputs a message indicating that it installed the package successfully" {
-            $Output.Lines | Should -Contain "Chocolatey installed 1/1 packages."
-        }
-    }
-
-    Context "Switching a normal Package to a side-by-side Package" {
-        BeforeAll {
-            Restore-ChocolateyInstallSnapshot
-
-            $PackageUnderTest = "installpackage"
-
-            $null = Invoke-Choco install $PackageUnderTest --confirm
-
-            $Output = Invoke-Choco install $PackageUnderTest --confirm --force --allowmultipleversions
-        }
-
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Installed the package to the lib directory" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0" | Should -Exist
-        }
-
-        It "Removed the previous version of the package from the lib directory" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest)" | Should -Not -Exist
-        }
-
-        It "Installs the expected version of the package" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0\$($PackageUnderTest).1.0.0.nuspec" | Should -Exist
-            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest).1.0.0\$($PackageUnderTest).1.0.0.nuspec"
-            $XML.package.metadata.version | Should -Be "1.0.0"
-        }
-
-        It "Outputs a warning message about side by side installs are deprecated" {
-            $Output.Lines | Should -Contain "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0." -Because $Output.String
-        }
-
-        It "Outputs a message indicating that it installed the package successfully" {
-            $Output.Lines | Should -Contain "Chocolatey installed 1/1 packages."
-        }
-    }
-
-    Context "Switching a side-by-side Package to a normal Package" {
-        BeforeAll {
-            Restore-ChocolateyInstallSnapshot
-
-            $PackageUnderTest = "installpackage"
-
-            $null = Invoke-Choco install $PackageUnderTest --confirm --allowmultipleversion
-
-            $Output = Invoke-Choco install $PackageUnderTest --confirm --force
-        }
-
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
-        }
-
-        It "Installed the package to the lib directory" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest)" | Should -Exist
-        }
-
-        It "Installs the expected version of the package" {
-            "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec" | Should -Exist
-            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec"
-            $XML.package.metadata.version | Should -Be "1.0.0"
-        }
-
-        It "Does not output a warning message about side by side installs are deprecated" {
-            $Output.Lines | Should -Not -Contain "Installing the same package with multiple versions is deprecated and will be removed in v2.0.0." -Because $Output.String
-        }
-
-        It "Does not output a warning message that installed side by side package is deprecated" {
-            $Output.Lines | Should -Not -Contain "installpackage has been installed as a side by side installation." -Because $Output.String
-            $Output.Lines | Should -Not -Contain "Side by side installations are deprecated and is pending removal in v2.0.0." -Because $Output.String
-        }
-
-        It "Outputs a message indicating that it installed the package successfully" {
-            $Output.Lines | Should -Contain "Chocolatey installed 1/1 packages."
-        }
-    }
-
     Context "Installing a Package with dependencies (Happy Path)" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
@@ -780,7 +753,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -814,7 +787,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -853,7 +826,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -903,7 +876,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -952,7 +925,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -990,7 +963,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Doesn't install the package to the lib directory" {
@@ -1016,7 +989,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Has installed a package to the lib directory" {
@@ -1050,7 +1023,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -1089,7 +1062,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Has not installed the package to the lib directory" {
@@ -1112,7 +1085,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Has installed the package to the lib directory" {
@@ -1130,7 +1103,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Force Installing a Package that depends on a newer version of an installed dependency (that is unavailable, forcing depedencies)" {
+    Context "Force Installing a Package that depends on a newer version of an installed dependency (that is unavailable, forcing dependencies)" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -1141,7 +1114,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Has not installed the package to the lib directory" {
@@ -1180,7 +1153,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Has installed the package to the lib directory" {
@@ -1214,69 +1187,29 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $Output = Invoke-Choco install $PackagePath --confirm --params '/ParameterOne:FirstOne /ParameterTwo:AnotherOne'
         }
 
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
-        It "Installed a package to the lib directory" {
-            "$env:ChocolateyInstall\lib\$PackageUnderTest" | Should -Exist
+        It "Not Installed a package to the lib directory" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest" | Should -Not -Exist
         }
 
-        # We are skipping this for now, until we have stabilized the directory
-        # path reporting functionality. There are times that this test will
-        # fail due to Chocolatey not reporting the path.
-        # This failure seems to happen randomly, and is therefore not a
-        # reliable test we can make.
-        It "Outputs the installation directory" -Skip {
-            $directoryPath = "$env:ChocolateyInstall\lib\$PackageUnderTest"
-            $lineRegex = [regex]::Escape($directoryPath)
-
-            $Output.String | Should -Match "$lineRegex"
+        It "Not Installed a package to the lib bad directory" {
+            "$env:ChocolateyInstall\lib-bad\$PackageUnderTest" | Should -Not -Exist
         }
 
-        It "Has created the installation directory" {
-            $Output.Lines -Match "$([Regex]::Escape((Join-Path $env:ChocolateyInstall "lib\$PackageUnderTest")))" | Should -Exist
+        It "Not Installed a package to the lib backup directory" {
+            "$env:ChocolateyInstall\lib-backup\$PackageUnderTest" | Should -Not -Exist
         }
 
-        It "Installs the expected version of the package" {
-            "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec" | Should -Exist
-            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec"
-            $XML.package.metadata.version | Should -Be "1.0.0"
-        }
+        It "Outputs expected error message" {
+            $Output.String | Should -Match @"
+Package name cannot be a path to a file on a remote, or local file system.
 
-        It "Creates a Console Shim in the Bin Directory" {
-            "$env:ChocolateyInstall\bin\console.exe" | Should -Exist
-        }
-
-        It "Creates a Graphical Shim in the Bin Directory" {
-            "$env:ChocolateyInstall\bin\graphical.exe" | Should -Exist
-        }
-
-        It "Does not create a Shim for Ignored Executable in the Bin Directory" {
-            "$env:ChocolateyInstall\bin\not.installed.exe" | Should -Not -Exist
-        }
-
-        It "Does not create a Shim for Ignored Executable (with mismatched case) in the Bin Directory" {
-            "$env:ChocolateyInstall\bin\casemismatch.exe" | Should -Not -Exist
-        }
-
-        It "Does not create an extensions folder for the package" {
-            "$env:ChocolateyInstall\extensions\$PackageUnderTest" | Should -Not -Exist
-        }
-
-        It "Contains the output of the ChocolateyInstall.ps1 script" {
-            $Output.Lines | Should -Contain "Ya!"
-        }
-
-        # https://github.com/chocolatey/choco/issues/2089
-        It "Reports the Package Parameters expected" {
-            $Output.Lines | Should -Contain "Package Parameters:"
-            $Output.Lines | Should -Contain "ParameterOne - FirstOne"
-            $Output.Lines | Should -Contain "ParameterTwo - AnotherOne"
-        }
-
-        It "Outputs a message showing that installation was successful" {
-            $Output.String | Should -Match "Chocolatey installed 1/1 packages\."
+To install a local, or remote file, you may use:
+  choco install $packageUnderTest --version="1.0.0" --source="$([regex]::Escape($snapshotPath.PackagesPath))
+"@
         }
     }
 
@@ -1289,7 +1222,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs a message showing that installation was successful" {
@@ -1319,7 +1252,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Outputs a message indicating that there were no sources enabled" {
@@ -1332,7 +1265,8 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Installing a Package with proxy and proxy bypass list" -Skip:(!$licensedProxyFixed) {
+    # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
+    Context "Installing a Package with proxy and proxy bypass list" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
@@ -1342,7 +1276,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays package files install completed" {
@@ -1351,7 +1285,8 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Installing a Package with proxy and proxy bypass list on command" -Skip:(!$licensedProxyFixed) {
+    # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
+    Context "Installing a Package with proxy and proxy bypass list on command" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
@@ -1360,7 +1295,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays package files install completed" {
@@ -1387,7 +1322,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         # TODO: Background service only works with Chocolatey Licensed Extension. Assess moving this test to CLE test suite
@@ -1423,7 +1358,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         # TODO: Background service only works with Chocolatey Licensed Extension. Assess moving this test to CLE test suite
@@ -1442,25 +1377,26 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
 
     Context "Installing commercial package with custom commandlets" -Tag FossOnly {
         BeforeAll {
-            New-ChocolateyInstallSnapshot
+            Restore-ChocolateyInstallSnapshot
 
             $Output = Invoke-Choco install get-chocolateyunzip-licensed --confirm
         }
 
         It "Exits with Failure (-1)" {
-            $Output.ExitCode | Should -Be -1
+            $Output.ExitCode | Should -Be -1 -Because $Output.String
         }
     }
 
     Context "Installing license only package on open source" -Tag FossOnly {
         BeforeAll {
-            New-ChocolateyInstallSnapshot
+            Restore-ChocolateyInstallSnapshot
+            Enable-ChocolateySource -Name hermes-setup
 
             $Output = Invoke-Choco install business-only-license --confirm
         }
 
         It "Exits with Failure (-1)" {
-            $Output.ExitCode | Should -Be -1
+            $Output.ExitCode | Should -Be -1 -Because $Output.String
         }
 
         It "Outputs warning message about needing commercial edition" {
@@ -1472,7 +1408,8 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
     }
 
-    Context "Installing package with beforeInstall scriptblock defined" -Skip:(!$hasBeforeInstallBlock) {
+    # These are skipped in the Proxy Test environment because the beforeInstall reaches out to GitHub which is not permitted through our proxy.
+    Context "Installing package with beforeInstall scriptblock defined" -Tag ProxySkip -Skip:(!$hasBeforeInstallBlock) {
         BeforeAll {
             New-ChocolateyInstallSnapshot
             Remove-Item "$env:ChocolateyInstall\logs\*" -ErrorAction Ignore
@@ -1481,7 +1418,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs string defined in before installation block" {
@@ -1502,13 +1439,13 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Failure (1)" {
-            $result1.ExitCode | Should -Be 1
-            $result2.ExitCode | Should -Be 1
+            $result1.ExitCode | Should -Be 1 -Because $result1.String
+            $result2.ExitCode | Should -Be 1 -Because $result2.String
         }
 
         It "should identify a circular dependency" {
-            $result1.Lines | Should -Contain "Circular dependency detected 'circulardependency1 0.0.1 => circulardependency2 0.0.1 => circulardependency1 0.0.1'."
-            $result2.Lines | Should -Contain "Circular dependency detected 'circulardependency2 0.0.1 => circulardependency1 0.0.1 => circulardependency2 0.0.1'."
+            $result1.Lines | Should -Contain "Unable to resolve dependency 'circulardependency1': Circular dependency detected 'circulardependency1 0.0.1 => circulardependency2 0.0.1 => circulardependency1 0.0.1'." -Because $result1.String
+            $result2.Lines | Should -Contain "Unable to resolve dependency 'circulardependency1': Circular dependency detected 'circulardependency1 0.0.1 => circulardependency2 0.0.1 => circulardependency1 0.0.1'." -Because $result2.String
         }
     }
 
@@ -1551,7 +1488,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Does not output extracted file path '<_>'" -ForEach @('tools\'; 'tools\chocolateybeforemodify.ps1'; 'tools\chocolateyinstall.ps1'; 'tools\chocolateyuninstall.ps1'; 'zip-log-disable-test.nuspec') {
@@ -1567,7 +1504,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Does not output extracted file path '<_>'" -ForEach @('tools\'; 'tools\chocolateybeforemodify.ps1'; 'tools\chocolateyinstall.ps1'; 'tools\chocolateyuninstall.ps1'; 'zip-log-disable-test.nuspec') {
@@ -1578,7 +1515,6 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     Context "Installing package that makes use of new Get Chocolatey Path helper" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
-            Enable-ChocolateySource -Name 'local'
 
             $Output = Invoke-Choco install test-chocolateypath -y
         }
@@ -1594,4 +1530,351 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $Output.Lines | Should -Contain "$($_ -replace '<installPath>',$env:ChocolateyInstall)" -Because $Output.String
         }
     }
+
+
+    Context "Installing multiple packages at once without allowGlobalConfirmation" {
+
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            Disable-ChocolateyFeature -Name allowGlobalConfirmation
+
+            $PackageUnderTest = "installpackage", "packagewithscript"
+
+            $Output = "a`n"*2 | Invoke-Choco install @PackageUnderTest
+        }
+
+        It "Installs successfully and exits with success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Installed the packages to the lib directory" {
+            $PackageUnderTest | ForEach-Object {
+                "$env:ChocolateyInstall\lib\$_" | Should -Exist
+            }
+        }
+
+        It "Ran both installation scripts after selecting [A] Yes to all at the first prompt" {
+            $promptLine = "Do you want to run the script?([Y]es/[A]ll - yes to all/[N]o/[P]rint):"
+            $prompts = $Output.Lines | Where-Object { $_ -eq $promptLine }
+
+            $prompts.Count | Should -Be 1
+        }
+    }
+
+    # We are marking this test as internal, as the package we need to make use
+    # of downloads a zip archive from a internal server, and the package is also
+    # only located on an internal feed.
+    Context "Installing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
+        BeforeAll {
+            $paths = Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePathLong)" --no-progress
+        }
+
+        AfterAll {
+            $null = Invoke-Choco uninstall install-chocolateyzip --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Runs under background Service' -Tag Background {
+            $Output.Lines | Should -Contain 'Running in background mode' -Because $Output.String
+        }
+
+        It 'Outputs downloading 64bit package' {
+            $Output.Lines | Should -Contain 'Downloading install-chocolateyzip 64 bit' -Because $Output.String
+        }
+
+        It 'Outputs download completed' {
+            $testMessage = if ($features.License) {
+                "Download of 'cmake-3.21.2-windows-x86_64.zip' (36.01 MB) completed."
+            } else {
+                "Download of cmake-3.21.2-windows-x86_64.zip (36.01 MB) completed."
+            }
+            $Output.Lines | Should -Contain $testMessage -Because $Output.String
+        }
+
+        It 'Outputs extracting correct archive' {
+            $testMessage = if ($features.License) {
+                "Extracting cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+            } else {
+                "Extracting $($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+            }
+            $Output.Lines | Should -Contain $testMessage -Because $Output.String
+        }
+
+        It 'Created shim for <_>' -ForEach 'cmake-gui.exe', 'cmake.exe', 'cmcldeps.exe', 'cpack.exe', 'ctest.exe' {
+            $Output.Lines | Should -Contain "ShimGen has successfully created a shim for $_"
+            "$env:ChocolateyInstall\bin\$_" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of install-chocolateyzip was successful.' -Because $Output.String
+        }
+
+        It 'Outputs software installation directory' {
+            $Output.Lines | Should -Contain "Software installed to '$env:ChocolateyInstall\lib\install-chocolateyzip\tools'" -Because $Output.String
+        }
+
+        It 'Should have cached installed directory in custom cache' {
+            # Need to be verified, but the file may not exist on licensed edition
+            "$($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip" | Should -Exist
+        }
+
+        It 'Installed software to expected directory' {
+            "$env:ChocolateyInstall\lib\install-chocolateyzip\tools\cmake-3.21.2-windows-x86_64\bin\cmake.exe" | Should -Exist
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "2.1.0"
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier (Repository optimization disabled)' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm --disable-repository-optimizations
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "2.1.0"
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier and specific version' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm --disable-repository-optimizations --version 1.0.0
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier and specific version (Repository optimization disabled)' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm --disable-repository-optimizations --version 1.0.0
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+    }
+
+    Context "Installing a package when invalid package source is being used" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $InvalidSource = "https://invalid.chocolatey.org/api/v2/"
+            $null = Invoke-Choco source add -n "invalid" -s $InvalidSource
+
+            $Output = Invoke-Choco install installpackage --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Outputs warning about unable to load service index' {
+            $Output.Lines | Should -Contain "Unable to load the service index for source $InvalidSource."
+        }
+
+        It 'Outputs successful installation of single package' {
+            $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.'
+        }
+    }
+
+    Context "Installing a package when the user specifies a non-conforming casing of the id" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install InstAlLpAckaGe --confirm
+        }
+
+        It 'Exits with Success' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Outputs successful installation of single package' {
+            $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.' -Because $Output.String
+        }
+
+        It 'Installed package to expected location' {
+            "$env:ChocolateyInstall\lib\installpackage" | Should -Exist
+        }
+    }
+
+    Context "Installing a package with a non-normalized version number" -ForEach @(
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1' ; NuspecVersion = '01.0.0.0'}
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0' ; NuspecVersion = '01.0.0.0'}
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0.0' ; NuspecVersion = '01.0.0.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '4.0.1' ; NuspecVersion = '004.0.01.0' }
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' ; NuspecVersion = '01.0.0.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '004.0.01.0' ; NuspecVersion = '004.0.01.0' }
+        @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '0000004.00000.00001.0000' ; NuspecVersion = '004.0.01.0' }
+    ) -Tag VersionNormalization {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $PackageUnderTest = 'nonnormalizedversions'
+            $Output = Invoke-Choco install $PackageUnderTest --Version $SearchVersion
+        }
+
+        It "Should exit with success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should report successful installation" {
+            $Output.Lines | Should -Contain "$PackageUnderTest v$ExpectedPackageVersion" -Because $Output.String
+            $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.' -Because $Output.String
+        }
+
+        It "Should have installed the correct files" {
+            $ExpectedFiles = "${env:ChocolateyInstall}/lib/$PackageUnderTest/$PackageUnderTest"
+            "$ExpectedFiles.nupkg" | Should -Exist -Because $Output.String
+            $NuspecContents = [xml](Get-Content "$ExpectedFiles.nuspec")
+            $NuspecContents.package.metadata.version | Should -Be $NuspecVersion
+        }
+    }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
+    Test-NuGetPaths
+
+    Context 'Installing a package with unsupported nuspec elements shows a warning' {
+
+        BeforeDiscovery {
+            $testCases = @(
+                '<license>'
+                '<packageTypes>'
+                '<readme>'
+                '<repository>'
+                '<serviceable>'
+            )
+        }
+
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $nuspec = @'
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>unsupportedmetadata</id>
+    <version>1.0.0</version>
+    <title>unsupportedmetadata (Install)</title>
+    <authors>Chocolatey Software</authors>
+    <tags>unsupportedmetadata</tags>
+
+    <license type="expression">MIT</license>
+    <packageTypes>
+        <packageType name="Unsupported" />
+    </packageTypes>
+    <readme>readme.md</readme>
+    <repository type="git" url="https://github.com/chocolatey/choco.git" />
+    <serviceable>true</serviceable>
+
+    <summary>Test of unsupported metadata</summary>
+    <description>Some metadata fields are not supported by chocolatey. `choco pack` should fail to pack them, while `choco install` or `upgrade` should allow them with a warning.</description>
+  </metadata>
+</package>
+'@
+            $tempPath = "$env:TEMP/$(New-Guid)"
+            $packageName = 'unsupportedmetadata'
+            $nuspecPath = "$tempPath/$packageName/$packageName.nuspec"
+
+            $null = New-Item -Path "$tempPath/$packageName" -ItemType Directory
+            $nuspec | Set-Content -Path $nuspecPath
+            "readme content" | Set-Content -Path "$tempPath/$packageName/readme.md"
+
+            $null = Invoke-Choco install nuget.commandline
+            $null = & "$env:ChocolateyInstall/bin/nuget.exe" pack $nuspecPath
+
+            Disable-ChocolateySource -Name hermes-setup
+
+            $Output = Invoke-Choco install $packageName --source .
+        }
+
+        AfterAll {
+            Remove-Item $tempPath -Recurse -Force
+        }
+
+        It 'Installs successfully and exits with success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Shows a warning about the unsupported nuspec metadata element "<_>"' -TestCases $testCases {
+            $Output.String | Should -Match "$_ elements are not supported in Chocolatey CLI"
+        }
+    }
+
+    # Do not add tests here unless they use the NuGet CLI. All Chocolatey tests should be above the Test-NuGetPaths call.
 }

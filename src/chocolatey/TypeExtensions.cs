@@ -28,7 +28,7 @@ namespace chocolatey
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>true if meets criteria for system type</returns>
-        public static bool is_built_in_system_type(this Type type)
+        public static bool IsBuiltinType(this Type type)
         {
             if (type == null) return false;
 
@@ -36,7 +36,7 @@ namespace chocolatey
             return type.IsPrimitive
                    || type.IsValueType
                    || (type == typeof (string))
-                   || type.Namespace.Equals("System");
+                   || type.Namespace.Equals("System", StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -44,12 +44,23 @@ namespace chocolatey
         /// </summary>
         /// <param name="type">The type.</param>
         /// <returns>true if enumerable</returns>
-        public static bool is_collections_type(this Type type)
+        public static bool IsCollectionType(this Type type)
         {
             if (type == null) return false;
 
+            // Surely we can do a check around "is ICollection" / "is ICollection<>" here?
             return type.IsArray
                    || type.Namespace.Contains("System.Collections");
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool is_built_in_system_type(this Type type)
+            => IsBuiltinType(type);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool is_collections_type(this Type type)
+            => IsCollectionType(type);
+#pragma warning restore IDE1006
     }
 }

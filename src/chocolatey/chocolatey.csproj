@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -10,10 +11,14 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>chocolatey</RootNamespace>
     <AssemblyName>chocolatey</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -24,6 +29,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\chocolatey.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -35,6 +41,7 @@
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <DebugSymbols>true</DebugSymbols>
     <DocumentationFile>bin\Release\chocolatey.xml</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>..\..\docs\logo\chocolatey.ico</ApplicationIcon>
@@ -50,10 +57,36 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficial|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\ReleaseOfficial\</OutputPath>
+    <DefineConstants>TRACE;FORCE_CHOCOLATEY_OFFICIAL_KEY</DefineConstants>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <DocumentationFile>bin\Release\chocolatey.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficialNo7zip|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ReleaseOfficialNo7zip\</OutputPath>
+    <DefineConstants>TRACE;FORCE_CHOCOLATEY_OFFICIAL_KEY</DefineConstants>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
+    <DocumentationFile>bin\Release\chocolatey.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficialNo7zip|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\ReleaseOfficialNo7zip\</OutputPath>
     <DefineConstants>TRACE;FORCE_CHOCOLATEY_OFFICIAL_KEY</DefineConstants>
     <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
     <DocumentationFile>bin\Release\chocolatey.xml</DocumentationFile>
@@ -68,42 +101,94 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AlphaFS.2.1.3\lib\net40\AlphaFS.dll</HintPath>
     </Reference>
+    <Reference Include="Chocolatey.NuGet.Commands">
+      <HintPath>..\packages\Chocolatey.NuGet.Commands.3.1.0\lib\net472\Chocolatey.NuGet.Commands.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Common">
+      <HintPath>..\packages\Chocolatey.NuGet.Common.3.1.0\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Configuration">
+      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.1.0\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Credentials">
+      <HintPath>..\packages\Chocolatey.NuGet.Credentials.3.1.0\lib\net472\Chocolatey.NuGet.Credentials.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.DependencyResolver.Core">
+      <HintPath>..\packages\Chocolatey.NuGet.DependencyResolver.Core.3.1.0\lib\net472\Chocolatey.NuGet.DependencyResolver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Frameworks">
+      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.1.0\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.LibraryModel">
+      <HintPath>..\packages\Chocolatey.NuGet.LibraryModel.3.1.0\lib\net472\Chocolatey.NuGet.LibraryModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.PackageManagement">
+      <HintPath>..\packages\Chocolatey.NuGet.PackageManagement.3.1.0\lib\net472\Chocolatey.NuGet.PackageManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Packaging">
+      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.1.0\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.ProjectModel">
+      <HintPath>..\packages\Chocolatey.NuGet.ProjectModel.3.1.0\lib\net472\Chocolatey.NuGet.ProjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Protocol">
+      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.1.0\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Resolver">
+      <HintPath>..\packages\Chocolatey.NuGet.Resolver.3.1.0\lib\net472\Chocolatey.NuGet.Resolver.dll</HintPath>
+    </Reference>
+    <Reference Include="Chocolatey.NuGet.Versioning">
+      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.1.0\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
-      <HintPath>..\packages\log4net.2.0.12\lib\net40-client\log4net.dll</HintPath>
+      <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
+    <Reference Include="Microsoft.Bcl.HashCode, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.HashCode.1.1.1\lib\net461\Microsoft.Bcl.HashCode.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Core, Version=2.11.0.0, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Chocolatey-NuGet.Core.2.11.0.20220901\lib\net4\NuGet.Core.dll</HintPath>
+    <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Web.XmlTransform, Version=3.1.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Web.Xdt.3.1.0\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="Rhino.Licensing">
       <HintPath>..\..\lib\Rhino.Licensing.1.4.1\lib\net40\Rhino.Licensing.dll</HintPath>
     </Reference>
     <Reference Include="SimpleInjector, Version=2.8.3.0, Culture=neutral, PublicKeyToken=984cb50dea722e99, processorArchitecture=MSIL">
-      <HintPath>..\packages\SimpleInjector.2.8.3\lib\net40-client\SimpleInjector.dll</HintPath>
+      <HintPath>..\packages\SimpleInjector.2.8.3\lib\net45\SimpleInjector.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.IdentityModel" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Management.Automation">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
     </Reference>
-    <Reference Include="System.Reactive.Core">
-      <HintPath>..\packages\Rx-Core.2.1.30214.0\lib\Net40\System.Reactive.Core.dll</HintPath>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
+    <Reference Include="System.Reactive, Version=5.0.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.5.0.0\lib\net472\System.Reactive.dll</HintPath>
     </Reference>
-    <Reference Include="System.Reactive.Interfaces">
-      <HintPath>..\packages\Rx-Interfaces.2.1.30214.0\lib\Net40\System.Reactive.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Linq">
-      <HintPath>..\packages\Rx-Linq.2.1.30214.0\lib\Net40\System.Reactive.Linq.dll</HintPath>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.3\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
     <Reference Include="System.Security" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Transactions" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
@@ -115,14 +200,18 @@
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="infrastructure.app\attributes\MultiServiceAttribute.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyTemplateCommand.cs" />
-    <Compile Include="infrastructure.app\commands\ChocolateyUpdateCommand.cs" />
-    <Compile Include="infrastructure.app\commands\ChocolateyVersionCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyCommandBase.cs" />
+    <Compile Include="infrastructure.app\domain\ApiKeyCommandType.cs" />
     <Compile Include="infrastructure.app\domain\SourceTypes.cs" />
+    <Compile Include="infrastructure.app\domain\ChocolateyPackageMetadata.cs" />
     <Compile Include="infrastructure.app\domain\TemplateCommandType.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyExportCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyHelpCommand.cs" />
+    <Compile Include="infrastructure.app\nuget\NuGetEndpointResources.cs" />
+    <Compile Include="infrastructure.app\nuget\NuGetEndpointResourcesExtensions.cs" />
     <Compile Include="infrastructure.app\registration\ChocolateyRegistrationModule.cs" />
     <Compile Include="infrastructure.app\registration\IContainerRegistrator.cs" />
     <Compile Include="infrastructure.app\registration\IContainerResolver.cs" />
@@ -131,6 +220,23 @@
     <Compile Include="infrastructure.app\registration\IExtensionModule.cs" />
     <Compile Include="infrastructure.app\registration\SimpleInjectorContainerRegistrator.cs" />
     <Compile Include="infrastructure.app\registration\SimpleInjectorContainerResolver.cs" />
+    <Compile Include="infrastructure.app\nuget\ChocolateyNuGetProjectContext.cs" />
+    <Compile Include="infrastructure.app\nuget\ChocolateyNuGetSettings.cs" />
+    <Compile Include="infrastructure.app\nuget\ChocolateySourceCacheContext.cs" />
+    <Compile Include="infrastructure.app\rules\MetadataRuleBase.cs" />
+    <Compile Include="infrastructure.app\rules\RequiredMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\EmptyOrInvalidUrlMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\FrameWorkReferencesMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\IconMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\LicenseMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\PackageTypesMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\ReadmeMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\RepositoryMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\RequireLicenseAcceptanceMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\RuleIdentifiers.cs" />
+    <Compile Include="infrastructure.app\rules\ServicableMetadataRule.cs" />
+    <Compile Include="infrastructure.app\rules\VersionMetadataRule.cs" />
+    <Compile Include="infrastructure.app\services\RuleService.cs" />
     <Compile Include="infrastructure\cryptography\DefaultEncryptionUtility.cs" />
     <Compile Include="infrastructure\adapters\IEncryptionUtility.cs" />
     <Compile Include="infrastructure.app\validations\GlobalConfigurationValidation.cs" />
@@ -156,7 +262,6 @@
     <Compile Include="infrastructure.app\services\PendingRebootService.cs" />
     <Compile Include="infrastructure.app\templates\ChocolateyTodoTemplate.cs" />
     <Compile Include="infrastructure.app\utility\ArgumentsUtility.cs" />
-    <Compile Include="infrastructure.app\utility\HashCode.cs" />
     <Compile Include="infrastructure.app\utility\PackageUtility.cs" />
     <Compile Include="infrastructure.app\validations\SystemStateValidation.cs" />
     <Compile Include="infrastructure\filesystem\FileSystem.cs" />
@@ -167,6 +272,12 @@
     <Compile Include="infrastructure\logging\LogMessage.cs" />
     <Compile Include="infrastructure\logging\LogSinkLog.cs" />
     <Compile Include="infrastructure\registration\AssemblyResolution.cs" />
+    <Compile Include="infrastructure\registration\HttpsSecurity.cs" />
+    <Compile Include="infrastructure\rules\IMetadataRule.cs" />
+    <Compile Include="infrastructure\rules\ImmutableRule.cs" />
+    <Compile Include="infrastructure\rules\RuleResult.cs" />
+    <Compile Include="infrastructure\rules\RuleType.cs" />
+    <Compile Include="infrastructure\services\IRuleService.cs" />
     <Compile Include="infrastructure\synchronization\GlobalMutex.cs" />
     <Compile Include="infrastructure\logging\TraceLog.cs" />
     <Compile Include="infrastructure\registration\SecurityProtocol.cs" />
@@ -203,7 +314,6 @@
     <Compile Include="infrastructure.app\domain\SourceCommandType.cs" />
     <Compile Include="infrastructure.app\events\PostRunMessage.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyNugetCredentialProvider.cs" />
-    <Compile Include="infrastructure.app\nuget\ChocolateyClientCertificateProvider.cs" />
     <Compile Include="infrastructure.app\nuget\NugetPush.cs" />
     <Compile Include="infrastructure.app\runners\GenericRunner.cs" />
     <Compile Include="infrastructure.app\services\AutomaticUninstallerService.cs" />
@@ -265,7 +375,6 @@
     <Compile Include="infrastructure.app\services\RegistryService.cs" />
     <Compile Include="infrastructure.app\services\ShimGenerationService.cs" />
     <Compile Include="infrastructure.app\services\TemplateService.cs" />
-    <Compile Include="infrastructure.app\services\WebPiService.cs" />
     <Compile Include="infrastructure.app\templates\ChocolateyInstallTemplate.cs" />
     <Compile Include="infrastructure.app\templates\ChocolateyUninstallTemplate.cs" />
     <Compile Include="infrastructure.app\templates\NuspecTemplate.cs" />
@@ -301,7 +410,7 @@
     <Compile Include="infrastructure.app\domain\SourceType.cs" />
     <Compile Include="infrastructure\extractors\AssemblyFileExtractor.cs" />
     <Compile Include="infrastructure.app\builders\ConfigurationBuilder.cs" />
-    <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateySearchCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUnpackSelfCommand.cs" />
     <Compile Include="infrastructure.app\attributes\CommandForAttribute.cs" />
     <Compile Include="infrastructure.app\domain\CommandNameType.cs" />
@@ -357,8 +466,10 @@
     <Compile Include="infrastructure\validations\ValidationStatus.cs" />
     <Compile Include="infrastructure\xml\XmlCData.cs" />
     <Compile Include="LogExtensions.cs" />
+    <Compile Include="NuGetVersionExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RuleResultExtensions.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="TypeExtensions.cs" />
   </ItemGroup>
@@ -399,7 +510,22 @@
   <ItemGroup>
     <EmbeddedResource Include="infrastructure\logging\log4net.mono.nocolor.config.xml" />
   </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\analyzers\dotnet\cs\Microsoft.CodeAnalysis.BannedApiAnalyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.BannedApiAnalyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <AdditionalFiles Include="BannedSymbols.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.targets'))" />
+  </Target>
+  <Import Project="..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.targets" Condition="Exists('..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

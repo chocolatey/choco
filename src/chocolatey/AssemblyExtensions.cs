@@ -36,7 +36,7 @@ namespace chocolatey
         /// <param name="assembly">The assembly.</param>
         /// <param name="manifestResourceStreamLocation">The manifest resource stream location.</param>
         /// <returns></returns>
-        public static string get_manifest_string(this IAssembly assembly, string manifestResourceStreamLocation)
+        public static string GetManifestString(this IAssembly assembly, string manifestResourceStreamLocation)
         {
             string manifestFileText = "";
 
@@ -62,7 +62,7 @@ namespace chocolatey
         /// <param name="assembly">The assembly.</param>
         /// <param name="manifestResourceStreamLocation">The manifest resource stream location.</param>
         /// <returns></returns>
-        public static Stream get_manifest_stream(this IAssembly assembly, string manifestResourceStreamLocation)
+        public static Stream GetManifestStream(this IAssembly assembly, string manifestResourceStreamLocation)
         {
             return assembly.GetManifestResourceStream(manifestResourceStreamLocation);
         }
@@ -73,14 +73,14 @@ namespace chocolatey
         /// <param name="assembly">The assembly.</param>
         /// <returns></returns>
         /// <remarks>Borrowed heavily from http://dhvik.blogspot.com/2009/05/assemblynamegetpublickeytoken-tostring.html </remarks>
-        public static string get_public_key_token(this IAssembly assembly)
+        public static string GetPublicKeyToken(this IAssembly assembly)
         {
             if (assembly == null) return string.Empty;
 
-            return assembly.GetName().get_public_key_token();
+            return assembly.GetName().GetPublicKeyTokenString();
         }
 
-        public static string get_public_key_token(this AssemblyName assemblyName)
+        public static string GetPublicKeyTokenString(this AssemblyName assemblyName)
         {
             if (assemblyName == null) return string.Empty;
 
@@ -91,7 +91,7 @@ namespace chocolatey
             return publicKeyToken.Select(x => x.ToString("x2")).Aggregate((x, y) => x + y);
         }
 
-        public static IEnumerable<Type> get_loadable_types(this IAssembly assembly)
+        public static IEnumerable<Type> GetLoadableTypes(this IAssembly assembly)
         {
             // Code originates from the following stack overflow answer: https://stackoverflow.com/a/11915414
             if (assembly == null)
@@ -109,14 +109,14 @@ namespace chocolatey
             }
         }
 
-        public static IEnumerable<IExtensionModule> get_extension_modules(this IAssembly assembly)
+        public static IEnumerable<IExtensionModule> GetExtensionModules(this IAssembly assembly)
         {
             var result = new List<IExtensionModule>();
 
             "chocolatey".Log().Debug("Gathering exported extension registration modules!");
 
             var registrationTypes = assembly
-                .get_loadable_types()
+                .GetLoadableTypes()
                 .Where(t => t.IsClass && !t.IsAbstract && !t.IsGenericType && typeof(IExtensionModule).IsAssignableFrom(t));
 
             foreach (var extensionType in registrationTypes)
@@ -138,5 +138,31 @@ namespace chocolatey
 
             return result;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_manifest_string(this IAssembly assembly, string manifestResourceStreamLocation)
+            => GetManifestString(assembly, manifestResourceStreamLocation);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static Stream get_manifest_stream(this IAssembly assembly, string manifestResourceStreamLocation)
+            => GetManifestStream(assembly, manifestResourceStreamLocation);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_public_key_token(this IAssembly assembly)
+            => GetPublicKeyToken(assembly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_public_key_token(this AssemblyName assemblyName)
+            => GetPublicKeyTokenString(assemblyName);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IEnumerable<Type> get_loadable_types(this IAssembly assembly)
+            => GetLoadableTypes(assembly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IEnumerable<IExtensionModule> get_extension_modules(this IAssembly assembly)
+            => GetExtensionModules(assembly);
+#pragma warning restore IDE1006
     }
 }

@@ -15,7 +15,7 @@
 # limitations under the License.
 
 function Write-FunctionCallLogMessage {
-<#
+    <#
 .SYNOPSIS
 DO NOT USE. Not part of the public API.
 
@@ -23,8 +23,6 @@ DO NOT USE. Not part of the public API.
 Writes function call as a debug message.
 
 .NOTES
-Available in 0.10.2+.
-
 This function is not part of the API.
 
 .INPUTS
@@ -48,23 +46,25 @@ Allows splatting with arguments that do not apply. Do not use directly.
 Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
 #>
-param (
-  $invocation,
-  $parameters,
-  [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
-)
+    param (
+        $invocation,
+        $parameters,
+        [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
+    )
 
-  # do not log function call - recursion?
+    # do not log function call - recursion?
 
-  $argumentsPassed = ''
-  foreach ($param in $parameters.GetEnumerator()) {
-    if ($param.Key -eq 'ignoredArguments') { continue; }
-    $paramValue = $param.Value -Join ' '
-    if ($param.Key -eq 'sensitiveStatements' -or $param.Key -eq 'password') {
-      $paramValue = '[REDACTED]'
+    $argumentsPassed = ''
+    foreach ($param in $parameters.GetEnumerator()) {
+        if ($param.Key -eq 'ignoredArguments') {
+            continue;
+        }
+        $paramValue = $param.Value -Join ' '
+        if ($param.Key -eq 'sensitiveStatements' -or $param.Key -eq 'password') {
+            $paramValue = '[REDACTED]'
+        }
+        $argumentsPassed += "-$($param.Key) '$paramValue' "
     }
-    $argumentsPassed += "-$($param.Key) '$paramValue' "
-  }
 
-  Write-Debug "Running $($invocation.InvocationName) $argumentsPassed"
+    Write-Debug "Running $($invocation.InvocationName) $argumentsPassed"
 }

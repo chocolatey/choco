@@ -29,6 +29,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
     public class ChocolateyPackCommandSpecs
     {
+        [ConcernFor("pack")]
         public abstract class ChocolateyPackCommandSpecsBase : TinySpec
         {
             protected ChocolateyPackCommand command;
@@ -41,7 +42,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_implementing_command_for : ChocolateyPackCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyPackCommandSpecsBase
         {
             private List<string> results;
 
@@ -51,13 +52,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_pack()
+            public void Should_implement_pack()
             {
                 results.ShouldContain("pack");
             }
         }
 
-        public class when_configurating_the_argument_parser : ChocolateyPackCommandSpecsBase
+        public class When_configurating_the_argument_parser : ChocolateyPackCommandSpecsBase
         {
             private OptionSet optionSet;
 
@@ -69,23 +70,23 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                command.configure_argument_parser(optionSet, configuration);
+                command.ConfigureArgumentParser(optionSet, configuration);
             }
 
             [Fact]
-            public void should_add_version_to_the_option_set()
+            public void Should_add_version_to_the_option_set()
             {
                 optionSet.Contains("version").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_outputdirectory_to_the_option_set()
+            public void Should_add_outputdirectory_to_the_option_set()
             {
                 optionSet.Contains("outputdirectory").ShouldBeTrue();
             }
         }
 
-        public class when_handling_additional_argument_parsing : ChocolateyPackCommandSpecsBase
+        public class When_handling_additional_argument_parsing : ChocolateyPackCommandSpecsBase
         {
             private readonly IList<string> unparsedArgs = new List<string>();
             private const string nuspecPath = "./some/path/to.nuspec";
@@ -103,29 +104,29 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                command.handle_additional_argument_parsing(unparsedArgs, configuration);
+                command.ParseAdditionalArguments(unparsedArgs, configuration);
             }
 
             [Fact]
-            public void should_allow_a_path_to_the_nuspec_to_be_passed_in()
+            public void Should_allow_a_path_to_the_nuspec_to_be_passed_in()
             {
                 configuration.Input.ShouldEqual(nuspecPath);
             }
 
             [Fact]
-            public void should_property_foo_equal_1()
+            public void Should_property_foo_equal_1()
             {
                 configuration.PackCommand.Properties["foo"].ShouldEqual("1");
             }
 
             [Fact]
-            public void should_property_bar_equal_baz()
+            public void Should_property_bar_equal_baz()
             {
                 configuration.PackCommand.Properties["bar"].ShouldEqual("baz");
             }
 
             [Fact]
-            public void should_log_warning_on_duplicate_foo()
+            public void Should_log_warning_on_duplicate_foo()
             {
                 var warnings = MockLogger.MessagesFor(LogLevel.Warn);
                 warnings.Count.ShouldEqual(1);
@@ -133,35 +134,35 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_noop_is_called : ChocolateyPackCommandSpecsBase
+        public class When_noop_is_called : ChocolateyPackCommandSpecsBase
         {
             public override void Because()
             {
-                command.noop(configuration);
+                command.DryRun(configuration);
             }
 
             [Fact]
-            public void should_call_service_package_noop()
+            public void Should_call_service_package_noop()
             {
-                packageService.Verify(c => c.pack_noop(configuration), Times.Once);
+                packageService.Verify(c => c.PackDryRun(configuration), Times.Once);
             }
         }
 
-        public class when_run_is_called : ChocolateyPackCommandSpecsBase
+        public class When_run_is_called : ChocolateyPackCommandSpecsBase
         {
             public override void Because()
             {
-                command.run(configuration);
+                command.Run(configuration);
             }
 
             [Fact]
-            public void should_call_service_pack_run()
+            public void Should_call_service_pack_run()
             {
-                packageService.Verify(c => c.pack_run(configuration), Times.Once);
+                packageService.Verify(c => c.Pack(configuration), Times.Once);
             }
         }
 
-        public class when_handling_arguments_parsing : ChocolateyPackCommandSpecsBase
+        public class When_handling_arguments_parsing : ChocolateyPackCommandSpecsBase
         {
             private OptionSet optionSet;
 
@@ -169,7 +170,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 base.Context();
                 optionSet = new OptionSet();
-                command.configure_argument_parser(optionSet, configuration);
+                command.ConfigureArgumentParser(optionSet, configuration);
             }
 
             public override void Because()
@@ -178,13 +179,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_version_equal_to_42()
+            public void Should_version_equal_to_42()
             {
                 configuration.Version.ShouldEqual("0.42.0");
             }
 
             [Fact]
-            public void should_outputdirectory_equal_packages()
+            public void Should_outputdirectory_equal_packages()
             {
                 configuration.OutputDirectory.ShouldEqual("c:\\packages");
             }

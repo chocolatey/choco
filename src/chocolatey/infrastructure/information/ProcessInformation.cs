@@ -23,9 +23,9 @@ namespace chocolatey.infrastructure.information
 
     public sealed class ProcessInformation
     {
-        public static bool user_is_administrator()
+        public static bool UserIsAdministrator()
         {
-            if (Platform.get_platform() != PlatformType.Windows) return false;
+            if (Platform.GetPlatform() != PlatformType.Windows) return false;
 
             var isAdmin = false;
 
@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.information
 
                     // Any version of Windows less than 6 does not have UAC
                     // so bail with the answer from the above check
-                    if (Platform.get_version().Major < 6) return isAdmin;
+                    if (Platform.GetVersion().Major < 6) return isAdmin;
 
                     if (!isAdmin)
                     {
@@ -73,7 +73,7 @@ namespace chocolatey.infrastructure.information
 
                             if (!successfulCall)
                             {
-                                "chocolatey".Log().Warn("Error during native GetTokenInformation call - {0}".format_with(Marshal.GetLastWin32Error()));
+                                "chocolatey".Log().Warn("Error during native GetTokenInformation call - {0}".FormatWith(Marshal.GetLastWin32Error()));
                                 if (tokenInformation != IntPtr.Zero) Marshal.FreeHGlobal(tokenInformation);
                             }
 
@@ -100,9 +100,9 @@ namespace chocolatey.infrastructure.information
             return isAdmin;
         }
 
-        public static bool process_is_elevated()
+        public static bool IsElevated()
         {
-            if (Platform.get_platform() != PlatformType.Windows) return false;
+            if (Platform.GetPlatform() != PlatformType.Windows) return false;
 
             using (var identity = WindowsIdentity.GetCurrent(TokenAccessLevels.Query | TokenAccessLevels.Duplicate))
             {
@@ -116,19 +116,19 @@ namespace chocolatey.infrastructure.information
             return false;
         }
 
-        public static bool user_is_terminal_services()
+        public static bool UserIsTerminalServices()
         {
-            return Environment.GetEnvironmentVariable("SESSIONNAME").to_string().contains("rdp-");
+            return Environment.GetEnvironmentVariable("SESSIONNAME").ToStringSafe().ContainsSafe("rdp-");
         }
 
-        public static bool user_is_remote()
+        public static bool UserIsRemote()
         {
-            return user_is_terminal_services() || Environment.GetEnvironmentVariable("SESSIONNAME").to_string() == string.Empty;
+            return UserIsTerminalServices() || Environment.GetEnvironmentVariable("SESSIONNAME").ToStringSafe() == string.Empty;
         }
 
-        public static bool user_is_system()
+        public static bool UserIsSystem()
         {
-             if (Platform.get_platform() != PlatformType.Windows) return false;
+             if (Platform.GetPlatform() != PlatformType.Windows) return false;
 
             var isSystem = false;
 
@@ -139,8 +139,6 @@ namespace chocolatey.infrastructure.information
 
             return isSystem;
         }
-
-        // ReSharper disable InconsistentNaming
 
         /*
          https://msdn.microsoft.com/en-us/library/windows/desktop/aa376402.aspx
@@ -228,7 +226,26 @@ namespace chocolatey.infrastructure.information
             TokenElevationTypeLimited
         }
 
-        // ReSharper restore InconsistentNaming
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool user_is_administrator()
+            => UserIsAdministrator();
 
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool process_is_elevated()
+            => IsElevated();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool user_is_terminal_services()
+            => UserIsTerminalServices();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool user_is_remote()
+            => UserIsRemote();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool user_is_system()
+            => UserIsSystem();
+#pragma warning restore IDE1006
     }
 }

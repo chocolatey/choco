@@ -28,14 +28,14 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public InnoSetupInstaller()
         {
-            InstallExecutable = "\"{0}\" ".format_with(InstallTokens.INSTALLER_LOCATION);
+            InstallExecutable = "\"{0}\" ".FormatWith(InstallTokens.InstallerLocation);
             SilentInstall = "/VERYSILENT";
             NoReboot = "/NORESTART /RESTARTEXITCODE=3010";
-            LogFile = "/LOG=\"{0}\\InnoSetup.Install.log\"".format_with(InstallTokens.PACKAGE_LOCATION);
-            CustomInstallLocation = "/DIR=\"{0}\"".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
-            Language = "/LANG={0}".format_with(InstallTokens.LANGUAGE);
+            LogFile = "/LOG=\"{0}\\InnoSetup.Install.log\"".FormatWith(InstallTokens.PackageLocation);
+            CustomInstallLocation = "/DIR=\"{0}\"".FormatWith(InstallTokens.CustomInstallLocation);
+            Language = "/LANG={0}".FormatWith(InstallTokens.Language);
             OtherInstallOptions = "/SP- /SUPPRESSMSGBOXES /CLOSEAPPLICATIONS /FORCECLOSEAPPLICATIONS /NOICONS";
-            UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            UninstallExecutable = "\"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             SilentUninstall = "/VERYSILENT";
             OtherUninstallOptions = "/SUPPRESSMSGBOXES";
             // http://www.jrsoftware.org/ishelp/index.php?topic=setupexitcodes

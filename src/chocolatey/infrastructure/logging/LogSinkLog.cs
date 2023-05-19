@@ -19,8 +19,6 @@ namespace chocolatey.infrastructure.logging
     using System;
     using System.Collections.Generic;
 
-    // ReSharper disable InconsistentNaming
-
     public sealed class LogSinkLog : ILog, ILog<LogSinkLog>
     {
         private readonly IList<LogMessage> _messages = new List<LogMessage>();
@@ -34,7 +32,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Debug(string message, params object[] formatting)
         {
-            _messages.Add(new LogMessage(LogLevelType.Debug, message.format_with(formatting)));
+            _messages.Add(new LogMessage(LogLevelType.Debug, message.FormatWith(formatting)));
         }
 
         public void Debug(Func<string> message)
@@ -44,7 +42,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Info(string message, params object[] formatting)
         {
-            _messages.Add(new LogMessage(LogLevelType.Information, message.format_with(formatting)));
+            _messages.Add(new LogMessage(LogLevelType.Information, message.FormatWith(formatting)));
         }
 
         public void Info(Func<string> message)
@@ -54,7 +52,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Warn(string message, params object[] formatting)
         {
-            _messages.Add(new LogMessage(LogLevelType.Warning, message.format_with(formatting)));
+            _messages.Add(new LogMessage(LogLevelType.Warning, message.FormatWith(formatting)));
         }
 
         public void Warn(Func<string> message)
@@ -64,7 +62,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Error(string message, params object[] formatting)
         {
-            _messages.Add(new LogMessage(LogLevelType.Error, message.format_with(formatting)));
+            _messages.Add(new LogMessage(LogLevelType.Error, message.FormatWith(formatting)));
         }
 
         public void Error(Func<string> message)
@@ -74,7 +72,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Fatal(string message, params object[] formatting)
         {
-            _messages.Add(new LogMessage(LogLevelType.Fatal, message.format_with(formatting)));
+            _messages.Add(new LogMessage(LogLevelType.Fatal, message.FormatWith(formatting)));
         }
 
         public void Fatal(Func<string> message)
@@ -82,6 +80,4 @@ namespace chocolatey.infrastructure.logging
             _messages.Add(new LogMessage(LogLevelType.Fatal, message()));
         }
     }
-
-    // ReSharper restore InconsistentNaming
 }
