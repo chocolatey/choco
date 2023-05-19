@@ -8,7 +8,7 @@ issue-labels-include:
 - Documentation
 issue-labels-exclude:
 - Internal Refactoring
-- Build
+- BuildAutomation
 - NO RELEASE NOTES
 issue-labels-alias:
     - name:    Documentation
