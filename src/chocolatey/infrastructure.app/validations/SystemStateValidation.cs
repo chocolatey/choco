@@ -69,7 +69,7 @@ namespace chocolatey.infrastructure.app.validations
                     validationResults.Add(new ValidationResult
                     {
                         Message = @"A pending system reboot request has been detected, however, this is
-   being ignored due to the current command being used '{0}'.
+   being ignored due to the current command used being '{0}'.
    It is recommended that you reboot at your earliest convenience.
 ".format_with(config.CommandName),
                         Status = ValidationStatus.Warning,
