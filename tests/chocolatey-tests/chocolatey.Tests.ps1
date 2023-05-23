@@ -231,6 +231,8 @@ exit $error.count
     # This is skipped when not run in CI because it modifies the local system.
     Context 'License warning is worded properly' -Tag FossOnly -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            Enable-ChocolateySource -Name hermes-setup
             $null = Invoke-Choco install chocolatey-license-business -y
             $Output = Invoke-Choco list -lo
         }
@@ -240,16 +242,17 @@ exit $error.count
         }
 
         It 'Should display warning' {
-            $Output.Lines | Should -Contain 'A valid chocolatey license was found, but the chocolatey.licensed.dll assembly could not be loaded:'
-            $Output.Lines | Should -Contain 'Ensure that the chocolatey.licensed.dll exists at the following path:'
-            $Output.Lines | Should -Contain 'To resolve this, install the Chocolatey Licensed Extension package with'
-            $Output.Lines | Should -Contain '`choco install chocolatey.extension`'
+            $Output.Lines | Should -Contain 'A valid chocolatey license was found, but the chocolatey.licensed.dll assembly could not be loaded:' -Because $Output.String
+            $Output.Lines | Should -Contain 'Ensure that the chocolatey.licensed.dll exists at the following path:' -Because $Output.String
+            $Output.Lines | Should -Contain 'To resolve this, install the Chocolatey Licensed Extension package with' -Because $Output.String
+            $Output.Lines | Should -Contain '`choco install chocolatey.extension`' -Because $Output.String
         }
     }
 
     # This is skipped when not run in CI because it modifies the local system.
     Context 'PowerShell Profile comments updated correctly' -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
+            Restore-ChocolateyInstallSnapshot
             Remove-Item $Profile.CurrentUserCurrentHost -ErrorAction Ignore
             New-Item $Profile.CurrentUserCurrentHost -Force
             $chocolatey = (Invoke-Choco list chocolatey -lo -r --exact).Lines | ConvertFrom-ChocolateyOutput -Command List
@@ -325,7 +328,7 @@ exit $error.count
                 }
             }
 
-            Enable-ChocolateySource -Name local
+            Enable-ChocolateySource -Name hermes-setup
             $Output = Invoke-Choco install chocolatey -f --version $chocolatey.Version --no-progress
         }
 
@@ -368,6 +371,7 @@ exit $error.count
     ) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.1.0'))) {
         BeforeAll {
             New-ChocolateyInstallSnapshot
+            Enable-ChocolateySource -Name hermes-setup
             $pwshInstall = Invoke-Choco install $_ -y
             $ChocoUnzipped = "$(Get-TempDirectory)$(New-Guid)"
             $modulePath = "$ChocoUnzipped/tools/chocolateySetup.psm1"

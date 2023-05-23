@@ -14,6 +14,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
@@ -1466,6 +1467,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     Context "Installing license only package on open source" -Tag FossOnly {
         BeforeAll {
             New-ChocolateyInstallSnapshot
+            Enable-ChocolateySource -Name hermes-setup
 
             $Output = Invoke-Choco install business-only-license --confirm
         }
@@ -1636,4 +1638,200 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
             $prompts.Count | Should -Be 1
         }
     }
+
+    # We are marking this test as internal, as the package we need to make use
+    # of downloads a zip archive from a internal server, and the package is also
+    # only located on an internal feed.
+    Context "Installing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
+        BeforeAll {
+            $paths = Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePath)" --no-progress
+        }
+
+        AfterAll {
+            $null = Invoke-Choco uninstall install-chocolateyzip --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Runs under background Service' -Tag Background {
+            $Output.Lines | Should -Contain 'Running in background mode' -Because $Output.String
+        }
+
+        It 'Outputs downloading 64bit package' {
+            $Output.Lines | Should -Contain 'Downloading install-chocolateyzip 64 bit' -Because $Output.String
+        }
+
+        It 'Outputs download completed' {
+            $testMessage = if ($features.License) {
+                "Download of 'cmake-3.21.2-windows-x86_64.zip' (36.01 MB) completed."
+            } else {
+                "Download of cmake-3.21.2-windows-x86_64.zip (36.01 MB) completed."
+            }
+            $Output.Lines | Should -Contain $testMessage -Because $Output.String
+        }
+
+        It 'Outputs extracting correct archive' {
+            $testMessage = if ($features.License) {
+                "Extracting cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+            } else {
+                "Extracting $($paths.CachePath)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
+            }
+            $Output.Lines | Should -Contain $testMessage -Because $Output.String
+        }
+
+        It 'Created shim for <_>' -ForEach 'cmake-gui.exe', 'cmake.exe', 'cmcldeps.exe', 'cpack.exe', 'ctest.exe' {
+            $Output.Lines | Should -Contain "ShimGen has successfully created a shim for $_"
+            "$env:ChocolateyInstall\bin\$_" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of install-chocolateyzip was successful.' -Because $Output.String
+        }
+
+        It 'Outputs software installation directory' {
+            $Output.Lines | Should -Contain "Software installed to '$env:ChocolateyInstall\lib\install-chocolateyzip\tools'" -Because $Output.String
+        }
+
+        It 'Should have cached installed directory in custom cache' {
+            # Need to be verified, but the file may not exist on licensed edition
+            "$($paths.CachePath)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip" | Should -Exist
+        }
+
+        It 'Installed software to expected directory' {
+            "$env:ChocolateyInstall\lib\install-chocolateyzip\tools\cmake-3.21.2-windows-x86_64\bin\cmake.exe" | Should -Exist
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "2.1.0"
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier (Repository optimization disabled)' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm --disable-repository-optimizations
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "2.1.0"
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier and specific version' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm --disable-repository-optimizations --version 1.0.0
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+    }
+
+    Context 'Installing a package while passing in an uppercase letter as the identifier and specific version (Repository optimization disabled)' {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install IsDependency --confirm --disable-repository-optimizations --version 1.0.0
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Installs package to expected directory' {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'The install of isdependency was successful.' -Because $Output.String
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\isdependency\isdependency.nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+    }
+
+    Context "Installing a package when invalid package source is being used" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Invoke-Choco source add -n "invalid" -s "https://invalid.chocolatey.org/api/v2/"
+
+            $Output = Invoke-Choco install installpackage --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Outputs warning about unable to load service index' {
+            $Output.String | Should -Match "Error retrieving packages from source 'https://invalid.chocolatey.org/api/v2/':"
+        }
+
+        It 'Outputs successful installation of single package' {
+            $Output.Lines | Should -Contain 'Chocolatey installed 1/1 packages.'
+        }
+    }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

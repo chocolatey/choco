@@ -6,6 +6,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
     }
 
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
     }
 
@@ -162,4 +163,29 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
             $Output.Lines | Should -Contain "Side by side installations are deprecated and is pending removal in v2.0.0." -Because $Output.String
         }
     }
+
+    Context "Listing package information when invalid package source is being used" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Invoke-Choco source add -n "invalid" -s "https://invalid.chocolatey.org/api/v2/"
+
+            $Output = Invoke-Choco info chocolatey
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It 'Outputs warning about unable to retrieve packages from source' {
+            $Output.String | Should -Match 'Error retrieving packages from source 'https://invalid.chocolatey.org/api/v2/':'
+        }
+
+        It 'Output information about the package' {
+            $Output.String | Should -Match "Title: Chocolatey "
+        }
+    }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

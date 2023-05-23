@@ -1,4 +1,4 @@
-﻿param(
+param(
     # The command to test.
     [string[]]$Command = @(
         "apikey"
@@ -10,6 +10,7 @@ Import-Module helpers/common-helpers
 
 Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
     BeforeAll {
+        Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
         $CurrentCommand = $_
 
@@ -35,9 +36,42 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
     }
 
+    # Even though v1.x does not support explicit list command, it still functions as expected.
+    # As such we keep this test here to be comparable with v2.x
+    Context "Running $CurrentCommand list with no sources configured" {
+        BeforeAll {
+            $Output = Invoke-Choco $CurrentCommand list
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Only displays chocolatey name with version" {
+
+            $Output.String | Should -Match "(?m)^$expectedLicenseHeader(\s*|\s*Chocolatey is not an official build.*)$"
+        }
+    }
+
     Context "Running $CurrentCommand with no sources configured with source parameter" {
         BeforeAll {
             $Output = Invoke-Choco $CurrentCommand --source "https://not-existing.test.com/api"
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Only displays chocolatey name with version" {
+            $Output.String | Should -Match "(?m)^$expectedLicenseHeader(\s*|\s*Chocolatey is not an official build.*)$"
+        }
+    }
+
+    # Even though v1.x does not support explicit list command, it still functions as expected.
+    # As such we keep this test here to be comparable with v2.x
+    Context "Running $CurrentCommand list with no sources configured with source parameter" {
+        BeforeAll {
+            $Output = Invoke-Choco $CurrentCommand list --source "https://not-existing.test.com/api"
         }
 
         It "Exits with Success (0)" {
@@ -234,4 +268,31 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
             $Output.Lines | Should -Contain "https://test.com/api - (Authenticated)"
         }
     }
+
+    # Even though v1.x does not support explicit list command, it still functions as expected.
+    # As such we keep this test here to be comparable with v2.x
+    Context "Returns configured apikey source by source name with list subcommand" {
+        BeforeAll {
+            $null = Invoke-Choco $CurrentCommand --key "test-api-key" --source "https://test.com/api"
+            $null = Invoke-Choco $CurrentCommand --key "test-api-key" --source "https://test.com/api/2"
+
+            $Output = Invoke-Choco $CurrentCommand list --source "https://test.com/api"
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0
+        }
+
+        It "Displays chocolatey name with version" {
+            $Output.Lines | Should -Contain $expectedLicenseHeader
+        }
+
+        It "Displays a message with the configured apikey" {
+            $Output.Lines | Should -Contain "https://test.com/api - (Authenticated)"
+            $Output.Lines | Should -Not -Contain "https://test.com/api/2 - (Authenticated)"
+        }
+    }
+
+    # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
+    Test-NuGetPaths
 }

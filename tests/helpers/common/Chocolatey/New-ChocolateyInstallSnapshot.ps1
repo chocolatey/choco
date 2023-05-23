@@ -62,5 +62,8 @@
     [PSCustomObject]@{
         InstallPath  = $env:ChocolateyInstall
         PackagesPath = $env:CHOCOLATEY_TEST_PACKAGES_PATH
+        # we are not returning the long cache path, this does not work with Chocolatey CLI v1 as the full path needs to be less than 260 characters, and the directory length less than 248 characters.
+        # CachePathLong= "$SnapshotPath\ChocolateyCache\This\Cache\Is\Intended\to\Be\Very\Long\On\Purpose" # This path will most likely not be removed due to long path errors
+        CachePath    = "$SnapshotPath\Cache"
     }
 }
