@@ -137,6 +137,11 @@ Did you know Pro / Business automatically syncs with Programs and
 
         public virtual int Count(ChocolateyConfiguration config)
         {
+            if (config.SourceType.IsEqualTo(SourceTypes.Normal))
+            {
+                return _nugetService.Count(config);
+            }
+
             return PerformSourceRunnerFunction<ICountSourceRunner, int>(
                 config,
                 runner => runner.Count(config),
@@ -153,7 +158,7 @@ Did you know Pro / Business automatically syncs with Programs and
         private void PerformSourceRunnerAction<TSourceRunner>(ChocolateyConfiguration config, Action<TSourceRunner> action, IEnumerable<TSourceRunner> alternativeSourceRunners, bool throwOnException = false)
             where TSourceRunner : class, IAlternativeSourceRunner
         {
-            var runner = GetSourceRunner<TSourceRunner>(config.SourceType, alternativeSourceRunners);
+            var runner = GetSourceRunner(config.SourceType, alternativeSourceRunners);
             if (runner != null && action != null)
             {
                 if (runner is IBootstrappableSourceRunner bootstrapper)
@@ -186,7 +191,7 @@ Did you know Pro / Business automatically syncs with Programs and
         private TResult PerformSourceRunnerFunction<TSourceRunner, TResult>(ChocolateyConfiguration config, Func<TSourceRunner, TResult> function, IEnumerable<TSourceRunner> alternativeSourceRunners, bool throwOnException = false)
             where TSourceRunner : class, IAlternativeSourceRunner
         {
-            var runner = GetSourceRunner<TSourceRunner>(config.SourceType, alternativeSourceRunners);
+            var runner = GetSourceRunner(config.SourceType, alternativeSourceRunners);
             if (runner != null && function != null)
             {
                 if (runner is IBootstrappableSourceRunner bootstrapper)
@@ -209,7 +214,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 this.Log().Warn("No runner was found that implements source type '{0}' or, it does not support requested functionality.".FormatWith(config.SourceType));
             }
 
-            return default(TResult);
+            return default;
         }
 
         public void ListDryRun(ChocolateyConfiguration config)
@@ -1793,15 +1798,6 @@ ATTENTION: You must take manual action to remove {1} from
                     }
                 }
             }
-        }
-
-        private TSourceRunner GetSourceRunner<TSourceRunner>(string sourceType)
-            where TSourceRunner : class, IAlternativeSourceRunner
-        {
-            // We add the trailing s to the check in case of windows feature which can be specified both with and without
-            // the s.
-            var sourceRunners = _containerResolver.ResolveAll<TSourceRunner>();
-            return GetSourceRunner(sourceType, sourceRunners);
         }
 
         private TSourceRunner GetSourceRunner<TSourceRunner>(string sourceType, IEnumerable<TSourceRunner> alternativeSourceRunners)
