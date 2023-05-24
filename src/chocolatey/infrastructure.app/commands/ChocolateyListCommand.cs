@@ -148,18 +148,18 @@ namespace chocolatey.infrastructure.app.commands
         public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             var argumentsWithoutLocalOnly = new List<string>(unparsedArguments.Count);
+            const string unsupportedArgumentMessage = @"
+Ignoring the argument {0}. This argument is unsupported for locally installed packages.";
 
             foreach (var argument in unparsedArguments)
             {
                 if (_unsupportedArguments.Contains(argument, StringComparer.OrdinalIgnoreCase))
                 {
-                    this.Log().Warn(ChocolateyLoggers.Important, @"
-UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!", argument);
+                    this.Log().Warn(ChocolateyLoggers.LogFileOnly, unsupportedArgumentMessage, argument);
                 }
                 else if (_unsupportedIncludeRegistryProgramsArguments.Contains(argument, StringComparer.OrdinalIgnoreCase))
                 {
-                    this.Log().Warn(ChocolateyLoggers.Important, @"
-UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!", argument);
+                    this.Log().Warn(ChocolateyLoggers.LogFileOnly, unsupportedArgumentMessage, argument);
                     configuration.ListCommand.IncludeRegistryPrograms = true;
                 }
                 else
