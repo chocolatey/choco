@@ -147,7 +147,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                     _because();
                     MockLogger.Messages.Keys.ShouldContain("Warn");
                     MockLogger.Messages["Warn"].ShouldContain(@"
-Ignoring the argument {0}. This argument is unsupported for locally installed packages.".FormatWith(argument));
+Invalid argument {0}. This argument has been removed from the list command and cannot be used.".FormatWith(argument));
                 }
 
                 [NUnit.Framework.TestCase("-li")]
@@ -157,7 +157,7 @@ Ignoring the argument {0}. This argument is unsupported for locally installed pa
                     _because();
                     MockLogger.Messages.Keys.ShouldContain("Warn");
                     MockLogger.Messages["Warn"].ShouldContain(@"
-Ignoring the argument {0}. This argument is unsupported for locally installed packages.".FormatWith(argument));
+Invalid argument {0}. This argument has been removed from the list command and cannot be used.".FormatWith(argument));
                     Configuration.ListCommand.IncludeRegistryPrograms.ShouldBeTrue();
                 }
             }
