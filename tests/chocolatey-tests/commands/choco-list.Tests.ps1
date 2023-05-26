@@ -99,29 +99,31 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
     }
 
-    Context "Listing local packages with unsupported argument outputs warning to log file only" -ForEach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
+    Context "Listing local packages with unsupported argument outputs a warning" -ForEach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
         BeforeAll {
-            $LogPath = "$env:ChocolateyInstall\logs\chocolatey.log"
-            $OldLogContent = Get-Content $LogPath
-            Remove-Item -Path $LogPath
-
             $Output = Invoke-Choco list $_
-            $LogFile = Get-Content -Path $LogPath
+        }
 
-            # Logs are picked up by CI for investigation if needed, so we'll keep both full sets of logs.
-            @(
-                $OldLogContent
-                $LogFile
-            ) | Set-Content -Path $LogPath
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1
+        }
+
+        It "Should output expected warning message" {
+            $Output.Lines | Should -Contain "Invalid argument $_. This argument has been removed from the list command and cannot be used." -Because $Output.String
+        }
+    }
+
+    Context "Listing local packages with unsupported argument and --limit-output does not output a warning" -Foreach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
+        BeforeAll {
+            $Output = Invoke-Choco list $_ --limit-output
         }
 
         It "Exits with Success (0)" {
             $Output.ExitCode | Should -Be 0
         }
 
-        It "Should contain expected warning message in the logs" {
-            @($LogFile) -match "Ignoring the argument $_. This argument is unsupported for locally installed packages." |
-                Should -Not -BeNullOrEmpty
+        It "Should not output the warning message" {
+            $Output.Lines | Should -Not -Contain "Invalid argument $_. This argument has been removed from the list command and cannot be used." -Because $Output.String
         }
     }
 }

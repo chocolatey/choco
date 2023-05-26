@@ -148,19 +148,33 @@ namespace chocolatey.infrastructure.app.commands
         public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             var argumentsWithoutLocalOnly = new List<string>(unparsedArguments.Count);
-            const string unsupportedArgumentMessage = @"
-Ignoring the argument {0}. This argument is unsupported for locally installed packages.";
 
             foreach (var argument in unparsedArguments)
             {
-                if (_unsupportedArguments.Contains(argument, StringComparer.OrdinalIgnoreCase))
+                bool isUnsupportedArgument = _unsupportedArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
+                bool isUnsupportedRegistryProgramsArgument = _unsupportedIncludeRegistryProgramsArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
+
+                if (isUnsupportedArgument || isUnsupportedRegistryProgramsArgument)
                 {
-                    this.Log().Warn(ChocolateyLoggers.LogFileOnly, unsupportedArgumentMessage, argument);
-                }
-                else if (_unsupportedIncludeRegistryProgramsArguments.Contains(argument, StringComparer.OrdinalIgnoreCase))
-                {
-                    this.Log().Warn(ChocolateyLoggers.LogFileOnly, unsupportedArgumentMessage, argument);
-                    configuration.ListCommand.IncludeRegistryPrograms = true;
+                    if (isUnsupportedRegistryProgramsArgument)
+                    {
+                        configuration.ListCommand.IncludeRegistryPrograms = true;
+                    }
+
+                    if (configuration.RegularOutput)
+                    {
+                        this.Log().Warn(ChocolateyLoggers.Important, @"
+Invalid argument {0}. This argument has been removed from the list command and cannot be used.", argument);
+
+                        // Give an error code to make the warning more notable; as this could potentially cause issues if these are used in v3
+                        // we want folks to take note that they need to be careful about using these unsupported arguments.
+                        Environment.ExitCode = 1;
+                    }
+                    else
+                    {
+                        this.Log().Warn(ChocolateyLoggers.LogFileOnly, @"
+Ignoring the argument {0}. This argument is unsupported for locally installed packages.", argument);
+                    }
                 }
                 else
                 {
