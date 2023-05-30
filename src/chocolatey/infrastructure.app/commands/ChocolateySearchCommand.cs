@@ -86,7 +86,7 @@ namespace chocolatey.infrastructure.app.commands
                              }
                          })
                 .Add("page-size=",
-                     "Page Size - the amount of package results to return per page. Defaults to 25.",
+                     "Page Size - the amount of packages to return in each page of results. NOTE: this value is per source. Defaults to 25 for each source that is included in query.",
                      option =>
                      {
                          configuration.ListCommand.PageSize = int.Parse(option);
