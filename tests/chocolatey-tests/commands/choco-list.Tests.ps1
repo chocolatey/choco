@@ -99,7 +99,7 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
     }
 
-    Context "Listing local packages with unsupported argument outputs a warning" -ForEach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
+    Context "Listing local packages with unsupported argument errors out" -ForEach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
         BeforeAll {
             $Output = Invoke-Choco list $_
         }
@@ -108,12 +108,12 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
             $Output.ExitCode | Should -Be 1
         }
 
-        It "Should output expected warning message" {
+        It "Should output expected error message" {
             $Output.Lines | Should -Contain "Invalid argument $_. This argument has been removed from the list command and cannot be used." -Because $Output.String
         }
     }
 
-    Context "Listing local packages with unsupported argument and --limit-output does not output a warning" -Foreach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
+    Context "Listing local packages with unsupported argument and --limit-output allows listing packages" -Foreach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
         BeforeAll {
             $Output = Invoke-Choco list $_ --limit-output
         }
@@ -122,7 +122,7 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
             $Output.ExitCode | Should -Be 0
         }
 
-        It "Should not output the warning message" {
+        It "Should not output the error message" {
             $Output.Lines | Should -Not -Contain "Invalid argument $_. This argument has been removed from the list command and cannot be used." -Because $Output.String
         }
     }

@@ -156,25 +156,17 @@ namespace chocolatey.infrastructure.app.commands
 
                 if (isUnsupportedArgument || isUnsupportedRegistryProgramsArgument)
                 {
+                    if (configuration.RegularOutput)
+                    {
+                        throw new ApplicationException("Invalid argument {0}. This argument has been removed from the list command and cannot be used.".FormatWith(argument));
+                    }
+
                     if (isUnsupportedRegistryProgramsArgument)
                     {
                         configuration.ListCommand.IncludeRegistryPrograms = true;
                     }
 
-                    if (configuration.RegularOutput)
-                    {
-                        this.Log().Warn(ChocolateyLoggers.Important, @"
-Invalid argument {0}. This argument has been removed from the list command and cannot be used.", argument);
-
-                        // Give an error code to make the warning more notable; as this could potentially cause issues if these are used in v3
-                        // we want folks to take note that they need to be careful about using these unsupported arguments.
-                        Environment.ExitCode = 1;
-                    }
-                    else
-                    {
-                        this.Log().Warn(ChocolateyLoggers.LogFileOnly, @"
-Ignoring the argument {0}. This argument is unsupported for locally installed packages.", argument);
-                    }
+                    this.Log().Warn(ChocolateyLoggers.LogFileOnly, "Ignoring the argument {0}. This argument is unsupported for locally installed packages.", argument);
                 }
                 else
                 {
