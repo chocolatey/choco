@@ -120,6 +120,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                     _unparsedArgs.Add("pkg1");
                     _unparsedArgs.Add("pkg2");
                     _unparsedArgs.Add("-l");
+                    _unparsedArgs.Add("-lo");
                     _unparsedArgs.Add("--local-only");
                     _unparsedArgs.Add("--localonly");
                     _unparsedArgs.Add("-li");
@@ -132,32 +133,60 @@ namespace chocolatey.tests.infrastructure.app.commands
                     _because = () => Command.ParseAdditionalArguments(_unparsedArgs, Configuration);
                 }
 
-                [Fact]
-                public void Should_set_unparsed_arguments_to_configuration_input()
+                [NUnit.Framework.TestCase("-l")]
+                [NUnit.Framework.TestCase("-lo")]
+                [NUnit.Framework.TestCase("--local-only")]
+                [NUnit.Framework.TestCase("--localonly")]
+                [NUnit.Framework.TestCase("-li")]
+                [NUnit.Framework.TestCase("-lai")]
+                public void Should_throw_on_unsupported_argument(string argument)
                 {
+                    Configuration.RegularOutput = true;
+                    var errored = false;
+                    Exception error = null;
+                    try
+                    {
+                        _because();
+                    }
+                    catch (Exception ex)
+                    {
+                        errored = true;
+                        error = ex;
+                    }
+
+                    errored.ShouldBeTrue();
+                    error.ShouldNotBeNull();
+                    error.ShouldBeType<ApplicationException>();
+                }
+
+                [Fact]
+                public void Should_set_unparsed_arguments_to_configuration_input_with_limit_output()
+                {
+                    Configuration.RegularOutput = false;
                     _because();
                     Configuration.Input.ShouldEqual("pkg1 pkg2");
                 }
 
                 [NUnit.Framework.TestCase("-l")]
+                [NUnit.Framework.TestCase("-lo")]
                 [NUnit.Framework.TestCase("--local-only")]
                 [NUnit.Framework.TestCase("--localonly")]
-                public void Should_output_warning_message_about_unsupported_argument(string argument)
+                public void Should_output_warning_message_about_unsupported_argument_with_limit_output(string argument)
                 {
+                    Configuration.RegularOutput = false;
                     _because();
                     MockLogger.Messages.Keys.ShouldContain("Warn");
-                    MockLogger.Messages["Warn"].ShouldContain(@"
-Invalid argument {0}. This argument has been removed from the list command and cannot be used.".FormatWith(argument));
+                    MockLogger.Messages["Warn"].ShouldContain("Ignoring the argument {0}. This argument is unsupported for locally installed packages.".FormatWith(argument));
                 }
 
                 [NUnit.Framework.TestCase("-li")]
                 [NUnit.Framework.TestCase("-lai")]
-                public void Should_output_warning_message_about_unsupported_argument_and_set_include_programs(string argument)
+                public void Should_output_warning_message_about_unsupported_argument_and_set_include_programs_with_limit_output(string argument)
                 {
+                    Configuration.RegularOutput = false;
                     _because();
                     MockLogger.Messages.Keys.ShouldContain("Warn");
-                    MockLogger.Messages["Warn"].ShouldContain(@"
-Invalid argument {0}. This argument has been removed from the list command and cannot be used.".FormatWith(argument));
+                    MockLogger.Messages["Warn"].ShouldContain("Ignoring the argument {0}. This argument is unsupported for locally installed packages.".FormatWith(argument));
                     Configuration.ListCommand.IncludeRegistryPrograms.ShouldBeTrue();
                 }
             }
