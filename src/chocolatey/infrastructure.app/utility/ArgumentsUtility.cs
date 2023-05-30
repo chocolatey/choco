@@ -43,6 +43,10 @@ namespace chocolatey.infrastructure.app.utility
              || commandArguments.ContainsSafe("-key=")
              || commandArguments.ContainsSafe("-apikey")
              || commandArguments.ContainsSafe("-api-key")
+             || commandArguments.ContainsSafe("-u ")
+             || commandArguments.ContainsSafe("-u=")
+             || commandArguments.ContainsSafe("-user ")
+             || commandArguments.ContainsSafe("-user=")
             ;
         }
 
