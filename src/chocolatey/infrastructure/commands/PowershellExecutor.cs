@@ -45,7 +45,7 @@ namespace chocolatey.infrastructure.commands
 
         private static string _powershell = string.Empty;
 
-        public static int execute(
+        public static int Execute(
             string command,
             IFileSystem fileSystem,
             int waitForExitSeconds,
@@ -53,15 +53,15 @@ namespace chocolatey.infrastructure.commands
             Action<object, DataReceivedEventArgs> stdErrAction
             )
         {
-            if (string.IsNullOrWhiteSpace(_powershell)) _powershell = get_powershell_location(fileSystem);
+            if (string.IsNullOrWhiteSpace(_powershell)) _powershell = GetPowerShellLocation(fileSystem);
             //-NoProfile -NoLogo -ExecutionPolicy unrestricted -Command "[System.Threading.Thread]::CurrentThread.CurrentCulture = ''; [System.Threading.Thread]::CurrentThread.CurrentUICulture = '';& '%DIR%chocolatey.ps1' %PS_ARGS%"
-            string arguments = "-NoProfile -NoLogo -ExecutionPolicy Bypass -Command \"{0}\"".format_with(command);
+            string arguments = "-NoProfile -NoLogo -ExecutionPolicy Bypass -Command \"{0}\"".FormatWith(command);
 
-            return CommandExecutor.execute_static(
+            return CommandExecutor.ExecuteStatic(
                 _powershell,
                 arguments,
                 waitForExitSeconds,
-                workingDirectory: fileSystem.get_directory_name(fileSystem.get_current_assembly_path()),
+                workingDirectory: fileSystem.GetDirectoryName(fileSystem.GetCurrentAssemblyPath()),
                 stdOutAction: stdOutAction,
                 stdErrAction: stdErrAction,
                 updateProcessPath: true,
@@ -69,17 +69,32 @@ namespace chocolatey.infrastructure.commands
                 );
         }
 
-        public static string get_powershell_location(IFileSystem fileSystem)
+        public static string GetPowerShellLocation(IFileSystem fileSystem)
         {
             foreach (var powershellLocation in _powershellLocations)
             {
-                if (fileSystem.file_exists(powershellLocation))
+                if (fileSystem.FileExists(powershellLocation))
                 {
                     return powershellLocation;
                 }
             }
 
-            throw new FileNotFoundException("Unable to find suitable location for PowerShell. Searched the following locations: '{0}'".format_with(string.Join("; ", _powershellLocations)));
+            throw new FileNotFoundException("Unable to find suitable location for PowerShell. Searched the following locations: '{0}'".FormatWith(string.Join("; ", _powershellLocations)));
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static int execute(
+            string command,
+            IFileSystem fileSystem,
+            int waitForExitSeconds,
+            Action<object, DataReceivedEventArgs> stdOutAction,
+            Action<object, DataReceivedEventArgs> stdErrAction)
+            => Execute(command, fileSystem, waitForExitSeconds, stdOutAction, stdErrAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_powershell_location(IFileSystem fileSystem)
+            => GetPowerShellLocation(fileSystem);
+#pragma warning restore IDE1006
     }
 }

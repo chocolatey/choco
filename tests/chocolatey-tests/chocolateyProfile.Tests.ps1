@@ -19,22 +19,33 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
             [bool]((Get-Command TabExpansion).ScriptBlock -match "ChocolateyTabExpansion") | Should -BeTrue
         }
 
-        It "Should list completions for Top Level Commands" {
+        It "Should list completions for all Top Level Commands, sorted alphabetically, but not aliases or unpackself" {
             $Command = "choco "
             $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            # These should be first
-            $Completions[0] | Should -Be "-?"
-            $Completions[1] | Should -Be "search"
+            $sortedCompletions = $Completions | Sort-Object -Property { $_ -replace '[^a-z](.*$)', '$1--' }
+            $differences = Compare-Object -ReferenceObject $sortedCompletions -DifferenceObject $Completions -SyncWindow 0
+            $differences | Should -BeNullOrEmpty -Because ($differences | Format-Table | Out-String)
 
-            # TODO: Determine why these lines are commented out. Remove if not needed, get working otherwise.
-            <#  Completions don't contain aliases, etc
-            foreach ($Command in $(
-                $(choco --help) -match " \* (?<Command>\w+) -" -replace " \* (?<Command>\w+) -.+", '$1'
-            )) {
-                $Completions | Should -Contain $Command
-            }
-            #>
+            # These are not provided by tab completion as they are either command aliases or not intended to be used
+            # by end-users.
+            $missingFromTabCompletion = @(
+                'features'
+                'find'
+                'setapikey'
+                'sources'
+                'synchronize'
+                'templates'
+                'unpackself'
+            )
+
+            # Fail the test if any choco command listed by `choco --help` isn't either in the missing list or the
+            # tab completion.
+            $unaccountedForCommands = @(choco --help) -match " \* \w+ -" -replace " \* (?<Command>\w+) -.+", '${Command}' |
+                Where-Object { $_ -notin $missingFromTabCompletion } |
+                Where-Object { $_ -notin $Completions }
+
+            $unaccountedForCommands | Should -HaveCount 0 -Because "expected all un-excluded commands to be present in tab completion, but the following were missing: $($unaccountedForCommands -join ', ')"
         }
 
         It "Should list completions for Pin" {

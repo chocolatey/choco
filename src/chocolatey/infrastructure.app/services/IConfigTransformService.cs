@@ -18,6 +18,7 @@ namespace chocolatey.infrastructure.app.services
 {
     using configuration;
     using results;
+    using System;
 
     public interface IConfigTransformService
     {
@@ -26,6 +27,11 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="packageResult">The package result.</param>
         /// <param name="config">The configuration.</param>
+        void Run(PackageResult packageResult, ChocolateyConfiguration config);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         void run(PackageResult packageResult, ChocolateyConfiguration config);
+#pragma warning restore IDE1006
     }
 }

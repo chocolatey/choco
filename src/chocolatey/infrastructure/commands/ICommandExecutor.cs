@@ -21,10 +21,10 @@ namespace chocolatey.infrastructure.commands
 
     public interface ICommandExecutor
     {
-        int execute(string process, string arguments, int waitForExitInSeconds);
-        int execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory);
+        int Execute(string process, string arguments, int waitForExitInSeconds);
+        int Execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory);
 
-        int execute(
+        int Execute(
             string process,
             string arguments,
             int waitForExitInSeconds,
@@ -33,6 +33,46 @@ namespace chocolatey.infrastructure.commands
             bool updateProcessPath
             );
 
+        int Execute(
+            string process,
+            string arguments,
+            int waitForExitInSeconds,
+            string workingDirectory,
+            Action<object, DataReceivedEventArgs> stdOutAction,
+            Action<object, DataReceivedEventArgs> stdErrAction,
+            bool updateProcessPath,
+            bool allowUseWindow
+            );
+
+        int Execute(
+            string process,
+            string arguments,
+            int waitForExitInSeconds,
+            string workingDirectory,
+            Action<object, DataReceivedEventArgs> stdOutAction,
+            Action<object, DataReceivedEventArgs> stdErrAction,
+            bool updateProcessPath,
+            bool allowUseWindow,
+            bool waitForExit
+            );
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        int execute(string process, string arguments, int waitForExitInSeconds);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        int execute(string process, string arguments, int waitForExitInSeconds, string workingDirectory);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        int execute(
+            string process,
+            string arguments,
+            int waitForExitInSeconds,
+            Action<object, DataReceivedEventArgs> stdOutAction,
+            Action<object, DataReceivedEventArgs> stdErrAction,
+            bool updateProcessPath
+            );
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         int execute(
             string process,
             string arguments,
@@ -44,6 +84,7 @@ namespace chocolatey.infrastructure.commands
             bool allowUseWindow
             );
 
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         int execute(
             string process,
             string arguments,
@@ -55,5 +96,6 @@ namespace chocolatey.infrastructure.commands
             bool allowUseWindow,
             bool waitForExit
             );
+#pragma warning restore IDE1006
     }
 }

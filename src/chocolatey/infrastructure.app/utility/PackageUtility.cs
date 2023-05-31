@@ -28,19 +28,19 @@ namespace chocolatey.infrastructure.app.utility
         /// <param name="config">The configuration.</param>
         /// <param name="packageName">Name of the package.</param>
         /// <returns>true if the package is a dependency, false if the package is the one specified or a virtual/semi-virtual</returns>
-        public static bool package_is_a_dependency(ChocolateyConfiguration config, string packageName)
+        public static bool PackageIdHasDependencySuffix(ChocolateyConfiguration config, string packageName)
         {
             if (string.IsNullOrWhiteSpace(config.PackageNames)) return true;
             if (string.IsNullOrWhiteSpace(packageName)) return true;
 
-            foreach (var package in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).or_empty_list_if_null())
+            foreach (var package in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
             {
-                if (packageName.is_equal_to(package)
-                    || packageName.contains(package + ".")
-                    || (package.contains(packageName)
-                        && (package.contains(".nupkg")
-                            || package.contains(".nuspec")
-                            || package.contains("{0}".format_with(Platform.get_platform() == PlatformType.Windows ? "\\" : "/"))
+                if (packageName.IsEqualTo(package)
+                    || packageName.ContainsSafe(package + ".")
+                    || (package.ContainsSafe(packageName)
+                        && (package.ContainsSafe(".nupkg")
+                            || package.ContainsSafe(".nuspec")
+                            || package.ContainsSafe("{0}".FormatWith(Platform.GetPlatform() == PlatformType.Windows ? "\\" : "/"))
                         )
                     )
                 )
@@ -51,5 +51,11 @@ namespace chocolatey.infrastructure.app.utility
 
             return true;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static bool package_is_a_dependency(ChocolateyConfiguration config, string packageName)
+            => PackageIdHasDependencySuffix(config, packageName);
+#pragma warning restore IDE1006
     }
 }

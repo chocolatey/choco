@@ -22,7 +22,7 @@ namespace chocolatey.infrastructure.app.rules
 
     internal sealed class EmptyOrInvalidUrlMetadataRule : MetadataRuleBase
     {
-        public override IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             var items = new[]
             {
@@ -37,20 +37,26 @@ namespace chocolatey.infrastructure.app.rules
 
             foreach (var item in items)
             {
-                if (has_element(reader, item))
+                if (HasElement(reader, item))
                 {
-                    var value = get_element_value(reader, item);
+                    var value = GetElementValue(reader, item);
 
                     if (string.IsNullOrWhiteSpace(value))
                     {
-                        yield return new RuleResult(RuleType.Error, RuleIdentifiers.EmptyRequiredElement, "The {0} element in the package nuspec file cannot be empty.".format_with(item));
+                        yield return GetRule(RuleIdentifiers.EmptyRequiredElement, "The {0} element in the package nuspec file cannot be empty.".FormatWith(item));
                     }
                     else if (!Uri.TryCreate(value, UriKind.Absolute, out _))
                     {
-                        yield return new RuleResult(RuleType.Error, RuleIdentifiers.InvalidTypeElement, "'{0}' is not a valid URL for the {1} element in the package nuspec file.".format_with(value, item));
+                        yield return GetRule(RuleIdentifiers.InvalidTypeElement, "'{0}' is not a valid URL for the {1} element in the package nuspec file.".FormatWith(value, item));
                     }
                 }
             }
+        }
+
+        protected override IEnumerable<ImmutableRule> GetRules()
+        {
+            yield return new ImmutableRule(RuleType.Error, RuleIdentifiers.EmptyRequiredElement, "A required element does not contain any content.");
+            yield return new ImmutableRule(RuleType.Error, RuleIdentifiers.InvalidTypeElement, "The specified content of the element is not of the expected type and can not be accepted.");
         }
     }
 }

@@ -37,7 +37,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_implementing_command_for : ChocolateyHelpCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyHelpCommandSpecsBase
         {
             private List<string> results;
 
@@ -47,7 +47,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_help()
+            public void Should_implement_help()
             {
                 results.ShouldContain("help");
             }

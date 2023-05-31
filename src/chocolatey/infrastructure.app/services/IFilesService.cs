@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using configuration;
     using domain;
     using results;
@@ -30,28 +31,28 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="filepath">The filepath.</param>
         /// <returns>PackageFiles with entries based on the file if it exists, otherwise null</returns>
-        PackageFiles read_from_file(string filepath);
+        PackageFiles ReadPackageSnapshot(string filepath);
 
         /// <summary>
         /// Saves the files snapshot to the specified file path.
         /// </summary>
         /// <param name="snapshot">The snapshot.</param>
         /// <param name="filePath">The file path.</param>
-        void save_to_file(PackageFiles snapshot, string filePath);
+        void SavePackageSnapshot(PackageFiles snapshot, string filePath);
 
         /// <summary>
         /// Ensure that the package files have compatible file attributes (e.g. no readonly).
         /// </summary>
         /// <param name="packageResult">The package result.</param>
         /// <param name="config">The configuration.</param>
-        void ensure_compatible_file_attributes(PackageResult packageResult, ChocolateyConfiguration config);
+        void EnsureCompatibleFileAttributes(PackageResult packageResult, ChocolateyConfiguration config);
 
         /// <summary>
         /// Ensure that files in a directory have compatible file attributes (e.g. no readonly).
         /// </summary>
         /// <param name="directory">The directory.</param>
         /// <param name="config">The configuration.</param>
-        void ensure_compatible_file_attributes(string directory, ChocolateyConfiguration config);
+        void EnsureCompatibleFileAttributes(string directory, ChocolateyConfiguration config);
 
         /// <summary>
         /// Captures the snapshot of the package files
@@ -59,7 +60,7 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="packageResult">The package result.</param>
         /// <param name="config">The configuration.</param>
         /// <returns>PackageFiles with entries based on the install location of the package.</returns>
-        PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config);
+        PackageFiles CaptureSnapshot(PackageResult packageResult, ChocolateyConfiguration config);
 
         /// <summary>
         /// Captures the snapshot of the package files
@@ -67,13 +68,32 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="directory">The directory.</param>
         /// <param name="config">The configuration.</param>
         /// <returns>PackageFiles with entries based on the install location of the package.</returns>
-        PackageFiles capture_package_files(string directory, ChocolateyConfiguration config);
+        PackageFiles CaptureSnapshot(string directory, ChocolateyConfiguration config);
 
         /// <summary>
         /// Gets a PackageFile from the filepath
         /// </summary>
         /// <param name="file">The file.</param>
         /// <returns>PackageFile object</returns>
+        PackageFile GetPackageFile(string file);
+
+        bool MovePackageUsingBackupStrategy(string sourceFolder, string destinationFolder, bool restoreSource);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        PackageFiles read_from_file(string filepath);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void save_to_file(PackageFiles snapshot, string filePath);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void ensure_compatible_file_attributes(PackageResult packageResult, ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void ensure_compatible_file_attributes(string directory, ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        PackageFiles capture_package_files(string directory, ChocolateyConfiguration config);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         PackageFile get_package_file(string file);
+#pragma warning restore IDE1006
     }
 }

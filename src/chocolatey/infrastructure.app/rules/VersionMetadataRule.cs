@@ -22,16 +22,21 @@ namespace chocolatey.infrastructure.app.rules
 
     internal sealed class VersionMetadataRule : MetadataRuleBase
     {
-        public override IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
-            var version = get_element_value(reader, "version");
+            var version = GetElementValue(reader, "version");
 
             // We need to check for the $version$ substitution value, as it will not be replaced
             // before the package gets created
-            if (!string.IsNullOrEmpty(version) && !version.is_equal_to("$version$") && !NuGetVersion.TryParse(version, out _))
+            if (!string.IsNullOrEmpty(version) && !version.IsEqualTo("$version$") && !NuGetVersion.TryParse(version, out _))
             {
-                yield return new RuleResult(RuleType.Error, RuleIdentifiers.InvalidTypeElement, "'{0}' is not a valid version string in the package nuspec file.".format_with(version));
+                yield return GetRule(RuleIdentifiers.InvalidTypeElement, "'{0}' is not a valid version string in the package nuspec file.".FormatWith(version));
             }
+        }
+
+        protected override IEnumerable<ImmutableRule> GetRules()
+        {
+            yield return new ImmutableRule(RuleType.Error, RuleIdentifiers.InvalidTypeElement, "The specified version is not a valid version string.");
         }
     }
 }

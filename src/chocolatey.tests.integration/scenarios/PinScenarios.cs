@@ -56,7 +56,7 @@ namespace chocolatey.tests.integration.scenarios
                     (c) =>
                     {
                         var attributes = c.GetType().GetCustomAttributes(typeof(CommandForAttribute), false);
-                        return attributes.Cast<CommandForAttribute>().Any(attribute => attribute.CommandName.is_equal_to(Configuration.CommandName));
+                        return attributes.Cast<CommandForAttribute>().Any(attribute => attribute.CommandName.IsEqualTo(Configuration.CommandName));
                     }).FirstOrDefault() as ChocolateyPinCommand;
 
                 Configuration.Sources = ApplicationParameters.PackagesLocation;
@@ -66,235 +66,235 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        public class when_listing_pins_with_no_pins : ScenariosBase
+        public class When_listing_pins_with_no_pins : ScenariosBase
         {
             public override void Context()
             {
                 base.Context();
-                Configuration.PinCommand.Command = PinCommandType.list;
+                Configuration.PinCommand.Command = PinCommandType.List;
             }
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.run(Configuration);
+                MockLogger.Reset();
+                Service.Run(Configuration);
             }
 
             [Fact]
-            public void should_not_contain_list_results()
+            public void Should_not_contain_list_results()
             {
-                MockLogger.contains_message("upgradepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
-                MockLogger.contains_message("upgradepackage 1.0.0", LogLevel.Warn).ShouldBeFalse();
-                MockLogger.contains_message("upgradepackage 1.0.0", LogLevel.Error).ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Warn).ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Error).ShouldBeFalse();
             }
 
             [Fact]
-            public void should_not_contain_any_pins_by_default()
+            public void Should_not_contain_any_pins_by_default()
             {
-                MockLogger.contains_message("upgradepackage|1.0.0").ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage|1.0.0").ShouldBeFalse();
             }
         }
 
-        public class when_listing_pins_with_an_existing_pin : ScenariosBase
+        public class When_listing_pins_with_an_existing_pin : ScenariosBase
         {
             public override void Context()
             {
                 base.Context();
-                Configuration.PinCommand.Command = PinCommandType.add;
+                Configuration.PinCommand.Command = PinCommandType.Add;
                 Configuration.PinCommand.Name = "upgradepackage";
-                Service.run(Configuration);
-                Configuration.PinCommand.Command = PinCommandType.list;
+                Service.Run(Configuration);
+                Configuration.PinCommand.Command = PinCommandType.List;
             }
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.run(Configuration);
+                MockLogger.Reset();
+                Service.Run(Configuration);
             }
 
             [Fact]
-            public void should_not_contain_list_results()
+            public void Should_not_contain_list_results()
             {
-                MockLogger.contains_message("upgradepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
-                MockLogger.contains_message("upgradepackage 1.0.0", LogLevel.Warn).ShouldBeFalse();
-                MockLogger.contains_message("upgradepackage 1.0.0", LogLevel.Error).ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Warn).ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Error).ShouldBeFalse();
             }
 
             [Fact]
-            public void should_contain_existing_pin_messages()
+            public void Should_contain_existing_pin_messages()
             {
-                MockLogger.contains_message("upgradepackage|1.0.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage|1.0.0").ShouldBeTrue();
             }
         }
 
-        public class when_listing_pins_with_existing_pins : ScenariosBase
+        public class When_listing_pins_with_existing_pins : ScenariosBase
         {
             public override void Context()
             {
                 base.Context();
-                Configuration.PinCommand.Command = PinCommandType.add;
+                Configuration.PinCommand.Command = PinCommandType.Add;
                 Configuration.PinCommand.Name = "upgradepackage";
-                Service.run(Configuration);
+                Service.Run(Configuration);
                 Configuration.PinCommand.Name = "installpackage";
-                Service.run(Configuration);
-                Configuration.PinCommand.Command = PinCommandType.list;
+                Service.Run(Configuration);
+                Configuration.PinCommand.Command = PinCommandType.List;
             }
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.run(Configuration);
+                MockLogger.Reset();
+                Service.Run(Configuration);
             }
 
             [Fact]
-            public void should_not_contain_list_results()
+            public void Should_not_contain_list_results()
             {
-                MockLogger.contains_message("upgradepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
-                MockLogger.contains_message("upgradepackage 1.0.0", LogLevel.Warn).ShouldBeFalse();
-                MockLogger.contains_message("upgradepackage 1.0.0", LogLevel.Error).ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Warn).ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Error).ShouldBeFalse();
             }
 
             [Fact]
-            public void should_contain_a_pin_message_for_each_existing_pin()
+            public void Should_contain_a_pin_message_for_each_existing_pin()
             {
-                MockLogger.contains_message("installpackage|1.0.0").ShouldBeTrue();
-                MockLogger.contains_message("upgradepackage|1.0.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("installpackage|1.0.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage|1.0.0").ShouldBeTrue();
             }
         }
 
-        public class when_setting_a_pin_for_an_installed_package : ScenariosBase
+        public class When_setting_a_pin_for_an_installed_package : ScenariosBase
         {
             public override void Context()
             {
                 base.Context();
-                Configuration.PinCommand.Command = PinCommandType.add;
+                Configuration.PinCommand.Command = PinCommandType.Add;
                 Configuration.PinCommand.Name = "upgradepackage";
             }
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.run(Configuration);
+                MockLogger.Reset();
+                Service.Run(Configuration);
             }
 
             [Fact]
-            public void should_contain_success_message()
+            public void Should_contain_success_message()
             {
-                MockLogger.contains_message("Successfully added a pin for upgradepackage").ShouldBeTrue();
+                MockLogger.ContainsMessage("Successfully added a pin for upgradepackage").ShouldBeTrue();
             }
         }
 
-        public class when_setting_a_pin_for_an_already_pinned_package : ScenariosBase
+        public class When_setting_a_pin_for_an_already_pinned_package : ScenariosBase
         {
             public override void Context()
             {
                 base.Context();
-                Configuration.PinCommand.Command = PinCommandType.add;
+                Configuration.PinCommand.Command = PinCommandType.Add;
                 Configuration.PinCommand.Name = "upgradepackage";
-                Service.run(Configuration);
+                Service.Run(Configuration);
             }
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.run(Configuration);
+                MockLogger.Reset();
+                Service.Run(Configuration);
             }
 
             [Fact]
-            public void should_contain_nothing_to_do_message()
+            public void Should_contain_nothing_to_do_message()
             {
-                MockLogger.contains_message("Nothing to change. Pin already set or removed.").ShouldBeTrue();
+                MockLogger.ContainsMessage("Nothing to change. Pin already set or removed.").ShouldBeTrue();
             }
         }
 
-        public class when_setting_a_pin_for_a_non_installed_package : ScenariosBase
+        public class When_setting_a_pin_for_a_non_installed_package : ScenariosBase
         {
             public override void Context()
             {
                 base.Context();
-                Configuration.PinCommand.Command = PinCommandType.add;
+                Configuration.PinCommand.Command = PinCommandType.Add;
                 Configuration.PinCommand.Name = "whatisthis";
             }
 
             public override void Because()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
-            public void should_throw_an_error_about_not_finding_the_package()
+            public void Should_throw_an_error_about_not_finding_the_package()
             {
-                Assert.That(() => Service.run(Configuration),
+                Assert.That(() => Service.Run(Configuration),
                     Throws.TypeOf<ApplicationException>()
                     .And.Message.EqualTo("Unable to find package named 'whatisthis' to pin. Please check to ensure it is installed."));
             }
         }
 
-        public class when_removing_a_pin_for_a_pinned_package : ScenariosBase
+        public class When_removing_a_pin_for_a_pinned_package : ScenariosBase
         {
             public override void Context()
             {
                 base.Context();
-                Configuration.PinCommand.Command = PinCommandType.add;
+                Configuration.PinCommand.Command = PinCommandType.Add;
                 Configuration.PinCommand.Name = "upgradepackage";
-                Service.run(Configuration);
+                Service.Run(Configuration);
 
-                Configuration.PinCommand.Command = PinCommandType.remove;
+                Configuration.PinCommand.Command = PinCommandType.Remove;
             }
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.run(Configuration);
+                MockLogger.Reset();
+                Service.Run(Configuration);
             }
 
             [Fact]
-            public void should_contain_success_message()
+            public void Should_contain_success_message()
             {
-                MockLogger.contains_message("Successfully removed a pin for upgradepackage").ShouldBeTrue();
+                MockLogger.ContainsMessage("Successfully removed a pin for upgradepackage").ShouldBeTrue();
             }
         }
 
-        public class when_removing_a_pin_for_an_unpinned_package : ScenariosBase
+        public class When_removing_a_pin_for_an_unpinned_package : ScenariosBase
         {
             public override void Context()
             {
                 base.Context();
-                Configuration.PinCommand.Command = PinCommandType.remove;
+                Configuration.PinCommand.Command = PinCommandType.Remove;
                 Configuration.PinCommand.Name = "upgradepackage";
             }
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.run(Configuration);
+                MockLogger.Reset();
+                Service.Run(Configuration);
             }
 
             [Fact]
-            public void should_contain_nothing_to_do_message()
+            public void Should_contain_nothing_to_do_message()
             {
-                MockLogger.contains_message("Nothing to change. Pin already set or removed.").ShouldBeTrue();
+                MockLogger.ContainsMessage("Nothing to change. Pin already set or removed.").ShouldBeTrue();
             }
         }
 
-        public class when_removing_a_pin_for_a_non_installed_package : ScenariosBase
+        public class When_removing_a_pin_for_a_non_installed_package : ScenariosBase
         {
             public override void Context()
             {
                 base.Context();
-                Configuration.PinCommand.Command = PinCommandType.remove;
+                Configuration.PinCommand.Command = PinCommandType.Remove;
                 Configuration.PinCommand.Name = "whatisthis";
             }
 
             public override void Because()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
-            public void should_throw_an_error_about_not_finding_the_package()
+            public void Should_throw_an_error_about_not_finding_the_package()
             {
-                Assert.That(() => Service.run(Configuration),
+                Assert.That(() => Service.Run(Configuration),
                     Throws.TypeOf<ApplicationException>()
                     .And.Message.EqualTo("Unable to find package named 'whatisthis' to pin. Please check to ensure it is installed."));
             }

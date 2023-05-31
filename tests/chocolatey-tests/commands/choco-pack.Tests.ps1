@@ -1,34 +1,35 @@
-﻿Import-Module helpers/common-helpers
-
-$successPack = @('basic'; 'basic-dependencies'; "cdata"; "full")
-# Required elements, that can also not be empty
-$missingFailures = @('id'; 'version'; 'authors'; 'description')
-# Elements that can not be set to an empty string, but are not required
-$emptyFailures = @(
-    "projectUrl"
-    "projectSourceUrl"
-    "docsUrl"
-    "bugTrackerUrl"
-    "mailingListUrl"
-    "iconUrl"
-    "licenseUrl"
-)
-# Elements that will return an invalid failure (usually due to serialization)
-$invalidFailures = @(
-    @{id = 'projectUrl'; message = "ERROR: CHCU0001: 'invalid project url' is not a valid URL for the projectUrl element in the package nuspec file." }
-    @{id = 'projectSourceUrl'; message = "ERROR: CHCU0001: 'invalid project source url' is not a valid URL for the projectSourceUrl element in the package nuspec file." }
-    @{id = 'docsUrl'; message = "ERROR: CHCU0001: 'invalid docs url' is not a valid URL for the docsUrl element in the package nuspec file." }
-    @{id = 'bugTrackerUrl'; message = "ERROR: CHCU0001: 'invalid bug tracker url' is not a valid URL for the bugTrackerUrl element in the package nuspec file." }
-    @{id = 'mailingListUrl'; message = "ERROR: CHCU0001: 'invalid mailing list url' is not a valid URL for the mailingListUrl element in the package nuspec file." }
-    @{id = 'iconUrl'; message = "ERROR: CHCU0001: 'invalid icon url' is not a valid URL for the iconUrl element in the package nuspec file." }
-    @{id = 'licenseUrl'; message = "ERROR: CHCU0001: 'invalid license url' is not a valid URL for the licenseUrl element in the package nuspec file." }
-    @{id = "version"; message = "ERROR: CHCU0001: 'INVALID' is not a valid version string in the package nuspec file." }
-    @{id = "no-content"; message = "Cannot create a package that has no dependencies nor content." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
-    @{id = "id"; message = "The package ID 'invalid id' contains invalid characters. Examples of valid package IDs include 'MyPackage' and 'MyPackage.Sample'." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
-    @{id = "requirelicenseacceptance"; message = "ERROR: CHCR0002: Enabling license acceptance requires a license url." }
-)
-
+﻿
 Describe "choco pack" -Tag Chocolatey, PackCommand {
+    BeforeDiscovery {
+        $successPack = @('basic'; 'basic-dependencies'; "cdata"; "full")
+        # Required elements, that can also not be empty
+        $missingFailures = @('id'; 'version'; 'authors'; 'description')
+        # Elements that can not be set to an empty string, but are not required
+        $emptyFailures = @(
+            "projectUrl"
+            "projectSourceUrl"
+            "docsUrl"
+            "bugTrackerUrl"
+            "mailingListUrl"
+            "iconUrl"
+            "licenseUrl"
+        )
+        # Elements that will return an invalid failure (usually due to serialization)
+        $invalidFailures = @(
+            @{id = 'projectUrl'; message = "ERROR: CHCU0001: 'invalid project url' is not a valid URL for the projectUrl element in the package nuspec file." }
+            @{id = 'projectSourceUrl'; message = "ERROR: CHCU0001: 'invalid project source url' is not a valid URL for the projectSourceUrl element in the package nuspec file." }
+            @{id = 'docsUrl'; message = "ERROR: CHCU0001: 'invalid docs url' is not a valid URL for the docsUrl element in the package nuspec file." }
+            @{id = 'bugTrackerUrl'; message = "ERROR: CHCU0001: 'invalid bug tracker url' is not a valid URL for the bugTrackerUrl element in the package nuspec file." }
+            @{id = 'mailingListUrl'; message = "ERROR: CHCU0001: 'invalid mailing list url' is not a valid URL for the mailingListUrl element in the package nuspec file." }
+            @{id = 'iconUrl'; message = "ERROR: CHCU0001: 'invalid icon url' is not a valid URL for the iconUrl element in the package nuspec file." }
+            @{id = 'licenseUrl'; message = "ERROR: CHCU0001: 'invalid license url' is not a valid URL for the licenseUrl element in the package nuspec file." }
+            @{id = "version"; message = "ERROR: CHCU0001: 'INVALID' is not a valid version string in the package nuspec file." }
+            @{id = "no-content"; message = "Cannot create a package that has no dependencies nor content." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
+            @{id = "id"; message = "The package ID 'invalid id' contains invalid characters. Examples of valid package IDs include 'MyPackage' and 'MyPackage.Sample'." } # This is a message from NuGet.Client, we may want to take ownership of it eventually.
+            @{id = "requirelicenseacceptance"; message = "ERROR: CHCR0002: Enabling license acceptance requires a license url." }
+        )
+    }
+
     BeforeAll {
         Remove-NuGetPaths
         $testPackageLocation = "$(Get-TempDirectory)ChocolateyTests\packages"
@@ -581,6 +582,46 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
 
         It "Should output message about validation issues found" {
             $Output.Lines | Should -Contain "One or more issues found with $nuspecPath, please fix all validation items above listed as errors."
+        }
+    }
+
+    Context 'Packing a package with non-normalized versions generates normalized versions' -ForEach @(
+        @{ ExpectedPackageVersion = '0.1.0' ; ProvidedVersion = '0.1.0.0' }
+        @{ ExpectedPackageVersion = '1.2.3.4' ; ProvidedVersion = '01.02.03.04' }
+        @{ ExpectedPackageVersion = '1.2.4' ; ProvidedVersion = '01.02.04' }
+        @{ ExpectedPackageVersion = '1.2.0' ; ProvidedVersion = '01.02' }
+        @{ ExpectedPackageVersion = '1.2.3' ; ProvidedVersion = '0001.0002.0003' }
+        @{ ExpectedPackageVersion = '2.0.0' ; ProvidedVersion = '02' }
+    ) -Tag VersionNormalization {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $PackageUnderTest = 'nonnormalizedversions'
+            Push-Location (New-Item "$(Get-TempDirectory)/$(New-Guid)" -ItemType Directory)
+            $null = Invoke-Choco new $PackageUnderTest --version $ProvidedVersion
+            $SourceNuspec = "$PWD/$PackageUnderTest/$PackageUnderTest.nuspec"
+            $Output = Invoke-Choco pack $SourceNuspec
+        }
+
+        AfterAll {
+            Pop-Location
+        }
+
+        It "Should exit with success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should report successful installation" {
+            $Output.Lines | Should -Contain "Successfully created package '$PWD\$PackageUnderTest.$ExpectedPackageVersion.nupkg'" -Because $Output.String
+        }
+
+        It "Should have generated the correct files" {
+            $ExpectedNupkg = "$PWD/$PackageUnderTest.$ExpectedPackageVersion.nupkg"
+            $ExpectedNupkg | Should -Exist -Because $Output.String
+            Expand-ZipArchive -Source $ExpectedNupkg -Destination "$PWD/$PackageUnderTest-expanded"
+            $SourceNuspecContents = [xml](Get-Content $SourceNuspec)
+            $PackedNuspecContents = [xml](Get-Content "$PWD/$PackageUnderTest-expanded/$PackageUnderTest.nuspec")
+            $SourceNuspecContents.package.metadata.version | Should -Be $ProvidedVersion
+            $PackedNuspecContents.package.metadata.version | Should -Be $ExpectedPackageVersion
         }
     }
 

@@ -16,17 +16,16 @@
 namespace chocolatey.infrastructure.app.rules
 {
     using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
     using chocolatey.infrastructure.rules;
     using NuGet.Packaging;
 
-    internal sealed class LicenseMetadataRule : IMetadataRule
+    internal sealed class LicenseMetadataRule : FrameWorkReferencesMetadataRule
     {
-        public IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             if (!(reader.GetLicenseMetadata() is null))
             {
-                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<license> elements are not supported in Chocolatey CLI, use <licenseUrl> instead.");
+                yield return GetRule(RuleIdentifiers.UnsupportedElementUsed, "<license> elements are not supported in Chocolatey CLI, use <licenseUrl> instead.");
             }
         }
     }

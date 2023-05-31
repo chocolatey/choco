@@ -22,9 +22,9 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 3389, host: 14389, id: 'rdp', auto_correct: true
 
   config.vm.provider "virtualbox" do |vb|
-    vb.gui = true
-    vb.memory = 4096
-    vb.cpus = 2
+    vb.gui = ENV['VM_GUI'] ? ENV['VM_GUI'].to_s.downcase == 'true' : true
+    vb.memory = ENV['VM_MEMORY'] ? ENV['VM_MEMORY'].to_i : 4096
+    vb.cpus = ENV['VM_CPU'] ? ENV['VM_CPU'].to_i : 2
     vb.linked_clone = true
     vb.customize ['modifyvm', :id, '--vram', '128']
   end
@@ -37,30 +37,39 @@ Vagrant.configure("2") do |config|
 
   config.vm.synced_folder '../', '/chocoRoot'
 
-  config.vm.provision "shell", inline: <<-SHELL
+  config.vm.provision "shell", name: "prep", inline: <<-SHELL
     cscript c:/windows/system32/slmgr.vbs /rearm | Out-Null
     Set-ExecutionPolicy Bypass -Scope Process -Force
-    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+    iex (irm https://community.chocolatey.org/install.ps1)
 
-    Write-Host "We are going to install some prerequisites now. This could take some time"
+    Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) We are going to install some prerequisites now. This could take some time"
     $null = choco install git pester visualstudio2022community visualstudio2022-workload-manageddesktop netfx-4.8-devpack -y
     Import-Module $env:ChocolateyInstall/helpers/chocolateyProfile.psm1
     Update-SessionEnvironment
-    Write-Host "Done installing software, now copying files"
-    $null = robocopy c:/chocoRoot c:/code/choco /mir
+    Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Done installing software, now copying files"
+    # If you try to build on macOS, then run this, there are attributes on some files that cause the build to fail inside of the vagrant environment.
+    $null = robocopy c:/chocoRoot c:/code/choco /e /copy:dt
+  SHELL
+  config.vm.provision "shell", name: "build", inline: <<-SHELL
+    $null = robocopy c:/chocoRoot c:/code/choco /e /copy:dt /purge
     Push-Location c:/code/choco
-    Write-Host "Files have been copied, beginning build process."
+    Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Files have been copied, beginning build process."
     $CakeOutput = ./build.bat 2>&1
+
     if ($LastExitCode -ne 0) {
-      Set-Content c:/chocoRoot/buildOutput.txt -Value $CakeOutput
-      Write-Host "The build has failed. Please see the buildOutput.txt file at the root of the repository for details"
-      exit $LastExitCode
+        Set-Content c:/vagrant/buildOutput.log -Value $CakeOutput
+        Write-Host "The build has failed. Please see the buildOutput.log file for details"
+        exit $LastExitCode
     }
 
-    Write-Host "Build complete. Executing tests."
+    Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Build complete."
+  SHELL
+  config.vm.provision "shell", name: "test", inline: <<-SHELL
+    Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Starting Test Execution"
+    Push-Location c:/code/choco
     # $env:TEST_KITCHEN = 1
     $env:VM_RUNNING = 1
     ./Invoke-Tests.ps1
+    Copy-Item $env:ALLUSERSPROFILE/chocolatey/logs/testInvocations.log C:/vagrant
   SHELL
 end

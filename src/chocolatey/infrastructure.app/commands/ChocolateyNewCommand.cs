@@ -37,44 +37,44 @@ namespace chocolatey.infrastructure.app.commands
             _templateService = templateService;
         }
 
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("a|auto|automaticpackage",
                      "AutomaticPackage - Generate automatic package instead of normal. Defaults to false",
                      option => configuration.NewCommand.AutomaticPackage = option != null)
                 .Add("t=|template=|template-name=",
-                     "TemplateName - Use a named template in {0}\\templates\\templatename instead of built-in template. Available in 0.9.9.9+. Manage templates as packages in 0.9.10+.".format_with(ApplicationParameters.InstallLocation),
-                     option => configuration.NewCommand.TemplateName = option.remove_surrounding_quotes())
+                     "TemplateName - Use a named template in {0}\\templates\\templatename instead of built-in template.".FormatWith(ApplicationParameters.InstallLocation),
+                     option => configuration.NewCommand.TemplateName = option.UnquoteSafe())
                 .Add("name=",
                      "Name [Required]- the name of the package. Can be passed as first parameter without \"--name=\".",
                      option =>
                          {
-                             configuration.NewCommand.Name = option.remove_surrounding_quotes();
-                             configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, option.remove_surrounding_quotes());
+                             configuration.NewCommand.Name = option.UnquoteSafe();
+                             configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, option.UnquoteSafe());
                          })
                 .Add("version=",
                      "Version - the version of the package. Can also be passed as the property PackageVersion=somevalue",
-                     option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.VersionPropertyName, option.remove_surrounding_quotes()))
+                     option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.VersionPropertyName, option.UnquoteSafe()))
                 .Add("maintainer=",
                      "Maintainer - the name of the maintainer. Can also be passed as the property MaintainerName=somevalue",
-                     option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.MaintainerPropertyName, option.remove_surrounding_quotes()))
+                     option => configuration.NewCommand.TemplateProperties.Add(TemplateValues.MaintainerPropertyName, option.UnquoteSafe()))
                 .Add("out=|outdir=|outputdirectory=|output-directory=",
-                    "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory. Available in 0.9.10+.",
-                    option => configuration.OutputDirectory = option.remove_surrounding_quotes())
+                    "OutputDirectory - Specifies the directory for the created Chocolatey package file. If not specified, uses the current directory.",
+                    option => configuration.OutputDirectory = option.UnquoteSafe())
                 .Add("built-in|built-in-template|originaltemplate|original-template|use-original-template|use-built-in-template",
-                    "BuiltInTemplate - Use the original built-in template instead of any override. Available in 0.9.10+.",
+                    "BuiltInTemplate - Use the original built-in template instead of any override.",
                     option => configuration.NewCommand.UseOriginalTemplate = option != null)
                 ;
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
 
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.Name))
             {
-                configuration.NewCommand.Name = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault(arg => !arg.StartsWith("-") && !arg.contains("="));
+                configuration.NewCommand.Name = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault(arg => !arg.StartsWith("-") && !arg.ContainsSafe("="));
                 var property = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().Split(new[] {'='}, StringSplitOptions.RemoveEmptyEntries);
                 if (property.Length == 1)
                 {
@@ -82,17 +82,17 @@ namespace chocolatey.infrastructure.app.commands
                 }
             }
 
-            foreach (var unparsedArgument in unparsedArguments.or_empty_list_if_null())
+            foreach (var unparsedArgument in unparsedArguments.OrEmpty())
             {
                 var property = unparsedArgument.Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
                 if (property.Length == 2)
                 {
-                    var propName = property[0].trim_safe();
-                    var propValue = property[1].trim_safe().remove_surrounding_quotes();
+                    var propName = property[0].TrimSafe();
+                    var propValue = property[1].TrimSafe().UnquoteSafe();
 
                     if (configuration.NewCommand.TemplateProperties.ContainsKey(propName))
                     {
-                        this.Log().Warn(() => "A value for '{0}' has already been added with the value '{1}'. Ignoring {0}='{2}'.".format_with(propName, configuration.NewCommand.TemplateProperties[propName], propValue));
+                        this.Log().Warn(() => "A value for '{0}' has already been added with the value '{1}'. Ignoring {0}='{2}'.".FormatWith(propName, configuration.NewCommand.TemplateProperties[propName], propValue));
                     }
                     else
                     {
@@ -102,7 +102,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.Name))
             {
@@ -116,7 +116,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "New Command");
             this.Log().Info(@"
@@ -136,7 +136,7 @@ Possible properties to pass:
     url64
     silentargs
 
-NOTE: Starting in 0.9.10, you can pass arbitrary property value pairs
+NOTE: You can pass arbitrary property value pairs
  through to templates. This really unlocks your ability to create
  packages automatically!
 
@@ -178,19 +178,49 @@ If you find other exit codes that we have not yet documented, please
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
-            _templateService.generate_noop(configuration);
+            _templateService.GenerateDryRun(configuration);
         }
 
-        public virtual void run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
-            _templateService.generate(configuration);
+            _templateService.Generate(configuration);
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
             return false;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+#pragma warning restore IDE1006
     }
 }

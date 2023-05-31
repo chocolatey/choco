@@ -33,16 +33,16 @@ namespace chocolatey.infrastructure.services
 
         private readonly ISubject<object> _subject = new Subject<object>();
 
-        public void publish<Event>(Event eventMessage) where Event : class, IMessage
+        public void Publish<Event>(Event eventMessage) where Event : class, IMessage
         {
-            Ensure.that(() => eventMessage).is_not_null();
+            Ensure.That(() => eventMessage).NotNull();
 
-            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Sending message '{0}' out if there are subscribers...".format_with(typeof (Event).Name));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Sending message '{0}' out if there are subscribers...".FormatWith(typeof (Event).Name));
 
             _subject.OnNext(eventMessage);
         }
 
-        public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
+        public IDisposable Subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
         {
             if (filter == null) filter = (message) => true;
             if (handleError == null) handleError = (ex) => { };
@@ -53,5 +53,15 @@ namespace chocolatey.infrastructure.services
 
             return subscription;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void publish<Event>(Event eventMessage) where Event : class, IMessage
+            => Publish(eventMessage);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
+            => Subscribe(handleEvent, handleError, filter);
+#pragma warning restore IDE1006
     }
 }

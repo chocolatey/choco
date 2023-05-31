@@ -26,8 +26,8 @@ FileName location specified.
 This is a low-level function and not recommended for use in package
 scripts. It is recommended you call `Get-ChocolateyWebFile` instead.
 
-Starting in 0.9.10, will automatically call Set-PowerShellExitCode to
-set the package exit code to 404 if the resource is not found.
+Will automatically call Set-PowerShellExitCode to set the package
+exit code to 404 if the resource is not found.
 
 .INPUTS
 None

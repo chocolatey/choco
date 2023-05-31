@@ -45,10 +45,6 @@ namespace chocolatey.tests
             Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
         }
 
-        public virtual void before_everything()
-        {
-        }
-
         [OneTimeTearDown]
         public void AfterEverything()
         {
@@ -67,7 +63,7 @@ namespace chocolatey.tests
         [OneTimeSetUp]
         public void Setup()
         {
-            if (MockLogger != null) MockLogger.reset();
+            if (MockLogger != null) MockLogger.Reset();
             //Log.InitializeWith(MockLogger);
             NugetCommon.ClearRepositoriesCache();
             Context();
@@ -125,7 +121,7 @@ namespace chocolatey.tests
     public class ConcernForAttribute : CategoryAttribute
     {
         public ConcernForAttribute(string name)
-            : base("ConcernFor - {0}".format_with(name))
+            : base("ConcernFor - {0}".FormatWith(name))
         {
         }
     }
@@ -144,7 +140,7 @@ namespace chocolatey.tests
     public class PendingAttribute : IgnoreAttribute
     {
         public PendingAttribute(string reason)
-            : base("Pending test - {0}".format_with(reason))
+            : base("Pending test - {0}".FormatWith(reason))
         {
         }
     }

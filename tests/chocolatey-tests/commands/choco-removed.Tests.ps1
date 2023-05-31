@@ -64,7 +64,7 @@ exit $command.Count
             $null = Invoke-Choco new testPackage --version 1.0.0
             $null = Invoke-Choco pack testPackage/testPackage.nuspec
             $null = Invoke-Choco apikey add -s https://chocolatey.org -k None
-            $Output = Invoke-Choco push ./testPackage.1.0.0.nupkg
+            $Output = Invoke-Choco push ./testPackage.1.0.0.nupkg --source https://push.chocolatey.org/
         }
 
         It 'Exits with Failure (1)' {
@@ -109,7 +109,7 @@ exit $command.Count
     Context 'Ensure WebPI source removal' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.999.999')) {
 
         BeforeAll {
-            $Output = Invoke-Choco list --source webpi
+            $Output = Invoke-Choco search --source webpi
         }
 
         It 'Exits with Failure (1)' {
@@ -135,9 +135,9 @@ exit $command.Count
         }
     }
 
-    Context 'Ensure --allow-multiple removed from Chocolatey' -Tag InstallCommand, UpgradeCommand, UninstallCommand, AllowMultiple -Foreach @(
+    Context 'Ensure --allow-multiple removed from Chocolatey <Command> command' -Tag InstallCommand, UpgradeCommand, UninstallCommand, AllowMultiple, cory -Foreach @(
         @{ Command = 'install' }
-        @{ Command = 'update' }
+        @{ Command = 'upgrade' }
         @{ Command = 'uninstall' }
     ){
         BeforeAll {
@@ -156,11 +156,13 @@ exit $command.Count
             $Output = Invoke-Choco $Command $package @options
         }
 
-        It 'Exits with Success (0)' {
+        # Skipping on Upgrade as that exits with -1 due to the BeforeModify script.
+        It 'Exits with Success (0)' -Skip:($Command -eq 'upgrade') {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        It 'Does not use a versioned package folder' -Skip:($Command -eq 'upgrade') {
+        # Skipping on uninstall because there shouldn't be a folder after uninstall.
+        It 'Does not use a versioned package folder' -Skip:($Command -eq 'uninstall') {
             $expectedPath = Join-Path $env:ChocolateyInstall -ChildPath 'lib' |
                 Join-Path -ChildPath $package
 

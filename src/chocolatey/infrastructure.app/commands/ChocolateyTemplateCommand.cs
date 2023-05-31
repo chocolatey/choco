@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.commands
     using System.Collections.Generic;
     using System.Linq;
     using attributes;
+    using chocolatey.infrastructure.results;
     using commandline;
     using configuration;
     using domain;
@@ -39,16 +40,16 @@ namespace chocolatey.infrastructure.app.commands
             _templateService = templateService;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("n=|name=",
                     "The name of the template to get information about.",
-                    option => configuration.TemplateCommand.Name = option.remove_surrounding_quotes().ToLower());
+                    option => configuration.TemplateCommand.Name = option.UnquoteSafe().ToLower());
             // todo: #2570 Allow for templates from an external path? Requires #1477
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             // don't set configuration.Input or it will be passed to list
 
@@ -57,38 +58,35 @@ namespace chocolatey.infrastructure.app.commands
                 throw new ApplicationException("A single template command must be listed. Please see the help menu for those commands");
             }
 
-            var command = TemplateCommandType.unknown;
+            var command = TemplateCommandType.Unknown;
             string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
             Enum.TryParse(unparsedCommand, true, out command);
 
-            if (command == TemplateCommandType.unknown)
+            if (command == TemplateCommandType.Unknown)
             {
-                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
-                command = TemplateCommandType.list;
+                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                command = TemplateCommandType.List;
             }
 
             configuration.TemplateCommand.Command = command;
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
-            if (configuration.TemplateCommand.Command != TemplateCommandType.list && string.IsNullOrWhiteSpace(configuration.TemplateCommand.Name))
+            if (configuration.TemplateCommand.Command != TemplateCommandType.List && string.IsNullOrWhiteSpace(configuration.TemplateCommand.Name))
             {
-                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.TemplateCommand.Command.to_string()));
+                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".FormatWith(configuration.TemplateCommand.Command.ToStringSafe().ToLower()));
             }
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Template Command");
             "chocolatey".Log().Info(@"
 List information installed templates.
 
 Both manually installed templates and templates installed via
- .template packages are displayed.
-
-NOTE: Available with 0.12.0+."
-);
+ .template packages are displayed.");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
@@ -125,36 +123,66 @@ If you find other exit codes that we have not yet documented, please
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
             switch (configuration.TemplateCommand.Command)
             {
-                case TemplateCommandType.list:
-                    _templateService.list_noop(configuration);
+                case TemplateCommandType.List:
+                    _templateService.ListDryRun(configuration);
                     break;
-                case TemplateCommandType.info:
-                    _templateService.list_noop(configuration);
+                case TemplateCommandType.Info:
+                    _templateService.ListDryRun(configuration);
                     break;
             }
         }
 
-        public virtual void run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
             switch (configuration.TemplateCommand.Command)
             {
-                case TemplateCommandType.list:
-                    _templateService.list(configuration);
+                case TemplateCommandType.List:
+                    _templateService.List(configuration);
                     break;
-                case TemplateCommandType.info:
+                case TemplateCommandType.Info:
                     configuration.Verbose = true;
-                    _templateService.list(configuration);
+                    _templateService.List(configuration);
                     break;
             }
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
             return false;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+#pragma warning restore IDE1006
     }
 }

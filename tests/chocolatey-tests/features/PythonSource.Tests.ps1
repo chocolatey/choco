@@ -1,12 +1,13 @@
 ﻿Import-Module helpers/common-helpers
 
 # This is skipped when not run in CI because it modifies the local system.
-Describe "Python Source" -Tag Chocolatey, UpgradeCommand, PythonSource -Skip:(-not $env:TEST_KITCHEN) {
+# This is skipped on Proxy as Python needs to reach out to pypi which our proxy server does not allow.
+Describe "Python Source" -Tag Chocolatey, UpgradeCommand, PythonSource, ProxySkip -Skip:(-not $env:TEST_KITCHEN) {
     BeforeAll {
         Initialize-ChocolateyTestInstall
         New-ChocolateyInstallSnapshot
-        # TODO: Internalize Python and most dependencies. (KB perhaps not internalized due to excessive size...)
-        $null = Invoke-Choco install python3 --source https://community.chocolatey.org/api/v2/
+        Enable-ChocolateySource -Name hermes-setup
+        $null = Invoke-Choco install python3
     }
 
     AfterAll {

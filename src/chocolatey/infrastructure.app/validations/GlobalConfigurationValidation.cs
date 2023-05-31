@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.validations
 {
+    using System;
     using System.Collections.Generic;
     using configuration;
     using infrastructure.validations;
@@ -28,12 +29,12 @@ namespace chocolatey.infrastructure.app.validations
     /// </summary>
     public class GlobalConfigurationValidation : IValidation
     {
-        public ICollection<ValidationResult> validate(ChocolateyConfiguration config)
+        public ICollection<ValidationResult> Validate(ChocolateyConfiguration config)
         {
             this.Log().Debug("Global Configuration Validation Checks:");
             var validationResults = new List<ValidationResult>();
 
-            check_usage_of_package_exit_code(config, validationResults);
+            ValidateUseOfPackageExitCode(config, validationResults);
 
             if (validationResults.Count == 0)
             {
@@ -48,7 +49,7 @@ namespace chocolatey.infrastructure.app.validations
             return validationResults;
         }
 
-        private void check_usage_of_package_exit_code(ChocolateyConfiguration config, ICollection<ValidationResult> validationResults)
+        private void ValidateUseOfPackageExitCode(ChocolateyConfiguration config, ICollection<ValidationResult> validationResults)
         {
             var validationStatusResult = ValidationStatus.Checked;
             // In order for a Chocolatey execution to correctly halt
@@ -65,7 +66,7 @@ namespace chocolatey.infrastructure.app.validations
    usePackageExitCodes feature enabled.  Use the following command:
      choco feature enable -name={0}
    to enable this feature (exit code 1).
-".format_with(ApplicationParameters.Features.UsePackageExitCodes),
+".FormatWith(ApplicationParameters.Features.UsePackageExitCodes),
                     Status = ValidationStatus.Error,
                     ExitCode = 1
                 };
@@ -80,7 +81,13 @@ namespace chocolatey.infrastructure.app.validations
                 validationResults.Add(validationResult);
             }
 
-            this.Log().Debug(" - Package Exit Code / Exit On Reboot = {0}".format_with(validationStatusResult.to_string()));
+            this.Log().Debug(" - Package Exit Code / Exit On Reboot = {0}".FormatWith(validationStatusResult.ToStringSafe()));
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ICollection<ValidationResult> validate(ChocolateyConfiguration config)
+            => Validate(config);
+#pragma warning restore IDE1006
     }
 }

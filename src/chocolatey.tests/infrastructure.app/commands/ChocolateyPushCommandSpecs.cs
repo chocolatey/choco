@@ -34,149 +34,161 @@ namespace chocolatey.tests.infrastructure.app.commands
         [ConcernFor("push")]
         public abstract class ChocolateyPushCommandSpecsBase : TinySpec
         {
-            protected ChocolateyPushCommand command;
-            protected Mock<IChocolateyPackageService> packageService = new Mock<IChocolateyPackageService>();
-            protected Mock<IChocolateyConfigSettingsService> configSettingsService = new Mock<IChocolateyConfigSettingsService>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateyPushCommand Command;
+            protected Mock<IChocolateyPackageService> PackageService = new Mock<IChocolateyPackageService>();
+            protected Mock<IChocolateyConfigSettingsService> ConfigSettingsService = new Mock<IChocolateyConfigSettingsService>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                configuration.Sources = "https://localhost/somewhere/out/there";
-                command = new ChocolateyPushCommand(packageService.Object, configSettingsService.Object);
+                Configuration.Sources = "https://localhost/somewhere/out/there";
+                Command = new ChocolateyPushCommand(PackageService.Object, ConfigSettingsService.Object);
             }
         }
 
-        public class when_implementing_command_for : ChocolateyPushCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyPushCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
-            public void should_implement_push()
+            public void Should_implement_push()
             {
-                results.ShouldContain("push");
+                _results.ShouldContain("push");
             }
         }
 
         //Yes, configurating [sic]
-        public class when_configurating_the_argument_parser : ChocolateyPushCommandSpecsBase
+        public class When_configurating_the_argument_parser : ChocolateyPushCommandSpecsBase
         {
-            private OptionSet optionSet;
+            private OptionSet _optionSet;
 
             public override void Context()
             {
                 base.Context();
-                optionSet = new OptionSet();
+                _optionSet = new OptionSet();
             }
 
             public override void Because()
             {
-                command.configure_argument_parser(optionSet, configuration);
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
             }
 
             [Fact]
-            public void should_clear_previously_set_Source()
+            public void Should_clear_previously_set_Source()
             {
-                configuration.Sources.ShouldBeNull();
+                Configuration.Sources.ShouldBeNull();
             }
 
             [Fact]
-            public void should_add_source_to_the_option_set()
+            public void Should_add_source_to_the_option_set()
             {
-                optionSet.Contains("source").ShouldBeTrue();
+                _optionSet.Contains("source").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_source_to_the_option_set()
+            public void Should_add_short_version_of_source_to_the_option_set()
             {
-                optionSet.Contains("s").ShouldBeTrue();
+                _optionSet.Contains("s").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_apikey_to_the_option_set()
+            public void Should_add_apikey_to_the_option_set()
             {
-                optionSet.Contains("apikey").ShouldBeTrue();
+                _optionSet.Contains("apikey").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_apikey_to_the_option_set()
+            public void Should_add_short_version_of_apikey_to_the_option_set()
             {
-                optionSet.Contains("k").ShouldBeTrue();
+                _optionSet.Contains("k").ShouldBeTrue();
             }
 
             [Fact]
-            public void should_not_add_short_version_of_timeout_to_the_option_set()
+            public void Should_not_add_short_version_of_timeout_to_the_option_set()
             {
-                optionSet.Contains("t").ShouldBeFalse();
+                _optionSet.Contains("t").ShouldBeFalse();
             }
         }
 
-        public class when_handling_additional_argument_parsing : ChocolateyPushCommandSpecsBase
+        public class When_handling_additional_argument_parsing : ChocolateyPushCommandSpecsBase
         {
-            private readonly IList<string> unparsedArgs = new List<string>();
-            private const string apiKey = "bobdaf";
-            private Action because;
+            private readonly IList<string> _unparsedArgs = new List<string>();
+            private Action _because;
 
             public override void Because()
             {
-                because = () => command.handle_additional_argument_parsing(unparsedArgs, configuration);
+                _because = () => Command.ParseAdditionalArguments(_unparsedArgs, Configuration);
             }
 
-            public void reset()
+            public void Reset()
             {
-                unparsedArgs.Clear();
-                configSettingsService.ResetCalls();
+                _unparsedArgs.Clear();
+                ConfigSettingsService.ResetCalls();
             }
 
             [Fact]
-            public void should_allow_a_path_to_the_nupkg_to_be_passed_in()
+            public void Should_allow_a_path_to_the_nupkg_to_be_passed_in()
             {
-                reset();
+                Reset();
                 string nupkgPath = "./some/path/to.nupkg";
-                unparsedArgs.Add(nupkgPath);
-                because();
-                configuration.Input.ShouldEqual(nupkgPath);
+                _unparsedArgs.Add(nupkgPath);
+                _because();
+                Configuration.Input.ShouldEqual(nupkgPath);
+            }
+        }
+
+        public class When_validating : ChocolateyPushCommandSpecsBase
+        {
+            private Action _because;
+            private string _apiKey = "abcdef";
+
+            public override void Because()
+            {
+                _because = () => Command.Validate(Configuration);
             }
 
             [Fact]
-            public void should_set_the_source_to_defaultpushsource_if_set_and_no_explicit_source()
+            public void Should_not_override_explicit_source_if_defaultpushsource_is_set()
             {
-                reset();
-                configuration.Sources = "";
-                configuration.PushCommand.DefaultSource = "https://localhost/default/source";
-                because();
+                Configuration.Sources = "https://localhost/somewhere/out/there";
+                Configuration.PushCommand.Key = _apiKey;
+                Configuration.PushCommand.DefaultSource = "https://localhost/default/source";
+                _because();
 
-                configuration.Sources.ShouldEqual("https://localhost/default/source");
+                Configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
+            }
+
+
+            [Fact]
+            public void Should_set_the_source_to_defaultpushsource_if_set_and_no_explicit_source()
+            {
+                Configuration.Sources = "";
+                Configuration.PushCommand.DefaultSource = "https://localhost/default/source";
+                ConfigSettingsService.Setup(s => s.GetApiKey(It.Is<ChocolateyConfiguration>(c => c.Sources == "https://localhost/default/source"), null))
+                    .Returns(() => _apiKey);
+
+                _because();
+
+                Configuration.Sources.ShouldEqual("https://localhost/default/source");
             }
 
             [Fact]
-            public void should_not_override_explicit_source_if_defaultpushsource_is_set()
+            public void Should_throw_when_defaultpushsource_is_not_set_and_no_explicit_sources()
             {
-                reset();
-                configuration.Sources = "https://localhost/somewhere/out/there";
-                configuration.PushCommand.DefaultSource = "https://localhost/default/source";
-                because();
-
-                configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
-            }
-
-            [Fact]
-            public void should_throw_when_defaultpushsource_is_not_set_and_no_explicit_sources()
-            {
-                reset();
-                configuration.PushCommand.DefaultSource = "";
-                configuration.Sources = "";
+                Configuration.PushCommand.DefaultSource = "";
+                Configuration.Sources = "";
 
                 var errorred = false;
                 Exception error = null;
 
                 try
                 {
-                    because();
+                    _because();
                 }
                 catch (Exception ex)
                 {
@@ -191,77 +203,86 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_continue_when_defaultpushsource_is_not_set_and_explicit_sources_passed()
+            public void Should_continue_when_defaultpushsource_is_not_set_and_explicit_sources_passed()
             {
-                reset();
-                configuration.Sources = "https://somewhere/out/there";
-                configuration.PushCommand.Key = "bob";
-                configuration.PushCommand.DefaultSource = "";
-                because();
+                Configuration.Sources = "https://somewhere/out/there";
+                Configuration.PushCommand.Key = _apiKey;
+                Configuration.PushCommand.DefaultSource = "";
+                _because();
             }
 
             [Fact]
-            public void should_not_set_the_apiKey_if_source_is_not_found()
+            public void Should_throw_if_apikey_is_not_found_for_source()
             {
-                reset();
-                configSettingsService.Setup(c => c.get_api_key(configuration, null)).Returns("");
-                configuration.PushCommand.Key = "";
-                configuration.Sources = "https://localhost/somewhere/out/there";
-                because();
+                ConfigSettingsService.Setup(c => c.GetApiKey(Configuration, null)).Returns("");
+                Configuration.PushCommand.Key = "";
+                Configuration.Sources = "https://localhost/somewhere/out/there";
 
-                configuration.PushCommand.Key.ShouldEqual("");
+                var errorred = false;
+                Exception error = null;
+
+                try
+                {
+                    _because();
+                }
+                catch (Exception ex)
+                {
+                    errorred = true;
+                    error = ex;
+                }
+
+                errorred.ShouldBeTrue();
+                error.ShouldNotBeNull();
+                error.ShouldBeType<ApplicationException>();
+                error.Message.ShouldContain($"An API key was not found for '{Configuration.Sources}'");
             }
 
             [Fact]
-            public void should_not_try_to_determine_the_key_if_passed_in_as_an_argument()
+            public void Should_not_try_to_determine_the_key_if_passed_in_as_an_argument()
             {
-                reset();
-                configSettingsService.Setup(c => c.get_api_key(configuration, null)).Returns("");
-                configuration.PushCommand.Key = "bob";
-                configuration.Sources = "https://localhost/somewhere/out/there";
-                because();
+                ConfigSettingsService.Setup(c => c.GetApiKey(Configuration, null)).Returns("");
+                Configuration.PushCommand.Key = _apiKey;
+                Configuration.Sources = "https://localhost/somewhere/out/there";
+                _because();
 
-                configuration.PushCommand.Key.ShouldEqual("bob");
-                configSettingsService.Verify(c => c.get_api_key(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
+                Configuration.PushCommand.Key.ShouldEqual(_apiKey);
+                ConfigSettingsService.Verify(c => c.GetApiKey(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
             }
 
             [Fact]
-            public void should_not_try_to_determine_the_key_if_source_is_set_for_a_local_source()
+            public void Should_not_try_to_determine_the_key_if_source_is_set_for_a_local_source()
             {
-                reset();
-                configuration.Sources = "c:\\packages";
-                configuration.PushCommand.Key = "";
-                because();
+                Configuration.Sources = "c:\\packages";
+                Configuration.PushCommand.Key = "";
+                _because();
 
-                configSettingsService.Verify(c => c.get_api_key(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
+                ConfigSettingsService.Verify(c => c.GetApiKey(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
             }
 
             [Fact]
-            public void should_not_try_to_determine_the_key_if_source_is_set_for_an_unc_source()
+            public void Should_not_try_to_determine_the_key_if_source_is_set_for_an_unc_source()
             {
-                reset();
-                configuration.Sources = "\\\\someserver\\packages";
-                configuration.PushCommand.Key = "";
-                because();
+                Configuration.Sources = "\\\\someserver\\packages";
+                Configuration.PushCommand.Key = "";
+                _because();
 
-                configSettingsService.Verify(c => c.get_api_key(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
+                ConfigSettingsService.Verify(c => c.GetApiKey(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Never);
             }
 
             [Fact]
-            public void should_throw_if_multiple_sources_are_passed()
+            public void Should_throw_if_multiple_sources_are_passed()
             {
-                reset();
-                configuration.Sources = "https://localhost/somewhere/out/there;https://localhost/somewhere/out/there";
+                Configuration.Sources = "https://localhost/somewhere/out/there;https://localhost/somewhere/out/there";
 
-                Assert.Throws<ApplicationException>(() => because(), "Multiple sources are not support by push command.");
+                Assert.Throws<ApplicationException>(() => _because(), "Multiple sources are not supported by push command.");
             }
 
             [Fact]
-            public void should_update_source_if_alias_is_passed()
+            [Pending("This functionality is not yet implemented. See https://github.com/chocolatey/choco/issues/63")]
+            public void Should_update_source_if_alias_is_passed()
             {
-                reset();
-                configuration.Sources = "chocolatey";
-                configuration.MachineSources = new List<MachineSourceConfiguration>
+                Configuration.Sources = "chocolatey";
+                Configuration.MachineSources = new List<MachineSourceConfiguration>
                 {
                     new MachineSourceConfiguration
                     {
@@ -269,18 +290,18 @@ namespace chocolatey.tests.infrastructure.app.commands
                         Key = "https://localhost/somewhere/out/there"
                     }
                  };
-                because();
+                _because();
 
-                configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
+                Configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
             }
 
             [Fact]
-            public void should_update_source_if_alias_is_passed_via_defaultpushsource()
+            [Pending("This functionality is not yet implemented. See https://github.com/chocolatey/choco/issues/63")]
+            public void Should_update_source_if_alias_is_passed_via_defaultpushsource()
             {
-                reset();
-                configuration.Sources = "";
-                configuration.PushCommand.DefaultSource = "myrepo";
-                configuration.MachineSources = new List<MachineSourceConfiguration>
+                Configuration.Sources = "";
+                Configuration.PushCommand.DefaultSource = "myrepo";
+                Configuration.MachineSources = new List<MachineSourceConfiguration>
                 {
                     new MachineSourceConfiguration
                     {
@@ -288,55 +309,22 @@ namespace chocolatey.tests.infrastructure.app.commands
                         Key = "https://localhost/somewhere/out/there"
                     }
                 };
-                because();
+                _because();
 
-                configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
-            }
-        }
-
-        public class when_handling_validation : ChocolateyPushCommandSpecsBase
-        {
-            private Action because;
-
-            public override void Because()
-            {
-                because = () => command.handle_validation(configuration);
+                Configuration.Sources.ShouldEqual("https://localhost/somewhere/out/there");
             }
 
             [Fact]
-            public void should_throw_when_source_is_not_set()
+            public void Should_throw_when_apiKey_has_not_been_set_or_determined_for_a_https_source()
             {
-                configuration.Sources = "";
+                Configuration.Sources = "https://somewhere/out/there";
+                Configuration.PushCommand.Key = "";
                 var errored = false;
                 Exception error = null;
 
                 try
                 {
-                    because();
-                }
-                catch (Exception ex)
-                {
-                    errored = true;
-                    error = ex;
-                }
-
-                errored.ShouldBeTrue();
-                error.ShouldNotBeNull();
-                error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldContain("Source is required.");
-            }
-
-            [Fact]
-            public void should_throw_when_apiKey_has_not_been_set_or_determined_for_a_https_source()
-            {
-                configuration.Sources = "https://somewhere/out/there";
-                configuration.PushCommand.Key = "";
-                var errored = false;
-                Exception error = null;
-
-                try
-                {
-                    because();
+                    _because();
                 }
                 catch (Exception ex)
                 {
@@ -351,41 +339,41 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_continue_when_source_and_apikey_is_set_for_a_https_source()
+            public void Should_continue_when_source_and_apikey_is_set_for_a_https_source()
             {
-                configuration.Sources = "https://somewhere/out/there";
-                configuration.PushCommand.Key = "bob";
-                because();
+                Configuration.Sources = "https://somewhere/out/there";
+                Configuration.PushCommand.Key = _apiKey;
+                _because();
             }
 
             [Fact]
-            public void should_continue_when_source_is_set_for_a_local_source()
+            public void Should_continue_when_source_is_set_for_a_local_source()
             {
-                configuration.Sources = "c:\\packages";
-                configuration.PushCommand.Key = "";
-                because();
+                Configuration.Sources = "c:\\packages";
+                Configuration.PushCommand.Key = "";
+                _because();
             }
 
             [Fact]
-            public void should_continue_when_source_is_set_for_an_unc_source()
+            public void Should_continue_when_source_is_set_for_an_unc_source()
             {
-                configuration.Sources = "\\\\someserver\\packages";
-                configuration.PushCommand.Key = "";
-                because();
+                Configuration.Sources = "\\\\someserver\\packages";
+                Configuration.PushCommand.Key = "";
+                _because();
             }
 
             [Fact]
-            public void should_throw_when_source_is_http_and_not_secure()
+            public void Should_throw_when_source_is_http_and_not_secure()
             {
-                configuration.Sources = "http://somewhere/out/there";
-                configuration.PushCommand.Key = "bob";
-                configuration.Force = false;
+                Configuration.Sources = "http://somewhere/out/there";
+                Configuration.PushCommand.Key = _apiKey;
+                Configuration.Force = false;
                 var errored = false;
                 Exception error = null;
 
                 try
                 {
-                    because();
+                    _because();
                 }
                 catch (Exception ex)
                 {
@@ -396,45 +384,45 @@ namespace chocolatey.tests.infrastructure.app.commands
                 errored.ShouldBeTrue();
                 error.ShouldNotBeNull();
                 error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldContain("WARNING! The specified source '{0}' is not secure".format_with(configuration.Sources));
+                error.Message.ShouldContain("WARNING! The specified source '{0}' is not secure".FormatWith(Configuration.Sources));
             }
 
             [Fact]
-            public void should_continue_when_source_is_http_and_not_secure_if_force_is_passed()
+            public void Should_continue_when_source_is_http_and_not_secure_if_force_is_passed()
             {
-                configuration.Sources = "http://somewhere/out/there";
-                configuration.PushCommand.Key = "bob";
-                configuration.Force = true;
+                Configuration.Sources = "http://somewhere/out/there";
+                Configuration.PushCommand.Key = _apiKey;
+                Configuration.Force = true;
 
-                because();
+                _because();
             }
         }
 
-        public class when_noop_is_called : ChocolateyPushCommandSpecsBase
+        public class When_noop_is_called : ChocolateyPushCommandSpecsBase
         {
             public override void Because()
             {
-                command.noop(configuration);
+                Command.DryRun(Configuration);
             }
 
             [Fact]
-            public void should_call_service_push_noop()
+            public void Should_call_service_push_noop()
             {
-                packageService.Verify(c => c.push_noop(configuration), Times.Once);
+                PackageService.Verify(c => c.PushDryRun(Configuration), Times.Once);
             }
         }
 
-        public class when_run_is_called : ChocolateyPushCommandSpecsBase
+        public class When_run_is_called : ChocolateyPushCommandSpecsBase
         {
             public override void Because()
             {
-                command.run(configuration);
+                Command.Run(Configuration);
             }
 
             [Fact]
-            public void should_call_service_push_run()
+            public void Should_call_service_push_run()
             {
-                packageService.Verify(c => c.push_run(configuration), Times.Once);
+                PackageService.Verify(c => c.Push(Configuration), Times.Once);
             }
         }
     }

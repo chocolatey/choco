@@ -14,22 +14,6 @@
     <tags>apt-get machine repository chocolatey</tags>
     <summary>Chocolatey is the package manager for Windows (like apt-get but for Windows)</summary>
     <description>
-> **Warning**
->
-> This is a pre-release version of Chocolatey CLI and it is **NOT** suitable for production use! A pre-release version will have bugs that could have a detrimental impact to your environment. Ensure all necessary due diligence steps are taken before using in your environment.
-
-> **Warning**
->
-> This pre-release version of Chocolatey CLI does **NOT** work with the Chocolatey Licensed Extension. It will actually prevent the loading of the Chocolatey Licensed Extension if it is installed.
-
-> **Note**
->
-> If you run into any problems when using this alpha version of Chocolatey CLI we would ask that you comment on this [discussion](https://github.com/chocolatey/choco/discussions/2995), which is where we will be collating issues, and providing workarounds, etc.  We will not be accepting issues raised against this alpha release.
-
-### Known Issues
-
-See this [list](https://github.com/chocolatey/choco/discussions/2995) for known issues with this pre-release.
-
 Chocolatey is a package manager for Windows (like apt-get but for Windows). It was designed to be a decentralized framework for quickly installing applications and tools that you need. It is built on the NuGet infrastructure currently using PowerShell as its focus for delivering packages from the distros to your door, err computer.
 
 Chocolatey is brought to you by the work and inspiration of the community, the work and thankless nights of the Chocolatey Team (https://github.com/orgs/chocolatey/people), with Rob heading up the direction.

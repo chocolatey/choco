@@ -43,19 +43,19 @@ namespace chocolatey.infrastructure.app.commands
             _fileSystem = fileSystem;
         }
 
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("o=|output-file-path=",
                      "Output File Path - the path to where the list of currently installed packages should be saved. Defaults to packages.config.",
-                     option => configuration.ExportCommand.OutputFilePath = option.remove_surrounding_quotes())
+                     option => configuration.ExportCommand.OutputFilePath = option.UnquoteSafe())
                 .Add("include-version-numbers|include-version",
                      "Include Version Numbers - controls whether or not version numbers for each package appear in generated file.  Defaults to false.",
                      option => configuration.ExportCommand.IncludeVersionNumbers = option != null)
                 ;
         }
 
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
 
@@ -71,12 +71,12 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void handle_validation(ChocolateyConfiguration configuration)
+        public void Validate(ChocolateyConfiguration configuration)
         {
             // Currently, no additional validation is required.
         }
 
-        public void help_message(ChocolateyConfiguration configuration)
+        public void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Export Command");
             this.Log().Info(@"
@@ -85,8 +85,6 @@ Export all currently installed packages to a file.
 This is especially helpful when re-building a machine that was created
 using Chocolatey.  Export all packages to a file, and then re-install
 those packages onto new machine using `choco install packages.config`.
-
-NOTE: Available with 0.11.0+.
 ");
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
@@ -126,22 +124,22 @@ If you find other exit codes that we have not yet documented, please
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public bool may_require_admin_access()
+        public bool MayRequireAdminAccess()
         {
             return false;
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public void DryRun(ChocolateyConfiguration configuration)
         {
-            this.Log().Info("Export would have been with options: {0} Output File Path={1}{0} Include Version Numbers:{2}".format_with(Environment.NewLine, configuration.ExportCommand.OutputFilePath, configuration.ExportCommand.IncludeVersionNumbers));
+            this.Log().Info("Export would have been with options: {0} Output File Path={1}{0} Include Version Numbers:{2}".FormatWith(Environment.NewLine, configuration.ExportCommand.OutputFilePath, configuration.ExportCommand.IncludeVersionNumbers));
         }
 
-        public void run(ChocolateyConfiguration configuration)
+        public void Run(ChocolateyConfiguration configuration)
         {
-            var packageResults = _nugetService.get_all_installed_packages(configuration);
+            var packageResults = _nugetService.GetInstalledPackages(configuration);
             var settings = new XmlWriterSettings { Indent = true, Encoding = new UTF8Encoding(false) };
 
-            FaultTolerance.try_catch_with_logging_exception(
+            FaultTolerance.TryCatchWithLoggingException(
                 () =>
                 {
                     using (var stringWriter = new StringWriter())
@@ -168,13 +166,13 @@ If you find other exit codes that we have not yet documented, please
                             xw.Flush();
                         }
 
-                        var fullOutputFilePath = _fileSystem.get_full_path(configuration.ExportCommand.OutputFilePath);
-                        var fileExists = _fileSystem.file_exists(fullOutputFilePath);
+                        var fullOutputFilePath = _fileSystem.GetFullPath(configuration.ExportCommand.OutputFilePath);
+                        var fileExists = _fileSystem.FileExists(fullOutputFilePath);
 
                         // If the file doesn't already exist, just write the new one out directly
                         if (!fileExists)
                         {
-                            _fileSystem.write_file(
+                            _fileSystem.WriteFile(
                                 fullOutputFilePath,
                                 stringWriter.GetStringBuilder().ToString(),
                                 new UTF8Encoding(false));
@@ -185,16 +183,46 @@ If you find other exit codes that we have not yet documented, please
 
                         // Otherwise, create an update file, and resiliently move it into place.
                         var tempUpdateFile = fullOutputFilePath + "." + Process.GetCurrentProcess().Id + ".update";
-                        _fileSystem.write_file(tempUpdateFile,
+                        _fileSystem.WriteFile(tempUpdateFile,
                             stringWriter.GetStringBuilder().ToString(),
                             new UTF8Encoding(false));
 
-                        _fileSystem.replace_file(tempUpdateFile, fullOutputFilePath, fullOutputFilePath + ".backup");
+                        _fileSystem.ReplaceFile(tempUpdateFile, fullOutputFilePath, fullOutputFilePath + ".backup");
                     }
                 },
                 errorMessage: "Error exporting currently installed packages",
                 throwError: true
             );
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+#pragma warning restore IDE1006
     }
 }

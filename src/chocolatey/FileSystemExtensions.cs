@@ -28,24 +28,24 @@ namespace chocolatey
 
     public static class FileSystemExtensions
     {
-        internal static IEnumerable<IAssembly> get_extension_assemblies(this IFileSystem fileSystem)
+        internal static IEnumerable<IAssembly> GetExtensionAssemblies(this IFileSystem fileSystem)
         {
             var result = new List<IAssembly>();
 
-            if (!fileSystem.directory_exists(ApplicationParameters.ExtensionsLocation))
+            if (!fileSystem.DirectoryExists(ApplicationParameters.ExtensionsLocation))
             {
                 return result;
             }
 
-            var extensionDllFiles = fileSystem.get_files(ApplicationParameters.ExtensionsLocation, "*.dll", SearchOption.AllDirectories);
+            var extensionDllFiles = fileSystem.GetFiles(ApplicationParameters.ExtensionsLocation, "*.dll", SearchOption.AllDirectories);
 
             foreach (var extensionFile in extensionDllFiles)
             {
-                var name = fileSystem.get_file_name_without_extension(extensionFile);
+                var name = fileSystem.GetFilenameWithoutExtension(extensionFile);
 
                 try
                 {
-                    var assembly = AssemblyResolution.load_extension(name);
+                    var assembly = AssemblyResolution.LoadExtension(name);
 
                     if (assembly == null)
                     {
@@ -65,5 +65,11 @@ namespace chocolatey
 
             return result.Distinct();
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        internal static IEnumerable<IAssembly> get_extension_assemblies(this IFileSystem fileSystem)
+            => GetExtensionAssemblies(fileSystem);
+#pragma warning restore IDE1006
     }
 }

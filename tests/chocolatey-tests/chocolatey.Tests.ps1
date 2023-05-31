@@ -1,4 +1,4 @@
-Import-Module helpers/common-helpers
+﻿Import-Module helpers/common-helpers
 
 Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolatey {
     BeforeDiscovery {
@@ -146,9 +146,9 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         # This is FossOnly for now as there are some undetermined errors here that do not seem to present inside of Chocolatey. https://gitlab.com/chocolatey/build-automation/chocolatey-test-kitchen/-/issues/39
         It "Should be able to run the script in AllSigned mode" -Skip:($_ -notin $PowerShellFiles) -Tag FossOnly {
             $expectedErrors = 0
-            $command = "Import-Module $FileUnderTest -ErrorAction SilentlyContinue; exit `$error.count"
-            & powershell.exe -noprofile -ExecutionPolicy AllSigned -command $command 2>$null
-            $LastExitCode | Should -BeExactly $expectedErrors
+            $command = "try { `$ErrorActionPreference = 'Stop'; Import-Module $FileUnderTest } catch { $_ ; exit 1 }"
+            $result = & powershell.exe -noprofile -ExecutionPolicy AllSigned -command $command *>&1
+            $LastExitCode | Should -BeExactly $expectedErrors -Because $result
         }
     }
 
@@ -182,15 +182,55 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         # This is Foss only as PowerShell running under version 2 doesn't have .net available and can't import the Licensed DLL.
         # Tests on Windows 7 show no issues with running Chocolatey under Windows 7 with PowerShell v2 aside from issues surrounding TLS versions that we cannot resolve without an upgrade to Windows 7.
         It "Imports ChocolateyInstaller module successfully in PowerShell v2" -Tag FossOnly {
-            $command = 'Import-Module $env:ChocolateyInstall\helpers\chocolateyInstaller.psm1;exit $error.count'
-            & powershell.exe -Version 2 -noprofile -command $command
-            $LastExitCode | Should -BeExactly 0
+            $command = 'try { $ErrorActionPreference = ''Stop''; Import-Module $env:ChocolateyInstall\helpers\chocolateyInstaller.psm1 } catch { $_ ; exit 1 }'
+            $result = & powershell.exe -Version 2 -noprofile -command $command
+            $LastExitCode | Should -BeExactly 0 -Because $result
         }
 
         It "Imports ChocolateyProfile module successfully in PowerShell v2" {
-            $command = 'Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1;exit $error.count'
-            & powershell.exe -Version 2 -noprofile -command $command
-            $LastExitCode | Should -BeExactly 0
+            $command = 'try { $ErrorActionPreference = ''Stop''; Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1 } catch { $_ ; exit 1 }'
+            $result = & powershell.exe -Version 2 -noprofile -command $command
+            $LastExitCode | Should -BeExactly 0 -Because $result
+        }
+
+        Context "chocolateyScriptRunner.ps1" {
+            BeforeAll {
+                $Command = @'
+& "$env:ChocolateyInstall\helpers\chocolateyScriptRunner.ps1" -packageScript '{0}' -installArguments '' -packageParameters '' -preRunHookScripts '{1}' -postRunHookScripts '{2}'
+exit $error.count
+'@
+            'Write-Host "packageScript"' > packageScript.ps1
+            'Write-Host "preRunHookScript"' > preRunHookScript.ps1
+            'Write-Host "postRunHookScript"' > postRunHookScript.ps1
+            }
+
+            It "Handles just a packageScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", $null, $null
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('packageScript') -Because ($output -join ([Environment]::NewLine))
+            }
+
+            It "Handles a packageScript with a preRunHookScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", "$PWD/preRunHookScript.ps1", $null
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('preRunHookScript','packageScript') -Because ($output -join ([Environment]::NewLine))
+            }
+
+            It "Handles a packageScript with a preRunHookScript and postRunHookScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", "$PWD/preRunHookScript.ps1", "$PWD/postRunHookScript.ps1"
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('preRunHookScript','packageScript', 'postRunHookScript') -Because ($output -join ([Environment]::NewLine))
+            }
+
+            It "Handles a packageScript with and postRunHookScript" {
+                $commandToExecute = $Command -f "$PWD/packageScript.ps1", $null, "$PWD/postRunHookScript.ps1"
+                $output = & powershell.exe -Version 2 -noprofile -command $commandToExecute
+                $LastExitCode | Should -BeExactly 0 -Because ($output -join ([Environment]::NewLine))
+                $output | Should -Be @('packageScript', 'postRunHookScript') -Because ($output -join ([Environment]::NewLine))
+            }
         }
     }
 
@@ -402,6 +442,31 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
 
         It "Reports .NET Framework 4.8 is required" {
             $Output.Lines | Should -Contain '.NET 4.8 is not installed or may need a reboot to complete installation.'
+        }
+    }
+
+
+    Context 'Chocolatey lib directory missing' {
+        BeforeAll {
+            New-ChocolateyInstallSnapshot
+            Remove-Item -Path $env:ChocolateyInstall/lib/ -Recurse -Force
+            $Output = Invoke-Choco list
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It 'Exits with success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Emits a warning about the missing directory' {
+            $Output.Lines | Should -Contain "Directory '$($env:ChocolateyInstall)\lib' does not exist." -Because $Output.String
+        }
+
+        It 'Does not emit a NuGet error for the missing directory and fall over' {
+            $Output.Lines | Should -Not -Contain "The path '$($env:ChocolateyInstall)\lib' for the selected source could not be resolved."
         }
     }
 }

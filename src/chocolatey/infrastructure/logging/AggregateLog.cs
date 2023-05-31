@@ -19,8 +19,6 @@ namespace chocolatey.infrastructure.logging
     using System;
     using System.Collections.Generic;
 
-    // ReSharper disable InconsistentNaming
-
     public sealed class AggregateLog : ILog, ILog<AggregateLog>
     {
         public IEnumerable<ILog> Loggers { get; private set; }
@@ -37,7 +35,7 @@ namespace chocolatey.infrastructure.logging
 
         public void InitializeFor(string loggerName)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.InitializeFor(loggerName);
             }
@@ -45,7 +43,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Debug(string message, params object[] formatting)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.Debug(message, formatting);
             }
@@ -53,7 +51,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Debug(Func<string> message)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.Debug(message);
             }
@@ -61,7 +59,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Info(string message, params object[] formatting)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.Info(message, formatting);
             }
@@ -69,7 +67,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Info(Func<string> message)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.Info(message);
             }
@@ -77,7 +75,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Warn(string message, params object[] formatting)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.Warn(message, formatting);
             }
@@ -85,7 +83,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Warn(Func<string> message)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.Warn(message);
             }
@@ -93,7 +91,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Error(string message, params object[] formatting)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.Error(message, formatting);
             }
@@ -101,7 +99,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Error(Func<string> message)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.Error(message);
             }
@@ -109,7 +107,7 @@ namespace chocolatey.infrastructure.logging
 
         public void Fatal(string message, params object[] formatting)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.Fatal(message, formatting);
             }
@@ -117,12 +115,10 @@ namespace chocolatey.infrastructure.logging
 
         public void Fatal(Func<string> message)
         {
-            foreach (var logger in Loggers.or_empty_list_if_null())
+            foreach (var logger in Loggers.OrEmpty())
             {
                 logger.Fatal(message);
             }
         }
     }
-
-    // ReSharper restore InconsistentNaming
 }

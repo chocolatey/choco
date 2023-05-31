@@ -19,14 +19,19 @@ namespace chocolatey.infrastructure.app.rules
     using chocolatey.infrastructure.rules;
     using NuGet.Packaging;
 
-    internal sealed class RequireLicenseAcceptanceMetadataRule : IMetadataRule
+    internal sealed class RequireLicenseAcceptanceMetadataRule : MetadataRuleBase
     {
-        public IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             if (string.IsNullOrWhiteSpace(reader.GetLicenseUrl()) && reader.GetRequireLicenseAcceptance())
             {
-                yield return new RuleResult(RuleType.Error, RuleIdentifiers.MissingElementOnRequiringLicenseAcceptance, "Enabling license acceptance requires a license url.");
+                yield return GetRule(RuleIdentifiers.MissingElementOnRequiringLicenseAcceptance);
             }
+        }
+
+        protected override IEnumerable<ImmutableRule> GetRules()
+        {
+            yield return new ImmutableRule(RuleType.Error, RuleIdentifiers.MissingElementOnRequiringLicenseAcceptance, "Enabling license acceptance requires a license url.");
         }
     }
 }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.props" Condition="Exists('..\packages\Microsoft.CodeAnalysis.BannedApiAnalyzers.3.3.3\build\Microsoft.CodeAnalysis.BannedApiAnalyzers.props')" />
   <PropertyGroup>
@@ -101,44 +101,44 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AlphaFS.2.1.3\lib\net40\AlphaFS.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Commands, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Commands.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.Commands.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Commands">
+      <HintPath>..\packages\Chocolatey.NuGet.Commands.3.1.0\lib\net472\Chocolatey.NuGet.Commands.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Common, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Common.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Common">
+      <HintPath>..\packages\Chocolatey.NuGet.Common.3.1.0\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Configuration, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Configuration">
+      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.1.0\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Credentials, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Credentials.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.Credentials.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Credentials">
+      <HintPath>..\packages\Chocolatey.NuGet.Credentials.3.1.0\lib\net472\Chocolatey.NuGet.Credentials.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.DependencyResolver.Core, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.DependencyResolver.Core.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.DependencyResolver.Core.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.DependencyResolver.Core">
+      <HintPath>..\packages\Chocolatey.NuGet.DependencyResolver.Core.3.1.0\lib\net472\Chocolatey.NuGet.DependencyResolver.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Frameworks, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Frameworks">
+      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.1.0\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.LibraryModel, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.LibraryModel.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.LibraryModel.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.LibraryModel">
+      <HintPath>..\packages\Chocolatey.NuGet.LibraryModel.3.1.0\lib\net472\Chocolatey.NuGet.LibraryModel.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.PackageManagement, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.PackageManagement.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.PackageManagement.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.PackageManagement">
+      <HintPath>..\packages\Chocolatey.NuGet.PackageManagement.3.1.0\lib\net472\Chocolatey.NuGet.PackageManagement.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Packaging, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Packaging">
+      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.1.0\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.ProjectModel, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.ProjectModel.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.ProjectModel.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.ProjectModel">
+      <HintPath>..\packages\Chocolatey.NuGet.ProjectModel.3.1.0\lib\net472\Chocolatey.NuGet.ProjectModel.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Protocol, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Protocol">
+      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.1.0\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Resolver, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Resolver.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.Resolver.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Resolver">
+      <HintPath>..\packages\Chocolatey.NuGet.Resolver.3.1.0\lib\net472\Chocolatey.NuGet.Resolver.dll</HintPath>
     </Reference>
-    <Reference Include="Chocolatey.NuGet.Versioning, Version=3.0.0.204, Culture=neutral, PublicKeyToken=fd112f53c3ab578c, processorArchitecture=MSIL">
-      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.0.0-alpha-20230315-204\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
+    <Reference Include="Chocolatey.NuGet.Versioning">
+      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.1.0\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
@@ -210,6 +210,8 @@
     <Compile Include="infrastructure.app\commands\ChocolateyExportCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyInfoCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyHelpCommand.cs" />
+    <Compile Include="infrastructure.app\nuget\NuGetEndpointResources.cs" />
+    <Compile Include="infrastructure.app\nuget\NuGetEndpointResourcesExtensions.cs" />
     <Compile Include="infrastructure.app\registration\ChocolateyRegistrationModule.cs" />
     <Compile Include="infrastructure.app\registration\IContainerRegistrator.cs" />
     <Compile Include="infrastructure.app\registration\IContainerResolver.cs" />
@@ -270,7 +272,9 @@
     <Compile Include="infrastructure\logging\LogMessage.cs" />
     <Compile Include="infrastructure\logging\LogSinkLog.cs" />
     <Compile Include="infrastructure\registration\AssemblyResolution.cs" />
+    <Compile Include="infrastructure\registration\HttpsSecurity.cs" />
     <Compile Include="infrastructure\rules\IMetadataRule.cs" />
+    <Compile Include="infrastructure\rules\ImmutableRule.cs" />
     <Compile Include="infrastructure\rules\RuleResult.cs" />
     <Compile Include="infrastructure\rules\RuleType.cs" />
     <Compile Include="infrastructure\services\IRuleService.cs" />

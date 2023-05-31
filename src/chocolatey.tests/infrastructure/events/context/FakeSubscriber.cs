@@ -23,7 +23,7 @@ namespace chocolatey.tests.infrastructure.events.context
     {
         public FakeSubscriber(IEventSubscriptionManagerService subscriptionManager)
         {
-            subscriptionManager.subscribe<FakeEvent>(
+            subscriptionManager.Subscribe<FakeEvent>(
                 x =>
                 {
                     WasCalled = true;

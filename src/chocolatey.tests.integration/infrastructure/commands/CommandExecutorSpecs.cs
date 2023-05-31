@@ -38,7 +38,7 @@ namespace chocolatey.tests.integration.infrastructure.commands
 
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
-        public class when_CommandExecutor_errors : CommandExecutorSpecsBase
+        public class When_CommandExecutor_errors : CommandExecutorSpecsBase
         {
             private int result;
             private string errorOutput;
@@ -50,11 +50,11 @@ namespace chocolatey.tests.integration.infrastructure.commands
 
             public override void Because()
             {
-                result = commandExecutor.execute(
+                result = commandExecutor.Execute(
                     "cmd.exe",
                     "/c bob123123",
                     ApplicationParameters.DefaultWaitForExitInSeconds,
-                    fileSystem.get_current_directory(),
+                    fileSystem.GetCurrentDirectory(),
                     null,
                     (s, e) => { errorOutput += e.Data; },
                     updateProcessPath: false,
@@ -62,19 +62,19 @@ namespace chocolatey.tests.integration.infrastructure.commands
             }
 
             [Fact]
-            public void should_not_return_an_exit_code_of_zero()
+            public void Should_not_return_an_exit_code_of_zero()
             {
                 result.ShouldNotEqual(0);
             }
 
             [Fact]
-            public void should_contain_error_output()
+            public void Should_contain_error_output()
             {
                 errorOutput.ShouldNotBeNull();
             }
 
             [Fact]
-            public void should_message_the_error()
+            public void Should_message_the_error()
             {
                 errorOutput.ShouldEqual("'bob123123' is not recognized as an internal or external command,operable program or batch file.");
             }
@@ -82,7 +82,7 @@ namespace chocolatey.tests.integration.infrastructure.commands
 
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
-        public class when_CommandExecutor_is_given_a_nonexisting_process : CommandExecutorSpecsBase
+        public class When_CommandExecutor_is_given_a_nonexisting_process : CommandExecutorSpecsBase
         {
             private string result;
             private string errorOutput;
@@ -91,7 +91,7 @@ namespace chocolatey.tests.integration.infrastructure.commands
             {
                 try
                 {
-                    commandExecutor.execute("noprocess.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, null, (s, e) => { errorOutput += e.Data; });
+                    commandExecutor.Execute("noprocess.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, null, (s, e) => { errorOutput += e.Data; });
                 }
                 catch (Exception e)
                 {
@@ -100,7 +100,7 @@ namespace chocolatey.tests.integration.infrastructure.commands
             }
 
             [Fact]
-            public void should_have_an_error_message()
+            public void Should_have_an_error_message()
             {
                 result.ShouldNotBeNull();
             }

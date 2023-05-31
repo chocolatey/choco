@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.validations
 {
+    using System;
     using System.Collections.Generic;
     using app.configuration;
     using chocolatey.infrastructure.app.attributes;
@@ -31,6 +32,11 @@ namespace chocolatey.infrastructure.validations
         /// </summary>
         /// <param name="config">The current Chocolatey Configuration</param>
         /// <returns>The validation results</returns>
+        ICollection<ValidationResult> Validate(ChocolateyConfiguration config);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         ICollection<ValidationResult> validate(ChocolateyConfiguration config);
+#pragma warning restore IDE1006
     }
 }

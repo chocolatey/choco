@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.app.services
 {
+    using System;
     using System.Collections.Generic;
     using domain;
     using Microsoft.Win32;
@@ -23,14 +24,35 @@ namespace chocolatey.infrastructure.app.services
 
     public interface IRegistryService
     {
+        Registry GetInstallerKeys();
+        Registry GetInstallerKeysChanged(Registry before, Registry after);
+        IEnumerable<GenericRegistryValue> GetEnvironmentValues();
+        IEnumerable<GenericRegistryValue> GetNewAndModifiedEnvironmentValues(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after);
+        IEnumerable<GenericRegistryValue> GetRemovedEnvironmentValues(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after);
+        void SaveRegistrySnapshot(Registry snapshot, string filePath);
+        Registry ReadRegistrySnapshot(string filePath);
+        bool InstallerKeyExists(string keyPath);
+        RegistryKey GetKey(RegistryHive hive, string subKeyPath);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         Registry get_installer_keys();
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         Registry get_installer_key_differences(Registry before, Registry after);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         IEnumerable<GenericRegistryValue> get_environment_values();
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         IEnumerable<GenericRegistryValue> get_added_changed_environment_differences(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         IEnumerable<GenericRegistryValue> get_removed_environment_differences(IEnumerable<GenericRegistryValue> before, IEnumerable<GenericRegistryValue> after);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         void save_to_file(Registry snapshot, string filePath);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         Registry read_from_file(string filePath);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         bool installer_value_exists(string keyPath, string value);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         RegistryKey get_key(RegistryHive hive, string subKeyPath);
+#pragma warning restore IDE1006
     }
 }

@@ -1,0 +1,5 @@
+We have just released v{0} of the Chocolatey CLI!
+
+Release notes can be found here:
+
+https://docs.chocolatey.org/en-us/choco/release-notes#{1}

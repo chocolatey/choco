@@ -21,7 +21,7 @@ namespace chocolatey.infrastructure.app.rules
 
     internal sealed class RequiredMetadataRule : MetadataRuleBase
     {
-        public override IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             var requiredItems = new[]
             {
@@ -33,11 +33,16 @@ namespace chocolatey.infrastructure.app.rules
 
             foreach (var item in requiredItems)
             {
-                if (string.IsNullOrWhiteSpace(get_element_value(reader, item)))
+                if (string.IsNullOrWhiteSpace(GetElementValue(reader, item)))
                 {
-                    yield return new RuleResult(RuleType.Error, RuleIdentifiers.EmptyRequiredElement, "{0} is a required element in the package nuspec file.".format_with(item));
+                    yield return GetRule(RuleIdentifiers.EmptyRequiredElement, "{0} is a required element in the package nuspec file.".FormatWith(item));
                 }
             }
+        }
+
+        protected override IEnumerable<ImmutableRule> GetRules()
+        {
+            yield return new ImmutableRule(RuleType.Error, RuleIdentifiers.EmptyRequiredElement, "A required element is missing or has no content in the package nuspec file.");
         }
     }
 }

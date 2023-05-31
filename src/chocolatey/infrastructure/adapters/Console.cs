@@ -39,7 +39,7 @@ namespace chocolatey.infrastructure.adapters
         {
             if (!ApplicationParameters.AllowPrompts) return string.Empty;
 
-            return ReadLineTimeout.read(timeoutMilliseconds);
+            return ReadLineTimeout.Read(timeoutMilliseconds);
         }
 
         public System.ConsoleKeyInfo ReadKey(bool intercept)
@@ -53,7 +53,7 @@ namespace chocolatey.infrastructure.adapters
         {
             if (!ApplicationParameters.AllowPrompts) return new System.ConsoleKeyInfo('\0', ConsoleKey.Enter, false, false, false);
 
-            return ReadKeyTimeout.read_key(timeoutMilliseconds);
+            return ReadKeyTimeout.ReadKey(timeoutMilliseconds);
         }
 
         public TextWriter Error { get { return System.Console.Error; } }
@@ -62,7 +62,7 @@ namespace chocolatey.infrastructure.adapters
 
         public void Write(object value)
         {
-            System.Console.Write(value.to_string());
+            System.Console.Write(value.ToStringSafe());
         }
 
         public void WriteLine()
@@ -109,7 +109,7 @@ namespace chocolatey.infrastructure.adapters
             {
                 if (!IsOutputRedirected) return System.Console.BufferWidth;
 
-                return get_console_buffer().dwSize.X; //the current console window width
+                return GetConsoleBuffer().dwSize.X; //the current console window width
             }
             set
             {
@@ -123,7 +123,7 @@ namespace chocolatey.infrastructure.adapters
             {
                 if (!IsOutputRedirected) return System.Console.BufferHeight;
 
-                return get_console_buffer().dwSize.Y; //the current console window height
+                return GetConsoleBuffer().dwSize.Y; //the current console window height
             }
             set
             {
@@ -166,7 +166,7 @@ namespace chocolatey.infrastructure.adapters
             {
                 if (!IsOutputRedirected) return System.Console.CursorSize;
 
-                return get_console_buffer().dwCursorPosition.Y;
+                return GetConsoleBuffer().dwCursorPosition.Y;
             }
             set
             {
@@ -180,7 +180,7 @@ namespace chocolatey.infrastructure.adapters
             {
                 if (!IsOutputRedirected) return System.Console.LargestWindowWidth;
 
-                return get_console_buffer().dwMaximumWindowSize.X; //the max console window width
+                return GetConsoleBuffer().dwMaximumWindowSize.X; //the max console window width
             }
         }
 
@@ -190,7 +190,7 @@ namespace chocolatey.infrastructure.adapters
             {
                 if (!IsOutputRedirected) return System.Console.LargestWindowHeight;
 
-                return get_console_buffer().dwMaximumWindowSize.Y; //the max console window height
+                return GetConsoleBuffer().dwMaximumWindowSize.Y; //the max console window height
             }
         }
 
@@ -200,7 +200,7 @@ namespace chocolatey.infrastructure.adapters
             {
                 if (!IsOutputRedirected) return System.Console.WindowWidth;
 
-                return get_console_buffer().dwSize.X; //the current console window width
+                return GetConsoleBuffer().dwSize.X; //the current console window width
             }
             set
             {
@@ -214,7 +214,7 @@ namespace chocolatey.infrastructure.adapters
             {
                 if (!IsOutputRedirected) return System.Console.WindowHeight;
 
-                return get_console_buffer().dwSize.Y; //the current console window height
+                return GetConsoleBuffer().dwSize.Y; //the current console window height
             }
             set
             {
@@ -233,7 +233,7 @@ namespace chocolatey.infrastructure.adapters
             {
                 if (!IsOutputRedirected) return System.Console.WindowLeft;
 
-                return get_console_buffer().srWindow.Left;
+                return GetConsoleBuffer().srWindow.Left;
             }
             set
             {
@@ -247,7 +247,7 @@ namespace chocolatey.infrastructure.adapters
             {
                 if (!IsOutputRedirected) return System.Console.WindowTop;
 
-                return get_console_buffer().srWindow.Top;
+                return GetConsoleBuffer().srWindow.Top;
             }
             set
             {
@@ -267,7 +267,7 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!is_windows()) return false;
+                if (!IsWindows()) return false;
 
                 return FileType.Char != GetFileType(GetStdHandle(StdHandle.StdOut));
             }
@@ -280,7 +280,7 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!is_windows()) return false;
+                if (!IsWindows()) return false;
 
                 return FileType.Char != GetFileType(GetStdHandle(StdHandle.StdErr));
             }
@@ -293,18 +293,18 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!is_windows()) return false;
+                if (!IsWindows()) return false;
 
                 return FileType.Char != GetFileType(GetStdHandle(StdHandle.StdIn));
             }
         }
 
-        private bool is_windows()
+        private bool IsWindows()
         {
-            return Platform.get_platform() == PlatformType.Windows;
+            return Platform.GetPlatform() == PlatformType.Windows;
         }
 
-        private CONSOLE_SCREEN_BUFFER_INFO get_console_buffer()
+        private CONSOLE_SCREEN_BUFFER_INFO GetConsoleBuffer()
         {
             var defaultConsoleBuffer = new CONSOLE_SCREEN_BUFFER_INFO
             {
@@ -315,7 +315,7 @@ namespace chocolatey.infrastructure.adapters
                 wAttributes = 0,
             };
 
-            if (!is_windows()) return defaultConsoleBuffer;
+            if (!IsWindows()) return defaultConsoleBuffer;
 
             CONSOLE_SCREEN_BUFFER_INFO csbi;
             if (GetConsoleScreenBufferInfo(GetStdHandle(StdHandle.StdOut), out csbi))

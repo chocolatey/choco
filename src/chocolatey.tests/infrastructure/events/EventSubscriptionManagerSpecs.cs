@@ -39,7 +39,7 @@ namespace chocolatey.tests.infrastructure.events
             }
         }
 
-        public class when_using_eventSubscriptionManager_to_subscribe_to_an_event : EventSubscriptionManagerSpecsBase
+        public class When_using_eventSubscriptionManager_to_subscribe_to_an_event : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
             private FakeEvent _localFakeEvent;
@@ -47,7 +47,7 @@ namespace chocolatey.tests.infrastructure.events
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeEvent>(
+                SubscriptionManager.Subscribe<FakeEvent>(
                     x =>
                     {
                         _wasCalled = true;
@@ -59,35 +59,35 @@ namespace chocolatey.tests.infrastructure.events
 
             public override void Because()
             {
-                SubscriptionManager.publish(Event);
+                SubscriptionManager.Publish(Event);
             }
 
             [Fact]
-            public void should_have_called_the_action()
+            public void Should_have_called_the_action()
             {
                 _wasCalled.ShouldBeTrue();
             }
 
             [Fact]
-            public void should_have_passed_the_message()
+            public void Should_have_passed_the_message()
             {
                 _localFakeEvent.ShouldEqual(Event);
             }
 
             [Fact]
-            public void should_have_passed_the_name_correctly()
+            public void Should_have_passed_the_name_correctly()
             {
                 _localFakeEvent.Name.ShouldEqual("yo");
             }
 
             [Fact]
-            public void should_have_passed_the_digits_correctly()
+            public void Should_have_passed_the_digits_correctly()
             {
                 _localFakeEvent.Digits.ShouldEqual(12d);
             }
         }
 
-        public class when_using_eventSubscriptionManager_with_long_running_event_subscriber : EventSubscriptionManagerSpecsBase
+        public class When_using_eventSubscriptionManager_with_long_running_event_subscriber : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
             private FakeEvent _localFakeEvent;
@@ -95,7 +95,7 @@ namespace chocolatey.tests.infrastructure.events
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeEvent>(
+                SubscriptionManager.Subscribe<FakeEvent>(
                     m =>
                     {
                         //stuff is happening
@@ -110,24 +110,24 @@ namespace chocolatey.tests.infrastructure.events
 
             public override void Because()
             {
-                SubscriptionManager.publish(Event);
+                SubscriptionManager.Publish(Event);
             }
 
             [Fact]
-            public void should_wait_the_event_to_complete()
+            public void Should_wait_the_event_to_complete()
             {
                 Console.WriteLine("event complete should be above this");
                 _wasCalled.ShouldBeTrue();
             }
 
             [Fact]
-            public void should_have_passed_the_message()
+            public void Should_have_passed_the_message()
             {
                 _localFakeEvent.ShouldEqual(Event);
             }
         }
 
-        public class when_using_eventSubscriptionManager_to_subscribe_to_an_event_with_a_filter_that_the_event_satisfies : EventSubscriptionManagerSpecsBase
+        public class When_using_eventSubscriptionManager_to_subscribe_to_an_event_with_a_filter_that_the_event_satisfies : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
             private FakeEvent _localFakeEvent;
@@ -135,7 +135,7 @@ namespace chocolatey.tests.infrastructure.events
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeEvent>(
+                SubscriptionManager.Subscribe<FakeEvent>(
                     x =>
                     {
                         _wasCalled = true;
@@ -147,35 +147,35 @@ namespace chocolatey.tests.infrastructure.events
 
             public override void Because()
             {
-                SubscriptionManager.publish(Event);
+                SubscriptionManager.Publish(Event);
             }
 
             [Fact]
-            public void should_have_called_the_action()
+            public void Should_have_called_the_action()
             {
                 _wasCalled.ShouldBeTrue();
             }
 
             [Fact]
-            public void should_have_passed_the_message()
+            public void Should_have_passed_the_message()
             {
                 _localFakeEvent.ShouldEqual(Event);
             }
 
             [Fact]
-            public void should_have_passed_the_name_correctly()
+            public void Should_have_passed_the_name_correctly()
             {
                 _localFakeEvent.Name.ShouldEqual("yo");
             }
 
             [Fact]
-            public void should_have_passed_the_digits_correctly()
+            public void Should_have_passed_the_digits_correctly()
             {
                 _localFakeEvent.Digits.ShouldEqual(12d);
             }
         }
 
-        public class when_using_eventSubscriptionManager_to_subscribe_to_an_event_with_a_filter_that_the_event_does_not_satisfy : EventSubscriptionManagerSpecsBase
+        public class When_using_eventSubscriptionManager_to_subscribe_to_an_event_with_a_filter_that_the_event_does_not_satisfy : EventSubscriptionManagerSpecsBase
         {
             private bool _wasCalled;
             private FakeEvent _localFakeEvent;
@@ -183,7 +183,7 @@ namespace chocolatey.tests.infrastructure.events
             public override void Context()
             {
                 base.Context();
-                SubscriptionManager.subscribe<FakeEvent>(
+                SubscriptionManager.Subscribe<FakeEvent>(
                     x =>
                     {
                         _wasCalled = true;
@@ -195,23 +195,23 @@ namespace chocolatey.tests.infrastructure.events
 
             public override void Because()
             {
-                SubscriptionManager.publish(Event);
+                SubscriptionManager.Publish(Event);
             }
 
             [Fact]
-            public void should_not_have_called_the_action()
+            public void Should_not_have_called_the_action()
             {
                 _wasCalled.ShouldBeFalse();
             }
 
             [Fact]
-            public void should_not_have_passed_the_message()
+            public void Should_not_have_passed_the_message()
             {
                 _localFakeEvent.ShouldNotEqual(Event);
             }
         }
 
-        public class when_using_eventSubscriptionManager_and_multiple_parties_subscribe_to_the_same_event : EventSubscriptionManagerSpecsBase
+        public class When_using_eventSubscriptionManager_and_multiple_parties_subscribe_to_the_same_event : EventSubscriptionManagerSpecsBase
         {
             private IList<FakeSubscriber> _list;
 
@@ -229,11 +229,11 @@ namespace chocolatey.tests.infrastructure.events
 
             public override void Because()
             {
-                SubscriptionManager.publish(Event);
+                SubscriptionManager.Publish(Event);
             }
         }
 
-        public class when_using_eventSubscriptionManager_to_send_a_null_event_message : EventSubscriptionManagerSpecsBase
+        public class When_using_eventSubscriptionManager_to_send_a_null_event_message : EventSubscriptionManagerSpecsBase
         {
             private bool _errored;
 
@@ -241,7 +241,7 @@ namespace chocolatey.tests.infrastructure.events
             {
                 try
                 {
-                    SubscriptionManager.publish<FakeEvent>(null);
+                    SubscriptionManager.Publish<FakeEvent>(null);
                 }
                 catch (Exception)
                 {
@@ -250,9 +250,9 @@ namespace chocolatey.tests.infrastructure.events
             }
 
             [Fact]
-            public void should_throw_an_error()
+            public void Should_throw_an_error()
             {
-                Assert.Throws<ArgumentNullException>(() => SubscriptionManager.publish<FakeEvent>(null));
+                Assert.Throws<ArgumentNullException>(() => SubscriptionManager.Publish<FakeEvent>(null));
                 _errored.ShouldBeTrue();
             }
         }

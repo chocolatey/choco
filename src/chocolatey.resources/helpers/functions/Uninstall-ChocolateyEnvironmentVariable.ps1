@@ -28,9 +28,6 @@ the User or to the Machine. If Machine level scoping is specified, the
 command is elevated to an administrative session.
 
 .NOTES
-Available in 0.9.10+. If you need compatibility with older versions,
-use Install-ChocolateyEnvironmentVariable and set `-VariableValue $null`
-
 This command will assert UAC/Admin privileges on the machine when
 `-VariableType Machine`.
 

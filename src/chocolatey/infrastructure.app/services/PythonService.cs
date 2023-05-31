@@ -34,25 +34,25 @@ namespace chocolatey.infrastructure.app.services
     /// <summary>
     ///   Alternative Source for Installing Python packages
     /// </summary>
-    public sealed class PythonService : ISourceRunner
+    public sealed class PythonService : IBootstrappableSourceRunner, IListSourceRunner, IInstallSourceRunner, IUpgradeSourceRunner, IUninstallSourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
         private readonly INugetService _nugetService;
         private readonly IFileSystem _fileSystem;
         private readonly IRegistryService _registryService;
-        private const string PACKAGE_NAME_TOKEN = "{{packagename}}";
-        private const string LOG_LEVEL_TOKEN = "{{loglevel}}";
-        private const string FORCE_TOKEN = "{{force}}";
-        public const string PYTHON_PACKAGE = "python";
+        private const string PackageNameToken = "{{packagename}}";
+        private const string LogLevelToken = "{{loglevel}}";
+        private const string ForceToken = "{{force}}";
+        private const string PythonPackage = "python";
         private string _exePath = string.Empty;
 
-        private const string APP_NAME = "Python";
-        public const string PACKAGE_NAME_GROUP = "PkgName";
-        public static readonly Regex InstalledRegex = new Regex(@"Successfully installed", RegexOptions.Compiled);
-        public static readonly Regex UninstalledRegex = new Regex(@"Successfully uninstalled", RegexOptions.Compiled);
-        public static readonly Regex PackageNameRegex = new Regex(@"\s(?<{0}>[^-\s]*)-".format_with(PACKAGE_NAME_GROUP), RegexOptions.Compiled);
-        public static readonly Regex ErrorRegex = new Regex(@"Error:", RegexOptions.Compiled);
-        public static readonly Regex ErrorNotFoundRegex = new Regex(@"Could not find any downloads that", RegexOptions.Compiled);
+        private const string AppName = "Python";
+        private const string PackageNameGroup = "PkgName";
+        private static readonly Regex _installedRegex = new Regex(@"Successfully installed", RegexOptions.Compiled);
+        private static readonly Regex _uninstalledRegex = new Regex(@"Successfully uninstalled", RegexOptions.Compiled);
+        private static readonly Regex _packageNameRegex = new Regex(@"\s(?<{0}>[^-\s]*)-".FormatWith(PackageNameGroup), RegexOptions.Compiled);
+        private static readonly Regex _errorRegex = new Regex(@"Error:", RegexOptions.Compiled);
+        private static readonly Regex _errorNotFoundRegex = new Regex(@"Could not find any downloads that", RegexOptions.Compiled);
 
         private readonly IDictionary<string, ExternalCommandArgument> _listArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
         private readonly IDictionary<string, ExternalCommandArgument> _installArguments = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
@@ -65,41 +65,41 @@ namespace chocolatey.infrastructure.app.services
             _nugetService = nugetService;
             _fileSystem = fileSystem;
             _registryService = registryService;
-            set_cmd_args_dictionaries();
+            SetupCommandArgsDictionaries();
         }
 
         /// <summary>
         ///   Set any command arguments dictionaries necessary for the service
         /// </summary>
-        private void set_cmd_args_dictionaries()
+        private void SetupCommandArgsDictionaries()
         {
-            set_list_dictionary(_listArguments);
-            set_install_dictionary(_installArguments);
-            set_upgrade_dictionary(_upgradeArguments);
-            set_uninstall_dictionary(_uninstallArguments);
+            SetupListDictionary(_listArguments);
+            SetupInstallDictionary(_installArguments);
+            SetupUpgradeDictionary(_upgradeArguments);
+            SetupUninstallDictionary(_uninstallArguments);
         }
 
         /// <summary>
         ///   Sets list dictionary
         /// </summary>
-        private void set_list_dictionary(IDictionary<string, ExternalCommandArgument> args)
+        private void SetupListDictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            set_common_args(args);
+            AddCommonArguments(args);
             args.Add("_command_", new ExternalCommandArgument { ArgumentOption = "list", Required = true });
         }
 
         /// <summary>
         ///   Sets install dictionary
         /// </summary>
-        private void set_install_dictionary(IDictionary<string, ExternalCommandArgument> args)
+        private void SetupInstallDictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            set_common_args(args);
+            AddCommonArguments(args);
 
             args.Add("_command_", new ExternalCommandArgument { ArgumentOption = "install", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
             {
                 ArgumentOption = "",
-                ArgumentValue = PACKAGE_NAME_TOKEN,
+                ArgumentValue = PackageNameToken,
                 QuoteValue = false,
                 UseValueOnly = true,
                 Required = true
@@ -109,16 +109,16 @@ namespace chocolatey.infrastructure.app.services
         /// <summary>
         ///   Sets install dictionary
         /// </summary>
-        private void set_upgrade_dictionary(IDictionary<string, ExternalCommandArgument> args)
+        private void SetupUpgradeDictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            set_common_args(args);
+            AddCommonArguments(args);
 
             args.Add("_command_", new ExternalCommandArgument { ArgumentOption = "install", Required = true });
             args.Add("_upgrade_", new ExternalCommandArgument { ArgumentOption = "--upgrade", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
             {
                 ArgumentOption = "",
-                ArgumentValue = PACKAGE_NAME_TOKEN,
+                ArgumentValue = PackageNameToken,
                 QuoteValue = false,
                 UseValueOnly = true,
                 Required = true
@@ -128,28 +128,28 @@ namespace chocolatey.infrastructure.app.services
         /// <summary>
         ///   Sets uninstall dictionary
         /// </summary>
-        private void set_uninstall_dictionary(IDictionary<string, ExternalCommandArgument> args)
+        private void SetupUninstallDictionary(IDictionary<string, ExternalCommandArgument> args)
         {
-            set_common_args(args);
+            AddCommonArguments(args);
 
             args.Add("_command_", new ExternalCommandArgument { ArgumentOption = "uninstall", Required = true });
             args.Add("_confirm_", new ExternalCommandArgument { ArgumentOption = "-y", Required = true });
             args.Add("_package_name_", new ExternalCommandArgument
             {
                 ArgumentOption = "",
-                ArgumentValue = PACKAGE_NAME_TOKEN,
+                ArgumentValue = PackageNameToken,
                 QuoteValue = false,
                 UseValueOnly = true,
                 Required = true
             });
         }
 
-        private void set_common_args(IDictionary<string, ExternalCommandArgument> args)
+        private void AddCommonArguments(IDictionary<string, ExternalCommandArgument> args)
         {
             args.Add("_loglevel_", new ExternalCommandArgument
             {
                 ArgumentOption = "",
-                ArgumentValue = LOG_LEVEL_TOKEN,
+                ArgumentValue = LogLevelToken,
                 QuoteValue = false,
                 UseValueOnly = true,
                 Required = true
@@ -158,7 +158,7 @@ namespace chocolatey.infrastructure.app.services
             args.Add("_force_", new ExternalCommandArgument
             {
                 ArgumentOption = "",
-                ArgumentValue = FORCE_TOKEN,
+                ArgumentValue = ForceToken,
                 QuoteValue = false,
                 UseValueOnly = true,
                 Required = true
@@ -167,18 +167,18 @@ namespace chocolatey.infrastructure.app.services
 
         public string SourceType
         {
-            get { return SourceTypes.PYTHON; }
+            get { return SourceTypes.Python; }
         }
 
-        public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
+        public void EnsureSourceAppInstalled(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
         {
-            if (Platform.get_platform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+            if (Platform.GetPlatform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
 
             //ensure at least python 2.7.9 is installed
-            var python = _fileSystem.get_executable_path("python");
+            var python = _fileSystem.GetExecutablePath("python");
             //python -V
 
-            if (python.is_equal_to("python"))
+            if (python.IsEqualTo("python"))
             {
                 var runnerConfig = new ChocolateyConfiguration
                 {
@@ -195,37 +195,32 @@ namespace chocolatey.infrastructure.app.services
                 };
                 runnerConfig.ListCommand.LocalOnly = true;
 
-                var localPackages = _nugetService.list_run(runnerConfig);
+                var localPackages = _nugetService.List(runnerConfig);
 
-                if (!localPackages.Any(p => p.Name.is_equal_to(PYTHON_PACKAGE)))
+                if (!localPackages.Any(p => p.Name.IsEqualTo(PythonPackage)))
                 {
-                    runnerConfig.PackageNames = PYTHON_PACKAGE;
+                    runnerConfig.PackageNames = PythonPackage;
                     runnerConfig.Sources = ApplicationParameters.ChocolateyCommunityFeedSource;
 
                     var prompt = config.PromptForConfirmation;
                     config.PromptForConfirmation = false;
-                    _nugetService.install_run(runnerConfig, ensureAction.Invoke);
+                    _nugetService.Install(runnerConfig, ensureAction.Invoke);
                     config.PromptForConfirmation = prompt;
                 }
             }
         }
 
-        public int count_run(ChocolateyConfiguration config)
-        {
-            throw new NotImplementedException("Count is not supported for this source runner.");
-        }
-
-        public void set_executable_path_if_not_set()
+        private void EnsureExecutablePathSet()
         {
             if (!string.IsNullOrWhiteSpace(_exePath)) return;
 
-            var python = _fileSystem.get_executable_path("python");
+            var python = _fileSystem.GetExecutablePath("python");
 
             var pipPath = string.Empty;
-            if (!python.is_equal_to("python"))
+            if (!python.IsEqualTo("python"))
             {
-                pipPath = _fileSystem.combine_paths(_fileSystem.get_directory_name(python), "Scripts", "pip.exe");
-                if (_fileSystem.file_exists(pipPath))
+                pipPath = _fileSystem.CombinePaths(_fileSystem.GetDirectoryName(python), "Scripts", "pip.exe");
+                if (_fileSystem.FileExists(pipPath))
                 {
                     _exePath = pipPath;
                     return;
@@ -233,17 +228,17 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var topLevelPath = string.Empty;
-            var python34PathKey = _registryService.get_key(RegistryHive.LocalMachine, "SOFTWARE\\Python\\PythonCore\\3.4\\InstallPath");
+            var python34PathKey = _registryService.GetKey(RegistryHive.LocalMachine, "SOFTWARE\\Python\\PythonCore\\3.4\\InstallPath");
             if (python34PathKey != null)
             {
-                topLevelPath = python34PathKey.GetValue("", string.Empty).to_string();
+                topLevelPath = python34PathKey.GetValue("", string.Empty).ToStringSafe();
             }
             if (string.IsNullOrWhiteSpace(topLevelPath))
             {
-                var python27PathKey = _registryService.get_key(RegistryHive.LocalMachine, "SOFTWARE\\Python\\PythonCore\\2.7\\InstallPath");
+                var python27PathKey = _registryService.GetKey(RegistryHive.LocalMachine, "SOFTWARE\\Python\\PythonCore\\2.7\\InstallPath");
                 if (python27PathKey != null)
                 {
-                    topLevelPath = python27PathKey.GetValue("", string.Empty).to_string();
+                    topLevelPath = python27PathKey.GetValue("", string.Empty).ToStringSafe();
                 }
             }
 
@@ -252,11 +247,11 @@ namespace chocolatey.infrastructure.app.services
                 var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
                 if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
 
-                topLevelPath = _fileSystem.combine_paths(binRoot, "python");
+                topLevelPath = _fileSystem.CombinePaths(binRoot, "python");
             }
 
-            pipPath = _fileSystem.combine_paths(_fileSystem.get_directory_name(topLevelPath), "Scripts", "pip.exe");
-            if (_fileSystem.file_exists(pipPath))
+            pipPath = _fileSystem.CombinePaths(_fileSystem.GetDirectoryName(topLevelPath), "Scripts", "pip.exe");
+            if (_fileSystem.FileExists(pipPath))
             {
                 _exePath = pipPath;
             }
@@ -264,63 +259,63 @@ namespace chocolatey.infrastructure.app.services
             if (string.IsNullOrWhiteSpace(_exePath)) throw new FileNotFoundException("Unable to find pip");
         }
 
-        public string build_args(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
+        private string BuildArguments(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
         {
-            var args = ExternalCommandArgsBuilder.build_arguments(config, argsDictionary);
+            var args = ExternalCommandArgsBuilder.BuildArguments(config, argsDictionary);
 
-            args = args.Replace(LOG_LEVEL_TOKEN, config.Debug ? "-vvv" : "");
+            args = args.Replace(LogLevelToken, config.Debug ? "-vvv" : "");
 
-            if (config.CommandName.is_equal_to("install"))
+            if (config.CommandName.IsEqualTo("install"))
             {
-                args = args.Replace(FORCE_TOKEN, config.Force ? "--ignore-installed" : "");
+                args = args.Replace(ForceToken, config.Force ? "--ignore-installed" : "");
             }
-            else if (config.CommandName.is_equal_to("upgrade"))
+            else if (config.CommandName.IsEqualTo("upgrade"))
             {
-                args = args.Replace(FORCE_TOKEN, config.Force ? "--force-reinstall" : "");
+                args = args.Replace(ForceToken, config.Force ? "--force-reinstall" : "");
             }
             else
             {
-                args = args.Replace(FORCE_TOKEN, "");
+                args = args.Replace(ForceToken, "");
             }
 
             return args;
         }
 
-        public void list_noop(ChocolateyConfiguration config)
+        public void ListDryRun(ChocolateyConfiguration config)
         {
-            set_executable_path_if_not_set();
-            var args = build_args(config, _listArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath.escape_curly_braces(), args.escape_curly_braces()));
+            EnsureExecutablePathSet();
+            var args = BuildArguments(config, _listArguments);
+            this.Log().Info("Would have run '{0} {1}'".FormatWith(_exePath.EscapeCurlyBraces(), args.EscapeCurlyBraces()));
         }
 
-        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
+        public IEnumerable<PackageResult> List(ChocolateyConfiguration config)
         {
-            set_executable_path_if_not_set();
-            var args = build_args(config, _listArguments);
+            EnsureExecutablePathSet();
+            var args = BuildArguments(config, _listArguments);
             var packageResults = new List<PackageResult>();
 
-            Environment.ExitCode = _commandExecutor.execute(
+            Environment.ExitCode = _commandExecutor.Execute(
                 _exePath,
                 args,
                 config.CommandExecutionTimeoutSeconds,
-                _fileSystem.get_current_directory(),
+                _fileSystem.GetCurrentDirectory(),
                 stdOutAction: (s, e) =>
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
                         if (!config.QuietOutput)
                         {
-                            this.Log().Info(logMessage.escape_curly_braces());
+                            this.Log().Info(logMessage.EscapeCurlyBraces());
                         }
                         else
                         {
-                            this.Log().Debug(() => "[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+                            this.Log().Debug(() => "[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
                         }
                     },
                 stdErrAction: (s, e) =>
                     {
                         if (string.IsNullOrWhiteSpace(e.Data)) return;
-                        this.Log().Error(() => "{0}".format_with(e.Data.escape_curly_braces()));
+                        this.Log().Error(() => "{0}".FormatWith(e.Data.EscapeCurlyBraces()));
                     },
                 updateProcessPath: false,
                 allowUseWindow: true
@@ -329,22 +324,22 @@ namespace chocolatey.infrastructure.app.services
             return packageResults;
         }
 
-        public void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+        public void InstallDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
-            set_executable_path_if_not_set();
-            var args = build_args(config, _installArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath.escape_curly_braces(), args.escape_curly_braces()));
+            EnsureExecutablePathSet();
+            var args = BuildArguments(config, _installArguments);
+            this.Log().Info("Would have run '{0} {1}'".FormatWith(_exePath.EscapeCurlyBraces(), args.EscapeCurlyBraces()));
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+        public ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
-            return install_run(config, continueAction, beforeModifyAction: null);
+            return Install(config, continueAction, beforeModifyAction: null);
         }
 
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
+        public ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
         {
-            set_executable_path_if_not_set();
-            var args = build_args(config, _installArguments);
+            EnsureExecutablePathSet();
+            var args = BuildArguments(config, _installArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (var packageToInstall in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries))
@@ -352,42 +347,42 @@ namespace chocolatey.infrastructure.app.services
                 var pkgName = packageToInstall;
                 if (!string.IsNullOrWhiteSpace(config.Version))
                 {
-                    pkgName = "{0}=={1}".format_with(packageToInstall, config.Version);
+                    pkgName = "{0}=={1}".FormatWith(packageToInstall, config.Version);
                 }
-                var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, pkgName);
+                var argsForPackage = args.Replace(PackageNameToken, pkgName);
 
-                var exitCode = _commandExecutor.execute(
+                var exitCode = _commandExecutor.Execute(
                     _exePath,
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
-                    _fileSystem.get_current_directory(),
+                    _fileSystem.GetCurrentDirectory(),
                     (s, e) =>
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+                        this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
-                        if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
+                        if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
                         {
                             var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageToInstall, null, null));
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         }
 
-                        if (InstalledRegex.IsMatch(logMessage))
+                        if (_installedRegex.IsMatch(logMessage))
                         {
-                            var packageName = get_value_from_output(logMessage, PackageNameRegex, PACKAGE_NAME_GROUP);
+                            var packageName = GetValueFromOutput(logMessage, _packageNameRegex, PackageNameGroup);
                             var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                             results.Messages.Add(new ResultMessage(ResultType.Note, packageName));
-                            this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
+                            this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".FormatWith(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
                         }
                     },
                     (s, e) =>
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+                        this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
-                        if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
+                        if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
                         {
                             var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageToInstall, null, null));
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -406,23 +401,23 @@ namespace chocolatey.infrastructure.app.services
             return packageResults;
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+        public ConcurrentDictionary<string, PackageResult> UpgradeDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
-            set_executable_path_if_not_set();
-            var args = build_args(config, _upgradeArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath.escape_curly_braces(), args.escape_curly_braces()));
+            EnsureExecutablePathSet();
+            var args = BuildArguments(config, _upgradeArguments);
+            this.Log().Info("Would have run '{0} {1}'".FormatWith(_exePath.EscapeCurlyBraces(), args.EscapeCurlyBraces()));
             return new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null)
+        public ConcurrentDictionary<string, PackageResult> Upgrade(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null)
         {
-            if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
+            if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
             {
                 throw new NotImplementedException("The all keyword is not available for alternate sources");
             }
 
-            set_executable_path_if_not_set();
-            var args = build_args(config, _upgradeArguments);
+            EnsureExecutablePathSet();
+            var args = BuildArguments(config, _upgradeArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (var packageToInstall in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries))
@@ -430,43 +425,43 @@ namespace chocolatey.infrastructure.app.services
                 var pkgName = packageToInstall;
                 if (!string.IsNullOrWhiteSpace(config.Version))
                 {
-                    pkgName = "{0}=={1}".format_with(packageToInstall, config.Version);
+                    pkgName = "{0}=={1}".FormatWith(packageToInstall, config.Version);
                 }
 
-                var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, pkgName);
+                var argsForPackage = args.Replace(PackageNameToken, pkgName);
 
-                var exitCode = _commandExecutor.execute(
+                var exitCode = _commandExecutor.Execute(
                     _exePath,
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
-                    _fileSystem.get_current_directory(),
+                    _fileSystem.GetCurrentDirectory(),
                     (s, e) =>
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+                        this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
-                        if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
+                        if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
                         {
                             var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageToInstall, null, null));
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         }
 
-                        if (InstalledRegex.IsMatch(logMessage))
+                        if (_installedRegex.IsMatch(logMessage))
                         {
-                            var packageName = get_value_from_output(logMessage, PackageNameRegex, PACKAGE_NAME_GROUP);
+                            var packageName = GetValueFromOutput(logMessage, _packageNameRegex, PackageNameGroup);
                             var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                             results.Messages.Add(new ResultMessage(ResultType.Note, packageName));
-                            this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
+                            this.Log().Info(ChocolateyLoggers.Important, " {0} has been installed successfully.".FormatWith(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
                         }
                     },
                     (s, e) =>
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+                        this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
-                        if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
+                        if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
                         {
                             var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageToInstall, null, null));
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -485,55 +480,55 @@ namespace chocolatey.infrastructure.app.services
             return packageResults;
         }
 
-        public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+        public void UninstallDryRun(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
         {
-            set_executable_path_if_not_set();
-            var args = build_args(config, _uninstallArguments);
-            this.Log().Info("Would have run '{0} {1}'".format_with(_exePath.escape_curly_braces(), args.escape_curly_braces()));
+            EnsureExecutablePathSet();
+            var args = BuildArguments(config, _uninstallArguments);
+            this.Log().Info("Would have run '{0} {1}'".FormatWith(_exePath.EscapeCurlyBraces(), args.EscapeCurlyBraces()));
         }
 
-        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
+        public ConcurrentDictionary<string, PackageResult> Uninstall(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
         {
-            set_executable_path_if_not_set();
-            var args = build_args(config, _uninstallArguments);
+            EnsureExecutablePathSet();
+            var args = BuildArguments(config, _uninstallArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
             foreach (var packageToInstall in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries))
             {
-                var argsForPackage = args.Replace(PACKAGE_NAME_TOKEN, packageToInstall);
+                var argsForPackage = args.Replace(PackageNameToken, packageToInstall);
 
-                var exitCode = _commandExecutor.execute(
+                var exitCode = _commandExecutor.Execute(
                     _exePath,
                     argsForPackage,
                     config.CommandExecutionTimeoutSeconds,
-                    _fileSystem.get_current_directory(),
+                    _fileSystem.GetCurrentDirectory(),
                     (s, e) =>
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Info(() => " [{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+                        this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
-                        if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
+                        if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
                         {
                             var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageToInstall, null, null));
                             results.Messages.Add(new ResultMessage(ResultType.Error, packageToInstall));
                         }
 
-                        if (UninstalledRegex.IsMatch(logMessage))
+                        if (_uninstalledRegex.IsMatch(logMessage))
                         {
-                            var packageName = get_value_from_output(logMessage, PackageNameRegex, PACKAGE_NAME_GROUP);
+                            var packageName = GetValueFromOutput(logMessage, _packageNameRegex, PackageNameGroup);
                             var results = packageResults.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                             results.Messages.Add(new ResultMessage(ResultType.Note, packageName));
-                            this.Log().Info(ChocolateyLoggers.Important, " {0} has been uninstalled successfully.".format_with(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
+                            this.Log().Info(ChocolateyLoggers.Important, " {0} has been uninstalled successfully.".FormatWith(string.IsNullOrWhiteSpace(packageName) ? packageToInstall : packageName));
                         }
                     },
                     (s, e) =>
                     {
                         var logMessage = e.Data;
                         if (string.IsNullOrWhiteSpace(logMessage)) return;
-                        this.Log().Error("[{0}] {1}".format_with(APP_NAME, logMessage.escape_curly_braces()));
+                        this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
-                        if (ErrorRegex.IsMatch(logMessage) || ErrorNotFoundRegex.IsMatch(logMessage))
+                        if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
                         {
                             var results = packageResults.GetOrAdd(packageToInstall, new PackageResult(packageToInstall, null, null));
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -559,7 +554,7 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="regex">The regex.</param>
         /// <param name="groupName">Name of the group.</param>
         /// <returns></returns>
-        private static string get_value_from_output(string output, Regex regex, string groupName)
+        private static string GetValueFromOutput(string output, Regex regex, string groupName)
         {
             var matchGroup = regex.Match(output).Groups[groupName];
             if (matchGroup != null)
@@ -569,5 +564,70 @@ namespace chocolatey.infrastructure.app.services
 
             return string.Empty;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string PYTHON_PACKAGE = PythonPackage;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string PACKAGE_NAME_GROUP = PackageNameGroup;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex InstalledRegex = _installedRegex;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex UninstalledRegex = _uninstalledRegex;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex PackageNameRegex = _packageNameRegex;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex ErrorRegex = _errorRegex;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static readonly Regex ErrorNotFoundRegex = new Regex(@"Could not find any downloads that", RegexOptions.Compiled);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
+            => EnsureSourceAppInstalled(config, ensureAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void set_executable_path_if_not_set()
+            => EnsureExecutablePathSet();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string build_args(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
+            => BuildArguments(config, argsDictionary);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void list_noop(ChocolateyConfiguration config)
+            => ListDryRun(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public IEnumerable<PackageResult> list_run(ChocolateyConfiguration config)
+            => List(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+            => InstallDryRun(config, continueAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+            => Install(config, continueAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
+            => Install(config, continueAction, beforeModifyAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+            => UpgradeDryRun(config, continueAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null)
+            => Upgrade(config, continueAction, beforeUpgradeAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
+            => UninstallDryRun(config, continueAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
+            => Uninstall(config, continueAction, beforeUninstallAction);
+#pragma warning restore IDE1006
     }
 }

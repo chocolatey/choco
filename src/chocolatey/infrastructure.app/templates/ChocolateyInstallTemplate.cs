@@ -49,7 +49,7 @@ $packageArgs = @{
 
   softwareName  = '[[PackageName]]*' #part or all of the Display Name as you see it in Programs and Features. It should be enough to be unique
 
-  # Checksums are now required as of 0.10.0.
+  # Checksums are required for packages which will be hosted on the Chocolatey Community Repository.
   # To determine checksums, you can get that from the original site if provided.
   # You can also use checksum.exe (choco install checksum) and use it
   # e.g. checksum -t sha256 -f path\to\file
