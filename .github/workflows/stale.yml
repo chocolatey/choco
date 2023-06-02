@@ -20,11 +20,11 @@ jobs:
           exempt-all-assignees: false
           exempt-draft-pr: true
           stale-issue-label: "Pending Closure"
-          stale-pr-label: '0 - Waiting on User'
-          only-pr-labels: '0 - Waiting on User'
+          stale-pr-label: 'Pending Closure'
+          only-labels: '0 - Waiting on User'
           close-issue-label: "No Response / Stale"
           close-pr-label: "No Response / Stale"
-          exempt-issue-labels: 'Security / CVE,0 - Backlog,1 - Ready for work,2 - Working,3 - Review,4 - Done,5 - Push required'
+          exempt-issue-labels: 'Security / CVE'
           exempt-pr-labels: 'Security / CVE'
           labels-to-remove-when-unstale: '0 - Wating on User,Pending closure'
           stale-issue-message: |
