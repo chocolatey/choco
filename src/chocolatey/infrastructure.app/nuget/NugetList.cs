@@ -158,7 +158,7 @@ namespace chocolatey.infrastructure.app.nuget
                             }
 
                             partResults.Clear();
-                            partResults.AddRange(await repositoryResources.SearchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
+                            partResults.AddRange(await repositoryResources.SearchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, cacheContext, CancellationToken.None));
                             skipNumber += takeNumber;
                             perSourceThresholdLimit -= partResults.Count;
                             perSourceThresholdMinLimit -= partResults.Count;
@@ -196,7 +196,7 @@ namespace chocolatey.infrastructure.app.nuget
                         configuration.Prerelease = configuration.Prerelease || (version != null && version.IsPrerelease);
                         configuration.AllVersions = configuration.AllVersions || (version != null);
 
-                        var tempResults = await repositoryResources.ListResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, CancellationToken.None);
+                        var tempResults = await repositoryResources.ListResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, cacheContext, CancellationToken.None);
                         var enumerator = tempResults.GetEnumeratorAsync();
 
                         var perSourceThresholdLimit = thresholdLimit;
