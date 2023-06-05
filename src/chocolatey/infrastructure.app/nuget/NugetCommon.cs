@@ -124,7 +124,10 @@ namespace chocolatey.infrastructure.app.nuget
             }
             else
             {
-                ProxyCache.Instance.Override(new System.Net.WebProxy());
+                // We need to override the proxy so that we don't use the NuGet configuration.
+                // We must however also be able to use the system proxy.
+                // Our changes to ProxyCache test for a null overridden proxy and get the system proxy if it's null.
+                ProxyCache.Instance.Override(proxy: null);
             }
 
             IEnumerable<string> sources = configuration.Sources.ToStringSafe().Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
