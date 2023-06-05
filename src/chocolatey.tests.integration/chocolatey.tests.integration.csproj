@@ -79,22 +79,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Chocolatey.NuGet.Common">
-      <HintPath>..\packages\Chocolatey.NuGet.Common.3.1.0\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Common.3.2.0\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Configuration">
-      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.1.0\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.2.0\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Frameworks">
-      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.1.0\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.2.0\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Packaging">
-      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.1.0\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.2.0\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Protocol">
-      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.1.0\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.2.0\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Versioning">
-      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.1.0\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.2.0\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=2.0.12.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.12\lib\net45\log4net.dll</HintPath>
