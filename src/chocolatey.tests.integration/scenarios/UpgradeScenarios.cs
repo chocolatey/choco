@@ -248,7 +248,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -507,7 +507,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -908,7 +908,7 @@ namespace chocolatey.tests.integration.scenarios
 
                     version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
                     version.OriginalVersion.ToStringSafe().ShouldEqual("1.1.1-beta2");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta2");
+                    version.ToNormalizedStringChecked().ShouldEqual("1.1.1-beta2");
                 }
             }
 
@@ -1066,7 +1066,7 @@ namespace chocolatey.tests.integration.scenarios
 
                     version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
                     version.OriginalVersion.ToStringSafe().ShouldEqual("1.1.1-beta.1");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta.1");
+                    version.ToNormalizedStringChecked().ShouldEqual("1.1.1-beta.1");
                 }
             }
 
@@ -1223,7 +1223,7 @@ namespace chocolatey.tests.integration.scenarios
 
                     version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
                     version.OriginalVersion.ToStringSafe().ShouldEqual("1.1.1-beta2");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta2");
+                    version.ToNormalizedStringChecked().ShouldEqual("1.1.1-beta2");
                 }
             }
 
@@ -1389,7 +1389,7 @@ namespace chocolatey.tests.integration.scenarios
                     var version = packageReader.NuspecReader.GetVersion();
                     version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
                     version.OriginalVersion.ShouldEqual("1.1.1-beta");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta");
+                    version.ToNormalizedStringChecked().ShouldEqual("1.1.1-beta");
                 }
             }
 
@@ -1487,7 +1487,7 @@ namespace chocolatey.tests.integration.scenarios
                     var version = packageReader.NuspecReader.GetVersion();
                     version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
                     version.OriginalVersion.ShouldEqual("1.1.1-beta");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta");
+                    version.ToNormalizedStringChecked().ShouldEqual("1.1.1-beta");
                 }
             }
 
@@ -1552,7 +1552,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -1692,7 +1692,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -1784,7 +1784,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -1875,7 +1875,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -1989,7 +1989,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -2125,7 +2125,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2211,7 +2211,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -2294,7 +2294,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -2626,7 +2626,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2644,7 +2644,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames, "2.0.0", Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.0.0");
                 }
             }
 
@@ -2741,7 +2741,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.1.0");
                 }
             }
 
@@ -2751,7 +2751,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.1.0");
                 }
             }
 
@@ -2761,7 +2761,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.0.0");
                 }
             }
 
@@ -2829,7 +2829,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2839,7 +2839,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2849,7 +2849,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2956,7 +2956,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.1.0");
                 }
             }
 
@@ -2966,7 +2966,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -2976,7 +2976,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3044,7 +3044,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -3054,7 +3054,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3064,7 +3064,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3132,7 +3132,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.1.0");
                 }
             }
 
@@ -3142,7 +3142,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.1.0");
                 }
             }
 
@@ -3152,7 +3152,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.0.0");
                 }
             }
 
@@ -3222,7 +3222,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.1.0");
                 }
             }
 
@@ -3232,7 +3232,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.1.0");
                 }
             }
 
@@ -3242,7 +3242,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.0.0");
                 }
             }
 
@@ -3312,7 +3312,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -3322,7 +3322,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3332,7 +3332,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3420,7 +3420,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -3430,7 +3430,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3440,7 +3440,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3529,7 +3529,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -3539,7 +3539,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3549,7 +3549,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3636,7 +3636,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3646,7 +3646,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3656,7 +3656,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
                 }
             }
 
@@ -3740,7 +3740,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -3843,7 +3843,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -4022,7 +4022,7 @@ namespace chocolatey.tests.integration.scenarios
                     var version = packageReader.NuspecReader.GetVersion();
                     version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
                     version.OriginalVersion.ShouldEqual("1.1.1-beta2");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta2");
+                    version.ToNormalizedStringChecked().ShouldEqual("1.1.1-beta2");
                 }
             }
 
@@ -4077,7 +4077,7 @@ namespace chocolatey.tests.integration.scenarios
                     var version = packageReader.NuspecReader.GetVersion();
                     version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
                     version.OriginalVersion.ShouldEqual("1.1.1-beta");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta");
+                    version.ToNormalizedStringChecked().ShouldEqual("1.1.1-beta");
                 }
             }
 
@@ -4153,7 +4153,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.1-beta.1");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.1-beta.1");
                 }
             }
 
@@ -4332,7 +4332,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.0.0");
                 }
             }
 
@@ -4478,7 +4478,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -4688,7 +4688,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -4824,7 +4824,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
                 }
             }
 
@@ -5039,7 +5039,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_match_the_upgrade_version()
             {
-                _packageResult.Version.ShouldEqual(NonNormalizedVersion);
+                _packageResult.Version.ShouldEqual(NormalizedVersion);
             }
 
             [Fact]
@@ -5057,7 +5057,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
-                    .Any(p => p.EndsWith("upgradepackage {0} Installed".FormatWith(NonNormalizedVersion)))
+                    .Any(p => p.EndsWith("upgradepackage {0} Installed".FormatWith(NormalizedVersion)))
                     .ShouldBeTrue();
             }
 
@@ -5070,7 +5070,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage {0} Before Modification".FormatWith(NonNormalizedVersion), LogLevel.Info).ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage {0} Before Modification".FormatWith(NormalizedVersion), LogLevel.Info).ShouldBeFalse();
             }
 
             [Fact]
@@ -5078,7 +5078,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage {0} Installed".FormatWith(NonNormalizedVersion), LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage {0} Installed".FormatWith(NormalizedVersion), LogLevel.Info).ShouldBeTrue();
             }
         }
 
@@ -5167,7 +5167,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", DependencyName, "{0}.nupkg".FormatWith(DependencyName));
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.0.0");
                 }
             }
 

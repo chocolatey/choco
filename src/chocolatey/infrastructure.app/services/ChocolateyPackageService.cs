@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2023 Chocolatey Software, Inc
+// Copyright © 2017 - 2023 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -1312,11 +1312,6 @@ The recent package changes indicate a reboot is necessary.
 
         public virtual void HandlePackageUninstall(PackageResult packageResult, ChocolateyConfiguration config)
         {
-            if (!_fileSystem.DirectoryExists(packageResult.InstallLocation))
-            {
-                packageResult.InstallLocation += ".{0}".FormatWith(packageResult.PackageMetadata.Version.ToStringSafe());
-            }
-
             //These items only apply to windows systems.
             if (config.Information.PlatformType == PlatformType.Windows)
             {

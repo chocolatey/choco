@@ -225,7 +225,7 @@ A corrupt .registry file exists at {0}.
             {
                 var versionOverrideFile = _fileSystem.CombinePaths(pkgStorePath, VersionOverrideFile);
                 if (_fileSystem.FileExists(versionOverrideFile)) _fileSystem.DeleteFile(versionOverrideFile);
-                _fileSystem.WriteFile(versionOverrideFile, packageInformation.VersionOverride.ToStringSafe());
+                _fileSystem.WriteFile(versionOverrideFile, packageInformation.VersionOverride.ToNormalizedStringChecked());
             }
             else
             {
@@ -265,6 +265,9 @@ A corrupt .registry file exists at {0}.
             {
                 return preferredStorePath;
             }
+
+            // Legacy handling for old package versions that was installed prior to v2.0.0.
+            // Do not remove the call to `ToStringSafe`.
 
             var pkgStorePath = fileSystem.CombinePaths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".FormatWith(id, version.ToStringSafe()));
 

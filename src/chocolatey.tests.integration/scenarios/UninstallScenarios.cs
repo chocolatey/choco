@@ -1448,7 +1448,8 @@ namespace chocolatey.tests.integration.scenarios
         {
             private PackageResult packageResult;
 
-            private string NonNormalizedVersion = "0004.0004.00005.00";
+            private const string NonNormalizedVersion = "0004.0004.00005.00";
+            private const string NormalizedVersion = "4.4.5";
 
             public override void Context()
             {
@@ -1550,7 +1551,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script()
             {
-                MockLogger.ContainsMessage("upgradepackage {0} Before Modification".FormatWith(NonNormalizedVersion), LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage {0} Before Modification".FormatWith(NormalizedVersion), LogLevel.Info).ShouldBeTrue();
             }
 
             [Fact]
@@ -1558,7 +1559,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyUninstall_script()
             {
-                MockLogger.ContainsMessage("upgradepackage {0} Uninstalled".FormatWith(NonNormalizedVersion), LogLevel.Info).ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage {0} Uninstalled".FormatWith(NormalizedVersion), LogLevel.Info).ShouldBeTrue();
             }
         }
 

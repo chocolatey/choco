@@ -55,16 +55,16 @@ namespace chocolatey.infrastructure.results
             PackageMetadata = metadata;
             SearchMetadata = search;
             Name = metadata.Id;
-            Version = metadata.Version.ToStringSafe();
+            Version = metadata.Version.ToNormalizedStringChecked();
         }
 
-        public PackageResult(IPackageMetadata packageMetadata, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.ToStringSafe(), installLocation)
+        public PackageResult(IPackageMetadata packageMetadata, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
         {
             PackageMetadata = packageMetadata;
             Source = source;
         }
 
-        public PackageResult(IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageSearch.Identity.Id, packageSearch.Identity.Version.ToStringSafe(), installLocation)
+        public PackageResult(IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageSearch.Identity.Id, packageSearch.Identity.Version.ToNormalizedStringChecked(), installLocation)
         {
             SearchMetadata = packageSearch;
             Source = source;
@@ -103,7 +103,7 @@ namespace chocolatey.infrastructure.results
             */
         }
 
-        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.ToStringSafe(), installLocation)
+        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
         {
             SearchMetadata = packageSearch;
             PackageMetadata = packageMetadata;

@@ -282,7 +282,7 @@ namespace chocolatey.infrastructure.app.services
 
             var templateInstalledViaPackage = (pkg != null);
 
-            var pkgVersion = templateInstalledViaPackage ? pkg.Identity.Version.ToStringSafe() : "0.0.0";
+            var pkgVersion = templateInstalledViaPackage ? pkg.Identity.Version.ToNormalizedStringChecked() : "0.0.0";
             var pkgTitle = templateInstalledViaPackage ? pkg.Title : "{0} (Unmanaged)".FormatWith(configuration.TemplateCommand.Name);
             var pkgSummary = templateInstalledViaPackage ?
                 (pkg.Summary != null && !string.IsNullOrWhiteSpace(pkg.Summary.ToStringSafe()) ? "{0}".FormatWith(pkg.Summary.EscapeCurlyBraces().ToStringSafe()) : string.Empty) : string.Empty;

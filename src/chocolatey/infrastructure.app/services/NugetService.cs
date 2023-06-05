@@ -1136,7 +1136,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                             else
                             {
-                                this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                                this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe()));
                             }
                         }
 
@@ -1858,7 +1858,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         {
             if (packageInfo == null || packageInfo.Package == null) return;
 
-            var version = packageInfo.Package.Version.ToStringSafe();
+            var version = packageInfo.Package.Version.ToNormalizedStringChecked();
 
             if (packageInfo.FilesSnapshot == null || packageInfo.FilesSnapshot.Files.Count == 0)
             {
@@ -1923,7 +1923,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         private void RemovePackageFromCache(ChocolateyConfiguration config, IPackageMetadata installedPackage)
         {
             this.Log().Debug(ChocolateyLoggers.Verbose, "Ensuring removal of package cache files.");
-            var cacheDirectory = _fileSystem.CombinePaths(config.CacheLocation, installedPackage.Id, installedPackage.Version.ToStringSafe());
+            var cacheDirectory = _fileSystem.CombinePaths(config.CacheLocation, installedPackage.Id, installedPackage.Version.ToNormalizedStringChecked());
 
             if (!_fileSystem.DirectoryExists(cacheDirectory)) return;
 
@@ -1952,8 +1952,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             FaultTolerance.TryCatchWithLoggingException(
                 () =>
                 {
-                    var packageFolderPath = _fileSystem.CombinePaths(tempFolder, "{0}/{1}".FormatWith(installedPackage.Identity.Id, installedPackage.Identity.Version.ToStringSafe()));
-                    var nugetCachedFile = _fileSystem.CombinePaths(packageFolderPath, "{0}.{1}.nupkg".FormatWith(installedPackage.Identity.Id, installedPackage.Identity.Version.ToStringSafe()));
+                    var packageFolderPath = _fileSystem.CombinePaths(tempFolder, "{0}/{1}".FormatWith(installedPackage.Identity.Id, installedPackage.Identity.Version.ToNormalizedStringChecked()));
+                    var nugetCachedFile = _fileSystem.CombinePaths(packageFolderPath, "{0}.{1}.nupkg".FormatWith(installedPackage.Identity.Id, installedPackage.Identity.Version.ToNormalizedStringChecked()));
                     var nupkgMetaDataFile = _fileSystem.CombinePaths(packageFolderPath, ".nupkg.metadata");
                     var nupkgShaFile = nugetCachedFile + ".sha512";
 
