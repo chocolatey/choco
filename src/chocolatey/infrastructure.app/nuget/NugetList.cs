@@ -41,9 +41,15 @@ namespace chocolatey.infrastructure.app.nuget
             return SearchPackagesAsync(configuration, nugetLogger, filesystem).GetAwaiter().GetResult();
         }
 
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-            var packageRepositoriesResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem);
+            return GetCount(configuration, nugetLogger, filesystem, new ChocolateySourceCacheContext(configuration));
+        }
+
+        public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem, ChocolateySourceCacheContext cacheContext)
+        {
+            var packageRepositoriesResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem, cacheContext);
             string searchTermLower = configuration.Input.ToLowerSafe();
 
             SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
@@ -64,7 +70,8 @@ namespace chocolatey.infrastructure.app.nuget
             ThresholdHit = false;
             LowerThresholdHit = false;
 
-            var packageRepositoryResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem);
+            var cacheContext = new ChocolateySourceCacheContext(configuration);
+            var packageRepositoryResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem, cacheContext);
             string searchTermLower = configuration.Input.ToLowerSafe();
 
             SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
@@ -90,8 +97,6 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 searchFilter.IdStartsWith = true;
             }
-
-            var cacheContext = new ChocolateySourceCacheContext(configuration);
 
             NuGetVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? NuGetVersion.Parse(configuration.Version) : null;
 
@@ -153,7 +158,7 @@ namespace chocolatey.infrastructure.app.nuget
                             }
 
                             partResults.Clear();
-                            partResults.AddRange(await repositoryResources.SearchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, CancellationToken.None));
+                            partResults.AddRange(await repositoryResources.SearchResource.SearchAsync(searchTermLower, searchFilter, skipNumber, takeNumber, nugetLogger, cacheContext, CancellationToken.None));
                             skipNumber += takeNumber;
                             perSourceThresholdLimit -= partResults.Count;
                             perSourceThresholdMinLimit -= partResults.Count;
@@ -191,7 +196,7 @@ namespace chocolatey.infrastructure.app.nuget
                         configuration.Prerelease = configuration.Prerelease || (version != null && version.IsPrerelease);
                         configuration.AllVersions = configuration.AllVersions || (version != null);
 
-                        var tempResults = await repositoryResources.ListResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, CancellationToken.None);
+                        var tempResults = await repositoryResources.ListResource.ListAsync(searchTermLower, configuration.Prerelease, configuration.AllVersions, false, nugetLogger, cacheContext, CancellationToken.None);
                         var enumerator = tempResults.GetEnumeratorAsync();
 
                         var perSourceThresholdLimit = thresholdLimit;
@@ -361,7 +366,7 @@ namespace chocolatey.infrastructure.app.nuget
                     if (config.Features.UsePackageRepositoryOptimizations && resource.ListResource != null)
                     {
                         var package = FaultTolerance.TryCatchWithLoggingException(
-                            () => resource.ListResource.PackageAsync(packageNameLower, config.Prerelease, nugetLogger, CancellationToken.None).GetAwaiter().GetResult(),
+                            () => resource.ListResource.PackageAsync(packageNameLower, config.Prerelease, nugetLogger, cacheContext, CancellationToken.None).GetAwaiter().GetResult(),
                             errorMessage: "Unable to connect to source '{0}'".FormatWith(resource.Source.PackageSource.Source),
                             throwError: false,
                             logWarningInsteadOfError: true);
