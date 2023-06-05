@@ -240,15 +240,27 @@ var source = sourceValue;
             return repositories;
         }
 
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-            IEnumerable<SourceRepository> remoteRepositories = GetRemoteRepositories(configuration, nugetLogger, filesystem);
-            return GetRepositoryResources(remoteRepositories);
+            return GetRepositoryResources(configuration, nugetLogger, filesystem, new ChocolateySourceCacheContext(configuration));
         }
 
+        public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem, ChocolateySourceCacheContext cacheContext)
+        {
+            IEnumerable<SourceRepository> remoteRepositories = GetRemoteRepositories(configuration, nugetLogger, filesystem);
+            return GetRepositoryResources(remoteRepositories, cacheContext);
+        }
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(IEnumerable<SourceRepository> packageRepositories)
         {
-            return NuGetEndpointResources.GetResourcesBySource(packageRepositories).ToList();
+            return GetRepositoryResources(packageRepositories, cacheContext: null);
+        }
+
+        public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(IEnumerable<SourceRepository> packageRepositories, ChocolateySourceCacheContext cacheContext)
+        {
+            return NuGetEndpointResources.GetResourcesBySource(packageRepositories, cacheContext).ToList();
         }
 
         public static void SetHttpHandlerCredentialService(ChocolateyConfiguration configuration)

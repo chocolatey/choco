@@ -271,8 +271,8 @@ namespace chocolatey.infrastructure.app.services
 
         protected void ListCustomTemplateInformation(ChocolateyConfiguration configuration)
         {
-            var packageResources = NugetCommon.GetRepositoryResources(configuration, _nugetLogger, _fileSystem);
             var sourceCacheContext = new ChocolateySourceCacheContext(configuration);
+            var packageResources = NugetCommon.GetRepositoryResources(configuration, _nugetLogger, _fileSystem, sourceCacheContext);
             var pkg = NugetList.FindPackage(
                     "{0}.template".FormatWith(configuration.TemplateCommand.Name),
                     configuration,
