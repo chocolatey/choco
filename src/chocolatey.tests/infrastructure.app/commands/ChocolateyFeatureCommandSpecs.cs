@@ -26,7 +26,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateyFeatureCommandSpecs
     {
@@ -56,13 +56,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_implement_feature()
             {
-                _results.ShouldContain("feature");
+                _results.Should().Contain("feature");
             }
 
             [Fact]
             public void Should_implement_features()
             {
-                _results.ShouldContain("features");
+                _results.Should().Contain("features");
             }
         }
 
@@ -85,13 +85,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_add_name_to_the_option_set()
             {
-                _optionSet.Contains("name").ShouldBeTrue();
+                _optionSet.Contains("name").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_name_to_the_option_set()
             {
-                _optionSet.Contains("n").ShouldBeTrue();
+                _optionSet.Contains("n").Should().BeTrue();
             }
         }
 
@@ -118,7 +118,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 _unparsedArgs.Add("list");
                 _because();
 
-                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
+                Configuration.FeatureCommand.Command.Should().Be(FeatureCommandType.List);
             }
 
             [Fact]
@@ -140,10 +140,10 @@ namespace chocolatey.tests.infrastructure.app.commands
                     error = ex;
                 }
 
-                errored.ShouldBeTrue();
-                error.ShouldNotBeNull();
-                error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldContain("A single features command must be listed");
+                errored.Should().BeTrue();
+                error.Should().NotBeNull();
+                error.Should().BeOfType<ApplicationException>();
+                error.Message.Should().Contain("A single features command must be listed");
             }
 
             [Fact]
@@ -153,7 +153,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 _unparsedArgs.Add("enable");
                 _because();
 
-                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.Enable);
+                Configuration.FeatureCommand.Command.Should().Be(FeatureCommandType.Enable);
             }
 
             [Fact]
@@ -163,7 +163,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 _unparsedArgs.Add("disable");
                 _because();
 
-                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.Disable);
+                Configuration.FeatureCommand.Command.Should().Be(FeatureCommandType.Disable);
             }
 
             [Fact]
@@ -173,7 +173,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 _unparsedArgs.Add("wtf");
                 _because();
 
-                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
+                Configuration.FeatureCommand.Command.Should().Be(FeatureCommandType.List);
             }
 
             [Fact]
@@ -182,7 +182,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 Reset();
                 _because();
 
-                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
+                Configuration.FeatureCommand.Command.Should().Be(FeatureCommandType.List);
             }
 
             [Fact]
@@ -192,7 +192,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 _unparsedArgs.Add(" ");
                 _because();
 
-                Configuration.FeatureCommand.Command.ShouldEqual(FeatureCommandType.List);
+                Configuration.FeatureCommand.Command.Should().Be(FeatureCommandType.List);
             }
         }
 
@@ -223,10 +223,10 @@ namespace chocolatey.tests.infrastructure.app.commands
                     error = ex;
                 }
 
-                errored.ShouldBeTrue();
-                error.ShouldNotBeNull();
-                error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldEqual("When specifying the subcommand '{0}', you must also specify --name.".FormatWith(Configuration.FeatureCommand.Command.ToStringSafe().ToLower()));
+                errored.Should().BeTrue();
+                error.Should().NotBeNull();
+                error.Should().BeOfType<ApplicationException>();
+                error.Message.Should().Be("When specifying the subcommand '{0}', you must also specify --name.".FormatWith(Configuration.FeatureCommand.Command.ToStringSafe().ToLower()));
             }
 
             [Fact]

@@ -19,7 +19,7 @@ namespace chocolatey.tests.infrastructure.tokens
     using System.Collections.Generic;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.tokens;
-    using Should;
+    using FluentAssertions;
 
     public class TokenReplacerSpecs
     {
@@ -43,67 +43,67 @@ namespace chocolatey.tests.infrastructure.tokens
             [Fact]
             public void When_given_brace_brace_CommandName_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[CommandName]]").ShouldEqual("Hi! My name is " + name);
+                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[CommandName]]").Should().Be("Hi! My name is " + name);
             }
 
             [Fact]
             public void When_given_brace_CommandName_brace_should_NOT_replace_the_value()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [CommandName]").ShouldEqual("Hi! My name is [CommandName]");
+                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [CommandName]").Should().Be("Hi! My name is [CommandName]");
             }
 
             [Fact]
             public void When_given_a_value_that_is_the_name_of_a_configuration_item_but_is_not_properly_tokenized_it_should_NOT_replace_the_value()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is CommandName").ShouldEqual("Hi! My name is CommandName");
+                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is CommandName").Should().Be("Hi! My name is CommandName");
             }
 
             [Fact]
             public void When_given_brace_brace_commandname_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[commandname]]").ShouldEqual("Hi! My name is " + name);
+                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[commandname]]").Should().Be("Hi! My name is " + name);
             }
 
             [Fact]
             public void When_given_brace_brace_COMMANDNAME_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[COMMANDNAME]]").ShouldEqual("Hi! My name is " + name);
+                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[COMMANDNAME]]").Should().Be("Hi! My name is " + name);
             }
 
             [Fact]
             public void When_given_brace_brace_cOMmAnDnAMe_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[cOMmAnDnAMe]]").ShouldEqual("Hi! My name is " + name);
+                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[cOMmAnDnAMe]]").Should().Be("Hi! My name is " + name);
             }
 
             [Fact]
             public void If_given_brace_brace_Version_brace_brace_should_NOT_replace_with_the_Name_from_the_configuration()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Go to [[Version]]").ShouldNotContain(name);
+                TokenReplacer.ReplaceTokens(configuration, "Go to [[Version]]").Should().NotContain(name);
             }
 
             [Fact]
             public void If_given_a_value_that_is_not_set_should_return_that_value_as_string_Empty()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Go to [[Version]]").ShouldEqual("Go to " + string.Empty);
+                TokenReplacer.ReplaceTokens(configuration, "Go to [[Version]]").Should().Be("Go to " + string.Empty);
             }
 
             [Fact]
             public void If_given_a_value_that_does_not_exist_should_return_the_original_value_unchanged()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[DataBase]]").ShouldEqual("Hi! My name is [[DataBase]]");
+                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[DataBase]]").Should().Be("Hi! My name is [[DataBase]]");
             }
 
             [Fact]
             public void If_given_an_empty_value_should_return_the_empty_value()
             {
-                TokenReplacer.ReplaceTokens(configuration, "").ShouldEqual("");
+                TokenReplacer.ReplaceTokens(configuration, "").Should().Be("");
             }
 
             [Fact]
             public void If_given_an_null_value_should_return_the_ll_value()
             {
-                TokenReplacer.ReplaceTokens(configuration, null).ShouldEqual("");
+                TokenReplacer.ReplaceTokens(configuration, null).Should().Be("");
             }
         }
 
@@ -120,7 +120,7 @@ namespace chocolatey.tests.infrastructure.tokens
             [Fact]
             public void When_given_a_proper_token_it_should_replace_with_the_dictionary_value()
             {
-                TokenReplacer.ReplaceTokens(tokens, "Hi! My name is [[dude]]").ShouldEqual("Hi! My name is " + value);
+                TokenReplacer.ReplaceTokens(tokens, "Hi! My name is [[dude]]").Should().Be("Hi! My name is " + value);
             }
         }
     }

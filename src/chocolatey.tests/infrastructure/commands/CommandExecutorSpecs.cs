@@ -22,7 +22,7 @@ namespace chocolatey.tests.infrastructure.commands
     using chocolatey.infrastructure.commands;
     using chocolatey.infrastructure.filesystem;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class CommandExecutorSpecs
     {
@@ -94,7 +94,7 @@ namespace chocolatey.tests.infrastructure.commands
             [Fact]
             public void Should_return_an_exit_code_of_zero_when_finished()
             {
-                result.ShouldEqual(0);
+                result.Should().Be(0);
             }
         }
 
@@ -123,7 +123,7 @@ namespace chocolatey.tests.infrastructure.commands
             [Fact]
             public void Should_return_an_exit_code_of_negative_one_since_it_timed_out()
             {
-                result.ShouldEqual(-1);
+                result.Should().Be(-1);
             }
 
             [Fact]
@@ -145,7 +145,7 @@ namespace chocolatey.tests.infrastructure.commands
             [Fact]
             public void Should_have_an_exit_code_of_negative_one_as_it_didnt_wait_for_finish()
             {
-                result.ShouldEqual(-1);
+                result.Should().Be(-1);
             }
 
             [Fact]

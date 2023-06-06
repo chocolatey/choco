@@ -30,7 +30,8 @@ namespace chocolatey.tests.integration.scenarios
     using NUnit.Framework;
 
     using NuGet.Configuration;
-    using Should;
+    using FluentAssertions;
+    using Moq;
 
     public class PinScenarios
     {
@@ -83,15 +84,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_contain_list_results()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Warn).ShouldBeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Error).ShouldBeFalse();
+                MockLogger.Messages.Should()
+                    .NotContainKeys(new string[]
+                        { LogLevel.Info.ToStringSafe(), LogLevel.Warn.ToStringSafe(), LogLevel.Error.ToStringSafe() });
             }
 
             [Fact]
             public void Should_not_contain_any_pins_by_default()
             {
-                MockLogger.ContainsMessage("upgradepackage|1.0.0").ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage|1.0.0").Should().BeFalse();
             }
         }
 
@@ -115,15 +116,17 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_contain_list_results()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Warn).ShouldBeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Error).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.0.0"));
+                MockLogger.Messages.Should()
+                    .NotContainKeys(new string[]
+                        { LogLevel.Warn.ToStringSafe(), LogLevel.Error.ToStringSafe() });
             }
 
             [Fact]
             public void Should_contain_existing_pin_messages()
             {
-                MockLogger.ContainsMessage("upgradepackage|1.0.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage|1.0.0").Should().BeTrue();
             }
         }
 
@@ -149,16 +152,18 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_contain_list_results()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Warn).ShouldBeFalse();
-                MockLogger.ContainsMessage("upgradepackage 1.0.0", LogLevel.Error).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.0.0"));
+                MockLogger.Messages.Should()
+                    .NotContainKeys(new string[]
+                        { LogLevel.Warn.ToStringSafe(), LogLevel.Error.ToStringSafe() });
             }
 
             [Fact]
             public void Should_contain_a_pin_message_for_each_existing_pin()
             {
-                MockLogger.ContainsMessage("installpackage|1.0.0").ShouldBeTrue();
-                MockLogger.ContainsMessage("upgradepackage|1.0.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("installpackage|1.0.0").Should().BeTrue();
+                MockLogger.ContainsMessage("upgradepackage|1.0.0").Should().BeTrue();
             }
         }
 
@@ -180,7 +185,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_success_message()
             {
-                MockLogger.ContainsMessage("Successfully added a pin for upgradepackage").ShouldBeTrue();
+                MockLogger.ContainsMessage("Successfully added a pin for upgradepackage").Should().BeTrue();
             }
         }
 
@@ -203,7 +208,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_nothing_to_do_message()
             {
-                MockLogger.ContainsMessage("Nothing to change. Pin already set or removed.").ShouldBeTrue();
+                MockLogger.ContainsMessage("Nothing to change. Pin already set or removed.").Should().BeTrue();
             }
         }
 
@@ -251,7 +256,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_success_message()
             {
-                MockLogger.ContainsMessage("Successfully removed a pin for upgradepackage").ShouldBeTrue();
+                MockLogger.ContainsMessage("Successfully removed a pin for upgradepackage").Should().BeTrue();
             }
         }
 
@@ -273,7 +278,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_nothing_to_do_message()
             {
-                MockLogger.ContainsMessage("Nothing to change. Pin already set or removed.").ShouldBeTrue();
+                MockLogger.ContainsMessage("Nothing to change. Pin already set or removed.").Should().BeTrue();
             }
         }
 

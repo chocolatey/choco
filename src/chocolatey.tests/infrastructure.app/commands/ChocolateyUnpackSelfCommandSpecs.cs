@@ -25,7 +25,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.filesystem;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateyUnpackSelfCommandSpecs
     {
@@ -56,7 +56,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_implement_unpackself()
             {
-                results.ShouldContain("unpackself");
+                results.Should().Contain("unpackself");
             }
         }
 
@@ -76,13 +76,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_log_one_message()
             {
-                MockLogger.Messages.Count.ShouldEqual(1);
+                MockLogger.Messages.Should().HaveCount(1);
             }
 
             [Fact]
             public void Should_log_a_message_about_what_it_would_have_done()
             {
-                MockLogger.MessagesFor(LogLevel.Info).FirstOrDefault().ShouldContain("This would have unpacked");
+                MockLogger.MessagesFor(LogLevel.Info).FirstOrDefault().Should().Contain("This would have unpacked");
             }
         }
 

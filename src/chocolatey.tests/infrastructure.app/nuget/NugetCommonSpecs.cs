@@ -28,7 +28,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
     using NuGet.Packaging;
     using NuGet.Protocol;
     using NuGet.Protocol.Core.Types;
-    using Should;
+    using FluentAssertions;
 
     public class NugetCommonSpecs
     {
@@ -67,7 +67,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.Count().ShouldEqual(0);
+                packageRepositories.Should().BeEmpty();
             }
 
             [Fact]
@@ -80,9 +80,9 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
-                packageRepositories.First().PackageSource.SourceUri.ToStringSafe().ShouldEqual(source);
-                packageRepositories.First().PackageSource.IsHttp.ShouldBeTrue();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.ToStringSafe().Should().Be(source);
+                packageRepositories.First().PackageSource.IsHttp.Should().BeTrue();
             }
 
             [Fact]
@@ -95,9 +95,9 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
-                packageRepositories.First().PackageSource.SourceUri.ToStringSafe().ShouldEqual(source);
-                packageRepositories.First().PackageSource.IsHttps.ShouldBeTrue();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.ToStringSafe().Should().Be(source);
+                packageRepositories.First().PackageSource.IsHttps.Should().BeTrue();
             }
 
             [Fact]
@@ -109,10 +109,10 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
                 packageRepositories.First().PackageSource.SourceUri.ToStringSafe()
-                    .ShouldEqual(("file:///" + source).Replace("\\","/"));
-                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
+                    .Should().Be(("file:///" + source).Replace("\\","/"));
+                packageRepositories.First().PackageSource.IsLocal.Should().BeTrue();
             }
 
             [Fact]
@@ -125,10 +125,10 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
                 packageRepositories.First().PackageSource.SourceUri.ToStringSafe()
-                    .ShouldEqual(("file:///" + fullsource).Replace("\\", "/"));
-                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
+                    .Should().Be(("file:///" + fullsource).Replace("\\", "/"));
+                packageRepositories.First().PackageSource.IsLocal.Should().BeTrue();
             }
 
             [Fact]
@@ -141,10 +141,10 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
                 packageRepositories.First().PackageSource.SourceUri.ToStringSafe()
-                    .ShouldEqual(("file:///" + fullsource + "/").Replace("\\", "/"));
-                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
+                    .Should().Be(("file:///" + fullsource + "/").Replace("\\", "/"));
+                packageRepositories.First().PackageSource.IsLocal.Should().BeTrue();
             }
 
             [Fact]
@@ -156,11 +156,11 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
                 packageRepositories.First().PackageSource.SourceUri.ToStringSafe()
-                    .ShouldEqual(("file:" + source).Replace("\\", "/"));
-                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
-                packageRepositories.First().PackageSource.SourceUri.IsUnc.ShouldBeTrue();
+                    .Should().Be(("file:" + source).Replace("\\", "/"));
+                packageRepositories.First().PackageSource.IsLocal.Should().BeTrue();
+                packageRepositories.First().PackageSource.SourceUri.IsUnc.Should().BeTrue();
             }
 
             [Fact]
@@ -176,7 +176,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 // Change this when the NuGet version is updated.
                 string nugetClientVersion = "6.4.1";
                 string expectedUserAgentString = "{0}/{1} via NuGet Client/{2}".FormatWith(ApplicationParameters.UserAgent, configuration.Information.ChocolateyProductVersion, nugetClientVersion);
-                UserAgent.UserAgentString.ShouldStartWith(expectedUserAgentString);
+                UserAgent.UserAgentString.Should().StartWith(expectedUserAgentString);
             }
         }
     }

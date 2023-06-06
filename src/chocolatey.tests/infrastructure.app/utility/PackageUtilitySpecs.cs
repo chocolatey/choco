@@ -19,7 +19,7 @@ namespace chocolatey.tests.infrastructure.app.utility
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.platforms;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class PackageUtilitySpecs
     {
@@ -67,7 +67,7 @@ namespace chocolatey.tests.infrastructure.app.utility
             [Fact]
             public void Should_return_expected_result()
             {
-                _result.ShouldEqual(_expectedResult);
+                _result.Should().Be(_expectedResult);
             }
         }
     }

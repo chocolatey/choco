@@ -32,7 +32,8 @@ namespace chocolatey.tests.integration.scenarios
     using NuGet.Configuration;
     using NuGet.Packaging;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
+    using FluentAssertions.Execution;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
     public class InstallScenarios
@@ -83,13 +84,8 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_it_would_have_used_Nuget_to_install_a_package()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("would have used NuGet to install packages")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToString())
+                    .WhoseValue.Should().Contain(m => m.Contains("would have used NuGet to install packages"));
             }
 
             [Fact]
@@ -97,13 +93,17 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_contain_a_message_that_it_would_have_run_a_powershell_script()
             {
-                MockLogger.ContainsMessage("chocolateyinstall.ps1", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("chocolateyinstall.ps1"));
             }
 
             [Fact]
             public void Should_not_contain_a_message_that_it_would_have_run_powershell_modification_script()
             {
-                MockLogger.ContainsMessage("chocolateyBeforeModify.ps1", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("chocolateyBeforeModify.ps1"));
             }
         }
 
@@ -132,25 +132,16 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_it_would_have_used_Nuget_to_install_a_package()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("would have used NuGet to install packages")) expectedMessage = true;
-                }
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToString())
+                    .WhoseValue.Should().Contain(m => m.Contains("would have used NuGet to install packages"));
 
-                expectedMessage.ShouldBeTrue();
             }
 
             [Fact]
             public void Should_contain_a_message_that_it_was_unable_to_find_package()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).OrEmpty())
-                {
-                    if (message.Contains("somethingnonexisting not installed. The package was not found with the source(s) listed")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToString())
+                    .WhoseValue.Should().Contain(m => m.Contains("somethingnonexisting not installed. The package was not found with the source(s) listed"));
             }
         }
 
@@ -196,7 +187,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual(TestVersion());
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be(TestVersion());
                 }
             }
 
@@ -268,15 +259,9 @@ namespace chocolatey.tests.integration.scenarios
                     stdErrAction: (s, e) => messages.Add(e.Data)
                 );
 
-                var messageFound = false;
-
-                foreach (var message in messages.OrEmpty())
-                {
-                    if (string.IsNullOrWhiteSpace(message)) continue;
-                    if (message.Contains("is gui? False")) messageFound = true;
-                }
-
-                messageFound.ShouldBeTrue("GUI false message not found");
+                messages.Should()
+                    .NotBeNullOrEmpty()
+                    .And.Contain(m => m.Contains("is gui? False"), "GUI false message not found");
             }
 
             [Fact]
@@ -295,57 +280,47 @@ namespace chocolatey.tests.integration.scenarios
                     stdErrAction: (s, e) => messages.Add(e.Data)
                 );
 
-                var messageFound = false;
-
-                foreach (var message in messages.OrEmpty())
-                {
-                    if (string.IsNullOrWhiteSpace(message)) continue;
-                    if (message.Contains("is gui? True")) messageFound = true;
-                }
-
-                messageFound.ShouldBeTrue("GUI true message not found");
+                messages.Should()
+                    .NotBeNullOrEmpty()
+                    .And.Contain(m => m.Contains("is gui? True"), "GUI true message not found");
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Warn.ToString())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                packageResult.Version.ShouldEqual(TestVersion());
+                packageResult.Version.Should().Be(TestVersion());
             }
 
             [Fact]
@@ -355,7 +330,9 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var message = "installpackage v{0} has been installed".FormatWith(TestVersion());
 
-                MockLogger.ContainsMessage(message, LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Info.ToString())
+                    .WhoseValue.Should().Contain(m => m.Contains(message));
             }
 
             protected string TestVersion()
@@ -440,89 +417,55 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_4_out_of_5_packages_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("5/6")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("5/6"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_upgradepackage_with_an_expected_specified_version_was_installed()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("upgradepackage v1.0.0")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage v1.0.0"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result_for_all_but_expected_missing_package()
             {
-                foreach (var packageResult in Results)
-                {
-                    if (packageResult.Value.Name.IsEqualTo("missingpackage")) continue;
-
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Where(r => !r.Value.Name.IsEqualTo("missingpackage"))
+                    .Should().AllSatisfy(p => p.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result_for_missing_package()
             {
-                foreach (var packageResult in Results)
-                {
-                    if (!packageResult.Value.Name.IsEqualTo("missingpackage")) continue;
-
-                    packageResult.Value.Success.ShouldBeFalse();
-                }
+                Results.Should().Contain(r => r.Value.Name.IsEqualTo("missingpackage"))
+                    .Which.Value.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_specify_config_file_is_being_used_in_message()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("Installing from config file:")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Installing from config file:"));
             }
 
             [Fact]
             public void Should_print_out_package_from_config_file_in_message()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("installpackage")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage"));
             }
         }
 
@@ -556,47 +499,35 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_was_unable_to_install_any_packages()
             {
-                bool installWarning = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installWarning = true;
-                }
-
-                installWarning.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_contain_a_message_about_force_to_reinstall()
             {
-                bool installWarning = false;
-                foreach (var messageType in MockLogger.Messages.OrEmpty())
-                {
-                    foreach (var message in messageType.Value)
-                    {
-                        if (message.Contains("Use --force to reinstall")) installWarning = true;
-                    }
-                }
-
-                installWarning.ShouldBeTrue();
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Use --force to reinstall"));
             }
 
             [Fact]
             public void Should_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeTrue();
+                packageResult.Inconclusive.Should().BeTrue();
             }
 
             [Fact]
             public void Should_ave_warning_package_result()
             {
-                packageResult.Warning.ShouldBeTrue();
+                packageResult.Warning.Should().BeTrue();
             }
         }
 
@@ -641,7 +572,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -649,7 +580,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_remove_and_re_add_the_package_files_in_the_lib_directory()
             {
                 var modifiedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
-                File.ReadAllText(modifiedFile).ShouldNotEqual(modifiedText);
+                File.ReadAllText(modifiedFile).Should().NotBe(modifiedText);
             }
 
             [Fact]
@@ -663,43 +594,38 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                packageResult.Version.ShouldEqual("1.0.0");
+                packageResult.Version.Should().Be("1.0.0");
             }
         }
 
@@ -735,7 +661,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedString().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedString().Should().Be("1.0.0");
                 }
             }
 
@@ -743,7 +669,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_restore_the_original_files_in_the_package_lib_folder()
             {
                 var modifiedFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
-                File.ReadAllText(modifiedFile).ShouldEqual(modifiedText);
+                File.ReadAllText(modifiedFile).Should().Be(modifiedText);
             }
 
             [Fact]
@@ -757,31 +683,26 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_it_was_unsuccessful()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
         }
 
@@ -834,7 +755,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -851,43 +772,38 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_it_installed_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                packageResult.Version.ShouldEqual("1.0.0");
+                packageResult.Version.Should().Be("1.0.0");
             }
         }
 
@@ -934,7 +850,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -949,31 +865,26 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_it_was_unable_to_reinstall_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeTrue();
+                packageResult.Inconclusive.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
         }
 
@@ -1004,67 +915,47 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_did_not_install_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                packageResult.Messages.Should().Contain(m => m.MessageType == ResultType.Error);
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        if (message.Message.Contains("The package was not found")) errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("The package was not found")));
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_one()
             {
-                packageResult.Version.ShouldEqual("1.0.1");
+                packageResult.Version.Should().Be("1.0.1");
             }
         }
 
@@ -1095,61 +986,41 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_was_unable_to_install_a_package()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                packageResult.Messages.Should().Contain(m => m.MessageType == ResultType.Error);
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        if (message.Message.Contains("The package was not found")) errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("The package was not found")));
             }
         }
 
@@ -1190,61 +1061,41 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_was_unable_to_install_a_package()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                packageResult.Messages.Should().Contain(m => m.MessageType == ResultType.Error);
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        if (message.Message.Contains("chocolateyInstall.ps1")) errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("chocolateyInstall.ps1")));
             }
         }
 
@@ -1287,50 +1138,45 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.Input, Configuration.Input + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedString().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedString().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.Input);
+                packageResult.Name.Should().Be(Configuration.Input);
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                packageResult.Version.ShouldEqual("1.0.0");
+                packageResult.Version.Should().Be("1.0.0");
             }
         }
 
@@ -1374,61 +1220,41 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_was_unable_to_install_a_package()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                packageResult.Messages.Should().Contain(m => m.MessageType == ResultType.Error);
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        if (message.Message.Contains("chocolateyInstall.ps1")) errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("chocolateyInstall.ps1")));
             }
         }
 
@@ -1479,56 +1305,39 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_installed_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("3/3")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("3/3"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Version.ShouldEqual("1.0.0");
-                }
+                Results.Should().AllSatisfy(r => r.Value.Version.Should().Be("1.0.0"));
             }
         }
 
@@ -1575,7 +1384,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -1593,56 +1402,39 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_it_installed_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Version.ShouldEqual("1.0.0");
-                }
+                Results.Should().AllSatisfy(r => r.Value.Version.Should().Be("1.0.0"));
             }
         }
 
@@ -1696,7 +1488,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -1723,7 +1515,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -1733,47 +1525,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("3/3")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("3/3"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -1821,7 +1599,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -1839,7 +1617,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -1849,47 +1627,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -1938,7 +1702,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -1959,40 +1723,26 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -2029,78 +1779,42 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_was_unable_to_install_any_packages()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-
-                foreach (var packageResult in Results)
-                {
-                    foreach (var message in packageResult.Value.Messages)
-                    {
-                        if (message.MessageType == ResultType.Error)
-                        {
-                            errorFound = true;
-                        }
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m => m.MessageType == ResultType.Error));
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-
-                foreach (var packageResult in Results)
-                {
-                    foreach (var message in packageResult.Value.Messages)
-                    {
-                        if (message.MessageType == ResultType.Error)
-                        {
-                            if (message.Message.Contains("Unable to resolve dependency 'isdependency")) errorFound = true;
-                        }
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("Unable to resolve dependency 'isdependency")));
             }
         }
 
@@ -2142,7 +1856,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
                 }
             }
 
@@ -2157,37 +1871,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
         }
 
@@ -2232,7 +1941,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.6.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.6.0");
                 }
             }
 
@@ -2250,47 +1959,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("3/3")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("3/3"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -2322,40 +2017,26 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_is_was_unable_to_install_any_packages()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -2400,47 +2081,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.6.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.6.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_it_installed_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -2477,85 +2144,49 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_was_unable_to_install_any_packages()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-
-                foreach (var packageResult in Results)
-                {
-                    foreach (var message in packageResult.Value.Messages)
-                    {
-                        if (message.MessageType == ResultType.Error)
-                        {
-                            errorFound = true;
-                        }
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m => m.MessageType == ResultType.Error));
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-
-                foreach (var packageResult in Results)
-                {
-                    foreach (var message in packageResult.Value.Messages)
-                    {
-                        if (message.MessageType == ResultType.Error)
-                        {
-                            if (message.Message.Contains("Unable to resolve dependency 'isdependency")) errorFound = true;
-                        }
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("Unable to resolve dependency 'isdependency")));
             }
         }
 
@@ -2601,47 +2232,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.1");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.1");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_it_installed_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("installed 2/2")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installed 2/2"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -2687,7 +2304,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -2697,66 +2314,40 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_it_was_unable_to_install_any_packages()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("installed 0/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installed 0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-
-                foreach (var packageResult in Results)
-                {
-                    foreach (var message in packageResult.Value.Messages)
-                    {
-                        if (message.MessageType == ResultType.Error)
-                        {
-                            errorFound = true;
-                        }
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m => m.MessageType == ResultType.Error));
             }
         }
 
@@ -2799,66 +2390,40 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_it_was_unable_to_install_any_packages()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("installed 0/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installed 0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-
-                foreach (var packageResult in Results)
-                {
-                    foreach (var message in packageResult.Value.Messages)
-                    {
-                        if (message.MessageType == ResultType.Error)
-                        {
-                            errorFound = true;
-                        }
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m => m.MessageType == ResultType.Error));
             }
         }
 
@@ -2916,7 +2481,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "childdependencywithlooserversiondependency", "childdependencywithlooserversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -2926,47 +2491,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_installed_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("3/3")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("3/3"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -2995,7 +2546,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_thrown_exception_when_installing()
             {
-                _exception.ShouldBeType<ApplicationException>();
+                _exception.Should().BeOfType<ApplicationException>();
             }
 
             [Fact]
@@ -3009,7 +2560,7 @@ namespace chocolatey.tests.integration.scenarios
                     .AppendLine("  choco install installpackage --version=\"1.0.0\" --source=\"{0}\"".FormatWith(Configuration.Sources))
                     .ToString();
 
-                _exception.Message.ShouldEqual(expectedMessage);
+                _exception.Message.Should().Be(expectedMessage);
             }
 
             [Fact]
@@ -3062,7 +2613,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_thrown_exception_when_installing()
             {
-                _exception.ShouldBeType<ApplicationException>();
+                _exception.Should().BeOfType<ApplicationException>();
             }
 
             [Fact]
@@ -3076,7 +2627,7 @@ namespace chocolatey.tests.integration.scenarios
                     .AppendLine("  choco install installpackage --version=\"0.56.0-alpha-0544\" --prerelease --source=\"{0}\"".FormatWith(Configuration.Sources))
                     .ToString();
 
-                _exception.Message.ShouldEqual(expectedMessage);
+                _exception.Message.Should().Be(expectedMessage);
             }
 
             [Fact]
@@ -3132,7 +2683,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_thrown_exception_when_installing()
             {
-                _exception.ShouldBeType<ApplicationException>();
+                _exception.Should().BeOfType<ApplicationException>();
             }
 
             [Fact]
@@ -3146,7 +2697,7 @@ namespace chocolatey.tests.integration.scenarios
                     .AppendLine("  choco install installpackage --version=\"1.0.0\" --source=\"{0}\"".FormatWith(Configuration.Sources))
                     .ToString();
 
-                _exception.Message.ShouldEqual(expectedMessage);
+                _exception.Message.Should().Be(expectedMessage);
             }
 
             [Fact]
@@ -3200,13 +2751,13 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_thrown_exception_when_installing()
             {
-                _exception.ShouldBeType<ApplicationException>();
+                _exception.Should().BeOfType<ApplicationException>();
             }
 
             [Fact]
             public void Should_have_outputted_expected_exception_message()
             {
-                _exception.Message.ShouldEqual("Package name cannot point directly to a local, or remote file. Please use the --source argument and point it to a local file directory, UNC directory path or a NuGet feed instead.");
+                _exception.Message.Should().Be("Package name cannot point directly to a local, or remote file. Please use the --source argument and point it to a local file directory, UNC directory path or a NuGet feed instead.");
             }
 
             [Fact]
@@ -3260,13 +2811,13 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_thrown_exception_when_installing()
             {
-                _exception.ShouldBeType<ApplicationException>();
+                _exception.Should().BeOfType<ApplicationException>();
             }
 
             [Fact]
             public void Should_have_outputted_expected_exception_message()
             {
-                _exception.Message.ShouldEqual("Package name cannot point directly to a package manifest file. Please create a package by running 'choco pack' on the .nuspec file first.");
+                _exception.Message.Should().Be("Package name cannot point directly to a package manifest file. Please create a package by running 'choco pack' on the .nuspec file first.");
             }
 
             [Fact]
@@ -3323,62 +2874,57 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                packageResult.Version.ShouldEqual("1.0.0");
+                packageResult.Version.Should().Be("1.0.0");
             }
 
             [Fact]
             public void Should_not_change_the_test_value_in_the_config_due_to_XDT_InsertIfMissing()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='test']/@value").TypedValue.ToStringSafe().ShouldEqual("default 1.0.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='test']/@value").TypedValue.ToStringSafe().Should().Be("default 1.0.0");
             }
 
             [Fact]
             public void Should_change_the_testReplace_value_in_the_config_due_to_XDT_Replace()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='testReplace']/@value").TypedValue.ToStringSafe().ShouldEqual("1.0.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='testReplace']/@value").TypedValue.ToStringSafe().Should().Be("1.0.0");
             }
 
             [Fact]
             public void Should_add_the_insert_value_in_the_config_due_to_XDT_InsertIfMissing()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.ToStringSafe().ShouldEqual("1.0.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.ToStringSafe().Should().Be("1.0.0");
             }
         }
 
@@ -3398,13 +2944,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_no_sources_enabled_result()
             {
-                MockLogger.ContainsMessage("Installation was NOT successful. There are no sources enabled for", LogLevel.Error).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Installation was NOT successful. There are no sources enabled for"));
             }
 
             [Fact]
             public void Should_not_install_any_packages()
             {
-                Results.Count().ShouldEqual(0);
+                Results.Should().BeEmpty();
             }
         }
 
@@ -3439,7 +2986,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -3466,50 +3013,45 @@ namespace chocolatey.tests.integration.scenarios
                 foreach (string scriptName in hookScripts)
                 {
                     var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), scriptName);
-                    File.ReadAllText(hookScriptPath).ShouldContain("Write-Output");
+                    File.ReadAllText(hookScriptPath).Should().Contain("Write-Output");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.0.0");
+                _packageResult.Version.Should().Be("1.0.0");
             }
 
         }
@@ -3552,7 +3094,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -3624,15 +3166,9 @@ namespace chocolatey.tests.integration.scenarios
                     stdErrAction: (s, e) => messages.Add(e.Data)
                 );
 
-                var messageFound = false;
-
-                foreach (var message in messages.OrEmpty())
-                {
-                    if (string.IsNullOrWhiteSpace(message)) continue;
-                    if (message.Contains("is gui? False")) messageFound = true;
-                }
-
-                messageFound.ShouldBeTrue("GUI false message not found");
+                messages.Should()
+                    .NotBeNullOrEmpty()
+                    .And.Contain(m => m.Contains("is gui? False"), "GUI false message not found");
             }
 
             [Fact]
@@ -3651,57 +3187,46 @@ namespace chocolatey.tests.integration.scenarios
                     stdErrAction: (s, e) => messages.Add(e.Data)
                 );
 
-                var messageFound = false;
-
-                foreach (var message in messages.OrEmpty())
-                {
-                    if (string.IsNullOrWhiteSpace(message)) continue;
-                    if (message.Contains("is gui? True")) messageFound = true;
-                }
-
-                messageFound.ShouldBeTrue("GUI true message not found");
+                messages.Should()
+                    .NotBeNullOrEmpty()
+                    .And.Contain(m => m.Contains("is gui? True"), "GUI true message not found");
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.0.0");
+                _packageResult.Version.Should().Be("1.0.0");
             }
 
             [Fact]
@@ -3709,7 +3234,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script()
             {
-                MockLogger.ContainsMessage("installpackage v1.0.0 has been installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage v1.0.0 has been installed"));
             }
 
             [Fact]
@@ -3717,7 +3243,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_all_hook_script()
             {
-                MockLogger.ContainsMessage("pre-install-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-install-all.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -3725,7 +3252,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_all_hook_script()
             {
-                MockLogger.ContainsMessage("post-install-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("post-install-all.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -3733,7 +3261,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_installpackage_hook_script()
             {
-                MockLogger.ContainsMessage("pre-install-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-install-installpackage.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -3741,7 +3270,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_installpackage_hook_script()
             {
-                MockLogger.ContainsMessage("post-install-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("post-install-installpackage.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -3749,7 +3279,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_uninstall_hook_script()
             {
-                MockLogger.ContainsMessage("post-uninstall-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("post-uninstall-all.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -3757,7 +3288,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_upgradepackage_hook_script()
             {
-                MockLogger.ContainsMessage("pre-install-upgradepackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("pre-install-upgradepackage.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -3765,7 +3297,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_beforemodify_hook_script()
             {
-                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for installpackage 1.0.0"));
             }
         }
 
@@ -3808,7 +3341,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -3880,15 +3413,9 @@ namespace chocolatey.tests.integration.scenarios
                     stdErrAction: (s, e) => messages.Add(e.Data)
                 );
 
-                var messageFound = false;
-
-                foreach (var message in messages.OrEmpty())
-                {
-                    if (string.IsNullOrWhiteSpace(message)) continue;
-                    if (message.Contains("is gui? False")) messageFound = true;
-                }
-
-                messageFound.ShouldBeTrue("GUI false message not found");
+                messages.Should()
+                    .NotBeNullOrEmpty()
+                    .And.Contain(m => m.Contains("is gui? False"), "GUI false message not found");
             }
 
             [Fact]
@@ -3907,57 +3434,46 @@ namespace chocolatey.tests.integration.scenarios
                     stdErrAction: (s, e) => messages.Add(e.Data)
                 );
 
-                var messageFound = false;
-
-                foreach (var message in messages.OrEmpty())
-                {
-                    if (string.IsNullOrWhiteSpace(message)) continue;
-                    if (message.Contains("is gui? True")) messageFound = true;
-                }
-
-                messageFound.ShouldBeTrue("GUI true message not found");
+                messages.Should()
+                    .NotBeNullOrEmpty()
+                    .And.Contain(m => m.Contains("is gui? True"), "GUI true message not found");
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.0.0");
+                _packageResult.Version.Should().Be("1.0.0");
             }
 
             [Fact]
@@ -3965,7 +3481,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_chocolateyInstall_script()
             {
-                MockLogger.ContainsMessage("portablepackage v1.0.0 has been installed", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("portablepackage v1.0.0 has been installed"));
             }
 
             [Fact]
@@ -3973,7 +3490,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_all_hook_script()
             {
-                MockLogger.ContainsMessage("pre-install-all.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-install-all.ps1 hook ran for portablepackage 1.0.0"));
             }
 
             [Fact]
@@ -3981,7 +3499,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_all_hook_script()
             {
-                MockLogger.ContainsMessage("post-install-all.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("post-install-all.ps1 hook ran for portablepackage 1.0.0"));
             }
 
             [Fact]
@@ -3989,7 +3508,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_uninstall_hook_script()
             {
-                MockLogger.ContainsMessage("post-uninstall-all.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("post-uninstall-all.ps1 hook ran for portablepackage 1.0.0"));
             }
 
             [Fact]
@@ -3997,7 +3517,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_upgradepackage_hook_script()
             {
-                MockLogger.ContainsMessage("pre-install-upgradepackage.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("pre-install-upgradepackage.ps1 hook ran for portablepackage 1.0.0"));
             }
 
             [Fact]
@@ -4005,7 +3526,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_beforemodify_hook_script()
             {
-                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for portablepackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for portablepackage 1.0.0"));
             }
         }
 
@@ -4051,7 +3573,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 using (var reader = new PackageFolderReader(packageDirectory))
                 {
-                    reader.NuspecReader.GetVersion().ToNormalizedString().ShouldEqual("2.0.0");
+                    reader.NuspecReader.GetVersion().ToNormalizedString().Should().Be("2.0.0");
                 }
             }
 
@@ -4074,43 +3596,38 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_have_a_version_of_two_dot_zero_dot_zero()
             {
-                packageResult.Version.ShouldEqual("2.0.0");
+                packageResult.Version.Should().Be("2.0.0");
             }
 
             [Fact]
@@ -4118,7 +3635,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_reported_package_installed()
             {
-                MockLogger.ContainsMessage("isdependency 2.0.0 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("isdependency 2.0.0 Installed"));
             }
         }
 
@@ -4142,10 +3660,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_report_success()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeFalse());
             }
 
             [Fact]
@@ -4159,30 +3674,22 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_results()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_report_package_not_found()
             {
-                foreach (var packageResult in Results)
-                {
-                    var message = packageResult.Value.Messages.First();
-                    message.MessageType.ShouldEqual(ResultType.Error);
-                    message.Message.ShouldStartWith("non-existing not installed. The package was not found with the source(s) listed.");
-                }
+                Results.Should().AllSatisfy(r => r.Value.Messages.First().MessageType.Should().Be(ResultType.Error))
+                    .And.AllSatisfy(p =>
+                        p.Value.Messages.First().Message.Should()
+                            .StartWith("non-existing not installed. The package was not found with the source(s) listed."));
             }
         }
 
@@ -4229,10 +3736,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_install_lower_version_of_package()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Version.ShouldEqual("1.0.0");
-                }
+                Results.Should().AllSatisfy(r => r.Value.Version.Should().Be("1.0.0"));
             }
 
             [Fact]
@@ -4244,35 +3748,26 @@ namespace chocolatey.tests.integration.scenarios
 
                 using (var reader = new PackageFolderReader(packageFolder))
                 {
-                    reader.NuspecReader.GetVersion().ToNormalizedString().ShouldEqual("1.0.0");
+                    reader.NuspecReader.GetVersion().ToNormalizedString().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_results()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_results()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_success_package_results()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
         }
 
@@ -4320,44 +3815,32 @@ namespace chocolatey.tests.integration.scenarios
 
                 using (var reader = new PackageFolderReader(packageFolder))
                 {
-                    reader.NuspecReader.GetVersion().ToNormalizedString().ShouldEqual("1.0.0");
+                    reader.NuspecReader.GetVersion().ToNormalizedString().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_install_lower_version_of_package()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Version.ShouldEqual("1.0.0");
-                }
+                Results.Should().AllSatisfy(r => r.Value.Version.Should().Be("1.0.0"));
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_results()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_results()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_success_package_results()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
         }
 
@@ -4427,7 +3910,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 using (var reader = new PackageFolderReader(path))
                 {
-                    reader.NuspecReader.GetVersion().ToNormalizedString().ShouldEqual(version);
+                    reader.NuspecReader.GetVersion().ToNormalizedString().Should().Be(version);
                 }
             }
 
@@ -4435,34 +3918,25 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_report_installed_version_of_package(string name, string version)
             {
                 var package = Results.First(r => r.Key == name);
-                package.Value.Version.ShouldEqual(version);
+                package.Value.Version.Should().Be(version);
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_results()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_results()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_success_package_results()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
         }
 
@@ -4510,7 +3984,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -4533,43 +4007,38 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.0.0");
+                _packageResult.Version.Should().Be("1.0.0");
             }
 
             [Fact]
@@ -4577,7 +4046,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script()
             {
-                MockLogger.ContainsMessage("UpperCase 1.0.0 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("UpperCase 1.0.0 Installed"));
             }
         }
 
@@ -4618,7 +4088,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -4641,54 +4111,45 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_about_unsupported_elements()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("Issues found with nuspec elements")) upgradeMessage = true;
-                }
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Issues found with nuspec elements"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeTrue();
+                _packageResult.Warning.Should().BeTrue();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_have_a_version_of_one_dot_zero_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.0.0");
+                _packageResult.Version.Should().Be("1.0.0");
             }
 
             [Fact]
@@ -4696,7 +4157,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script()
             {
-                MockLogger.ContainsMessage("unsupportedelements 1.0.0 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("unsupportedelements 1.0.0 Installed"));
             }
         }
 
@@ -4740,7 +4202,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual(NonNormalizedVersion);
+                    packageReader.NuspecReader.GetVersion().ToStringSafe().Should().Be(NonNormalizedVersion);
                 }
             }
 
@@ -4763,43 +4225,38 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_installed_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Result_should_have_the_correct_version()
             {
-                _packageResult.Version.ShouldEqual(NormalizedVersion);
+                _packageResult.Version.Should().Be(NormalizedVersion);
             }
 
             [Fact]
@@ -4809,7 +4266,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var message = "installpackage v{0} has been installed".FormatWith(NormalizedVersion);
 
-                MockLogger.ContainsMessage(message, LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains(message));
             }
 
             [Fact]
@@ -4864,15 +4322,9 @@ namespace chocolatey.tests.integration.scenarios
                     stdErrAction: (s, e) => messages.Add(e.Data)
                 );
 
-                var messageFound = false;
-
-                foreach (var message in messages.OrEmpty())
-                {
-                    if (string.IsNullOrWhiteSpace(message)) continue;
-                    if (message.Contains("is gui? False")) messageFound = true;
-                }
-
-                messageFound.ShouldBeTrue("GUI false message not found");
+                messages.Should()
+                    .NotBeNullOrEmpty()
+                    .And.Contain(m => m.Contains("is gui? False"), "GUI false message not found");
             }
 
             [Fact]
@@ -4891,15 +4343,9 @@ namespace chocolatey.tests.integration.scenarios
                     stdErrAction: (s, e) => messages.Add(e.Data)
                 );
 
-                var messageFound = false;
-
-                foreach (var message in messages.OrEmpty())
-                {
-                    if (string.IsNullOrWhiteSpace(message)) continue;
-                    if (message.Contains("is gui? True")) messageFound = true;
-                }
-
-                messageFound.ShouldBeTrue("GUI true message not found");
+                messages.Should()
+                    .NotBeNullOrEmpty()
+                    .And.Contain(m => m.Contains("is gui? True"), "GUI true message not found");
             }
         }
 
@@ -4984,7 +4430,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", TargetPackageName, "{0}.nupkg".FormatWith(TargetPackageName));
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
                 }
             }
 
@@ -4994,14 +4440,15 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", DependencyName, "{0}.nupkg".FormatWith(DependencyName));
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_installed_successfully()
             {
-                MockLogger.ContainsMessage("installed 2/2", LogLevel.Warn).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installed 2/2"));
             }
 
             [Fact]
@@ -5009,7 +4456,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_run_target_package_beforeModify_for_upgraded_version()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(TargetPackageName, "2.0.0"), LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("Ran BeforeModify: {0} {1}".FormatWith(TargetPackageName, "2.0.0")));
             }
 
             [Fact]
@@ -5017,7 +4465,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_already_installed_dependency_package_beforeModify()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "1.0.0")));
             }
 
             [Fact]
@@ -5025,34 +4474,26 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_run_dependency_package_beforeModify_for_upgraded_version()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "2.0.0"), LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "2.0.0")));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
     }

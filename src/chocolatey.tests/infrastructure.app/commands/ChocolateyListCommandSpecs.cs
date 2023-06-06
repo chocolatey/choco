@@ -24,7 +24,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public static class ChocolateyListCommandSpecs
     {
@@ -53,19 +53,19 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_implement_list()
             {
-                _results.ShouldContain("list");
+                _results.Should().Contain("list");
             }
 
             [Fact]
             public void Should_not_implement_search()
             {
-                _results.ShouldNotContain("search");
+                _results.Should().NotContain("search");
             }
 
             [Fact]
             public void Should_not_implement_find()
             {
-                _results.ShouldNotContain("find");
+                _results.Should().NotContain("find");
             }
 
             public class When_configurating_the_argument_parser : ChocolateyListCommandSpecsBase
@@ -91,7 +91,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 [NUnit.Framework.TestCase("i")]
                 public void Should_add_to_option_set(string option)
                 {
-                    _optionSet.Contains(option).ShouldBeTrue();
+                    _optionSet.Contains(option).Should().BeTrue();
                 }
 
                 [NUnit.Framework.TestCase("localonly")]
@@ -104,7 +104,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 [NUnit.Framework.TestCase("a")]
                 public void Should_not_add_to_option_set(string option)
                 {
-                    _optionSet.Contains(option).ShouldBeFalse();
+                    _optionSet.Contains(option).Should().BeFalse();
                 }
             }
 
@@ -154,9 +154,9 @@ namespace chocolatey.tests.infrastructure.app.commands
                         error = ex;
                     }
 
-                    errored.ShouldBeTrue();
-                    error.ShouldNotBeNull();
-                    error.ShouldBeType<ApplicationException>();
+                    errored.Should().BeTrue();
+                    error.Should().NotBeNull();
+                    error.Should().BeOfType<ApplicationException>();
                 }
 
                 [Fact]
@@ -164,7 +164,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 {
                     Configuration.RegularOutput = false;
                     _because();
-                    Configuration.Input.ShouldEqual("pkg1 pkg2");
+                    Configuration.Input.Should().Be("pkg1 pkg2");
                 }
 
                 [NUnit.Framework.TestCase("-l")]
@@ -175,8 +175,8 @@ namespace chocolatey.tests.infrastructure.app.commands
                 {
                     Configuration.RegularOutput = false;
                     _because();
-                    MockLogger.Messages.Keys.ShouldContain("Warn");
-                    MockLogger.Messages["Warn"].ShouldContain("Ignoring the argument {0}. This argument is unsupported for locally installed packages.".FormatWith(argument));
+                    MockLogger.Messages.Keys.Should().Contain("Warn");
+                    MockLogger.Messages["Warn"].Should().Contain("Ignoring the argument {0}. This argument is unsupported for locally installed packages.".FormatWith(argument));
                 }
 
                 [NUnit.Framework.TestCase("-li")]
@@ -185,9 +185,9 @@ namespace chocolatey.tests.infrastructure.app.commands
                 {
                     Configuration.RegularOutput = false;
                     _because();
-                    MockLogger.Messages.Keys.ShouldContain("Warn");
-                    MockLogger.Messages["Warn"].ShouldContain("Ignoring the argument {0}. This argument is unsupported for locally installed packages.".FormatWith(argument));
-                    Configuration.ListCommand.IncludeRegistryPrograms.ShouldBeTrue();
+                    MockLogger.Messages.Keys.Should().Contain("Warn");
+                    MockLogger.Messages["Warn"].Should().Contain("Ignoring the argument {0}. This argument is unsupported for locally installed packages.".FormatWith(argument));
+                    Configuration.ListCommand.IncludeRegistryPrograms.Should().BeTrue();
                 }
             }
 
@@ -214,7 +214,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 [Fact]
                 public void Should_not_report_any_warning_messages()
                 {
-                    MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                    MockLogger.Messages.Keys.Should().NotContain("Warn");
                 }
             }
 
@@ -240,7 +240,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 [Fact]
                 public void Should_not_report_any_warning_messages()
                 {
-                    MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                    MockLogger.Messages.Keys.Should().NotContain("Warn");
                 }
             }
         }

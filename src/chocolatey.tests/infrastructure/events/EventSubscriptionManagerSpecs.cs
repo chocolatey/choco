@@ -22,7 +22,7 @@ namespace chocolatey.tests.infrastructure.events
     using chocolatey.infrastructure.services;
     using context;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class EventSubscriptionManagerSpecs
     {
@@ -65,25 +65,25 @@ namespace chocolatey.tests.infrastructure.events
             [Fact]
             public void Should_have_called_the_action()
             {
-                _wasCalled.ShouldBeTrue();
+                _wasCalled.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_passed_the_message()
             {
-                _localFakeEvent.ShouldEqual(Event);
+                _localFakeEvent.Should().Be(Event);
             }
 
             [Fact]
             public void Should_have_passed_the_name_correctly()
             {
-                _localFakeEvent.Name.ShouldEqual("yo");
+                _localFakeEvent.Name.Should().Be("yo");
             }
 
             [Fact]
             public void Should_have_passed_the_digits_correctly()
             {
-                _localFakeEvent.Digits.ShouldEqual(12d);
+                _localFakeEvent.Digits.Should().Be(12d);
             }
         }
 
@@ -117,13 +117,13 @@ namespace chocolatey.tests.infrastructure.events
             public void Should_wait_the_event_to_complete()
             {
                 Console.WriteLine("event complete should be above this");
-                _wasCalled.ShouldBeTrue();
+                _wasCalled.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_passed_the_message()
             {
-                _localFakeEvent.ShouldEqual(Event);
+                _localFakeEvent.Should().Be(Event);
             }
         }
 
@@ -153,25 +153,25 @@ namespace chocolatey.tests.infrastructure.events
             [Fact]
             public void Should_have_called_the_action()
             {
-                _wasCalled.ShouldBeTrue();
+                _wasCalled.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_passed_the_message()
             {
-                _localFakeEvent.ShouldEqual(Event);
+                _localFakeEvent.Should().Be(Event);
             }
 
             [Fact]
             public void Should_have_passed_the_name_correctly()
             {
-                _localFakeEvent.Name.ShouldEqual("yo");
+                _localFakeEvent.Name.Should().Be("yo");
             }
 
             [Fact]
             public void Should_have_passed_the_digits_correctly()
             {
-                _localFakeEvent.Digits.ShouldEqual(12d);
+                _localFakeEvent.Digits.Should().Be(12d);
             }
         }
 
@@ -201,13 +201,13 @@ namespace chocolatey.tests.infrastructure.events
             [Fact]
             public void Should_not_have_called_the_action()
             {
-                _wasCalled.ShouldBeFalse();
+                _wasCalled.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_passed_the_message()
             {
-                _localFakeEvent.ShouldNotEqual(Event);
+                _localFakeEvent.Should().NotBe(Event);
             }
         }
 
@@ -253,7 +253,7 @@ namespace chocolatey.tests.infrastructure.events
             public void Should_throw_an_error()
             {
                 Assert.Throws<ArgumentNullException>(() => SubscriptionManager.Publish<FakeEvent>(null));
-                _errored.ShouldBeTrue();
+                _errored.Should().BeTrue();
             }
         }
     }
