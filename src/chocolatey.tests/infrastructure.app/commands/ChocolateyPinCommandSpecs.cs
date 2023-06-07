@@ -48,6 +48,8 @@ namespace chocolatey.tests.infrastructure.app.commands
             protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
             protected Mock<IPackageMetadata> package = new Mock<IPackageMetadata>();
             protected Mock<IPackageMetadata> pinnedPackage = new Mock<IPackageMetadata>();
+            protected Mock<IPackageMetadata> mingwPackage = new Mock<IPackageMetadata>();
+            protected Mock<IPackageMetadata> gstreamerMingwPackage = new Mock<IPackageMetadata>();
 
             public override void Context()
             {
@@ -69,6 +71,23 @@ namespace chocolatey.tests.infrastructure.app.commands
                 pinnedPackage.Setup(p => p.Version).Returns(new NuGetVersion("1.1.0"));
                 packageInfoService.Setup(s => s.Get(pinnedPackage.Object)).Returns(
                     new ChocolateyPackageInformation(pinnedPackage.Object)
+                    {
+                        IsPinned = true
+                    });
+
+                mingwPackage = new Mock<IPackageMetadata>();
+                mingwPackage.Setup(p => p.Id).Returns("mingw");
+                mingwPackage.Setup(p => p.Version).Returns(new NuGetVersion("1.0.0"));
+                packageInfoService.Setup(s => s.Get(mingwPackage.Object)).Returns(
+                    new ChocolateyPackageInformation(mingwPackage.Object)
+                    {
+                        IsPinned = true
+                    });
+                gstreamerMingwPackage = new Mock<IPackageMetadata>();
+                gstreamerMingwPackage.Setup(p => p.Id).Returns("gstreamer-mingw");
+                gstreamerMingwPackage.Setup(p => p.Version).Returns(new NuGetVersion("1.0.0"));
+                packageInfoService.Setup(s => s.Get(gstreamerMingwPackage.Object)).Returns(
+                    new ChocolateyPackageInformation(gstreamerMingwPackage.Object)
                     {
                         IsPinned = true
                     });
@@ -461,5 +480,62 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
+        public class When_run_is_called_with_similarly_named_package_installed : ChocolateyPinCommandSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                configuration.Sources = ApplicationParameters.PackagesLocation;
+                configuration.ListCommand.LocalOnly = true;
+                configuration.AllVersions = true;
+
+                var packageResults = new[]
+                {
+                    new PackageResult(mingwPackage.Object, null),
+                    new PackageResult(gstreamerMingwPackage.Object, null)
+                };
+                nugetService.Setup(n => n.List(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
+            }
+
+            public new void Reset()
+            {
+                Context();
+                base.Reset();
+            }
+
+            public override void AfterEachSpec()
+            {
+                base.AfterEachSpec();
+                MockLogger.Messages.Clear();
+            }
+
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void Should_call_nuget_service_list_run_when_command_is_list()
+            {
+                Reset();
+                configuration.PinCommand.Command = PinCommandType.List;
+                command.Run(configuration);
+
+                nugetService.Verify(n => n.List(It.IsAny<ChocolateyConfiguration>()), Times.Once);
+            }
+
+            [Fact]
+            public void Should_remove_pin_from_correct_package()
+            {
+                Reset();
+                configuration.PinCommand.Name = "mingw";
+                configuration.PinCommand.Command = PinCommandType.Remove;
+
+                command.SetPin(configuration);
+
+                packageInfoService.Verify(s =>
+                    s.Save(It.Is<ChocolateyPackageInformation>(n =>
+                        n.Package.Id.Equals("mingw"))), Times.Once);
+            }
+        }
     }
 }
