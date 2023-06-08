@@ -19,59 +19,165 @@ namespace chocolatey.tests.infrastructure.app.services
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
     using chocolatey.infrastructure.app.rules;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.rules;
     using chocolatey.infrastructure.services;
     using FluentAssertions;
+    using NuGet.Packaging;
 
-    public class RulesServiceSpecs : TinySpec
+    public class RulesServiceSpecs
     {
-        private RuleService _service;
-        private IReadOnlyList<ImmutableRule> _detectedRules;
-        // We can't reference RuleIdentifiers directly as it's Internal. We should either get these from there, or do something different...
-        private const string EmptyRequiredElement = "CHCR0001";
-        private const string InvalidTypeElement = "CHCU0001";
-        private const string MissingElementOnRequiringLicenseAcceptance = "CHCR0002";
-        private const string UnsupportedElementUsed = "CHCU0002";
-
-        public override void Context()
+        [Categories.RuleEngine]
+        public abstract class RulesServiceSpecsBase : TinySpec
         {
-            Type[] availableRules = typeof(IRuleService).Assembly
+            protected RuleService Service;
+            protected IReadOnlyList<ImmutableRule> DetectedRules;
+
+            public override void Context()
+            {
+                var rules = GetRules();
+
+                Service = new RuleService(rules.ToArray());
+            }
+
+            public override void Because()
+            {
+                DetectedRules = Service.GetAllAvailableRules();
+            }
+
+            protected abstract IEnumerable<IMetadataRule> GetRules();
+        }
+
+        public class WhenGettingAllAvailableRulesShouldGetTheExpectedRules : RulesServiceSpecsBase
+        {
+            // We can't reference RuleIdentifiers directly as it's Internal. We should either get these from there, or do something different...
+            private const string EmptyRequiredElement = "CHCR0001";
+
+            private const string InvalidTypeElement = "CHCU0001";
+            private const string MissingElementOnRequiringLicenseAcceptance = "CHCR0002";
+            private const string UnsupportedElementUsed = "CHCU0002";
+
+            protected override IEnumerable<IMetadataRule> GetRules()
+            {
+                Type[] availableRules = typeof(IRuleService).Assembly
                 .GetTypes()
                 .Where(t => !t.IsInterface && !t.IsAbstract && typeof(IMetadataRule).IsAssignableFrom(t))
                 .ToArray();
-            var rules = new List<IMetadataRule>();
+                var rules = new List<IMetadataRule>();
 
-            foreach (Type availableRule in availableRules)
-            {
-                // We do first here as we want it to fail if the constructor can't be found.
-                var rule = availableRule.GetConstructors().First().Invoke(new object[] { });
-                rules.Add((MetadataRuleBase)rule);
+                foreach (Type availableRule in availableRules)
+                {
+                    // We do first here as we want it to fail if the constructor can't be found.
+                    var rule = availableRule.GetConstructors().First().Invoke(new object[] { });
+                    rules.Add((MetadataRuleBase)rule);
+                }
+
+                return rules;
             }
 
-            _service = new RuleService(rules.ToArray());
-        }
-
-        public override void Because()
-        {
-            _detectedRules = _service.GetAllAvailableRules();
-        }
-
-        [Fact]
-        public void GetsRulesFromService()
-        {
-            _detectedRules.Should().HaveCount(4);
-            IEnumerable<string> ruleIds = _detectedRules.Select(t => t.Id);
-
-            ruleIds.Should().Contain(new[]
+            [Fact]
+            public void GetsRulesFromService()
             {
-                UnsupportedElementUsed,
-                EmptyRequiredElement,
-                InvalidTypeElement,
-                MissingElementOnRequiringLicenseAcceptance
-            });
+                DetectedRules.Should().HaveCount(4);
+                var ruleIds = DetectedRules.Select(t => t.Id);
+
+                ruleIds.Should().ContainInOrder(new[]
+                {
+                    EmptyRequiredElement,
+                    MissingElementOnRequiringLicenseAcceptance,
+                    InvalidTypeElement,
+                    UnsupportedElementUsed,
+                });
+            }
+        }
+
+        public class WhenTwoAvailableRulesContainsNoIdentifierAndWithTheSameSummary : RulesServiceSpecsBase
+        {
+            private static readonly ImmutableRule _expectedRule = new ImmutableRule(RuleType.Warning, string.Empty, "Some summary");
+
+            protected override IEnumerable<IMetadataRule> GetRules()
+            {
+                yield return new EmptyRulesValidator();
+            }
+
+            [Fact]
+            public void ShouldHaveOnlyASingleResult()
+            {
+                DetectedRules.Should().ContainSingle();
+            }
+
+            [Fact]
+            public void ShouldOnlyContainsTheFirstFoundItem()
+            {
+                DetectedRules.Should().ContainEquivalentOf(_expectedRule);
+            }
+
+            private class EmptyRulesValidator : IMetadataRule
+            {
+                public IReadOnlyList<ImmutableRule> GetAvailableRules()
+                {
+                    return new[]
+                    {
+                        _expectedRule,
+                        new ImmutableRule(RuleType.Error, string.Empty, "Some summary")
+                    };
+                }
+
+                public IEnumerable<RuleResult> Validate(NuspecReader reader)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public IEnumerable<RuleResult> validate(NuspecReader reader)
+                {
+                    throw new NotImplementedException();
+                }
+            }
+        }
+
+        public class WhenTwoAvailableRulesContainNoIdentifierWithDifferentSummaries : RulesServiceSpecsBase
+        {
+            protected override IEnumerable<IMetadataRule> GetRules()
+            {
+                yield return new EmptyRulesValidator();
+            }
+
+            [Fact]
+            public void ShouldHaveGottenTwoAvailableRules()
+            {
+                DetectedRules.Should().HaveCount(2);
+            }
+
+            [Fact]
+            public void ShouldHaveGottenExpectedRules()
+            {
+                var ruleSummaries = DetectedRules.Select(t => t.Summary);
+
+                ruleSummaries.Should().ContainInOrder("Some summary of rule 2", "Some summary of rule 1");
+            }
+
+            private class EmptyRulesValidator : IMetadataRule
+            {
+                public IReadOnlyList<ImmutableRule> GetAvailableRules()
+                {
+                    return new[]
+                    {
+                        new ImmutableRule(RuleType.Warning, string.Empty, "Some summary of rule 1"),
+                        new ImmutableRule(RuleType.Error, string.Empty, "Some summary of rule 2")
+                    };
+                }
+
+                public IEnumerable<RuleResult> Validate(NuspecReader reader)
+                {
+                    throw new NotImplementedException();
+                }
+
+                public IEnumerable<RuleResult> validate(NuspecReader reader)
+                {
+                    throw new NotImplementedException();
+                }
+            }
         }
     }
 }
