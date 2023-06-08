@@ -187,6 +187,15 @@ namespace chocolatey.tests
         }
 
         [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class RuleEngine : CategoryAttribute
+        {
+            public RuleEngine()
+                : base("Rule Engine")
+            {
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
         public sealed class LegacySemVerAttribute : CategoryAttribute
         {
             public LegacySemVerAttribute()
