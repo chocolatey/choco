@@ -24,6 +24,7 @@ namespace chocolatey.tests.integration.scenarios
     using NuGet.Configuration;
     using NUnit.Framework;
     using FluentAssertions;
+    using System.IO;
 
     public class SearchScenarios
     {
@@ -568,6 +569,56 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Results[0].PackageMetadata.Version.ToNormalizedString().Should().Be("1.0.0");
                 Results[1].PackageMetadata.Version.ToNormalizedString().Should().Be("0.9.0");
+            }
+        }
+
+        public class WhenSearchingForAPackageWithPageSizeAndMultipleSources : ScenariosBase
+        {
+            public override void Context()
+            {
+                Configuration = Scenario.search();
+                Scenario.reset(Configuration);
+                Scenario.add_packages_to_source_location(Configuration, "upgradepackage*" + NuGetConstants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                var secondSource = Path.Combine(Scenario.get_top_level(), "infrastructure");
+                Configuration.Sources = Configuration.Sources + ";" + secondSource;
+                Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+
+                Configuration.ListCommand.PageSize = 2;
+                Configuration.ListCommand.ExplicitPageSize = true;
+                Configuration.Input = Configuration.PackageNames = string.Empty;
+            }
+
+            public override void Because()
+            {
+                MockLogger.Reset();
+                Results = Service.List(Configuration).ToList();
+            }
+
+            [Fact]
+            public void ShouldOutputWarningAboutThresholdBeingReached()
+            {
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Warn.ToString())
+                    .WhoseValue.Should().ContainSingle(m => m == "The threshold of 2 packages per source has been met. Please refine your search, or specify a page to find any more results.");
+            }
+
+            [Fact]
+            public void ShouldListExpectedPackagesFoundOnSource()
+            {
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Info.ToString())
+                    .WhoseValue.Should()
+                        .ContainInOrder(
+                            "installpackage 1.0.0",
+                            "isexactversiondependency 2.0.0")
+                        .And.NotContain(new[]
+                        {
+                            "installpackage 0.9.9",
+                            "isexactversiondependency 1.0.0",
+                            "upgradepackage 1.1.0",
+                        });
             }
         }
 
