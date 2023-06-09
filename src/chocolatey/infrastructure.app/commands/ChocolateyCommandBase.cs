@@ -114,17 +114,13 @@ Exit codes that normally result from running this command.
             if (normalExitCodes.Length > 0)
             {
                 this.Log().Info("Normal:");
-                this.Log().Info(string.Empty);
                 OutputExitCodes(normalExitCodes);
-                this.Log().Info(string.Empty);
             }
 
             if (enhancedExitCodes.Length > 0)
             {
                 this.Log().Info("Enhanced:");
-                this.Log().Info(string.Empty);
                 OutputExitCodes(enhancedExitCodes);
-                this.Log().Info(string.Empty);
             }
 
             if (normalExitCodes.Length > 0 || enhancedExitCodes.Length > 0)

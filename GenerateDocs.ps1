@@ -575,6 +575,7 @@ The following are experimental or use not recommended:
     $global:powerShellReferenceTOC | Out-File $fileName -Encoding UTF8 -Force
 
     Write-Host "Generating command reference markdown files"
+    Generate-CommandReference 'Cache' '5'
     Generate-CommandReference 'Config' '10'
     Generate-CommandReference 'Download' '20'
     Generate-CommandReference 'Export' '30'
