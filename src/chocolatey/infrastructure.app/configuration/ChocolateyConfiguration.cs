@@ -38,6 +38,7 @@ namespace chocolatey.infrastructure.app.configuration
             RegularOutput = true;
             PromptForConfirmation = true;
             DisableCompatibilityChecks = false;
+            CacheExpirationInMinutes = 30;
             SourceType = SourceTypes.Normal;
             Information = new InformationCommandConfiguration();
             Features = new FeaturesConfiguration();
@@ -339,6 +340,15 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ApplyPackageParametersToDependencies { get; set; }
         public bool ApplyInstallArgumentsToDependencies { get; set; }
         public bool IgnoreDependencies { get; set; }
+
+        /// <summary>
+        /// Gets or sets the time before the cache is considered to have expired in minutes.
+        /// </summary>
+        /// <value>
+        /// The cache expiration in minutes.
+        /// </value>
+        /// <remarks>specifying a negative number disables the caching completely.</remarks>
+        public int CacheExpirationInMinutes { get; set; }
 
         public bool AllowDowngrade { get; set; }
         public bool ForceDependencies { get; set; }

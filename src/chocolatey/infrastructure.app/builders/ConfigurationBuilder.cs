@@ -441,6 +441,15 @@ namespace chocolatey.infrastructure.app.builders
                         .Add("skipcompatibilitychecks|skip-compatibility-checks",
                             "SkipCompatibilityChecks - Prevent warnings being shown before and after command execution when a runtime compatibility problem is found between the version of Chocolatey and the Chocolatey Licensed Extension. Available in 1.1.0+",
                             option => config.DisableCompatibilityChecks = option != null)
+                        .Add("ignore-http-cache",
+                            "IgnoreHttpCache - Ignore any HTTP caches that have previously been created when querying sources, and create new caches. Available in 2.1.0+",
+                            option =>
+                            {
+                                if (option != null)
+                                {
+                                    config.CacheExpirationInMinutes = -1;
+                                }
+                            });
                         ;
                 },
                 (unparsedArgs) =>
