@@ -165,8 +165,8 @@ namespace chocolatey.infrastructure.app.nuget
                             latestResults.AddRange(partResults);
                         } while (partResults.Count >= takeNumber && skipNumber < totalToGet);
 
-                        ThresholdHit = perSourceThresholdLimit <= 0;
-                        LowerThresholdHit = perSourceThresholdMinLimit <= 0;
+                        ThresholdHit = ThresholdHit || perSourceThresholdLimit <= 0;
+                        LowerThresholdHit = LowerThresholdHit || perSourceThresholdMinLimit <= 0;
 
                         if (configuration.AllVersions)
                         {
