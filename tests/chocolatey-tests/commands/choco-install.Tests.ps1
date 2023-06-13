@@ -1807,7 +1807,7 @@ To install a local, or remote file, you may use:
     }
 
     # Tagged as Internal since this package is only available internally and downloads from internal infrastructure.
-    Context 'Installing package with Open Source Get-ChocolateyWebFile, Get-WebFileName and Get-WebHeaders' -Tag Internal {
+    Context 'Installing package with Open Source Get-ChocolateyWebFile, Get-WebFileName and Get-WebHeaders' -Tag Internal, FossOnly {
         BeforeAll {
             $paths = New-ChocolateyInstallSnapshot
 
