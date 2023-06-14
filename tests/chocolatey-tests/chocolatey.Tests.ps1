@@ -170,7 +170,9 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     # These tests are not a true test of PowerShell v2 compatibility as -Version 2 does not guarantee that things run exactly as in a PowerShell 2 instance, but it is as close as we can get in a testing environment.
     # Full proper testing on v2 would require a VM with only v2 installed.
     # This is skipped when not run in CI because it modifies the local system.
-    Context "PowerShell v2 compatibility" -Skip:(-not $env:TEST_KITCHEN) {
+    # These are skipped on Proxy tests because the proxy server we use doesn't allow
+    # the Windows updates access this needs to install PowerShell 2 support
+    Context "PowerShell v2 compatibility" -Skip:(-not $env:TEST_KITCHEN) -Tag ProxySkip {
         BeforeAll {
             # TODO: This doesn't work on client OSes (might be Install-WindowsOptionalFeature). Make sure this works on both server and client.
             Install-WindowsFeature powershell-v2
