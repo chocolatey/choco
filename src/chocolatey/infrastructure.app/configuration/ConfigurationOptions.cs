@@ -79,7 +79,7 @@ namespace chocolatey.infrastructure.app.configuration
                         "Prints out the help menu.",
                         option => configuration.HelpRequested = option != null)
                     .Add("online",
-                        "Online - Open help for specified command in default browser application. This option only works when used in combintation with the -?/--help/-h option.",
+                        "Online - Open help for specified command in default browser application. This option only works when used in combintation with the -?/--help/-h option.  Available in 2.0.0+",
                         option => configuration.ShowOnlineHelp = option != null);
             }
 
