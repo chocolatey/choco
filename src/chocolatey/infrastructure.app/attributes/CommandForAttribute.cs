@@ -24,6 +24,11 @@ namespace chocolatey.infrastructure.app.attributes
         public string CommandName { get; private set; }
         public string Description { get; private set; }
 
+        /// <summary>
+        /// Gets or sets the version a command was introduced in.
+        /// </summary>
+        public string Version { get; set; }
+
         public CommandForAttribute(string commandName, string description)
         {
             CommandName = commandName;

@@ -238,6 +238,7 @@
     <Compile Include="infrastructure.app\rules\ServicableMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\VersionMetadataRule.cs" />
     <Compile Include="infrastructure.app\services\RuleService.cs" />
+    <Compile Include="infrastructure\commands\ExitCodeDescription.cs" />
     <Compile Include="infrastructure\cryptography\DefaultEncryptionUtility.cs" />
     <Compile Include="infrastructure\adapters\IEncryptionUtility.cs" />
     <Compile Include="infrastructure.app\validations\GlobalConfigurationValidation.cs" />

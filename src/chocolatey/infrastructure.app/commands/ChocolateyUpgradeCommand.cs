@@ -285,7 +285,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public virtual void HelpMessage(ChocolateyConfiguration configuration)
+        public override void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Upgrade Command");
             this.Log().Info(@"
