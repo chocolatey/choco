@@ -22,7 +22,8 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
     using chocolatey.infrastructure.filesystem;
     using chocolatey.infrastructure.platforms;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
+    using FluentAssertions.Extensions;
 
     public class DotNetFileSystemSpecs
     {
@@ -50,7 +51,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             }
         }
 
-        public class when_finding_paths_to_executables_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        public class When_finding_paths_to_executables_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -59,45 +60,43 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void GetExecutablePath_should_find_existing_executable()
             {
-                FileSystem.get_executable_path("cmd").ShouldEqual(
-                    Platform.get_platform() == PlatformType.Windows
+                FileSystem.GetExecutablePath("cmd").Should().BeEquivalentTo(
+                    Platform.GetPlatform() == PlatformType.Windows
                         ? "C:\\Windows\\system32\\cmd.exe"
-                        : "cmd",
-                    StringComparer.OrdinalIgnoreCase
-                );
+                        : "cmd"
+                    );
             }
 
             [Fact]
             public void GetExecutablePath_should_find_existing_executable_with_extension()
             {
-                FileSystem.get_executable_path("cmd.exe").ShouldEqual(
-                    Platform.get_platform() == PlatformType.Windows
+                FileSystem.GetExecutablePath("cmd.exe").Should().BeEquivalentTo(
+                    Platform.GetPlatform() == PlatformType.Windows
                         ? "c:\\windows\\system32\\cmd.exe"
-                        : "cmd.exe",
-                    StringComparer.OrdinalIgnoreCase
+                        : "cmd.exe"
                 );
             }
 
             [Fact]
             public void GetExecutablePath_should_return_same_value_when_executable_is_not_found()
             {
-                FileSystem.get_executable_path("daslakjsfdasdfwea").ShouldEqual("daslakjsfdasdfwea");
+                FileSystem.GetExecutablePath("daslakjsfdasdfwea").Should().Be("daslakjsfdasdfwea");
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_null()
             {
-                FileSystem.get_executable_path(null).ShouldEqual(string.Empty);
+                FileSystem.GetExecutablePath(null).Should().BeEmpty();
             }
 
             [Fact]
             public void GetExecutablePath_should_return_empty_string_when_value_is_empty_string()
             {
-                FileSystem.get_executable_path(string.Empty).ShouldEqual(string.Empty);
+                FileSystem.GetExecutablePath(string.Empty).Should().BeEmpty();
             }
         }
 
-        public class when_doing_file_system_operations_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        public class When_doing_file_system_operations_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Context()
             {
@@ -120,20 +119,19 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void GetFiles_should_return_string_array_of_files()
             {
-                FileSystem.get_files(ContextPath, "*lipsum*", SearchOption.AllDirectories).ShouldEqual(FileArray);
+                FileSystem.GetFiles(ContextPath, "*lipsum*", SearchOption.AllDirectories).Should().BeEquivalentTo(FileArray);
             }
 
             [Fact]
             public void GetFiles_should_return_files_that_meet_the_pattern()
             {
-                string filePath = FileSystem.combine_paths(ContextPath, "chocolateyInstall.ps1");
+                string filePath = FileSystem.CombinePaths(ContextPath, "chocolateyInstall.ps1");
 
-                FileSystem.write_file(filePath, "yo");
-                var actual = FileSystem.get_files(ContextPath, "chocolateyInstall.ps1", SearchOption.AllDirectories).ToList();
-                FileSystem.delete_file(filePath);
+                FileSystem.WriteFile(filePath, "yo");
+                var actual = FileSystem.GetFiles(ContextPath, "chocolateyInstall.ps1", SearchOption.AllDirectories).ToList();
+                FileSystem.DeleteFile(filePath);
 
-                actual.ShouldNotBeEmpty();
-                actual.Count().ShouldEqual(1);
+                actual.Should().ContainSingle();
             }
 
             [Fact]
@@ -141,208 +139,207 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Platform(Exclude = "Mono")]
             public void GetFiles_should_return_files_that_meet_the_pattern_regardless_of_case()
             {
-                string filePath = FileSystem.combine_paths(ContextPath, "chocolateyInstall.ps1");
+                string filePath = FileSystem.CombinePaths(ContextPath, "chocolateyInstall.ps1");
 
-                FileSystem.write_file(filePath, "yo");
-                var actual = FileSystem.get_files(ContextPath, "chocolateyinstall.ps1", SearchOption.AllDirectories).ToList();
-                FileSystem.delete_file(filePath);
+                FileSystem.WriteFile(filePath, "yo");
+                var actual = FileSystem.GetFiles(ContextPath, "chocolateyinstall.ps1", SearchOption.AllDirectories).ToList();
+                FileSystem.DeleteFile(filePath);
 
-                actual.ShouldNotBeEmpty();
-                actual.Count().ShouldEqual(1);
+                actual.Should().ContainSingle();
             }
 
             [Fact]
             public void FileExists_should_return_true_if_file_exists()
             {
-                FileSystem.file_exists(TheTestFile).ShouldBeTrue();
+                FileSystem.FileExists(TheTestFile).Should().BeTrue();
             }
 
             [Fact]
             public void FileExists_should_return_false_if_file_does_not_exists()
             {
-                FileSystem.file_exists(Path.Combine(ContextPath, "IDontExist.txt")).ShouldBeFalse();
+                FileSystem.FileExists(Path.Combine(ContextPath, "IDontExist.txt")).Should().BeFalse();
             }
 
             [Fact]
             public void DirectoryExists_should_return_true_if_directory_exists()
             {
-                FileSystem.directory_exists(ContextPath).ShouldBeTrue();
+                FileSystem.DirectoryExists(ContextPath).Should().BeTrue();
             }
 
             [Fact]
             public void DirectoryExists_should_return_false_if_directory_does_not_exist()
             {
-                FileSystem.directory_exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IDontExist")).ShouldBeFalse();
+                FileSystem.DirectoryExists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "IDontExist")).Should().BeFalse();
             }
 
             [Fact]
             public void GetFileSize_should_return_correct_file_size()
             {
-                FileSystem.get_file_size(TheTestFile).ShouldEqual(5377);
+                FileSystem.GetFileSize(TheTestFile).Should().Be(5377);
             }
 
             [Fact]
             public void GetDirectories_should_return_a_string_array_with_directories()
             {
-                FileSystem.get_directories(ContextPath).ShouldEqual(DirectoryArray);
+                FileSystem.GetDirectories(ContextPath).Should().BeEquivalentTo(DirectoryArray);
             }
         }
 
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
-        public class when_setting_file_attributes_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        public class When_setting_file_attributes_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Context()
             {
                 base.Context();
                 SourceFile = Path.Combine(DestinationPath, "attributes.txt");
-                File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes & ~FileAttributes.Hidden));
+                File.SetAttributes(SourceFile, (FileSystem.GetFileInfoFor(SourceFile).Attributes & ~FileAttributes.Hidden));
             }
 
             public override void Because()
             {
-                FileSystem.ensure_file_attribute_set(SourceFile, FileAttributes.Hidden);
+                FileSystem.EnsureFileAttributeSet(SourceFile, FileAttributes.Hidden);
             }
 
             [Fact]
-            public void visible_file_should_now_be_hidden()
+            public void Visible_file_should_now_be_hidden()
             {
-                ((FileAttributes)FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.Hidden).ShouldEqual(FileAttributes.Hidden);
+                ((FileAttributes)FileSystem.GetFileInfoFor(SourceFile).Attributes).Should().HaveFlag(FileAttributes.Hidden);
             }
 
             public override void AfterObservations()
             {
                 base.AfterObservations();
-                File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes & ~FileAttributes.Hidden));
+                File.SetAttributes(SourceFile, (FileSystem.GetFileInfoFor(SourceFile).Attributes & ~FileAttributes.Hidden));
             }
         }
 
-        public class when_removing_readonly_attributes_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        public class When_removing_readonly_attributes_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Context()
             {
                 base.Context();
                 SourceFile = Path.Combine(DestinationPath, "attributes.txt");
-                File.SetAttributes(SourceFile, (FileSystem.get_file_info_for(SourceFile).Attributes | FileAttributes.ReadOnly));
+                File.SetAttributes(SourceFile, (FileSystem.GetFileInfoFor(SourceFile).Attributes | FileAttributes.ReadOnly));
             }
 
             public override void Because()
             {
-                FileSystem.ensure_file_attribute_removed(SourceFile, FileAttributes.ReadOnly);
+                FileSystem.EnsureFileAttributeRemoved(SourceFile, FileAttributes.ReadOnly);
             }
 
             [Fact]
-            public void readonly_file_should_no_longer_be_readonly()
+            public void Readonly_file_should_no_longer_be_readonly()
             {
-                ((FileAttributes)FileSystem.get_file_info_for(SourceFile).Attributes & FileAttributes.ReadOnly).ShouldNotEqual(FileAttributes.ReadOnly);
+                ((FileAttributes)FileSystem.GetFileInfoFor(SourceFile).Attributes).Should().NotHaveFlag(FileAttributes.ReadOnly);
             }
         }
 
-        public class when_running_fileMove_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        public class When_running_fileMove_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
                 SourceFile = Path.Combine(ContextPath, "MoveMe.txt");
                 DestFile = Path.Combine(DestinationPath, "MoveMe.txt");
-                if (!FileSystem.file_exists(SourceFile))
+                if (!FileSystem.FileExists(SourceFile))
                 {
                     File.Create(SourceFile);
                 }
-                if (FileSystem.file_exists(DestFile))
+                if (FileSystem.FileExists(DestFile))
                 {
                     File.Delete(DestFile);
                 }
-                FileSystem.move_file(SourceFile, DestFile);
+                FileSystem.MoveFile(SourceFile, DestFile);
             }
 
             [Fact]
             public void Move_me_text_file_should_not_exist_in_the_source_path()
             {
-                FileSystem.file_exists(SourceFile).ShouldBeFalse();
+                FileSystem.FileExists(SourceFile).Should().BeFalse();
             }
 
             [Fact]
             public void Move_me_text_file_should_exist_in_destination_path()
             {
-                FileSystem.file_exists(DestFile).ShouldBeTrue();
+                FileSystem.FileExists(DestFile).Should().BeTrue();
             }
         }
 
-        public class when_running_fileCopy_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        public class When_running_fileCopy_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
                 SourceFile = Path.Combine(ContextPath, "CopyMe.txt");
                 DestFile = Path.Combine(DestinationPath, "CopyMe.txt");
-                if (!FileSystem.file_exists(SourceFile))
+                if (!FileSystem.FileExists(SourceFile))
                 {
                     File.Create(SourceFile);
                 }
-                if (FileSystem.file_exists(DestFile))
+                if (FileSystem.FileExists(DestFile))
                 {
                     File.Delete(DestFile);
                 }
                 //Copy File
-                FileSystem.copy_file(SourceFile, DestFile, true);
+                FileSystem.CopyFile(SourceFile, DestFile, true);
                 //Overwrite File
-                FileSystem.copy_file(SourceFile, DestFile, true);
+                FileSystem.CopyFile(SourceFile, DestFile, true);
             }
 
             [Fact]
             public void Copy_me_text_file_should_exist_in_context_path()
             {
-                FileSystem.file_exists(SourceFile).ShouldBeTrue();
+                FileSystem.FileExists(SourceFile).Should().BeTrue();
             }
 
             [Fact]
             public void Move_me_text_file_should_exist_in_destination_path()
             {
-                FileSystem.file_exists(DestFile).ShouldBeTrue();
+                FileSystem.FileExists(DestFile).Should().BeTrue();
             }
         }
 
-        public class when_running_fileDelete_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        public class When_running_fileDelete_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
                 DeleteFile = Path.Combine(DestinationPath, "DeleteMe.txt");
-                if (!FileSystem.file_exists(DeleteFile))
+                if (!FileSystem.FileExists(DeleteFile))
                 {
                     using (File.Create(DeleteFile))
                     {
                     }
                 }
 
-                FileSystem.delete_file(DeleteFile);
+                FileSystem.DeleteFile(DeleteFile);
             }
 
             [Fact]
-            public void delete_me_text_file_should_not_exist()
+            public void Delete_me_text_file_should_not_exist()
             {
-                FileSystem.file_exists(DeleteFile).ShouldBeFalse();
+                FileSystem.FileExists(DeleteFile).Should().BeFalse();
             }
         }
 
-        public class when_running_createDirectory_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        public class When_running_createDirectory_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
-                if (FileSystem.directory_exists(TestDirectory))
+                if (FileSystem.DirectoryExists(TestDirectory))
                 {
                     Directory.Delete(TestDirectory, recursive: true);
                 }
 
-                FileSystem.create_directory(TestDirectory);
+                FileSystem.CreateDirectory(TestDirectory);
             }
 
             [Fact]
-            public void test_directory_should_exist()
+            public void Test_directory_should_exist()
             {
-                FileSystem.directory_exists(TestDirectory).ShouldBeTrue();
+                FileSystem.DirectoryExists(TestDirectory).Should().BeTrue();
             }
         }
 
-        public class when_running_getFileModDate_with_dotNetFileSystem : DotNetFileSystemSpecsBase
+        public class When_running_getFileModDate_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
             public override void Because()
             {
@@ -351,9 +348,9 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             }
 
             [Fact]
-            public void should_have_correct_modified_date()
+            public void Should_have_correct_modified_date()
             {
-                FileSystem.get_file_modified_date(TheTestFile).ToShortDateString().ShouldEqual(DateTime.Now.AddDays(-1).ToShortDateString());
+                FileSystem.GetFileModifiedDate(TheTestFile).Should().BeCloseTo(1.Days().Before(DateTime.Now), 5.Seconds());
             }
         }
     }

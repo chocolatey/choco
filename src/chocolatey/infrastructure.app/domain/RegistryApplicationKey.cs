@@ -74,10 +74,10 @@ namespace chocolatey.infrastructure.app.domain
         /// <remarks>
         ///   http://community.spiceworks.com/how_to/show/2238-how-add-remove-programs-works
         /// </remarks>
-        public bool is_in_programs_and_features()
+        public bool IsInProgramsAndFeatures()
         {
             return !string.IsNullOrWhiteSpace(DisplayName)
-                   && !string.IsNullOrWhiteSpace(UninstallString.to_string())
+                   && !string.IsNullOrWhiteSpace(UninstallString.ToStringSafe())
                    && InstallerType != InstallerType.HotfixOrSecurityUpdate
                    && InstallerType != InstallerType.ServicePack
                    && string.IsNullOrWhiteSpace(ParentKeyName)
@@ -88,7 +88,7 @@ namespace chocolatey.infrastructure.app.domain
 
         public override string ToString()
         {
-            return "{0}|{1}|{2}|{3}|{4}".format_with(
+            return "{0}|{1}|{2}|{3}|{4}".FormatWith(
                 DisplayName,
                 DisplayVersion,
                 InstallerType,
@@ -101,7 +101,7 @@ namespace chocolatey.infrastructure.app.domain
         {
             return DisplayName.GetHashCode()
                    & DisplayVersion.GetHashCode()
-                   & UninstallString.to_string().GetHashCode()
+                   & UninstallString.ToStringSafe().GetHashCode()
                    & KeyPath.GetHashCode();
         }
 
@@ -116,11 +116,17 @@ namespace chocolatey.infrastructure.app.domain
         {
             if (ReferenceEquals(other, null)) return false;
 
-            return DisplayName.to_string().is_equal_to(other.DisplayName)
-                   && DisplayVersion.is_equal_to(other.DisplayVersion)
-                   && UninstallString.to_string().is_equal_to(other.UninstallString.to_string())
-                   && KeyPath.is_equal_to(other.KeyPath)
+            return DisplayName.ToStringSafe().IsEqualTo(other.DisplayName)
+                   && DisplayVersion.IsEqualTo(other.DisplayVersion)
+                   && UninstallString.ToStringSafe().IsEqualTo(other.UninstallString.ToStringSafe())
+                   && KeyPath.IsEqualTo(other.KeyPath)
                 ;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public bool is_in_programs_and_features()
+            => IsInProgramsAndFeatures();
+#pragma warning restore IDE1006
     }
 }

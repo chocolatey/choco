@@ -16,43 +16,57 @@
 namespace chocolatey
 {
     using NuGet.Versioning;
+    using System;
 
     /// <summary>
     /// Helper methods for dealing with the the nuget version returned by
     /// the NuGet.Client libraries to ensure they can be easily used.
     /// </summary>
-    /// <remarks>The class is marked as internal on purpose to ensure it will not be part of the public API</remarks>
-    internal static class NuGetVersionExtensions
+    public static class NuGetVersionExtensions
     {
+#pragma warning disable RS0030 // Do not used banned APIs
         /// <summary>
-        /// Wrapper object to prevent null reference exceptions happening.
-        /// Will return an empty string if the passed in <paramref name="version"/> is <c>null</c>.
-        /// Otherwise it will return the result of its call to <c>ToFullString()</c>.
+        /// Wrapper method to prevent null reference exceptions, calls into <see cref="SemanticVersion.ToFullString" />.
         /// </summary>
         /// <param name="version">The NuGet version to transform to a string.</param>
         /// <returns>An empty string if <paramref name="version"/> is <c>null</c>; otherwise the result of its call to <c>ToFullString</c>.</returns>
-        public static string to_full_string(this NuGetVersion version)
+        public static string ToFullStringChecked(this NuGetVersion version)
         {
             if (version is null)
             {
                 return string.Empty;
             }
 
-#pragma warning disable RS0030 // Do not used banned APIs
             return version.ToFullString();
-#pragma warning restore RS0030 // Do not used banned APIs
         }
+#pragma warning restore RS0030 // Do not used banned APIs
 
-        public static string to_normalized_string(this NuGetVersion version)
+
+#pragma warning disable RS0030 // Do not used banned APIs
+        /// <summary>
+        /// Wrapper method to prevent null reference exceptions, calls into <see cref="SemanticVersion.ToNormalizedString" />.
+        /// </summary>
+        /// <param name="version">The NuGet version to transform to a string.</param>
+        /// <returns>An empty string if <paramref name="version"/> is <c>null</c>; otherwise the result of its call to <c>ToFullString</c>.</returns>
+        public static string ToNormalizedStringChecked(this NuGetVersion version)
         {
             if (version is null)
             {
                 return string.Empty;
             }
 
-#pragma warning disable RS0030 // Do not used banned APIs
             return version.ToNormalizedString();
-#pragma warning restore RS0030 // Do not used banned APIs
         }
+#pragma warning restore RS0030 // Do not used banned APIs
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string to_full_string(this NuGetVersion version)
+            => ToFullStringChecked(version);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string to_normalized_string(this NuGetVersion version)
+            => ToNormalizedStringChecked(version);
+#pragma warning restore IDE1006
     }
 }

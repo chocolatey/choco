@@ -99,17 +99,31 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
     }
 
-    Context "Listing local packages with unsupported argument outputs warning" -ForEach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions') {
+    Context "Listing local packages with unsupported argument errors out" -ForEach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
         BeforeAll {
             $Output = Invoke-Choco list $_
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1
+        }
+
+        It "Should output expected error message" {
+            $Output.Lines | Should -Contain "Invalid argument $_. This argument has been removed from the list command and cannot be used." -Because $Output.String
+        }
+    }
+
+    Context "Listing local packages with unsupported argument and --limit-output allows listing packages" -Foreach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
+        BeforeAll {
+            $Output = Invoke-Choco list $_ --limit-output
         }
 
         It "Exits with Success (0)" {
             $Output.ExitCode | Should -Be 0
         }
 
-        It "Should contain expected warning message" {
-            $Output.Lines | Should -Contain "UNSUPPORTED ARGUMENT: Ignoring the argument $_. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!"
+        It "Should not output the error message" {
+            $Output.Lines | Should -Not -Contain "Invalid argument $_. This argument has been removed from the list command and cannot be used." -Because $Output.String
         }
     }
 }

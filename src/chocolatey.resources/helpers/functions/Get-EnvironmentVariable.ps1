@@ -38,7 +38,7 @@ The environment variable target scope. This is `Process`, `User`, or
 
 .PARAMETER PreserveVariables
 A switch parameter stating whether you want to expand the variables or
-not. Defaults to false. Available in 0.9.10+.
+not. Defaults to false.
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.

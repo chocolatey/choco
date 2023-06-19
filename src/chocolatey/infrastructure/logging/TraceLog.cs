@@ -29,11 +29,11 @@ namespace chocolatey.infrastructure.logging
         {
             try
             {
-                enable_system_net_logging();
+                EnableNetworkLogging();
             }
             catch (Exception e)
             {
-                this.Log().Warn(ChocolateyLoggers.Verbose, "Unable to set trace logging:{0} {1}".format_with(Environment.NewLine, e.Message));
+                this.Log().Warn(ChocolateyLoggers.Verbose, "Unable to set trace logging:{0} {1}".FormatWith(Environment.NewLine, e.Message));
             }
         }
 
@@ -42,11 +42,11 @@ namespace chocolatey.infrastructure.logging
         {
             try
             {
-                enable_system_net_logging();
+                EnableNetworkLogging();
             }
             catch (Exception e)
             {
-                this.Log().Warn(ChocolateyLoggers.Verbose, "Unable to set trace logging:{0} {1}".format_with(Environment.NewLine, e.Message));
+                this.Log().Warn(ChocolateyLoggers.Verbose, "Unable to set trace logging:{0} {1}".FormatWith(Environment.NewLine, e.Message));
             }
         }
 
@@ -54,7 +54,7 @@ namespace chocolatey.infrastructure.logging
         /// Enable logging for network requests and responses
         /// </summary>
         /// <remarks>Based on http://stackoverflow.com/a/27467753/18475 </remarks>
-        private void enable_system_net_logging()
+        private void EnableNetworkLogging()
         {
             var logging = typeof(WebRequest).Assembly.GetType("System.Net.Logging");
             var isInitialized = logging.GetField("s_LoggingInitialized", BindingFlags.NonPublic | BindingFlags.Static);
@@ -77,16 +77,16 @@ namespace chocolatey.infrastructure.logging
                 }
             }
 
-            enable_trace_source("s_WebTraceSource", logging, this); //System.Net
-            enable_trace_source("s_HttpListenerTraceSource", logging, this); //System.Net.HttpListener
-            enable_trace_source("s_SocketsTraceSource", logging, this); //System.Net.Sockets
-            enable_trace_source("s_CacheTraceSource", logging, this);  //System.Net.Cache
+            EnableTraceSource("s_WebTraceSource", logging, this); //System.Net
+            EnableTraceSource("s_HttpListenerTraceSource", logging, this); //System.Net.HttpListener
+            EnableTraceSource("s_SocketsTraceSource", logging, this); //System.Net.Sockets
+            EnableTraceSource("s_CacheTraceSource", logging, this);  //System.Net.Cache
 
             var isEnabled = logging.GetField("s_LoggingEnabled", BindingFlags.NonPublic | BindingFlags.Static);
             if (isEnabled !=null) isEnabled.SetValue(null, true);
         }
 
-        private static void enable_trace_source(string fieldName, Type logging, TraceListener listener)
+        private static void EnableTraceSource(string fieldName, Type logging, TraceListener listener)
         {
             var traceSource = (TraceSource)logging.GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
             if (traceSource != null)

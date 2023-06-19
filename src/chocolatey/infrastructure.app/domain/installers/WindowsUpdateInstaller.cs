@@ -30,14 +30,14 @@ namespace chocolatey.infrastructure.app.domain.installers
         {
             //todo: #2583 fully qualify wusa
             InstallExecutable = "wusa.exe";
-            SilentInstall = "\"{0}\" /quiet".format_with(InstallTokens.INSTALLER_LOCATION);
+            SilentInstall = "\"{0}\" /quiet".FormatWith(InstallTokens.InstallerLocation);
             NoReboot = "/norestart";
-            LogFile = "/log:\"{0}\\MSP_install_log.evtx\"".format_with(InstallTokens.PACKAGE_LOCATION);
+            LogFile = "/log:\"{0}\\MSP_install_log.evtx\"".FormatWith(InstallTokens.PackageLocation);
             CustomInstallLocation = "";
             Language = "";
             OtherInstallOptions = "";
             UninstallExecutable = "wusa.exe";
-            SilentUninstall = "\"{0}\" /quiet".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            SilentUninstall = "\"{0}\" /quiet".FormatWith(InstallTokens.UninstallerLocation);
             OtherUninstallOptions = "";
             // https://msdn.microsoft.com/en-us/library/aa376931.aspx
             // https://support.microsoft.com/en-us/kb/290158

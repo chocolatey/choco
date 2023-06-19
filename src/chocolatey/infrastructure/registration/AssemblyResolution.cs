@@ -30,7 +30,7 @@ namespace chocolatey.infrastructure.registration
 
     public class AssemblyResolution
     {
-        private const int LOCK_RESOLUTION_TIMEOUT_SECONDS = 5;
+        private const int LockResolutionTimeoutSeconds = 5;
         private static readonly object _lockObject = new object();
 
         private static readonly ConcurrentDictionary<string, IAssembly> _loadedAssemblies = new ConcurrentDictionary<string, IAssembly>();
@@ -43,8 +43,8 @@ namespace chocolatey.infrastructure.registration
         /// <param name="assemblyFileLocation">The assembly file location. Typically the path to the DLL on disk.</param>
         /// <returns>An assembly</returns>
         /// <exception cref="Exception">Unable to enter synchronized code to determine assembly loading</exception>
-        public static IAssembly resolve_or_load_assembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation) {
-            return resolve_or_load_assembly(assemblySimpleName, publicKeyToken, assemblyFileLocation, false);
+        public static IAssembly ResolveOrLoadAssembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation) {
+            return ResolveOrLoadAssembly(assemblySimpleName, publicKeyToken, assemblyFileLocation, false);
         }
 
         /// <summary>
@@ -56,12 +56,12 @@ namespace chocolatey.infrastructure.registration
         /// <param name="ignoreExisting">Whether any existing library that has previously been loaded should be ignored or not.</param>
         /// <returns>An assembly</returns>
         /// <exception cref="Exception">Unable to enter synchronized code to determine assembly loading</exception>
-        public static IAssembly resolve_or_load_assembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation, bool ignoreExisting = false)
+        public static IAssembly ResolveOrLoadAssembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation, bool ignoreExisting = false)
         {
             var lockTaken = false;
             try
             {
-                Monitor.TryEnter(_lockObject, TimeSpan.FromSeconds(LOCK_RESOLUTION_TIMEOUT_SECONDS), ref lockTaken);
+                Monitor.TryEnter(_lockObject, TimeSpan.FromSeconds(LockResolutionTimeoutSeconds), ref lockTaken);
             }
             catch (Exception)
             {
@@ -76,29 +76,29 @@ namespace chocolatey.infrastructure.registration
                 {
                     if (!ignoreExisting)
                     {
-                        resolvedAssembly = resolve_assembly(assemblySimpleName, publicKeyToken);
+                        resolvedAssembly = ResolveAssembly(assemblySimpleName, publicKeyToken);
                     }
 
                     if (resolvedAssembly == null)
                     {
-                        var tempAssembly = Assembly.Load(FileSystem.read_binary_file_into_byte_array(assemblyFileLocation));
+                        var tempAssembly = Assembly.Load(FileSystem.ReadFileBytes(assemblyFileLocation));
 
                         if (tempAssembly == null)
                         {
                             return null;
                         }
 
-                        if (string.IsNullOrWhiteSpace(publicKeyToken) || tempAssembly.GetName().get_public_key_token().is_equal_to(publicKeyToken))
+                        if (string.IsNullOrWhiteSpace(publicKeyToken) || AssemblyExtensions.GetPublicKeyTokenString(tempAssembly.GetName()).IsEqualTo(publicKeyToken))
                         {
-                            "chocolatey".Log().Debug("Loading up '{0}' assembly type from '{1}'".format_with(assemblySimpleName, assemblyFileLocation));
+                            "chocolatey".Log().Debug("Loading up '{0}' assembly type from '{1}'".FormatWith(assemblySimpleName, assemblyFileLocation));
                             resolvedAssembly = tempAssembly;
-                            _loadedAssemblies.TryAdd(assemblySimpleName.to_lower(), resolvedAssembly);
+                            _loadedAssemblies.TryAdd(assemblySimpleName.ToLowerSafe(), resolvedAssembly);
 
-                            if (assemblySimpleName.is_equal_to("choco"))
+                            if (assemblySimpleName.IsEqualTo("choco"))
                             {
                                 _loadedAssemblies.TryAdd("chocolatey", resolvedAssembly);
                             }
-                            else if (assemblySimpleName.is_equal_to("chocolatey"))
+                            else if (assemblySimpleName.IsEqualTo("chocolatey"))
                             {
                                 _loadedAssemblies.TryAdd("choco", resolvedAssembly);
                             }
@@ -115,7 +115,7 @@ namespace chocolatey.infrastructure.registration
             return resolvedAssembly;
         }
 
-        public static IAssembly load_assembly(string assemblySimpleName, string assemblyFileLocation, params string[] publicKeyTokens)
+        public static IAssembly LoadAssembly(string assemblySimpleName, string assemblyFileLocation, params string[] publicKeyTokens)
         {
             if (publicKeyTokens == null || publicKeyTokens.Length == 0)
             {
@@ -125,7 +125,7 @@ namespace chocolatey.infrastructure.registration
             var lockTaken = false;
             try
             {
-                Monitor.TryEnter(_lockObject, TimeSpan.FromSeconds(LOCK_RESOLUTION_TIMEOUT_SECONDS), ref lockTaken);
+                Monitor.TryEnter(_lockObject, TimeSpan.FromSeconds(LockResolutionTimeoutSeconds), ref lockTaken);
             }
             catch (Exception)
             {
@@ -140,19 +140,19 @@ namespace chocolatey.infrastructure.registration
                 {
                     IAssembly tempAssembly;
 #if FORCE_CHOCOLATEY_OFFICIAL_KEY
-                    tempAssembly = Assembly.Load(FileSystem.read_binary_file_into_byte_array(assemblyFileLocation));
+                    tempAssembly = Assembly.Load(FileSystem.ReadFileBytes(assemblyFileLocation));
 #else
 
                     var symbolFile = System.IO.Path.ChangeExtension(assemblyFileLocation, ".pdb");
                     if (System.IO.File.Exists(symbolFile))
                     {
                         tempAssembly = Assembly.Load(
-                            FileSystem.read_binary_file_into_byte_array(assemblyFileLocation),
-                            FileSystem.read_binary_file_into_byte_array(symbolFile));
+                            FileSystem.ReadFileBytes(assemblyFileLocation),
+                            FileSystem.ReadFileBytes(symbolFile));
                     }
                     else
                     {
-                        tempAssembly = Assembly.Load(FileSystem.read_binary_file_into_byte_array(assemblyFileLocation));
+                        tempAssembly = Assembly.Load(FileSystem.ReadFileBytes(assemblyFileLocation));
                     }
 #endif
 
@@ -163,18 +163,18 @@ namespace chocolatey.infrastructure.registration
 
                     foreach (var publicKeyToken in publicKeyTokens)
                     {
-                        if (string.IsNullOrWhiteSpace(publicKeyToken) || tempAssembly.GetName().get_public_key_token().is_equal_to(publicKeyToken))
+                        if (string.IsNullOrWhiteSpace(publicKeyToken) || AssemblyExtensions.GetPublicKeyTokenString(tempAssembly.GetName()).IsEqualTo(publicKeyToken))
                         {
-                            "chocolatey".Log().Debug("Loading up '{0}' assembly type from '{1}'".format_with(assemblySimpleName, assemblyFileLocation));
+                            "chocolatey".Log().Debug("Loading up '{0}' assembly type from '{1}'".FormatWith(assemblySimpleName, assemblyFileLocation));
                             resolvedAssembly = tempAssembly;
 
-                            _loadedAssemblies.TryAdd(assemblySimpleName.to_lower(), resolvedAssembly);
+                            _loadedAssemblies.TryAdd(assemblySimpleName.ToLowerSafe(), resolvedAssembly);
 
-                            if (assemblySimpleName.is_equal_to("choco"))
+                            if (assemblySimpleName.IsEqualTo("choco"))
                             {
                                 _loadedAssemblies.TryAdd("chocolatey", resolvedAssembly);
                             }
-                            else if (assemblySimpleName.is_equal_to("chocolatey"))
+                            else if (assemblySimpleName.IsEqualTo("chocolatey"))
                             {
                                 _loadedAssemblies.TryAdd("choco", resolvedAssembly);
                             }
@@ -201,7 +201,7 @@ namespace chocolatey.infrastructure.registration
         ///
         /// <returns>An assembly</returns>
         /// <exception cref="Exception">Unable to enter synchronized code to determine assembly loading</exception>
-        public static IAssembly resolve_existing_assembly(string assemblySimpleName, params string[] publicKeyTokens)
+        public static IAssembly ResolveExistingAssembly(string assemblySimpleName, params string[] publicKeyTokens)
         {
             if (publicKeyTokens == null || publicKeyTokens.Length == 0)
             {
@@ -211,7 +211,7 @@ namespace chocolatey.infrastructure.registration
             var lockTaken = false;
             try
             {
-                Monitor.TryEnter(_lockObject, TimeSpan.FromSeconds(LOCK_RESOLUTION_TIMEOUT_SECONDS), ref lockTaken);
+                Monitor.TryEnter(_lockObject, TimeSpan.FromSeconds(LockResolutionTimeoutSeconds), ref lockTaken);
             }
             catch (Exception)
             {
@@ -226,7 +226,7 @@ namespace chocolatey.infrastructure.registration
                 {
                     foreach (var publicKeyToken in publicKeyTokens)
                     {
-                        resolvedAssembly = resolve_assembly(assemblySimpleName, publicKeyToken);
+                        resolvedAssembly = ResolveAssembly(assemblySimpleName, publicKeyToken);
 
                         if (resolvedAssembly != null)
                         {
@@ -244,27 +244,27 @@ namespace chocolatey.infrastructure.registration
             return resolvedAssembly;
         }
 
-        private static IAssembly resolve_assembly(string assemblySimpleName, string publicKeyToken)
+        private static IAssembly ResolveAssembly(string assemblySimpleName, string publicKeyToken)
         {
             IAssembly resolvedAssembly = null;
 
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name.is_equal_to(assemblySimpleName)).or_empty_list_if_null())
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetName().Name.IsEqualTo(assemblySimpleName)).OrEmpty())
             {
-                if (string.IsNullOrWhiteSpace(publicKeyToken) || assembly.GetName().get_public_key_token().is_equal_to(publicKeyToken))
+                if (string.IsNullOrWhiteSpace(publicKeyToken) || AssemblyExtensions.GetPublicKeyTokenString(assembly.GetName()).IsEqualTo(publicKeyToken))
                 {
-                    "chocolatey".Log().Debug("Returning loaded assembly type for '{0}'".format_with(assemblySimpleName));
-                    resolvedAssembly = Assembly.set_assembly(assembly);
+                    "chocolatey".Log().Debug("Returning loaded assembly type for '{0}'".FormatWith(assemblySimpleName));
+                    resolvedAssembly = Assembly.SetAssembly(assembly);
                     break;
                 }
             }
 
             IAssembly tempAssembly;
 
-            if (_loadedAssemblies.TryGetValue(assemblySimpleName.to_lower(), out tempAssembly))
+            if (_loadedAssemblies.TryGetValue(assemblySimpleName.ToLowerSafe(), out tempAssembly))
             {
-                if (string.IsNullOrWhiteSpace(publicKeyToken) || tempAssembly.GetName().get_public_key_token().is_equal_to(publicKeyToken))
+                if (string.IsNullOrWhiteSpace(publicKeyToken) || AssemblyExtensions.GetPublicKeyTokenString(tempAssembly.GetName()).IsEqualTo(publicKeyToken))
                 {
-                    "chocolatey".Log().Debug("Returning loaded assembly type for '{0}'".format_with(assemblySimpleName));
+                    "chocolatey".Log().Debug("Returning loaded assembly type for '{0}'".FormatWith(assemblySimpleName));
                     resolvedAssembly = tempAssembly;
                 }
             }
@@ -272,7 +272,7 @@ namespace chocolatey.infrastructure.registration
             return resolvedAssembly;
         }
 
-        public static IAssembly load_extension(string assemblySimpleName)
+        public static IAssembly LoadExtension(string assemblySimpleName)
         {
 #if FORCE_CHOCOLATEY_OFFICIAL_KEY
             var chocolateyPublicKey = ApplicationParameters.OfficialChocolateyPublicKey;
@@ -280,7 +280,7 @@ namespace chocolatey.infrastructure.registration
             var chocolateyPublicKey = ApplicationParameters.UnofficialChocolateyPublicKey;
 #endif
 
-            var fullName = "{0}, Version=0.0.0.0, Culture=neutral, PublicKeyToken={1}".format_with(
+            var fullName = "{0}, Version=0.0.0.0, Culture=neutral, PublicKeyToken={1}".FormatWith(
                 assemblySimpleName,
                 chocolateyPublicKey);
 
@@ -292,7 +292,7 @@ namespace chocolatey.infrastructure.registration
 
                 if (assembly != null)
                 {
-                    return Assembly.set_assembly(assembly);
+                    return Assembly.SetAssembly(assembly);
                 }
             }
             // Ignore load failures, so we return null and let the caller handle the failure to load the extension.
@@ -311,7 +311,7 @@ namespace chocolatey.infrastructure.registration
             return null;
         }
 
-        public static System.Reflection.Assembly resolve_extension_or_merged_assembly(object sender, ResolveEventArgs args)
+        public static System.Reflection.Assembly ResolveExtensionOrMergedAssembly(object sender, ResolveEventArgs args)
         {
             var requestedAssembly = new AssemblyName(args.Name);
 
@@ -321,7 +321,7 @@ namespace chocolatey.infrastructure.registration
             var chocolateyPublicKey = ApplicationParameters.UnofficialChocolateyPublicKey;
 #endif
 
-            if (!requestedAssembly.get_public_key_token().is_equal_to(chocolateyPublicKey))
+            if (!AssemblyExtensions.GetPublicKeyTokenString(requestedAssembly).IsEqualTo(chocolateyPublicKey))
             {
                 // This resolver is only loading official extensions for Chocolatey and ILMerged assemblies.
                 // Everything else is not handled by this resolver.
@@ -329,7 +329,7 @@ namespace chocolatey.infrastructure.registration
             }
 
             // Check if the requested assembly is already loaded
-            var resolvedAssembly = resolve_existing_assembly(requestedAssembly.Name, chocolateyPublicKey);
+            var resolvedAssembly = ResolveExistingAssembly(requestedAssembly.Name, chocolateyPublicKey);
 
             if (resolvedAssembly != null)
             {
@@ -344,7 +344,7 @@ namespace chocolatey.infrastructure.registration
                     extensionsFound = true;
                     try
                     {
-                        resolvedAssembly = load_assembly(requestedAssembly.Name, extensionDll, chocolateyPublicKey);
+                        resolvedAssembly = LoadAssembly(requestedAssembly.Name, extensionDll, chocolateyPublicKey);
 
                         if (resolvedAssembly != null)
                         {
@@ -370,12 +370,38 @@ namespace chocolatey.infrastructure.registration
             // There are things that are ILMerged into Chocolatey. Anything with
             // the right public key except extensions should use the choco/chocolatey assembly
             if (!requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase)
-                && !requestedAssembly.Name.is_equal_to(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
+                && !requestedAssembly.Name.IsEqualTo(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
             {
                 return typeof(ConsoleApplication).Assembly;
             }
 
             return null;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IAssembly resolve_or_load_assembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation)
+            => ResolveOrLoadAssembly(assemblySimpleName, publicKeyToken, assemblyFileLocation);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IAssembly resolve_or_load_assembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation, bool ignoreExisting = false)
+            => ResolveOrLoadAssembly(assemblySimpleName, publicKeyToken, assemblyFileLocation, ignoreExisting);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IAssembly load_assembly(string assemblySimpleName, string assemblyFileLocation, params string[] publicKeyTokens)
+            => LoadAssembly(assemblySimpleName, assemblyFileLocation, publicKeyTokens);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IAssembly resolve_existing_assembly(string assemblySimpleName, params string[] publicKeyTokens)
+            => ResolveExistingAssembly(assemblySimpleName, publicKeyTokens);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IAssembly load_extension(string assemblySimpleName)
+            => LoadExtension(assemblySimpleName);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static System.Reflection.Assembly resolve_extension_or_merged_assembly(object sender, ResolveEventArgs args)
+            => ResolveExtensionOrMergedAssembly(sender, args);
+#pragma warning restore IDE1006
     }
 }

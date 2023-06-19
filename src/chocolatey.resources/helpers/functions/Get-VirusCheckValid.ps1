@@ -22,7 +22,7 @@ resources.
 
 .DESCRIPTION
 Run a runtime malware check against downloaded resources prior to
-allowing Chocolatey to execute a file. This is available in 0.9.10+ only
+allowing Chocolatey to execute a file. This is only available
 in Pro / Business editions.
 
 .NOTES

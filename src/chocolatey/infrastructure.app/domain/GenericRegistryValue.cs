@@ -42,10 +42,10 @@ namespace chocolatey.infrastructure.app.domain
         {
             if (other == null) return false;
 
-            return ParentKeyName.is_equal_to(other.ParentKeyName)
-                   && Name.is_equal_to(other.Name)
-                   && Value.is_equal_to(other.Value)
-                   && Type.to_string().is_equal_to(other.Type.to_string())
+            return ParentKeyName.IsEqualTo(other.ParentKeyName)
+                   && Name.IsEqualTo(other.Name)
+                   && Value.IsEqualTo(other.Value)
+                   && Type.ToStringSafe().IsEqualTo(other.Type.ToStringSafe())
                 ;
         }
     }

@@ -25,11 +25,11 @@ namespace chocolatey.infrastructure.app.domain
     public enum SourceType
     {
         //this is what it should be when it's not set
-        normal,
-        ruby,
-        python,
-        windowsfeature,
-        windowsfeatures,
-        cygwin,
+        Normal,
+        Ruby,
+        Python,
+        WindowsFeature,
+        WindowsFeatures,
+        Cygwin,
     }
 }

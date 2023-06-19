@@ -18,7 +18,7 @@ namespace chocolatey.tests.infrastructure.configuration
 {
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.configuration;
-    using Should;
+    using FluentAssertions;
 
     public class ConfigSpecs
     {
@@ -26,24 +26,24 @@ namespace chocolatey.tests.infrastructure.configuration
         {
             public override void Context()
             {
-                Config.initialize_with(new ChocolateyConfiguration());
+                Config.InitializeWith(new ChocolateyConfiguration());
             }
         }
 
-        public class when_Config_is_set_normally : ConfigSpecsBase
+        public class When_Config_is_set_normally : ConfigSpecsBase
         {
             public override void Because()
             {
             }
 
             [Fact]
-            public void should_be_of_type_ChocolateyConfiguration()
+            public void Should_be_of_type_ChocolateyConfiguration()
             {
-                Config.get_configuration_settings().ShouldBeType<ChocolateyConfiguration>();
+                Config.GetConfigurationSettings().Should().BeOfType<ChocolateyConfiguration>();
             }
         }
 
-        public class when_Config_is_overridden : ConfigSpecsBase
+        public class When_Config_is_overridden : ConfigSpecsBase
         {
             private class LocalConfig : ChocolateyConfiguration
             {
@@ -51,13 +51,13 @@ namespace chocolatey.tests.infrastructure.configuration
 
             public override void Because()
             {
-                Config.initialize_with(new LocalConfig());
+                Config.InitializeWith(new LocalConfig());
             }
 
             [Fact]
-            public void should_use_the_overridden_type()
+            public void Should_use_the_overridden_type()
             {
-                Config.get_configuration_settings().ShouldBeType<LocalConfig>();
+                Config.GetConfigurationSettings().Should().BeOfType<LocalConfig>();
             }
         }
     }

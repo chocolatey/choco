@@ -23,6 +23,7 @@ namespace chocolatey.infrastructure.app.registration
     using System.Reflection;
     using chocolatey.infrastructure.adapters;
     using chocolatey.infrastructure.app.attributes;
+    using chocolatey.infrastructure.app.services;
     using infrastructure.commands;
     using infrastructure.events;
     using infrastructure.services;
@@ -60,7 +61,7 @@ namespace chocolatey.infrastructure.app.registration
         public object Clone()
         {
             var cloned = (SimpleInjectorContainerRegistrator)MemberwiseClone();
-            cloned._allCommands = _allCommands.deep_copy();
+            cloned._allCommands = _allCommands.DeepCopy();
             cloned._instanceActionRegistrations = new ConcurrentDictionary<Type, Func<IContainerResolver, object>>();
 
             foreach (var instanceRegistration in _instanceActionRegistrations)
@@ -71,20 +72,20 @@ namespace chocolatey.infrastructure.app.registration
                 cloned._instanceActionRegistrations.TryAdd(key, value);
             }
 
-            cloned._multiServices = _multiServices.deep_copy();
-            cloned._registeredCommands = _registeredCommands.deep_copy();
-            cloned._singletonServices = _singletonServices.deep_copy();
-            cloned._transientServices = _transientServices.deep_copy();
+            cloned._multiServices = _multiServices.DeepCopy();
+            cloned._registeredCommands = _registeredCommands.DeepCopy();
+            cloned._singletonServices = _singletonServices.DeepCopy();
+            cloned._transientServices = _transientServices.DeepCopy();
             cloned._validationHandlers = new List<Func<Type, bool>>();
 
             return cloned;
         }
 
-        public void register_assembly_commands(IAssembly assembly)
+        public void RegisterAssemblyCommands(IAssembly assembly)
         {
             try
             {
-                var types = assembly.get_loadable_types()
+                var types = assembly.GetLoadableTypes()
                     .Where(t => t.IsClass &&
                                 !t.IsAbstract &&
                                 typeof(ICommand).IsAssignableFrom(t) &&
@@ -97,7 +98,7 @@ namespace chocolatey.infrastructure.app.registration
                         break;
                     }
 
-                    register_command(t);
+                    RegisterCommand(t);
                 }
             }
             catch (Exception ex)
@@ -108,11 +109,11 @@ namespace chocolatey.infrastructure.app.registration
             }
         }
 
-        public void register_command(Type commandType)
+        public void RegisterCommand(Type commandType)
         {
-            ensure_not_built();
+            EnsureNotBuilt();
 
-            if (!can_register_service(commandType))
+            if (!CanRegisterService(commandType))
             {
                 return;
             }
@@ -121,22 +122,22 @@ namespace chocolatey.infrastructure.app.registration
 
             if (commandForAttribute == null)
             {
-                throw new ArgumentException("{0} does not register a specific command!".format_with(commandType.Name));
+                throw new ArgumentException("{0} does not register a specific command!".FormatWith(commandType.Name));
             }
 
             if (!commandType.GetInterfaces().Contains(typeof(ICommand)))
             {
-                throw new ArgumentException("{0} does not implement the interface 'ICommand'. All commands must implement this interface!".format_with(commandType.Name));
+                throw new ArgumentException("{0} does not implement the interface 'ICommand'. All commands must implement this interface!".FormatWith(commandType.Name));
             }
 
-            var commandName = get_command_name(commandForAttribute);
+            var commandName = GetCommandName(commandForAttribute);
 
             _registeredCommands.AddOrUpdate(commandName, addValueFactory: (key) =>
             {
                 var commandTypeAttributes = commandType.GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>();
-                validate_commands_replacement(commandTypeAttributes);
+                ValidateCommandReplacements(commandTypeAttributes);
 
-                add_commands(commandTypeAttributes);
+                AddCommands(commandTypeAttributes);
 
                 this.Log().Debug("Registering new command '{0}' in assembly '{1}'",
                     commandName,
@@ -144,7 +145,7 @@ namespace chocolatey.infrastructure.app.registration
                 return commandType;
             }, updateValueFactory: (key, value) =>
             {
-                if (!value.Assembly.FullName.is_equal_to(_chocoAssembly.FullName) && !commandType.IsAssignableFrom(value))
+                if (!value.Assembly.FullName.IsEqualTo(_chocoAssembly.FullName) && !commandType.IsAssignableFrom(value))
                 {
                     // We do not allow extensions to override eachothers command.
                     // This may change in the future to allow multiple command handlers.
@@ -156,21 +157,21 @@ namespace chocolatey.infrastructure.app.registration
                     return value;
                 }
 
-                validate_replace_permissions();
+                ValidateReplacePermissions();
 
-                var removedCommands = remove_commands(value, commandName).ToList();
+                var removedCommands = RemoveCommands(value, commandName).ToList();
 
                 try
                 {
                     var commandTypeAttributes = commandType.GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>();
 
-                    validate_commands_replacement(commandTypeAttributes);
+                    ValidateCommandReplacements(commandTypeAttributes);
 
                     this.Log().Debug("Replacing existing command '{0}' from assembly '{1}' with implementation in assembly '{2}'",
                         commandName,
                         value.Assembly.GetName().Name,
                         commandType.Assembly.GetName().Name);
-                    add_commands(commandTypeAttributes);
+                    AddCommands(commandTypeAttributes);
                 }
                 catch (Exception ex)
                 {
@@ -183,52 +184,107 @@ namespace chocolatey.infrastructure.app.registration
             });
         }
 
-        public void register_instance<TService, TImplementation>(Func<TImplementation> instance)
+        public void RegisterInstance<TService, TImplementation>(Func<TImplementation> instance)
             where TImplementation : class, TService
         {
-            register_instance<TService, TImplementation>((container) => instance());
+            RegisterInstance<TService, TImplementation>((container) => instance());
         }
 
-        public void register_instance<TService, TImplementation>(Func<IContainerResolver, TImplementation> instance)
+        public void RegisterInstance<TService, TImplementation>(Func<IContainerResolver, TImplementation> instance)
         where TImplementation : class, TService
         {
-            register_instance(typeof(TService), (container) => instance(container));
+            RegisterInstance(typeof(TService), (container) => instance(container));
         }
 
-        public void register_instance<TImplementation>(Func<TImplementation> instance)
+        public void RegisterInstance<TImplementation>(Func<TImplementation> instance)
             where TImplementation : class
         {
-            register_instance<TImplementation, TImplementation>(instance);
+            RegisterInstance<TImplementation, TImplementation>(instance);
         }
 
-        public void register_service<TImplementation>(params Type[] types)
+        public void RegisterService<TImplementation>(params Type[] types)
         {
             foreach (var serviceType in types)
             {
-                register_service(typeof(TImplementation), serviceType);
+                RegisterService(typeof(TImplementation), serviceType);
             }
         }
 
-        public void register_service<TService, TImplementation>(bool transient = false)
+        public void RegisterService<TService, TImplementation>(bool transient = false)
                                                 where TImplementation : class, TService
         {
             var interfaceType = typeof(TService);
             var serviceType = typeof(TImplementation);
 
-            register_service(interfaceType, serviceType, transient);
+            RegisterService(interfaceType, serviceType, transient);
         }
 
-        public void register_validator(Func<Type, bool> validation_func)
+        public void RegisterValidator(Func<Type, bool> validation_func)
         {
             _validationHandlers.Add(validation_func);
         }
 
-        internal Container build_container(Container container)
+        public void RegisterSourceRunner<TService>() where TService : class
+        {
+            RegisterSourceRunner(typeof(TService));
+        }
+
+        public void RegisterSourceRunner(Type serviceType)
+        {
+            EnsureNotBuilt();
+
+            if (!CanRegisterService(serviceType))
+            {
+                return;
+            }
+
+            if (!typeof(IAlternativeSourceRunner).IsAssignableFrom(serviceType))
+            {
+                return;
+            }
+
+            AddToMultiServices(typeof(IAlternativeSourceRunner), serviceType);
+
+            foreach (var interfaceType in serviceType.GetInterfaces())
+            {
+                if (interfaceType == typeof(ICountSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+
+                if (interfaceType == typeof(IListSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+
+                if (interfaceType == typeof(ISearchableSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+
+                if (interfaceType == typeof(IInstallSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+
+                if (interfaceType == typeof(IUpgradeSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+
+                if (interfaceType == typeof(IUninstallSourceRunner))
+                {
+                    AddToMultiServices(interfaceType, serviceType);
+                }
+            }
+        }
+
+        internal Container BuildContainer(Container container)
         {
             container.RegisterAll<ICommand>(_registeredCommands.Values);
 
-            add_services_to_container(container, _singletonServices, Lifestyle.Singleton);
-            add_services_to_container(container, _transientServices, Lifestyle.Transient);
+            AddServicesToContainer(container, _singletonServices, Lifestyle.Singleton);
+            AddServicesToContainer(container, _transientServices, Lifestyle.Transient);
 
             foreach (var multiService in _multiServices)
             {
@@ -252,14 +308,14 @@ namespace chocolatey.infrastructure.app.registration
 
             container.RegisterSingle<IContainerResolver, SimpleInjectorContainerResolver>();
 
-            EventManager.initialize_with(container.GetInstance<IEventSubscriptionManagerService>);
+            EventManager.InitializeWith(container.GetInstance<IEventSubscriptionManagerService>);
 
             _isBuilt = true;
 
             return container;
         }
 
-        private static void add_services_to_container(Container container, ConcurrentDictionary<Type, Type> services, Lifestyle lifestyle)
+        private static void AddServicesToContainer(Container container, ConcurrentDictionary<Type, Type> services, Lifestyle lifestyle)
         {
             foreach (var service in services)
             {
@@ -267,11 +323,11 @@ namespace chocolatey.infrastructure.app.registration
             }
         }
 
-        private void add_commands(IEnumerable<CommandForAttribute> commandTypeAttributes)
+        private void AddCommands(IEnumerable<CommandForAttribute> commandTypeAttributes)
         {
             foreach (var commandFor in commandTypeAttributes)
             {
-                var commandName = commandFor.CommandName.to_lower();
+                var commandName = commandFor.CommandName.ToLowerSafe();
 
                 if (!_allCommands.Contains(commandName))
                 {
@@ -280,12 +336,12 @@ namespace chocolatey.infrastructure.app.registration
             }
         }
 
-        private void add_to_multi_services(Type interfaceType, Type serviceType)
+        private void AddToMultiServices(Type interfaceType, Type serviceType)
         {
-            ensure_not_built();
-            validate_service_registration(interfaceType, serviceType, validate_multi_services: false);
+            EnsureNotBuilt();
+            ValidateServiceRegistrations(interfaceType, serviceType, validate_multi_services: false);
 
-            remove_existing_registration(interfaceType);
+            RemoveRegistration(interfaceType);
 
             _multiServices.AddOrUpdate(interfaceType, new List<Type> { serviceType }, (key, value) =>
             {
@@ -298,7 +354,7 @@ namespace chocolatey.infrastructure.app.registration
             });
         }
 
-        private bool can_register_service(Type serviceType)
+        private bool CanRegisterService(Type serviceType)
         {
             foreach (var validator in _validationHandlers)
             {
@@ -311,7 +367,7 @@ namespace chocolatey.infrastructure.app.registration
             return true;
         }
 
-        private void ensure_not_built()
+        private void EnsureNotBuilt()
         {
             if (_isBuilt)
             {
@@ -319,9 +375,9 @@ namespace chocolatey.infrastructure.app.registration
             }
         }
 
-        private string get_command_name(CommandForAttribute commandForAttribute)
+        private string GetCommandName(CommandForAttribute commandForAttribute)
         {
-            var commandName = commandForAttribute.CommandName.to_lower();
+            var commandName = commandForAttribute.CommandName.ToLowerSafe();
 
             // First check if we have stored the actual command
             if (_registeredCommands.ContainsKey(commandName))
@@ -343,7 +399,7 @@ namespace chocolatey.infrastructure.app.registration
 
                 foreach (var aliasCommand in allCommandForAttributes)
                 {
-                    if (aliasCommand.CommandName.is_equal_to(commandName))
+                    if (aliasCommand.CommandName.IsEqualTo(commandName))
                     {
                         return command.Key;
                     }
@@ -353,24 +409,24 @@ namespace chocolatey.infrastructure.app.registration
             // If we have gotten here, that means all commands have a registered
             // command for this type, but it can not be found. As such we need to
             // throw an error so it can be looked at.
-            throw new ApplicationException("The command '{0}' has been globally registered, but can not be found!".format_with(commandName));
+            throw new ApplicationException("The command '{0}' has been globally registered, but can not be found!".FormatWith(commandName));
         }
 
-        private void register_instance(Type serviceType, Func<IContainerResolver, object> instanceAction)
+        private void RegisterInstance(Type serviceType, Func<IContainerResolver, object> instanceAction)
         {
-            ensure_not_built();
+            EnsureNotBuilt();
 
-            validate_service_registration(serviceType, serviceType, validate_multi_services: true);
-            remove_existing_registration(serviceType);
+            ValidateServiceRegistrations(serviceType, serviceType, validate_multi_services: true);
+            RemoveRegistration(serviceType);
 
             _instanceActionRegistrations.AddOrUpdate(serviceType, instanceAction, (key, value) => instanceAction);
         }
 
-        private void register_service(Type interfaceType, Type serviceType, bool transient = false)
+        private void RegisterService(Type interfaceType, Type serviceType, bool transient = false)
         {
-            ensure_not_built();
+            EnsureNotBuilt();
 
-            if (!can_register_service(serviceType))
+            if (!CanRegisterService(serviceType))
             {
                 return;
             }
@@ -379,12 +435,12 @@ namespace chocolatey.infrastructure.app.registration
 
             if (multiServiceAttribute != null && multiServiceAttribute.IsMultiService)
             {
-                add_to_multi_services(interfaceType, serviceType);
+                AddToMultiServices(interfaceType, serviceType);
             }
             else
             {
-                validate_service_registration(interfaceType, serviceType, validate_multi_services: true);
-                remove_existing_registration(interfaceType);
+                ValidateServiceRegistrations(interfaceType, serviceType, validate_multi_services: true);
+                RemoveRegistration(interfaceType);
 
                 if (transient)
                 {
@@ -397,13 +453,13 @@ namespace chocolatey.infrastructure.app.registration
             }
         }
 
-        private IEnumerable<string> remove_commands(Type commandType, string initialCommand)
+        private IEnumerable<string> RemoveCommands(Type commandType, string initialCommand)
         {
             var allCommandsForAttribute = commandType.GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>();
 
             foreach (var commandFor in allCommandsForAttribute)
             {
-                var commandName = commandFor.CommandName.to_lower();
+                var commandName = commandFor.CommandName.ToLowerSafe();
                 if (_allCommands.Contains(commandName))
                 {
                     _allCommands.Remove(commandName);
@@ -411,14 +467,14 @@ namespace chocolatey.infrastructure.app.registration
 
                 Type tempType;
 
-                if (!commandName.is_equal_to(initialCommand) && _registeredCommands.TryRemove(commandName, out tempType))
+                if (!commandName.IsEqualTo(initialCommand) && _registeredCommands.TryRemove(commandName, out tempType))
                 {
                     yield return commandName;
                 }
             }
         }
 
-        private void remove_existing_registration(Type interfaceType)
+        private void RemoveRegistration(Type interfaceType)
         {
             Type tempType;
             Func<IContainerResolver, object> tempAction;
@@ -427,22 +483,22 @@ namespace chocolatey.infrastructure.app.registration
             _instanceActionRegistrations.TryRemove(interfaceType, out tempAction);
         }
 
-        private void validate_commands_replacement(IEnumerable<CommandForAttribute> commandTypeAttributes)
+        private void ValidateCommandReplacements(IEnumerable<CommandForAttribute> commandTypeAttributes)
         {
-            validate_replace_permissions();
+            ValidateReplacePermissions();
 
             foreach (var commandFor in commandTypeAttributes)
             {
-                var commandName = commandFor.CommandName.to_lower();
+                var commandName = commandFor.CommandName.ToLowerSafe();
 
                 if (_allCommands.Contains(commandName))
                 {
-                    throw new ApplicationException("The command '{0}' is already registered for a different command handler!".format_with(commandName));
+                    throw new ApplicationException("The command '{0}' is already registered for a different command handler!".FormatWith(commandName));
                 }
             }
         }
 
-        private void validate_replace_permissions()
+        private void ValidateReplacePermissions()
         {
             if (!CanReplaceRegister)
             {
@@ -450,7 +506,7 @@ namespace chocolatey.infrastructure.app.registration
             }
         }
 
-        private void validate_service_registration(Type interfaceType, Type serviceType, bool validate_multi_services)
+        private void ValidateServiceRegistrations(Type interfaceType, Type serviceType, bool validate_multi_services)
         {
             if (interfaceType == typeof(IContainerRegistrator) ||
                 serviceType.GetInterfaces().Contains(typeof(IContainerRegistrator)))
@@ -474,7 +530,7 @@ namespace chocolatey.infrastructure.app.registration
 
             if (!valid)
             {
-                throw new ApplicationException("The type '{0}' is not inheriting from '{1}'. Unable to continue the registration.".format_with(
+                throw new ApplicationException("The type '{0}' is not inheriting from '{1}'. Unable to continue the registration.".FormatWith(
                     serviceType.Name,
                     interfaceType.Name));
             }
@@ -484,8 +540,46 @@ namespace chocolatey.infrastructure.app.registration
                 _instanceActionRegistrations.ContainsKey(interfaceType) ||
                 (validate_multi_services && _multiServices.ContainsKey(interfaceType)))
             {
-                validate_replace_permissions();
+                ValidateReplacePermissions();
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_assembly_commands(IAssembly assembly)
+            => RegisterAssemblyCommands(assembly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_command(Type commandType)
+            => RegisterCommand(commandType);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_instance<TService, TImplementation>(Func<TImplementation> instance)
+            where TImplementation : class, TService
+            => RegisterInstance<TService, TImplementation>(instance);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_instance<TService, TImplementation>(Func<IContainerResolver, TImplementation> instance)
+            where TImplementation : class, TService
+            => RegisterInstance<TService, TImplementation>(instance);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_instance<TImplementation>(Func<TImplementation> instance)
+            where TImplementation : class
+            => RegisterInstance(instance);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_service<TImplementation>(params Type[] types)
+            => RegisterService<TImplementation>(types);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_service<TService, TImplementation>(bool transient = false)
+            where TImplementation : class, TService
+            => RegisterService<TService, TImplementation>(transient);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void register_validator(Func<Type, bool> validation_func)
+            => RegisterValidator(validation_func);
+#pragma warning restore IDE1006
     }
 }

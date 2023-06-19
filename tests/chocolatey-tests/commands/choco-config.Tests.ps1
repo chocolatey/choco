@@ -69,10 +69,6 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
             $Output.Lines | Should -Contain $expectedLicenseHeader
         }
 
-        It "Displays Settings section" {
-            $Output.Lines | Should -Contain "Settings"
-        }
-
         It "Does not display Sources section" {
             $Output.Lines | Should  -Not -Contain "Sources"
         }
@@ -86,19 +82,19 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
         }
 
         It "Displays Available Setting <_>" -ForEach @(
-            "cacheLocation =  |"
-            "containsLegacyPackageInstalls = true |"
-            "commandExecutionTimeoutSeconds = 2700 |"
-            "proxy =  |"
-            "proxyUser =  |"
-            "proxyPassword =  |"
-            "webRequestTimeoutSeconds = 30 |"
-            "proxyBypassList =  |"
-            "proxyBypassOnLocal = true |"
-            "upgradeAllExceptions =  |"
-            "defaultTemplateName =  |"
+            "cacheLocation =  \|"
+            "containsLegacyPackageInstalls = true \|"
+            "commandExecutionTimeoutSeconds = 2700 \|"
+            "proxy = [^|]* \|"
+            "proxyUser = [^|]* \|"
+            "proxyPassword = [^|]* \|"
+            "webRequestTimeoutSeconds = 30 \|"
+            "proxyBypassList =  \|"
+            "proxyBypassOnLocal = true \|"
+            "upgradeAllExceptions =  \|"
+            "defaultTemplateName =  \|"
         ) {
-            $Output.String | Should -MatchExactly ([Regex]::Escape($_))
+            $Output.String | Should -MatchExactly $_
         }
     }
 

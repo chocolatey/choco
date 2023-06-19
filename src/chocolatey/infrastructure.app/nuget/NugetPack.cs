@@ -26,8 +26,6 @@ namespace chocolatey.infrastructure.app.nuget
     using NuGet.Configuration;
     using NuGet.Packaging;
 
-    // ReSharper disable InconsistentNaming
-
     public sealed class NugetPack
     {
         public static bool BuildPackage(PackageBuilder builder, IFileSystem fileSystem, string outputPath)
@@ -35,10 +33,10 @@ namespace chocolatey.infrastructure.app.nuget
             ExcludeFiles(builder.Files);
 
             // Track if the package file was already present on disk
-            bool isExistingPackage = fileSystem.file_exists(outputPath);
+            bool isExistingPackage = fileSystem.FileExists(outputPath);
             try
             {
-                using (Stream stream = fileSystem.create_file(outputPath))
+                using (Stream stream = fileSystem.CreateFile(outputPath))
                 {
                     // Truncate if needed, as Mono fails to truncate
                     if (stream.Length > 0)
@@ -50,9 +48,9 @@ namespace chocolatey.infrastructure.app.nuget
             }
             catch
             {
-                if (!isExistingPackage && fileSystem.file_exists(outputPath))
+                if (!isExistingPackage && fileSystem.FileExists(outputPath))
                 {
-                    fileSystem.delete_file(outputPath);
+                    fileSystem.DeleteFile(outputPath);
                 }
                 throw;
             }
@@ -65,7 +63,7 @@ namespace chocolatey.infrastructure.app.nuget
             // Always exclude the nuspec file
             // Review: This exclusion should be done by the package builder because it knows which file would collide with the auto-generated
             // manifest file.
-            var filter = Platform.get_platform() == PlatformType.Windows ? @"**\*" : "**/*";
+            var filter = Platform.GetPlatform() == PlatformType.Windows ? @"**\*" : "**/*";
             var excludes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
             var wildCards = excludes.Concat(new[] { filter + PackagingConstants.ManifestExtension, filter + NuGetConstants.PackageExtension });
 
@@ -83,6 +81,4 @@ namespace chocolatey.infrastructure.app.nuget
             return physicalPackageFile.SourcePath;
         }
     }
-
-    // ReSharper restore InconsistentNaming
 }

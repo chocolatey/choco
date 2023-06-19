@@ -31,14 +31,14 @@ namespace chocolatey.infrastructure.app.domain.installers
         public IzPackInstaller()
         {
             InstallExecutable = "java";
-            SilentInstall = "-jar \"{0}\" -options-system".format_with(InstallTokens.INSTALLER_LOCATION);
+            SilentInstall = "-jar \"{0}\" -options-system".FormatWith(InstallTokens.InstallerLocation);
             NoReboot = "";
             LogFile = "";
-            CustomInstallLocation = "-DINSTALL_PATH=\"{0}\"".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
+            CustomInstallLocation = "-DINSTALL_PATH=\"{0}\"".FormatWith(InstallTokens.CustomInstallLocation);
             Language = "";
             OtherInstallOptions = "";
             UninstallExecutable = "java"; //currently untested
-            SilentUninstall = "-jar \"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            SilentUninstall = "-jar \"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             OtherUninstallOptions = "";
             ValidInstallExitCodes = new List<long>
             {

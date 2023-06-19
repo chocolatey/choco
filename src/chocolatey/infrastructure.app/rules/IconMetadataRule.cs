@@ -19,13 +19,13 @@ namespace chocolatey.infrastructure.app.rules
     using chocolatey.infrastructure.rules;
     using NuGet.Packaging;
 
-    internal sealed class IconMetadataRule : IMetadataRule
+    internal sealed class IconMetadataRule : FrameWorkReferencesMetadataRule
     {
-        public IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
             if (!(reader.GetIcon() is null))
             {
-                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<icon> elements are not supported in Chocolatey CLI, use <iconUrl> instead.");
+                yield return GetRule(RuleIdentifiers.UnsupportedElementUsed, "<icon> elements are not supported in Chocolatey CLI, use <iconUrl> instead.");
             }
         }
     }

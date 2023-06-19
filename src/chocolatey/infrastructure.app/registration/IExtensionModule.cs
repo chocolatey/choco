@@ -17,9 +17,15 @@
 namespace chocolatey.infrastructure.app.registration
 {
     using chocolatey.infrastructure.app.configuration;
+    using System;
 
     public interface IExtensionModule
     {
+        void RegisterDependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         void register_dependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration);
+#pragma warning restore IDE1006
     }
 }

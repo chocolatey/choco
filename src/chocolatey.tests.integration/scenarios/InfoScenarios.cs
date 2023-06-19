@@ -18,7 +18,7 @@ namespace chocolatey.tests.integration.scenarios
 
     using NUnit.Framework;
 
-    using Should;
+    using FluentAssertions;
 
     public class InfoScenarios
     {
@@ -39,9 +39,9 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
                 // There is no info run. It is purely listing with verbose and exact set to true
-                Results = Service.list_run(Configuration).ToList();
+                Results = Service.List(Configuration).ToList();
             }
         }
 
@@ -62,13 +62,13 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
 
-                Command.run(Configuration);
+                Command.Run(Configuration);
             }
         }
 
-        public class when_searching_for_exact_package_through_command : CommandScenariosBase
+        public class When_searching_for_exact_package_through_command : CommandScenariosBase
         {
             public override void Context()
             {
@@ -81,31 +81,31 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_log_standalone_header_with_package_name_and_version()
+            public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage 1.0.0");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage 1.0.0"));
             }
 
             [Fact]
-            public void should_log_package_information()
+            public void Should_log_package_information()
             {
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate)));
             }
 
             [Fact]
-            public void should_log_package_count_as_warning()
+            public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
-                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1 packages found."));
             }
         }
 
-        public class when_searching_for_exact_package_with_version_specified : CommandScenariosBase
+        public class When_searching_for_exact_package_with_version_specified : CommandScenariosBase
         {
             public override void Context()
             {
@@ -120,31 +120,31 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_log_standalone_header_with_package_name_and_version()
+            public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage 1.0.0");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage 1.0.0"));
             }
 
             [Fact]
-            public void should_log_package_information()
+            public void Should_log_package_information()
             {
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate)));
             }
 
             [Fact]
-            public void should_log_package_count_as_warning()
+            public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
-                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1 packages found."));
             }
         }
 
-        public class when_searching_for_exact_package_with_non_normalized_version_specified : CommandScenariosBase
+        public class When_searching_for_exact_package_with_non_normalized_version_specified : CommandScenariosBase
         {
             public override void Context()
             {
@@ -159,34 +159,34 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_log_standalone_header_with_package_name_and_version()
+            public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage 1.0.0");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage 1.0.0"));
             }
 
             [Fact]
-            public void should_log_package_information()
+            public void Should_log_package_information()
             {
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate)));
             }
 
             [Fact]
-            public void should_log_package_count_as_warning()
+            public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
-                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1 packages found."));
             }
         }
 
-        public class when_searching_for_non_normalized_exact_package : CommandScenariosBase
+        public class When_searching_for_non_normalized_exact_package : CommandScenariosBase
         {
-            private string NonNormalizedVersion = "004.0.01.0";
-            private string NormalizedVersion = "4.0.1";
+            private const string NonNormalizedVersion = "004.0.01.0";
+            private const string NormalizedVersion = "4.0.1";
 
             public override void Context()
             {
@@ -200,34 +200,34 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_log_standalone_header_with_package_name_and_version()
+            public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage {0}".format_with(NormalizedVersion));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage {0}".FormatWith(NormalizedVersion)));
             }
 
             [Fact]
-            public void should_log_package_information()
+            public void Should_log_package_information()
             {
-                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".format_with(NonNormalizedVersion) + NuGetConstants.PackageExtension))
+                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".FormatWith(NonNormalizedVersion) + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate)));
             }
 
             [Fact]
-            public void should_log_package_count_as_warning()
+            public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
-                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1 packages found."));
             }
         }
 
-        public class when_searching_for_non_normalized_exact_package_with_version_specified : CommandScenariosBase
+        public class When_searching_for_non_normalized_exact_package_with_version_specified : CommandScenariosBase
         {
-            private string NonNormalizedVersion = "004.0.01.0";
-            private string NormalizedVersion = "4.0.1";
+            private const string NonNormalizedVersion = "004.0.01.0";
+            private const string NormalizedVersion = "4.0.1";
 
             public override void Context()
             {
@@ -243,34 +243,34 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_log_standalone_header_with_package_name_and_version()
+            public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage {0}".format_with(NormalizedVersion));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage {0}".FormatWith(NormalizedVersion)));
             }
 
             [Fact]
-            public void should_log_package_information()
+            public void Should_log_package_information()
             {
-                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".format_with(NonNormalizedVersion) + NuGetConstants.PackageExtension))
+                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".FormatWith(NonNormalizedVersion) + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate)));
             }
 
             [Fact]
-            public void should_log_package_count_as_warning()
+            public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
-                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1 packages found."));
             }
         }
 
-        public class when_searching_for_non_normalized_exact_package_with_non_normalized_version_specified : CommandScenariosBase
+        public class When_searching_for_non_normalized_exact_package_with_non_normalized_version_specified : CommandScenariosBase
         {
-            private string NonNormalizedVersion = "004.0.01.0";
-            private string NormalizedVersion = "4.0.1";
+            private const string NonNormalizedVersion = "004.0.01.0";
+            private const string NormalizedVersion = "4.0.1";
 
             public override void Context()
             {
@@ -286,31 +286,31 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_log_standalone_header_with_package_name_and_version()
+            public void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage {0}".format_with(NormalizedVersion));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage {0}".FormatWith(NormalizedVersion)));
             }
 
             [Fact]
-            public void should_log_package_information()
+            public void Should_log_package_information()
             {
-                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".format_with(NonNormalizedVersion) + NuGetConstants.PackageExtension))
+                var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.{0}".FormatWith(NonNormalizedVersion) + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate)));
             }
 
             [Fact]
-            public void should_log_package_count_as_warning()
+            public void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
-                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1 packages found."));
             }
         }
 
-        public class when_searching_for_exact_package_with_dot_relative_path_source : when_searching_for_exact_package_through_command
+        public class When_searching_for_exact_package_with_dot_relative_path_source : When_searching_for_exact_package_through_command
         {
             public override void Context()
             {
@@ -334,31 +334,31 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public new void should_log_standalone_header_with_package_name_and_version()
+            public new void Should_log_standalone_header_with_package_name_and_version()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain("installpackage 1.0.0");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage 1.0.0"));
             }
 
             [Fact]
-            public new void should_log_package_information()
+            public new void Should_log_package_information()
             {
                 var lastWriteDate = File.GetLastWriteTimeUtc(Path.Combine("PackageOutput", "installpackage.1.0.0" + NuGetConstants.PackageExtension))
                     .ToShortDateString();
 
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Info.to_string());
-                MockLogger.Messages[LogLevel.Info.to_string()].ShouldContain(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".format_with(lastWriteDate));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains(" Title: installpackage | Published: {0}\r\n Number of Downloads: n/a | Downloads for this version: n/a\r\n Package url\r\n Chocolatey Package Source: n/a\r\n Tags: installpackage admin\r\n Software Site: n/a\r\n Software License: n/a\r\n Summary: __REPLACE__\r\n Description: __REPLACE__\r\n".FormatWith(lastWriteDate)));
             }
 
             [Fact]
-            public new void should_log_package_count_as_warning()
+            public new void Should_log_package_count_as_warning()
             {
-                MockLogger.Messages.Keys.ShouldContain(LogLevel.Warn.to_string());
-                MockLogger.Messages[LogLevel.Warn.to_string()].ShouldContain("1 packages found.");
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1 packages found."));
             }
         }
 
-        public class when_searching_for_exact_package_with_verbose_output : ScenariosBase
+        public class When_searching_for_exact_package_with_verbose_output : ScenariosBase
         {
             public override void Context()
             {
@@ -370,46 +370,46 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_show_only_one_result()
+            public void Should_show_only_one_result()
             {
-                Results.Count.ShouldEqual(1, "Expected 1 package to be returned!");
+                Results.Should().ContainSingle("Expected 1 package to be returned!");
             }
 
             [Fact]
-            public void should_set_exit_code_to_zero()
+            public void Should_set_exit_code_to_zero()
             {
-                Results[0].ExitCode.ShouldEqual(0);
+                Results[0].ExitCode.Should().Be(0);
             }
 
             [Fact]
-            public void should_not_be_reported_as_inconclusive()
+            public void Should_not_be_reported_as_inconclusive()
             {
-                Results[0].Inconclusive.ShouldBeFalse();
+                Results[0].Inconclusive.Should().BeFalse();
             }
 
             [Fact]
-            public void should_report_expected_name()
+            public void Should_report_expected_name()
             {
-                Results[0].Name.ShouldEqual("installpackage");
+                Results[0].Name.Should().Be("installpackage");
             }
 
             [Fact]
-            public void should_set_source_to_expected_value()
+            public void Should_set_source_to_expected_value()
             {
-                Results[0].Source.ShouldEqual(
-                    ((Platform.get_platform() == PlatformType.Windows ? "file:///" : "file://") + Path.Combine(Environment.CurrentDirectory, "PackageOutput"))
+                Results[0].Source.Should().Be(
+                    ((Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://") + Path.Combine(Environment.CurrentDirectory, "PackageOutput"))
                     .Replace("\\","/"));
             }
 
             [Fact]
-            public void should_set_expected_version()
+            public void Should_set_expected_version()
             {
-                Results[0].Version.ShouldEqual("1.0.0");
+                Results[0].Version.Should().Be("1.0.0");
             }
         }
 
         [Categories.SourcePriority]
-        public class when_searching_for_a_package_in_a_priority_source : ScenariosBase
+        public class When_searching_for_a_package_in_a_priority_source : ScenariosBase
         {
             public override void Context()
             {
@@ -420,49 +420,49 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_show_only_one_result()
+            public void Should_show_only_one_result()
             {
-                Results.Count.ShouldEqual(1, "Expected 1 package to be returned!");
+                Results.Should().ContainSingle( "Expected 1 package to be returned!");
             }
 
             [Fact]
-            public void should_set_exit_code_to_zero()
+            public void Should_set_exit_code_to_zero()
             {
-                Results[0].ExitCode.ShouldEqual(0);
+                Results[0].ExitCode.Should().Be(0);
             }
 
             [Fact]
-            public void should_not_be_reported_as_inconclusive()
+            public void Should_not_be_reported_as_inconclusive()
             {
-                Results[0].Inconclusive.ShouldBeFalse();
+                Results[0].Inconclusive.Should().BeFalse();
             }
 
             [Fact]
-            public void should_report_expected_name()
+            public void Should_report_expected_name()
             {
-                Results[0].Name.ShouldEqual("test-package");
+                Results[0].Name.Should().Be("test-package");
             }
 
             [Fact]
-            public void should_set_source_to_expected_value()
+            public void Should_set_source_to_expected_value()
             {
                 var expectedSource = "file:///" + Path.Combine(
                     Scenario.get_top_level(),
                     "PrioritySources",
                     "Priority1").Replace('\\', '/');
 
-                Results[0].Source.ShouldEqual(expectedSource);
+                Results[0].Source.Should().Be(expectedSource);
             }
 
             [Fact]
-            public void should_set_expected_version()
+            public void Should_set_expected_version()
             {
-                Results[0].Version.ShouldEqual("0.1.0");
+                Results[0].Version.Should().Be("0.1.0");
             }
         }
 
         [Categories.SourcePriority]
-        public class when_searching_for_a_package_in_and_prioritised_source_has_lower_version : ScenariosBase
+        public class When_searching_for_a_package_in_and_prioritised_source_has_lower_version : ScenariosBase
         {
             public override void Context()
             {
@@ -476,44 +476,44 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void should_show_only_one_result()
+            public void Should_show_only_one_result()
             {
-                Results.Count.ShouldEqual(1, "Expected 1 package to be returned!");
+                Results.Should().ContainSingle( "Expected 1 package to be returned!");
             }
 
             [Fact]
-            public void should_set_exit_code_to_zero()
+            public void Should_set_exit_code_to_zero()
             {
-                Results[0].ExitCode.ShouldEqual(0);
+                Results[0].ExitCode.Should().Be(0);
             }
 
             [Fact]
-            public void should_not_be_reported_as_inconclusive()
+            public void Should_not_be_reported_as_inconclusive()
             {
-                Results[0].Inconclusive.ShouldBeFalse();
+                Results[0].Inconclusive.Should().BeFalse();
             }
 
             [Fact]
-            public void should_report_expected_name()
+            public void Should_report_expected_name()
             {
-                Results[0].Name.ShouldEqual("upgradepackage");
+                Results[0].Name.Should().Be("upgradepackage");
             }
 
             [Fact]
-            public void should_set_source_to_expected_value()
+            public void Should_set_source_to_expected_value()
             {
                 var expectedSource = "file:///" + Path.Combine(
                     Scenario.get_top_level(),
                     "PrioritySources",
                     "Priority1").Replace('\\', '/');
 
-                Results[0].Source.ShouldEqual(expectedSource);
+                Results[0].Source.Should().Be(expectedSource);
             }
 
             [Fact]
-            public void should_set_expected_version()
+            public void Should_set_expected_version()
             {
-                Results[0].Version.ShouldEqual("1.0.0");
+                Results[0].Version.Should().Be("1.0.0");
             }
         }
     }

@@ -16,6 +16,8 @@
 
 namespace chocolatey.infrastructure.services
 {
+    using System;
+
     public interface IXmlService
     {
         /// <summary>
@@ -24,7 +26,7 @@ namespace chocolatey.infrastructure.services
         /// <typeparam name="XmlType">The type of the ml type.</typeparam>
         /// <param name="xmlFilePath">The XML file path.</param>
         /// <returns></returns>
-        XmlType deserialize<XmlType>(string xmlFilePath);
+        XmlType Deserialize<XmlType>(string xmlFilePath);
 
         /// <summary>
         ///   Deserializes the specified XML file path.
@@ -33,7 +35,7 @@ namespace chocolatey.infrastructure.services
         /// <param name="xmlFilePath">The XML file path.</param>
         /// <param name="retryCount">The number of times to attempt deserialization on event of a failure.</param>
         /// <returns></returns>
-        XmlType deserialize<XmlType>(string xmlFilePath, int retryCount);
+        XmlType Deserialize<XmlType>(string xmlFilePath, int retryCount);
 
         /// <summary>
         ///   Serializes the specified XML type.
@@ -41,7 +43,7 @@ namespace chocolatey.infrastructure.services
         /// <typeparam name="XmlType">The type of the ml type.</typeparam>
         /// <param name="xmlType">Type of the XML.</param>
         /// <param name="xmlFilePath">The XML file path.</param>
-        void serialize<XmlType>(XmlType xmlType, string xmlFilePath);
+        void Serialize<XmlType>(XmlType xmlType, string xmlFilePath);
 
         /// <summary>
         ///   Serializes the specified XML type.
@@ -50,6 +52,20 @@ namespace chocolatey.infrastructure.services
         /// <param name="xmlType">Type of the XML.</param>
         /// <param name="xmlFilePath">The XML file path.</param>
         /// <param name="isSilent">Log messages?</param>
+        void Serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        XmlType deserialize<XmlType>(string xmlFilePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        XmlType deserialize<XmlType>(string xmlFilePath, int retryCount);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void serialize<XmlType>(XmlType xmlType, string xmlFilePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent);
+#pragma warning restore IDE1006
     }
 }

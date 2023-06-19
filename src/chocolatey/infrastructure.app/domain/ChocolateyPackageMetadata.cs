@@ -68,7 +68,7 @@ namespace chocolatey.infrastructure.app.domain
 
         public ChocolateyPackageMetadata(string packagePath, IFileSystem filesystem)
         {
-            if (filesystem.get_file_extension(packagePath) == NuGetConstants.PackageExtension)
+            if (filesystem.GetFileExtension(packagePath) == NuGetConstants.PackageExtension)
             {
                 using (var archiveReader = new PackageArchiveReader(packagePath))
                 {
@@ -110,7 +110,7 @@ namespace chocolatey.infrastructure.app.domain
                     FrameworkReferenceGroups = reader.GetFrameworkRefGroups();
                 }
             }
-            else if (filesystem.get_file_extension(packagePath) == NuGetConstants.ManifestExtension)
+            else if (filesystem.GetFileExtension(packagePath) == NuGetConstants.ManifestExtension)
             {
                 var reader = new NuspecReader(packagePath);
 

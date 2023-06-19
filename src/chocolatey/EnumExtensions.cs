@@ -30,7 +30,7 @@ namespace chocolatey
         ///   Gets the description [Description("")] or ToString() value of an enumeration.
         /// </summary>
         /// <param name="enumeration">The enumeration item.</param>
-        public static string get_description_or_value(this Enum enumeration)
+        public static string DescriptionOrValue(this Enum enumeration)
         {
             string description = enumeration.ToString();
 
@@ -50,19 +50,14 @@ namespace chocolatey
             return description;
         }
 
-        public static TEnum parse_enum_from_description<TEnum>(this string description)
-            where TEnum : struct
+        public static TEnum ParseEnumDescription<TEnum>(this string description)
+            where TEnum : struct, Enum
         {
-            if (!typeof (TEnum).IsEnum)
-            {
-                throw new InvalidEnumArgumentException("TEnum must be of type Enum");
-            }
-
             Type type = typeof (TEnum);
             foreach (var fieldInfo in type.GetFields())
             {
                 var attr = fieldInfo.GetCustomAttributes(typeof (DescriptionAttribute), false).Cast<DescriptionAttribute>().SingleOrDefault();
-                if (attr != null && attr.Description.Equals(description))
+                if (attr != null && attr.Description.Equals(description, StringComparison.Ordinal))
                 {
                     return (TEnum) fieldInfo.GetValue(null);
                 }
@@ -70,5 +65,16 @@ namespace chocolatey
 
             return default(TEnum);
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_description_or_value(this Enum enumeration)
+            => DescriptionOrValue(enumeration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static TEnum parse_enum_from_description<TEnum>(this string description)
+            where TEnum : struct, Enum
+            => ParseEnumDescription<TEnum>(description);
+#pragma warning restore IDE1006
     }
 }

@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.cryptography
     {
         private readonly byte[] _entropyBytes = Encoding.UTF8.GetBytes("Chocolatey");
 
-        public string encrypt_string(string cleartextValue)
+        public string EncryptString(string cleartextValue)
         {
             if (string.IsNullOrWhiteSpace(cleartextValue)) return null;
 
@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.cryptography
             }
             catch (Exception ex)
             {
-                if (Platform.get_platform() != PlatformType.Windows && ex is CryptographicException)
+                if (Platform.GetPlatform() != PlatformType.Windows && ex is CryptographicException)
                 {
                     this.Log().Warn(@"Could not encrypt with LocalMachine scope.
 Falling back to CurrentUser scope for encryption.
@@ -56,7 +56,7 @@ Anything encrypted as CurrentUser can only be decrypted by your current user.");
             return encryptedString;
         }
 
-        public string decrypt_string(string encryptedString)
+        public string DecryptString(string encryptedString)
         {
             var encryptedByteArray = Convert.FromBase64String(encryptedString);
             byte[] decryptedByteArray;
@@ -67,7 +67,7 @@ Anything encrypted as CurrentUser can only be decrypted by your current user.");
             }
             catch (Exception ex)
             {
-                if (Platform.get_platform() != PlatformType.Windows && ex is CryptographicException)
+                if (Platform.GetPlatform() != PlatformType.Windows && ex is CryptographicException)
                 {
                     this.Log().Warn(@"Could not decrypt with LocalMachine scope.
 Falling back to CurrentUser scope for decryption.
@@ -83,13 +83,27 @@ Anything encrypted as CurrentUser can only be decrypted by your current user.");
             return Encoding.UTF8.GetString(decryptedByteArray);
         }
 
-        public string generate_unique_token(string caseInsensitiveKey)
+        public string GenerateUniqueToken(string caseInsensitiveKey)
         {
             // SHA256 is case sensitive; given that our key is case insensitive, we upper case it
             var pathBytes = Encoding.UTF8.GetBytes(caseInsensitiveKey.ToUpperInvariant());
-            var hashProvider = new NuGet.Common.CryptoHashProvider("SHA256");
+            var hashProvider = new global::NuGet.Common.CryptoHashProvider("SHA256");
 
             return Convert.ToBase64String(hashProvider.CalculateHash(pathBytes)).ToUpperInvariant();
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string encrypt_string(string cleartextValue)
+            => EncryptString(cleartextValue);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string decrypt_string(string encryptedString)
+            => DecryptString(encryptedString);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string generate_unique_token(string caseInsensitiveKey)
+            => GenerateUniqueToken(caseInsensitiveKey);
+#pragma warning restore IDE1006
     }
 }

@@ -31,7 +31,7 @@ $TestsLocation = Join-Path $PSScriptRoot tests
 $MaxFileNameLength = 110
 $LongFiles = Get-ChildItem $TestsLocation -Recurse |
     Where-Object { ($_.FullName.Length - $TestsLocation.Length) -gt $MaxFileNameLength } |
-    Select-Object -Property @{Name = 'RelativePath' ; Expression = { $_.FullName.Replace($TestsLocation, [string]::Empty)}}, @{ Name = 'ReductionNeeded' ; Expression = { $_.FullName.Length - $TestsLocation.Length - $MaxFileNameLength } }
+        Select-Object -Property @{Name = 'RelativePath' ; Expression = { $_.FullName.Replace($TestsLocation, [string]::Empty) } }, @{ Name = 'ReductionNeeded' ; Expression = { $_.FullName.Length - $TestsLocation.Length - $MaxFileNameLength } }
 
 if ($LongFiles) {
     Write-Host "Tests' file paths may be too long for Test Kitchen use. Please shorten file names or paths:"
@@ -50,7 +50,8 @@ else {
 if (-not (Test-Path "$TestPath/packages") -or -not $SkipPackaging) {
     $null = New-Item -Path "$TestPath/packages" -ItemType Directory -Force
     # Get and pack packages
-    $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages -Recurse | Where-Object Name -Like '*.nuspec'
+    $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages -Recurse -Include *.nuspec
+    Get-ChildItem -Path $PSScriptRoot/tests/packages -Recurse -Include *.nupkg | Copy-Item -Destination "$TestPath/packages"
 
     foreach ($file in $nuspecs) {
         Write-Host "Packaging $file"
@@ -117,6 +118,9 @@ try {
                     'VMOnly'
                 }
             )
+        }
+        Should     = @{
+            ErrorAction = 'Continue'
         }
     }
 

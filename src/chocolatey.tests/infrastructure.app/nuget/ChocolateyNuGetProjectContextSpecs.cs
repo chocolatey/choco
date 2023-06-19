@@ -21,7 +21,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
     using NuGet.Common;
     using NuGet.ProjectManagement;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateyNuGetProjectContextSpecs
     {
@@ -39,7 +39,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
         }
 
         [Categories.Logging, Parallelizable(ParallelScope.Self)]
-        public class when_calling_logging_methods_the_passed_in_logger_is_used : ChocolateyNuGetProjectContextSpecsBase
+        public class When_calling_logging_methods_the_passed_in_logger_is_used : ChocolateyNuGetProjectContextSpecsBase
         {
             public override void Because()
             { }
@@ -52,7 +52,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void should_log_debug_information_in_child_logger()
+            public void Should_log_debug_information_in_child_logger()
             {
                 Service.Log(MessageLevel.Debug, "Some {0} message", "DEBUG");
 
@@ -63,7 +63,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void should_log_error_information_in_child_logger()
+            public void Should_log_error_information_in_child_logger()
             {
                 Service.Log(MessageLevel.Error, "Some {0} message", "ERROR");
 
@@ -74,7 +74,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void should_log_info_information_in_child_logger()
+            public void Should_log_info_information_in_child_logger()
             {
                 Service.Log(MessageLevel.Info, "Some {0} message", "INFO");
 
@@ -85,7 +85,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [TestCase(LogLevel.Debug)]
-            public void should_log_to_child_logger_and_pass_along_original_message(LogLevel logLevel)
+            public void Should_log_to_child_logger_and_pass_along_original_message(LogLevel logLevel)
             {
                 var logMessage = new LogMessage(logLevel, "My awesome message");
 
@@ -98,7 +98,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void should_log_warning_information_in_child_logger()
+            public void Should_log_warning_information_in_child_logger()
             {
                 Service.Log(MessageLevel.Warning, "Some {0} message", "WARNING");
 
@@ -109,7 +109,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void should_report_errors_to_child_logger()
+            public void Should_report_errors_to_child_logger()
             {
                 Service.ReportError("Some kind of error!");
 
@@ -120,7 +120,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void should_report_errors_with_message_to_child_logger()
+            public void Should_report_errors_with_message_to_child_logger()
             {
                 var logMessage = new LogMessage(LogLevel.Debug, "Some message");
 
@@ -133,13 +133,13 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void should_report_warning_when_resolving_file_conflicts()
+            public void Should_report_warning_when_resolving_file_conflicts()
             {
                 var message = "Some kind of message";
 
                 var result = Service.ResolveFileConflict(message);
 
-                result.ShouldEqual(FileConflictAction.OverwriteAll);
+                result.Should().Be(FileConflictAction.OverwriteAll);
 
                 Logger.Verify(l => l.LogWarning("File conflict, overwriting all: Some kind of message"), Times.Once);
 

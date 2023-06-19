@@ -22,7 +22,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using Microsoft.Win32;
     using Moq;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
     using Registry = chocolatey.infrastructure.app.domain.Registry;
 
     public class RegistryServiceSpecs
@@ -35,21 +35,21 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Context()
             {
-                reset();
+                Reset();
                 Service = new RegistryService(XmlService.Object, FileSystem.Object);
             }
 
-            protected void reset()
+            protected void Reset()
             {
                 FileSystem.ResetCalls();
                 XmlService.ResetCalls();
-                MockLogger.reset();
+                MockLogger.Reset();
             }
         }
 
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
-        public class when_RegistryService_get_installer_keys_is_called : RegistryServiceSpecsBase
+        public class When_RegistryService_get_installer_keys_is_called : RegistryServiceSpecsBase
         {
             private Registry _result;
 
@@ -60,19 +60,19 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                _result = Service.get_installer_keys();
+                _result = Service.GetInstallerKeys();
             }
 
             [Fact]
-            public void should_not_be_null()
+            public void Should_not_be_null()
             {
-                _result.ShouldNotBeNull();
+                _result.Should().NotBeNull();
             }
         }
 
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
-        public class when_RegistryService_get_key_is_called_for_a_value_that_exists : RegistryServiceSpecsBase
+        public class When_RegistryService_get_key_is_called_for_a_value_that_exists : RegistryServiceSpecsBase
         {
             private RegistryKey _result;
             private readonly RegistryHive _hive = RegistryHive.CurrentUser;
@@ -85,37 +85,37 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                _result = Service.get_key(_hive, _subkeyPath);
+                _result = Service.GetKey(_hive, _subkeyPath);
             }
 
             [Fact]
-            public void should_return_a_non_null_value()
+            public void Should_return_a_non_null_value()
             {
-                _result.ShouldNotBeNull();
+                _result.Should().NotBeNull();
             }
 
             [Fact]
-            public void should_return_a_value_of_type_RegistryKey()
+            public void Should_return_a_value_of_type_RegistryKey()
             {
-                _result.ShouldBeType<RegistryKey>();
+                _result.Should().BeOfType<RegistryKey>();
             }
 
             [Fact]
-            public void should_contain_keys()
+            public void Should_contain_keys()
             {
-                _result.GetSubKeyNames().ShouldNotBeEmpty();
+                _result.GetSubKeyNames().Should().NotBeEmpty();
             }
 
             [Fact]
-            public void should_contain_values()
+            public void Should_contain_values()
             {
-                Service.get_key(_hive, "Environment").GetValueNames().ShouldNotBeEmpty();
+                Service.GetKey(_hive, "Environment").GetValueNames().Should().NotBeEmpty();
             }
         }
 
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
-        public class when_RegistryService_get_key_is_called_for_a_value_that_does_not_exist : RegistryServiceSpecsBase
+        public class When_RegistryService_get_key_is_called_for_a_value_that_does_not_exist : RegistryServiceSpecsBase
         {
             private RegistryKey _result;
             private readonly RegistryHive _hive = RegistryHive.CurrentUser;
@@ -128,19 +128,19 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                _result = Service.get_key(_hive, _subkeyPath);
+                _result = Service.GetKey(_hive, _subkeyPath);
             }
 
             [Fact]
-            public void should_not_error()
+            public void Should_not_error()
             {
                 //nothing to see here
             }
 
             [Fact]
-            public void should_return_null_key()
+            public void Should_return_null_key()
             {
-                _result.ShouldBeNull();
+                _result.Should().BeNull();
             }
         }
 

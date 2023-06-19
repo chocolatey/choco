@@ -25,8 +25,6 @@ namespace chocolatey.infrastructure.app.nuget
     using NuGet.ProjectManagement;
     using NuGet.Versioning;
 
-    // ReSharper disable InconsistentNaming
-
     public sealed class ChocolateyPackagePathResolver : PackagePathResolver
     {
         public string RootDirectory { get; set; }
@@ -43,7 +41,7 @@ namespace chocolatey.infrastructure.app.nuget
             => GetInstallPath(packageIdentity.Id);
 
         public string GetInstallPath(string packageId)
-            => _filesystem.combine_paths(RootDirectory, packageId);
+            => _filesystem.CombinePaths(RootDirectory, packageId);
 
         [Obsolete("This overload will be removed in a future version.")]
         public string GetInstallPath(string id, NuGetVersion version)
@@ -52,6 +50,4 @@ namespace chocolatey.infrastructure.app.nuget
         public override string GetPackageFileName(PackageIdentity packageIdentity)
             => packageIdentity.Id + NuGetConstants.PackageExtension;
     }
-
-    // ReSharper restore InconsistentNaming
 }

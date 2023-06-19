@@ -28,17 +28,6 @@ chocolateyUninstall.ps1 automation script.
 The function also prevents `Get-ItemProperty` from failing when
 handling wrongly encoded registry keys.
 
-.NOTES
-Available in 0.9.10+. If you need to maintain compatibility with pre
-0.9.10, please add the following to your nuspec (check for minimum
-version):
-
-~~~xml
-<dependencies>
-  <dependency id="chocolatey-core.extension" version="1.1.0" />
-</dependencies>
-~~~
-
 .INPUTS
 String
 

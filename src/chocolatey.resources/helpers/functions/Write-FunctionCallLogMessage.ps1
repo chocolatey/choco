@@ -23,8 +23,6 @@ DO NOT USE. Not part of the public API.
 Writes function call as a debug message.
 
 .NOTES
-Available in 0.10.2+.
-
 This function is not part of the API.
 
 .INPUTS

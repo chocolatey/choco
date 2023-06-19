@@ -28,9 +28,9 @@ namespace chocolatey.infrastructure.app.commands
         /// </summary>
         /// <param name="unparsedOptions">The list of unrecognised and unparsed options.</param>
         /// <param name="removedOptions">The list of options which are known to be removed and should be warned for.</param>
-        protected virtual void warn_for_removed_options(IEnumerable<string> unparsedOptions, IEnumerable<string> removedOptions)
+        protected virtual void WarnForRemovedOptions(IEnumerable<string> unparsedOptions, IEnumerable<string> removedOptions)
         {
-            if (!unparsedOptions.or_empty_list_if_null().Any() || !removedOptions.or_empty_list_if_null().Any())
+            if (!unparsedOptions.OrEmpty().Any() || !removedOptions.OrEmpty().Any())
             {
                 return;
             }

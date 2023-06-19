@@ -30,7 +30,7 @@ namespace chocolatey.tests.infrastructure.app.services
     using Moq;
     using NuGet.Common;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
     using LogLevel = tests.LogLevel;
 
     public class TemplateServiceSpecs
@@ -50,7 +50,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        public class when_generate_noop_is_called : TemplateServiceSpecsBase
+        public class When_generate_noop_is_called : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -58,46 +58,46 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
                 config.NewCommand.Name = "Bob";
             }
 
             public override void Because()
             {
-                because = () => service.generate_noop(config);
+                because = () => service.GenerateDryRun(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
-            public void should_log_current_directory_if_no_outputdirectory()
+            public void Should_log_current_directory_if_no_outputdirectory()
             {
                 because();
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.ShouldEqual(1);
-                infos[0].ShouldEqual("Would have generated a new package specification at c:\\chocolatey\\Bob");
+                infos.Should().ContainSingle();
+                infos.Should().HaveElementAt(0,"Would have generated a new package specification at c:\\chocolatey\\Bob");
             }
 
             [Fact]
-            public void should_log_output_directory_if_outputdirectory_is_specified()
+            public void Should_log_output_directory_if_outputdirectory_is_specified()
             {
                 config.OutputDirectory = "c:\\packages";
 
                 because();
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.ShouldEqual(1);
-                infos[0].ShouldEqual("Would have generated a new package specification at c:\\packages\\Bob");
+                infos.Should().ContainSingle();
+                infos.Should().HaveElementAt(0,"Would have generated a new package specification at c:\\packages\\Bob");
             }
         }
 
-        public class when_generate_file_from_template_is_called : TemplateServiceSpecsBase
+        public class When_generate_file_from_template_is_called : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -110,7 +110,7 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.write_file(It.Is((string fl) => fl == fileLocation), It.IsAny<string>(), Encoding.UTF8))
+                fileSystem.Setup(x => x.WriteFile(It.Is((string fl) => fl == fileLocation), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => this.fileContent = fileContent);
 
                 templateValues.PackageName = "Bob";
@@ -118,42 +118,42 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate_file_from_template(config, templateValues, template, fileLocation, Encoding.UTF8);
+                because = () => service.GenerateFileFromTemplate(config, templateValues, template, fileLocation, Encoding.UTF8);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
-            public void should_write_file_withe_replaced_tokens()
+            public void Should_write_file_withe_replaced_tokens()
             {
                 because();
 
                 var debugs = MockLogger.MessagesFor(LogLevel.Debug);
-                debugs.Count.ShouldEqual(1);
-                debugs[0].ShouldEqual("Bob");
+                debugs.Should().ContainSingle();
+                debugs.Should().HaveElementAt(0,"Bob");
             }
 
             [Fact]
-            public void should_log_info_if_regular_output()
+            public void Should_log_info_if_regular_output()
             {
                 config.RegularOutput = true;
 
                 because();
 
                 var debugs = MockLogger.MessagesFor(LogLevel.Debug);
-                debugs.Count.ShouldEqual(1);
-                debugs[0].ShouldEqual("Bob");
+                debugs.Should().ContainSingle();
+                debugs.Should().HaveElementAt(0,"Bob");
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.ShouldEqual(1);
-                infos[0].ShouldEqual(string.Format(@"Generating template to a file{0} at 'c:\packages\bob.nuspec'", Environment.NewLine));
+                infos.Should().ContainSingle();
+                infos.Should().HaveElementAt(0,string.Format(@"Generating template to a file{0} at 'c:\packages\bob.nuspec'", Environment.NewLine));
             }
         }
 
-        public class when_generate_is_called_with_existing_directory : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_existing_directory : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -163,10 +163,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(
+                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns<string>(
                     x =>
                     {
                         verifiedDirectoryPath = x;
@@ -178,16 +178,16 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
-            public void should_throw_exception()
+            public void Should_throw_exception()
             {
                 bool errored = false;
                 string errorMessage = string.Empty;
@@ -202,13 +202,13 @@ namespace chocolatey.tests.infrastructure.app.services
                     errorMessage = ex.Message;
                 }
 
-                errored.ShouldBeTrue();
-                errorMessage.ShouldEqual(string.Format("The location for the template already exists. You can:{0} 1. Remove 'c:\\chocolatey\\Bob'{0} 2. Use --force{0} 3. Specify a different name", Environment.NewLine));
-                verifiedDirectoryPath.ShouldEqual("c:\\chocolatey\\Bob");
+                errored.Should().BeTrue();
+                errorMessage.Should().Be(string.Format("The location for the template already exists. You can:{0} 1. Remove 'c:\\chocolatey\\Bob'{0} 2. Use --force{0} 3. Specify a different name", Environment.NewLine));
+                verifiedDirectoryPath.Should().Be("c:\\chocolatey\\Bob");
             }
 
             [Fact]
-            public void should_throw_exception_even_with_outputdirectory()
+            public void Should_throw_exception_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
 
@@ -225,13 +225,13 @@ namespace chocolatey.tests.infrastructure.app.services
                     errorMessage = ex.Message;
                 }
 
-                errored.ShouldBeTrue();
-                errorMessage.ShouldEqual(string.Format("The location for the template already exists. You can:{0} 1. Remove 'c:\\packages\\Bob'{0} 2. Use --force{0} 3. Specify a different name", Environment.NewLine));
-                verifiedDirectoryPath.ShouldEqual("c:\\packages\\Bob");
+                errored.Should().BeTrue();
+                errorMessage.Should().Be(string.Format("The location for the template already exists. You can:{0} 1. Remove 'c:\\packages\\Bob'{0} 2. Use --force{0} 3. Specify a different name", Environment.NewLine));
+                verifiedDirectoryPath.Should().Be("c:\\packages\\Bob");
             }
         }
 
-        public class when_generate_is_called : TemplateServiceSpecsBase
+        public class When_generate_is_called : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -243,8 +243,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns(
                         (string a, string[] b) =>
                         {
@@ -254,13 +254,13 @@ namespace chocolatey.tests.infrastructure.app.services
                             }
                             return a + "\\" + b[0];
                         });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\default"));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
+                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\default"));
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
-                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
+                fileSystem.Setup(x => x.DeleteDirectoryChecked(It.IsAny<string>(), true));
+                fileSystem.Setup(x => x.EnsureDirectoryExists(It.IsAny<string>())).Callback(
                     (string directory) =>
                     {
                         if (!string.IsNullOrWhiteSpace(directory))
@@ -268,64 +268,64 @@ namespace chocolatey.tests.infrastructure.app.services
                             directoryCreated.Add(directory);
                         }
                     });
-                fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories)).Returns(new[] { "templates\\default\\template.nuspec", "templates\\default\\random.txt" });
-                fileSystem.Setup(x => x.get_directory_name(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
-                fileSystem.Setup(x => x.get_file_extension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
-                fileSystem.Setup(x => x.read_file(It.IsAny<string>())).Returns(string.Empty);
+                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), "*.*", SearchOption.AllDirectories)).Returns(new[] { "templates\\default\\template.nuspec", "templates\\default\\random.txt" });
+                fileSystem.Setup(x => x.GetDirectoryName(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
+                fileSystem.Setup(x => x.GetFileExtension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
+                fileSystem.Setup(x => x.ReadFile(It.IsAny<string>())).Returns(string.Empty);
 
                 config.NewCommand.Name = "Bob";
             }
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
                 files.Clear();
                 directoryCreated.Clear();
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories()
+            public void Should_generate_all_files_and_directories()
             {
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.ShouldEqual(2, "There should be 2 directories, but there was: " + string.Join(", ", directories));
-                directories[0].ShouldEqual("c:\\chocolatey\\Bob");
-                directories[1].ShouldEqual("c:\\chocolatey\\Bob\\tools");
+                directories.Should().HaveCount(2, "There should be 2 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\chocolatey\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\tools");
 
-                files.Count.ShouldEqual(2, "There should be 2 files, but there was: " + string.Join(", ", files));
-                files[0].ShouldEqual("c:\\chocolatey\\Bob\\__name_replace__.nuspec");
-                files[1].ShouldEqual("c:\\chocolatey\\Bob\\random.txt");
+                files.Should().HaveCount(2, "There should be 2 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\chocolatey\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\random.txt");
 
-                MockLogger.MessagesFor(LogLevel.Info).Last().ShouldEqual(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\chocolatey\Bob'", Environment.NewLine));
+                MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\chocolatey\Bob'", Environment.NewLine));
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories_even_with_outputdirectory()
+            public void Should_generate_all_files_and_directories_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
 
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.ShouldEqual(2, "There should be 2 directories, but there was: " + string.Join(", ", directories));
-                directories[0].ShouldEqual("c:\\packages\\Bob");
-                directories[1].ShouldEqual("c:\\packages\\Bob\\tools");
+                directories.Should().HaveCount(2, "There should be 2 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\packages\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\packages\\Bob\\tools");
 
-                files.Count.ShouldEqual(2, "There should be 2 files, but there was: " + string.Join(", ", files));
-                files[0].ShouldEqual("c:\\packages\\Bob\\__name_replace__.nuspec");
-                files[1].ShouldEqual("c:\\packages\\Bob\\random.txt");
+                files.Should().HaveCount(2, "There should be 2 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\packages\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\packages\\Bob\\random.txt");
 
-                MockLogger.MessagesFor(LogLevel.Info).Last().ShouldEqual(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
+                MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
             }
         }
 
-        public class when_generate_is_called_with_nested_folders : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_nested_folders : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -337,8 +337,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns(
                         (string a, string[] b) =>
                         {
@@ -348,17 +348,17 @@ namespace chocolatey.tests.infrastructure.app.services
                             }
                             return a + "\\" + b[0];
                         });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
+                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
-                fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                fileSystem.Setup(x => x.DeleteDirectoryChecked(It.IsAny<string>(), true));
+                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
                     .Returns(new[] { "templates\\test\\template.nuspec", "templates\\test\\random.txt", "templates\\test\\tools\\chocolateyInstall.ps1", "templates\\test\\tools\\lower\\another.ps1" });
-                fileSystem.Setup(x => x.get_directories(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                fileSystem.Setup(x => x.GetDirectories(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
                     .Returns(new[] { "templates\\test", "templates\\test\\tools", "templates\\test\\tools\\lower" });
-                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
+                fileSystem.Setup(x => x.EnsureDirectoryExists(It.IsAny<string>())).Callback(
                     (string directory) =>
                     {
                         if (!string.IsNullOrWhiteSpace(directory))
@@ -366,9 +366,9 @@ namespace chocolatey.tests.infrastructure.app.services
                             directoryCreated.Add(directory);
                         }
                     });
-                fileSystem.Setup(x => x.get_directory_name(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
-                fileSystem.Setup(x => x.get_file_extension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
-                fileSystem.Setup(x => x.read_file(It.IsAny<string>())).Returns(string.Empty);
+                fileSystem.Setup(x => x.GetDirectoryName(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
+                fileSystem.Setup(x => x.GetFileExtension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
+                fileSystem.Setup(x => x.ReadFile(It.IsAny<string>())).Returns(string.Empty);
 
                 config.NewCommand.Name = "Bob";
                 config.NewCommand.TemplateName = "test";
@@ -376,60 +376,60 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
                 files.Clear();
                 directoryCreated.Clear();
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories()
+            public void Should_generate_all_files_and_directories()
             {
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.ShouldEqual(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
-                directories[0].ShouldEqual("c:\\chocolatey\\Bob");
-                directories[1].ShouldEqual("c:\\chocolatey\\Bob\\tools");
-                directories[2].ShouldEqual("c:\\chocolatey\\Bob\\tools\\lower");
+                directories.Should().HaveCount(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\chocolatey\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\tools");
+                directories.Should().HaveElementAt(2,"c:\\chocolatey\\Bob\\tools\\lower");
 
-                files.Count.ShouldEqual(4, "There should be 4 files, but there was: " + string.Join(", ", files));
-                files[0].ShouldEqual("c:\\chocolatey\\Bob\\__name_replace__.nuspec");
-                files[1].ShouldEqual("c:\\chocolatey\\Bob\\random.txt");
-                files[2].ShouldEqual("c:\\chocolatey\\Bob\\tools\\chocolateyInstall.ps1");
-                files[3].ShouldEqual("c:\\chocolatey\\Bob\\tools\\lower\\another.ps1");
+                files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\chocolatey\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\random.txt");
+                files.Should().HaveElementAt(2,"c:\\chocolatey\\Bob\\tools\\chocolateyInstall.ps1");
+                files.Should().HaveElementAt(3,"c:\\chocolatey\\Bob\\tools\\lower\\another.ps1");
 
-                MockLogger.MessagesFor(LogLevel.Info).Last().ShouldEqual(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\chocolatey\Bob'", Environment.NewLine));
+                MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\chocolatey\Bob'", Environment.NewLine));
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories_even_with_outputdirectory()
+            public void Should_generate_all_files_and_directories_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
 
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.ShouldEqual(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
-                directories[0].ShouldEqual("c:\\packages\\Bob");
-                directories[1].ShouldEqual("c:\\packages\\Bob\\tools");
-                directories[2].ShouldEqual("c:\\packages\\Bob\\tools\\lower");
+                directories.Should().HaveCount(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\packages\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\packages\\Bob\\tools");
+                directories.Should().HaveElementAt(2,"c:\\packages\\Bob\\tools\\lower");
 
-                files.Count.ShouldEqual(4, "There should be 4 files, but there was: " + string.Join(", ", files));
-                files[0].ShouldEqual("c:\\packages\\Bob\\__name_replace__.nuspec");
-                files[1].ShouldEqual("c:\\packages\\Bob\\random.txt");
-                files[2].ShouldEqual("c:\\packages\\Bob\\tools\\chocolateyInstall.ps1");
-                files[3].ShouldEqual("c:\\packages\\Bob\\tools\\lower\\another.ps1");
+                files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\packages\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\packages\\Bob\\random.txt");
+                files.Should().HaveElementAt(2,"c:\\packages\\Bob\\tools\\chocolateyInstall.ps1");
+                files.Should().HaveElementAt(3,"c:\\packages\\Bob\\tools\\lower\\another.ps1");
 
-                MockLogger.MessagesFor(LogLevel.Info).Last().ShouldEqual(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
+                MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
             }
         }
 
-        public class when_generate_is_called_with_empty_nested_folders : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_empty_nested_folders : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -441,8 +441,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns(
                         (string a, string[] b) =>
                         {
@@ -452,17 +452,17 @@ namespace chocolatey.tests.infrastructure.app.services
                             }
                             return a + "\\" + b[0];
                         });
-                fileSystem.Setup(x => x.directory_exists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
+                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns<string>(dirPath => dirPath.EndsWith("templates\\test"));
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), Encoding.UTF8))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.write_file(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
+                fileSystem.Setup(x => x.WriteFile(It.IsAny<string>(), It.IsAny<string>(), utf8WithoutBOM))
                     .Callback((string filePath, string fileContent, Encoding encoding) => files.Add(filePath));
-                fileSystem.Setup(x => x.delete_directory_if_exists(It.IsAny<string>(), true));
-                fileSystem.Setup(x => x.get_files(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                fileSystem.Setup(x => x.DeleteDirectoryChecked(It.IsAny<string>(), true));
+                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
                     .Returns(new[] { "templates\\test\\template.nuspec", "templates\\test\\random.txt", "templates\\test\\tools\\chocolateyInstall.ps1", "templates\\test\\tools\\lower\\another.ps1" });
-                fileSystem.Setup(x => x.get_directories(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
+                fileSystem.Setup(x => x.GetDirectories(It.IsAny<string>(), "*.*", SearchOption.AllDirectories))
                     .Returns(new[] { "templates\\test", "templates\\test\\tools", "templates\\test\\tools\\lower", "templates\\test\\empty", "templates\\test\\empty\\nested" });
-                fileSystem.Setup(x => x.create_directory_if_not_exists(It.IsAny<string>())).Callback(
+                fileSystem.Setup(x => x.EnsureDirectoryExists(It.IsAny<string>())).Callback(
                     (string directory) =>
                     {
                         if (!string.IsNullOrWhiteSpace(directory))
@@ -470,9 +470,9 @@ namespace chocolatey.tests.infrastructure.app.services
                             directoryCreated.Add(directory);
                         }
                     });
-                fileSystem.Setup(x => x.get_directory_name(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
-                fileSystem.Setup(x => x.get_file_extension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
-                fileSystem.Setup(x => x.read_file(It.IsAny<string>())).Returns(string.Empty);
+                fileSystem.Setup(x => x.GetDirectoryName(It.IsAny<string>())).Returns<string>(file => Path.GetDirectoryName(file));
+                fileSystem.Setup(x => x.GetFileExtension(It.IsAny<string>())).Returns<string>(file => Path.GetExtension(file));
+                fileSystem.Setup(x => x.ReadFile(It.IsAny<string>())).Returns(string.Empty);
 
                 config.NewCommand.Name = "Bob";
                 config.NewCommand.TemplateName = "test";
@@ -480,64 +480,64 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
                 files.Clear();
                 directoryCreated.Clear();
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories()
+            public void Should_generate_all_files_and_directories()
             {
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.ShouldEqual(5, "There should be 5 directories, but there was: " + string.Join(", ", directories));
-                directories[0].ShouldEqual("c:\\chocolatey\\Bob");
-                directories[1].ShouldEqual("c:\\chocolatey\\Bob\\tools");
-                directories[2].ShouldEqual("c:\\chocolatey\\Bob\\tools\\lower");
-                directories[3].ShouldEqual("c:\\chocolatey\\Bob\\empty");
-                directories[4].ShouldEqual("c:\\chocolatey\\Bob\\empty\\nested");
+                directories.Should().HaveCount(5, "There should be 5 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\chocolatey\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\tools");
+                directories.Should().HaveElementAt(2,"c:\\chocolatey\\Bob\\tools\\lower");
+                directories.Should().HaveElementAt(3,"c:\\chocolatey\\Bob\\empty");
+                directories.Should().HaveElementAt(4,"c:\\chocolatey\\Bob\\empty\\nested");
 
-                files.Count.ShouldEqual(4, "There should be 4 files, but there was: " + string.Join(", ", files));
-                files[0].ShouldEqual("c:\\chocolatey\\Bob\\__name_replace__.nuspec");
-                files[1].ShouldEqual("c:\\chocolatey\\Bob\\random.txt");
-                files[2].ShouldEqual("c:\\chocolatey\\Bob\\tools\\chocolateyInstall.ps1");
-                files[3].ShouldEqual("c:\\chocolatey\\Bob\\tools\\lower\\another.ps1");
+                files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\chocolatey\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\random.txt");
+                files.Should().HaveElementAt(2,"c:\\chocolatey\\Bob\\tools\\chocolateyInstall.ps1");
+                files.Should().HaveElementAt(3,"c:\\chocolatey\\Bob\\tools\\lower\\another.ps1");
 
-                MockLogger.MessagesFor(LogLevel.Info).Last().ShouldEqual(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\chocolatey\Bob'", Environment.NewLine));
+                MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\chocolatey\Bob'", Environment.NewLine));
             }
 
             [Fact]
-            public void should_generate_all_files_and_directories_even_with_outputdirectory()
+            public void Should_generate_all_files_and_directories_even_with_outputdirectory()
             {
                 config.OutputDirectory = "c:\\packages";
 
                 because();
 
                 var directories = directoryCreated.ToList();
-                directories.Count.ShouldEqual(5, "There should be 5 directories, but there was: " + string.Join(", ", directories));
-                directories[0].ShouldEqual("c:\\packages\\Bob");
-                directories[1].ShouldEqual("c:\\packages\\Bob\\tools");
-                directories[2].ShouldEqual("c:\\packages\\Bob\\tools\\lower");
-                directories[3].ShouldEqual("c:\\packages\\Bob\\empty");
-                directories[4].ShouldEqual("c:\\packages\\Bob\\empty\\nested");
+                directories.Should().HaveCount(5, "There should be 5 directories, but there was: " + string.Join(", ", directories));
+                directories.Should().HaveElementAt(0,"c:\\packages\\Bob");
+                directories.Should().HaveElementAt(1,"c:\\packages\\Bob\\tools");
+                directories.Should().HaveElementAt(2,"c:\\packages\\Bob\\tools\\lower");
+                directories.Should().HaveElementAt(3,"c:\\packages\\Bob\\empty");
+                directories.Should().HaveElementAt(4,"c:\\packages\\Bob\\empty\\nested");
 
-                files.Count.ShouldEqual(4, "There should be 4 files, but there was: " + string.Join(", ", files));
-                files[0].ShouldEqual("c:\\packages\\Bob\\__name_replace__.nuspec");
-                files[1].ShouldEqual("c:\\packages\\Bob\\random.txt");
-                files[2].ShouldEqual("c:\\packages\\Bob\\tools\\chocolateyInstall.ps1");
-                files[3].ShouldEqual("c:\\packages\\Bob\\tools\\lower\\another.ps1");
+                files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", files));
+                files.Should().HaveElementAt(0,"c:\\packages\\Bob\\__name_replace__.nuspec");
+                files.Should().HaveElementAt(1,"c:\\packages\\Bob\\random.txt");
+                files.Should().HaveElementAt(2,"c:\\packages\\Bob\\tools\\chocolateyInstall.ps1");
+                files.Should().HaveElementAt(3,"c:\\packages\\Bob\\tools\\lower\\another.ps1");
 
-                MockLogger.MessagesFor(LogLevel.Info).Last().ShouldEqual(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
+                MockLogger.MessagesFor(LogLevel.Info).Last().Should().Be(string.Format(@"Successfully generated Bob package specification files{0} at 'c:\packages\Bob'", Environment.NewLine));
             }
         }
 
-        public class when_generate_is_called_with_defaulttemplatename_in_configuration_but_template_folder_doesnt_exist : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_defaulttemplatename_in_configuration_but_template_folder_doesnt_exist : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -546,8 +546,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
 
                 config.NewCommand.Name = "Bob";
@@ -556,26 +556,26 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_use_null_value_for_template()
+            public void Should_use_null_value_for_template()
             {
                 because();
 
-                config.NewCommand.TemplateName.ShouldBeNull();
+                config.NewCommand.TemplateName.Should().BeNull();
             }
         }
 
-        public class when_generate_is_called_with_defaulttemplatename_in_configuration_and_template_folder_exists : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_defaulttemplatename_in_configuration_and_template_folder_exists : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -585,10 +585,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "msi"))).Returns<string>(
+                fileSystem.Setup(x => x.DirectoryExists(Path.Combine(ApplicationParameters.TemplatesLocation, "msi"))).Returns<string>(
                     x =>
                     {
                         verifiedDirectoryPath = x;
@@ -601,26 +601,26 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_use_template_name_from_configuration()
+            public void Should_use_template_name_from_configuration()
             {
                 because();
 
-                config.NewCommand.TemplateName.ShouldEqual("msi");
+                config.NewCommand.TemplateName.Should().Be("msi");
             }
         }
 
-        public class when_generate_is_called_with_defaulttemplatename_in_configuration_and_template_name_option_set : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_defaulttemplatename_in_configuration_and_template_name_option_set : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
@@ -630,171 +630,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
 
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
                     .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
-                    x =>
-                    {
-                        verifiedDirectoryPath = x;
-                        return true;
-                    });
-
-                config.NewCommand.Name = "Bob";
-                config.NewCommand.TemplateName = "zip";
-                config.DefaultTemplateName = "msi";
-            }
-
-            public override void Because()
-            {
-                because = () => service.generate(config);
-            }
-
-            public override void BeforeEachSpec()
-            {
-                MockLogger.reset();
-            }
-
-            [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
-            public void should_use_template_name_from_command_line_option()
-            {
-                because();
-
-                config.NewCommand.TemplateName.ShouldEqual("zip");
-            }
-        }
-
-        public class when_generate_is_called_with_built_in_option_set : TemplateServiceSpecsBase
-        {
-            private Action because;
-            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-
-            public override void Context()
-            {
-                base.Context();
-
-                config.NewCommand.Name = "Bob";
-                config.NewCommand.UseOriginalTemplate = true;
-            }
-
-            public override void Because()
-            {
-                because = () => service.generate(config);
-            }
-
-            public override void BeforeEachSpec()
-            {
-                MockLogger.reset();
-            }
-
-            [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
-            public void should_use_null_value_for_template()
-            {
-                because();
-
-                config.NewCommand.TemplateName.ShouldBeNull();
-            }
-        }
-
-        public class when_generate_is_called_with_built_in_option_set_and_defaulttemplate_in_configuration : TemplateServiceSpecsBase
-        {
-            private Action because;
-            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-
-            public override void Context()
-            {
-                base.Context();
-
-                config.NewCommand.Name = "Bob";
-                config.NewCommand.UseOriginalTemplate = true;
-                config.DefaultTemplateName = "msi";
-            }
-
-            public override void Because()
-            {
-                because = () => service.generate(config);
-            }
-
-            public override void BeforeEachSpec()
-            {
-                MockLogger.reset();
-            }
-
-            [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
-            public void should_use_null_value_for_template()
-            {
-                because();
-
-                config.NewCommand.TemplateName.ShouldBeNull();
-            }
-        }
-
-        public class when_generate_is_called_with_built_in_option_set_and_template_name_option_set_and_template_folder_exists : TemplateServiceSpecsBase
-        {
-            private Action because;
-            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-            private string verifiedDirectoryPath;
-
-            public override void Context()
-            {
-                base.Context();
-
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
-                    .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
-                    x =>
-                    {
-                        verifiedDirectoryPath = x;
-                        return true;
-                    });
-
-                config.NewCommand.Name = "Bob";
-                config.NewCommand.TemplateName = "zip";
-                config.NewCommand.UseOriginalTemplate = true;
-            }
-
-            public override void Because()
-            {
-                because = () => service.generate(config);
-            }
-
-            public override void BeforeEachSpec()
-            {
-                MockLogger.reset();
-            }
-
-            [Fact]
-            [WindowsOnly]
-            [Platform(Exclude = "Mono")]
-            public void should_use_template_name_from_command_line_option()
-            {
-                because();
-
-                config.NewCommand.TemplateName.ShouldEqual("zip");
-            }
-        }
-
-        public class when_generate_is_called_with_built_in_option_set_and_template_name_option_set_and_defaulttemplatename_set_and_template_folder_exists : TemplateServiceSpecsBase
-        {
-            private Action because;
-            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-            private string verifiedDirectoryPath;
-
-            public override void Context()
-            {
-                base.Context();
-
-                fileSystem.Setup(x => x.get_current_directory()).Returns("c:\\chocolatey");
-                fileSystem.Setup(x => x.combine_paths(It.IsAny<string>(), It.IsAny<string>()))
-                    .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
-                fileSystem.Setup(x => x.directory_exists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
+                fileSystem.Setup(x => x.DirectoryExists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
                     x =>
                     {
                         verifiedDirectoryPath = x;
@@ -804,64 +643,225 @@ namespace chocolatey.tests.infrastructure.app.services
                 config.NewCommand.Name = "Bob";
                 config.NewCommand.TemplateName = "zip";
                 config.DefaultTemplateName = "msi";
-                config.NewCommand.UseOriginalTemplate = true;
             }
 
             public override void Because()
             {
-                because = () => service.generate(config);
+                because = () => service.Generate(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
-            public void should_use_template_name_from_command_line_option()
+            public void Should_use_template_name_from_command_line_option()
             {
                 because();
 
-                config.NewCommand.TemplateName.ShouldEqual("zip");
+                config.NewCommand.TemplateName.Should().Be("zip");
             }
         }
 
-        public class when_list_noop_is_called : TemplateServiceSpecsBase
+        public class When_generate_is_called_with_built_in_option_set : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+
+            public override void Context()
+            {
+                base.Context();
+
+                config.NewCommand.Name = "Bob";
+                config.NewCommand.UseOriginalTemplate = true;
+            }
+
+            public override void Because()
+            {
+                because = () => service.Generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.Reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void Should_use_null_value_for_template()
+            {
+                because();
+
+                config.NewCommand.TemplateName.Should().BeNull();
+            }
+        }
+
+        public class When_generate_is_called_with_built_in_option_set_and_defaulttemplate_in_configuration : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+
+            public override void Context()
+            {
+                base.Context();
+
+                config.NewCommand.Name = "Bob";
+                config.NewCommand.UseOriginalTemplate = true;
+                config.DefaultTemplateName = "msi";
+            }
+
+            public override void Because()
+            {
+                because = () => service.Generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.Reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void Should_use_null_value_for_template()
+            {
+                because();
+
+                config.NewCommand.TemplateName.Should().BeNull();
+            }
+        }
+
+        public class When_generate_is_called_with_built_in_option_set_and_template_name_option_set_and_template_folder_exists : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private string verifiedDirectoryPath;
+
+            public override void Context()
+            {
+                base.Context();
+
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
+                    .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
+                fileSystem.Setup(x => x.DirectoryExists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
+                    x =>
+                    {
+                        verifiedDirectoryPath = x;
+                        return true;
+                    });
+
+                config.NewCommand.Name = "Bob";
+                config.NewCommand.TemplateName = "zip";
+                config.NewCommand.UseOriginalTemplate = true;
+            }
+
+            public override void Because()
+            {
+                because = () => service.Generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.Reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void Should_use_template_name_from_command_line_option()
+            {
+                because();
+
+                config.NewCommand.TemplateName.Should().Be("zip");
+            }
+        }
+
+        public class When_generate_is_called_with_built_in_option_set_and_template_name_option_set_and_defaulttemplatename_set_and_template_folder_exists : TemplateServiceSpecsBase
+        {
+            private Action because;
+            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private string verifiedDirectoryPath;
+
+            public override void Context()
+            {
+                base.Context();
+
+                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\chocolatey");
+                fileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string>()))
+                    .Returns((string a, string[] b) => { return a + "\\" + b[0]; });
+                fileSystem.Setup(x => x.DirectoryExists(Path.Combine(ApplicationParameters.TemplatesLocation, "zip"))).Returns<string>(
+                    x =>
+                    {
+                        verifiedDirectoryPath = x;
+                        return true;
+                    });
+
+                config.NewCommand.Name = "Bob";
+                config.NewCommand.TemplateName = "zip";
+                config.DefaultTemplateName = "msi";
+                config.NewCommand.UseOriginalTemplate = true;
+            }
+
+            public override void Because()
+            {
+                because = () => service.Generate(config);
+            }
+
+            public override void BeforeEachSpec()
+            {
+                MockLogger.Reset();
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void Should_use_template_name_from_command_line_option()
+            {
+                because();
+
+                config.NewCommand.TemplateName.Should().Be("zip");
+            }
+        }
+
+        public class When_list_noop_is_called : TemplateServiceSpecsBase
         {
             private Action because;
             private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
 
             public override void Because()
             {
-                because = () => service.list_noop(config);
+                because = () => service.ListDryRun(config);
             }
 
             public override void BeforeEachSpec()
             {
-                MockLogger.reset();
+                MockLogger.Reset();
             }
 
             [Fact]
-            public void should_log_template_location_if_no_template_name()
+            public void Should_log_template_location_if_no_template_name()
             {
                 because();
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.ShouldEqual(1);
-                infos[0].ShouldEqual("Would have listed templates in {0}".format_with(ApplicationParameters.TemplatesLocation));
+                infos.Should().ContainSingle();
+                infos.Should().HaveElementAt(0,"Would have listed templates in {0}".FormatWith(ApplicationParameters.TemplatesLocation));
             }
 
             [Fact]
-            public void should_log_template_name_if_template_name()
+            public void Should_log_template_name_if_template_name()
             {
                 config.TemplateCommand.Name = "msi";
                 because();
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.ShouldEqual(1);
-                infos[0].ShouldEqual("Would have listed information about {0}".format_with(config.TemplateCommand.Name));
+                infos.Should().ContainSingle();
+                infos.Should().HaveElementAt(0,"Would have listed information about {0}".FormatWith(config.TemplateCommand.Name));
             }
         }
     }

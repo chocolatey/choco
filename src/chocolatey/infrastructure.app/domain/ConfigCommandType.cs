@@ -16,12 +16,27 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
+    using System;
+
     public enum ConfigCommandType
     {
-        unknown,
-        list,
-        get,
-        set,
-        unset,
+        Unknown,
+        List,
+        Get,
+        Set,
+        Unset,
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        unknown = Unknown,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        list = List,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        get = Get,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        set = Set,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        unset = Unset,
+#pragma warning restore IDE1006
     }
 }

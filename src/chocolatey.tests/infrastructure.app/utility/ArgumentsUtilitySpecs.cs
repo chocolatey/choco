@@ -2,7 +2,7 @@
 {
     using chocolatey.infrastructure.app.utility;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class ArgumentsUtilitySpecs
     {
@@ -35,13 +35,13 @@
         [TestFixture("choco install bob -api-key=secretKey", true)]
         [TestFixture("choco install bob -api-key secretKey", true)]
         [TestFixture("choco install bob", false)]
-        public class when_ArgumentsUtility_is_testing_for_sensitive_parameters : ArgumentsUtilitySpecsBase
+        public class When_ArgumentsUtility_is_testing_for_sensitive_parameters : ArgumentsUtilitySpecsBase
         {
             private bool _result;
             private bool _expectedResult;
             private string _commandArguments;
 
-            public when_ArgumentsUtility_is_testing_for_sensitive_parameters(string commandArguments, bool expectedResult)
+            public When_ArgumentsUtility_is_testing_for_sensitive_parameters(string commandArguments, bool expectedResult)
             {
                 _commandArguments = commandArguments;
                 _expectedResult = expectedResult;
@@ -49,13 +49,13 @@
 
             public override void Because()
             {
-                _result = ArgumentsUtility.arguments_contain_sensitive_information(_commandArguments);
+                _result = ArgumentsUtility.SensitiveArgumentsProvided(_commandArguments);
             }
 
             [Fact]
-            public void should_return_expected_result()
+            public void Should_return_expected_result()
             {
-                _result.ShouldEqual(_expectedResult);
+                _result.Should().Be(_expectedResult);
             }
         }
     }

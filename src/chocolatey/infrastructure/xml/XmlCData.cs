@@ -49,7 +49,7 @@ namespace chocolatey.infrastructure.xml
         /// <returns></returns>
         public static implicit operator string(XmlCData cdata)
         {
-            if (cdata != null) return cdata._value.to_string();
+            if (cdata != null) return cdata._value.ToStringSafe();
 
             return string.Empty;
         }
@@ -65,7 +65,7 @@ namespace chocolatey.infrastructure.xml
 
         public override string ToString()
         {
-            return _value.to_string();
+            return _value.ToStringSafe();
         }
 
         public XmlSchema GetSchema()

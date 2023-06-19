@@ -24,76 +24,76 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public static class ChocolateyListCommandSpecs
     {
         [ConcernFor("list")]
         public abstract class ChocolateyListCommandSpecsBase : TinySpec
         {
-            protected ChocolateyListCommand command;
-            protected Mock<IChocolateyPackageService> packageService = new Mock<IChocolateyPackageService>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateyListCommand Command;
+            protected Mock<IChocolateyPackageService> PackageService = new Mock<IChocolateyPackageService>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                command = new ChocolateyListCommand(packageService.Object);
+                Command = new ChocolateyListCommand(PackageService.Object);
             }
         }
 
-        public class when_implementing_command_for : ChocolateyListCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyListCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
-            public void should_implement_list()
+            public void Should_implement_list()
             {
-                results.ShouldContain("list");
+                _results.Should().Contain("list");
             }
 
             [Fact]
-            public void should_not_implement_search()
+            public void Should_not_implement_search()
             {
-                results.ShouldNotContain("search");
+                _results.Should().NotContain("search");
             }
 
             [Fact]
-            public void should_not_implement_find()
+            public void Should_not_implement_find()
             {
-                results.ShouldNotContain("find");
+                _results.Should().NotContain("find");
             }
 
-            public class when_configurating_the_argument_parser : ChocolateyListCommandSpecsBase
+            public class When_configurating_the_argument_parser : ChocolateyListCommandSpecsBase
             {
-                private OptionSet optionSet;
+                private OptionSet _optionSet;
 
                 public override void Context()
                 {
                     base.Context();
-                    optionSet = new OptionSet();
+                    _optionSet = new OptionSet();
                 }
 
                 public override void Because()
                 {
-                    command.configure_argument_parser(optionSet, configuration);
-                }
-
-                [NUnit.Framework.TestCase("prerelease")]
-                [NUnit.Framework.TestCase("pre")]
-                [NUnit.Framework.TestCase("includeprograms")]
-                [NUnit.Framework.TestCase("i")]
-                public void should_add_to_option_set(string option)
-                {
-                    optionSet.Contains(option).ShouldBeTrue();
+                    Command.ConfigureArgumentParser(_optionSet, Configuration);
                 }
 
                 [NUnit.Framework.TestCase("source")]
                 [NUnit.Framework.TestCase("s")]
+                [NUnit.Framework.TestCase("prerelease")]
+                [NUnit.Framework.TestCase("pre")]
+                [NUnit.Framework.TestCase("includeprograms")]
+                [NUnit.Framework.TestCase("i")]
+                public void Should_add_to_option_set(string option)
+                {
+                    _optionSet.Contains(option).Should().BeTrue();
+                }
+
                 [NUnit.Framework.TestCase("localonly")]
                 [NUnit.Framework.TestCase("l")]
                 [NUnit.Framework.TestCase("user")]
@@ -102,103 +102,145 @@ namespace chocolatey.tests.infrastructure.app.commands
                 [NUnit.Framework.TestCase("p")]
                 [NUnit.Framework.TestCase("allversions")]
                 [NUnit.Framework.TestCase("a")]
-                public void should_not_add_to_option_set(string option)
+                public void Should_not_add_to_option_set(string option)
                 {
-                    optionSet.Contains(option).ShouldBeFalse();
+                    _optionSet.Contains(option).Should().BeFalse();
                 }
             }
 
-            public class when_handling_additional_argument_parsing : ChocolateyListCommandSpecsBase
+            public class When_handling_additional_argument_parsing : ChocolateyListCommandSpecsBase
             {
-                private readonly IList<string> unparsedArgs = new List<string>();
-                private readonly string source = "https://somewhereoutthere";
-                private Action because;
+                private readonly IList<string> _unparsedArgs = new List<string>();
+                private readonly string _source = "https://somewhereoutthere";
+                private Action _because;
 
                 public override void Context()
                 {
                     base.Context();
-                    unparsedArgs.Add("pkg1");
-                    unparsedArgs.Add("pkg2");
-                    unparsedArgs.Add("-l");
-                    unparsedArgs.Add("--local-only");
-                    unparsedArgs.Add("--localonly");
-                    configuration.Sources = source;
+                    _unparsedArgs.Add("pkg1");
+                    _unparsedArgs.Add("pkg2");
+                    _unparsedArgs.Add("-l");
+                    _unparsedArgs.Add("-lo");
+                    _unparsedArgs.Add("--local-only");
+                    _unparsedArgs.Add("--localonly");
+                    _unparsedArgs.Add("-li");
+                    _unparsedArgs.Add("-lai");
+                    Configuration.Sources = _source;
                 }
 
                 public override void Because()
                 {
-                    because = () => command.handle_additional_argument_parsing(unparsedArgs, configuration);
-                }
-
-                [Fact]
-                public void should_set_unparsed_arguments_to_configuration_input()
-                {
-                    because();
-                    configuration.Input.ShouldEqual("pkg1 pkg2");
+                    _because = () => Command.ParseAdditionalArguments(_unparsedArgs, Configuration);
                 }
 
                 [NUnit.Framework.TestCase("-l")]
+                [NUnit.Framework.TestCase("-lo")]
                 [NUnit.Framework.TestCase("--local-only")]
                 [NUnit.Framework.TestCase("--localonly")]
-                public void should_output_warning_message_about_unsupported_argument(string argument)
+                [NUnit.Framework.TestCase("-li")]
+                [NUnit.Framework.TestCase("-lai")]
+                public void Should_throw_on_unsupported_argument(string argument)
                 {
-                    because();
-                    MockLogger.Messages.Keys.ShouldContain("Warn");
-                    MockLogger.Messages["Warn"].ShouldContain(@"
-UNSUPPORTED ARGUMENT: Ignoring the argument {0}. This argument is unsupported for locally installed packages, and will be treated as a package name in Chocolatey CLI v3!".format_with(argument));
+                    Configuration.RegularOutput = true;
+                    var errored = false;
+                    Exception error = null;
+                    try
+                    {
+                        _because();
+                    }
+                    catch (Exception ex)
+                    {
+                        errored = true;
+                        error = ex;
+                    }
+
+                    errored.Should().BeTrue();
+                    error.Should().NotBeNull();
+                    error.Should().BeOfType<ApplicationException>();
+                }
+
+                [Fact]
+                public void Should_set_unparsed_arguments_to_configuration_input_with_limit_output()
+                {
+                    Configuration.RegularOutput = false;
+                    _because();
+                    Configuration.Input.Should().Be("pkg1 pkg2");
+                }
+
+                [NUnit.Framework.TestCase("-l")]
+                [NUnit.Framework.TestCase("-lo")]
+                [NUnit.Framework.TestCase("--local-only")]
+                [NUnit.Framework.TestCase("--localonly")]
+                public void Should_output_warning_message_about_unsupported_argument_with_limit_output(string argument)
+                {
+                    Configuration.RegularOutput = false;
+                    _because();
+                    MockLogger.Messages.Keys.Should().Contain("Warn");
+                    MockLogger.Messages["Warn"].Should().Contain("Ignoring the argument {0}. This argument is unsupported for locally installed packages.".FormatWith(argument));
+                }
+
+                [NUnit.Framework.TestCase("-li")]
+                [NUnit.Framework.TestCase("-lai")]
+                public void Should_output_warning_message_about_unsupported_argument_and_set_include_programs_with_limit_output(string argument)
+                {
+                    Configuration.RegularOutput = false;
+                    _because();
+                    MockLogger.Messages.Keys.Should().Contain("Warn");
+                    MockLogger.Messages["Warn"].Should().Contain("Ignoring the argument {0}. This argument is unsupported for locally installed packages.".FormatWith(argument));
+                    Configuration.ListCommand.IncludeRegistryPrograms.Should().BeTrue();
                 }
             }
 
-            public class when_noop_is_called_with_list_command : ChocolateyListCommandSpecsBase
+            public class When_noop_is_called_with_list_command : ChocolateyListCommandSpecsBase
             {
                 public override void Context()
                 {
                     base.Context();
-                    configuration.CommandName = "search";
-                    configuration.ListCommand.LocalOnly = false;
+                    Configuration.CommandName = "search";
+                    Configuration.ListCommand.LocalOnly = false;
                 }
 
                 public override void Because()
                 {
-                    command.noop(configuration);
+                    Command.DryRun(Configuration);
                 }
 
                 [Fact]
-                public void should_call_service_list_noop()
+                public void Should_call_service_list_noop()
                 {
-                    packageService.Verify(c => c.list_noop(configuration), Times.Once);
+                    PackageService.Verify(c => c.ListDryRun(Configuration), Times.Once);
                 }
 
                 [Fact]
-                public void should_not_report_any_warning_messages()
+                public void Should_not_report_any_warning_messages()
                 {
-                    MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                    MockLogger.Messages.Keys.Should().NotContain("Warn");
                 }
             }
 
-            public class when_run_is_called_with_search_command_and_local_only : ChocolateyListCommandSpecsBase
+            public class When_run_is_called_with_search_command_and_local_only : ChocolateyListCommandSpecsBase
             {
                 public override void Context()
                 {
                     base.Context();
-                    configuration.CommandName = "list";
+                    Configuration.CommandName = "list";
                 }
 
                 public override void Because()
                 {
-                    command.run(configuration);
+                    Command.Run(Configuration);
                 }
 
                 [Fact]
-                public void should_call_service_list_run()
+                public void Should_call_service_list_run()
                 {
-                    packageService.Verify(c => c.list_run(configuration), Times.Once);
+                    PackageService.Verify(c => c.List(Configuration), Times.Once);
                 }
 
                 [Fact]
-                public void should_not_report_any_warning_messages()
+                public void Should_not_report_any_warning_messages()
                 {
-                    MockLogger.Messages.Keys.ShouldNotContain("Warn");
+                    MockLogger.Messages.Keys.Should().NotContain("Warn");
                 }
             }
         }

@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.app.commands
         private readonly IChocolateyPackageInformationService _packageInfoService;
         private readonly ILogger _nugetLogger;
         private readonly INugetService _nugetService;
-        private const string NO_CHANGE_MESSAGE = "Nothing to change. Pin already set or removed.";
+        private const string NoChangeMessage = "Nothing to change. Pin already set or removed.";
 
         public ChocolateyPinCommand(IChocolateyPackageInformationService packageInfoService, ILogger nugetLogger, INugetService nugetService)
         {
@@ -47,19 +47,19 @@ namespace chocolatey.infrastructure.app.commands
             _nugetService = nugetService;
         }
 
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("n=|name=",
                      "Name - the name of the package. Required with some actions. Defaults to empty.",
-                     option => configuration.PinCommand.Name = option.remove_surrounding_quotes())
+                     option => configuration.PinCommand.Name = option.UnquoteSafe())
                 .Add("version=",
                      "Version - Used when multiple versions of a package are installed.  Defaults to empty.",
-                     option => configuration.Version = option.remove_surrounding_quotes())
+                     option => configuration.Version = option.UnquoteSafe())
                 ;
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             // don't set configuration.Input or it will be passed to list
 
@@ -68,14 +68,14 @@ namespace chocolatey.infrastructure.app.commands
                 throw new ApplicationException("A single pin command must be listed. Please see the help menu for those commands");
             }
 
-            var command = PinCommandType.unknown;
+            var command = PinCommandType.Unknown;
             string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
             Enum.TryParse(unparsedCommand, true, out command);
 
-            if (command == PinCommandType.unknown)
+            if (command == PinCommandType.Unknown)
             {
-                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
-                command = PinCommandType.list;
+                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                command = PinCommandType.List;
             }
 
             configuration.PinCommand.Command = command;
@@ -85,15 +85,15 @@ namespace chocolatey.infrastructure.app.commands
             configuration.Prerelease = true;
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
-            if (configuration.PinCommand.Command != PinCommandType.list && string.IsNullOrWhiteSpace(configuration.PinCommand.Name))
+            if (configuration.PinCommand.Command != PinCommandType.List && string.IsNullOrWhiteSpace(configuration.PinCommand.Name))
             {
-                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".format_with(configuration.PinCommand.Command.to_string()));
+                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name.".FormatWith(configuration.PinCommand.Command.ToStringSafe().ToLower()));
             }
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Pin Command");
             this.Log().Info(@"
@@ -140,90 +140,123 @@ If you find other exit codes that we have not yet documented, please
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
-            this.Log().Info("Pin would have called {0} with other options:{1} Name={2}{1} Version={3}".format_with(configuration.PinCommand.Command.to_string(), Environment.NewLine, configuration.PinCommand.Name, configuration.Version));
+            this.Log().Info("Pin would have called {0} with other options:{1} Name={2}{1} Version={3}".FormatWith(configuration.PinCommand.Command.ToStringSafe(), Environment.NewLine, configuration.PinCommand.Name, configuration.Version));
         }
 
-        public virtual void run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
             switch (configuration.PinCommand.Command)
             {
-                case PinCommandType.list:
-                    list_pins(configuration);
+                case PinCommandType.List:
+                    ListPins(configuration);
                     break;
-                case PinCommandType.add:
-                case PinCommandType.remove:
-                    set_pin(configuration);
+                case PinCommandType.Add:
+                case PinCommandType.Remove:
+                    SetPin(configuration);
                     break;
             }
         }
 
-        public virtual void list_pins(ChocolateyConfiguration config)
+        public virtual void ListPins(ChocolateyConfiguration config)
         {
             var input = config.Input;
             config.Input = string.Empty;
             var quiet = config.QuietOutput;
             config.QuietOutput = true;
-            var packages = _nugetService.list_run(config).ToList();
+            var packages = _nugetService.List(config).ToList();
             config.QuietOutput = quiet;
             config.Input = input;
 
-            foreach (var pkg in packages.or_empty_list_if_null())
+            foreach (var pkg in packages.OrEmpty())
             {
-                var pkgInfo = _packageInfoService.get_package_information(pkg.PackageMetadata);
+                var pkgInfo = _packageInfoService.Get(pkg.PackageMetadata);
                 if (pkgInfo != null && pkgInfo.IsPinned)
                 {
-                    this.Log().Info(() => "{0}|{1}".format_with(pkgInfo.Package.Id, pkgInfo.Package.Version));
+                    this.Log().Info(() => "{0}|{1}".FormatWith(pkgInfo.Package.Id, pkgInfo.Package.Version));
                 }
             }
         }
 
-        public virtual void set_pin(ChocolateyConfiguration config)
+        public virtual void SetPin(ChocolateyConfiguration config)
         {
-            var addingAPin = config.PinCommand.Command == PinCommandType.add;
-            this.Log().Info("Trying to {0} a pin for {1}".format_with(config.PinCommand.Command.to_string(), config.PinCommand.Name));
+            var addingAPin = config.PinCommand.Command == PinCommandType.Add;
+            this.Log().Info("Trying to {0} a pin for {1}".FormatWith(config.PinCommand.Command.ToStringSafe(), config.PinCommand.Name));
             var versionUnspecified = string.IsNullOrWhiteSpace(config.Version);
             NuGetVersion semanticVersion = versionUnspecified ? null : NuGetVersion.Parse(config.Version);
 
             var input = config.Input;
             config.Input = config.PinCommand.Name;
-            config.Version = semanticVersion.to_full_string();
+            config.Version = semanticVersion.ToFullStringChecked();
             config.ListCommand.ByIdOnly = true;
+            var exact = config.ListCommand.Exact;
+            config.ListCommand.Exact = true;
             var quiet = config.QuietOutput;
             config.QuietOutput = true;
-            var installedPackage = _nugetService.list_run(config).FirstOrDefault();
+            var installedPackage = _nugetService.List(config).FirstOrDefault();
+            config.ListCommand.Exact = exact;
             config.QuietOutput = quiet;
             config.Input = input;
 
             if (installedPackage == null)
             {
-                throw new ApplicationException("Unable to find package named '{0}'{1} to pin. Please check to ensure it is installed.".format_with(config.PinCommand.Name, versionUnspecified ? "" : " (version '{0}')".format_with(config.Version)));
+                throw new ApplicationException("Unable to find package named '{0}'{1} to pin. Please check to ensure it is installed.".FormatWith(config.PinCommand.Name, versionUnspecified ? "" : " (version '{0}')".FormatWith(config.Version)));
             }
 
-            var pkgInfo = _packageInfoService.get_package_information(installedPackage.PackageMetadata);
+            var pkgInfo = _packageInfoService.Get(installedPackage.PackageMetadata);
 
             bool changeMessage = pkgInfo.IsPinned != addingAPin;
 
             pkgInfo.IsPinned = addingAPin;
-            _packageInfoService.save_package_information(pkgInfo);
+            _packageInfoService.Save(pkgInfo);
 
             if (changeMessage)
             {
-                this.Log().Warn("Successfully {0} a pin for {1} v{2}.".format_with(addingAPin ? "added" : "removed", pkgInfo.Package.Id, pkgInfo.Package.Version.to_full_string()));
+                this.Log().Warn("Successfully {0} a pin for {1} v{2}.".FormatWith(addingAPin ? "added" : "removed", pkgInfo.Package.Id, pkgInfo.Package.Version.ToFullStringChecked()));
             }
             else
             {
-                this.Log().Warn(NO_CHANGE_MESSAGE);
+                this.Log().Warn(NoChangeMessage);
             }
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
-            var config = Config.get_configuration_settings();
+            var config = Config.GetConfigurationSettings();
             if (config == null) return true;
 
-            return config.PinCommand.Command != PinCommandType.list;
+            return config.PinCommand.Command != PinCommandType.List;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+#pragma warning restore IDE1006
     }
 }

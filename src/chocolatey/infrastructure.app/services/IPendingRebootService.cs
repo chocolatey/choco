@@ -17,6 +17,7 @@
 namespace chocolatey.infrastructure.app.services
 {
     using configuration;
+    using System;
 
     /// <summary>
     ///   Test to see if there are any known situations that require
@@ -25,6 +26,11 @@ namespace chocolatey.infrastructure.app.services
     /// <returns><c>true</c> if reboot is required; otherwise <c>false</c>.</returns>
     public interface IPendingRebootService
     {
+        bool IsRebootPending(ChocolateyConfiguration config);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         bool is_pending_reboot(ChocolateyConfiguration config);
+#pragma warning restore IDE1006
     }
 }

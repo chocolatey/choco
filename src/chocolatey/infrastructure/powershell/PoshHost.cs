@@ -52,7 +52,7 @@ namespace chocolatey.infrastructure.powershell
             ExitCode = -1;
             _configuration = configuration;
             _psUI = new PoshHostUserInterface(configuration);
-            _version = get_current_version();
+            _version = GetCurrentVersion();
         }
 
         /// <summary>
@@ -60,12 +60,12 @@ namespace chocolatey.infrastructure.powershell
         /// </summary>
         /// <returns></returns>
         /// <remarks>We can cheat because we require at least v2, which takes us down to just the check for v3</remarks>
-        private Version get_current_version()
+        private Version GetCurrentVersion()
         {
             // users need at least v2 to even use Chocolatey
             // this allows us to shortcut the check for the v1/2 key
             var version = new Version(2, 0);
-            var majorMinor = RegistryService.get_value(RegistryHiveType.LocalMachine, "SOFTWARE\\Microsoft\\PowerShell\\3\\PowerShellEngine", "PowerShellVersion");
+            var majorMinor = RegistryService.GetRegistryValue(RegistryHiveType.LocalMachine, "SOFTWARE\\Microsoft\\PowerShell\\3\\PowerShellEngine", "PowerShellVersion");
             if (majorMinor != null)
             {
                 version = new Version(majorMinor.Value);

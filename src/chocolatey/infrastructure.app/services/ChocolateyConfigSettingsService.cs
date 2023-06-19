@@ -31,14 +31,14 @@ namespace chocolatey.infrastructure.app.services
         private readonly HashSet<string> _knownFeatures = new HashSet<string>();
         private readonly Lazy<ConfigFileSettings> _configFileSettings;
         private readonly IXmlService _xmlService;
-        private const string NO_CHANGE_MESSAGE = "Nothing to change. Config already set.";
+        private const string NoChangeMessage = "Nothing to change. Config already set.";
 
         public ChocolateyConfigSettingsService()
         {
-            add_known_features_from_static_class(typeof(ApplicationParameters.Features));
+            AddKnownFeaturesFromStaticClass(typeof(ApplicationParameters.Features));
         }
 
-        private ConfigFileSettings configFileSettings
+        private ConfigFileSettings ConfigFileSettings
         {
             get { return _configFileSettings.Value; }
         }
@@ -47,53 +47,53 @@ namespace chocolatey.infrastructure.app.services
             : this()
         {
             _xmlService = xmlService;
-            _configFileSettings = new Lazy<ConfigFileSettings>(() => _xmlService.deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation));
+            _configFileSettings = new Lazy<ConfigFileSettings>(() => _xmlService.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation));
         }
 
-        public void noop(ChocolateyConfiguration configuration)
+        public void DryRun(ChocolateyConfiguration configuration)
         {
             this.Log().Info("Would have made a change to the configuration.");
         }
 
-        public virtual bool skip_source(ConfigFileSourceSetting source, ChocolateyConfiguration configuration)
+        public virtual bool SkipSource(ConfigFileSourceSetting source, ChocolateyConfiguration configuration)
         {
             return false;
         }
 
-        public virtual IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration)
+        public virtual IEnumerable<ChocolateySource> ListSources(ChocolateyConfiguration configuration)
         {
             var list = new List<ChocolateySource>();
-            foreach (var source in configFileSettings.Sources)
+            foreach (var source in ConfigFileSettings.Sources.OrEmpty().OrderBy(s => s.Id))
             {
-                if (skip_source(source, configuration)) continue;
+                if (SkipSource(source, configuration)) continue;
 
                 if (!configuration.QuietOutput)
                 {
                     if (configuration.RegularOutput)
                     {
-                        this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}|Admin Only - {7}.".format_with(
+                        this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}|Admin Only - {7}.".FormatWith(
                         source.Id,
                         source.Disabled ? " [Disabled]" : string.Empty,
                         source.Value,
                         (string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)) ? string.Empty : "(Authenticated)",
                         source.Priority,
-                        source.BypassProxy.to_string(),
-                        source.AllowSelfService.to_string(),
-                        source.VisibleToAdminsOnly.to_string()
+                        source.BypassProxy.ToStringSafe(),
+                        source.AllowSelfService.ToStringSafe(),
+                        source.VisibleToAdminsOnly.ToStringSafe()
                         ));
                     }
                     else
                     {
-                        this.Log().Info(() => "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}".format_with(
-                        source.Id.quote_if_pipe_found(),
+                        this.Log().Info(() => "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}".FormatWith(
+                        source.Id.QuoteIfContainsPipe(),
                         source.Value,
-                        source.Disabled.to_string(),
-                        source.UserName.quote_if_pipe_found(),
+                        source.Disabled.ToStringSafe(),
+                        source.UserName.QuoteIfContainsPipe(),
                         source.Certificate,
                         source.Priority,
-                        source.BypassProxy.to_string(),
-                        source.AllowSelfService.to_string(),
-                        source.VisibleToAdminsOnly.to_string()
+                        source.BypassProxy.ToStringSafe(),
+                        source.AllowSelfService.ToStringSafe(),
+                        source.VisibleToAdminsOnly.ToStringSafe()
                         ));
                     }
                 }
@@ -112,9 +112,9 @@ namespace chocolatey.infrastructure.app.services
             return list;
         }
 
-        public void source_add(ChocolateyConfiguration configuration)
+        public void AddSource(ChocolateyConfiguration configuration)
         {
-            var source = configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
+            var source = ConfigFileSettings.Sources.FirstOrDefault(p => p.Id.IsEqualTo(configuration.SourceCommand.Name));
             if (source == null)
             {
                 source = new ConfigFileSourceSetting
@@ -130,27 +130,27 @@ namespace chocolatey.infrastructure.app.services
                     AllowSelfService = configuration.SourceCommand.AllowSelfService,
                     VisibleToAdminsOnly = configuration.SourceCommand.VisibleToAdminsOnly
                 };
-                configFileSettings.Sources.Add(source);
+                ConfigFileSettings.Sources.Add(source);
 
-                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                if (!configuration.QuietOutput) this.Log().Warn(() => "Added {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
+                _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Added {0} - {1} (Priority {2})".FormatWith(source.Id, source.Value, source.Priority));
             }
             else
             {
                 var currentPassword = string.IsNullOrWhiteSpace(source.Password) ? null : NugetEncryptionUtility.DecryptString(source.Password);
                 var currentCertificatePassword = string.IsNullOrWhiteSpace(source.CertificatePassword) ? null : NugetEncryptionUtility.DecryptString(source.CertificatePassword);
-                if (configuration.Sources.is_equal_to(source.Value) &&
+                if (configuration.Sources.IsEqualTo(source.Value) &&
                     configuration.SourceCommand.Priority == source.Priority &&
-                    configuration.SourceCommand.Username.is_equal_to(source.UserName) &&
-                    configuration.SourceCommand.Password.is_equal_to(currentPassword) &&
-                    configuration.SourceCommand.CertificatePassword.is_equal_to(currentCertificatePassword) &&
-                    configuration.SourceCommand.Certificate.is_equal_to(source.Certificate) &&
+                    configuration.SourceCommand.Username.IsEqualTo(source.UserName) &&
+                    configuration.SourceCommand.Password.IsEqualTo(currentPassword) &&
+                    configuration.SourceCommand.CertificatePassword.IsEqualTo(currentCertificatePassword) &&
+                    configuration.SourceCommand.Certificate.IsEqualTo(source.Certificate) &&
                     configuration.SourceCommand.BypassProxy == source.BypassProxy &&
                     configuration.SourceCommand.AllowSelfService == source.AllowSelfService &&
                     configuration.SourceCommand.VisibleToAdminsOnly == source.VisibleToAdminsOnly
                     )
                 {
-                    if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
+                    if (!configuration.QuietOutput) this.Log().Warn(NoChangeMessage);
                 }
                 else
                 {
@@ -164,138 +164,160 @@ namespace chocolatey.infrastructure.app.services
                     source.AllowSelfService = configuration.SourceCommand.AllowSelfService;
                     source.VisibleToAdminsOnly = configuration.SourceCommand.VisibleToAdminsOnly;
 
-                    _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                    if (!configuration.QuietOutput) this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".format_with(source.Id, source.Value, source.Priority));
+                    _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                    if (!configuration.QuietOutput) this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".FormatWith(source.Id, source.Value, source.Priority));
                 }
             }
         }
 
-        public void source_remove(ChocolateyConfiguration configuration)
+        public void RemoveSource(ChocolateyConfiguration configuration)
         {
-            var source = configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
+            var source = ConfigFileSettings.Sources.FirstOrDefault(p => p.Id.IsEqualTo(configuration.SourceCommand.Name));
             if (source != null)
             {
-                configFileSettings.Sources.Remove(source);
-                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                ConfigFileSettings.Sources.Remove(source);
+                _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                if (!configuration.QuietOutput) this.Log().Warn(() => "Removed {0}".format_with(source.Id));
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Removed {0}".FormatWith(source.Id));
             }
             else
             {
-                if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
+                if (!configuration.QuietOutput) this.Log().Warn(NoChangeMessage);
             }
         }
 
-        public void source_disable(ChocolateyConfiguration configuration)
+        public void DisableSource(ChocolateyConfiguration configuration)
         {
-            var source = configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
+            var source = ConfigFileSettings.Sources.FirstOrDefault(p => p.Id.IsEqualTo(configuration.SourceCommand.Name));
             if (source != null && !source.Disabled)
             {
                 source.Disabled = true;
-                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                if (!configuration.QuietOutput) this.Log().Warn(() => "Disabled {0}".format_with(source.Id));
+                _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Disabled {0}".FormatWith(source.Id));
             }
             else
             {
-                if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
+                if (!configuration.QuietOutput) this.Log().Warn(NoChangeMessage);
             }
         }
 
-        public void source_enable(ChocolateyConfiguration configuration)
+        public void EnableSource(ChocolateyConfiguration configuration)
         {
-            var source = configFileSettings.Sources.FirstOrDefault(p => p.Id.is_equal_to(configuration.SourceCommand.Name));
+            var source = ConfigFileSettings.Sources.FirstOrDefault(p => p.Id.IsEqualTo(configuration.SourceCommand.Name));
             if (source != null && source.Disabled)
             {
                 source.Disabled = false;
-                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                if (!configuration.QuietOutput) this.Log().Warn(() => "Enabled {0}".format_with(source.Id));
+                _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                if (!configuration.QuietOutput) this.Log().Warn(() => "Enabled {0}".FormatWith(source.Id));
             }
             else
             {
-                if (!configuration.QuietOutput) this.Log().Warn(NO_CHANGE_MESSAGE);
+                if (!configuration.QuietOutput) this.Log().Warn(NoChangeMessage);
             }
         }
 
-        public void feature_list(ChocolateyConfiguration configuration)
+        public void ListFeatures(ChocolateyConfiguration configuration)
         {
-            foreach (var feature in configFileSettings.Features)
+            foreach (var feature in ConfigFileSettings.Features.OrEmpty().OrderBy(f => f.Name))
             {
                 if (configuration.RegularOutput)
                 {
-                    this.Log().Info(() => "{0} {1} - {2}".format_with(feature.Enabled ? "[x]" : "[ ]", feature.Name, feature.Description));
+                    this.Log().Info(() => "{0} {1} - {2}".FormatWith(feature.Enabled ? "[x]" : "[ ]", feature.Name, feature.Description));
                 }
                 else
                 {
-                    this.Log().Info(() => "{0}|{1}|{2}".format_with(feature.Name, !feature.Enabled ? "Disabled" : "Enabled", feature.Description));
+                    this.Log().Info(() => "{0}|{1}|{2}".FormatWith(feature.Name, !feature.Enabled ? "Disabled" : "Enabled", feature.Description));
                 }
             }
         }
 
-        public void feature_disable(ChocolateyConfiguration configuration)
+        public void GetFeature(ChocolateyConfiguration configuration)
         {
-            var feature = configFileSettings.Features.FirstOrDefault(p => p.Name.is_equal_to(configuration.FeatureCommand.Name));
+            var feature = GetFeatureValue(configuration.FeatureCommand.Name);
             if (feature == null)
             {
-                throw new ApplicationException("Feature '{0}' not found".format_with(configuration.FeatureCommand.Name));
+                throw new ApplicationException("No feature value by the name '{0}'".FormatWith(configuration.FeatureCommand.Name));
             }
 
-            validate_supported_feature(feature);
+            this.Log().Info("{0}".FormatWith(feature.Enabled ? "Enabled" : "Disabled"));
+        }
+
+        public ConfigFileFeatureSetting GetFeatureValue(string featureName)
+        {
+            var feature = ConfigFileSettings.Features.FirstOrDefault(f => f.Name.IsEqualTo(featureName));
+            if (feature == null)
+            {
+                return null;
+            }
+
+            return feature;
+        }
+
+        public void DisableFeature(ChocolateyConfiguration configuration)
+        {
+            var feature = ConfigFileSettings.Features.FirstOrDefault(p => p.Name.IsEqualTo(configuration.FeatureCommand.Name));
+            if (feature == null)
+            {
+                throw new ApplicationException("Feature '{0}' not found".FormatWith(configuration.FeatureCommand.Name));
+            }
+
+            ValidateSupportedFeature(feature);
 
             if (feature.Enabled || !feature.SetExplicitly)
             {
                 if (!feature.Enabled && !feature.SetExplicitly)
                 {
-                    this.Log().Info(() => "{0} was disabled by default. Explicitly setting value.".format_with(feature.Name));
+                    this.Log().Info(() => "{0} was disabled by default. Explicitly setting value.".FormatWith(feature.Name));
                 }
                 feature.Enabled = false;
                 feature.SetExplicitly = true;
-                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                this.Log().Warn(() => "Disabled {0}".format_with(feature.Name));
+                _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                this.Log().Warn(() => "Disabled {0}".FormatWith(feature.Name));
             }
             else
             {
-                this.Log().Warn(NO_CHANGE_MESSAGE);
+                this.Log().Warn(NoChangeMessage);
             }
         }
 
-        public void feature_enable(ChocolateyConfiguration configuration)
+        public void EnableFeature(ChocolateyConfiguration configuration)
         {
-            var feature = configFileSettings.Features.FirstOrDefault(p => p.Name.is_equal_to(configuration.FeatureCommand.Name));
+            var feature = ConfigFileSettings.Features.FirstOrDefault(p => p.Name.IsEqualTo(configuration.FeatureCommand.Name));
 
             if (feature == null)
             {
-                throw new ApplicationException("Feature '{0}' not found".format_with(configuration.FeatureCommand.Name));
+                throw new ApplicationException("Feature '{0}' not found".FormatWith(configuration.FeatureCommand.Name));
             }
 
-            validate_supported_feature(feature);
+            ValidateSupportedFeature(feature);
 
             if (!feature.Enabled || !feature.SetExplicitly)
             {
                 if (feature.Enabled && !feature.SetExplicitly)
                 {
-                    this.Log().Info(() => "{0} was enabled by default. Explicitly setting value.".format_with(feature.Name));
+                    this.Log().Info(() => "{0} was enabled by default. Explicitly setting value.".FormatWith(feature.Name));
                 }
                 feature.Enabled = true;
                 feature.SetExplicitly = true;
-                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                this.Log().Warn(() => "Enabled {0}".format_with(feature.Name));
+                _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                this.Log().Warn(() => "Enabled {0}".FormatWith(feature.Name));
             }
             else
             {
-                this.Log().Warn(NO_CHANGE_MESSAGE);
+                this.Log().Warn(NoChangeMessage);
             }
         }
 
-        public string get_api_key(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction)
+        public string GetApiKey(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction)
         {
             string apiKeyValue = null;
 
             if (!string.IsNullOrWhiteSpace(configuration.Sources))
             {
-                var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.TrimEnd('/').is_equal_to(configuration.Sources.TrimEnd('/')));
+                var apiKey = ConfigFileSettings.ApiKeys.FirstOrDefault(p => p.Source.TrimEnd('/').IsEqualTo(configuration.Sources.TrimEnd('/')));
                 if (apiKey != null)
                 {
-                    apiKeyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
+                    apiKeyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).ToStringSafe();
 
                     if (keyAction != null)
                     {
@@ -305,9 +327,9 @@ namespace chocolatey.infrastructure.app.services
             }
             else
             {
-                foreach (var apiKey in configFileSettings.ApiKeys.or_empty_list_if_null())
+                foreach (var apiKey in ConfigFileSettings.ApiKeys.OrEmpty().OrderBy(a => a.Source))
                 {
-                    var keyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).to_string();
+                    var keyValue = NugetEncryptionUtility.DecryptString(apiKey.Key).ToStringSafe();
                     if (keyAction != null)
                     {
                         keyAction.Invoke(new ConfigFileApiKeySetting { Key = keyValue, Source = apiKey.Source });
@@ -318,86 +340,86 @@ namespace chocolatey.infrastructure.app.services
             return apiKeyValue;
         }
 
-        public void set_api_key(ChocolateyConfiguration configuration)
+        public void SetApiKey(ChocolateyConfiguration configuration)
         {
-            var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Sources));
+            var apiKey = ConfigFileSettings.ApiKeys.FirstOrDefault(p => p.Source.IsEqualTo(configuration.Sources));
             if (apiKey == null)
             {
-                configFileSettings.ApiKeys.Add(new ConfigFileApiKeySetting
+                ConfigFileSettings.ApiKeys.Add(new ConfigFileApiKeySetting
                 {
                     Source = configuration.Sources,
                     Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key),
                 });
 
-                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                this.Log().Info(() => "Added API key for {0}".format_with(configuration.Sources));
+                this.Log().Info(() => "Added API key for {0}".FormatWith(configuration.Sources));
             }
             else
             {
-                if (!NugetEncryptionUtility.DecryptString(apiKey.Key).to_string().is_equal_to(configuration.ApiKeyCommand.Key))
+                if (!NugetEncryptionUtility.DecryptString(apiKey.Key).ToStringSafe().IsEqualTo(configuration.ApiKeyCommand.Key))
                 {
                     apiKey.Key = NugetEncryptionUtility.EncryptString(configuration.ApiKeyCommand.Key);
-                    _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                    this.Log().Info(() => "Updated API key for {0}".format_with(configuration.Sources));
+                    _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                    this.Log().Info(() => "Updated API key for {0}".FormatWith(configuration.Sources));
                 }
-                else this.Log().Warn(NO_CHANGE_MESSAGE);
+                else this.Log().Warn(NoChangeMessage);
             }
         }
 
-        public void remove_api_key(ChocolateyConfiguration configuration)
+        public void RemoveApiKey(ChocolateyConfiguration configuration)
         {
-            var apiKey = configFileSettings.ApiKeys.FirstOrDefault(p => p.Source.is_equal_to(configuration.Sources));
+            var apiKey = ConfigFileSettings.ApiKeys.FirstOrDefault(p => p.Source.IsEqualTo(configuration.Sources));
             if (apiKey != null)
             {
-                configFileSettings.ApiKeys.RemoveWhere(x => x.Source.is_equal_to(configuration.Sources));
+                ConfigFileSettings.ApiKeys.RemoveWhere(x => x.Source.IsEqualTo(configuration.Sources));
 
-                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                this.Log().Info(() => "Removed API key for {0}".format_with(configuration.Sources));
+                this.Log().Info(() => "Removed API key for {0}".FormatWith(configuration.Sources));
             }
             else
             {
-                this.Log().Info(() => "API key was not found for {0}".format_with(configuration.Sources));
+                this.Log().Info(() => "API key was not found for {0}".FormatWith(configuration.Sources));
             }
 
         }
 
-        public void config_list(ChocolateyConfiguration configuration)
+        public void ListConfig(ChocolateyConfiguration configuration)
         {
-            foreach (var config in configFileSettings.ConfigSettings)
+            foreach (var config in ConfigFileSettings.ConfigSettings.OrEmpty().OrderBy(c => c.Key))
             {
                 if (configuration.RegularOutput)
                 {
-                    this.Log().Info(() => "{0} = {1} | {2}".format_with(config.Key, config.Value, config.Description));
+                    this.Log().Info(() => "{0} = {1} | {2}".FormatWith(config.Key, config.Value, config.Description));
 
                 }
                 else
                 {
-                    this.Log().Info(() => "{0}|{1}|{2}".format_with(config.Key, config.Value, config.Description));
+                    this.Log().Info(() => "{0}|{1}|{2}".FormatWith(config.Key, config.Value, config.Description));
                 }
             }
         }
 
-        public void config_get(ChocolateyConfiguration configuration)
+        public void GetConfig(ChocolateyConfiguration configuration)
         {
-            var config = config_get(configuration.ConfigCommand.Name);
-            if (config == null) throw new ApplicationException("No configuration value by the name '{0}'".format_with(configuration.ConfigCommand.Name));
-            this.Log().Info("{0}".format_with(config.Value));
+            var config = GetConfigValue(configuration.ConfigCommand.Name);
+            if (config == null) throw new ApplicationException("No configuration value by the name '{0}'".FormatWith(configuration.ConfigCommand.Name));
+            this.Log().Info("{0}".FormatWith(config.Value));
         }
 
-        public ConfigFileConfigSetting config_get(string configKeyName)
+        public ConfigFileConfigSetting GetConfigValue(string configKeyName)
         {
-            var config = configFileSettings.ConfigSettings.FirstOrDefault(p => p.Key.is_equal_to(configKeyName));
+            var config = ConfigFileSettings.ConfigSettings.FirstOrDefault(p => p.Key.IsEqualTo(configKeyName));
             if (config == null) return null;
 
             return config;
         }
 
-        public void config_set(ChocolateyConfiguration configuration)
+        public void SetConfig(ChocolateyConfiguration configuration)
         {
-            var encryptValue = configuration.ConfigCommand.Name.contains("password");
-            var config = config_get(configuration.ConfigCommand.Name);
+            var encryptValue = configuration.ConfigCommand.Name.ContainsSafe("password");
+            var config = GetConfigValue(configuration.ConfigCommand.Name);
             var configValue = encryptValue
                                   ? NugetEncryptionUtility.EncryptString(configuration.ConfigCommand.ConfigValue)
                                   : configuration.ConfigCommand.ConfigValue;
@@ -410,11 +432,11 @@ namespace chocolatey.infrastructure.app.services
                     Value = configValue,
                 };
 
-                configFileSettings.ConfigSettings.Add(setting);
+                ConfigFileSettings.ConfigSettings.Add(setting);
 
-                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                this.Log().Warn(() => "Added {0} = {1}".format_with(setting.Key, setting.Value));
+                this.Log().Warn(() => "Added {0} = {1}".FormatWith(setting.Key, setting.Value));
             }
             else
             {
@@ -422,37 +444,37 @@ namespace chocolatey.infrastructure.app.services
                                        ? NugetEncryptionUtility.DecryptString(config.Value)
                                        : config.Value;
 
-                if (configuration.ConfigCommand.ConfigValue.is_equal_to(currentValue.to_string()))
+                if (configuration.ConfigCommand.ConfigValue.IsEqualTo(currentValue.ToStringSafe()))
                 {
-                    this.Log().Warn(NO_CHANGE_MESSAGE);
+                    this.Log().Warn(NoChangeMessage);
                 }
                 else
                 {
                     config.Value = configValue;
-                    _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                    _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                    this.Log().Warn(() => "Updated {0} = {1}".format_with(config.Key, config.Value));
+                    this.Log().Warn(() => "Updated {0} = {1}".FormatWith(config.Key, config.Value));
                 }
             }
         }
 
-        public void config_unset(ChocolateyConfiguration configuration)
+        public void UnsetConfig(ChocolateyConfiguration configuration)
         {
-            var config = config_get(configuration.ConfigCommand.Name);
+            var config = GetConfigValue(configuration.ConfigCommand.Name);
             if (config == null || string.IsNullOrEmpty(config.Value))
             {
-                this.Log().Warn(NO_CHANGE_MESSAGE);
+                this.Log().Warn(NoChangeMessage);
             }
             else
             {
                 config.Value = "";
-                _xmlService.serialize(configFileSettings, ApplicationParameters.GlobalConfigFileLocation);
+                _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                this.Log().Warn(() => "Unset {0}".format_with(config.Key));
+                this.Log().Warn(() => "Unset {0}".FormatWith(config.Key));
             }
         }
 
-        protected void add_known_features_from_static_class(Type classType)
+        protected void AddKnownFeaturesFromStaticClass(Type classType)
         {
             var fieldInfos = classType.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.GetField);
 
@@ -463,30 +485,116 @@ namespace chocolatey.infrastructure.app.services
                     var value = (string)fi.GetValue(null);
                     if (!string.IsNullOrEmpty(value))
                     {
-                        add_known_feature(value);
+                        AddKnownFeature(value);
                     }
                 }
                 catch
                 {
-                    typeof(ChocolateyConfigSettingsService).Log().Debug("Unable to get value for known feature name for variable '{0}'!".format_with(fi.Name));
+                    typeof(ChocolateyConfigSettingsService).Log().Debug("Unable to get value for known feature name for variable '{0}'!".FormatWith(fi.Name));
                 }
             }
         }
 
-        protected void add_known_feature(string name)
+        protected void AddKnownFeature(string name)
         {
-            if (!_knownFeatures.Contains(name.to_lower()))
+            if (!_knownFeatures.Contains(name.ToLowerSafe()))
             {
-                _knownFeatures.Add(name.to_lower());
+                _knownFeatures.Add(name.ToLowerSafe());
             }
         }
 
-        protected void validate_supported_feature(ConfigFileFeatureSetting feature)
+        protected void ValidateSupportedFeature(ConfigFileFeatureSetting feature)
         {
-            if (!_knownFeatures.Contains(feature.Name.to_lower()))
+            if (!_knownFeatures.Contains(feature.Name.ToLowerSafe()))
             {
-                throw new ApplicationException("Feature '{0}' is not supported.".format_with(feature.Name));
+                throw new ApplicationException("Feature '{0}' is not supported.".FormatWith(feature.Name));
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool skip_source(ConfigFileSourceSetting source, ChocolateyConfiguration configuration)
+            => SkipSource(source, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual IEnumerable<ChocolateySource> source_list(ChocolateyConfiguration configuration)
+            => ListSources(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void source_add(ChocolateyConfiguration configuration)
+            => AddSource(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void source_remove(ChocolateyConfiguration configuration)
+            => RemoveSource(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void source_disable(ChocolateyConfiguration configuration)
+            => DisableSource(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void source_enable(ChocolateyConfiguration configuration)
+            => EnableSource(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void feature_list(ChocolateyConfiguration configuration)
+            => ListFeatures(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void feature_disable(ChocolateyConfiguration configuration)
+            => DisableFeature(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void feature_enable(ChocolateyConfiguration configuration)
+            => EnableFeature(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string get_api_key(ChocolateyConfiguration configuration, Action<ConfigFileApiKeySetting> keyAction)
+            => GetApiKey(configuration, keyAction);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void set_api_key(ChocolateyConfiguration configuration)
+            => SetApiKey(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void remove_api_key(ChocolateyConfiguration configuration)
+            => RemoveApiKey(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void config_list(ChocolateyConfiguration configuration)
+            => ListConfig(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void config_get(ChocolateyConfiguration configuration)
+            => GetConfig(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public ConfigFileConfigSetting config_get(string configKeyName)
+            => GetConfigValue(configKeyName);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void config_set(ChocolateyConfiguration configuration)
+            => SetConfig(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void config_unset(ChocolateyConfiguration configuration)
+            => UnsetConfig(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected void add_known_features_from_static_class(Type classType)
+            => AddKnownFeaturesFromStaticClass(classType);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected void add_known_feature(string name)
+            => AddKnownFeature(name);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        protected void validate_supported_feature(ConfigFileFeatureSetting feature)
+            => ValidateSupportedFeature(feature);
+#pragma warning disable IDE1006
     }
 }

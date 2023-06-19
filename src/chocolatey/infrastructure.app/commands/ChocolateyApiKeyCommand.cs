@@ -39,21 +39,21 @@ namespace chocolatey.infrastructure.app.commands
             _configSettingsService = configSettingsService;
         }
 
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             configuration.Sources = null;
 
             optionSet
                 .Add("s=|source=",
                      "Source [REQUIRED] - The source location for the key",
-                     option => configuration.Sources = option.remove_surrounding_quotes())
+                     option => configuration.Sources = option.UnquoteSafe())
                 .Add("k=|key=|apikey=|api-key=",
                      "ApiKey - The API key for the source. This is the authentication that identifies you and allows you to push to a source. With some sources this is either a key or it could be a user name and password specified as 'user:password'.",
-                     option => configuration.ApiKeyCommand.Key = option.remove_surrounding_quotes())
+                     option => configuration.ApiKeyCommand.Key = option.UnquoteSafe())
                 ;
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
 
@@ -71,7 +71,7 @@ namespace chocolatey.infrastructure.app.commands
 
                 if (!string.IsNullOrWhiteSpace(unparsedCommand))
                 {
-                    this.Log().Warn("Unknown command {0}. Setting to list.".format_with(unparsedCommand));
+                    this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
                 }
                 else if (!string.IsNullOrWhiteSpace(configuration.ApiKeyCommand.Key))
                 {
@@ -83,7 +83,7 @@ namespace chocolatey.infrastructure.app.commands
             configuration.ApiKeyCommand.Command = command;
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
             switch (configuration.ApiKeyCommand.Command)
             {
@@ -104,7 +104,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "ApiKey Command");
             this.Log().Info(@"
@@ -158,7 +158,7 @@ In order to save your API key for {0},
 
     choco apikey add -k <your key here> -s {0}
 
-".format_with(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+".FormatWith(ApplicationParameters.ChocolateyCommunityFeedPushSource));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Exit Codes");
             "chocolatey".Log().Info(@"
@@ -176,45 +176,75 @@ If you find other exit codes that we have not yet documented, please
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
-            _configSettingsService.noop(configuration);
+            _configSettingsService.DryRun(configuration);
         }
 
-        public virtual void run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
             switch (configuration.ApiKeyCommand.Command)
             {
                 case ApiKeyCommandType.Remove:
-                    _configSettingsService.remove_api_key(configuration);
+                    _configSettingsService.RemoveApiKey(configuration);
                     break;
                 case ApiKeyCommandType.Add:
-                    _configSettingsService.set_api_key(configuration);
+                    _configSettingsService.SetApiKey(configuration);
                     break;
                 default:
-                    _configSettingsService.get_api_key(configuration, (key) =>
+                    _configSettingsService.GetApiKey(configuration, (key) =>
                     {
                         string authenticatedString = string.IsNullOrWhiteSpace(key.Key) ? string.Empty : "(Authenticated)";
 
                         if (configuration.RegularOutput)
                         {
-                            this.Log().Info(() => "{0} - {1}".format_with(key.Source, authenticatedString));
+                            this.Log().Info(() => "{0} - {1}".FormatWith(key.Source, authenticatedString));
                         }
                         else
                         {
-                            this.Log().Info(() => "{0}|{1}".format_with(key.Source, authenticatedString));
+                            this.Log().Info(() => "{0}|{1}".FormatWith(key.Source, authenticatedString));
                         }
                     });
                     break;
             }
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
-            var config = Config.get_configuration_settings();
+            var config = Config.GetConfigurationSettings();
             if (config == null) return true;
 
             return !string.IsNullOrWhiteSpace(config.ApiKeyCommand.Key);
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+#pragma warning restore IDE1006
     }
 }

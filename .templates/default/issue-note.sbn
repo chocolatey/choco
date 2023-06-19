@@ -1,1 +1,1 @@
-- {{ issue.title }} - see [#{{ issue.number }}]({{ issue.html_url }})
+- {{ issue.title }} - see [#{{ issue.number }}]({{ issue.html_url }}).

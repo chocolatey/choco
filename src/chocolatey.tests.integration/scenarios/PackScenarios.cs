@@ -28,7 +28,8 @@ namespace chocolatey.tests.integration.scenarios
 
     using NUnit.Framework;
 
-    using Should;
+    using FluentAssertions;
+    using FluentAssertions.Execution;
 
     public class PackScenarios
     {
@@ -53,8 +54,8 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.reset(Configuration);
 
                 Service = NUnitSetup.Container.GetInstance<INugetService>();
-                MockLogger.reset();
-                ServiceAct = () => Service.pack_run(Configuration);
+                MockLogger.Reset();
+                ServiceAct = () => Service.Pack(Configuration);
             }
 
             protected void AddFile(string fileName, string fileContent)
@@ -64,19 +65,19 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Categories.ExceptionHandling]
-        public class when_invalid_data_is_used_in_nuspec_file : ScenariosInvalidBase
+        public class When_invalid_data_is_used_in_nuspec_file : ScenariosInvalidBase
         {
             [Fact]
-            public void should_throw_xml_exception_on_empty_nuspec_file()
+            public void Should_throw_xml_exception_on_empty_nuspec_file()
             {
                 AddFile("myPackage.nuspec", string.Empty);
 
-                ServiceAct.ShouldThrow<XmlException>();
+                ServiceAct.Should().Throw<XmlException>();
             }
 
             [TestCase("")]
             [TestCase("invalid_version")]
-            public void should_throw_invalid_data_exception_on_invalid_version(string version)
+            public void Should_throw_invalid_data_exception_on_invalid_version(string version)
             {
                 AddFile("myPackage.nuspec", @"<?xml version=""1.0"" encoding=""utf-8""?>
 <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
@@ -94,9 +95,9 @@ namespace chocolatey.tests.integration.scenarios
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
   </metadata>
-</package>".format_with(version));
+</package>".FormatWith(version));
 
-                ServiceAct.ShouldThrow<InvalidDataException>();
+                ServiceAct.Should().Throw<InvalidDataException>();
             }
         }
 
@@ -151,37 +152,41 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
-            public void generated_package_should_be_in_current_directory()
+            public void Generated_package_should_be_in_current_directory()
             {
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
-                infos.Count.ShouldEqual(2);
-                infos[0].ShouldEqual("Attempting to build package from 'myPackage.nuspec'.");
-                infos[1].ShouldEqual(string.Concat("Successfully created package '", PackagePath, "'"));
+
+                using (new AssertionScope())
+                {
+                    infos.Should().HaveCount(2);
+                    infos.Should().HaveElementAt(0, "Attempting to build package from 'myPackage.nuspec'.");
+                    infos.Should().HaveElementAt(1, string.Concat("Successfully created package '", PackagePath, "'"));
+                }
 
                 FileAssert.Exists(PackagePath);
             }
 
             [Fact]
-            public void generated_package_should_include_expected_version_in_nuspec()
+            public void Generated_package_should_include_expected_version_in_nuspec()
             {
                 using (var packageReader = new PackageArchiveReader(PackagePath))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
 
-                    version.ToFullString().ShouldEqual(ExpectedNuspecVersion);
+                    version.ToFullString().Should().Be(ExpectedNuspecVersion);
                 }
             }
 
             [Fact]
-            public void sources_should_be_set_to_current_directory()
+            public void Sources_should_be_set_to_current_directory()
             {
                 if (string.IsNullOrEmpty(ExpectedSubDirectory))
                 {
-                    Configuration.Sources.ShouldEqual(Scenario.get_top_level());
+                    Configuration.Sources.Should().Be(Scenario.get_top_level());
                 }
                 else
                 {
-                    Configuration.Sources.ShouldEqual(ExpectedSubDirectory);
+                    Configuration.Sources.Should().Be(ExpectedSubDirectory);
                 }
             }
 
@@ -191,31 +196,31 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        public class when_packing_without_specifying_an_output_directory : ScenariosBase
+        public class When_packing_without_specifying_an_output_directory : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.1.0";
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
         }
 
-        public class when_packing_with_an_output_directory : ScenariosBase
+        public class When_packing_with_an_output_directory : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.1.0";
             protected override string ExpectedSubDirectory => "PackageOutput";
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
         }
 
         [Categories.LegacySemVer]
-        public class when_packing_with_only_major_minor_version : ScenariosBase
+        public class When_packing_with_only_major_minor_version : ScenariosBase
         {
             protected override string PackagePath => Path.Combine("PackageOutput", "test-package.0.3.0.nupkg");
             protected override string ExpectedNuspecVersion => "0.3.0";
@@ -223,8 +228,8 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
@@ -234,15 +239,15 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Categories.LegacySemVer]
-        public class when_packing_with_full_4_part_versioning_scheme : ScenariosBase
+        public class When_packing_with_full_4_part_versioning_scheme : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.5.0.5";
             protected override string ExpectedSubDirectory => "PackageOutput";
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
@@ -252,7 +257,7 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Categories.SemVer20]
-        public class when_packaging_with_build_metadata : ScenariosBase
+        public class When_packaging_with_build_metadata : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.1.0+build.543";
             protected override string ExpectedPathVersion => "0.1.0";
@@ -260,8 +265,8 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
@@ -271,7 +276,7 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Categories.SemVer20]
-        public class when_packaging_with_semver_20_pre_release_tag : ScenariosBase
+        public class When_packaging_with_semver_20_pre_release_tag : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.1.0-rc.5+build.999";
             protected override string ExpectedPathVersion => "0.1.0-rc.5";
@@ -279,8 +284,8 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
@@ -290,15 +295,15 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Categories.LegacySemVer]
-        public class when_packaging_with_legacy_pre_release_tag : ScenariosBase
+        public class When_packaging_with_legacy_pre_release_tag : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.1.0-rc-5";
             protected override string ExpectedSubDirectory => "PackageOutput";
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
@@ -308,7 +313,7 @@ namespace chocolatey.tests.integration.scenarios
         }
 
         [Categories.SemVer20]
-        public class when_packaging_with_four_part_version_with_trailing_zero : ScenariosBase
+        public class When_packaging_with_four_part_version_with_trailing_zero : ScenariosBase
         {
             private string _originalVersion = "0.1.0.0";
             protected override string ExpectedNuspecVersion => "0.1.0";
@@ -316,18 +321,18 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
             {
-                return NuspecContentWithFormatableVersion.format_with(_originalVersion);
+                return NuspecContentWithFormatableVersion.FormatWith(_originalVersion);
             }
         }
 
         [Categories.SemVer20]
-        public class when_packaging_with_leading_zeros_four_part : ScenariosBase
+        public class When_packaging_with_leading_zeros_four_part : ScenariosBase
         {
             private string _originalVersion = "01.02.03.04";
             protected override string ExpectedNuspecVersion => "1.2.3.4";
@@ -335,18 +340,18 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
             {
-                return NuspecContentWithFormatableVersion.format_with(_originalVersion);
+                return NuspecContentWithFormatableVersion.FormatWith(_originalVersion);
             }
         }
 
         [Categories.SemVer20]
-        public class when_packaging_with_leading_zeros_three_part : ScenariosBase
+        public class When_packaging_with_leading_zeros_three_part : ScenariosBase
         {
             private string _originalVersion = "01.02.04";
             protected override string ExpectedNuspecVersion => "1.2.4";
@@ -354,18 +359,18 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
             {
-                return NuspecContentWithFormatableVersion.format_with(_originalVersion);
+                return NuspecContentWithFormatableVersion.FormatWith(_originalVersion);
             }
         }
 
         [Categories.SemVer20]
-        public class when_packaging_with_leading_zeros_two_part : ScenariosBase
+        public class When_packaging_with_leading_zeros_two_part : ScenariosBase
         {
             private string _originalVersion = "01.02";
             protected override string ExpectedNuspecVersion => "1.2.0";
@@ -373,18 +378,18 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
             {
-                return NuspecContentWithFormatableVersion.format_with(_originalVersion);
+                return NuspecContentWithFormatableVersion.FormatWith(_originalVersion);
             }
         }
 
         [Categories.SemVer20]
-        public class when_packaging_with_multiple_leading_zeros : ScenariosBase
+        public class When_packaging_with_multiple_leading_zeros : ScenariosBase
         {
             private string _originalVersion = "0001.0002.0003";
             protected override string ExpectedNuspecVersion => "1.2.3";
@@ -392,17 +397,17 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             protected override string GetNuspecContent()
             {
-                return NuspecContentWithFormatableVersion.format_with(_originalVersion);
+                return NuspecContentWithFormatableVersion.FormatWith(_originalVersion);
             }
         }
 
-        public class when_packing_with_properties : ScenariosBase
+        public class When_packing_with_properties : ScenariosBase
         {
             protected override string ExpectedNuspecVersion => "0.1.0";
 
@@ -418,84 +423,109 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Because()
             {
-                MockLogger.reset();
-                Service.pack_run(Configuration);
+                MockLogger.Reset();
+                Service.Pack(Configuration);
             }
 
             [Fact]
-            public void property_settings_should_be_logged_as_debug_messages()
+            public void Property_settings_should_be_logged_as_debug_messages()
             {
                 var messages = MockLogger.MessagesFor(LogLevel.Debug);
-                messages.Count.ShouldEqual(2);
-                messages.ShouldContain("Setting property 'commitId': 1234abcd");
-                messages.ShouldContain("Setting property 'version': 0.1.0");
+
+                using (new AssertionScope())
+                {
+                    messages.Should().HaveCount(2);
+                    messages.Should().ContainEquivalentOf("Setting property 'commitId': 1234abcd");
+                    messages.Should().ContainEquivalentOf("Setting property 'version': 0.1.0");
+                }
             }
         }
 
-        public class when_packing_with_unsupported_elements : ScenariosInvalidBase
+        public class When_packing_with_unsupported_elements : ScenariosInvalidBase
         {
             [Fact]
-            public void should_throw_exception_on_all_unsupported_elements()
+            public void Should_throw_exception_on_all_unsupported_elements()
             {
                 AddFile("myPackage.nuspec", NuspecContentWithAllUnsupportedElements);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
-            public void should_throw_exception_on_serviceable_element()
+            public void Should_throw_exception_on_serviceable_element()
             {
                 AddFile("myPackage.nuspec", NuspecContentWithServiceableElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
-            public void should_throw_exception_on_license_element()
+            public void Should_throw_exception_on_license_element()
             {
                 AddFile("myPackage.nuspec", NuspecContentWithLicenseElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
-            public void should_throw_exception_on_repository_element()
+            public void Should_throw_exception_on_repository_element()
             {
                 AddFile("myPackage.nuspec", NuspecContentWithRepositoryElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
-            public void should_throw_exception_on_package_types_element()
+            public void Should_throw_exception_on_package_types_element()
             {
                 AddFile("myPackage.nuspec", NuspecContentWithPackageTypesElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
-            public void should_throw_exception_on_framework_references_element()
+            public void Should_throw_exception_on_framework_references_element()
             {
                 AddFile("myPackage.nuspec", NuspecContentWithFrameWorkReferencesElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
-            public void should_throw_exception_on_readme_element()
+            public void Should_throw_exception_on_readme_element()
             {
                 AddFile("myPackage.nuspec", NuspecContentWithReadmeElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
             }
 
             [Fact]
-            public void should_throw_exception_on_icon_element()
+            public void Should_throw_exception_on_icon_element()
             {
                 AddFile("myPackage.nuspec", NuspecContentWithIconElement);
 
-                ServiceAct.ShouldThrow<System.IO.InvalidDataException>();
+                ServiceAct.Should().Throw<System.IO.InvalidDataException>();
+            }
+        }
+
+        public class When_packing_with_min_client_version : ScenariosBase
+        {
+            protected override string ExpectedNuspecVersion => "0.1.0";
+            protected override string ExpectedSubDirectory => "PackageOutput";
+
+            // This high version is to ensure that pack does not throw, even if the min client version is well
+            // above both the Chocolatey and NuGet assembly versions.
+            private string _minClientVersion = "100.0.0";
+
+            public override void Because()
+            {
+                MockLogger.Reset();
+                Service.Pack(Configuration);
+            }
+
+            protected override string GetNuspecContent()
+            {
+                return NuspecContentWithFormatableMinClientVersion.FormatWith(_minClientVersion);
             }
         }
 
@@ -900,6 +930,29 @@ namespace chocolatey.tests.integration.scenarios
     <id>test-package</id>
     <title>Test Package</title>
     <version>{0}</version>
+    <authors>package author</authors>
+    <owners>package owner</owners>
+    <summary>A brief summary</summary>
+    <description>A big description</description>
+    <tags>test admin</tags>
+    <copyright></copyright>
+    <licenseUrl>http://apache.org/2</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+    <dependencies>
+      <dependency id=""chocolatey-core.extension"" />
+    </dependencies>
+  </metadata>
+  <files>
+  </files>
+</package>";
+
+    private const string NuspecContentWithFormatableMinClientVersion = @"<?xml version=""1.0"" encoding=""utf-8""?>
+<package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
+  <metadata minClientVersion=""{0}"">
+    <id>test-package</id>
+    <title>Test Package</title>
+    <version>0.1.0</version>
     <authors>package author</authors>
     <owners>package owner</owners>
     <summary>A brief summary</summary>

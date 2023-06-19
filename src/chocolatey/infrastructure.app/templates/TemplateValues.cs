@@ -23,11 +23,11 @@ namespace chocolatey.infrastructure.app.templates
     {
         public TemplateValues()
         {
-            set_normal();
+            SetNormal();
             AdditionalProperties = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase);
         }
 
-        public void set_normal()
+        public void SetNormal()
         {
             PackageName = "__NAME_REPLACE__";
             PackageVersion = "__REPLACE__";
@@ -45,7 +45,7 @@ namespace chocolatey.infrastructure.app.templates
             ChecksumType64 = "sha256";
         }
 
-        public void set_auto()
+        public void SetAutomatic()
         {
             PackageName = "{{PackageName}}";
             PackageVersion = "{{PackageVersion}}";
@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.app.templates
 
         public string PackageNameLower
         {
-            get { return PackageName.to_lower(); }
+            get { return PackageName.ToLowerSafe(); }
         }
 
         public string PackageVersion { get; set; }
@@ -84,5 +84,15 @@ namespace chocolatey.infrastructure.app.templates
         public static readonly string NamePropertyName = "PackageName";
         public static readonly string VersionPropertyName = "PackageVersion";
         public static readonly string MaintainerPropertyName = "MaintainerName";
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void set_normal()
+            => SetNormal();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void set_auto()
+            => SetAutomatic();
+#pragma warning restore IDE1006
     }
 }

@@ -16,12 +16,13 @@
 
 namespace chocolatey.infrastructure.information
 {
+    using System;
     using System.Diagnostics;
     using adapters;
 
     public sealed class VersionInformation
     {
-        public static string get_current_assembly_version(IAssembly assembly = null)
+        public static string GetCurrentAssemblyVersion(IAssembly assembly = null)
         {
             string version = null;
             if (assembly == null) assembly = Assembly.GetExecutingAssembly();
@@ -37,9 +38,9 @@ namespace chocolatey.infrastructure.information
                 var attributes= assembly.UnderlyingType.GetCustomAttributesData();
                 foreach (var attribute in attributes)
                 {
-                    if (attribute.to_string().Contains("AssemblyFileVersion"))
+                    if (attribute.ToStringSafe().Contains("AssemblyFileVersion"))
                     {
-                        version = attribute.ConstructorArguments[0].Value.to_string();
+                        version = attribute.ConstructorArguments[0].Value.ToStringSafe();
                         break;
                     }
                 }
@@ -48,7 +49,7 @@ namespace chocolatey.infrastructure.information
             return version;
         }
 
-        public static string get_current_informational_version(IAssembly assembly = null)
+        public static string GetCurrentInformationalVersion(IAssembly assembly = null)
         {
             string version = null;
             if (assembly == null) assembly = Assembly.GetExecutingAssembly();
@@ -64,9 +65,9 @@ namespace chocolatey.infrastructure.information
                 var attributes = assembly.UnderlyingType.GetCustomAttributesData();
                 foreach (var attribute in attributes)
                 {
-                    if (attribute.to_string().Contains("AssemblyInformationalVersion"))
+                    if (attribute.ToStringSafe().Contains("AssemblyInformationalVersion"))
                     {
-                        version = attribute.ConstructorArguments[0].Value.to_string();
+                        version = attribute.ConstructorArguments[0].Value.ToStringSafe();
                         break;
                     }
                 }
@@ -75,16 +76,16 @@ namespace chocolatey.infrastructure.information
             return version;
         }
 
-        public static string get_minimum_chocolatey_version(IAssembly assembly = null)
+        public static string GetMinimumChocolateyVersion(IAssembly assembly = null)
         {
             if (assembly == null) assembly = Assembly.GetExecutingAssembly();
 
             var attributeData = assembly.UnderlyingType.GetCustomAttributesData();
             foreach (var attribute in attributeData)
             {
-                if (attribute.to_string().Contains("MinimumChocolateyVersion"))
+                if (attribute.ToStringSafe().Contains("MinimumChocolateyVersion"))
                 {
-                    return attribute.ConstructorArguments[0].Value.to_string();
+                    return attribute.ConstructorArguments[0].Value.ToStringSafe();
                 }
             }
 
@@ -93,5 +94,19 @@ namespace chocolatey.infrastructure.information
             // attribute on the assembly to say what the minimum required Chocolatey version is.
             return "1.0.0";
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_current_assembly_version(IAssembly assembly = null)
+            => GetCurrentAssemblyVersion(assembly = null);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_current_informational_version(IAssembly assembly = null)
+            => GetCurrentInformationalVersion(assembly);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static string get_minimum_chocolatey_version(IAssembly assembly = null)
+            => GetMinimumChocolateyVersion(assembly);
+#pragma warning restore IDE1006
     }
 }

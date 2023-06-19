@@ -23,7 +23,7 @@ Uninstalls software from "Programs and Features".
 This will uninstall software from your machine (in Programs and
 Features). This may not be necessary if Auto Uninstaller is turned on.
 
-Choco 0.9.9+ automatically tracks registry changes for "Programs and
+Chocolatey CLI automatically tracks registry changes for "Programs and
 Features" of the underlying software's native installers when
 installing packages. The "Automatic Uninstaller" (auto uninstaller)
 service is a feature that can use that information to automatically
@@ -38,8 +38,8 @@ Chocolatey but does not remove the software from your system without
 auto uninstaller.
 
 .NOTES
-May not be required. Starting in 0.9.10+, the Automatic Uninstaller
-(AutoUninstaller) is turned on by default.
+May not be required. The Automatic Uninstaller (AutoUninstaller) is
+turned on by default.
 
 .INPUTS
 None
@@ -54,8 +54,7 @@ recommended that it matches the package id.
 .PARAMETER FileType
 This is the extension of the file. This should be either exe or msi.
 
-If what is provided is empty or null, Chocolatey will use 'exe'
-starting in 0.10.1.
+If what is provided is empty or null, Chocolatey will use 'exe'.
 
 .PARAMETER SilentArgs
 OPTIONAL - These are the parameters to pass to the native uninstaller,

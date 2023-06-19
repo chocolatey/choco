@@ -33,9 +33,11 @@
 
             $remainingArguments
         )
-
     }
     end {
+        $stopwatch = [System.Diagnostics.Stopwatch]::new()
+        $stopwatch.Start()
+
         $output = if ($PipelineInput) {
             $PipelineInput | & $chocoPath @arguments
         }
@@ -43,18 +45,30 @@
             & $chocoPath @arguments
         }
 
+        $CommandExitCode = $LastExitCode
+        $stopwatch.Stop()
+        # We do not use env:ChocolateyInstall here as it is not guaranteed due to snapshots.
+        # Saving into the default Chocolatey install location as .log so Test Kitchen can pick up the file.
+        [PSCustomObject]@{
+            Date       = Get-Date -Format 'o'
+            Duration   = $stopwatch.Elapsed
+            Invocation = ($MyInvocation.PositionMessage -split "`r`n")[0]
+            ExitCode   = $CommandExitCode
+        } | Export-Csv -Path $env:ALLUSERSPROFILE/chocolatey/logs/testInvocations.log -NoTypeInformation -Append
+
         [PSCustomObject]@{
             # We trim all the lines, so we do not take into account
             # trimming the lines when asserting, and that extra whitespace
             # is not considered in our assertions.
-            Lines    = if ($output) {
+            Lines     = if ($output) {
                 $output.Trim()
             }
             else {
                 @()
             }
-            String   = $output -join "`r`n"
-            ExitCode = $LastExitCode
+            String    = $output -join "`r`n"
+            ExitCode  = $CommandExitCode
+            Duration  = $stopwatch.Elapsed
         }
     }
 }

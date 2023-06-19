@@ -38,7 +38,7 @@ This method is also added to the user's PowerShell profile as
 `refreshenv`. When called as `refreshenv`, the method will provide
 additional output.
 
-Preserves `PSModulePath` as set by the process starting in 0.9.10.
+Preserves `PSModulePath` as set by the process.
 
 .INPUTS
 None

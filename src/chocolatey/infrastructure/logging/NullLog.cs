@@ -18,8 +18,6 @@ namespace chocolatey.infrastructure.logging
 {
     using System;
 
-    // ReSharper disable InconsistentNaming
-
     /// <summary>
     ///   The default logger until one is set.
     /// </summary>
@@ -69,6 +67,4 @@ namespace chocolatey.infrastructure.logging
         {
         }
     }
-
-    // ReSharper restore InconsistentNaming
 }

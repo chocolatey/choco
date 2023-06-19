@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.services
     using configuration;
     using Microsoft.Win32;
     using platforms;
+    using System;
 
     /// <summary>
     ///   Service to check for System level pending reboot request
@@ -38,7 +39,7 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The current Chocolatey Configuration</param>
         /// <returns><c>true</c> if reboot is required; otherwise <c>false</c>.</returns>
-        public bool is_pending_reboot(ChocolateyConfiguration config)
+        public bool IsRebootPending(ChocolateyConfiguration config)
         {
             if (config.Information.PlatformType != PlatformType.Windows)
             {
@@ -48,12 +49,12 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Debug(" Reboot Requirement Checks:");
 
             // note this is short-circuited, if one trips, it won't continue the checks
-            return is_pending_computer_rename() ||
-                   is_pending_component_based_servicing() ||
-                   is_pending_windows_auto_update() ||
-                   is_pending_file_rename_operations() ||
-                   is_pending_package_installer() ||
-                   is_pending_package_installer_syswow64();
+            return IsPendingComputerRename() ||
+                   IsPendingComponentBasedServicing() ||
+                   IsPendingWindowsAutoUpdate() ||
+                   IsPendingFileRenameOperation() ||
+                   IsPendingPackageInstaller() ||
+                   IsPendingPackageInstallerSysWow64();
         }
 
         /// <summary>
@@ -62,17 +63,17 @@ namespace chocolatey.infrastructure.app.services
         /// <returns>
         ///   <c>true</c> if [is pending computer rename]; otherwise, <c>false</c>.
         /// </returns>
-        private bool is_pending_computer_rename()
+        private bool IsPendingComputerRename()
         {
             var path = "SYSTEM\\CurrentControlSet\\Control\\ComputerName\\{0}";
-            var activeName = get_registry_key_string_value(path.format_with("ActiveComputerName"), "ComputerName");
-            var pendingName = get_registry_key_string_value(path.format_with("ComputerName"), "ComputerName");
+            var activeName = GetRegistryKeyString(path.FormatWith("ActiveComputerName"), "ComputerName");
+            var pendingName = GetRegistryKeyString(path.FormatWith("ComputerName"), "ComputerName");
 
             bool result = !string.IsNullOrWhiteSpace(activeName) &&
                           !string.IsNullOrWhiteSpace(pendingName) &&
                           activeName != pendingName;
 
-            this.Log().Debug(" - Pending Computer Rename = {0}".format_with(result ? "Flagged" : "Checked"));
+            this.Log().Debug(" - Pending Computer Rename = {0}".FormatWith(result ? "Flagged" : "Checked"));
 
             return result;
         }
@@ -88,19 +89,19 @@ namespace chocolatey.infrastructure.app.services
         /// <remarks>
         /// https://blogs.technet.microsoft.com/askperf/2008/04/23/understanding-component-based-servicing/
         /// </remarks>
-        private bool is_pending_component_based_servicing()
+        private bool IsPendingComponentBasedServicing()
         {
-            if (!is_vista_sp1_or_later())
+            if (!IsAtLeastVistaSp1())
             {
                 this.Log().Trace("Not using Windows Vista SP1 or earlier, so no check for Component Based Servicing can be made.");
                 return false;
             }
 
             var path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Component Based Servicing\\RebootPending";
-            var key = _registryService.get_key(RegistryHive.LocalMachine, path);
+            var key = _registryService.GetKey(RegistryHive.LocalMachine, path);
             var result = key != null;
 
-            this.Log().Debug(" - Pending Component Based Servicing = {0}".format_with(result ? "Flagged" : "Checked"));
+            this.Log().Debug(" - Pending Component Based Servicing = {0}".FormatWith(result ? "Flagged" : "Checked"));
 
             return result;
         }
@@ -111,13 +112,13 @@ namespace chocolatey.infrastructure.app.services
         /// <returns>
         ///   <c>true</c> if is pending windows automatic update; otherwise, <c>false</c>.
         /// </returns>
-        private bool is_pending_windows_auto_update()
+        private bool IsPendingWindowsAutoUpdate()
         {
             var path = "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\WindowsUpdate\\Auto Update\\RebootRequired";
-            var key = _registryService.get_key(RegistryHive.LocalMachine, path);
+            var key = _registryService.GetKey(RegistryHive.LocalMachine, path);
             var result = key != null;
 
-            this.Log().Debug(" - Pending Windows Auto Update = {0}".format_with(result ? "Flagged" : "Checked"));
+            this.Log().Debug(" - Pending Windows Auto Update = {0}".FormatWith(result ? "Flagged" : "Checked"));
 
             return result;
         }
@@ -128,10 +129,10 @@ namespace chocolatey.infrastructure.app.services
         /// <returns>
         ///   <c>false</c>, however, additional information provided in debug log to indicate if it was ignored.
         /// </returns>
-        private bool is_pending_file_rename_operations()
+        private bool IsPendingFileRenameOperation()
         {
             var path = "SYSTEM\\CurrentControlSet\\Control\\Session Manager";
-            var value = get_registry_key_value(path, "PendingFileRenameOperations");
+            var value = GetRegistryKeyValue(path, "PendingFileRenameOperations");
 
             var result = false;
 
@@ -140,7 +141,7 @@ namespace chocolatey.infrastructure.app.services
                 result = (value as string[]).Length != 0;
             }
 
-            this.Log().Debug(" - Pending File Rename Operations = {0}".format_with(result ? "Ignored" : "Checked"));
+            this.Log().Debug(" - Pending File Rename Operations = {0}".FormatWith(result ? "Ignored" : "Checked"));
 
             // Always return false, as we don't want this check to result in a pending reboot warning/error.
             // Instead, this will only provide output in the debug log indicating that the check was ignored.
@@ -157,14 +158,14 @@ namespace chocolatey.infrastructure.app.services
         /// https://support.microsoft.com/kb/832475
         /// 0x00000000 (0)	No pending restart.
         /// </remarks>
-        private bool is_pending_package_installer()
+        private bool IsPendingPackageInstaller()
         {
             var path = "SOFTWARE\\Microsoft\\Updates";
-            var value = get_registry_key_string_value(path, "UpdateExeVolatile");
+            var value = GetRegistryKeyString(path, "UpdateExeVolatile");
 
             var result = !string.IsNullOrWhiteSpace(value) && value != "0";
 
-            this.Log().Debug(" - Pending Windows Package Installer = {0}".format_with(result ? "Flagged" : "Checked"));
+            this.Log().Debug(" - Pending Windows Package Installer = {0}".FormatWith(result ? "Flagged" : "Checked"));
 
             return result;
         }
@@ -179,33 +180,33 @@ namespace chocolatey.infrastructure.app.services
         /// https://support.microsoft.com/kb/832475
         /// 0x00000000 (0)	No pending restart.
         /// </remarks>
-        private bool is_pending_package_installer_syswow64()
+        private bool IsPendingPackageInstallerSysWow64()
         {
             var path = "SOFTWARE\\Wow6432Node\\Microsoft\\Updates";
-            var value = get_registry_key_string_value(path, "UpdateExeVolatile");
+            var value = GetRegistryKeyString(path, "UpdateExeVolatile");
 
             var result = !string.IsNullOrWhiteSpace(value) && value != "0";
 
-            this.Log().Debug(" - Pending Windows Package Installer SysWow64 = {0}".format_with(result ? "Flagged" : "Checked"));
+            this.Log().Debug(" - Pending Windows Package Installer SysWow64 = {0}".FormatWith(result ? "Flagged" : "Checked"));
 
             return result;
         }
 
-        private string get_registry_key_string_value(string path, string value)
+        private string GetRegistryKeyString(string path, string value)
         {
-            var key = _registryService.get_key(RegistryHive.LocalMachine, path);
+            var key = _registryService.GetKey(RegistryHive.LocalMachine, path);
 
             if (key == null)
             {
                 return string.Empty;
             }
 
-            return key.GetValue(value, string.Empty).to_string();
+            return key.GetValue(value, string.Empty).ToStringSafe();
         }
 
-        private object get_registry_key_value(string path, string value)
+        private object GetRegistryKeyValue(string path, string value)
         {
-            var key = _registryService.get_key(RegistryHive.LocalMachine, path);
+            var key = _registryService.GetKey(RegistryHive.LocalMachine, path);
 
             if (key == null)
             {
@@ -215,13 +216,19 @@ namespace chocolatey.infrastructure.app.services
             return key.GetValue(value, null);
         }
 
-        private bool is_vista_sp1_or_later()
+        private bool IsAtLeastVistaSp1()
         {
-            var versionNumber = Platform.get_version();
+            var versionNumber = Platform.GetVersion();
 
-            this.Log().Trace(" Operating System Version Number: {0}".format_with(versionNumber));
+            this.Log().Trace(" Operating System Version Number: {0}".FormatWith(versionNumber));
 
             return versionNumber.Build >= 6001;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public bool is_pending_reboot(ChocolateyConfiguration config)
+            => IsRebootPending(config);
+#pragma warning restore IDE1006
     }
 }

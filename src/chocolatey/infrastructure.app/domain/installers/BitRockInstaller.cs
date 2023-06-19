@@ -30,17 +30,17 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public BitRockInstaller()
         {
-            InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
+            InstallExecutable = "\"{0}\"".FormatWith(InstallTokens.InstallerLocation);
             SilentInstall = "--mode unattended";
             // http://answers.bitrock.com/questions/215/how-can-i-restart-the-computer-after-installation-has-completed
             NoReboot = "";
             LogFile = "";
             // http://installbuilder.bitrock.com/docs/installbuilder-userguide.html#_command_line_parameters
             // http://answers.bitrock.com/questions/57/how-do-i-specify-a-different-default-installation-directory-for-unix-and-windows
-            CustomInstallLocation = "--installdir {0}".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
+            CustomInstallLocation = "--installdir {0}".FormatWith(InstallTokens.CustomInstallLocation);
             Language = "";
             OtherInstallOptions = "--unattendedmodeui none";
-            UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            UninstallExecutable = "\"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             SilentUninstall = "--mode unattended";
             OtherUninstallOptions = "--unattendedmodeui none";
             ValidInstallExitCodes = new List<long>

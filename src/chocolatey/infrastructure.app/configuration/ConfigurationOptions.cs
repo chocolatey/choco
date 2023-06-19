@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.app.configuration
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Diagnostics;
     using System.Linq;
     using System.Text.RegularExpressions;
     using adapters;
@@ -30,12 +31,12 @@ namespace chocolatey.infrastructure.app.configuration
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void initialize_with(Lazy<IConsole> console)
+        public static void InitializeWith(Lazy<IConsole> console)
         {
             _console = console;
         }
 
-        public static void reset_options()
+        public static void ClearOptions()
         {
             _optionSet.Clear();
         }
@@ -61,7 +62,7 @@ namespace chocolatey.infrastructure.app.configuration
         /// <param name="afterParse">Actions to take after parsing</param>
         /// <param name="validateConfiguration">Validate the configuration</param>
         /// <param name="helpMessage">The help message.</param>
-        public static void parse_arguments_and_update_configuration(ICollection<string> args,
+        public static void ParseArgumentsAndUpdateConfiguration(ICollection<string> args,
                                                                     ChocolateyConfiguration configuration,
                                                                     Action<OptionSet> setOptions,
                                                                     Action<IList<string>> afterParse,
@@ -75,8 +76,11 @@ namespace chocolatey.infrastructure.app.configuration
             {
                 _optionSet
                     .Add("?|help|h",
-                         "Prints out the help menu.",
-                         option => configuration.HelpRequested = option != null);
+                        "Prints out the help menu.",
+                        option => configuration.HelpRequested = option != null)
+                    .Add("online",
+                        "Online - Open help for specified command in default browser application. This option only works when used in combintation with the -?/--help/-h option.  Available in 2.0.0+",
+                        option => configuration.ShowOnlineHelp = option != null);
             }
 
             if (setOptions != null)
@@ -90,7 +94,7 @@ namespace chocolatey.infrastructure.app.configuration
             }
             catch (OptionException)
             {
-                show_help(_optionSet, helpMessage);
+                ShowHelp(_optionSet, helpMessage);
                 configuration.UnsuccessfulParsing = true;
             }
 
@@ -102,7 +106,7 @@ namespace chocolatey.infrastructure.app.configuration
                 {
                     configuration.CommandName = commandName;
                 }
-                else if (commandName.is_equal_to("-v") || commandName.is_equal_to("--version"))
+                else if (commandName.IsEqualTo("-v") || commandName.IsEqualTo("--version"))
                 {
                     // skip help menu
                 }
@@ -120,10 +124,38 @@ namespace chocolatey.infrastructure.app.configuration
 
             if (configuration.HelpRequested)
             {
-                show_help(_optionSet, helpMessage);
+                if (configuration.ShowOnlineHelp)
+                {
+                    if (string.IsNullOrWhiteSpace(configuration.CommandName))
+                    {
+                        "chocolatey".Log().Warn("Unable to open command help as no command name has been provided.");
+                        return;
+                    }
+
+                    var targetAddress = "https://ch0.co/c/{0}".FormatWith(configuration.CommandName.ToLowerSafe());
+
+                    try
+                    {
+                        System.Diagnostics.Process.Start(new ProcessStartInfo(targetAddress) { UseShellExecute = true });
+                    }
+                    catch (Exception)
+                    {
+                        "chocolatey".Log().Warn("There was an error while attempting to open the following URL: {0} in the default browser.".FormatWith(targetAddress));
+                    }
+
+                    return;
+                }
+
+                ShowHelp(_optionSet, helpMessage);
             }
             else
             {
+                // Only show this warning once
+                if (configuration.ShowOnlineHelp)
+                {
+                    "chocolatey".Log().Warn("The --online option has been used, without the corresponding -?/--help/-h option.  Command execution will be completed without invoking help.");
+                }
+
                 if (validateConfiguration != null)
                 {
                     validateConfiguration();
@@ -136,7 +168,7 @@ namespace chocolatey.infrastructure.app.configuration
         /// </summary>
         /// <param name="optionSet">The option_set.</param>
         /// <param name="helpMessage">The action that displays the message</param>
-        private static void show_help(OptionSet optionSet, Action helpMessage)
+        private static void ShowHelp(OptionSet optionSet, Action helpMessage)
         {
             if (helpMessage != null)
             {
@@ -145,5 +177,25 @@ namespace chocolatey.infrastructure.app.configuration
 
             optionSet.WriteOptionDescriptions(Console.Out);
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public static void initialize_with(Lazy<IConsole> console)
+            => InitializeWith(console);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void reset_options()
+            => ClearOptions();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void parse_arguments_and_update_configuration(ICollection<string> args,
+                                                                    ChocolateyConfiguration configuration,
+                                                                    Action<OptionSet> setOptions,
+                                                                    Action<IList<string>> afterParse,
+                                                                    Action validateConfiguration,
+                                                                    Action helpMessage)
+            => ParseArgumentsAndUpdateConfiguration(args, configuration, setOptions, afterParse, validateConfiguration, helpMessage);
+#pragma warning restore IDE1006
     }
 }

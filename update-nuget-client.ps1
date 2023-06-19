@@ -27,8 +27,8 @@ if ($build -or !(Test-Path "$sourceLocation\artifacts")) {
     "Configuring NuGet.Client repository dependencies"
     #.\configure.ps1
     
-    "Calling .\build.ps1 -CI -SkipUnitTest -Configuration Debug -BuildNumber $buildNumber -ReleaseLabel 'zlocal'"
-    .\build.ps1 -CI -SkipUnitTest -Configuration Debug -BuildNumber $buildNumber -ReleaseLabel 'zlocal'
+    "Calling .\build.ps1 -CI -SkipUnitTest -ChocolateyBuild -Configuration Debug -BuildNumber $buildNumber -ReleaseLabel 'zlocal'"
+    .\build.ps1 -CI -SkipUnitTest -ChocolateyBuild -Configuration Debug -BuildNumber $buildNumber -ReleaseLabel 'zlocal'
 }
 
 Get-ChildItem "$thisLocation\src\packages\Chocolatey.NuGet.*" | ForEach-Object {

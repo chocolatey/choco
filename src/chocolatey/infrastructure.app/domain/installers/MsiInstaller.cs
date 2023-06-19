@@ -34,15 +34,15 @@ namespace chocolatey.infrastructure.app.domain.installers
         {
             //todo: #2573 fully qualify msiexec
             InstallExecutable = "msiexec.exe";
-            SilentInstall = "/i \"{0}\" /qn".format_with(InstallTokens.INSTALLER_LOCATION); // /quiet
+            SilentInstall = "/i \"{0}\" /qn".FormatWith(InstallTokens.InstallerLocation); // /quiet
             // http://msdn.microsoft.com/en-us/library/aa371101.aspx
             NoReboot = "/norestart"; //REBOOT=ReallySuppress
-            LogFile = "/l*v \"{0}\\MSI.Install.log\"".format_with(InstallTokens.PACKAGE_LOCATION);
+            LogFile = "/l*v \"{0}\\MSI.Install.log\"".FormatWith(InstallTokens.PackageLocation);
             // https://msdn.microsoft.com/en-us/library/aa372064.aspx
             // http://apprepack.blogspot.com/2012/08/installdir-vs-targetdir.html
-            CustomInstallLocation = "TARGETDIR=\"{0}\"".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
+            CustomInstallLocation = "TARGETDIR=\"{0}\"".FormatWith(InstallTokens.CustomInstallLocation);
             // http://msdn.microsoft.com/en-us/library/aa370856.aspx
-            Language = "ProductLanguage={0}".format_with(InstallTokens.LANGUAGE);
+            Language = "ProductLanguage={0}".FormatWith(InstallTokens.Language);
             // http://msdn.microsoft.com/en-us/library/aa367559.aspx
             OtherInstallOptions = "ALLUSERS=1 DISABLEDESKTOPSHORTCUT=1 ADDDESKTOPICON=0 ADDSTARTMENU=0";
             UninstallExecutable = "msiexec.exe";

@@ -22,41 +22,51 @@ namespace chocolatey.infrastructure.guards
 
     public static class Ensure
     {
-        public static EnsureString that(Expression<Func<string>> expression)
+        public static EnsureString That(Expression<Func<string>> expression)
         {
-            var memberName = expression.get_name_on_right().Member.Name;
+            var memberName = expression.GetNameOnRight().Member.Name;
             return new EnsureString(memberName, expression.Compile().Invoke());
         }
 
-        public static Ensure<TypeToEnsure> that<TypeToEnsure>(Expression<Func<TypeToEnsure>> expression) where TypeToEnsure : class
+        public static Ensure<TypeToEnsure> That<TypeToEnsure>(Expression<Func<TypeToEnsure>> expression) where TypeToEnsure : class
         {
-            var memberName = expression.get_name_on_right().Member.Name;
+            var memberName = expression.GetNameOnRight().Member.Name;
             return new Ensure<TypeToEnsure>(memberName, expression.Compile().Invoke());
         }
 
-        private static MemberExpression get_name_on_right(this Expression e)
+        // This method needs a beter name.
+        private static MemberExpression GetNameOnRight(this Expression e)
         {
-            if (e is LambdaExpression)
-                return get_name_on_right(((LambdaExpression) e).Body);
+            if (e is LambdaExpression lambdaExpr)
+                return GetNameOnRight(lambdaExpr.Body);
 
-            if (e is MemberExpression)
-                return (MemberExpression) e;
+            if (e is MemberExpression memberExpr)
+                return memberExpr;
 
-            if (e is MethodCallExpression)
+            if (e is MethodCallExpression methodExpr)
             {
-                var callExpression = (MethodCallExpression) e;
-                var member = callExpression.Arguments.Count > 0 ? callExpression.Arguments[0] : callExpression.Object;
-                return get_name_on_right(member);
+                var member = methodExpr.Arguments.Count > 0 ? methodExpr.Arguments[0] : methodExpr.Object;
+                return GetNameOnRight(member);
             }
 
-            if (e is UnaryExpression)
+            if (e is UnaryExpression unaryExpr)
             {
-                var unaryExpression = (UnaryExpression) e;
-                return get_name_on_right(unaryExpression.Operand);
+                return GetNameOnRight(unaryExpr.Operand);
             }
 
-            throw new Exception("Unable to find member for {0}".format_with(e.to_string()));
+            throw new Exception("Unable to find member for {0}".FormatWith(e.ToStringSafe()));
         }
+
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static EnsureString that(Expression<Func<string>> expression)
+            => That(expression);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static Ensure<TypeToEnsure> that<TypeToEnsure>(Expression<Func<TypeToEnsure>> expression) where TypeToEnsure : class
+            => That(expression);
+#pragma warning restore IDE1006
     }
 
     public class EnsureString : Ensure<string>
@@ -66,32 +76,41 @@ namespace chocolatey.infrastructure.guards
         {
         }
 
-        public EnsureString is_not_null_or_whitespace()
+        public EnsureString NotNullOrWhitespace()
         {
-            is_not_null();
+            NotNull();
 
             if (string.IsNullOrWhiteSpace(Value))
             {
-                throw new ArgumentException(Name, "Value for {0} cannot be empty or only contain whitespace.".format_with(Name));
+                throw new ArgumentException(Name, "Value for {0} cannot be empty or only contain whitespace.".FormatWith(Name));
             }
 
             return this;
         }
 
-        public EnsureString has_any_extension(params string[] extensions)
+        public EnsureString HasExtension(params string[] extensions)
         {
             var actualExtension = Path.GetExtension(Value);
 
             foreach (var extension in extensions)
             {
-                if (extension.is_equal_to(actualExtension))
+                if (extension.IsEqualTo(actualExtension))
                 {
                     return this;
                 }
             }
 
-            throw new ArgumentException(Name, "Value for {0} must contain one of the following extensions: {1}".format_with(Name, string.Join(", ", extensions)));
+            throw new ArgumentException(Name, "Value for {0} must contain one of the following extensions: {1}".FormatWith(Name, string.Join(", ", extensions)));
         }
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public EnsureString is_not_null_or_whitespace()
+            => NotNullOrWhitespace();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public EnsureString has_any_extension(params string[] extensions)
+            => HasExtension(extensions);
+#pragma warning restore IDE1006
     }
 
     public class Ensure<EnsurableType> where EnsurableType : class
@@ -105,23 +124,32 @@ namespace chocolatey.infrastructure.guards
             Value = value;
         }
 
-        public void is_not_null()
+        public void NotNull()
         {
             if (Value == null)
             {
-                throw new ArgumentNullException(Name, "Value for {0} cannot be null.".format_with(Name));
+                throw new ArgumentNullException(Name, "Value for {0} cannot be null.".FormatWith(Name));
             }
         }
 
-        public void meets(Func<EnsurableType, bool> ensureFunction, Action<string, EnsurableType> exceptionAction)
+        public void Meets(Func<EnsurableType, bool> ensureFunction, Action<string, EnsurableType> exceptionAction)
         {
-            Ensure.that(() => ensureFunction).is_not_null();
-            Ensure.that(() => exceptionAction).is_not_null();
+            Ensure.That(() => ensureFunction).NotNull();
+            Ensure.That(() => exceptionAction).NotNull();
 
             if (!ensureFunction(Value))
             {
                 exceptionAction.Invoke(Name, Value);
             }
         }
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void is_not_null()
+            => NotNull();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void meets(Func<EnsurableType, bool> ensureFunction, Action<string, EnsurableType> exceptionAction)
+            => Meets(ensureFunction, exceptionAction);
+#pragma warning restore IDE1006
     }
 }

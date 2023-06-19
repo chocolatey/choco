@@ -23,8 +23,6 @@ namespace chocolatey.infrastructure.app.nuget
     using logging;
     using NuGet.Common;
 
-    // ReSharper disable InconsistentNaming
-
     public sealed class ChocolateyNugetLogger : ILogger
     {
         public void LogDebug(string message)
@@ -76,7 +74,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public void Log(LogLevel level, string message)
         {
-            var prefixedMessage = prefix_all_lines("[NuGet]", message);
+            var prefixedMessage = PrefixAllLines("[NuGet]", message);
 
             switch (level)
             {
@@ -121,7 +119,7 @@ namespace chocolatey.infrastructure.app.nuget
             return LogAsync(log.Level, log.Message);
         }
 
-        private static string prefix_all_lines(string prefix, string message)
+        private static string PrefixAllLines(string prefix, string message)
         {
             if (message == null || (string.IsNullOrWhiteSpace(message) && message.IndexOf('\n') < 0))
             {
@@ -129,7 +127,7 @@ namespace chocolatey.infrastructure.app.nuget
             }
             else if (message.IndexOf('\n') < 0)
             {
-                return "{0} {1}".format_with(prefix, message);
+                return "{0} {1}".FormatWith(prefix, message);
             }
 
             var builder = new StringBuilder(message.Length);
@@ -154,6 +152,4 @@ namespace chocolatey.infrastructure.app.nuget
             return builder.ToString(0, builder.Length - Environment.NewLine.Length);
         }
     }
-
-    // ReSharper restore InconsistentNaming
 }

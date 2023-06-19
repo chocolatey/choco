@@ -32,13 +32,13 @@ namespace chocolatey.infrastructure.synchronization
     public class GlobalMutex : IDisposable
     {
         private readonly bool _hasHandle = false;
-        private const string APP_GUID = "bd59231e-97d1-4fc0-a975-80c3fed498b7"; // matches the one in Assembly
+        private const string AppGuid = "bd59231e-97d1-4fc0-a975-80c3fed498b7"; // matches the one in Assembly
         private Mutex _mutex;
 
-        private void init_mutex()
+        private void InitMutex()
         {
             this.Log().Trace("Initializing global mutex");
-            var mutexId = "Global\\{{{0}}}".format_with(APP_GUID);
+            var mutexId = "Global\\{{{0}}}".FormatWith(AppGuid);
             _mutex = new Mutex(initiallyOwned: false, name: mutexId);
 
             var allowEveryoneRule = new MutexAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), MutexRights.FullControl, AccessControlType.Allow);
@@ -54,10 +54,10 @@ namespace chocolatey.infrastructure.synchronization
         /// <exception cref="System.TimeoutException">Timeout waiting for exclusive access to value.</exception>
         private GlobalMutex(int timeOut)
         {
-            init_mutex();
+            InitMutex();
             try
             {
-                this.Log().Trace("Waiting on the mutex handle for {0} milliseconds".format_with(timeOut));
+                this.Log().Trace("Waiting on the mutex handle for {0} milliseconds".FormatWith(timeOut));
                 _hasHandle = _mutex.WaitOne(timeOut < 0 ? Timeout.Infinite : timeOut, exitContext: false);
 
                 if (_hasHandle == false)
@@ -75,11 +75,11 @@ namespace chocolatey.infrastructure.synchronization
         /// Enters the Global Mutex
         /// </summary>
         /// <param name="action">The action to perform.</param>
-        /// <param name="timeout">The timeout in seconds.</param>
-        public static void enter(Action action, int timeout)
+        /// <param name="timeout">The timeout in milliseconds.</param>
+        public static void Enter(Action action, int timeout)
         {
 
-            if (Platform.get_platform() == PlatformType.Windows)
+            if (Platform.GetPlatform() == PlatformType.Windows)
             {
                 using (new GlobalMutex(timeout))
                 {
@@ -99,11 +99,11 @@ namespace chocolatey.infrastructure.synchronization
         /// <param name="func">The function to perform.</param>
         /// <param name="timeout">The timeout in seconds.</param>
         /// <returns></returns>
-        public static T enter<T>(Func<T> func, int timeout)
+        public static T Enter<T>(Func<T> func, int timeout)
         {
             var returnValue = default(T);
 
-            if (Platform.get_platform() == PlatformType.Windows)
+            if (Platform.GetPlatform() == PlatformType.Windows)
             {
                 using (new GlobalMutex(timeout))
                 {
@@ -129,5 +129,15 @@ namespace chocolatey.infrastructure.synchronization
                 _mutex.Dispose();
             }
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void enter(Action action, int timeout)
+            => Enter(action, timeout);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static T enter<T>(Func<T> func, int timeout)
+            => Enter(func, timeout);
+#pragma warning restore IDE1006
     }
 }

@@ -21,17 +21,20 @@ namespace chocolatey.infrastructure.app.nuget
     using logging;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading.Tasks;
     using filesystem;
     using NuGet.Common;
-    using NuGet.Configuration;
-    using NuGet.Protocol;
     using NuGet.Protocol.Core.Types;
     using System.Net.Http;
 
     public class NugetPush
     {
-        public static void push_package(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName, IFileSystem filesystem)
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void PushPackage(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName, IFileSystem filesystem)
+        {
+            PushPackage(config, nupkgFilePath, nugetLogger, nupkgFileName, filesystem, cacheContext: null);
+        }
+
+        public static void PushPackage(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName, IFileSystem filesystem, ChocolateySourceCacheContext cacheContext)
         {
             var timeout = TimeSpan.FromSeconds(Math.Abs(config.CommandExecutionTimeoutSeconds));
             if (timeout.Seconds <= 0)
@@ -46,8 +49,8 @@ namespace chocolatey.infrastructure.app.nuget
             const bool skipDuplicate = false;
 
             //OK to use FirstOrDefault in this case as the command validates that there is only one source
-            SourceRepository sourceRepository = NugetCommon.GetRemoteRepositories(config, nugetLogger, filesystem).FirstOrDefault();
-            PackageUpdateResource packageUpdateResource = sourceRepository.GetResource<PackageUpdateResource>();
+            NuGetEndpointResources sourceEndpoint = NugetCommon.GetRepositoryResources(config, nugetLogger, filesystem, cacheContext).FirstOrDefault();
+            PackageUpdateResource packageUpdateResource = sourceEndpoint.PackageUpdateResource;
             var nupkgFilePaths = new List<string>() { nupkgFilePath };
 
             try
@@ -72,7 +75,7 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     if (config.Sources == ApplicationParameters.ChocolateyCommunityFeedPushSource && message.Contains("already exists and cannot be modified"))
                     {
-                        throw new ApplicationException("An error has occurred. This package version already exists on the repository and cannot be modified.{0}Package versions that are approved, rejected, or exempted cannot be modified.{0}See https://docs.chocolatey.org/en-us/community-repository/moderation/ for more information".format_with(Environment.NewLine), ex);
+                        throw new ApplicationException("An error has occurred. This package version already exists on the repository and cannot be modified.{0}Package versions that are approved, rejected, or exempted cannot be modified.{0}See https://docs.chocolatey.org/en-us/community-repository/moderation/ for more information".FormatWith(Environment.NewLine), ex);
                     }
 
                     if (message.Contains("406") || message.Contains("409"))
@@ -85,7 +88,13 @@ namespace chocolatey.infrastructure.app.nuget
                 throw;
             }
 
-            "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} was pushed successfully to {1}".format_with(nupkgFileName, config.Sources));
+            "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} was pushed successfully to {1}".FormatWith(nupkgFileName, config.Sources));
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void push_package(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName, IFileSystem filesystem)
+            => PushPackage(config, nupkgFilePath, nugetLogger, nupkgFileName, filesystem);
+#pragma warning restore IDE1006
     }
 }

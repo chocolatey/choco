@@ -19,13 +19,13 @@ namespace chocolatey.infrastructure.app.rules
     using chocolatey.infrastructure.rules;
     using NuGet.Packaging;
 
-    internal sealed class ServicableMetadataRule : MetadataRuleBase
+    internal sealed class ServicableMetadataRule : FrameWorkReferencesMetadataRule
     {
-        public override IEnumerable<RuleResult> validate(NuspecReader reader)
+        public override IEnumerable<RuleResult> Validate(NuspecReader reader)
         {
-            if (has_element(reader, "serviceable"))
+            if (HasElement(reader, "serviceable"))
             {
-                yield return new RuleResult(RuleType.Error, RuleIdentifiers.UnsupportedElementUsed, "<serviceable> elements are not supported in Chocolatey CLI.");
+                yield return GetRule(RuleIdentifiers.UnsupportedElementUsed, "<serviceable> elements are not supported in Chocolatey CLI.");
             }
         }
     }

@@ -24,10 +24,10 @@ namespace chocolatey.infrastructure.app.domain.installers
         {
             //todo: #2573 fully qualify msiexec
             InstallExecutable = "msiexec.exe";
-            SilentInstall = "/p \"{0}\" /qn".format_with(InstallTokens.INSTALLER_LOCATION);
+            SilentInstall = "/p \"{0}\" /qn".FormatWith(InstallTokens.InstallerLocation);
             // http://msdn.microsoft.com/en-us/library/aa371101.aspx
             NoReboot = "/norestart";
-            LogFile = "/l*v \"{0}\\MSP.Install.log\"".format_with(InstallTokens.PACKAGE_LOCATION);
+            LogFile = "/l*v \"{0}\\MSP.Install.log\"".FormatWith(InstallTokens.PackageLocation);
             // https://msdn.microsoft.com/en-us/library/aa372064.aspx
             // http://apprepack.blogspot.com/2012/08/installdir-vs-targetdir.html
             CustomInstallLocation = "";
@@ -36,7 +36,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             // http://msdn.microsoft.com/en-us/library/aa367559.aspx
             OtherInstallOptions = "REINSTALLMODE=sumo REINSTALL=ALL";
             UninstallExecutable = "msiexec.exe";
-            SilentUninstall = "/package {0} /qn".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            SilentUninstall = "/package {0} /qn".FormatWith(InstallTokens.UninstallerLocation);
             OtherUninstallOptions = "MSIPATCHREMOVE={PATCH_GUID_HERE}";
             // https://msdn.microsoft.com/en-us/library/aa376931.aspx
             // https://support.microsoft.com/en-us/kb/290158

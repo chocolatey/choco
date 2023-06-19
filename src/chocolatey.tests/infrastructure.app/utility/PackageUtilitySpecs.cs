@@ -19,7 +19,7 @@ namespace chocolatey.tests.infrastructure.app.utility
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.platforms;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class PackageUtilitySpecs
     {
@@ -43,16 +43,16 @@ namespace chocolatey.tests.infrastructure.app.utility
         [TestFixture("dependency", "\\bob", true)]
         [TestFixture("dependency", "bob", true)]
         [TestFixture("dependency", "bob;separatedPackage", true)]
-        public class when_PackageUtility_is_checking_if_package_is_dependency : PackageUtilitySpecsBase
+        public class When_PackageUtility_is_checking_if_package_is_dependency : PackageUtilitySpecsBase
         {
             private readonly ChocolateyConfiguration _config = new ChocolateyConfiguration();
             private bool _result;
             private bool _expectedResult;
             private string _packageName;
 
-            public when_PackageUtility_is_checking_if_package_is_dependency(string packageName, string configNames, bool expectedResult)
+            public When_PackageUtility_is_checking_if_package_is_dependency(string packageName, string configNames, bool expectedResult)
             {
-                if (Platform.get_platform() != PlatformType.Windows) configNames = configNames.Replace("\\", "/");
+                if (Platform.GetPlatform() != PlatformType.Windows) configNames = configNames.Replace("\\", "/");
 
                 _packageName = packageName;
                 _config.PackageNames = configNames;
@@ -61,13 +61,13 @@ namespace chocolatey.tests.infrastructure.app.utility
 
             public override void Because()
             {
-                _result = PackageUtility.package_is_a_dependency(_config, _packageName);
+                _result = PackageUtility.PackageIdHasDependencySuffix(_config, _packageName);
             }
 
             [Fact]
-            public void should_return_expected_result()
+            public void Should_return_expected_result()
             {
-                _result.ShouldEqual(_expectedResult);
+                _result.Should().Be(_expectedResult);
             }
         }
     }

@@ -26,7 +26,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateyUninstallCommandSpecs
     {
@@ -44,7 +44,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        public class when_implementing_command_for : ChocolateyUninstallCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyUninstallCommandSpecsBase
         {
             private List<string> results;
 
@@ -54,13 +54,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
-            public void should_implement_uninstall()
+            public void Should_implement_uninstall()
             {
-                results.ShouldContain(CommandNameType.uninstall.to_string());
+                results.Should().Contain("uninstall");
             }
         }
 
-        public class when_configurating_the_argument_parser : ChocolateyUninstallCommandSpecsBase
+        public class When_configurating_the_argument_parser : ChocolateyUninstallCommandSpecsBase
         {
             private OptionSet optionSet;
 
@@ -72,119 +72,119 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                command.configure_argument_parser(optionSet, configuration);
+                command.ConfigureArgumentParser(optionSet, configuration);
             }
 
             [Fact]
-            public void should_add_version_to_the_option_set()
+            public void Should_add_version_to_the_option_set()
             {
-                optionSet.Contains("version").ShouldBeTrue();
+                optionSet.Contains("version").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_allversions_to_the_option_set()
+            public void Should_add_allversions_to_the_option_set()
             {
-                optionSet.Contains("allversions").ShouldBeTrue();
+                optionSet.Contains("allversions").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_allversions_to_the_option_set()
+            public void Should_add_short_version_of_allversions_to_the_option_set()
             {
-                optionSet.Contains("a").ShouldBeTrue();
+                optionSet.Contains("a").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_uninstallargs_to_the_option_set()
+            public void Should_add_uninstallargs_to_the_option_set()
             {
-                optionSet.Contains("uninstallarguments").ShouldBeTrue();
+                optionSet.Contains("uninstallarguments").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_uninstallargs_to_the_option_set()
+            public void Should_add_short_version_of_uninstallargs_to_the_option_set()
             {
-                optionSet.Contains("ua").ShouldBeTrue();
+                optionSet.Contains("ua").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_overrideargs_to_the_option_set()
+            public void Should_add_overrideargs_to_the_option_set()
             {
-                optionSet.Contains("overridearguments").ShouldBeTrue();
+                optionSet.Contains("overridearguments").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_overrideargs_to_the_option_set()
+            public void Should_add_short_version_of_overrideargs_to_the_option_set()
             {
-                optionSet.Contains("o").ShouldBeTrue();
+                optionSet.Contains("o").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_notsilent_to_the_option_set()
+            public void Should_add_notsilent_to_the_option_set()
             {
-                optionSet.Contains("notsilent").ShouldBeTrue();
+                optionSet.Contains("notsilent").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_packageparameters_to_the_option_set()
+            public void Should_add_packageparameters_to_the_option_set()
             {
-                optionSet.Contains("packageparameters").ShouldBeTrue();
+                optionSet.Contains("packageparameters").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_packageparameters_to_the_option_set()
+            public void Should_add_short_version_of_packageparameters_to_the_option_set()
             {
-                optionSet.Contains("params").ShouldBeTrue();
+                optionSet.Contains("params").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_applyPackageParametersToDependencies_to_the_option_set()
+            public void Should_add_applyPackageParametersToDependencies_to_the_option_set()
             {
-                optionSet.Contains("apply-package-parameters-to-dependencies").ShouldBeTrue();
+                optionSet.Contains("apply-package-parameters-to-dependencies").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_applyInstallArgumentsToDependencies_to_the_option_set()
+            public void Should_add_applyInstallArgumentsToDependencies_to_the_option_set()
             {
-                optionSet.Contains("apply-install-arguments-to-dependencies").ShouldBeTrue();
+                optionSet.Contains("apply-install-arguments-to-dependencies").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_forcedependencies_to_the_option_set()
+            public void Should_add_forcedependencies_to_the_option_set()
             {
-                optionSet.Contains("forcedependencies").ShouldBeTrue();
+                optionSet.Contains("forcedependencies").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_forcedependencies_to_the_option_set()
+            public void Should_add_short_version_of_forcedependencies_to_the_option_set()
             {
-                optionSet.Contains("x").ShouldBeTrue();
+                optionSet.Contains("x").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_skippowershell_to_the_option_set()
+            public void Should_add_skippowershell_to_the_option_set()
             {
-                optionSet.Contains("skippowershell").ShouldBeTrue();
+                optionSet.Contains("skippowershell").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_skippowershell_to_the_option_set()
+            public void Should_add_short_version_of_skippowershell_to_the_option_set()
             {
-                optionSet.Contains("n").ShouldBeTrue();
+                optionSet.Contains("n").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_skip_hooks_to_the_option_set()
+            public void Should_add_skip_hooks_to_the_option_set()
             {
-                optionSet.Contains("skip-hooks").ShouldBeTrue();
+                optionSet.Contains("skip-hooks").Should().BeTrue();
             }
 
             [Fact]
-            public void should_add_short_version_of_skip_hooks_to_the_option_set()
+            public void Should_add_short_version_of_skip_hooks_to_the_option_set()
             {
-                optionSet.Contains("skiphooks").ShouldBeTrue();
+                optionSet.Contains("skiphooks").Should().BeTrue();
             }
         }
 
-        public class when_handling_additional_argument_parsing : ChocolateyUninstallCommandSpecsBase
+        public class When_handling_additional_argument_parsing : ChocolateyUninstallCommandSpecsBase
         {
             private readonly IList<string> unparsedArgs = new List<string>();
 
@@ -197,24 +197,24 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Because()
             {
-                command.handle_additional_argument_parsing(unparsedArgs, configuration);
+                command.ParseAdditionalArguments(unparsedArgs, configuration);
             }
 
             [Fact]
-            public void should_set_unparsed_arguments_to_the_package_names()
+            public void Should_set_unparsed_arguments_to_the_package_names()
             {
-                configuration.PackageNames.ShouldEqual("pkg1;pkg2");
+                configuration.PackageNames.Should().Be("pkg1;pkg2");
             }
         }
 
-        public class when_handling_validation : ChocolateyUninstallCommandSpecsBase
+        public class When_validating : ChocolateyUninstallCommandSpecsBase
         {
             public override void Because()
             {
             }
 
             [Fact]
-            public void should_throw_when_packagenames_is_not_set()
+            public void Should_throw_when_packagenames_is_not_set()
             {
                 configuration.PackageNames = "";
                 var errored = false;
@@ -222,7 +222,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
                 try
                 {
-                    command.handle_validation(configuration);
+                    command.Validate(configuration);
                 }
                 catch (Exception ex)
                 {
@@ -230,44 +230,44 @@ namespace chocolatey.tests.infrastructure.app.commands
                     error = ex;
                 }
 
-                errored.ShouldBeTrue();
-                error.ShouldNotBeNull();
-                error.ShouldBeType<ApplicationException>();
+                errored.Should().BeTrue();
+                error.Should().NotBeNull();
+                error.Should().BeOfType<ApplicationException>();
             }
 
             [Fact]
-            public void should_continue_when_packagenames_is_set()
+            public void Should_continue_when_packagenames_is_set()
             {
                 configuration.PackageNames = "bob";
-                command.handle_validation(configuration);
+                command.Validate(configuration);
             }
         }
 
-        public class when_noop_is_called : ChocolateyUninstallCommandSpecsBase
+        public class When_noop_is_called : ChocolateyUninstallCommandSpecsBase
         {
             public override void Because()
             {
-                command.noop(configuration);
+                command.DryRun(configuration);
             }
 
             [Fact]
-            public void should_call_service_uninstall_noop()
+            public void Should_call_service_uninstall_noop()
             {
-                packageService.Verify(c => c.uninstall_noop(configuration), Times.Once);
+                packageService.Verify(c => c.UninstallDryRun(configuration), Times.Once);
             }
         }
 
-        public class when_run_is_called : ChocolateyUninstallCommandSpecsBase
+        public class When_run_is_called : ChocolateyUninstallCommandSpecsBase
         {
             public override void Because()
             {
-                command.run(configuration);
+                command.Run(configuration);
             }
 
             [Fact]
-            public void should_call_service_uninstall_run()
+            public void Should_call_service_uninstall_run()
             {
-                packageService.Verify(c => c.uninstall_run(configuration), Times.Once);
+                packageService.Verify(c => c.Uninstall(configuration), Times.Once);
             }
         }
     }

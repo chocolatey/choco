@@ -16,11 +16,24 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
+    using System;
+
     public enum PinCommandType
     {
-        unknown,
-        list,
-        add,
-        remove,
+        Unknown,
+        List,
+        Add,
+        Remove,
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        unknown = Unknown,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        list = List,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        add = Add,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        remove = Remove,
+#pragma warning restore IDE1006
     }
 }

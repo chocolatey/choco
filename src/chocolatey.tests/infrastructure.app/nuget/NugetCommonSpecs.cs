@@ -19,6 +19,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using chocolatey.infrastructure.app;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.nuget;
     using chocolatey.infrastructure.filesystem;
@@ -27,7 +28,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
     using NuGet.Packaging;
     using NuGet.Protocol;
     using NuGet.Protocol.Core.Types;
-    using Should;
+    using FluentAssertions;
 
     public class NugetCommonSpecs
     {
@@ -47,7 +48,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 packageDownloader.ResetCalls();
                 filesystem.ResetCalls();
 
-                filesystem.Setup(f => f.get_full_path(It.IsAny<string>())).Returns((string a) =>
+                filesystem.Setup(f => f.GetFullPath(It.IsAny<string>())).Returns((string a) =>
                 {
                     return "C:\\packages\\" + a;
                 });
@@ -59,18 +60,18 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void should_create_repository_when_source_is_null()
+            public void Should_create_repository_when_source_is_null()
             {
                 Context();
                 configuration.Sources = null;
 
                 because();
 
-                packageRepositories.Count().ShouldEqual(0);
+                packageRepositories.Should().BeEmpty();
             }
 
             [Fact]
-            public void should_parse_http_source()
+            public void Should_parse_http_source()
             {
                 Context();
                 var source = "http://nexus.example.com:8081/repository/choco";
@@ -79,13 +80,13 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
-                packageRepositories.First().PackageSource.SourceUri.to_string().ShouldEqual(source);
-                packageRepositories.First().PackageSource.IsHttp.ShouldBeTrue();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.ToStringSafe().Should().Be(source);
+                packageRepositories.First().PackageSource.IsHttp.Should().BeTrue();
             }
 
             [Fact]
-            public void should_parse_https_source()
+            public void Should_parse_https_source()
             {
                 Context();
                 var source = "https://nexus.example.com/repository/choco";
@@ -94,13 +95,13 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
-                packageRepositories.First().PackageSource.SourceUri.to_string().ShouldEqual(source);
-                packageRepositories.First().PackageSource.IsHttps.ShouldBeTrue();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.ToStringSafe().Should().Be(source);
+                packageRepositories.First().PackageSource.IsHttps.Should().BeTrue();
             }
 
             [Fact]
-            public void should_parse_absolute_path_source()
+            public void Should_parse_absolute_path_source()
             {
                 Context();
                 var source = "C:\\packages";
@@ -108,14 +109,14 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
-                packageRepositories.First().PackageSource.SourceUri.to_string()
-                    .ShouldEqual(("file:///" + source).Replace("\\","/"));
-                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.ToStringSafe()
+                    .Should().Be(("file:///" + source).Replace("\\","/"));
+                packageRepositories.First().PackageSource.IsLocal.Should().BeTrue();
             }
 
             [Fact]
-            public void should_parse_relative_path_source()
+            public void Should_parse_relative_path_source()
             {
                 Context();
                 var source = "choco";
@@ -124,14 +125,14 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
-                packageRepositories.First().PackageSource.SourceUri.to_string()
-                    .ShouldEqual(("file:///" + fullsource).Replace("\\", "/"));
-                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.ToStringSafe()
+                    .Should().Be(("file:///" + fullsource).Replace("\\", "/"));
+                packageRepositories.First().PackageSource.IsLocal.Should().BeTrue();
             }
 
             [Fact]
-            public void should_parse_dot_relative_path_source()
+            public void Should_parse_dot_relative_path_source()
             {
                 Context();
                 var source = ".";
@@ -140,14 +141,14 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
-                packageRepositories.First().PackageSource.SourceUri.to_string()
-                    .ShouldEqual(("file:///" + fullsource + "/").Replace("\\", "/"));
-                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.ToStringSafe()
+                    .Should().Be(("file:///" + fullsource + "/").Replace("\\", "/"));
+                packageRepositories.First().PackageSource.IsLocal.Should().BeTrue();
             }
 
             [Fact]
-            public void should_parse_unc_source()
+            public void Should_parse_unc_source()
             {
                 Context();
                 var source = "\\\\samba-server\\choco-share";
@@ -155,11 +156,27 @@ namespace chocolatey.tests.infrastructure.app.nuget
 
                 because();
 
-                packageRepositories.First().PackageSource.TrySourceAsUri.ShouldNotBeNull();
-                packageRepositories.First().PackageSource.SourceUri.to_string()
-                    .ShouldEqual(("file:" + source).Replace("\\", "/"));
-                packageRepositories.First().PackageSource.IsLocal.ShouldBeTrue();
-                packageRepositories.First().PackageSource.SourceUri.IsUnc.ShouldBeTrue();
+                packageRepositories.First().PackageSource.TrySourceAsUri.Should().NotBeNull();
+                packageRepositories.First().PackageSource.SourceUri.ToStringSafe()
+                    .Should().Be(("file:" + source).Replace("\\", "/"));
+                packageRepositories.First().PackageSource.IsLocal.Should().BeTrue();
+                packageRepositories.First().PackageSource.SourceUri.IsUnc.Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_set_user_agent_string()
+            {
+                Context();
+                var source = "https://community.chocolatey.org/api/v2/";
+                configuration.Sources = source;
+                configuration.Information.ChocolateyProductVersion = "vNext";
+
+                because();
+
+                // Change this when the NuGet version is updated.
+                string nugetClientVersion = "6.4.1";
+                string expectedUserAgentString = "{0}/{1} via NuGet Client/{2}".FormatWith(ApplicationParameters.UserAgent, configuration.Information.ChocolateyProductVersion, nugetClientVersion);
+                UserAgent.UserAgentString.Should().StartWith(expectedUserAgentString);
             }
         }
     }

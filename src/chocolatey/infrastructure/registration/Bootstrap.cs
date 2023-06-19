@@ -32,7 +32,7 @@ namespace chocolatey.infrastructure.registration
         /// <summary>
         ///   Initializes this instance.
         /// </summary>
-        public static void initialize()
+        public static void Initialize()
         {
             Log.InitializeWith<Log4NetLog>();
             _logger.Debug("XmlConfiguration is now operational");
@@ -41,7 +41,7 @@ namespace chocolatey.infrastructure.registration
         /// <summary>
         ///   Startups this instance.
         /// </summary>
-        public static void startup()
+        public static void Startup()
         {
             AppDomain.CurrentDomain.UnhandledException += DomainUnhandledException;
         }
@@ -75,8 +75,22 @@ namespace chocolatey.infrastructure.registration
         /// <summary>
         ///   Shutdowns this instance.
         /// </summary>
-        public static void shutdown()
+        public static void Shutdown()
         {
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void initialize()
+            => Initialize();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void startup()
+            => Startup();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void shutdown()
+            => Shutdown();
+#pragma warning restore IDE1006
     }
 }

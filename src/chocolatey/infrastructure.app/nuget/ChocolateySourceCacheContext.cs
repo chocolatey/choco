@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace chocolatey.infrastructure.app.nuget
+﻿namespace chocolatey.infrastructure.app.nuget
 {
+    using System;
     using System.Threading;
     using Alphaleonis.Win32.Filesystem;
-    using configuration;
+    using chocolatey.infrastructure.app.configuration;
     using NuGet.Protocol.Core.Types;
 
     public class ChocolateySourceCacheContext : SourceCacheContext
@@ -22,6 +17,16 @@ namespace chocolatey.infrastructure.app.nuget
         public ChocolateySourceCacheContext(ChocolateyConfiguration config)
         {
             _chocolateyCacheLocation = config.CacheLocation;
+
+            if (config.CacheExpirationInMinutes <= 0)
+            {
+                MaxAge = DateTime.UtcNow;
+                RefreshMemoryCache = true;
+            }
+            else
+            {
+                MaxAge = DateTime.UtcNow.AddMinutes(-config.CacheExpirationInMinutes);
+            }
         }
 
         public override string GeneratedTempFolder

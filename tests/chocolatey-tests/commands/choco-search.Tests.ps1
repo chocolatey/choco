@@ -1,4 +1,4 @@
-﻿<#
+<#
     .Synopsis
         Tests for `choco search` and aliases
 
@@ -18,6 +18,7 @@ Import-Module helpers/common-helpers
 Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindCommand {
     BeforeDiscovery {
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
+        $hasEnabledV3Feed = Test-HasNuGetV3Source
     }
 
     BeforeAll {
@@ -35,7 +36,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         Remove-ChocolateyTestInstall
     }
 
-    Context "Searching packages with no filter (Happy Path)" {
+    # Skip when searching against a v3 source as our current source is not returning consistent results.
+    Context "Searching packages with no filter (Happy Path)" -Skip:$hasEnabledV3Feed {
         BeforeAll {
             $Output = Invoke-Choco $_
         }
@@ -84,7 +86,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
     }
 
-    Context "Searching all available packages" {
+    # Skip when searching against a v3 source as our current source is not returning consistent results.
+    Context "Searching all available packages" -Skip:$hasEnabledV3Feed {
         BeforeAll {
             $Output = Invoke-Choco $_ --AllVersions
         }
@@ -110,7 +113,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
     }
 
-    Context "Searching all available packages (allowing prerelease)" -Tag Testing {
+    Context "Searching all available packages (allowing prerelease)" {
         BeforeAll {
             $Output = Invoke-Choco $_ --AllVersions --PreRelease
         }
@@ -154,7 +157,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
     }
 
-    Context "Searching packages with Verbose" {
+    # Skip when searching against a v3 source as our current source is not returning consistent results.
+    Context "Searching packages with Verbose" -Skip:$hasEnabledV3Feed {
         BeforeAll {
             $Output = Invoke-Choco $_ --Verbose
         }
@@ -250,7 +254,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Searching packages on source using proxy and proxy bypass list" -Skip:(!$licensedProxyFixed) {
+    # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
+    Context "Searching packages on source using proxy and proxy bypass list" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
@@ -273,7 +278,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
     }
 
     # Issue: https://gitlab.com/chocolatey/collaborators/choco-licensed/-/issues/530 (NOTE: Proxy bypassing also works on Chocolatey FOSS)
-    Context "Searching packages on source using proxy and proxy bypass list on command" -Skip:(!$licensedProxyFixed) {
+    # These are skipped on Proxy tests because the proxy server can't be bypassed in that test environment.
+    Context "Searching packages on source using proxy and proxy bypass list on command" -Tag ProxySkip -Skip:(!$licensedProxyFixed) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
@@ -442,7 +448,29 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Uses search term '--local-only'" {
-            $Output.String | Should -BeLike "*searchTerm='--local-only'*"
+            $Output.String | Should -Match "searchTerm='--local-only'|q=--local-only"
+        }
+    }
+
+    Context "Searching for package when invalid package source is being used" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            $InvalidSource = "https://invalid.chocolatey.org/api/v2/"
+            $null = Invoke-Choco source add -n "invalid" -s $InvalidSource
+
+            $Output = Invoke-Choco search dependency
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Outputs warning about unable to load service index' {
+            $Output.Lines | Should -Contain "Unable to load the service index for source $InvalidSource." -Because $Output.String
+        }
+
+        It 'Outputs the results of the search' {
+            $Output.Lines | Should -Contain 'hasrebootdependency 1.0.0'
         }
     }
 

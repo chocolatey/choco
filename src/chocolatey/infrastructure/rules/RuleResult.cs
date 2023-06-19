@@ -28,5 +28,17 @@ namespace chocolatey.infrastructure.rules
         public string Id { get; private set; }
         public string Message { get; private set; }
         public RuleType Severity { get; set; }
+
+        internal static RuleResult FromImmutableRule(ImmutableRule result, string summary = null)
+        {
+            if (string.IsNullOrEmpty(summary))
+            {
+                return new RuleResult(result.Severity, result.Id, result.Summary) { HelpUrl = result.HelpUrl };
+            }
+            else
+            {
+                return new RuleResult(result.Severity, result.Id, summary) { HelpUrl = result.HelpUrl };
+            }
+        }
     }
 }

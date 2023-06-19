@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.services
 {
+    using System;
     using System.Text.RegularExpressions;
 
     /// <summary>
@@ -23,10 +24,16 @@ namespace chocolatey.infrastructure.services
     /// </summary>
     public class RegularExpressionService : IRegularExpressionService
     {
-        public string replace(string input, string pattern, MatchEvaluator matchEvaluator)
+        public string Replace(string input, string pattern, MatchEvaluator matchEvaluator)
         {
             var regex = new Regex(pattern, RegexOptions.IgnoreCase | RegexOptions.Multiline);
             return regex.Replace(input, matchEvaluator);
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public string replace(string input, string pattern, MatchEvaluator matchEvaluator)
+            => Replace(input, pattern, matchEvaluator);
+#pragma warning restore IDE1006
     }
 }

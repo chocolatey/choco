@@ -18,7 +18,7 @@ namespace chocolatey.tests.infrastructure.information
 {
     using System;
     using chocolatey.infrastructure.information;
-    using Should;
+    using FluentAssertions;
 
     public class VersionInformationSpecs
     {
@@ -29,37 +29,37 @@ namespace chocolatey.tests.infrastructure.information
             }
         }
 
-        public class when_calling_VersionInformation_to_get_current_assembly_version : VersionInformationSpecsBase
+        public class When_calling_VersionInformation_to_get_current_assembly_version : VersionInformationSpecsBase
         {
             public string result = null;
 
             public override void Because()
             {
-                result = VersionInformation.get_current_assembly_version();
+                result = VersionInformation.GetCurrentAssemblyVersion();
             }
 
             [Fact]
-            public void should_not_be_null()
+            public void Should_not_be_null()
             {
-                result.ShouldNotBeNull();
+                result.Should().NotBeNull();
             }
 
             [Fact]
-            public void should_not_be_empty()
+            public void Should_not_be_empty()
             {
-                result.ShouldNotBeEmpty();
+                result.Should().NotBeEmpty();
             }
 
             [Fact]
-            public void should_be_transferable_to_Version()
+            public void Should_be_transferable_to_Version()
             {
-                new Version(result).ShouldNotBeNull();
+                new Version(result).Should().NotBeNull();
             }
 
             [Fact]
-            public void should_not_equal_zero_dot_zero_dot_zero_dot_zero()
+            public void Should_not_equal_zero_dot_zero_dot_zero_dot_zero()
             {
-                result.ShouldNotEqual("0.0.0.0");
+                result.Should().NotBe("0.0.0.0");
             }
         }
     }

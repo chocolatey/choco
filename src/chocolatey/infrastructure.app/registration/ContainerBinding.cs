@@ -51,24 +51,24 @@ namespace chocolatey.infrastructure.app.registration
         {
             var availableExtensions = new List<ExtensionInformation>();
 
-            var configuration = Config.get_configuration_settings();
+            var configuration = Config.GetConfigurationSettings();
 
             var registrator = new SimpleInjectorContainerRegistrator();
 
             // We can not resolve this class, as that will prevent future registrations
             var fileSystem = new DotNetFileSystem();
-            var xmlService = new XmlService(fileSystem, new cryptography.CryptoHashProvider(fileSystem));
+            var xmlService = new XmlService(fileSystem, new CryptoHashProvider(fileSystem));
 
             var mainRegistrator = new ChocolateyRegistrationModule();
             registrator.CanReplaceRegister = true;
-            registrator.register_instance<filesystem.IFileSystem>(() => fileSystem);
-            registrator.register_instance(() => Config.get_configuration_settings());
-            mainRegistrator.register_dependencies(registrator, configuration);
-            registrator.register_assembly_commands(Assembly.GetExecutingAssembly());
+            registrator.RegisterInstance<IFileSystem>(() => fileSystem);
+            registrator.RegisterInstance(() => Config.GetConfigurationSettings());
+            mainRegistrator.RegisterDependencies(registrator, configuration);
+            registrator.RegisterAssemblyCommands(Assembly.GetExecutingAssembly());
             registrator.CanReplaceRegister = false;
 
-            var assemblies = fileSystem.get_extension_assemblies();
-            var currentAssemblyVersionString = VersionInformation.get_current_assembly_version();
+            var assemblies = fileSystem.GetExtensionAssemblies();
+            var currentAssemblyVersionString = VersionInformation.GetCurrentAssemblyVersion();
             Version currentAssemblyVersion;
             if (!Version.TryParse(currentAssemblyVersionString, out currentAssemblyVersion))
             {
@@ -77,13 +77,13 @@ namespace chocolatey.infrastructure.app.registration
 
             var arguments = Environment.GetCommandLineArgs();
 
-            var disableCompatibilityChecks = ConfigurationBuilder.is_compatibility_checks_disabled(fileSystem, xmlService) ||
-                arguments.Any(a => a.is_equal_to("--skip-compatibility-checks"));
+            var disableCompatibilityChecks = ConfigurationBuilder.AreCompatibilityChecksDisabled(fileSystem, xmlService) ||
+                arguments.Any(a => a.IsEqualTo("--skip-compatibility-checks"));
 
-            var chocoVersion = NuGetVersion.Parse(VersionInformation.get_current_assembly_version());
-            registrator = register_extensions(availableExtensions, configuration, registrator, assemblies, currentAssemblyVersion, chocoVersion, disableCompatibilityChecks);
+            var chocoVersion = NuGetVersion.Parse(VersionInformation.GetCurrentAssemblyVersion());
+            registrator = RegisterExtensions(availableExtensions, configuration, registrator, assemblies, currentAssemblyVersion, chocoVersion, disableCompatibilityChecks);
 
-            container = registrator.build_container(container);
+            container = registrator.BuildContainer(container);
 
             var availableExtensionsArray = availableExtensions.Distinct().ToArray();
 
@@ -100,13 +100,13 @@ namespace chocolatey.infrastructure.app.registration
             return availableExtensionsArray;
         }
 
-        private SimpleInjectorContainerRegistrator register_extensions(List<ExtensionInformation> availableExtensions, ChocolateyConfiguration configuration, SimpleInjectorContainerRegistrator registrator, IEnumerable<adapters.IAssembly> assemblies, Version currentAssemblyVersion, NuGetVersion chocoVersion, bool disableCompatibilityChecks)
+        private SimpleInjectorContainerRegistrator RegisterExtensions(List<ExtensionInformation> availableExtensions, ChocolateyConfiguration configuration, SimpleInjectorContainerRegistrator registrator, IEnumerable<adapters.IAssembly> assemblies, Version currentAssemblyVersion, NuGetVersion chocoVersion, bool disableCompatibilityChecks)
         {
             foreach (var assembly in assemblies)
             {
                 var assemblyName = assembly.GetName().Name;
                 var extensionInformation = new ExtensionInformation(assembly);
-                var minimumChocolateyVersionString = VersionInformation.get_minimum_chocolatey_version(assembly);
+                var minimumChocolateyVersionString = VersionInformation.GetMinimumChocolateyVersion(assembly);
                 Version minimumChocolateyVersion;
 
                 if (!disableCompatibilityChecks && Version.TryParse(minimumChocolateyVersionString, out minimumChocolateyVersion) && currentAssemblyVersion < minimumChocolateyVersion)
@@ -132,7 +132,7 @@ choco feature enable --name=""disableCompatibilityChecks""",
 
                 try
                 {
-                    var registrationClasses = assembly.get_extension_modules();
+                    var registrationClasses = assembly.GetExtensionModules();
 
                     this.Log().Debug("Trying to load and register extension '{0}'", assemblyName);
 
@@ -151,14 +151,14 @@ choco feature enable --name=""disableCompatibilityChecks""",
 
                         this.Log().Debug("Calling registration module '{0}' in extension '{1}'!", registration.GetType().Name, assemblyName);
                         clonedRegistrator._validationHandlers.Clear();
-                        clonedRegistrator.register_validator((instanceType) => validate_minimum_chocolatey_version(instanceType, chocoVersion));
-                        registration.register_dependencies(clonedRegistrator, configuration.deep_copy());
+                        clonedRegistrator.RegisterValidator((instanceType) => ValidateMinimumChocolateyVersion(instanceType, chocoVersion));
+                        registration.RegisterDependencies(clonedRegistrator, configuration.DeepCopy());
                         hasRegisteredDependencies = !clonedRegistrator.RegistrationFailed;
                     }
 
                     if (hasRegisteredDependencies)
                     {
-                        clonedRegistrator.register_assembly_commands(assembly);
+                        clonedRegistrator.RegisterAssemblyCommands(assembly);
                         hasRegisteredDependencies = !clonedRegistrator.RegistrationFailed;
                     }
 
@@ -188,7 +188,7 @@ choco feature enable --name=""disableCompatibilityChecks""",
                 {
                     registrator.CanReplaceRegister = false;
 
-                    if (hasRegisteredDependencies || !extensionInformation.Name.is_equal_to("chocolatey.licensed"))
+                    if (hasRegisteredDependencies || !extensionInformation.Name.IsEqualTo("chocolatey.licensed"))
                     {
                         availableExtensions.Add(extensionInformation);
                     }
@@ -198,14 +198,17 @@ choco feature enable --name=""disableCompatibilityChecks""",
             return registrator;
         }
 
-        private bool validate_minimum_chocolatey_version(Type instanceType, NuGetVersion chocoVersion)
+        private bool ValidateMinimumChocolateyVersion(Type instanceType, NuGetVersion chocoVersion)
         {
             if (instanceType == null)
             {
                 return false;
             }
 
-            var methodImpl = instanceType.GetMethod("supports_chocolatey", BindingFlags.Static | BindingFlags.Public);
+            // NOTE: This method, SupportsChocolatey, does not currently exist anywhere in our code bases.
+            // This validation check was put in place for future proofing the interaction between Chocolatey
+            // and its consumers.
+            var methodImpl = instanceType.GetMethod("SupportsChocolatey", BindingFlags.Static | BindingFlags.Public);
 
             if (methodImpl == null)
             {
@@ -222,6 +225,4 @@ choco feature enable --name=""disableCompatibilityChecks""",
             }
         }
     }
-
-    // ReSharper restore InconsistentNaming
 }

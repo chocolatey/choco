@@ -17,6 +17,7 @@
 namespace chocolatey.infrastructure.tasks
 {
     using chocolatey.infrastructure.app.attributes;
+    using System;
 
     /// <summary>
     ///   Interface for all runners.
@@ -28,11 +29,19 @@ namespace chocolatey.infrastructure.tasks
         ///   Initializes a task. This should be initialized to run on a schedule, a trigger, a subscription to event messages,
         ///   etc, or some combination of the above.
         /// </summary>
-        void initialize();
+        void Initialize();
 
         /// <summary>
         ///   Shuts down a task that is in a waiting state. Turns off all schedules, triggers or subscriptions.
         /// </summary>
+        void Shutdown();
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void initialize();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         void shutdown();
+#pragma warning restore IDE1006
     }
 }

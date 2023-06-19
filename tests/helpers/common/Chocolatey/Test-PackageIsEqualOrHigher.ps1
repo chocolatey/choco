@@ -1,4 +1,3 @@
-﻿# TODO: Should we cache the result
 function Test-PackageIsEqualOrHigher {
     [CmdletBinding()]
     [OutputType([boolean])]
@@ -9,12 +8,15 @@ function Test-PackageIsEqualOrHigher {
         [NuGet.Versioning.NuGetVersion]$Version,
         [switch]$AllowMissingPackage
     )
-
-    $package = (Invoke-Choco list --limitoutput).Lines |
+    if (-not $script:ChocolateyInstalledPackages) {
+        $script:ChocolateyInstalledPackages = (Invoke-Choco list --limitoutput).Lines |
         Where-Object { $_ -notmatch 'please upgrade' } |
-        ConvertFrom-ChocolateyOutput -Command List |
-        Where-Object Name -EQ $PackageName
-    if (!$package) {
+        ConvertFrom-ChocolateyOutput -Command List
+    }
+
+    $package = $script:ChocolateyInstalledPackages | Where-Object Name -EQ $PackageName
+
+    if (-not $package) {
         return $AllowMissingPackage.IsPresent
     }
 

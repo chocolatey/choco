@@ -45,70 +45,70 @@ namespace chocolatey.tests.integration
         public override void BeforeEverything()
         {
             Container = SimpleInjectorContainer.Container;
-            fix_application_parameter_variables(Container);
+            FixApplicationParameterVariables(Container);
 
             base.BeforeEverything();
 
             // deep copy so we don't have the same configuration and
             // don't have to worry about issues using it
-            var config = Container.GetInstance<ChocolateyConfiguration>().deep_copy();
-            config.Information.PlatformType = Platform.get_platform();
+            var config = Container.GetInstance<ChocolateyConfiguration>().DeepCopy();
+            config.Information.PlatformType = Platform.GetPlatform();
             config.Information.IsInteractive = false;
             config.PromptForConfirmation = false;
             config.Force = true;
-            unpack_self(Container, config);
-            build_packages(Container, config);
+            UnpackSelf(Container, config);
+            BuildPackages(Container, config);
 
-            ConfigurationBuilder.set_up_configuration(new List<string>(), config, Container, new ChocolateyLicense(), null);
+            ConfigurationBuilder.SetupConfiguration(new List<string>(), config, Container, new ChocolateyLicense(), null);
 
-            MockLogger.reset();
+            MockLogger.Reset();
         }
 
         /// <summary>
         ///   Most of the application parameters are already set by runtime and are readonly values.
         ///   They need to be updated, so we can do that with reflection.
         /// </summary>
-        private static void fix_application_parameter_variables(Container container)
+        private static void FixApplicationParameterVariables(Container container)
         {
             var fileSystem = container.GetInstance<IFileSystem>();
 
-            var applicationLocation = fileSystem.get_directory_name(fileSystem.get_current_assembly_path());
+            var applicationLocation = fileSystem.GetDirectoryName(fileSystem.GetCurrentAssemblyPath());
 
             var field = typeof(ApplicationParameters).GetField("InstallLocation");
             field.SetValue(null, applicationLocation);
 
             field = typeof(ApplicationParameters).GetField("LoggingLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "logs"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "logs"));
 
             field = typeof(ApplicationParameters).GetField("GlobalConfigFileLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "config", "chocolatey.config"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "config", "chocolatey.config"));
 
             field = typeof(ApplicationParameters).GetField("LicenseFileLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "license", "chocolatey.license.xml"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "license", "chocolatey.license.xml"));
 
             field = typeof(ApplicationParameters).GetField("PackagesLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "lib"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "lib"));
 
             field = typeof(ApplicationParameters).GetField("PackageFailuresLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "lib-bad"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "lib-bad"));
 
             field = typeof(ApplicationParameters).GetField("PackageBackupLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "lib-bkp"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "lib-bkp"));
 
             field = typeof(ApplicationParameters).GetField("ShimsLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "bin"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "bin"));
 
             field = typeof(ApplicationParameters).GetField("ChocolateyPackageInfoStoreLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, ".chocolatey"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, ".chocolatey"));
 
             field = typeof(ApplicationParameters).GetField("ExtensionsLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.HooksLocation, "extensions"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.HooksLocation, "extensions"));
 
             field = typeof(ApplicationParameters).GetField("TemplatesLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.HooksLocation, "templates"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.HooksLocation, "templates"));
 
             field = typeof(ApplicationParameters).GetField("HooksLocation");
-            field.SetValue(null, fileSystem.combine_paths(ApplicationParameters.InstallLocation, "hooks"));
+            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "hooks"));
 
             field = typeof(ApplicationParameters).GetField("LockTransactionalInstallFiles");
             field.SetValue(null, false);
@@ -121,43 +121,43 @@ namespace chocolatey.tests.integration
             }
         }
 
-        private void unpack_self(Container container, ChocolateyConfiguration config)
+        private void UnpackSelf(Container container, ChocolateyConfiguration config)
         {
             var unpackCommand = container.GetInstance<ChocolateyUnpackSelfCommand>();
-            unpackCommand.run(config);
+            unpackCommand.Run(config);
         }
 
-        private void build_packages(Container container, ChocolateyConfiguration config)
+        private void BuildPackages(Container container, ChocolateyConfiguration config)
         {
             var fileSystem = container.GetInstance<IFileSystem>();
-            var contextDir = fileSystem.combine_paths(fileSystem.get_directory_name(fileSystem.get_current_assembly_path()), "context");
+            var contextDir = fileSystem.CombinePaths(fileSystem.GetDirectoryName(fileSystem.GetCurrentAssemblyPath()), "context");
 
             // short-circuit building packages if they are already there.
-            if (fileSystem.get_files(contextDir, "*.nupkg").Any())
+            if (fileSystem.GetFiles(contextDir, "*.nupkg").Any())
             {
-                Console.WriteLine("Packages have already been built. Skipping... - If you need to rebuild packages, delete all nupkg files in {0}.".format_with(contextDir));
+                Console.WriteLine("Packages have already been built. Skipping... - If you need to rebuild packages, delete all nupkg files in {0}.".FormatWith(contextDir));
                 return;
             }
 
-            var files = fileSystem.get_files(contextDir, "*.nuspec", SearchOption.AllDirectories);
+            var files = fileSystem.GetFiles(contextDir, "*.nuspec", SearchOption.AllDirectories);
 
             config.PackCommand.PackThrowOnUnsupportedElements = false;
             var command = container.GetInstance<ChocolateyPackCommand>();
-            foreach (var file in files.or_empty_list_if_null())
+            foreach (var file in files.OrEmpty())
             {
                 config.Input = file;
-                Console.WriteLine("Building {0}".format_with(file));
-                command.run(config);
+                Console.WriteLine("Building {0}".FormatWith(file));
+                command.Run(config);
             }
             config.PackCommand.PackThrowOnUnsupportedElements = true;
 
-            Console.WriteLine("Moving all nupkgs in {0} to context directory.".format_with(fileSystem.get_current_directory()));
-            var nupkgs = fileSystem.get_files(fileSystem.get_current_directory(), "*.nupkg");
+            Console.WriteLine("Moving all nupkgs in {0} to context directory.".FormatWith(fileSystem.GetCurrentDirectory()));
+            var nupkgs = fileSystem.GetFiles(fileSystem.GetCurrentDirectory(), "*.nupkg");
 
-            foreach (var nupkg in nupkgs.or_empty_list_if_null())
+            foreach (var nupkg in nupkgs.OrEmpty())
             {
-                fileSystem.copy_file(nupkg, fileSystem.combine_paths(contextDir, fileSystem.get_file_name(nupkg)), overwriteExisting: true);
-                fileSystem.delete_file(nupkg);
+                fileSystem.CopyFile(nupkg, fileSystem.CombinePaths(contextDir, fileSystem.GetFileName(nupkg)), overwriteExisting: true);
+                fileSystem.DeleteFile(nupkg);
             }
 
             //concurrency issues when packages are first built out during testing

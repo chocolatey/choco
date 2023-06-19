@@ -16,14 +16,25 @@
 
 namespace chocolatey.infrastructure.app.registration
 {
+    using System;
     using System.Collections.Generic;
 
     public interface IContainerResolver
     {
+        TService Resolve<TService>()
+            where TService : class;
+
+        IEnumerable<TService> ResolveAll<TService>()
+            where TService : class;
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         TService resolve<TService>()
             where TService : class;
 
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         IEnumerable<TService> resolve_all<TService>()
             where TService : class;
+#pragma warning restore IDE1006
     }
 }

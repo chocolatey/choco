@@ -28,10 +28,7 @@ of {`32`|`64`}.
 When your installation script has to know what architecture it is run
 on, this simple function comes in handy.
 
-Available as `Get-OSArchitectureWidth` in 0.9.10+. If you need
-compatibility with pre 0.9.10, please use the alias `Get-ProcessorBits`.
-
-As of 0.10.14+, ARM64 architecture will automatically select 32bit width as
+ARM64 architecture will automatically select 32bit width as
 there is an emulator for 32 bit and there are no current plans by Microsoft to
 ship 64 bit x86 emulation for ARM64. For more details, see
 https://github.com/chocolatey/choco/issues/1800#issuecomment-484293844.

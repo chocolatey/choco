@@ -18,8 +18,6 @@ namespace chocolatey.infrastructure.logging
 {
     using System;
 
-    // ReSharper disable InconsistentNaming
-
     /// <summary>
     ///   Custom interface for logging messages
     /// </summary>
@@ -96,8 +94,6 @@ namespace chocolatey.infrastructure.logging
         /// <param name="message">The message.</param>
         void Fatal(Func<string> message);
     }
-
-    // ReSharper restore InconsistentNaming
 
     /// <summary>
     ///   Ensures a default constructor for the logger type

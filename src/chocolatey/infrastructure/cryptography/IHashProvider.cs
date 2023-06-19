@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.IO;
 
 namespace chocolatey.infrastructure.cryptography
@@ -27,27 +28,41 @@ namespace chocolatey.infrastructure.cryptography
         /// Changes the algorithm
         /// </summary>
         /// <param name="algorithmType">Type of the algorithm.</param>
-        void set_hash_algorithm(CryptoHashProviderType algorithmType);
+        void SetHashAlgorithm(CryptoHashProviderType algorithmType);
 
         /// <summary>
         /// Returns a hash of the specified file path.
         /// </summary>
         /// <param name="filePath">The file path.</param>
         /// <returns>A computed hash of the file, based on the contents.</returns>
-        string hash_file(string filePath);
+        string ComputeFileHash(string filePath);
 
         /// <summary>
         /// Returns a hash of the specified stream.
         /// </summary>
         /// <param name="inputStream">The stream.</param>
         /// <returns>A computed hash of the stream, based on the contents.</returns>
-        string hash_stream(Stream inputStream);
+        string ComputeStreamHash(Stream inputStream);
 
         /// <summary>
         /// Returns a hash of the specified byte array.
         /// </summary>
         /// <param name="buffer">The byte array.</param>
         /// <returns>A computed hash of the array, based on the contents.</returns>
+        string ComputeByteArrayHash(byte[] buffer);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void set_hash_algorithm(CryptoHashProviderType algorithmType);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string hash_file(string filePath);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        string hash_stream(Stream inputStream);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         string hash_byte_array(byte[] buffer);
+#pragma warning restore IDE1006
     }
 }

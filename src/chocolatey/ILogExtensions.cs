@@ -20,8 +20,6 @@ namespace chocolatey
     using System.Runtime;
     using infrastructure.logging;
 
-    // ReSharper disable InconsistentNaming
-
     /// <summary>
     ///   Extensions for ILog
     /// </summary>
@@ -35,13 +33,13 @@ namespace chocolatey
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Trace(this ILog logger, string message, params object[] formatting)
         {
-           if (LogTraceMessages) ChocolateyLoggers.Trace.to_string().Log().Debug(message, formatting);
+           if (LogTraceMessages) ChocolateyLoggers.Trace.ToStringSafe().Log().Debug(message, formatting);
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public static void Trace(this ILog logger, Func<string> message)
         {
-            if (LogTraceMessages) ChocolateyLoggers.Trace.to_string().Log().Debug(message);
+            if (LogTraceMessages) ChocolateyLoggers.Trace.ToStringSafe().Log().Debug(message);
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
@@ -57,7 +55,7 @@ namespace chocolatey
                     Trace(logger,message,formatting);
                     break;
                 default:
-                    logType.to_string().Log().Debug(message, formatting);
+                    logType.ToStringSafe().Log().Debug(message, formatting);
                     break;
             }
         }
@@ -74,7 +72,7 @@ namespace chocolatey
                     Trace(logger, message);
                     break;
                 default:
-                    logType.to_string().Log().Debug(message);
+                    logType.ToStringSafe().Log().Debug(message);
                     break;
             }
         }
@@ -91,7 +89,7 @@ namespace chocolatey
                     Trace(logger, message, formatting);
                     break;
                 default:
-                    logType.to_string().Log().Info(message, formatting);
+                    logType.ToStringSafe().Log().Info(message, formatting);
                     break;
             }
         }
@@ -108,7 +106,7 @@ namespace chocolatey
                     Trace(logger, message);
                     break;
                 default:
-                    logType.to_string().Log().Info(message);
+                    logType.ToStringSafe().Log().Info(message);
                     break;
             }
         }
@@ -125,7 +123,7 @@ namespace chocolatey
                     Trace(logger, message, formatting);
                     break;
                 default:
-                    logType.to_string().Log().Warn(message, formatting);
+                    logType.ToStringSafe().Log().Warn(message, formatting);
                     break;
             }
         }
@@ -142,7 +140,7 @@ namespace chocolatey
                     Trace(logger, message);
                     break;
                 default:
-                    logType.to_string().Log().Warn(message);
+                    logType.ToStringSafe().Log().Warn(message);
                     break;
             }
         }
@@ -159,7 +157,7 @@ namespace chocolatey
                     Trace(logger, message, formatting);
                     break;
                 default:
-                    logType.to_string().Log().Error(message, formatting);
+                    logType.ToStringSafe().Log().Error(message, formatting);
                     break;
             }
         }
@@ -176,7 +174,7 @@ namespace chocolatey
                     Trace(logger, message);
                     break;
                 default:
-                    logType.to_string().Log().Error(message);
+                    logType.ToStringSafe().Log().Error(message);
                     break;
             }
         }
@@ -193,7 +191,7 @@ namespace chocolatey
                     Trace(logger, message, formatting);
                     break;
                 default:
-                    logType.to_string().Log().Fatal(message, formatting);
+                    logType.ToStringSafe().Log().Fatal(message, formatting);
                     break;
             }
         }
@@ -210,12 +208,9 @@ namespace chocolatey
                     Trace(logger, message);
                     break;
                 default:
-                    logType.to_string().Log().Fatal(message);
+                    logType.ToStringSafe().Log().Fatal(message);
                     break;
             }
         }
     }
-
-
-    // ReSharper restore InconsistentNaming
 }

@@ -16,6 +16,7 @@
 
 namespace chocolatey.infrastructure.services
 {
+    using System;
     using System.Text.RegularExpressions;
 
     /// <summary>
@@ -30,6 +31,11 @@ namespace chocolatey.infrastructure.services
         /// <param name="pattern">The pattern.</param>
         /// <param name="matchEvaluator">The match evaluator.</param>
         /// <returns></returns>
+        string Replace(string input, string pattern, MatchEvaluator matchEvaluator);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         string replace(string input, string pattern, MatchEvaluator matchEvaluator);
+#pragma warning restore IDE1006
     }
 }

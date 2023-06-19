@@ -38,41 +38,41 @@ namespace chocolatey.infrastructure.app.commands
             _packageService = packageService;
         }
 
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("s=|source=",
                      "Source - Source location for install. Can use special 'windowsfeatures', 'ruby', 'cygwin', or 'python' sources. Defaults to sources.",
-                     option => configuration.Sources = option.remove_surrounding_quotes())
+                     option => configuration.Sources = option.UnquoteSafe())
                 .Add("idonly|id-only",
-                     "Id Only - Only return Package Ids in the list results. Available in 0.10.6+.",
+                     "Id Only - Only return Package Ids in the list results.",
                      option => configuration.ListCommand.IdOnly = option != null)
                 .Add("pre|prerelease",
                      "Prerelease - Include Prereleases? Defaults to false.",
                      option => configuration.Prerelease = option != null)
                 .Add("i|includeprograms|include-programs", // Should this parameter be deprecated on Search?
-                     "IncludePrograms - Used in conjunction with LocalOnly, filters out apps chocolatey has listed as packages and includes those in the list. Defaults to false.",
+                     "IncludePrograms - Filters out apps Chocolatey has listed as packages and includes those in the list. Defaults to false.",
                      option => configuration.ListCommand.IncludeRegistryPrograms = option != null)
                 .Add("a|all|allversions|all-versions",
                      "AllVersions - include results from all versions.",
                      option => configuration.AllVersions = option != null)
                 .Add("version=",
                      "Version - Specific version of a package to return.",
-                     option => configuration.Version = option.remove_surrounding_quotes())
+                     option => configuration.Version = option.UnquoteSafe())
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
-                     option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
+                     option => configuration.SourceCommand.Username = option.UnquoteSafe())
                 .Add("p=|password=",
                      "Password - the user's password to the source. Defaults to empty.",
-                     option => configuration.SourceCommand.Password = option.remove_surrounding_quotes())
+                     option => configuration.SourceCommand.Password = option.UnquoteSafe())
                 .Add("cert=",
-                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty. Available in 0.9.10+.",
-                     option => configuration.SourceCommand.Certificate = option.remove_surrounding_quotes())
+                     "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty.",
+                     option => configuration.SourceCommand.Certificate = option.UnquoteSafe())
                 .Add("cp=|certpassword=",
-                     "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
-                     option => configuration.SourceCommand.CertificatePassword = option.remove_surrounding_quotes())
+                     "Certificate Password - the client certificate's password to the source. Defaults to empty.",
+                     option => configuration.SourceCommand.CertificatePassword = option.UnquoteSafe())
                 .Add("page=",
-                     "Page - the 'page' of results to return. Defaults to return all results. Available in 0.9.10+.",
+                     "Page - the 'page' of results to return. Defaults to return all results.",
                      option =>
                          {
                              int page;
@@ -86,42 +86,42 @@ namespace chocolatey.infrastructure.app.commands
                              }
                          })
                 .Add("page-size=",
-                     "Page Size - the amount of package results to return per page. Defaults to 25. Available in 0.9.10+.",
+                     "Page Size - the amount of packages to return in each page of results. NOTE: this value is per source. Defaults to 25 for each source that is included in query.",
                      option =>
                      {
                          configuration.ListCommand.PageSize = int.Parse(option);
                          configuration.ListCommand.ExplicitPageSize = true;
                      })
                 .Add("e|exact",
-                     "Exact - Only return packages with this exact name. Available in 0.9.10+.",
+                     "Exact - Only return packages with this exact name.",
                      option => configuration.ListCommand.Exact = option != null)
                  .Add("by-id-only",
-                     "ByIdOnly - Only return packages where the id contains the search filter. Available in 0.9.10+.",
+                     "ByIdOnly - Only return packages where the id contains the search filter.",
                      option => configuration.ListCommand.ByIdOnly = option != null)
                  .Add("by-tag-only|by-tags-only",
-                     "ByTagOnly - Only return packages where the search filter matches on the tags. Available in 0.10.6+.",
+                     "ByTagOnly - Only return packages where the search filter matches on the tags.",
                      option => configuration.ListCommand.ByTagOnly = option != null)
                  .Add("id-starts-with",
-                     "IdStartsWith - Only return packages where the id starts with the search filter. Available in 0.9.10+.",
+                     "IdStartsWith - Only return packages where the id starts with the search filter.",
                      option => configuration.ListCommand.IdStartsWith = option != null)
                  .Add("order-by-popularity",
-                     "OrderByPopularity - Sort by package results by popularity. Available in 0.9.10+.",
+                     "OrderByPopularity - Sort by package results by popularity.",
                      option => configuration.ListCommand.OrderByPopularity = option != null)
                  .Add("approved-only",
-                    "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository. Available in 0.9.10+.",
+                    "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository.",
                      option => configuration.ListCommand.ApprovedOnly = option != null)
                  .Add("download-cache|download-cache-only",
-                     "DownloadCacheAvailable - Only return packages that have a download cache available - this option will filter out results not from the community repository. Available in 0.9.10+.",
+                     "DownloadCacheAvailable - Only return packages that have a download cache available - this option will filter out results not from the community repository.",
                      option => configuration.ListCommand.DownloadCacheAvailable = option != null)
                  .Add("not-broken",
-                     "NotBroken - Only return packages that are not failing testing - this option only filters out failing results from the community feed. It will not filter against other sources. Available in 0.9.10+.",
+                     "NotBroken - Only return packages that are not failing testing - this option only filters out failing results from the community feed. It will not filter against other sources.",
                      option => configuration.ListCommand.NotBroken = option != null)
                   .Add("detail|detailed",
-                     "Detailed - Alias for verbose. Available in 0.9.10+.",
+                     "Detailed - Alias for verbose.",
                      option => configuration.Verbose = option != null)
                   .Add("disable-repository-optimizations|disable-package-repository-optimizations",
-                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in Chocolatey v0.10.11 and before. Overrides the default feature '{0}' set to '{1}'. Available in 0.10.14+.".format_with
-                        (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.to_string()),
+                    "Disable Package Repository Optimizations - Do not use optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should not generally be used, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in earlier versions of Chocolatey. Overrides the default feature '{0}' set to '{1}'.".FormatWith
+                        (ApplicationParameters.Features.UsePackageRepositoryOptimizations, configuration.Features.UsePackageRepositoryOptimizations.ToStringSafe()),
                     option =>
                     {
                         if (option != null)
@@ -132,37 +132,32 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
         }
 
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
             if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.Username) && string.IsNullOrWhiteSpace(configuration.SourceCommand.Password))
             {
-                this.Log().Debug(ChocolateyLoggers.LogFileOnly, "Username '{0}' provided. Asking for password.".format_with(configuration.SourceCommand.Username));
-                System.Console.Write("User name '{0}' provided. Password: ".format_with(configuration.SourceCommand.Username));
-                configuration.SourceCommand.Password = InteractivePrompt.get_password(configuration.PromptForConfirmation);
+                this.Log().Debug(ChocolateyLoggers.LogFileOnly, "Username '{0}' provided. Asking for password.".FormatWith(configuration.SourceCommand.Username));
+                System.Console.Write("User name '{0}' provided. Password: ".FormatWith(configuration.SourceCommand.Username));
+                configuration.SourceCommand.Password = InteractivePrompt.GetPassword(configuration.PromptForConfirmation);
             }
 
             if (configuration.ListCommand.PageSize < 1 || configuration.ListCommand.PageSize > 100)
             {
-                var message = "The page size has been specified to be {0:N0} packages. The page size cannot be lower than 1 package, and no larger than 100 packages.".format_with(configuration.ListCommand.PageSize);
+                var message = "The page size has been specified to be {0:N0} packages. The page size cannot be lower than 1 package, and no larger than 100 packages.".FormatWith(configuration.ListCommand.PageSize);
                 throw new ApplicationException(message);
             }
         }
 
-        public virtual void help_message(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Search Command");
             this.Log().Info(@"
 Chocolatey will perform a search for a package local or remote.
-
-NOTE: 100% compatible with older Chocolatey client (0.9.8.x and below)
- with options and switches. In most cases you can still pass options
- and switches  with one dash (`-`). For more details, see
- the command reference (`choco -?`).
 ");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
@@ -199,36 +194,35 @@ Enhanced:
  - -1 or 1: an error has occurred
  - 2: no results (enhanced)
 
-NOTE: Starting in v0.10.12, if you have the feature '{0}'
- turned on, then choco will provide enhanced exit codes that allow
+NOTE: If you have the feature '{0}' turned on,
+ then choco will provide enhanced exit codes that allow
  better integration and scripting.
 
 If you find other exit codes that we have not yet documented, please
  file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
-".format_with(ApplicationParameters.Features.UseEnhancedExitCodes));
+".FormatWith(ApplicationParameters.Features.UseEnhancedExitCodes));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
 choco {0}: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_search.gif
 
-".format_with(configuration.CommandName));
+".FormatWith(configuration.CommandName));
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Alternative Sources");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
 
-        public virtual void noop(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
-            _packageService.list_noop(configuration);
+            _packageService.ListDryRun(configuration);
         }
 
-        public virtual void run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
-            _packageService.ensure_source_app_installed(configuration);
             // note: you must leave the .ToList() here or else the method won't be evaluated!
-            var packageResults = _packageService.list_run(configuration).ToList();
+            var packageResults = _packageService.List(configuration).ToList();
 
             // if there are no results, exit with a 2.
             if (configuration.Features.UseEnhancedExitCodes && packageResults.Count == 0 && Environment.ExitCode == 0)
@@ -237,22 +231,60 @@ choco {0}: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/c
             }
         }
 
-        public virtual IEnumerable<PackageResult> list(ChocolateyConfiguration configuration)
+        public virtual IEnumerable<PackageResult> List(ChocolateyConfiguration configuration)
         {
             configuration.QuietOutput = true;
             // here it's up to the caller to enumerate the results
-            return _packageService.list_run(configuration);
+            return _packageService.List(configuration);
         }
 
-        public virtual int count(ChocolateyConfiguration config)
+        public virtual int Count(ChocolateyConfiguration config)
         {
             config.QuietOutput = true;
-            return _packageService.count_run(config);
+            return _packageService.Count(config);
         }
 
-        public virtual bool may_require_admin_access()
+        public virtual bool MayRequireAdminAccess()
         {
             return false;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
+            => ConfigureArgumentParser(optionSet, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+            => ParseAdditionalArguments(unparsedArguments, configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void handle_validation(ChocolateyConfiguration configuration)
+            => Validate(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void help_message(ChocolateyConfiguration configuration)
+            => HelpMessage(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void noop(ChocolateyConfiguration configuration)
+            => DryRun(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual void run(ChocolateyConfiguration configuration)
+            => Run(configuration);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual bool may_require_admin_access()
+            => MayRequireAdminAccess();
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual int count(ChocolateyConfiguration config)
+            => Count(config);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public virtual IEnumerable<PackageResult> list(ChocolateyConfiguration config)
+            => List(config);
+#pragma warning restore IDE1006
     }
 }

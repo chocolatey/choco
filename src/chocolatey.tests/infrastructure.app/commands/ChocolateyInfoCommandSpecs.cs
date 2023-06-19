@@ -25,192 +25,247 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateyInfoCommandSpecs
     {
         [ConcernFor("info")]
         public abstract class ChocolateyInfoCommandSpecsBase : TinySpec
         {
-            protected ChocolateyInfoCommand command;
-            protected Mock<IChocolateyPackageService> packageService = new Mock<IChocolateyPackageService>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateyInfoCommand Command;
+            protected Mock<IChocolateyPackageService> PackageService = new Mock<IChocolateyPackageService>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                configuration.Sources = "bob";
-                command = new ChocolateyInfoCommand(packageService.Object);
+                Configuration.Sources = "bob";
+                Command = new ChocolateyInfoCommand(PackageService.Object);
             }
         }
 
-        public class when_implementing_command_for : ChocolateyInfoCommandSpecsBase
+        public class When_implementing_command_for : ChocolateyInfoCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
-            public void should_implement_info()
+            public void Should_implement_info()
             {
-                results.ShouldContain("info");
+                _results.Should().Contain("info");
             }
         }
 
-        public class when_configurating_the_argument_parser : ChocolateyInfoCommandSpecsBase
+        public class When_configurating_the_argument_parser : ChocolateyInfoCommandSpecsBase
         {
-            private OptionSet optionSet;
-
-            public override void Context()
-            {
-                base.Context();
-                optionSet = new OptionSet();
-            }
-
-            public override void Because()
-            {
-                command.configure_argument_parser(optionSet, configuration);
-            }
-
-            [Fact]
-            public void should_add_source_to_the_option_set()
-            {
-                optionSet.Contains("source").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_source_to_the_option_set()
-            {
-                optionSet.Contains("s").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_localonly_to_the_option_set()
-            {
-                optionSet.Contains("localonly").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_localonly_to_the_option_set()
-            {
-                optionSet.Contains("l").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_prerelease_to_the_option_set()
-            {
-                optionSet.Contains("prerelease").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_prerelease_to_the_option_set()
-            {
-                optionSet.Contains("pre").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_user_to_the_option_set()
-            {
-                optionSet.Contains("user").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_user_to_the_option_set()
-            {
-                optionSet.Contains("u").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_password_to_the_option_set()
-            {
-                optionSet.Contains("password").ShouldBeTrue();
-            }
-
-            [Fact]
-            public void should_add_short_version_of_password_to_the_option_set()
-            {
-                optionSet.Contains("p").ShouldBeTrue();
-            }
-        }
-
-        public class when_handling_additional_argument_parsing : ChocolateyInfoCommandSpecsBase
-        {
-            private readonly IList<string> unparsedArgs = new List<string>();
-            private readonly string source = "https://somewhereoutthere";
-            private Action because;
+            private OptionSet _optionSet;
 
             public override void Context()
             {
                 base.Context();
-                unparsedArgs.Add("pkg1");
-                unparsedArgs.Add("pkg2");
-                configuration.Sources = source;
+                _optionSet = new OptionSet();
             }
 
             public override void Because()
             {
-                because = () => command.handle_additional_argument_parsing(unparsedArgs, configuration);
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
             }
 
             [Fact]
-            public void should_set_unparsed_arguments_to_configuration_input()
+            public void Should_add_source_to_the_option_set()
             {
-                because();
-                configuration.Input.ShouldEqual("pkg1 pkg2");
+                _optionSet.Contains("source").Should().BeTrue();
             }
 
             [Fact]
-            public void should_leave_source_as_set()
+            public void Should_add_short_version_of_source_to_the_option_set()
             {
-                configuration.ListCommand.LocalOnly = false;
-                because();
-                configuration.Sources.ShouldEqual(source);
+                _optionSet.Contains("s").Should().BeTrue();
             }
 
             [Fact]
-            public void should_set_exact_to_true()
+            public void Should_add_localonly_to_the_option_set()
             {
-                configuration.ListCommand.Exact = false;
-                because();
-                configuration.ListCommand.Exact.ShouldBeTrue();
+                _optionSet.Contains("localonly").Should().BeTrue();
             }
 
             [Fact]
-            public void should_set_verbose_to_true()
+            public void Should_add_short_version_of_localonly_to_the_option_set()
             {
-                configuration.Verbose = false;
-                because();
-                configuration.Verbose.ShouldBeTrue();
+                _optionSet.Contains("l").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_prerelease_to_the_option_set()
+            {
+                _optionSet.Contains("prerelease").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_short_version_of_prerelease_to_the_option_set()
+            {
+                _optionSet.Contains("pre").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_user_to_the_option_set()
+            {
+                _optionSet.Contains("user").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_short_version_of_user_to_the_option_set()
+            {
+                _optionSet.Contains("u").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_password_to_the_option_set()
+            {
+                _optionSet.Contains("password").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_short_version_of_password_to_the_option_set()
+            {
+                _optionSet.Contains("p").Should().BeTrue();
             }
         }
 
-        public class when_noop_is_called : ChocolateyInfoCommandSpecsBase
+        public class When_handling_validation : ChocolateyInfoCommandSpecsBase
         {
+            private Exception _error = null;
+            private Action _because;
+
+            public override void Context()
+            {
+                base.Context();
+            }
+
             public override void Because()
             {
-                command.noop(configuration);
+                _because = () => Command.Validate(Configuration);
             }
 
             [Fact]
-            public void should_call_service_list_noop()
+            public void Show_throw_when_package_id_is_not_set()
             {
-                packageService.Verify(c => c.list_noop(configuration), Times.Once);
+                Configuration.Input = "";
+                _error = null;
+
+                try
+                {
+                    _because();
+                }
+                catch (Exception ex)
+                {
+                    _error = ex;
+                }
+
+                _error.Should().NotBeNull();
+                _error.Should().BeOfType<ApplicationException>();
+                _error.Message.Should().Contain("A single package name is required to run the choco info command.");
+            }
+
+            [Fact]
+            public void Should_throw_when_multiple_package_ids_set()
+            {
+                Configuration.Input = "foo bar";
+                _error = null;
+
+                try
+                {
+                    _because();
+                }
+                catch (Exception ex)
+                {
+                    _error = ex;
+                }
+
+                _error.Should().NotBeNull();
+                _error.Should().BeOfType<ApplicationException>();
+                _error.Message.Should().Contain("Only a single package name can be passed to the choco info command.");
+            }
+        }
+        public class When_handling_additional_argument_parsing : ChocolateyInfoCommandSpecsBase
+        {
+            private readonly IList<string> _unparsedArgs = new List<string>();
+            private readonly string _source = "https://somewhereoutthere";
+            private Action _because;
+
+            public override void Context()
+            {
+                base.Context();
+                _unparsedArgs.Add("pkg1");
+                _unparsedArgs.Add("pkg2");
+                Configuration.Sources = _source;
+            }
+
+            public override void Because()
+            {
+                _because = () => Command.ParseAdditionalArguments(_unparsedArgs, Configuration);
+            }
+
+            [Fact]
+            public void Should_set_unparsed_arguments_to_configuration_input()
+            {
+                _because();
+                Configuration.Input.Should().Be("pkg1 pkg2");
+            }
+
+            [Fact]
+            public void Should_leave_source_as_set()
+            {
+                Configuration.ListCommand.LocalOnly = false;
+                _because();
+                Configuration.Sources.Should().Be(_source);
+            }
+
+            [Fact]
+            public void Should_set_exact_to_true()
+            {
+                Configuration.ListCommand.Exact = false;
+                _because();
+                Configuration.ListCommand.Exact.Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_set_verbose_to_true()
+            {
+                Configuration.Verbose = false;
+                _because();
+                Configuration.Verbose.Should().BeTrue();
             }
         }
 
-        public class when_run_is_called : ChocolateyInfoCommandSpecsBase
+        public class When_noop_is_called : ChocolateyInfoCommandSpecsBase
         {
             public override void Because()
             {
-                command.run(configuration);
+                Command.DryRun(Configuration);
             }
 
             [Fact]
-            public void should_call_service_list_run()
+            public void Should_call_service_list_noop()
             {
-                packageService.Verify(c => c.list_run(configuration), Times.Once);
+                PackageService.Verify(c => c.ListDryRun(Configuration), Times.Once);
+            }
+        }
+
+        public class When_run_is_called : ChocolateyInfoCommandSpecsBase
+        {
+            public override void Because()
+            {
+                Command.Run(Configuration);
+            }
+
+            [Fact]
+            public void Should_call_service_list_run()
+            {
+                PackageService.Verify(c => c.List(Configuration), Times.Once);
             }
         }
     }

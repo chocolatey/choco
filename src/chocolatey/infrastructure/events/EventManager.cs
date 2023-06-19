@@ -29,7 +29,7 @@ namespace chocolatey.infrastructure.events
         /// </summary>
         /// <param name="messageSubscriptionManager">The message subscription manager.</param>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void initialize_with(Func<IEventSubscriptionManagerService> messageSubscriptionManager)
+        public static void InitializeWith(Func<IEventSubscriptionManagerService> messageSubscriptionManager)
         {
             _messageSubscriptionManager = messageSubscriptionManager;
         }
@@ -50,11 +50,11 @@ namespace chocolatey.infrastructure.events
         /// </summary>
         /// <typeparam name="Event">The type of the event.</typeparam>
         /// <param name="message">The message.</param>
-        public static void publish<Event>(Event message) where Event : class, IMessage
+        public static void Publish<Event>(Event message) where Event : class, IMessage
         {
             if (_messageSubscriptionManager != null)
             {
-                _messageSubscriptionManager().publish(message);
+                _messageSubscriptionManager().Publish(message);
             }
         }
 
@@ -66,14 +66,28 @@ namespace chocolatey.infrastructure.events
         /// <param name="handleError">The handle error.</param>
         /// <param name="filter">The filter.</param>
         /// <returns>The subscription so that a service could unsubscribe</returns>
-        public static IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
+        public static IDisposable Subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
         {
             if (_messageSubscriptionManager != null)
             {
-                return _messageSubscriptionManager().subscribe(handleEvent, handleError, filter);
+                return _messageSubscriptionManager().Subscribe(handleEvent, handleError, filter);
             }
 
             return null;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void initialize_with(Func<IEventSubscriptionManagerService> messageSubscriptionManager)
+            => InitializeWith(messageSubscriptionManager);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static void publish<Event>(Event message) where Event : class, IMessage
+            => Publish(message);
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
+            => Subscribe(handleEvent,handleError, filter);
+#pragma warning restore IDE1006
     }
 }

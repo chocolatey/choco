@@ -31,18 +31,18 @@ namespace chocolatey.infrastructure.app.runners
     /// </summary>
     public sealed class ConsoleApplication
     {
-        public void run(string[] args, ChocolateyConfiguration config, Container container)
+        public void Run(string[] args, ChocolateyConfiguration config, Container container)
         {
             var commandLine = Environment.CommandLine;
 
-            if (ArgumentsUtility.arguments_contain_sensitive_information(commandLine))
+            if (ArgumentsUtility.SensitiveArgumentsProvided(commandLine))
             {
                 this.Log().Debug(() => "Command line not shown - sensitive arguments may have been passed.");
             }
             else
             {
-                this.Log().Debug(() => "Command line: {0}".format_with(commandLine));
-                this.Log().Debug(() => "Received arguments: {0}".format_with(string.Join(" ", args)));
+                this.Log().Debug(() => "Command line: {0}".FormatWith(commandLine));
+                this.Log().Debug(() => "Received arguments: {0}".FormatWith(string.Join(" ", args)));
             }
 
             IList<string> commandArgs = new List<string>();
@@ -60,25 +60,25 @@ namespace chocolatey.infrastructure.app.runners
             }
 
             var runner = new GenericRunner();
-            runner.run(config, container, isConsole: true, parseArgs: command =>
+            runner.Run(config, container, isConsole: true, parseArgs: command =>
                 {
-                    ConfigurationOptions.parse_arguments_and_update_configuration(
+                    ConfigurationOptions.ParseArgumentsAndUpdateConfiguration(
                         commandArgs,
                         config,
-                        (optionSet) => command.configure_argument_parser(optionSet, config),
+                        (optionSet) => command.ConfigureArgumentParser(optionSet, config),
                         (unparsedArgs) => {
                             // if debug is bundled with local options, it may not get picked up when global
                             // options are parsed. Attempt to set it again once local options are set.
                             // This does mean some output from debug will be missed (but not much)
-                            if (config.Debug) Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(config.Debug, "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Verbose.to_string()), "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Trace.to_string()));
+                            if (config.Debug) Log4NetAppenderConfiguration.EnableDebugLoggingIf(config.Debug, "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Verbose.ToStringSafe()), "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Trace.ToStringSafe()));
 
-                            command.handle_additional_argument_parsing(unparsedArgs, config);
+                            command.ParseAdditionalArguments(unparsedArgs, config);
 
                             if (!config.Features.IgnoreInvalidOptionsSwitches)
                             {
                                 // all options / switches should be parsed,
                                 //  so show help menu if there are any left
-                                foreach (var unparsedArg in unparsedArgs.or_empty_list_if_null())
+                                foreach (var unparsedArg in unparsedArgs.OrEmpty())
                                 {
                                     if (unparsedArg.StartsWith("-") || unparsedArg.StartsWith("/"))
                                     {
@@ -90,16 +90,16 @@ namespace chocolatey.infrastructure.app.runners
                         },
                         () => {
                             this.Log().Debug(() => "Performing validation checks.");
-                            command.handle_validation(config);
+                            command.Validate(config);
 
                             var validationResults = new List<ValidationResult>();
                             var validationChecks = container.GetAllInstances<IValidation>();
                             foreach (var validationCheck in validationChecks)
                             {
-                                validationResults.AddRange(validationCheck.validate(config));
+                                validationResults.AddRange(validationCheck.Validate(config));
                             }
 
-                            var validationErrors = report_validation_summary(validationResults, config);
+                            var validationErrors = ReportValidationSummary(validationResults, config);
 
                             if (validationErrors != 0)
                             {
@@ -109,11 +109,11 @@ namespace chocolatey.infrastructure.app.runners
                                 throw new ApplicationException("");
                             }
                         },
-                        () => command.help_message(config));
+                        () => command.HelpMessage(config));
                 });
         }
 
-        private int report_validation_summary(IList<ValidationResult> validationResults, ChocolateyConfiguration config)
+        private int ReportValidationSummary(IList<ValidationResult> validationResults, ChocolateyConfiguration config)
         {
             var successes = validationResults.Count(v => v.Status == ValidationStatus.Success);
             var warnings = validationResults.Count(v => v.Status == ValidationStatus.Warning);
@@ -122,7 +122,7 @@ namespace chocolatey.infrastructure.app.runners
             var logOnWarnings = config.Features.LogValidationResultsOnWarnings;
             if (config.RegularOutput)
             {
-                this.Log().Info(errors + (logOnWarnings ? warnings : 0) == 0 ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, () => "{0} validations performed. {1} success(es), {2} warning(s), and {3} error(s).".format_with(
+                this.Log().Info(errors + (logOnWarnings ? warnings : 0) == 0 ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, () => "{0} validations performed. {1} success(es), {2} warning(s), and {3} error(s).".FormatWith(
                     validationResults.Count,
                     successes,
                     warnings,
@@ -133,9 +133,9 @@ namespace chocolatey.infrastructure.app.runners
                     var warningLogger = logOnWarnings ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly;
                     this.Log().Info(warningLogger, "");
                     this.Log().Warn(warningLogger, "Validation Warnings:");
-                    foreach (var warning in validationResults.Where(p => p.Status == ValidationStatus.Warning).or_empty_list_if_null())
+                    foreach (var warning in validationResults.Where(p => p.Status == ValidationStatus.Warning).OrEmpty())
                     {
-                        this.Log().Warn(warningLogger, " - {0}".format_with(warning.Message));
+                        this.Log().Warn(warningLogger, " - {0}".FormatWith(warning.Message));
                     }
                 }
             }
@@ -144,13 +144,19 @@ namespace chocolatey.infrastructure.app.runners
             {
                 this.Log().Info("");
                 this.Log().Error("Validation Errors:");
-                foreach (var error in validationResults.Where(p => p.Status == ValidationStatus.Error).or_empty_list_if_null())
+                foreach (var error in validationResults.Where(p => p.Status == ValidationStatus.Error).OrEmpty())
                 {
-                    this.Log().Error(" - {0}".format_with(error.Message));
+                    this.Log().Error(" - {0}".FormatWith(error.Message));
                 }
             }
 
             return errors;
         }
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public void run(string[] args, ChocolateyConfiguration config, Container container)
+            => Run(args, config, container);
+#pragma warning restore IDE1006
     }
 }

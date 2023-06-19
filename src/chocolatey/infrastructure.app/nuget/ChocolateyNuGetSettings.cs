@@ -13,7 +13,7 @@ namespace chocolatey.infrastructure.app.nuget
     public class ChocolateyNuGetSettings : ISettings
     {
         //private ClientPolicyContext
-        private const string CONFIG_SECTION_NAME = "config";
+        private const string ConfigSectionName = "config";
         //private SettingSection _configSettingSection;
 
         public ChocolateyNuGetSettings(ChocolateyConfiguration config)
@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public void AddOrUpdate(string sectionName, SettingItem item)
         {
-            this.Log().Warn("NuGet tried to add an item to section {0}".format_with(sectionName));
+            this.Log().Warn("NuGet tried to add an item to section {0}".FormatWith(sectionName));
         }
 
         public IList<string> GetConfigFilePaths() => Enumerable.Empty<string>().ToList();
@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.app.nuget
         {
             switch (sectionName)
             {
-                case CONFIG_SECTION_NAME:
+                case ConfigSectionName:
                     //TODO fix
                     return null;
                     //break;
@@ -48,7 +48,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public void Remove(string sectionName, SettingItem item)
         {
-            this.Log().Warn("NuGet tried to remove an item to section {0}".format_with(sectionName));
+            this.Log().Warn("NuGet tried to remove an item to section {0}".FormatWith(sectionName));
         }
 
         public void SaveToDisk()

@@ -25,14 +25,13 @@ specified, it is run with PowerShell.
 .NOTES
 This command will assert UAC/Admin privileges on the machine.
 
-Starting in 0.9.10, will automatically call Set-PowerShellExitCode to
-set the package exit code in the following ways:
+Will automatically call Set-PowerShellExitCode to set the package exit
+code in the following ways:
 
 - 4 if the binary turns out to be a text file.
 - The same exit code returned from the process that is run. If a 3010 is returned, it will set 3010 for the package.
 
-Aliases `Start-ChocolateyProcess` and `Invoke-ChocolateyProcess`
-available in 0.10.2+.
+Aliases `Start-ChocolateyProcess` and `Invoke-ChocolateyProcess`.
 
 .INPUTS
 None
@@ -50,8 +49,6 @@ The executable/application/installer to run. Defaults to `'powershell'`.
 .PARAMETER Elevated
 Indicate whether the process should run elevated.
 
-Available in 0.10.2+.
-
 .PARAMETER Minimized
 Switch indicating if a Windows pops up (if not called with a silent
 argument) that it should be minimized.
@@ -66,9 +63,7 @@ Array of exit codes indicating success. Defaults to `@(0)`.
 .PARAMETER WorkingDirectory
 The working directory for the running process. Defaults to
 `Get-Location`. If current location is a UNC path, uses
-`$env:TEMP` for default as of 0.10.14.
-
-Available in 0.10.1+.
+`$env:TEMP` for default.
 
 .PARAMETER SensitiveStatements
 Arguments to pass to  `ExeToRun` that are not logged.
@@ -76,8 +71,6 @@ Arguments to pass to  `ExeToRun` that are not logged.
 Note that only licensed versions of Chocolatey provide a way to pass
 those values completely through without having them in the install
 script or on the system in some way.
-
-Available in 0.10.1+.
 
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.

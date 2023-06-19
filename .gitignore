@@ -5,7 +5,8 @@ code_drop
 [Bb]in
 obj
 src/packages
-/.vscode/
+/.vscode/**
+!/.vscode/settings.json
 .vs
 
 *.suo
@@ -38,12 +39,12 @@ src/_dotTrace.chocolatey/
 src/chocolatey.sln.GhostDoc.xml
 
 chocolatey.official.snk
+chocolatey.license.xml
 
 docs/generated
 
 # Testing related
 .vagrant
-buildOutput.txt
 
 # Build related
 tools/**

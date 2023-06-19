@@ -30,15 +30,15 @@ namespace chocolatey.infrastructure.app.domain.installers
     {
         public NsisInstaller()
         {
-            InstallExecutable = "\"{0}\"".format_with(InstallTokens.INSTALLER_LOCATION);
+            InstallExecutable = "\"{0}\"".FormatWith(InstallTokens.InstallerLocation);
             SilentInstall = "/S";
             NoReboot = "";
             LogFile = "";
             // must be last thing specified and contain no quotes, even if there are spaces
-            CustomInstallLocation = "/D={0}".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
+            CustomInstallLocation = "/D={0}".FormatWith(InstallTokens.CustomInstallLocation);
             Language = "";
             OtherInstallOptions = "";
-            UninstallExecutable = "\"{0}\"".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            UninstallExecutable = "\"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             SilentUninstall = "/S";
             OtherUninstallOptions = "";
             ValidInstallExitCodes = new List<long> { 0 };

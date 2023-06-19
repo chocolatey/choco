@@ -75,9 +75,11 @@ Please see the [docs](https://docs.chocolatey.org/en-us/)
 Give `choco.exe -?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
 
 ### Requirements
-* .NET Framework 4.0+
+
+* .NET Framework 4.8+
 * PowerShell 2.0+
-* Windows Server 2003+ / Windows 7+
+* Windows Server 2008 R2+ / Windows 10+
+  - See our documentation on the [support lifecycle and supported operating systems](https://docs.chocolatey.org/en-us/information/support-lifecycle) for additional information
 
 ### License / Credits
 Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.

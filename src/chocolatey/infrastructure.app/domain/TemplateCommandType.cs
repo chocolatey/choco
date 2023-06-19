@@ -16,10 +16,21 @@
 
 namespace chocolatey.infrastructure.app.domain
 {
+    using System;
+
     public enum TemplateCommandType
     {
-        unknown,
-        list,
-        info
+        Unknown,
+        List,
+        Info,
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        unknown = Unknown,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        list = List,
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        info = Info,
+#pragma warning restore IDE1006
     }
 }

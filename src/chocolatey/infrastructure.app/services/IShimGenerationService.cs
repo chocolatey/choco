@@ -18,21 +18,29 @@ namespace chocolatey.infrastructure.app.services
 {
     using configuration;
     using results;
+    using System;
 
     public interface IShimGenerationService
     {
         /// <summary>
-        ///   Installs shimgens for the package
+        ///   Installs shims for the package
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="packageResult">The package result.</param>
-        void install(ChocolateyConfiguration configuration, PackageResult packageResult);
+        void Install(ChocolateyConfiguration configuration, PackageResult packageResult);
 
         /// <summary>
-        ///   Uninstalls shimgens for the package
+        ///   Uninstalls shims for the package
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="packageResult">The package result.</param>
+        void Uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        void install(ChocolateyConfiguration configuration, PackageResult packageResult);
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         void uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
+#pragma warning restore IDE1006
     }
 }

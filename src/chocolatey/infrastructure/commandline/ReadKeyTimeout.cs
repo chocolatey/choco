@@ -38,24 +38,24 @@ namespace chocolatey.infrastructure.commandline
         {
             _backgroundResponseReset = new AutoResetEvent(false);
             _foregroundResponseReset = new AutoResetEvent(false);
-            _responseThread = new Thread(console_read_key)
+            _responseThread = new Thread(ConsoleReadKey)
             {
                 IsBackground = true
             };
             _responseThread.Start();
         }
 
-        private void console_read_key()
+        private void ConsoleReadKey()
         {
             while (true)
             {
                 _backgroundResponseReset.WaitOne();
-                _input = Console.ReadKey(intercept:true);
+                _input = Console.ReadKey(intercept: true);
                 _foregroundResponseReset.Set();
             }
         }
 
-        public static ConsoleKeyInfo read_key(int timeoutMilliseconds)
+        public static ConsoleKeyInfo ReadKey(int timeoutMilliseconds)
         {
             using (var readLine = new ReadKeyTimeout())
             {
@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.commandline
 
                 return readLine._foregroundResponseReset.WaitOne(timeoutMilliseconds) ?
                            readLine._input
-                           : new ConsoleKeyInfo('\0',ConsoleKey.Enter,false,false,false);
+                           : new ConsoleKeyInfo('\0', ConsoleKey.Enter, false, false, false);
             }
         }
 
@@ -79,5 +79,10 @@ namespace chocolatey.infrastructure.commandline
             _foregroundResponseReset.Dispose();
         }
 
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public static ConsoleKeyInfo read_key(int timeoutMilliseconds)
+            => ReadKey(timeoutMilliseconds);
+#pragma warning restore IDE1006
     }
 }

@@ -29,35 +29,50 @@ namespace chocolatey.infrastructure.app.domain
         /// The source is of type Cygwin and need to be handled by an
         /// alternative source runner.
         /// </summary>
-        public const string CYGWIN = "cygwin";
+        public const string Cygwin = "cygwin";
 
         /// <summary>
         /// The source is a normal type, ie a chocolatey/nuget source.
         /// </summary>
-        public const string NORMAL = "normal";
+        public const string Normal = "normal";
 
         /// <summary>
         /// The source is of type Python and need to be handled by an
         /// alternative source runner.
         /// </summary>
-        public const string PYTHON = "python";
+        public const string Python = "python";
 
         /// <summary>
         /// The source is of type Ruby and need to be handled by an
         /// alternative source runner.
         /// </summary>
-        public const string RUBY = "ruby";
+        public const string Ruby = "ruby";
 
         /// <summary>
         /// The source is a windows feature and is only provided as an
-        /// alias for <see cref="WINDOWS_FEATURES" />
+        /// alias for <see cref="WindowsFeatures" />
         /// </summary>
-        public const string WINDOWS_FEATURE = "windowsfeature";
+        public const string WindowsFeature = "windowsfeature";
 
         /// <summary>
         /// The source is a windows feature and need to be handled by an
         /// alternative source runner.
         /// </summary>
-        public const string WINDOWS_FEATURES = "windowsfeatures";
+        public const string WindowsFeatures = "windowsfeatures";
+
+#pragma warning disable IDE1006
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string CYGWIN = Cygwin;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string NORMAL = Normal;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string PYTHON = Python;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string RUBY = Ruby;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string WINDOWS_FEATURE = WindowsFeature;
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public const string WINDOWS_FEATURES = WindowsFeatures;
+#pragma warning restore IDE1006
     }
 }
