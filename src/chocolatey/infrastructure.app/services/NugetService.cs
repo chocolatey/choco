@@ -822,10 +822,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
 
                         var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
+                        NormalizeNuspecCasing(packageRemoteMetadata, installedPath);
 
-                        NormalizeNuspecCasing(availablePackage, installedPath);
-
-                        RemovePackageFromNugetCache(availablePackage);
+                        RemovePackageFromNugetCache(packageRemoteMetadata);
 
                         var manifestPath = nugetProject.GetInstalledManifestFilePath(packageDependencyInfo);
                         var packageMetadata = new ChocolateyPackageMetadata(manifestPath, _fileSystem);
@@ -1422,12 +1421,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                 var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
 
-                                NormalizeNuspecCasing(availablePackage, installedPath);
+                                NormalizeNuspecCasing(packageRemoteMetadata, installedPath);
 
                                 var manifestPath = nugetProject.GetInstalledManifestFilePath(packageDependencyInfo);
                                 var packageMetadata = new ChocolateyPackageMetadata(manifestPath, _fileSystem);
 
-                                RemovePackageFromNugetCache(availablePackage);
+                                RemovePackageFromNugetCache(packageRemoteMetadata);
 
                                 this.Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".FormatWith(
                                     System.Environment.NewLine,
