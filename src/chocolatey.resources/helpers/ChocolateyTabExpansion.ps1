@@ -1,4 +1,4 @@
-﻿# Copyright © 2017 - 2021 Chocolatey Software, Inc.
+# Copyright © 2017 - 2021 Chocolatey Software, Inc.
 # Copyright © 2011 - 2017 RealDimensions Software, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,9 +62,9 @@ $commandOptions = @{
 
 $commandOptions['find'] = $commandOptions['search']
 
-$licenseFile = Get-Item -Path "$env:ChocolateyInstall\license\chocolatey.license.xml" -ErrorAction Stop
+$licenseFile = "$env:ChocolateyInstall\license\chocolatey.license.xml"
 
-if ($licenseFile) {
+if (Test-Path $licenseFile) {
     # Add pro-only commands
     $script:chocoCommands = @(
         $script:chocoCommands
@@ -85,7 +85,7 @@ if ($licenseFile) {
     $commandOptions.pin += " --note=''"
 
     # Add Business-only commands and options if the license is a Business or Trial license
-    [xml]$xml = Get-Content -Path $licenseFile.FullName -ErrorAction Stop
+    [xml]$xml = Get-Content -Path $licenseFile -ErrorAction Stop
     $licenseType = $xml.license.type
 
     if ('Business', 'BusinessTrial' -contains $licenseType) {
