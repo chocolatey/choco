@@ -1,4 +1,4 @@
-﻿# Copyright © 2022 Chocolatey Software, Inc.
+# Copyright © 2022 Chocolatey Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -58,7 +58,6 @@ $value = Get-ChocolateyConfigValue -configKey 'cacheLocation'
                 Select-Object -ExpandProperty value
     }
     catch {
-        Write-Warning "Unable to read config value '$configKey' with error"
-        Write-Warning $_
+        Write-Error "Unable to read config value '$configKey' with error" -Exception $_
     }
 }
