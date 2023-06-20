@@ -1,4 +1,4 @@
-﻿# Copyright © 2017 - 2021 Chocolatey Software, Inc.
+# Copyright © 2017 - 2021 Chocolatey Software, Inc.
 # Copyright © 2011 - 2017 RealDimensions Software, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -62,59 +62,50 @@ $commandOptions = @{
 
 $commandOptions['find'] = $commandOptions['search']
 
-try {
-    $licenseFile = Get-Item -Path "$env:ChocolateyInstall\license\chocolatey.license.xml" -ErrorAction Stop
+$licenseFile = "$env:ChocolateyInstall\license\chocolatey.license.xml"
 
-    if ($licenseFile) {
-        # Add pro-only commands
+if (Test-Path $licenseFile) {
+    # Add pro-only commands
+    $script:chocoCommands = @(
+        $script:chocoCommands
+        'download'
+        'optimize'
+    )
+
+    $commandOptions.download = "--internalize --internalize-all-urls --ignore-dependencies --installed-packages --ignore-unfound-packages --resources-location='' --download-location='' --outputdirectory='' --source='' --version='' --prerelease --user='' --password='' --cert='' --certpassword='' --append-use-original-location --recompile --disable-package-repository-optimizations"
+    $commandOptions.sync = "--output-directory='' --id='' --package-id=''"
+    $commandOptions.optimize = "--deflate-nupkg-only --id=''"
+
+    # Add pro switches to commands that have additional switches on Pro
+    $proInstallUpgradeOptions = " --install-directory='' --package-parameters-sensitive='' --max-download-rate='' --install-arguments-sensitive='' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum='' --deflate-package-size --no-deflate-package-size --deflate-nupkg-only"
+
+    $commandOptions.install += $proInstallUpgradeOptions
+    $commandOptions.upgrade += $proInstallUpgradeOptions + " --exclude-chocolatey-packages-during-upgrade-all --include-chocolatey-packages-during-upgrade-all"
+    $commandOptions.new += " --build-package --use-original-location --keep-remote --url='' --url64='' --checksum='' --checksum64='' --checksumtype='' --pause-on-error"
+    $commandOptions.pin += " --note=''"
+
+    # Add Business-only commands and options if the license is a Business or Trial license
+    [xml]$xml = Get-Content -Path $licenseFile -ErrorAction Stop
+    $licenseType = $xml.license.type
+
+    if ('Business', 'BusinessTrial' -contains $licenseType) {
+
+        # Add business-only commands
         $script:chocoCommands = @(
             $script:chocoCommands
-            'download'
-            'optimize'
+            'support'
+            'sync'
         )
 
-        $commandOptions.download = "--internalize --internalize-all-urls --ignore-dependencies --installed-packages --ignore-unfound-packages --resources-location='' --download-location='' --outputdirectory='' --source='' --version='' --prerelease --user='' --password='' --cert='' --certpassword='' --append-use-original-location --recompile --disable-package-repository-optimizations"
-        $commandOptions.sync = "--output-directory='' --id='' --package-id=''"
-        $commandOptions.optimize = "--deflate-nupkg-only --id=''"
+        $commandOptions.list += " --audit"
+        $commandOptions.uninstall += " --from-programs-and-features"
+        $commandOptions.new += " --file='' --file64='' --from-programs-and-features --remove-architecture-from-name --include-architecture-in-name"
 
-        # Add pro switches to commands that have additional switches on Pro
-        $proInstallUpgradeOptions = " --install-directory='' --package-parameters-sensitive='' --max-download-rate='' --install-arguments-sensitive='' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum='' --deflate-package-size --no-deflate-package-size --deflate-nupkg-only"
-
-        $commandOptions.install += $proInstallUpgradeOptions
-        $commandOptions.upgrade += $proInstallUpgradeOptions + " --exclude-chocolatey-packages-during-upgrade-all --include-chocolatey-packages-during-upgrade-all"
-        $commandOptions.new += " --build-package --use-original-location --keep-remote --url='' --url64='' --checksum='' --checksum64='' --checksumtype='' --pause-on-error"
-        $commandOptions.pin += " --note=''"
-
-        # Add Business-only commands and options if the license is a Business or Trial license
-        [xml]$xml = Get-Content -Path $licenseFile.FullName -ErrorAction Stop
-        $licenseType = $xml.license.type
-
-        if ('Business', 'BusinessTrial' -contains $licenseType) {
-
-            # Add business-only commands
-            $script:chocoCommands = @(
-                $script:chocoCommands
-                'support'
-                'sync'
-            )
-
-            $commandOptions.list += " --audit"
-            $commandOptions.uninstall += " --from-programs-and-features"
-            $commandOptions.new += " --file='' --file64='' --from-programs-and-features --remove-architecture-from-name --include-architecture-in-name"
-
-            # Add --use-self-service to commands that support it
-            $selfServiceCommands = 'list', 'find', 'search', 'info', 'install', 'upgrade', 'uninstall', 'pin', 'outdated', 'push', 'download', 'sync', 'optimize'
-            foreach ($command in $selfServiceCommands) {
-                $commandOptions.$command += ' --use-self-service'
-            }
+        # Add --use-self-service to commands that support it
+        $selfServiceCommands = 'list', 'find', 'search', 'info', 'install', 'upgrade', 'uninstall', 'pin', 'outdated', 'push', 'download', 'sync', 'optimize'
+        foreach ($command in $selfServiceCommands) {
+            $commandOptions.$command += ' --use-self-service'
         }
-    }
-}
-catch {
-    # Remove the error that last occurred from $error so it doesn't cause any
-    # issues for users, as we're deliberately ignoring it.
-    if ($error.Count -gt 0) {
-        $error.RemoveAt(0)
     }
 }
 
