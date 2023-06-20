@@ -66,6 +66,7 @@
     <EmbeddedResource Include="helpers\chocolateyInstaller.psm1" />
     <EmbeddedResource Include="helpers\functions\Format-FileSize.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-CheckSumValid.ps1" />
+    <EmbeddedResource Include="helpers\functions\Get-ChocolateyConfigValue.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-ChocolateyPath.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-ChocolateyUnzip.ps1" />
     <EmbeddedResource Include="helpers\functions\Get-ChocolateyWebFile.ps1" />
