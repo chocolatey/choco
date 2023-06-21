@@ -35,7 +35,7 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
         Where-Object { $_ -like "$filter*" }
 }
 
-$script:chocoCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','pack','push','-h','--help','pin','source','config','feature','apikey','export','help','template','--version')
+$script:chocoCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','pack','push','-h','--help','pin','source','config','feature','apikey','export','help','template','cache','--version')
 
 # ensure these all have a space to start, or they will cause issues
 $allcommands = " --debug --verbose --trace --noop --help -? --online --accept-license --confirm --limit-output --no-progress --log-file='' --execution-timeout='' --cache-location='' --proxy='' --proxy-user='' --proxy-password='' --proxy-bypass-list='' --proxy-bypass-on-local --force --no-color --skip-compatibility-checks --ignore-http-cache"
@@ -58,6 +58,7 @@ $commandOptions = @{
     apikey    = "--source='' --api-key='' --remove"
     export    = "--include-version-numbers --output-file-path=''"
     template  = "--name=''"
+    cache     = "--expired"
 }
 
 $commandOptions['find'] = $commandOptions['search']
@@ -222,6 +223,11 @@ function ChocolateyTabExpansion($lastBlock) {
         # Handles template first tab
         "^(template)\s+(?<subcommand>[^-\s]*)$" {
             @('list', 'info', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+        }
+
+        # Handles cache first tab
+        "^(cache)\s+(?<subcommand>[^-\s]*)$" {
+            @('list', 'remove', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
         # Handles more options after others
