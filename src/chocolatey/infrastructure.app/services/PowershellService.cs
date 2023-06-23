@@ -447,7 +447,6 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Identity.Version.ToNormalizedStringChecked());
             Environment.SetEnvironmentVariable("packageVersion", package.Identity.Version.ToNormalizedStringChecked());
             Environment.SetEnvironmentVariable("chocolateyPackageVersionPrerelease", package.Identity.Version.Release.ToStringSafe());
-            Environment.SetEnvironmentVariable("chocolateyPackageVersionPackageRelease", package.Identity.Version.Version.ToStringSafe());
 
             Environment.SetEnvironmentVariable("chocolateyPackageFolder", packageDirectory);
             Environment.SetEnvironmentVariable("packageFolder", packageDirectory);
