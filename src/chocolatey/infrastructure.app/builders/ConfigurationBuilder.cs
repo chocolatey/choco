@@ -217,6 +217,15 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void SetAllConfigItems(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
+            config.CacheLocation = Environment.ExpandEnvironmentVariables(
+                SetConfigItem(
+                    ApplicationParameters.ConfigSettings.CacheLocation,
+                    configFileSettings,
+                    string.Empty,
+                    "Cache location if not TEMP folder. Replaces `$env:TEMP` value for choco.exe process. It is highly recommended this be set to make Chocolatey more deterministic in cleanup."
+                    )
+                );
+
             if (string.IsNullOrWhiteSpace(config.CacheLocation))
             {
                 config.CacheLocation = fileSystem.GetTempPath(); // System.Environment.GetEnvironmentVariable("TEMP");
@@ -233,10 +242,12 @@ namespace chocolatey.infrastructure.app.builders
             if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "temp");
 
             var commandExecutionTimeoutSeconds = 0;
-            var commandExecutionTimeout = configFileSettings.ConfigSettings
-                .Where(f => f.Key.IsEqualTo(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds))
-                .Select(c => c.Value)
-                .FirstOrDefault();
+            var commandExecutionTimeout = SetConfigItem(
+                ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds,
+                configFileSettings,
+                ApplicationParameters.DefaultWaitForExitInSeconds.ToStringSafe(),
+                "Default timeout for command execution. '0' for infinite."
+            );
 
             int.TryParse(commandExecutionTimeout, out commandExecutionTimeoutSeconds);
             config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
