@@ -522,6 +522,7 @@ namespace chocolatey.infrastructure.app.builders
         private static void SetLicensedOptions(ChocolateyConfiguration config, ChocolateyLicense license, ConfigFileSettings configFileSettings)
         {
             config.Information.IsLicensedVersion = license.IsLicensedVersion();
+            config.Information.IsLicensedAssemblyLoaded = license.AssemblyLoaded;
             config.Information.LicenseType = license.LicenseType.DescriptionOrValue();
 
             if (license.AssemblyLoaded)
