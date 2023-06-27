@@ -113,6 +113,15 @@ namespace chocolatey.tests
     {
     }
 
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class InlineDataAttribute : TestCaseAttribute
+    {
+        public InlineDataAttribute(params object[] data)
+            : base(data)
+        {
+        }
+    }
+
     public class ExplicitAttribute : NUnit.Framework.ExplicitAttribute
     {
     }
