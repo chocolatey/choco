@@ -970,8 +970,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             var projectContext = new ChocolateyNuGetProjectContext(config, _nugetLogger);
 
             var configIgnoreDependencies = config.IgnoreDependencies;
-            SetPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; });
+            var allLocalPackages = SetPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; }).ToList();
             config.IgnoreDependencies = configIgnoreDependencies;
+            var localPackageListValid = true;
 
             config.CreateBackup();
 
@@ -981,7 +982,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 // before we start reading it.
                 config.RevertChanges();
 
-                var allLocalPackages = GetInstalledPackages(config).ToList();
+                if (!localPackageListValid)
+                {
+                    allLocalPackages = GetInstalledPackages(config).ToList();
+                    localPackageListValid = true;
+                }
+
                 var installedPackage = allLocalPackages.FirstOrDefault(p => p.Name.IsEqualTo(packageName));
                 var packagesToInstall = new List<IPackageSearchMetadata>();
                 var packagesToUninstall = new HashSet<PackageResult>();
@@ -1013,6 +1019,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
 
                     string logMessage = @"{0} is not installed. Installing...".FormatWith(packageName);
+                    localPackageListValid = false;
 
                     if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
 
@@ -1177,6 +1184,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                     if (performAction)
                     {
+                        localPackageListValid = false;
 
                         NugetCommon.GetPackageDependencies(availablePackage.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
 
