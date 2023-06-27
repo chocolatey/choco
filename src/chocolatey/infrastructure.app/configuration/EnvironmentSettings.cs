@@ -136,7 +136,10 @@ namespace chocolatey.infrastructure.app.configuration
         {
             Environment.SetEnvironmentVariable("ChocolateyLicenseType", config.Information.LicenseType);
 
-            if (!(config.Information.IsLicensedVersion && config.Information.IsLicensedAssemblyLoaded)) return;
+            if (!(config.Information.IsLicensedVersion && config.Information.IsLicensedAssemblyLoaded))
+            {
+                return;
+            }
 
             var licenseAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name.IsEqualTo("chocolatey.licensed"));
 
