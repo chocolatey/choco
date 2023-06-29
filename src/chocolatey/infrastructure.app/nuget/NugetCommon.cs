@@ -137,7 +137,7 @@ namespace chocolatey.infrastructure.app.nuget
             var updatedSources = new StringBuilder();
             foreach (var sourceValue in sources.OrEmpty())
             {
-var source = sourceValue;
+                var source = sourceValue;
                 var bypassProxy = false;
 
                 var sourceClientCertificates = new List<X509Certificate>();

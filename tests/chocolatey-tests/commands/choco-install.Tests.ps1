@@ -1863,6 +1863,39 @@ To install a local, or remote file, you may use:
         }
     }
 
+    # Tagged as Internal as this package needs to be packaged by an older version of Chocolatey CLI to have the nuspec version
+    # not be normalized.
+    Context 'Installing non-normalized package outputting all environment variables' -Tag Internal {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install test-environment --version 0.9 --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Outputs <Name> as <Value>' -ForEach @(@{
+            Name = 'chocolateyPackageVersion'
+            Value= '0.9.0'
+        }
+        @{
+            Name = 'packageVersion'
+            Value= '0.9.0'
+        }
+        @{
+            Name = 'chocolateyPackageNuspecVersion'
+            Value= '0.9'
+        }
+        @{
+            Name = 'packageNuspecVersion'
+            Value= '0.9'
+        }) {
+            $Output.Lines | Should -Contain "$Name=$Value"
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths
