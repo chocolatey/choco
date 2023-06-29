@@ -1806,6 +1806,96 @@ To install a local, or remote file, you may use:
         }
     }
 
+    # Tagged as Internal since this package is only available internally and downloads from internal infrastructure.
+    Context 'Installing package with Open Source Get-ChocolateyWebFile, Get-WebFileName and Get-WebHeaders' -Tag Internal, FossOnly {
+        BeforeAll {
+            $paths = New-ChocolateyInstallSnapshot
+
+            # Cache directory is set here to prevent assertion failures
+            $Output = Invoke-Choco install get-chocolateywebfile "--cache-location=$($paths.PackagesPath)" --confirm
+        }
+
+        AfterAll {
+            $null = Invoke-Choco uninstall get-chocolateywebfile --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Runs under background Service' -Tag Background {
+            $Output.Lines | Should -Contain 'Running in background mode' -Because $Output.String
+        }
+
+        It 'Outputs name of remote file' {
+            $Output.Lines | Should -Contain 'FileName: ChocolateyGUI.msi' -Because $Output.String
+        }
+
+        # We only get an output of System.Collections.Hashtable here,
+        # but that is enough for us to assert against the call to
+        # Get-WebHeaders
+        It 'Outputs information from web headers' {
+            $Output.Lines | Should -Contain 'System.Collections.Hashtable' -Because $Output.String
+        }
+
+        It 'Outputs downloading software' {
+            $Output.Lines | Should -Contain 'Downloading get-chocolateywebfile' -Because $Output.String
+        }
+
+        It 'Outputs download completed' {
+            $Output.Lines | Should -Contain "Download of ChocolateyGUI.msi (16.23 MB) completed." -Because $Output.String
+        }
+
+        It 'Outputs path to msi executable' {
+            $Output.Lines | Should -Contain "Path: $env:ChocolateyInstall\lib\get-chocolateywebfile\tools\ChocolateyGUI.msi" -Because $Output.String
+        }
+
+        It 'Outputs installing msi executable' {
+            $Output.Lines | Should -Contain 'Installing get-chocolateywebfile...' -Because $Output.String
+        }
+
+        It 'Outputs installation was successful' {
+            $Output.Lines | Should -Contain 'get-chocolateywebfile has been installed.' -Because $Output.String
+        }
+
+        It 'Installs software to expected directory' {
+            "${env:ProgramFiles(x86)}\Chocolatey GUI\ChocolateyGui.exe" | Should -Exist
+        }
+    }
+
+    # Tagged as Internal as this package needs to be packaged by an older version of Chocolatey CLI to have the nuspec version
+    # not be normalized.
+    Context 'Installing non-normalized package outputting all environment variables' -Tag Internal {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Output = Invoke-Choco install test-environment --version 0.9 --confirm
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Outputs <Name> as <Value>' -ForEach @(@{
+            Name = 'chocolateyPackageVersion'
+            Value= '0.9.0'
+        }
+        @{
+            Name = 'packageVersion'
+            Value= '0.9.0'
+        }
+        @{
+            Name = 'chocolateyPackageNuspecVersion'
+            Value= '0.9'
+        }
+        @{
+            Name = 'packageNuspecVersion'
+            Value= '0.9'
+        }) {
+            $Output.Lines | Should -Contain "$Name=$Value"
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

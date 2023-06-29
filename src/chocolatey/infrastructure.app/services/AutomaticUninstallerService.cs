@@ -102,7 +102,7 @@ namespace chocolatey.infrastructure.app.services
 
             foreach (var key in registryKeys.OrEmpty())
             {
-                var packageCacheLocation = _fileSystem.CombinePaths(_fileSystem.GetFullPath(config.CacheLocation), package.Id, package.Version.ToStringSafe());
+                var packageCacheLocation = _fileSystem.CombinePaths(_fileSystem.GetFullPath(config.CacheLocation), package.Id, package.Version.ToNormalizedStringChecked());
                 Remove(key, config, packageResult, packageCacheLocation);
             }
         }

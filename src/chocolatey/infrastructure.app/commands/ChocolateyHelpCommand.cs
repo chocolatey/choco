@@ -89,7 +89,14 @@ namespace chocolatey.infrastructure.app.commands
                 return c.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>();
             }).OrderBy(c => c.CommandName))
             {
-                commandsLog.AppendFormat(" * {0} - {1}\n", command.CommandName, command.Description);
+                if (!string.IsNullOrEmpty(command.Version))
+                {
+                    commandsLog.AppendFormat(" * {0} - {1} (v{2}+)\n", command.CommandName, command.Description, command.Version);
+                }
+                else
+                {
+                    commandsLog.AppendFormat(" * {0} - {1}\n", command.CommandName, command.Description);
+                }
             }
 
             "chocolatey".Log().Info(@"This is a listing of all of the different things you can pass to choco.

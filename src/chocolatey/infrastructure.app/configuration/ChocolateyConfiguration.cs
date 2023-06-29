@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2022 Chocolatey Software, Inc
+// Copyright © 2017 - 2023 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,6 +38,7 @@ namespace chocolatey.infrastructure.app.configuration
             RegularOutput = true;
             PromptForConfirmation = true;
             DisableCompatibilityChecks = false;
+            CacheExpirationInMinutes = 30;
             SourceType = SourceTypes.Normal;
             Information = new InformationCommandConfiguration();
             Features = new FeaturesConfiguration();
@@ -56,6 +57,7 @@ namespace chocolatey.infrastructure.app.configuration
             Proxy = new ProxyConfiguration();
             ExportCommand = new ExportCommandConfiguration();
             TemplateCommand = new TemplateCommandConfiguration();
+            CacheCommand = new CacheCommandConfiguration();
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -340,6 +342,15 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ApplyInstallArgumentsToDependencies { get; set; }
         public bool IgnoreDependencies { get; set; }
 
+        /// <summary>
+        /// Gets or sets the time before the cache is considered to have expired in minutes.
+        /// </summary>
+        /// <value>
+        /// The cache expiration in minutes.
+        /// </value>
+        /// <remarks>specifying a negative number disables the caching completely.</remarks>
+        public int CacheExpirationInMinutes { get; set; }
+
         public bool AllowDowngrade { get; set; }
         public bool ForceDependencies { get; set; }
         public string DownloadChecksum { get; set; }
@@ -478,6 +489,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </remarks>
         public TemplateCommandConfiguration TemplateCommand { get; set; }
 
+        /// <summary>
+        /// Gets or sets the configuration related specifically to the Cache command.
+        /// </summary>
+        public CacheCommandConfiguration CacheCommand { get; set; }
+
 #pragma warning disable IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void start_backup()
@@ -511,6 +527,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IsUserRemote { get; set; }
         public bool IsProcessElevated { get; set; }
         public bool IsLicensedVersion { get; set; }
+        public bool IsLicensedAssemblyLoaded { get; set; }
         public string LicenseType { get; set; }
         public string CurrentDirectory { get; set; }
     }
@@ -708,5 +725,25 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public TemplateCommandType Command { get; set; }
         public string Name { get; set; }
+    }
+
+    [Serializable]
+    public sealed class CacheCommandConfiguration
+    {
+        /// <summary>
+        /// Gets or sets the type of the command that should be used when running the Cache command.
+        /// </summary>
+        /// <value>
+        /// The command type to use.
+        /// </value>
+        public CacheCommandType Command { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether only expired items in the cache should be removed.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if only expired cache items should be removed; otherwise, <c>false</c>.
+        /// </value>
+        public bool RemoveExpiredItemsOnly { get; set; }
     }
 }

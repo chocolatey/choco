@@ -1,6 +1,6 @@
 # Contributing
 
-The Chocolatey team has very explicit information here regarding the process for contributions, and we will be sticklers about the way you write your commit messages (yes, really), so to save yourself some rework, please make sure you read over this entire document prior to contributing.
+The Chocolatey team has very explicit information here regarding the process for contributions, and we will be sticklers about the way you write your commit messages (yes, really), so to save yourself some rework, please make sure you read over this entire document prior to contributing. See this [Pull Request](https://github.com/chocolatey/choco/pull/3011) as an example of what we consider to be a great contribution.
 
 <!-- TOC -->
 
@@ -273,6 +273,8 @@ choco client properly.
 ```
 
 ### Submit Pull Request (PR)
+
+See this [Pull Request](https://github.com/chocolatey/choco/pull/3011) as an example of what we consider to be a great contribution.
 
 Prerequisites:
 

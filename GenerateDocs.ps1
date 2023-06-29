@@ -1,4 +1,4 @@
-﻿#Requires -PSEdition Desktop
+#Requires -PSEdition Desktop
 # Copyright © 2017 Chocolatey Software, Inc
 # Copyright © 2011 - 2017 RealDimensions Software, LLC
 #
@@ -23,7 +23,8 @@ $thisDirectory = (Split-Path -Parent $MyInvocation.MyCommand.Definition);
 $psModuleName = 'chocolateyInstaller'
 $psModuleLocation = [System.IO.Path]::GetFullPath("$thisDirectory\src\chocolatey.resources\helpers\chocolateyInstaller.psm1")
 $docsFolder = [System.IO.Path]::GetFullPath("$thisDirectory\docs\generated")
-$chocoExe = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\temp\_PublishedApps\choco_merged\choco.exe")
+$mergedDirectory = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\temp\_PublishedApps\choco_merged")
+$chocoExe = "$mergedDirectory\choco.exe"
 $lineFeed = "`r`n"
 $sourceLocation = 'https://github.com/chocolatey/choco/blob/master/'
 $sourceCommands = $sourceLocation + 'src/chocolatey/infrastructure.app/commands'
@@ -96,6 +97,11 @@ These are the functions from above as one list.
 
 '@
 
+if (!(Test-Path "$mergedDirectory\lib")) {
+    # Workaround for the warning outputted when the directory doesn't exist
+    $null = New-Item -Path "$mergedDirectory\lib" -ItemType Directory
+}
+
 function Get-Aliases($commandName) {
 
     $aliasOutput = ''
@@ -126,6 +132,9 @@ function Replace-CommonItems($text) {
 
     $text = $text.Replace("`n", $lineFeed)
     $text = $text -replace "\*\*NOTE:\*\*", '> :choco-info: **NOTE**
+>
+>'
+    $text = $text -replace "\*\*WARNING:\*\*",'> :choco-warning: **WARNING**
 >
 >'
     $text = $text -replace '(community feed[s]?[^\]]|community repository)', '[$1](https://community.chocolatey.org/packages)'
@@ -232,7 +241,8 @@ function Convert-CommandText {
     $commandText = $commandText -replace '^(Commands|How To Pass Options)', '## $1'
     $commandText = $commandText -replace '^(Windows Features|Ruby|Cygwin|Python)\s*$', '### $1'
     $commandText = $commandText -replace '(?<!\s)NOTE:', '> :choco-info: **NOTE**'
-    $commandText = $commandText -replace '\*> :choco-info: \*\*NOTE\*\*\*', '> :choco-info: **NOTE**'
+    $commandText = $commandText -replace '(?<!\s)WARNING:', '> :choco-warning: **WARNING**'
+    $commandText = $commandText -replace '\*> :choco-(info|warning): \*\*(INFO|WARNING)\*\*\*', '> :choco-$1: **$2**'
     $commandText = $commandText -replace 'the command reference', '[how to pass arguments](xref:choco-commands#how-to-pass-options-switches)'
     $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://community.chocolatey.org/packages)'
     #$commandText = $commandText -replace '\`(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[[`$1`|Commands$1]]'
@@ -258,7 +268,7 @@ function Convert-CommandText {
     $commandText = $commandText -replace 'https://chocolatey.org/docs/features-package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
     $commandText = $commandText -replace 'https://chocolatey.org/docs/en-us/features/package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
     $commandText = $commandText -replace '\[community feed\)\]\(https://community.chocolatey.org/packages\)', '[community feed](https://community.chocolatey.org/packages))'
-    $commandText = $commandText -replace '> :choco-info: \*\*NOTE\*\*\s', '> :choco-info: **NOTE**
+    $commandText = $commandText -replace '> :choco-(info|warning): \*\*(INFO|WARNING)\*\*\s', '> :choco-$1: **$2**
 >
 > '
 
@@ -575,6 +585,7 @@ The following are experimental or use not recommended:
     $global:powerShellReferenceTOC | Out-File $fileName -Encoding UTF8 -Force
 
     Write-Host "Generating command reference markdown files"
+    Generate-CommandReference 'Cache' '5'
     Generate-CommandReference 'Config' '10'
     Generate-CommandReference 'Download' '20'
     Generate-CommandReference 'Export' '30'

@@ -124,7 +124,8 @@ install them.
             int? pageValue = config.ListCommand.Page;
             try
             {
-                return NugetList.GetCount(config, _nugetLogger, _fileSystem);
+                var sourceCacheContext = new ChocolateySourceCacheContext(config);
+                return NugetList.GetCount(config, _nugetLogger, _fileSystem, sourceCacheContext);
             }
             finally
             {
@@ -421,7 +422,8 @@ that uses these options.");
             string nupkgFileName = _fileSystem.GetFileName(nupkgFilePath);
             if (config.RegularOutput) this.Log().Info(() => "Attempting to push {0} to {1}".FormatWith(nupkgFileName, config.Sources));
 
-            NugetPush.PushPackage(config, _fileSystem.GetFullPath(nupkgFilePath), _nugetLogger, nupkgFileName, _fileSystem);
+            var sourceCacheContext = new ChocolateySourceCacheContext(config);
+            NugetPush.PushPackage(config, _fileSystem.GetFullPath(nupkgFilePath), _nugetLogger, nupkgFileName, _fileSystem, sourceCacheContext);
 
             if (config.RegularOutput && (config.Sources.IsEqualTo(ApplicationParameters.ChocolateyCommunityFeedPushSource) || config.Sources.IsEqualTo(ApplicationParameters.ChocolateyCommunityFeedPushSourceOld)))
             {
@@ -487,7 +489,7 @@ folder.");
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
             var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
-            var remoteEndpoints = NugetCommon.GetRepositoryResources(remoteRepositories);
+            var remoteEndpoints = NugetCommon.GetRepositoryResources(remoteRepositories, sourceCacheContext);
             var localRepositorySource = NugetCommon.GetLocalRepository();
             var pathResolver = NugetCommon.GetPathResolver(_fileSystem);
             var nugetProject = new FolderNuGetProject(ApplicationParameters.PackagesLocation, pathResolver, NuGetFramework.AnyFramework);
@@ -754,7 +756,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                     if (packageRemoteMetadata is null)
                     {
-                        var endpoint = NuGetEndpointResources.GetResourcesBySource(packageDependencyInfo.Source);
+                        var endpoint = NuGetEndpointResources.GetResourcesBySource(packageDependencyInfo.Source, sourceCacheContext);
 
                         packageRemoteMetadata = endpoint.PackageMetadataResource
                             .GetMetadataAsync(packageDependencyInfo, sourceCacheContext, _nugetLogger, CancellationToken.None)
@@ -796,7 +798,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     try
                     {
                         //TODO, do sanity check here.
-                        var endpoint = NuGetEndpointResources.GetResourcesBySource(packageDependencyInfo.Source);
+                        var endpoint = NuGetEndpointResources.GetResourcesBySource(packageDependencyInfo.Source, sourceCacheContext);
                         var downloadResource = endpoint.DownloadResource;
 
                         _fileSystem.DeleteFile(pathResolver.GetInstalledPackageFilePath(packageDependencyInfo));
@@ -820,10 +822,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
 
                         var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
+                        NormalizeNuspecCasing(packageRemoteMetadata, installedPath);
 
-                        NormalizeNuspecCasing(availablePackage, installedPath);
-
-                        RemovePackageFromNugetCache(availablePackage);
+                        RemovePackageFromNugetCache(packageRemoteMetadata);
 
                         var manifestPath = nugetProject.GetInstalledManifestFilePath(packageDependencyInfo);
                         var packageMetadata = new ChocolateyPackageMetadata(manifestPath, _fileSystem);
@@ -964,7 +965,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
             var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
-            var remoteEndpoints = NugetCommon.GetRepositoryResources(remoteRepositories);
+            var remoteEndpoints = NugetCommon.GetRepositoryResources(remoteRepositories, sourceCacheContext);
             var localRepositorySource = NugetCommon.GetLocalRepository();
             var projectContext = new ChocolateyNuGetProjectContext(config, _nugetLogger);
 
@@ -1136,7 +1137,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                             else
                             {
-                                this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                                this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe()));
                             }
                         }
 
@@ -1353,7 +1354,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                             if (packageRemoteMetadata is null)
                             {
-                                var endpoint = NuGetEndpointResources.GetResourcesBySource(packageDependencyInfo.Source);
+                                var endpoint = NuGetEndpointResources.GetResourcesBySource(packageDependencyInfo.Source, sourceCacheContext);
 
                                 packageRemoteMetadata = endpoint.PackageMetadataResource
                                     .GetMetadataAsync(packageDependencyInfo, sourceCacheContext, _nugetLogger, CancellationToken.None)
@@ -1395,7 +1396,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     EnsureNupkgRemoved(oldPkgInfo.Package);
                                 }
 
-                                var endpoint = NuGetEndpointResources.GetResourcesBySource(packageDependencyInfo.Source);
+                                var endpoint = NuGetEndpointResources.GetResourcesBySource(packageDependencyInfo.Source, sourceCacheContext);
                                 var downloadResource = endpoint.DownloadResource;
 
                                 _fileSystem.DeleteFile(pathResolver.GetInstalledPackageFilePath(packageDependencyInfo));
@@ -1420,12 +1421,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                 var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
 
-                                NormalizeNuspecCasing(availablePackage, installedPath);
+                                NormalizeNuspecCasing(packageRemoteMetadata, installedPath);
 
                                 var manifestPath = nugetProject.GetInstalledManifestFilePath(packageDependencyInfo);
                                 var packageMetadata = new ChocolateyPackageMetadata(manifestPath, _fileSystem);
 
-                                RemovePackageFromNugetCache(availablePackage);
+                                RemovePackageFromNugetCache(packageRemoteMetadata);
 
                                 this.Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".FormatWith(
                                     System.Environment.NewLine,
@@ -1499,13 +1500,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         public virtual ConcurrentDictionary<string, PackageResult> GetOutdated(ChocolateyConfiguration config)
         {
+            var sourceCacheContext = new ChocolateySourceCacheContext(config);
             var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
-            var remoteEndpoints = NugetCommon.GetRepositoryResources(remoteRepositories);
+            var remoteEndpoints = NugetCommon.GetRepositoryResources(remoteRepositories, sourceCacheContext);
             var pathResolver = NugetCommon.GetPathResolver(_fileSystem);
 
             var outdatedPackages = new ConcurrentDictionary<string, PackageResult>();
 
-            var sourceCacheContext = new ChocolateySourceCacheContext(config);
             var allPackages = SetPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; });
             var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty().ToList();
 
@@ -1858,7 +1859,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         {
             if (packageInfo == null || packageInfo.Package == null) return;
 
-            var version = packageInfo.Package.Version.ToStringSafe();
+            var version = packageInfo.Package.Version.ToNormalizedStringChecked();
 
             if (packageInfo.FilesSnapshot == null || packageInfo.FilesSnapshot.Files.Count == 0)
             {
@@ -1923,7 +1924,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         private void RemovePackageFromCache(ChocolateyConfiguration config, IPackageMetadata installedPackage)
         {
             this.Log().Debug(ChocolateyLoggers.Verbose, "Ensuring removal of package cache files.");
-            var cacheDirectory = _fileSystem.CombinePaths(config.CacheLocation, installedPackage.Id, installedPackage.Version.ToStringSafe());
+            var cacheDirectory = _fileSystem.CombinePaths(config.CacheLocation, installedPackage.Id, installedPackage.Version.ToNormalizedStringChecked());
 
             if (!_fileSystem.DirectoryExists(cacheDirectory)) return;
 
@@ -1952,8 +1953,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             FaultTolerance.TryCatchWithLoggingException(
                 () =>
                 {
-                    var packageFolderPath = _fileSystem.CombinePaths(tempFolder, "{0}/{1}".FormatWith(installedPackage.Identity.Id, installedPackage.Identity.Version.ToStringSafe()));
-                    var nugetCachedFile = _fileSystem.CombinePaths(packageFolderPath, "{0}.{1}.nupkg".FormatWith(installedPackage.Identity.Id, installedPackage.Identity.Version.ToStringSafe()));
+                    var packageFolderPath = _fileSystem.CombinePaths(tempFolder, "{0}/{1}".FormatWith(installedPackage.Identity.Id, installedPackage.Identity.Version.ToNormalizedStringChecked()));
+                    var nugetCachedFile = _fileSystem.CombinePaths(packageFolderPath, "{0}.{1}.nupkg".FormatWith(installedPackage.Identity.Id, installedPackage.Identity.Version.ToNormalizedStringChecked()));
                     var nupkgMetaDataFile = _fileSystem.CombinePaths(packageFolderPath, ".nupkg.metadata");
                     var nupkgShaFile = nugetCachedFile + ".sha512";
 

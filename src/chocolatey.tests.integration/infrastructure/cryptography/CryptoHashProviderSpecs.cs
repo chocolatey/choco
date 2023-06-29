@@ -21,7 +21,7 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
     using System.Security.Cryptography;
     using chocolatey.infrastructure.cryptography;
     using chocolatey.infrastructure.filesystem;
-    using Should;
+    using FluentAssertions;
 
     public class CryptoHashProviderSpecs
     {
@@ -60,7 +60,7 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
             {
                 var expected = BitConverter.ToString(SHA256.Create().ComputeHash(File.ReadAllBytes(filePath))).Replace("-", string.Empty);
 
-                result.ShouldEqual(expected);
+                result.Should().Be(expected);
             }
         }
     }

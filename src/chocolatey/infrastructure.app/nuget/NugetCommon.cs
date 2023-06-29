@@ -124,7 +124,10 @@ namespace chocolatey.infrastructure.app.nuget
             }
             else
             {
-                ProxyCache.Instance.Override(new System.Net.WebProxy());
+                // We need to override the proxy so that we don't use the NuGet configuration.
+                // We must however also be able to use the system proxy.
+                // Our changes to ProxyCache test for a null overridden proxy and get the system proxy if it's null.
+                ProxyCache.Instance.Override(proxy: null);
             }
 
             IEnumerable<string> sources = configuration.Sources.ToStringSafe().Split(new[] { ";", "," }, StringSplitOptions.RemoveEmptyEntries);
@@ -134,7 +137,7 @@ namespace chocolatey.infrastructure.app.nuget
             var updatedSources = new StringBuilder();
             foreach (var sourceValue in sources.OrEmpty())
             {
-var source = sourceValue;
+                var source = sourceValue;
                 var bypassProxy = false;
 
                 var sourceClientCertificates = new List<X509Certificate>();
@@ -240,15 +243,27 @@ var source = sourceValue;
             return repositories;
         }
 
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
-            IEnumerable<SourceRepository> remoteRepositories = GetRemoteRepositories(configuration, nugetLogger, filesystem);
-            return GetRepositoryResources(remoteRepositories);
+            return GetRepositoryResources(configuration, nugetLogger, filesystem, new ChocolateySourceCacheContext(configuration));
         }
 
+        public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem, ChocolateySourceCacheContext cacheContext)
+        {
+            IEnumerable<SourceRepository> remoteRepositories = GetRemoteRepositories(configuration, nugetLogger, filesystem);
+            return GetRepositoryResources(remoteRepositories, cacheContext);
+        }
+
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(IEnumerable<SourceRepository> packageRepositories)
         {
-            return NuGetEndpointResources.GetResourcesBySource(packageRepositories).ToList();
+            return GetRepositoryResources(packageRepositories, cacheContext: null);
+        }
+
+        public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(IEnumerable<SourceRepository> packageRepositories, ChocolateySourceCacheContext cacheContext)
+        {
+            return NuGetEndpointResources.GetResourcesBySource(packageRepositories, cacheContext).ToList();
         }
 
         public static void SetHttpHandlerCredentialService(ChocolateyConfiguration configuration)

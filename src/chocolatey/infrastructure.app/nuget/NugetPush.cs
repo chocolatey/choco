@@ -28,7 +28,13 @@ namespace chocolatey.infrastructure.app.nuget
 
     public class NugetPush
     {
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void PushPackage(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName, IFileSystem filesystem)
+        {
+            PushPackage(config, nupkgFilePath, nugetLogger, nupkgFileName, filesystem, cacheContext: null);
+        }
+
+        public static void PushPackage(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName, IFileSystem filesystem, ChocolateySourceCacheContext cacheContext)
         {
             var timeout = TimeSpan.FromSeconds(Math.Abs(config.CommandExecutionTimeoutSeconds));
             if (timeout.Seconds <= 0)
@@ -43,7 +49,7 @@ namespace chocolatey.infrastructure.app.nuget
             const bool skipDuplicate = false;
 
             //OK to use FirstOrDefault in this case as the command validates that there is only one source
-            NuGetEndpointResources sourceEndpoint = NugetCommon.GetRepositoryResources(config, nugetLogger, filesystem).FirstOrDefault();
+            NuGetEndpointResources sourceEndpoint = NugetCommon.GetRepositoryResources(config, nugetLogger, filesystem, cacheContext).FirstOrDefault();
             PackageUpdateResource packageUpdateResource = sourceEndpoint.PackageUpdateResource;
             var nupkgFilePaths = new List<string>() { nupkgFilePath };
 

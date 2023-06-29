@@ -113,6 +113,15 @@ namespace chocolatey.tests
     {
     }
 
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+    public class InlineDataAttribute : TestCaseAttribute
+    {
+        public InlineDataAttribute(params object[] data)
+            : base(data)
+        {
+        }
+    }
+
     public class ExplicitAttribute : NUnit.Framework.ExplicitAttribute
     {
     }
@@ -182,6 +191,15 @@ namespace chocolatey.tests
         {
             public SemVer20Attribute()
                 : base("SemVer 2.0")
+            {
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false)]
+        public sealed class RuleEngine : CategoryAttribute
+        {
+            public RuleEngine()
+                : base("Rule Engine")
             {
             }
         }

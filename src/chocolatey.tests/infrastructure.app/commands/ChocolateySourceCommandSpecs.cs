@@ -26,7 +26,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateySourceCommandSpecs
     {
@@ -56,13 +56,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_implement_source()
             {
-                results.ShouldContain("source");
+                results.Should().Contain("source");
             }
 
             [Fact]
             public void Should_implement_sources()
             {
-                results.ShouldContain("sources");
+                results.Should().Contain("sources");
             }
         }
 
@@ -85,55 +85,55 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_clear_previously_set_Source()
             {
-                configuration.Sources.ShouldBeEmpty();
+                configuration.Sources.Should().BeEmpty();
             }
 
             [Fact]
             public void Should_add_name_to_the_option_set()
             {
-                optionSet.Contains("name").ShouldBeTrue();
+                optionSet.Contains("name").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_name_to_the_option_set()
             {
-                optionSet.Contains("n").ShouldBeTrue();
+                optionSet.Contains("n").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_source_to_the_option_set()
             {
-                optionSet.Contains("source").ShouldBeTrue();
+                optionSet.Contains("source").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_source_to_the_option_set()
             {
-                optionSet.Contains("s").ShouldBeTrue();
+                optionSet.Contains("s").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_user_to_the_option_set()
             {
-                optionSet.Contains("user").ShouldBeTrue();
+                optionSet.Contains("user").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_user_to_the_option_set()
             {
-                optionSet.Contains("u").ShouldBeTrue();
+                optionSet.Contains("u").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_password_to_the_option_set()
             {
-                optionSet.Contains("password").ShouldBeTrue();
+                optionSet.Contains("password").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_password_to_the_option_set()
             {
-                optionSet.Contains("p").ShouldBeTrue();
+                optionSet.Contains("p").Should().BeTrue();
             }
         }
 
@@ -160,7 +160,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 unparsedArgs.Add("list");
                 because();
 
-                configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.List);
+                configuration.SourceCommand.Command.Should().Be(SourceCommandType.List);
             }
 
             [Fact]
@@ -182,10 +182,10 @@ namespace chocolatey.tests.infrastructure.app.commands
                     error = ex;
                 }
 
-                errored.ShouldBeTrue();
-                error.ShouldNotBeNull();
-                error.ShouldBeType<ApplicationException>();
-                error.Message.ShouldContain("A single sources command must be listed");
+                errored.Should().BeTrue();
+                error.Should().NotBeNull();
+                error.Should().BeOfType<ApplicationException>();
+                error.Message.Should().Contain("A single sources command must be listed");
             }
 
             [Fact]
@@ -195,7 +195,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 unparsedArgs.Add("add");
                 because();
 
-                configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.Add);
+                configuration.SourceCommand.Command.Should().Be(SourceCommandType.Add);
             }
 
             [Fact]
@@ -205,7 +205,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 unparsedArgs.Add("ADD");
                 because();
 
-                configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.Add);
+                configuration.SourceCommand.Command.Should().Be(SourceCommandType.Add);
             }
 
             [Fact]
@@ -215,7 +215,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 unparsedArgs.Add("remove");
                 because();
 
-                configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.Remove);
+                configuration.SourceCommand.Command.Should().Be(SourceCommandType.Remove);
             }
 
             [Fact]
@@ -225,7 +225,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 unparsedArgs.Add("enable");
                 because();
 
-                configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.Enable);
+                configuration.SourceCommand.Command.Should().Be(SourceCommandType.Enable);
             }
 
             [Fact]
@@ -235,7 +235,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 unparsedArgs.Add("disable");
                 because();
 
-                configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.Disable);
+                configuration.SourceCommand.Command.Should().Be(SourceCommandType.Disable);
             }
 
             [Fact]
@@ -245,7 +245,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 unparsedArgs.Add("wtf");
                 because();
 
-                configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.List);
+                configuration.SourceCommand.Command.Should().Be(SourceCommandType.List);
             }
 
             [Fact]
@@ -254,7 +254,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 Reset();
                 because();
 
-                configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.List);
+                configuration.SourceCommand.Command.Should().Be(SourceCommandType.List);
             }
 
             [Fact]
@@ -264,7 +264,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 unparsedArgs.Add(" ");
                 because();
 
-                configuration.SourceCommand.Command.ShouldEqual(SourceCommandType.List);
+                configuration.SourceCommand.Command.Should().Be(SourceCommandType.List);
             }
         }
 
@@ -311,11 +311,11 @@ namespace chocolatey.tests.infrastructure.app.commands
                     error = ex;
                 }
 
-                errored.ShouldBeTrue();
-                error.ShouldNotBeNull();
-                error.ShouldBeType<ApplicationException>();
+                errored.Should().BeTrue();
+                error.Should().NotBeNull();
+                error.Should().BeOfType<ApplicationException>();
                 var commandName = configuration.SourceCommand.Command.ToStringSafe().ToLower();
-                error.Message.ShouldEqual(expectedMessage.FormatWith(commandName));
+                error.Message.Should().Be(expectedMessage.FormatWith(commandName));
             }
 
             [Fact]

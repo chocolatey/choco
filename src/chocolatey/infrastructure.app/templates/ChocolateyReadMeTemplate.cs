@@ -84,7 +84,7 @@ Chocolatey makes a number of environment variables available (You can access any
  * ChocolateyInstall - Top level folder where Chocolatey is installed
  * ChocolateyPackageName - The name of the package, equivalent to the `<id />` field in the nuspec
  * ChocolateyPackageTitle - The title of the package, equivalent to the `<title />` field in the nuspec
- * ChocolateyPackageVersion - The version of the package, equivalent to the `<version />` field in the nuspec
+ * ChocolateyPackageVersion - The normalized version of the package, equivalent to a normalized edition of the `<version />` field in the nuspec
  * ChocolateyPackageFolder - The top level location of the package folder  - the folder where Chocolatey has downloaded and extracted the NuGet package, typically `C:\ProgramData\chocolatey\lib\packageName`.
 
 #### Advanced Environment Variables

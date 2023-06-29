@@ -29,7 +29,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
     using chocolatey.infrastructure.services;
     using Moq;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class FilesServiceSpecs
     {
@@ -101,7 +101,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             [Fact]
             public void Should_return_a_special_code_for_locked_files()
             {
-                _result.Files.FirstOrDefault(x => x.Path == _theLockedFile).Checksum.ShouldEqual(ApplicationParameters.HashProviderFileLocked);
+                _result.Files.Should().ContainSingle(x => x.Path == _theLockedFile).Which.Checksum.Should().Be(ApplicationParameters.HashProviderFileLocked);
             }
         }
     }

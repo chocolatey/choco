@@ -5,6 +5,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.Dependencies
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.finishBuildTrigger
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 
 project {
@@ -57,13 +58,27 @@ object Chocolatey : BuildType({
 
         script {
             name = "Call Cake"
-            scriptContent = "call build.official.bat --verbosity=diagnostic --target=CI --testExecutionType=all --shouldRunOpenCover=false"
+            scriptContent = """
+                IF "%teamcity.build.triggeredBy%" == "Schedule Trigger" (SET TestType=all) ELSE (SET TestType=unit)
+                call build.official.bat --verbosity=diagnostic --target=CI --testExecutionType=%%TestType%% --shouldRunOpenCover=false
+            """.trimIndent()
         }
     }
 
     triggers {
         vcs {
             branchFilter = ""
+        }
+        schedule {
+            schedulingPolicy = daily {
+                hour = 2
+                minute = 0
+            }
+            branchFilter = """
+                +:<default>
+            """.trimIndent()
+            triggerBuild = always()
+			withPendingChangesOnly = false
         }
     }
 

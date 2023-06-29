@@ -444,10 +444,13 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable("packageName", package.Identity.Id);
             Environment.SetEnvironmentVariable("chocolateyPackageTitle", package.Title);
             Environment.SetEnvironmentVariable("packageTitle", package.Title);
-            Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Identity.Version.ToStringSafe());
-            Environment.SetEnvironmentVariable("packageVersion", package.Identity.Version.ToStringSafe());
+            Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Identity.Version.ToNormalizedStringChecked());
+            Environment.SetEnvironmentVariable("packageVersion", package.Identity.Version.ToNormalizedStringChecked());
+            // We use ToStringSafe on purpose here. There is a need for the version
+            // the package specified, not the normalized version we want users to use.
+            Environment.SetEnvironmentVariable(StringResources.EnvironmentVariables.ChocolateyPackageNuspecVersion, package.Identity.Version.ToStringSafe());
+            Environment.SetEnvironmentVariable(StringResources.EnvironmentVariables.PackageNuspecVersion, package.Identity.Version.ToStringSafe());
             Environment.SetEnvironmentVariable("chocolateyPackageVersionPrerelease", package.Identity.Version.Release.ToStringSafe());
-            Environment.SetEnvironmentVariable("chocolateyPackageVersionPackageRelease", package.Identity.Version.Version.ToStringSafe());
 
             Environment.SetEnvironmentVariable("chocolateyPackageFolder", packageDirectory);
             Environment.SetEnvironmentVariable("packageFolder", packageDirectory);

@@ -319,6 +319,8 @@ namespace chocolatey.tests.integration
             config.PinCommand.Name = string.Empty;
             config.PinCommand.Command = PinCommandType.Unknown;
             config.ListCommand.IdOnly = false;
+            config.ListCommand.PageSize = 25;
+            config.ListCommand.ExplicitPageSize = false;
             config.MachineSources.Clear();
 
             return config;

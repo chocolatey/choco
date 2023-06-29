@@ -26,6 +26,7 @@ namespace chocolatey.infrastructure.app.nuget
         private static readonly ConcurrentDictionary<SourceRepository, NuGetEndpointResources> _cachedResources = new ConcurrentDictionary<SourceRepository, NuGetEndpointResources>();
 
         private bool _resolvingFailed;
+        private readonly ChocolateySourceCacheContext _cacheContext;
         private readonly Lazy<DependencyInfoResource> _dependencyInfoResource;
         private readonly Lazy<DownloadResource> _downloadResource;
         private readonly Lazy<FindPackageByIdResource> _findPackageResource;
@@ -34,10 +35,11 @@ namespace chocolatey.infrastructure.app.nuget
         private readonly Lazy<PackageUpdateResource> _packageUpdateResource;
         private readonly Lazy<PackageSearchResource> _searchResource;
 
-        private NuGetEndpointResources(SourceRepository _sourceRepository)
+        private NuGetEndpointResources(SourceRepository _sourceRepository, ChocolateySourceCacheContext cacheContext)
         {
             Source = _sourceRepository;
 
+            _cacheContext = cacheContext;
             _dependencyInfoResource = new Lazy<DependencyInfoResource>(() => ResolveResource<DependencyInfoResource>());
             _downloadResource = new Lazy<DownloadResource>(() => ResolveResource<DownloadResource>());
             _findPackageResource = new Lazy<FindPackageByIdResource>(() => ResolveResource<FindPackageByIdResource>());
@@ -105,21 +107,33 @@ namespace chocolatey.infrastructure.app.nuget
 
         public SourceRepository Source { get; private set; }
 
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static NuGetEndpointResources GetResourcesBySource(SourceRepository source)
+        {
+            return GetResourcesBySource(source, cacheContext: null);
+        }
+
+        public static NuGetEndpointResources GetResourcesBySource(SourceRepository source, ChocolateySourceCacheContext cacheContext)
         {
             return _cachedResources.GetOrAdd(source, (key) =>
             {
-                var endpointResource = new NuGetEndpointResources(key);
+                var endpointResource = new NuGetEndpointResources(key, cacheContext);
 
                 return endpointResource;
             });
         }
 
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IEnumerable<NuGetEndpointResources> GetResourcesBySource(IEnumerable<SourceRepository> sources)
+        {
+            return GetResourcesBySource(sources, cacheContext: null);
+        }
+
+        public static IEnumerable<NuGetEndpointResources> GetResourcesBySource(IEnumerable<SourceRepository> sources, ChocolateySourceCacheContext cacheContext)
         {
             foreach (SourceRepository source in sources)
             {
-                yield return GetResourcesBySource(source);
+                yield return GetResourcesBySource(source, cacheContext);
             }
         }
 
@@ -132,7 +146,7 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 this.Log().Debug("Resolving resource {0} for source {1}", typeof(T).Name, Source.PackageSource.Source);
 #pragma warning disable RS0030 // Do not used banned APIs
-                resource = Source.GetResource<T>();
+                resource = Source.GetResource<T>(_cacheContext);
 #pragma warning restore RS0030 // Do not used banned APIs
             }
             catch (AggregateException ex) when (!(ex.InnerException is null))

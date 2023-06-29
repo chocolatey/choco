@@ -190,9 +190,12 @@ If you find other exit codes that we have not yet documented, please
             config.Input = config.PinCommand.Name;
             config.Version = semanticVersion.ToFullStringChecked();
             config.ListCommand.ByIdOnly = true;
+            var exact = config.ListCommand.Exact;
+            config.ListCommand.Exact = true;
             var quiet = config.QuietOutput;
             config.QuietOutput = true;
             var installedPackage = _nugetService.List(config).FirstOrDefault();
+            config.ListCommand.Exact = exact;
             config.QuietOutput = quiet;
             config.Input = input;
 

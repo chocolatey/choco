@@ -25,7 +25,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateyInfoCommandSpecs
     {
@@ -55,7 +55,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_implement_info()
             {
-                _results.ShouldContain("info");
+                _results.Should().Contain("info");
             }
         }
 
@@ -77,61 +77,61 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_add_source_to_the_option_set()
             {
-                _optionSet.Contains("source").ShouldBeTrue();
+                _optionSet.Contains("source").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_source_to_the_option_set()
             {
-                _optionSet.Contains("s").ShouldBeTrue();
+                _optionSet.Contains("s").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_localonly_to_the_option_set()
             {
-                _optionSet.Contains("localonly").ShouldBeTrue();
+                _optionSet.Contains("localonly").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_localonly_to_the_option_set()
             {
-                _optionSet.Contains("l").ShouldBeTrue();
+                _optionSet.Contains("l").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_prerelease_to_the_option_set()
             {
-                _optionSet.Contains("prerelease").ShouldBeTrue();
+                _optionSet.Contains("prerelease").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_prerelease_to_the_option_set()
             {
-                _optionSet.Contains("pre").ShouldBeTrue();
+                _optionSet.Contains("pre").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_user_to_the_option_set()
             {
-                _optionSet.Contains("user").ShouldBeTrue();
+                _optionSet.Contains("user").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_user_to_the_option_set()
             {
-                _optionSet.Contains("u").ShouldBeTrue();
+                _optionSet.Contains("u").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_password_to_the_option_set()
             {
-                _optionSet.Contains("password").ShouldBeTrue();
+                _optionSet.Contains("password").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_password_to_the_option_set()
             {
-                _optionSet.Contains("p").ShouldBeTrue();
+                _optionSet.Contains("p").Should().BeTrue();
             }
         }
 
@@ -165,9 +165,9 @@ namespace chocolatey.tests.infrastructure.app.commands
                     _error = ex;
                 }
 
-                _error.ShouldNotBeNull();
-                _error.ShouldBeType<ApplicationException>();
-                _error.Message.ShouldContain("A single package name is required to run the choco info command.");
+                _error.Should().NotBeNull();
+                _error.Should().BeOfType<ApplicationException>();
+                _error.Message.Should().Contain("A single package name is required to run the choco info command.");
             }
 
             [Fact]
@@ -185,9 +185,9 @@ namespace chocolatey.tests.infrastructure.app.commands
                     _error = ex;
                 }
 
-                _error.ShouldNotBeNull();
-                _error.ShouldBeType<ApplicationException>();
-                _error.Message.ShouldContain("Only a single package name can be passed to the choco info command.");
+                _error.Should().NotBeNull();
+                _error.Should().BeOfType<ApplicationException>();
+                _error.Message.Should().Contain("Only a single package name can be passed to the choco info command.");
             }
         }
         public class When_handling_additional_argument_parsing : ChocolateyInfoCommandSpecsBase
@@ -213,7 +213,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_set_unparsed_arguments_to_configuration_input()
             {
                 _because();
-                Configuration.Input.ShouldEqual("pkg1 pkg2");
+                Configuration.Input.Should().Be("pkg1 pkg2");
             }
 
             [Fact]
@@ -221,7 +221,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 Configuration.ListCommand.LocalOnly = false;
                 _because();
-                Configuration.Sources.ShouldEqual(_source);
+                Configuration.Sources.Should().Be(_source);
             }
 
             [Fact]
@@ -229,7 +229,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 Configuration.ListCommand.Exact = false;
                 _because();
-                Configuration.ListCommand.Exact.ShouldBeTrue();
+                Configuration.ListCommand.Exact.Should().BeTrue();
             }
 
             [Fact]
@@ -237,7 +237,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 Configuration.Verbose = false;
                 _because();
-                Configuration.Verbose.ShouldBeTrue();
+                Configuration.Verbose.Should().BeTrue();
             }
         }
 

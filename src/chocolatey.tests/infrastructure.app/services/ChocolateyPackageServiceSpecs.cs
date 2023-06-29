@@ -27,7 +27,7 @@ using chocolatey.infrastructure.results;
 using chocolatey.infrastructure.services;
 using Moq;
 using NUnit.Framework;
-using Should;
+using FluentAssertions;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
 namespace chocolatey.tests.infrastructure.app.services
@@ -134,7 +134,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Test]
             public void Should_return_package_that_should_have_been_installed()
             {
-                _result.Keys.ShouldContain("test-feature");
+                _result.Keys.Should().Contain("test-feature");
             }
 
             [Test]
@@ -191,7 +191,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 var ex = TryRun(Action);
                 var message = GetExpectedLocalValue(directory, "my-package");
 
-                ex.Message.ShouldEqual(message);
+                ex.Message.Should().Be(message);
             }
 
             [Fact]
@@ -209,7 +209,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var ex = TryRun(Action);
                 var message = GetExpectedLocalValue(directory, "my-package");
-                ex.Message.ShouldEqual(message);
+                ex.Message.Should().Be(message);
             }
 
             [Fact, Categories.Unc]
@@ -227,7 +227,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var ex = TryRun(Action);
                 var message = GetExpectedUncValue(directory, "my-package");
-                ex.Message.ShouldEqual(message);
+                ex.Message.Should().Be(message);
             }
 
             [Fact]
@@ -236,7 +236,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 Configuration.PackageNames = "https://test.com/repository/awesome-package.nupkg";
 
                 var ex = TryRun(Action);
-                ex.Message.ShouldEqual("Package name cannot point directly to a local, or remote file. Please use the --source argument and point it to a local file directory, UNC directory path or a NuGet feed instead.");
+                ex.Message.Should().Be("Package name cannot point directly to a local, or remote file. Please use the --source argument and point it to a local file directory, UNC directory path or a NuGet feed instead.");
             }
 
             [Fact]
@@ -253,7 +253,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var ex = TryRun(Action);
                 var expectedMessage = GetExpectedLocalValue(Environment.CurrentDirectory, "test", "1.5.0");
-                ex.Message.ShouldEqual(expectedMessage);
+                ex.Message.Should().Be(expectedMessage);
             }
 
             [Fact]
@@ -270,7 +270,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var ex = TryRun(Action);
                 var expectedMessage = GetExpectedLocalValue(Environment.CurrentDirectory, "test", "2.0.0-alpha", prerelease: true);
-                ex.Message.ShouldEqual(expectedMessage);
+                ex.Message.Should().Be(expectedMessage);
             }
 
             [Fact]
@@ -284,7 +284,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var ex = TryRun(Action);
                 var expectedMessage = GetExpectedLocalValue(string.Empty, "test", "2.0.0", prerelease: false);
-                ex.Message.ShouldEqual(expectedMessage);
+                ex.Message.Should().Be(expectedMessage);
             }
 
             [Fact]
@@ -294,7 +294,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var ex = TryRun(Action);
 
-                ex.Message.ShouldEqual("Package name cannot point directly to a local, or remote file. Please use the --source argument and point it to a local file directory, UNC directory path or a NuGet feed instead.");
+                ex.Message.Should().Be("Package name cannot point directly to a local, or remote file. Please use the --source argument and point it to a local file directory, UNC directory path or a NuGet feed instead.");
             }
 
             [Fact]
@@ -303,7 +303,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 Configuration.PackageNames = "test-package.nuspec";
 
                 var ex = TryRun(Action);
-                ex.Message.ShouldEqual("Package name cannot point directly to a package manifest file. Please create a package by running 'choco pack' on the .nuspec file first.");
+                ex.Message.Should().Be("Package name cannot point directly to a package manifest file. Please create a package by running 'choco pack' on the .nuspec file first.");
             }
 
             private string GetExpectedUncValue(string path, string name, string version = null, bool prerelease = false)
@@ -373,7 +373,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 }
                 catch (Exception ex)
                 {
-                    ex.ShouldBeType<ApplicationException>();
+                    ex.Should().BeOfType<ApplicationException>();
                     return ex;
                 }
             }

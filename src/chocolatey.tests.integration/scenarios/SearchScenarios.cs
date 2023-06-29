@@ -23,7 +23,8 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.results;
     using NuGet.Configuration;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
+    using System.IO;
 
     public class SearchScenarios
     {
@@ -74,9 +75,9 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_only_pick_up_package_from_highest_priority()
             {
-                Results.Count.ShouldEqual(1);
-                Results[0].Name.ShouldEqual("upgradepackage");
-                Results[0].Version.ShouldEqual("1.0.0");
+                Results.Should().ContainSingle();
+                Results[0].Name.Should().Be("upgradepackage");
+                Results[0].Version.Should().Be("1.0.0");
             }
         }
 
@@ -111,11 +112,11 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_only_pick_up_package_from_highest_priority()
             {
-                Results.Count.ShouldEqual(2);
-                Results[0].Name.ShouldEqual("upgradepackage");
-                Results[0].Version.ShouldEqual("1.1.1-beta");
-                Results[1].Name.ShouldEqual("upgradepackage");
-                Results[1].Version.ShouldEqual("1.0.0");
+                Results.Should().HaveCount(2);
+                Results[0].Name.Should().Be("upgradepackage");
+                Results[0].Version.Should().Be("1.1.1-beta");
+                Results[1].Name.Should().Be("upgradepackage");
+                Results[1].Version.Should().Be("1.0.0");
             }
         }
 
@@ -151,15 +152,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_pick_up_packages_from_all_feeds_except_those_with_same_name()
             {
-                Results.Count.ShouldEqual(4);
-                Results[0].Name.ShouldEqual("conflictingdependency");
-                Results[0].Version.ShouldEqual("2.0.0");
-                Results[1].Name.ShouldEqual("hasdependency");
-                Results[1].Version.ShouldEqual("2.1.0");
-                Results[2].Name.ShouldEqual("isdependency");
-                Results[2].Version.ShouldEqual("2.1.0");
-                Results[3].Name.ShouldEqual("isexactdependency");
-                Results[3].Version.ShouldEqual("2.0.0");
+                Results.Should().HaveCount(4);
+                Results[0].Name.Should().Be("conflictingdependency");
+                Results[0].Version.Should().Be("2.0.0");
+                Results[1].Name.Should().Be("hasdependency");
+                Results[1].Version.Should().Be("2.1.0");
+                Results[2].Name.Should().Be("isdependency");
+                Results[2].Version.Should().Be("2.1.0");
+                Results[3].Name.Should().Be("isexactdependency");
+                Results[3].Version.Should().Be("2.0.0");
             }
         }
 
@@ -176,34 +177,38 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_list_available_packages_only_once()
             {
-                MockLogger.ContainsMessageCount("upgradepackage").ShouldEqual(1);
+                MockLogger.ContainsMessageCount("upgradepackage").Should().Be(1);
             }
 
             [Fact]
             public void Should_contain_packages_and_versions_with_a_space_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage 1.1.0").Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_contain_packages_and_versions_with_a_pipe_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage|1.1.0").ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage|1.1.0").Should().BeFalse();
             }
 
             [Fact]
             public void Should_contain_a_summary()
             {
-                MockLogger.ContainsMessage("packages found").ShouldBeTrue();
+                MockLogger.ContainsMessage("packages found").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -224,28 +229,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_packages_and_versions_with_a_space_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage 1.1.0").Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_contain_packages_that_do_not_match()
             {
-                MockLogger.ContainsMessage("installpackage").ShouldBeFalse();
+                MockLogger.ContainsMessage("installpackage").Should().BeFalse();
             }
 
             [Fact]
             public void Should_contain_a_summary()
             {
-                MockLogger.ContainsMessage("packages found").ShouldBeTrue();
+                MockLogger.ContainsMessage("packages found").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -266,35 +275,39 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_list_available_packages_as_many_times_as_they_show_on_the_feed()
             {
-                MockLogger.ContainsMessageCount("upgradepackage").ShouldNotEqual(0);
-                MockLogger.ContainsMessageCount("upgradepackage").ShouldNotEqual(1);
+                MockLogger.ContainsMessageCount("upgradepackage").Should().NotBe(0);
+                MockLogger.ContainsMessageCount("upgradepackage").Should().NotBe(1);
             }
 
             [Fact]
             public void Should_contain_packages_and_versions_with_a_space_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage 1.1.0").Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_contain_packages_and_versions_with_a_pipe_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage|1.1.0").ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage|1.1.0").Should().BeFalse();
             }
 
             [Fact]
             public void Should_contain_a_summary()
             {
-                MockLogger.ContainsMessage("packages found").ShouldBeTrue();
+                MockLogger.ContainsMessage("packages found").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -315,46 +328,50 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_packages_and_versions_with_a_space_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("upgradepackage 1.1.0").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_description()
             {
-                MockLogger.ContainsMessage("Description: ").ShouldBeTrue();
+                MockLogger.ContainsMessage("Description: ").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_tags()
             {
-                MockLogger.ContainsMessage("Tags: ").ShouldBeTrue();
+                MockLogger.ContainsMessage("Tags: ").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_download_counts()
             {
-                MockLogger.ContainsMessage("Number of Downloads: ").ShouldBeTrue();
+                MockLogger.ContainsMessage("Number of Downloads: ").Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_contain_packages_and_versions_with_a_pipe_between_them()
             {
-                MockLogger.ContainsMessage("upgradepackage|1.1.0").ShouldBeFalse();
+                MockLogger.ContainsMessage("upgradepackage|1.1.0").Should().BeFalse();
             }
 
             [Fact]
             public void Should_contain_a_summary()
             {
-                MockLogger.ContainsMessage("packages found").ShouldBeTrue();
+                MockLogger.ContainsMessage("packages found").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -375,13 +392,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_no_sources_enabled_result()
             {
-                MockLogger.ContainsMessage("Unable to search for packages when there are no sources enabled for", LogLevel.Error).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Unable to search for packages when there are no sources enabled for"));
             }
 
             [Fact]
             public void Should_not_list_any_packages()
             {
-                Results.Count().ShouldEqual(0);
+                Results.Should().BeEmpty();
             }
         }
 
@@ -413,34 +431,38 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_find_exactly_one_result()
             {
-                Results.Count.ShouldEqual(1);
+                Results.Should().ContainSingle();
             }
 
             [Fact]
             public void Should_contain_packages_and_versions_with_a_space_between_them()
             {
-                MockLogger.ContainsMessage("exactpackage 1.0.0").ShouldBeTrue();
+                MockLogger.ContainsMessage("exactpackage 1.0.0").Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_contain_packages_that_do_not_match()
             {
-                MockLogger.ContainsMessage("exactpackage.dontfind").ShouldBeFalse();
+                MockLogger.ContainsMessage("exactpackage.dontfind").Should().BeFalse();
             }
 
             [Fact]
             public void Should_contain_a_summary()
             {
-                MockLogger.ContainsMessage("packages found").ShouldBeTrue();
+                MockLogger.ContainsMessage("packages found").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -474,28 +496,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_have_any_results()
             {
-                Results.Count.ShouldEqual(0);
+                Results.Should().BeEmpty();
             }
 
             [Fact]
             public void Should_not_contain_packages_that_do_not_match()
             {
-                MockLogger.ContainsMessage("exactpackage.dontfind").ShouldBeFalse();
+                MockLogger.ContainsMessage("exactpackage.dontfind").Should().BeFalse();
             }
 
             [Fact]
             public void Should_contain_a_summary()
             {
-                MockLogger.ContainsMessage("packages found").ShouldBeTrue();
+                MockLogger.ContainsMessage("packages found").Should().BeTrue();
             }
 
             [Fact]
             public void Should_contain_debugging_messages()
             {
-                MockLogger.ContainsMessage("Searching for package information", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Running list with the following filter", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("Start of List", LogLevel.Debug).ShouldBeTrue();
-                MockLogger.ContainsMessage("End of List", LogLevel.Debug).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Searching for package information"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Running list with the following filter"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Start of List"));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("End of List"));
             }
         }
 
@@ -528,21 +554,71 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_find_two_results()
             {
-                Results.Count.ShouldEqual(2);
+                Results.Should().HaveCount(2);
             }
 
             [Fact]
             public void Should_find_only_packages_with_exact_id()
             {
-                Results[0].PackageMetadata.Id.ShouldEqual("exactpackage");
-                Results[1].PackageMetadata.Id.ShouldEqual("exactpackage");
+                Results[0].PackageMetadata.Id.Should().Be("exactpackage");
+                Results[1].PackageMetadata.Id.Should().Be("exactpackage");
             }
 
             [Fact]
             public void Should_find_all_non_prerelease_versions_in_descending_order()
             {
-                Results[0].PackageMetadata.Version.ToNormalizedString().ShouldEqual("1.0.0");
-                Results[1].PackageMetadata.Version.ToNormalizedString().ShouldEqual("0.9.0");
+                Results[0].PackageMetadata.Version.ToNormalizedString().Should().Be("1.0.0");
+                Results[1].PackageMetadata.Version.ToNormalizedString().Should().Be("0.9.0");
+            }
+        }
+
+        public class WhenSearchingForAPackageWithPageSizeAndMultipleSources : ScenariosBase
+        {
+            public override void Context()
+            {
+                Configuration = Scenario.search();
+                Scenario.reset(Configuration);
+                Scenario.add_packages_to_source_location(Configuration, "upgradepackage*" + NuGetConstants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
+                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                var secondSource = Path.Combine(Scenario.get_top_level(), "infrastructure");
+                Configuration.Sources = Configuration.Sources + ";" + secondSource;
+                Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
+
+                Configuration.ListCommand.PageSize = 2;
+                Configuration.ListCommand.ExplicitPageSize = true;
+                Configuration.Input = Configuration.PackageNames = string.Empty;
+            }
+
+            public override void Because()
+            {
+                MockLogger.Reset();
+                Results = Service.List(Configuration).ToList();
+            }
+
+            [Fact]
+            public void ShouldOutputWarningAboutThresholdBeingReached()
+            {
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Warn.ToString())
+                    .WhoseValue.Should().ContainSingle(m => m == "The threshold of 2 packages per source has been met. Please refine your search, or specify a page to find any more results.");
+            }
+
+            [Fact]
+            public void ShouldListExpectedPackagesFoundOnSource()
+            {
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Info.ToString())
+                    .WhoseValue.Should()
+                        .ContainInOrder(
+                            "installpackage 1.0.0",
+                            "isexactversiondependency 2.0.0")
+                        .And.NotContain(new[]
+                        {
+                            "installpackage 0.9.9",
+                            "isexactversiondependency 1.0.0",
+                            "upgradepackage 1.1.0",
+                        });
             }
         }
 
@@ -576,23 +652,23 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_find_three_results()
             {
-                Results.Count.ShouldEqual(3);
+                Results.Should().HaveCount(3);
             }
 
             [Fact]
             public void Should_find_only_packages_with_exact_id()
             {
-                Results[0].PackageMetadata.Id.ShouldEqual("exactpackage");
-                Results[1].PackageMetadata.Id.ShouldEqual("exactpackage");
-                Results[2].PackageMetadata.Id.ShouldEqual("exactpackage");
+                Results[0].PackageMetadata.Id.Should().Be("exactpackage");
+                Results[1].PackageMetadata.Id.Should().Be("exactpackage");
+                Results[2].PackageMetadata.Id.Should().Be("exactpackage");
             }
 
             [Fact]
             public void Should_find_all_versions_in_descending_order()
             {
-                Results[0].PackageMetadata.Version.ToNormalizedString().ShouldEqual("1.0.0");
-                Results[1].PackageMetadata.Version.ToNormalizedString().ShouldEqual("1.0.0-beta1");
-                Results[2].PackageMetadata.Version.ToNormalizedString().ShouldEqual("0.9.0");
+                Results[0].PackageMetadata.Version.ToNormalizedString().Should().Be("1.0.0");
+                Results[1].PackageMetadata.Version.ToNormalizedString().Should().Be("1.0.0-beta1");
+                Results[2].PackageMetadata.Version.ToNormalizedString().Should().Be("0.9.0");
             }
         }
     }

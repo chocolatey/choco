@@ -221,46 +221,11 @@ Describe "Proxy configuration (<Name>)" -Tag Proxy, ProxySkip -ForEach $TestCase
                     continue
                 }
 
-                $ConfigurationsToTest.System {
-                    $Output.String | Should -MatchExactly "Proxy\.Location='$SystemSet'"
-                    continue
-                }
-
                 default {
                     $Output.String | Should -Not -Match "Proxy\.Location"
                     $Output.String | Should -Not -Match "Proxy\.BypassList"
                 }
             }
-        }
-    }
-}
-
-Describe "Multi-Protocol Proxy configuration" -Tag Proxy, ProxySkip -Skip:(-not $env:TEST_KITCHEN) {
-    BeforeAll {
-        Initialize-ChocolateyTestInstall
-        New-ChocolateyInstallSnapshot
-        $arguments = $null
-
-        $SystemSet = "SystemSetProxy"
-        Set-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -Name ProxyServer -Value "ftp=something;socks=another"
-        Set-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -Name ProxyEnable -Value 1
-    }
-
-    AfterAll {
-        Remove-ChocolateyTestInstall
-        Remove-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -Name ProxyServer -ErrorAction Ignore
-        Remove-ItemProperty -Path 'HKCU:/Software/Microsoft/Windows/CurrentVersion/Internet Settings' -Name ProxyEnable -ErrorAction Ignore
-        $env:https_proxy = $null
-    }
-
-    Context "Configured for command (<Command>)" -ForEach $CommandsToTest {
-        BeforeAll {
-            $Output = Invoke-Choco $Command @arguments @ExtraArguments --debug --verbose --noop
-        }
-
-        It "Should output the correct Proxy setting" {
-            $Output.String | Should -Not -MatchExactly "Proxy\.Location='$SystemSet'"
-            $Output.String | Should -Not -MatchExactly "Proxy\.Location"
         }
     }
 }

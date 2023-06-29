@@ -22,7 +22,7 @@ namespace chocolatey.tests.infrastructure.commands
     using chocolatey.infrastructure.filesystem;
     using Moq;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class PowershellExecutorSpecs
     {
@@ -55,19 +55,19 @@ namespace chocolatey.tests.infrastructure.commands
             [Fact]
             public void Should_not_return_null()
             {
-                result.ShouldNotBeNull();
+                result.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_find_powershell()
             {
-                result.ShouldNotBeEmpty();
+                result.Should().NotBeEmpty();
             }
 
             [Fact]
             public void Should_return_the_sysnative_path()
             {
-                result.ShouldEqual(expected);
+                result.Should().Be(expected);
             }
         }
 
@@ -92,7 +92,7 @@ namespace chocolatey.tests.infrastructure.commands
             [Fact]
             public void Should_return_system32_path()
             {
-                result.ShouldEqual(expected);
+                result.Should().Be(expected);
             }
         }
 

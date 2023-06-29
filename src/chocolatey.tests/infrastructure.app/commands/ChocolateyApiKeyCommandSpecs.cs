@@ -26,7 +26,7 @@ namespace chocolatey.tests.infrastructure.app.commands
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.commandline;
     using Moq;
-    using Should;
+    using FluentAssertions;
 
     public class ChocolateyApiKeyCommandSpecs
     {
@@ -56,13 +56,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_implement_apikey()
             {
-                results.ShouldContain("apikey");
+                results.Should().Contain("apikey");
             }
 
             [Fact]
             public void Should_implement_setapikey()
             {
-                results.ShouldContain("setapikey");
+                results.Should().Contain("setapikey");
             }
         }
 
@@ -84,31 +84,31 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_clear_previously_set_Source()
             {
-                configuration.Sources.ShouldBeNull();
+                configuration.Sources.Should().BeNull();
             }
 
             [Fact]
             public void Should_add_source_to_the_option_set()
             {
-                optionSet.Contains("source").ShouldBeTrue();
+                optionSet.Contains("source").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_source_to_the_option_set()
             {
-                optionSet.Contains("s").ShouldBeTrue();
+                optionSet.Contains("s").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_apikey_to_the_option_set()
             {
-                optionSet.Contains("apikey").ShouldBeTrue();
+                optionSet.Contains("apikey").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_apikey_to_the_option_set()
             {
-                optionSet.Contains("k").ShouldBeTrue();
+                optionSet.Contains("k").Should().BeTrue();
             }
         }
 
@@ -136,9 +136,9 @@ namespace chocolatey.tests.infrastructure.app.commands
                     error = ex;
                 }
 
-                errored.ShouldBeTrue();
-                error.ShouldNotBeNull();
-                error.ShouldBeType<ApplicationException>();
+                errored.Should().BeTrue();
+                error.Should().NotBeNull();
+                error.Should().BeOfType<ApplicationException>();
             }
 
             [Fact]
@@ -175,9 +175,9 @@ namespace chocolatey.tests.infrastructure.app.commands
                     error = ex;
                 }
 
-                errored.ShouldBeTrue();
-                error.ShouldNotBeNull();
-                error.ShouldBeType<ApplicationException>();
+                errored.Should().BeTrue();
+                error.Should().NotBeNull();
+                error.Should().BeOfType<ApplicationException>();
             }
 
             [Fact]

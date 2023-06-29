@@ -28,7 +28,7 @@ namespace chocolatey.tests.integration.scenarios
     using chocolatey.infrastructure.results;
     using NuGet.Configuration;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
     using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
     public class UninstallScenarios
@@ -83,13 +83,8 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_it_would_have_uninstalled_a_package()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("Would have uninstalled installpackage v1.0.0")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Would have uninstalled installpackage v1.0.0"));
             }
 
             [Fact]
@@ -97,7 +92,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_contain_a_message_that_it_would_have_run_a_powershell_script()
             {
-                MockLogger.ContainsMessage("chocolateyuninstall.ps1").ShouldBeTrue();
+                MockLogger.ContainsMessage("chocolateyuninstall.ps1").Should().BeTrue();
             }
 
             [Fact]
@@ -105,7 +100,7 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_contain_a_message_that_it_would_have_run_powershell_modification_script()
             {
-                MockLogger.ContainsMessage("chocolateyBeforeModify.ps1").ShouldBeTrue();
+                MockLogger.ContainsMessage("chocolateyBeforeModify.ps1").Should().BeTrue();
             }
         }
 
@@ -126,13 +121,8 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_it_was_unable_to_find_package()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).OrEmpty())
-                {
-                    if (message.Contains("somethingnonexisting is not installed. Cannot uninstall a non-existent package")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("somethingnonexisting is not installed. Cannot uninstall a non-existent package"));
             }
         }
 
@@ -193,37 +183,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
@@ -231,7 +216,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script()
             {
-                MockLogger.ContainsMessage("installpackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage 1.0.0 Before Modification"));
             }
 
             [Fact]
@@ -239,7 +225,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyUninstall_script()
             {
-                MockLogger.ContainsMessage("installpackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage 1.0.0 Uninstalled"));
             }
         }
 
@@ -294,37 +281,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
         }
 
@@ -346,7 +328,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Action m = () => Service.Uninstall(Configuration);
 
-                m.ShouldThrow<ApplicationException>();
+                m.Should().Throw<ApplicationException>();
             }
         }
 
@@ -389,31 +371,26 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_it_uninstalled_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("uninstalled 1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("uninstalled 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
         }
 
@@ -476,31 +453,26 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_it_uninstalled_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("uninstalled 1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("uninstalled 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
         }
 
@@ -567,47 +539,33 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_about_not_all_files_are_removed()
             {
-                bool expectedMessage = false;
-
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).OrEmpty())
-                {
-                    if (message.Contains("Unable to delete all existing package files. There will be leftover files requiring manual cleanup"))
-                    {
-                        expectedMessage = true;
-                    }
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Unable to delete all existing package files. There will be leftover files requiring manual cleanup"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_it_was_not_able_to_uninstall()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("uninstalled 0/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("uninstalled 0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeFalse();
+                _packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
         }
 
@@ -643,7 +601,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 foreach (var file in files.OrEmpty())
                 {
-                    Path.GetFileName(file).ShouldEqual("dude.txt", "Expected files were not deleted.");
+                    Path.GetFileName(file).Should().Be("dude.txt", "Expected files were not deleted.");
                 }
             }
 
@@ -678,37 +636,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
         }
 
@@ -744,7 +697,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 foreach (var file in files.OrEmpty())
                 {
-                    Path.GetFileName(file).ShouldEqual("chocolateyInstall.ps1", "Expected files were not deleted.");
+                    Path.GetFileName(file).Should().Be("chocolateyInstall.ps1", "Expected files were not deleted.");
                 }
             }
 
@@ -779,37 +732,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
         }
 
@@ -888,37 +836,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
         }
 
@@ -941,58 +884,39 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_it_was_unable_to_find_package()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).OrEmpty())
-                {
-                    if (message.Contains("somethingnonexisting is not installed. Cannot uninstall a non-existent package")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("somethingnonexisting is not installed. Cannot uninstall a non-existent package"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                packageResult.Messages.Should().Contain(m => m.MessageType == ResultType.Error);
             }
         }
 
@@ -1048,61 +972,41 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_was_unable_to_install_a_package()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeFalse();
+                packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                packageResult.Messages.Should().Contain(m => m.MessageType == ResultType.Error);
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        if (message.Message.Contains("chocolateyUninstall.ps1")) errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("chocolateyUninstall.ps1")));
             }
         }
 
@@ -1144,37 +1048,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
@@ -1250,37 +1149,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
@@ -1288,7 +1182,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script()
             {
-                MockLogger.ContainsMessage("installpackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage 1.0.0 Before Modification"));
             }
 
             [Fact]
@@ -1296,7 +1191,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyUninstall_script()
             {
-                MockLogger.ContainsMessage("installpackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage 1.0.0 Uninstalled"));
             }
 
             [Fact]
@@ -1304,7 +1200,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_all_hook_script()
             {
-                MockLogger.ContainsMessage("pre-uninstall-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-uninstall-all.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -1312,7 +1209,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_all_hook_script()
             {
-                MockLogger.ContainsMessage("post-uninstall-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("post-uninstall-all.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -1320,7 +1218,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_installpackage_hook_script()
             {
-                MockLogger.ContainsMessage("pre-uninstall-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-uninstall-installpackage.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -1328,7 +1227,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_installpackage_hook_script()
             {
-                MockLogger.ContainsMessage("post-uninstall-installpackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("post-uninstall-installpackage.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -1336,7 +1236,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_upgradepackage_hook_script()
             {
-                MockLogger.ContainsMessage("pre-uninstall-upgradepackage.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("pre-uninstall-upgradepackage.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -1344,7 +1245,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_beforemodify_hook_script()
             {
-                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for installpackage 1.0.0"));
             }
 
             [Fact]
@@ -1352,7 +1254,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_beforemodify_hook_script()
             {
-                MockLogger.ContainsMessage("post-beforemodify-all.ps1 hook ran for installpackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("post-beforemodify-all.ps1 hook ran for installpackage 1.0.0"));
             }
         }
 
@@ -1394,37 +1297,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
@@ -1432,7 +1330,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script()
             {
-                MockLogger.ContainsMessage("UpperCase 1.1.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("UpperCase 1.1.0 Before Modification"));
             }
 
             [Fact]
@@ -1440,7 +1339,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyUninstall_script()
             {
-                MockLogger.ContainsMessage("UpperCase 1.1.0 Uninstalled", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("UpperCase 1.1.0 Uninstalled"));
             }
         }
 
@@ -1449,6 +1349,7 @@ namespace chocolatey.tests.integration.scenarios
             private PackageResult packageResult;
 
             private string NonNormalizedVersion = "0004.0004.00005.00";
+            private string NormalizedVersion = "4.4.5";
 
             public override void Context()
             {
@@ -1512,37 +1413,32 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_uninstalled_successfully()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("1/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                packageResult.Success.ShouldBeTrue();
+                packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                packageResult.Inconclusive.ShouldBeFalse();
+                packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                packageResult.Warning.ShouldBeFalse();
+                packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
@@ -1550,7 +1446,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script()
             {
-                MockLogger.ContainsMessage("upgradepackage {0} Before Modification".FormatWith(NonNormalizedVersion), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage {0} Before Modification".FormatWith(NormalizedVersion)));
             }
 
             [Fact]
@@ -1558,7 +1455,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyUninstall_script()
             {
-                MockLogger.ContainsMessage("upgradepackage {0} Uninstalled".FormatWith(NonNormalizedVersion), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage {0} Uninstalled".FormatWith(NormalizedVersion)));
             }
         }
 
@@ -1589,20 +1487,21 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_uninstall_the_package()
             {
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", TargetPackageName, "{0}.nupkg".FormatWith(TargetPackageName));
-                File.Exists(packageFile).ShouldBeFalse();
+                FileAssert.DoesNotExist(packageFile);
             }
 
             [Fact]
             public void Should_uninstall_the_dependency()
             {
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", DependencyName, "{0}.nupkg".FormatWith(DependencyName));
-                File.Exists(packageFile).ShouldBeFalse();
+                FileAssert.DoesNotExist(packageFile);
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_uninstalled_successfully()
             {
-                MockLogger.ContainsMessage("uninstalled 2/2", LogLevel.Warn).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("uninstalled 2/2"));
             }
 
             [Fact]
@@ -1610,7 +1509,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_target_package_beforeModify()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(TargetPackageName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Ran BeforeModify: {0} {1}".FormatWith(TargetPackageName, "1.0.0")));
             }
 
             [Fact]
@@ -1618,34 +1518,26 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_dependency_package_beforeModify()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "1.0.0")));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
 
             }
         }

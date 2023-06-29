@@ -89,7 +89,6 @@ namespace chocolatey.infrastructure.app.builders
             SetGlobalOptions(args, config, container);
             SetEnvironmentOptions(config);
             EnvironmentSettings.SetEnvironmentVariables(config);
-            SetProxyOptions(config, container);
             // must be done last for overrides
             SetLicensedOptions(config, license, configFileSettings);
             // save all changes if there are any
@@ -218,6 +217,15 @@ namespace chocolatey.infrastructure.app.builders
 
         private static void SetAllConfigItems(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
+            config.CacheLocation = Environment.ExpandEnvironmentVariables(
+                SetConfigItem(
+                    ApplicationParameters.ConfigSettings.CacheLocation,
+                    configFileSettings,
+                    string.Empty,
+                    "Cache location if not TEMP folder. Replaces `$env:TEMP` value for choco.exe process. It is highly recommended this be set to make Chocolatey more deterministic in cleanup."
+                    )
+                );
+
             if (string.IsNullOrWhiteSpace(config.CacheLocation))
             {
                 config.CacheLocation = fileSystem.GetTempPath(); // System.Environment.GetEnvironmentVariable("TEMP");
@@ -234,10 +242,12 @@ namespace chocolatey.infrastructure.app.builders
             if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "temp");
 
             var commandExecutionTimeoutSeconds = 0;
-            var commandExecutionTimeout = configFileSettings.ConfigSettings
-                .Where(f => f.Key.IsEqualTo(ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds))
-                .Select(c => c.Value)
-                .FirstOrDefault();
+            var commandExecutionTimeout = SetConfigItem(
+                ApplicationParameters.ConfigSettings.CommandExecutionTimeoutSeconds,
+                configFileSettings,
+                ApplicationParameters.DefaultWaitForExitInSeconds.ToStringSafe(),
+                "Default timeout for command execution. '0' for infinite."
+            );
 
             int.TryParse(commandExecutionTimeout, out commandExecutionTimeoutSeconds);
             config.CommandExecutionTimeoutSeconds = commandExecutionTimeoutSeconds;
@@ -442,6 +452,15 @@ namespace chocolatey.infrastructure.app.builders
                         .Add("skipcompatibilitychecks|skip-compatibility-checks",
                             "SkipCompatibilityChecks - Prevent warnings being shown before and after command execution when a runtime compatibility problem is found between the version of Chocolatey and the Chocolatey Licensed Extension. Available in 1.1.0+",
                             option => config.DisableCompatibilityChecks = option != null)
+                        .Add("ignore-http-cache",
+                            "IgnoreHttpCache - Ignore any HTTP caches that have previously been created when querying sources, and create new caches. Available in 2.1.0+",
+                            option =>
+                            {
+                                if (option != null)
+                                {
+                                    config.CacheExpirationInMinutes = -1;
+                                }
+                            });
                         ;
                 },
                 (unparsedArgs) =>
@@ -462,53 +481,6 @@ namespace chocolatey.infrastructure.app.builders
                 {
                     ChocolateyHelpCommand.DisplayHelpMessage(container);
                 });
-        }
-
-        private static void SetProxyOptions(ChocolateyConfiguration config, Container container)
-        {
-            // Evaluation order of Proxy settings: System Set -> Environment Variable Set -> Chocolatey Configuration File Set -> CLI Passed in Argument
-            var proxyAlreadySet = !string.IsNullOrWhiteSpace(config.Proxy.Location);
-            var onWindows = Platform.GetPlatform() == PlatformType.Windows;
-
-            // Only Windows has a registry provider, if it's already set, or we're not on Windows we don't need to continue.
-            if (proxyAlreadySet || !onWindows)
-            {
-                return;
-            }
-
-            // We don't yet have a Proxy Location, check if the system has one configured in the registry
-            var registryService = container.GetInstance<IRegistryService>();
-            var internetSettingsRegKey = registryService.GetKey(RegistryHive.CurrentUser, "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Internet Settings");
-
-            if (!internetSettingsRegKey.GetValue("ProxyEnable").ToStringSafe().IsEqualTo("1"))
-            {
-                return;
-            }
-
-            var proxySetting = internetSettingsRegKey.GetValue("ProxyServer").ToStringSafe();
-
-            if (string.IsNullOrWhiteSpace(proxySetting))
-            {
-                return;
-            }
-
-            if (proxySetting.IndexOf(';') != -1)
-            {
-                var allProxies = proxySetting.Split(';');
-                proxySetting = allProxies.FirstOrDefault(s => s.TrimSafe().StartsWith("https="));
-
-                if (string.IsNullOrWhiteSpace(proxySetting))
-                {
-                    proxySetting = allProxies.FirstOrDefault(s => s.TrimSafe().StartsWith("http="));
-                }
-            }
-
-            if (proxySetting?.IndexOf('=') != -1 && !proxySetting.StartsWith("http"))
-            {
-                return;
-            }
-
-            config.Proxy.Location = proxySetting.Split('=').LastOrDefault();
         }
 
         private static void SetEnvironmentOptions(ChocolateyConfiguration config)
@@ -550,6 +522,7 @@ namespace chocolatey.infrastructure.app.builders
         private static void SetLicensedOptions(ChocolateyConfiguration config, ChocolateyLicense license, ConfigFileSettings configFileSettings)
         {
             config.Information.IsLicensedVersion = license.IsLicensedVersion();
+            config.Information.IsLicensedAssemblyLoaded = license.AssemblyLoaded;
             config.Information.LicenseType = license.LicenseType.DescriptionOrValue();
 
             if (license.AssemblyLoaded)

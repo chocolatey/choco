@@ -2,7 +2,7 @@
 {
     using chocolatey.infrastructure.app.utility;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
 
     public class ArgumentsUtilitySpecs
     {
@@ -55,7 +55,7 @@
             [Fact]
             public void Should_return_expected_result()
             {
-                _result.ShouldEqual(_expectedResult);
+                _result.Should().Be(_expectedResult);
             }
         }
     }

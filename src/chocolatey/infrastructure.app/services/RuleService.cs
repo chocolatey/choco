@@ -104,11 +104,26 @@ namespace chocolatey.infrastructure.app.services
         {
             public bool Equals(ImmutableRule x, ImmutableRule y)
             {
-                return ReferenceEquals(x, y) || x.Id.IsEqualTo(x.Id);
+                // When the id is empty on both classes, we need to compare
+                // using the summary to detect if the rules are unique or not.
+                if (string.IsNullOrEmpty(x.Id) && string.IsNullOrEmpty(y.Id))
+                {
+                    return x.Summary.IsEqualTo(y.Summary);
+                }
+
+                return x.Id.IsEqualTo(y.Id);
             }
 
             public int GetHashCode(ImmutableRule obj)
             {
+                // When the id is empty, we need to compare
+                // using the summary to detect if the rules are unique or not.
+
+                if (string.IsNullOrEmpty(obj.Id))
+                {
+                    return obj.Summary?.GetHashCode() ?? 0;
+                }
+
                 return obj.Id.GetHashCode();
             }
         }

@@ -168,7 +168,7 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public virtual void HelpMessage(ChocolateyConfiguration configuration)
+        public override void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Uninstall Command");
             this.Log().Info(@"

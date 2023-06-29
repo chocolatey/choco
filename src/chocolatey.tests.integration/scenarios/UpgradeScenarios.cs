@@ -32,7 +32,7 @@ namespace chocolatey.tests.integration.scenarios
     using NuGet.Configuration;
     using NuGet.Packaging;
     using NUnit.Framework;
-    using Should;
+    using FluentAssertions;
     using static chocolatey.tests.integration.scenarios.InstallScenarios;
 
     public class UpgradeScenarios
@@ -80,31 +80,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.0.0");
+                File.ReadAllText(shimFile).Should().Be("1.0.0");
             }
 
             [Fact]
             public void Should_contain_a_message_that_a_new_version_is_available()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source(s)")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source(s)"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_a_package_can_be_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("can upgrade 1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("can upgrade 1/1"));
             }
 
             [Fact]
@@ -133,25 +123,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_you_have_the_latest_version_available()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("installpackage v1.0.0 is the latest version available based on your source(s)")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage v1.0.0 is the latest version available based on your source(s)"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_no_packages_can_be_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("can upgrade 0/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("can upgrade 0/1"));
             }
 
             [Fact]
@@ -180,25 +160,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_the_package_was_not_found()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).OrEmpty())
-                {
-                    if (message.Contains("nonexistentpackage not installed. The package was not found with the source(s) listed")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("nonexistentpackage not installed. The package was not found with the source(s) listed"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_no_packages_can_be_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("can upgrade 0/0")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("can upgrade 0/0"));
             }
         }
 
@@ -239,7 +209,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.0");
+                File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
 
             [Fact]
@@ -248,44 +218,34 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -294,19 +254,19 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
 
             [Fact]
@@ -314,7 +274,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.0.0 Before Modification"));
             }
 
             [Fact]
@@ -324,20 +285,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
-                    .Any(p => p.EndsWith("upgradepackage 1.1.0 Installed"))
-                    .ShouldBeTrue();
+                    .Should().Contain(p => p.EndsWith("upgradepackage 1.1.0 Installed"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.0.0 Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.0 Before Modification", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.0 Before Modification"));
             }
 
             [Fact]
@@ -345,7 +307,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.0 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.1.0 Installed"));
             }
         }
 
@@ -372,25 +335,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_you_have_the_latest_version_available()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("upgradepackage v1.0.0 is the latest version available based on your source(s)")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage v1.0.0 is the latest version available based on your source(s)"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_no_packages_were_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 0/1 ")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 0/1 "));
             }
 
             [Fact]
@@ -416,32 +369,32 @@ namespace chocolatey.tests.integration.scenarios
 
                 using (var reader = new PackageFolderReader(packageFolder))
                 {
-                    reader.NuspecReader.GetVersion().ToNormalizedString().ShouldEqual("1.0.0");
+                    reader.NuspecReader.GetVersion().ToNormalizedString().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeTrue();
+                _packageResult.Inconclusive.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_match_the_original_package_version()
             {
-                _packageResult.Version.ShouldEqual("1.0.0");
+                _packageResult.Version.Should().Be("1.0.0");
             }
         }
 
@@ -464,25 +417,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_you_have_the_latest_version_available()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("upgradepackage v1.1.0 is the latest version available based on your source(s)")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage v1.1.0 is the latest version available based on your source(s)"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_no_packages_were_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 0/1 ")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 0/1 "));
             }
 
             [Fact]
@@ -507,32 +450,32 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeTrue();
+                _packageResult.Inconclusive.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_match_the_original_package_version()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
         }
 
@@ -579,7 +522,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.1-beta2");
+                File.ReadAllText(shimFile).Should().Be("1.1.1-beta2");
             }
 
             [Fact]
@@ -589,46 +532,36 @@ namespace chocolatey.tests.integration.scenarios
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
-                    version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
-                    version.OriginalVersion.ToStringSafe().ShouldEqual("1.1.1-beta2");
-                    version.ToString().ShouldEqual("1.1.1-beta2");
+                    version.Version.ToStringSafe().Should().Be("1.1.1.0");
+                    version.OriginalVersion.ToStringSafe().Should().Be("1.1.1-beta2");
+                    version.ToString().Should().Be("1.1.1-beta2");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.1-beta2 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.1-beta2 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -637,19 +570,19 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_the_new_beta()
             {
-                _packageResult.Version.ShouldEqual("1.1.1-beta2");
+                _packageResult.Version.Should().Be("1.1.1-beta2");
             }
 
             [Fact]
@@ -657,7 +590,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.0.0 Before Modification"));
             }
 
             [Fact]
@@ -667,20 +601,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
-                    .Any(p => p.EndsWith("upgradepackage 1.1.1-beta2 Installed"))
-                    .ShouldBeTrue();
+                    .Should().Contain(p => p.EndsWith("upgradepackage 1.1.1-beta2 Installed"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.0.0 Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta2 Before Modification", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.1-beta2 Before Modification"));
             }
 
             [Fact]
@@ -688,7 +623,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta2 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.1.1-beta2 Installed"));
             }
         }
 
@@ -737,7 +673,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.1-beta.1");
+                File.ReadAllText(shimFile).Should().Be("1.1.1-beta.1");
             }
 
             [Fact]
@@ -747,46 +683,36 @@ namespace chocolatey.tests.integration.scenarios
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
-                    version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
-                    version.OriginalVersion.ToStringSafe().ShouldEqual("1.1.1-beta.1");
-                    version.ToString().ShouldEqual("1.1.1-beta.1");
+                    version.Version.ToStringSafe().Should().Be("1.1.1.0");
+                    version.OriginalVersion.ToStringSafe().Should().Be("1.1.1-beta.1");
+                    version.ToString().Should().Be("1.1.1-beta.1");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.1-beta.1 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.1-beta.1 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -795,19 +721,19 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_the_new_beta()
             {
-                _packageResult.Version.ShouldEqual("1.1.1-beta.1");
+                _packageResult.Version.Should().Be("1.1.1-beta.1");
             }
 
             [Fact]
@@ -815,7 +741,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.0.0 Before Modification"));
             }
 
             [Fact]
@@ -825,20 +752,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
-                    .Any(p => p.EndsWith("upgradepackage 1.1.1-beta.1 Installed"))
-                    .ShouldBeTrue();
+                    .Should().Contain(p => p.EndsWith("upgradepackage 1.1.1-beta.1 Installed"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.0.0 Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta.1 Before Modification", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.1-beta.1 Before Modification"));
             }
 
             [Fact]
@@ -846,7 +774,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta.1 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.1.1-beta.1 Installed"));
             }
         }
 
@@ -895,7 +824,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.1-beta2");
+                File.ReadAllText(shimFile).Should().Be("1.1.1-beta2");
             }
 
             [Fact]
@@ -906,64 +835,54 @@ namespace chocolatey.tests.integration.scenarios
                 {
                     var version = packageReader.NuspecReader.GetVersion();
 
-                    version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
-                    version.OriginalVersion.ToStringSafe().ShouldEqual("1.1.1-beta2");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta2");
+                    version.Version.ToStringSafe().Should().Be("1.1.1.0");
+                    version.OriginalVersion.ToStringSafe().Should().Be("1.1.1-beta2");
+                    version.ToNormalizedStringChecked().Should().Be("1.1.1-beta2");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.1.1-beta installed. Version 1.1.1-beta2 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.1.1-beta installed. Version 1.1.1-beta2 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_the_new_beta()
             {
-                _packageResult.Version.ShouldEqual("1.1.1-beta2");
+                _packageResult.Version.Should().Be("1.1.1-beta2");
             }
 
             [Fact]
@@ -971,7 +890,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.1.1-beta Before Modification"));
             }
 
             [Fact]
@@ -981,20 +901,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("upgradepackage 1.1.1-beta Before Modification"))
-                    .Any(p => p.EndsWith("upgradepackage 1.1.1-beta2 Installed"))
-                    .ShouldBeTrue();
+                    .Should().Contain(p => p.EndsWith("upgradepackage 1.1.1-beta2 Installed"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.1-beta Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta2 Before Modification", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.1-beta2 Before Modification"));
             }
 
             [Fact]
@@ -1002,7 +923,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta2 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.1.1-beta2 Installed"));
             }
         }
 
@@ -1053,7 +975,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.1-beta.1");
+                File.ReadAllText(shimFile).Should().Be("1.1.1-beta.1");
             }
 
             [Fact]
@@ -1064,64 +986,54 @@ namespace chocolatey.tests.integration.scenarios
                 {
                     var version = packageReader.NuspecReader.GetVersion();
 
-                    version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
-                    version.OriginalVersion.ToStringSafe().ShouldEqual("1.1.1-beta.1");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta.1");
+                    version.Version.ToStringSafe().Should().Be("1.1.1.0");
+                    version.OriginalVersion.ToStringSafe().Should().Be("1.1.1-beta.1");
+                    version.ToNormalizedStringChecked().Should().Be("1.1.1-beta.1");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.1.1-beta installed. Version 1.1.1-beta.1 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.1.1-beta installed. Version 1.1.1-beta.1 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_the_new_beta()
             {
-                _packageResult.Version.ShouldEqual("1.1.1-beta.1");
+                _packageResult.Version.Should().Be("1.1.1-beta.1");
             }
 
             [Fact]
@@ -1129,7 +1041,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.1.1-beta Before Modification"));
             }
 
             [Fact]
@@ -1139,20 +1052,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("upgradepackage 1.1.1-beta Before Modification"))
-                    .Any(p => p.EndsWith("upgradepackage 1.1.1-beta.1 Installed"))
-                    .ShouldBeTrue();
+                    .Should().Contain(p => p.EndsWith("upgradepackage 1.1.1-beta.1 Installed"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.1-beta Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta.1 Before Modification", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.1-beta.1 Before Modification"));
             }
 
             [Fact]
@@ -1160,7 +1074,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta.1 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.1.1-beta.1 Installed"));
             }
         }
 
@@ -1210,7 +1125,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.1-beta2");
+                File.ReadAllText(shimFile).Should().Be("1.1.1-beta2");
             }
 
             [Fact]
@@ -1221,64 +1136,54 @@ namespace chocolatey.tests.integration.scenarios
                 {
                     var version = packageReader.NuspecReader.GetVersion();
 
-                    version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
-                    version.OriginalVersion.ToStringSafe().ShouldEqual("1.1.1-beta2");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta2");
+                    version.Version.ToStringSafe().Should().Be("1.1.1.0");
+                    version.OriginalVersion.ToStringSafe().Should().Be("1.1.1-beta2");
+                    version.ToNormalizedStringChecked().Should().Be("1.1.1-beta2");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.1.1-beta.1 installed. Version 1.1.1-beta2 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.1.1-beta.1 installed. Version 1.1.1-beta2 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_the_new_beta()
             {
-                _packageResult.Version.ShouldEqual("1.1.1-beta2");
+                _packageResult.Version.Should().Be("1.1.1-beta2");
             }
 
             [Fact]
@@ -1286,7 +1191,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta.1 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.1.1-beta.1 Before Modification"));
             }
 
             [Fact]
@@ -1296,20 +1202,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("upgradepackage 1.1.1-beta.1 Before Modification"))
-                    .Any(p => p.EndsWith("upgradepackage 1.1.1-beta2 Installed"))
-                    .ShouldBeTrue();
+                    .Should().Contain(p => p.EndsWith("upgradepackage 1.1.1-beta2 Installed"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta.1 Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.1-beta.1 Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta2 Before Modification", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.1-beta2 Before Modification"));
             }
 
             [Fact]
@@ -1317,7 +1224,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.1-beta2 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.1.1-beta2 Installed"));
             }
         }
 
@@ -1343,25 +1251,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_you_have_the_latest_version_available()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("upgradepackage v1.1.1-beta is newer")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage v1.1.1-beta is newer"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_no_packages_were_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 0/1 ")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 0/1 "));
             }
 
             [Fact]
@@ -1387,34 +1285,34 @@ namespace chocolatey.tests.integration.scenarios
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
-                    version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
-                    version.OriginalVersion.ShouldEqual("1.1.1-beta");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta");
+                    version.Version.ToStringSafe().Should().Be("1.1.1.0");
+                    version.OriginalVersion.Should().Be("1.1.1-beta");
+                    version.ToNormalizedStringChecked().Should().Be("1.1.1-beta");
                 }
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeTrue();
+                _packageResult.Inconclusive.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_only_find_the_last_stable_version()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
         }
 
@@ -1441,25 +1339,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_you_have_the_latest_version_available()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("upgradepackage v1.1.1-beta is newer")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage v1.1.1-beta is newer"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_no_packages_were_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 0/1 ")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 0/1 "));
             }
 
             [Fact]
@@ -1485,34 +1373,34 @@ namespace chocolatey.tests.integration.scenarios
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
-                    version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
-                    version.OriginalVersion.ShouldEqual("1.1.1-beta");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta");
+                    version.Version.ToStringSafe().Should().Be("1.1.1.0");
+                    version.OriginalVersion.Should().Be("1.1.1-beta");
+                    version.ToNormalizedStringChecked().Should().Be("1.1.1-beta");
                 }
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeTrue();
+                _packageResult.Inconclusive.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_only_find_the_last_stable_version()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
         }
 
@@ -1552,7 +1440,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
@@ -1569,43 +1457,33 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.0");
+                File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -1614,19 +1492,19 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
         }
 
@@ -1649,25 +1527,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_you_have_the_latest_version_available()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("installpackage v1.0.0 is the latest version available based on your source(s)")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage v1.0.0 is the latest version available based on your source(s)"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_no_packages_were_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 0/1 ")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 0/1 "));
             }
 
             [Fact]
@@ -1692,32 +1560,32 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeTrue();
+                _packageResult.Inconclusive.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_match_the_existing_version_of_one_dot_zero_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.0.0");
+                _packageResult.Version.Should().Be("1.0.0");
             }
         }
 
@@ -1741,25 +1609,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_that_you_have_the_latest_version_available()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Info).OrEmpty())
-                {
-                    if (message.Contains("installpackage v1.0.0 is the latest version available based on your source(s)")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("installpackage v1.0.0 is the latest version available based on your source(s)"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_the_package_was_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
@@ -1784,32 +1642,32 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_match_the_existing_version_of_one_dot_zero_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.0.0");
+                _packageResult.Version.Should().Be("1.0.0");
             }
         }
 
@@ -1831,7 +1689,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Action m = () => Service.Upgrade(Configuration);
 
-                m.ShouldThrow<ApplicationException>();
+                m.Should().Throw<ApplicationException>();
             }
         }
 
@@ -1875,7 +1733,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
@@ -1892,43 +1750,33 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.0");
+                File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -1937,7 +1785,7 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
         }
 
@@ -1989,7 +1837,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
@@ -2018,43 +1866,33 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.0");
+                File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -2063,7 +1901,7 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
         }
 
@@ -2116,7 +1954,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.0.0");
+                File.ReadAllText(shimFile).Should().Be("1.0.0");
             }
 
             [Fact]
@@ -2125,50 +1963,40 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_was_not_able_to_upgrade()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 0/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 0/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeFalse();
+                _packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
         }
 
@@ -2202,7 +2030,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.0");
+                File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
 
             [Fact]
@@ -2211,32 +2039,27 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -2245,13 +2068,13 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
         }
 
@@ -2277,7 +2100,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
-                File.ReadAllText(fileChanged).ShouldNotEqual("hellow");
+                File.ReadAllText(fileChanged).Should().NotBe("hellow");
             }
 
             [Fact]
@@ -2285,7 +2108,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.0");
+                File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
 
             [Fact]
@@ -2294,32 +2117,27 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -2328,13 +2146,13 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
         }
 
@@ -2365,73 +2183,48 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_message_the_package_was_not_found()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).OrEmpty())
-                {
-                    if (message.Contains("nonexistentpackage not installed. The package was not found with the source(s) listed")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("nonexistentpackage not installed. The package was not found with the source(s) listed"));
             }
 
             [Fact]
             public void Should_contain_a_message_that_no_packages_were_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 0/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeFalse();
+                _packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in _packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                _packageResult.Messages.Should().Contain(m => m.MessageType == ResultType.Error);
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in _packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        if (message.Message.Contains("The package was not found")) errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("The package was not found")));
             }
         }
 
@@ -2477,31 +2270,26 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
         }
 
@@ -2536,61 +2324,41 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_was_unable_to_upgrade_a_package()
             {
-                bool notInstalled = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) notInstalled = true;
-                }
-
-                notInstalled.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeFalse();
+                _packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in _packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                _packageResult.Messages.Should().Contain(m => m.MessageType == ResultType.Error);
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in _packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        if (message.Message.Contains("Cannot upgrade a non-existent package")) errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("Cannot upgrade a non-existent package")));
             }
         }
 
@@ -2626,7 +2394,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -2644,7 +2412,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames, "2.0.0", Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
                 }
             }
 
@@ -2659,61 +2427,41 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_a_warning_message_that_it_was_unable_to_upgrade_a_package()
             {
-                bool installedSuccessfully = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("0/1")) installedSuccessfully = true;
-                }
-
-                installedSuccessfully.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeFalse();
+                _packageResult.Success.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in _packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                _packageResult.Messages.Should().Contain(m => m.MessageType == ResultType.Error);
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-                foreach (var message in _packageResult.Messages)
-                {
-                    if (message.MessageType == ResultType.Error)
-                    {
-                        if (message.Message.Contains("chocolateyInstall.ps1")) errorFound = true;
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("chocolateyInstall.ps1")));
             }
         }
 
@@ -2741,7 +2489,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
                 }
             }
 
@@ -2751,7 +2499,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
                 }
             }
 
@@ -2761,47 +2509,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_upgraded_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 3/3")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 3/3"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -2829,7 +2563,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -2839,7 +2573,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -2849,85 +2583,49 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_it_was_unable_to_upgrade_anything()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 0/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 0/1"));
             }
 
             [Fact]
             public void Should_not_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                bool errorFound = false;
-
-                foreach (var packageResult in Results)
-                {
-                    foreach (var message in packageResult.Value.Messages)
-                    {
-                        if (message.MessageType == ResultType.Error)
-                        {
-                            errorFound = true;
-                        }
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m => m.MessageType == ResultType.Error));
             }
 
             [Fact]
             public void Should_have_expected_error_in_package_result()
             {
-                bool errorFound = false;
-
-                foreach (var packageResult in Results)
-                {
-                    foreach (var message in packageResult.Value.Messages)
-                    {
-                        if (message.MessageType == ResultType.Error)
-                        {
-                            if (message.Message.Contains("Unable to resolve dependency 'isexactversiondependency")) errorFound = true;
-                        }
-                    }
-                }
-
-                errorFound.ShouldBeTrue();
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains("Unable to resolve dependency 'isexactversiondependency")));
             }
         }
 
@@ -2956,7 +2654,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
                 }
             }
 
@@ -2966,7 +2664,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -2976,47 +2674,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_it_upgraded_only_the_package_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -3044,7 +2728,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
@@ -3054,7 +2738,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -3064,47 +2748,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_the_dependency_upgraded_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -3132,7 +2802,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
                 }
             }
 
@@ -3142,7 +2812,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
                 }
             }
 
@@ -3152,47 +2822,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_upgraded_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 3/3")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 3/3"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -3222,7 +2878,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
                 }
             }
 
@@ -3232,7 +2888,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
                 }
             }
 
@@ -3242,47 +2898,33 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_upgraded_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 3/3")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 3/3"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
 
@@ -3312,7 +2954,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
@@ -3322,7 +2964,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -3332,63 +2974,42 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_upgraded_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_outputted_conflicting_upgrade_message()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("One or more unresolved package dependency constraints detected in the Chocolatey lib folder")
-                        && message.Contains("hasdependency 1.0.0 constraint: isdependency (>= 1.0.0 && < 2.0.0)"))
-                    {
-                        expectedMessage = true;
-                    }
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m =>
+                        m.Contains("One or more unresolved package dependency constraints detected in the Chocolatey lib folder")
+                        && m.Contains("hasdependency 1.0.0 constraint: isdependency (>= 1.0.0 && < 2.0.0)"));
             }
         }
 
@@ -3420,7 +3041,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
@@ -3430,7 +3051,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -3440,64 +3061,43 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_upgraded_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 2/2")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 2/2"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_outputted_conflicting_upgrade_message()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("One or more unresolved package dependency constraints detected in the Chocolatey lib folder")
-                        && message.Contains("hasdependency 1.0.0 constraint: isexactversiondependency (= 1.0.0)")
-                        && message.Contains("hasdependency 1.0.0 constraint: isdependency (>= 1.0.0 && < 2.0.0)"))
-                    {
-                        expectedMessage = true;
-                    }
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m =>
+                        m.Contains("One or more unresolved package dependency constraints detected in the Chocolatey lib folder")
+                        && m.Contains("hasdependency 1.0.0 constraint: isexactversiondependency (= 1.0.0)")
+                        && m.Contains("hasdependency 1.0.0 constraint: isdependency (>= 1.0.0 && < 2.0.0)"));
             }
         }
 
@@ -3529,7 +3129,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
@@ -3539,7 +3139,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -3549,63 +3149,42 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_upgraded_successfully()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_outputted_conflicting_upgrade_message()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("One or more unresolved package dependency constraints detected in the Chocolatey lib folder")
-                        && message.Contains("hasdependency 1.0.0 constraint: isdependency (>= 1.0.0 && < 2.0.0)"))
-                    {
-                        expectedMessage = true;
-                    }
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m =>
+                        m.Contains("One or more unresolved package dependency constraints detected in the Chocolatey lib folder")
+                        && m.Contains("hasdependency 1.0.0 constraint: isdependency (>= 1.0.0 && < 2.0.0)"));
             }
         }
 
@@ -3636,7 +3215,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -3646,7 +3225,7 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
@@ -3656,59 +3235,40 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_nothing_was_upgraded()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 0/1")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 0/1"));
             }
 
             [Fact]
             public void Should_have_an_error_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
 
             [Fact]
             public void Should_have_outputted_expected_error_message()
             {
-                bool expectedMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Error).OrEmpty())
-                {
-                    if (message.Contains("Unable to resolve dependency chain. This may be caused by a parent package depending on this package, try specifying a specific version to use or don't ignore any dependencies!")) expectedMessage = true;
-                }
-
-                expectedMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Unable to resolve dependency chain. This may be caused by a parent package depending on this package, try specifying a specific version to use or don't ignore any dependencies!"));
             }
         }
 
@@ -3740,32 +3300,27 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -3774,13 +3329,13 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
 
             // any file in a nuget package will overwrite an existing file
@@ -3790,25 +3345,25 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_change_the_test_value_in_the_config_from_original_one_dot_zero_dot_zero_due_to_upgrade_and_XDT_InsertIfMissing()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='test']/@value").TypedValue.ToStringSafe().ShouldEqual("default 1.0.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='test']/@value").TypedValue.ToStringSafe().Should().Be("default 1.0.0");
             }
 
             [Fact]
             public void Should_change_the_testReplace_value_in_the_config_due_to_XDT_Replace()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='testReplace']/@value").TypedValue.ToStringSafe().ShouldEqual("1.1.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='testReplace']/@value").TypedValue.ToStringSafe().Should().Be("1.1.0");
             }
 
             [Fact]
             public void Should_not_change_the_insert_value_in_the_config_due_to_upgrade_and_XDT_InsertIfMissing()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.ToStringSafe().ShouldEqual("1.0.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.ToStringSafe().Should().Be("1.0.0");
             }
 
             [Fact]
             public void Should_add_the_insertNew_value_in_the_config_due_to_XDT_InsertIfMissing()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insertNew']/@value").TypedValue.ToStringSafe().ShouldEqual("1.1.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insertNew']/@value").TypedValue.ToStringSafe().Should().Be("1.1.0");
             }
         }
 
@@ -3843,32 +3398,27 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -3877,13 +3427,13 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
 
             // any file in a nuget package will overwrite an existing file
@@ -3893,31 +3443,31 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_change_the_test_value_in_the_config_from_original_one_dot_zero_dot_zero_due_to_upgrade_and_XDT_InsertIfMissing()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='test']/@value").TypedValue.ToStringSafe().ShouldEqual("default 1.0.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='test']/@value").TypedValue.ToStringSafe().Should().Be("default 1.0.0");
             }
 
             [Fact]
             public void Should_change_the_testReplace_value_in_the_config_due_to_XDT_Replace()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='testReplace']/@value").TypedValue.ToStringSafe().ShouldEqual("1.1.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='testReplace']/@value").TypedValue.ToStringSafe().Should().Be("1.1.0");
             }
 
             [Fact]
             public void Should_not_change_the_insert_value_in_the_config_due_to_upgrade_and_XDT_InsertIfMissing()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.ToStringSafe().ShouldEqual("1.0.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insert']/@value").TypedValue.ToStringSafe().Should().Be("1.0.0");
             }
 
             [Fact]
             public void Should_add_the_insertNew_value_in_the_config_due_to_XDT_InsertIfMissing()
             {
-                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insertNew']/@value").TypedValue.ToStringSafe().ShouldEqual("1.1.0");
+                _xPathNavigator.SelectSingleNode("//configuration/appSettings/add[@key='insertNew']/@value").TypedValue.ToStringSafe().Should().Be("1.1.0");
             }
 
             [Fact]
             public void Should_have_a_config_with_the_comment_from_the_original()
             {
-                File.ReadAllText(_xmlFilePath).ShouldContain(CommentAdded);
+                File.ReadAllText(_xmlFilePath).Should().Contain(CommentAdded);
             }
         }
 
@@ -3937,13 +3487,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_no_sources_enabled_result()
             {
-                MockLogger.ContainsMessage("Upgrading was NOT successful. There are no sources enabled for", LogLevel.Error).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Error.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Upgrading was NOT successful. There are no sources enabled for"));
             }
 
             [Fact]
             public void Should_not_have_any_packages_upgraded()
             {
-                Results.Count().ShouldEqual(0);
+                Results.Should().BeEmpty();
             }
         }
 
@@ -3963,23 +3514,23 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_report_for_all_installed_packages()
             {
-                Results.Count().ShouldEqual(3);
+                Results.Should().HaveCount(3);
             }
 
             [Fact]
             public void Should_upgrade_packages_with_upgrades()
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
-                upgradePackageResult.Count.ShouldEqual(1, "upgradepackage must be there once");
-                upgradePackageResult.First().Value.Version.ShouldEqual("1.1.0");
+                upgradePackageResult.Should().ContainSingle( "upgradepackage must be there once");
+                upgradePackageResult.First().Value.Version.Should().Be("1.1.0");
             }
 
             [Fact]
             public void Should_skip_packages_without_upgrades()
             {
                 var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
-                installPackageResult.Count.ShouldEqual(1, "installpackage must be there once");
-                installPackageResult.First().Value.Version.ShouldEqual("1.0.0");
+                installPackageResult.Should().ContainSingle( "installpackage must be there once");
+                installPackageResult.First().Value.Version.Should().Be("1.0.0");
             }
         }
 
@@ -4002,15 +3553,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_report_for_all_installed_packages()
             {
-                Results.Count().ShouldEqual(3);
+                Results.Should().HaveCount(3);
             }
 
             [Fact]
             public void Should_upgrade_packages_with_upgrades()
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
-                upgradePackageResult.Count.ShouldEqual(1, "upgradepackage must be there once");
-                upgradePackageResult.First().Value.Version.ShouldEqual("1.1.1-beta2");
+                upgradePackageResult.Should().ContainSingle( "upgradepackage must be there once");
+                upgradePackageResult.First().Value.Version.Should().Be("1.1.1-beta2");
             }
 
             [Fact]
@@ -4020,9 +3571,9 @@ namespace chocolatey.tests.integration.scenarios
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
-                    version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
-                    version.OriginalVersion.ShouldEqual("1.1.1-beta2");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta2");
+                    version.Version.ToStringSafe().Should().Be("1.1.1.0");
+                    version.OriginalVersion.Should().Be("1.1.1-beta2");
+                    version.ToNormalizedStringChecked().Should().Be("1.1.1-beta2");
                 }
             }
 
@@ -4030,8 +3581,8 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_skip_packages_without_upgrades()
             {
                 var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
-                installPackageResult.Count.ShouldEqual(1, "installpackage must be there once");
-                installPackageResult.First().Value.Version.ShouldEqual("1.0.0");
+                installPackageResult.Should().ContainSingle( "installpackage must be there once");
+                installPackageResult.First().Value.Version.Should().Be("1.0.0");
             }
         }
 
@@ -4056,16 +3607,16 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_report_for_all_installed_packages()
             {
-                Results.Count().ShouldEqual(3);
+                Results.Should().HaveCount(3);
             }
 
             [Fact]
             public void Should_upgrade_packages_with_upgrades()
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
-                upgradePackageResult.Count.ShouldEqual(1, "upgradepackage must be there once");
+                upgradePackageResult.Should().ContainSingle( "upgradepackage must be there once");
                 // available version will show as last stable
-                upgradePackageResult.First().Value.Version.ShouldEqual("1.1.0");
+                upgradePackageResult.First().Value.Version.Should().Be("1.1.0");
             }
 
             [Fact]
@@ -4075,9 +3626,9 @@ namespace chocolatey.tests.integration.scenarios
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
-                    version.Version.ToStringSafe().ShouldEqual("1.1.1.0");
-                    version.OriginalVersion.ShouldEqual("1.1.1-beta");
-                    version.ToStringSafe().ShouldEqual("1.1.1-beta");
+                    version.Version.ToStringSafe().Should().Be("1.1.1.0");
+                    version.OriginalVersion.Should().Be("1.1.1-beta");
+                    version.ToNormalizedStringChecked().Should().Be("1.1.1-beta");
                 }
             }
 
@@ -4085,8 +3636,8 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_skip_packages_without_upgrades()
             {
                 var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
-                installPackageResult.Count.ShouldEqual(1, "installpackage must be there once");
-                installPackageResult.First().Value.Version.ShouldEqual("1.0.0");
+                installPackageResult.Should().ContainSingle( "installpackage must be there once");
+                installPackageResult.First().Value.Version.Should().Be("1.0.0");
             }
         }
 
@@ -4112,7 +3663,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_a_single_package_result()
             {
-                Results.Count.ShouldEqual(1, "The returned package results do not have a single value!");
+                Results.Should().ContainSingle( "The returned package results do not have a single value!");
             }
 
             [Fact]
@@ -4144,7 +3695,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 FileAssert.Exists(shimFile);
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.1-beta.1");
+                File.ReadAllText(shimFile).Should().Be("1.1.1-beta.1");
             }
 
             [Fact]
@@ -4153,44 +3704,34 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.1-beta.1");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.1-beta.1");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.1-beta.1 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.1-beta.1 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -4199,19 +3740,19 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.1.1-beta.1");
+                _packageResult.Version.Should().Be("1.1.1-beta.1");
             }
 
             [Fact]
@@ -4219,7 +3760,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.0.0 Before Modification"));
             }
 
             [Fact]
@@ -4229,20 +3771,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
-                    .Any(p => p.EndsWith("upgradepackage 1.1.1-beta.1 Installed"))
-                    .ShouldBeTrue();
+                    .Should().Contain(p => p.EndsWith("upgradepackage 1.1.1-beta.1 Installed"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.0.0 Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.0 Before Modification", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.0 Before Modification"));
             }
 
             [Fact]
@@ -4252,7 +3795,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 const string expectedMessage = "upgradepackage 1.1.1-beta.1 Installed";
 
-                MockLogger.ContainsMessage(expectedMessage, LogLevel.Info).ShouldBeTrue("No log message containing the sentence '{0}' could be found!".FormatWith(expectedMessage));
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains(expectedMessage), "No log message containing the sentence '{0}' could be found!".FormatWith(expectedMessage));
             }
         }
 
@@ -4273,15 +3817,15 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_report_for_all_non_skipped_packages()
             {
-                Results.Count().ShouldEqual(1);
-                Results.First().Key.ShouldEqual("installpackage");
+                Results.Should().HaveCount(1);
+                Results.First().Key.Should().Be("installpackage");
             }
 
             [Fact]
             public void Should_skip_packages_in_except_list()
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
-                upgradePackageResult.Count.ShouldEqual(0, "upgradepackage should not be in the results list");
+                upgradePackageResult.Should().BeEmpty("upgradepackage should not be in the results list");
             }
         }
 
@@ -4332,62 +3876,52 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have scriptpackage.hook v1.0.0 installed. Version 2.0.0 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have scriptpackage.hook v1.0.0 installed. Version 2.0.0 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_two_dot_zero_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("2.0.0");
+                _packageResult.Version.Should().Be("2.0.0");
             }
 
             [Fact]
@@ -4405,7 +3939,7 @@ namespace chocolatey.tests.integration.scenarios
                 foreach (string scriptName in hookScripts)
                 {
                     var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), scriptName);
-                    File.ReadAllText(hookScriptPath).ShouldContain("Write-Output");
+                    File.ReadAllText(hookScriptPath).Should().Contain("Write-Output");
                 }
             }
 
@@ -4469,7 +4003,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                File.ReadAllText(shimFile).ShouldEqual("1.1.0");
+                File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
 
             [Fact]
@@ -4478,44 +4012,34 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version 1.1.0 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -4524,19 +4048,19 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
 
             [Fact]
@@ -4544,7 +4068,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.0.0 Before Modification"));
             }
 
             [Fact]
@@ -4554,20 +4079,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
-                    .Any(p => p.EndsWith("upgradepackage 1.1.0 Installed"))
-                    .ShouldBeTrue();
+                    .Should().Contain(p => p.EndsWith("upgradepackage 1.1.0 Installed"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.0.0 Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.0 Before Modification", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.1.0 Before Modification"));
             }
 
             [Fact]
@@ -4575,7 +4101,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.1.0 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.1.0 Installed"));
             }
 
             [Fact]
@@ -4583,7 +4110,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_all_hook_script()
             {
-                MockLogger.ContainsMessage("pre-install-all.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-install-all.ps1 hook ran for upgradepackage 1.1.0"));
             }
 
             [Fact]
@@ -4591,7 +4119,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_all_hook_script()
             {
-                MockLogger.ContainsMessage("post-install-all.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("post-install-all.ps1 hook ran for upgradepackage 1.1.0"));
             }
 
             [Fact]
@@ -4599,7 +4128,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_pre_upgradepackage_hook_script()
             {
-                MockLogger.ContainsMessage("pre-install-upgradepackage.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-install-upgradepackage.ps1 hook ran for upgradepackage 1.1.0"));
             }
 
             [Fact]
@@ -4607,7 +4137,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_post_upgradepackage_hook_script()
             {
-                MockLogger.ContainsMessage("post-install-upgradepackage.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("post-install-upgradepackage.ps1 hook ran for upgradepackage 1.1.0"));
             }
 
             [Fact]
@@ -4615,7 +4146,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_uninstall_hook_script()
             {
-                MockLogger.ContainsMessage("post-uninstall-all.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("post-uninstall-all.ps1 hook ran for upgradepackage 1.1.0"));
             }
 
             [Fact]
@@ -4623,7 +4155,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_installpackage_hook_script()
             {
-                MockLogger.ContainsMessage("pre-install-installpackage.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("pre-install-installpackage.ps1 hook ran for upgradepackage 1.1.0"));
             }
 
             [Fact]
@@ -4631,7 +4164,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_beforemodify_hook_script_for_previous_version()
             {
-                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for upgradepackage 1.0.0", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for upgradepackage 1.0.0"));
             }
 
             [Fact]
@@ -4639,7 +4173,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_have_executed_beforemodify_hook_script_for_upgrade_version()
             {
-                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for upgradepackage 1.1.0", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for upgradepackage 1.1.0"));
             }
         }
         public class When_upgrading_an_existing_package_with_uppercase_id : ScenariosBase
@@ -4688,62 +4223,52 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have UpperCase v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have UpperCase v1.0.0 installed. Version 1.1.0 is available based on your source"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeFalse();
+                _packageResult.Warning.Should().BeFalse();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
 
             [Fact]
@@ -4751,7 +4276,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("UpperCase 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("UpperCase 1.0.0 Before Modification"));
             }
 
             [Fact]
@@ -4761,20 +4287,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("UpperCase 1.0.0 Before Modification"))
-                    .Any(p => p.EndsWith("UpperCase 1.1.0 Installed"))
-                    .ShouldBeTrue();
+                    .Should().Contain(p => p.EndsWith("UpperCase 1.1.0 Installed"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("UpperCase 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("UpperCase 1.0.0 Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("UpperCase 1.1.0 Before Modification", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("UpperCase 1.1.0 Before Modification"));
             }
 
             [Fact]
@@ -4782,7 +4309,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("UpperCase 1.1.0 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("UpperCase 1.1.0 Installed"));
             }
         }
 
@@ -4824,73 +4352,59 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("1.1.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have unsupportedelements v1.0.0 installed. Version 1.1.0 is available based on your source")) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have unsupportedelements v1.0.0 installed. Version 1.1.0 is available based on your source"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_about_unsupported_elements()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("Issues found with nuspec elements")) upgradeMessage = true;
-                }
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Issues found with nuspec elements"));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
             public void Should_have_warning_package_result()
             {
-                _packageResult.Warning.ShouldBeTrue();
+                _packageResult.Warning.Should().BeTrue();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
-                _packageResult.Version.ShouldEqual("1.1.0");
+                _packageResult.Version.Should().Be("1.1.0");
             }
 
             [Fact]
@@ -4898,7 +4412,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("unsupportedelements 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("unsupportedelements 1.0.0 Before Modification"));
             }
 
             [Fact]
@@ -4908,20 +4423,21 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("unsupportedelements 1.0.0 Before Modification"))
-                    .Any(p => p.EndsWith("unsupportedelements 1.1.0 Installed"))
-                    .ShouldBeTrue();
+                    .Should().Contain(p => p.EndsWith("unsupportedelements 1.1.0 Installed"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("unsupportedelements 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("unsupportedelements 1.0.0 Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("unsupportedelements 1.1.0 Before Modification", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("unsupportedelements 1.1.0 Before Modification"));
             }
 
             [Fact]
@@ -4929,7 +4445,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("unsupportedelements 1.1.0 Installed", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("unsupportedelements 1.1.0 Installed"));
             }
         }
 
@@ -4981,44 +4498,34 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual(NonNormalizedVersion);
+                    packageReader.NuspecReader.GetVersion().ToStringSafe().Should().Be(NonNormalizedVersion);
                 }
             }
 
             [Fact]
             public void Should_contain_a_warning_message_that_it_upgraded_successfully()
             {
-                bool upgradedSuccessMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("upgraded 1/1")) upgradedSuccessMessage = true;
-                }
-
-                upgradedSuccessMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 1/1"));
             }
 
             [Fact]
             public void Should_contain_a_warning_message_with_old_and_new_versions()
             {
-                bool upgradeMessage = false;
-                foreach (var message in MockLogger.MessagesFor(LogLevel.Warn).OrEmpty())
-                {
-                    if (message.Contains("You have upgradepackage v1.0.0 installed. Version {0} is available based on your source".FormatWith(NonNormalizedVersion))) upgradeMessage = true;
-                }
-
-                upgradeMessage.ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("You have upgradepackage v1.0.0 installed. Version {0} is available based on your source".FormatWith(NonNormalizedVersion)));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                _packageResult.Success.ShouldBeTrue();
+                _packageResult.Success.Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                _packageResult.Inconclusive.ShouldBeFalse();
+                _packageResult.Inconclusive.Should().BeFalse();
             }
 
             [Fact]
@@ -5027,19 +4534,19 @@ namespace chocolatey.tests.integration.scenarios
                 // For before modify scripts that fail, we add a warning message.
                 // So we will ignore any such warnings.
                 var messages = _packageResult.Messages.Where(m => m.MessageType == ResultType.Warn && !m.Message.ContainsSafe("chocolateyBeforeModify"));
-                messages.ShouldBeEmpty();
+                messages.Should().BeEmpty();
             }
 
             [Fact]
             public void Config_should_match_package_result_name()
             {
-                _packageResult.Name.ShouldEqual(Configuration.PackageNames);
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
             }
 
             [Fact]
             public void Should_match_the_upgrade_version()
             {
-                _packageResult.Version.ShouldEqual(NonNormalizedVersion);
+                _packageResult.Version.Should().Be(NormalizedVersion);
             }
 
             [Fact]
@@ -5047,7 +4554,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Before Modification", LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage 1.0.0 Before Modification"));
             }
 
             [Fact]
@@ -5057,20 +4565,22 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.MessagesFor(LogLevel.Info).OrEmpty()
                     .SkipWhile(p => !p.Contains("upgradepackage 1.0.0 Before Modification"))
-                    .Any(p => p.EndsWith("upgradepackage {0} Installed".FormatWith(NonNormalizedVersion)))
-                    .ShouldBeTrue();
+                    .Any(p => p.EndsWith("upgradepackage {0} Installed".FormatWith(NormalizedVersion)))
+                    .Should().BeTrue();
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyUninstall_script_for_original_package()
             {
-                MockLogger.ContainsMessage("upgradepackage 1.0.0 Uninstalled", LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage 1.0.0 Uninstalled"));
             }
 
             [Fact]
             public void Should_not_have_executed_chocolateyBeforeModify_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage {0} Before Modification".FormatWith(NonNormalizedVersion), LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("upgradepackage {0} Before Modification".FormatWith(NormalizedVersion)));
             }
 
             [Fact]
@@ -5078,7 +4588,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script_for_new_package()
             {
-                MockLogger.ContainsMessage("upgradepackage {0} Installed".FormatWith(NonNormalizedVersion), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgradepackage {0} Installed".FormatWith(NormalizedVersion)));
             }
         }
 
@@ -5167,14 +4678,15 @@ namespace chocolatey.tests.integration.scenarios
                 var packageFile = Path.Combine(Scenario.get_top_level(), "lib", DependencyName, "{0}.nupkg".FormatWith(DependencyName));
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
-                    packageReader.NuspecReader.GetVersion().ToStringSafe().ShouldEqual("2.0.0");
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
                 }
             }
 
             [Fact]
             public void Should_contain_a_message_that_everything_upgraded_successfully()
             {
-                MockLogger.ContainsMessage("upgraded 2/2", LogLevel.Warn).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("upgraded 2/2"));
             }
 
             [Fact]
@@ -5182,7 +4694,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_beforemodify_hook_script_for_previous_version_of_target()
             {
-                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for {0} {1}".FormatWith(TargetPackageName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for {0} {1}".FormatWith(TargetPackageName, "1.0.0")));
             }
 
             [Fact]
@@ -5190,7 +4703,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_already_installed_target_package_beforeModify()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(TargetPackageName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Ran BeforeModify: {0} {1}".FormatWith(TargetPackageName, "1.0.0")));
             }
 
             [Fact]
@@ -5198,7 +4712,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_run_beforemodify_hook_script_for_upgrade_version_of_target()
             {
-                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for {0} {1}".FormatWith(TargetPackageName, "2.0.0"), LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for {0} {1}".FormatWith(TargetPackageName, "2.0.0")));
             }
 
             [Fact]
@@ -5206,7 +4721,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_run_target_package_beforeModify_for_upgraded_version()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(TargetPackageName, "2.0.0"), LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("Ran BeforeModify: {0} {1}".FormatWith(TargetPackageName, "2.0.0")));
             }
 
             [Fact]
@@ -5214,7 +4730,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_pre_all_hook_script_for_upgraded_version_of_target()
             {
-                MockLogger.ContainsMessage("pre-install-all.ps1 hook ran for {0} {1}".FormatWith(TargetPackageName, "2.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-install-all.ps1 hook ran for {0} {1}".FormatWith(TargetPackageName, "2.0.0")));
             }
 
             [Fact]
@@ -5222,7 +4739,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_post_all_hook_script_for_upgraded_version_of_target()
             {
-                MockLogger.ContainsMessage("post-install-all.ps1 hook ran for {0} {1}".FormatWith(TargetPackageName, "2.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("post-install-all.ps1 hook ran for {0} {1}".FormatWith(TargetPackageName, "2.0.0")));
             }
 
             [Fact]
@@ -5230,7 +4748,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_beforemodify_hook_script_for_previous_version_of_dependency()
             {
-                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for {0} {1}".FormatWith(DependencyName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for {0} {1}".FormatWith(DependencyName, "1.0.0")));
             }
 
             [Fact]
@@ -5238,7 +4757,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_already_installed_dependency_package_beforeModify()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "1.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "1.0.0")));
             }
 
             [Fact]
@@ -5246,7 +4766,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_run_beforemodify_hook_script_for_upgrade_version_of_dependency()
             {
-                MockLogger.ContainsMessage("pre-beforemodify-all.ps1 hook ran for {0} {1}".FormatWith(DependencyName, "2.0.0"), LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for {0} {1}".FormatWith(DependencyName, "2.0.0")));
             }
 
             [Fact]
@@ -5254,7 +4775,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_not_run_dependency_package_beforeModify_for_upgraded_version()
             {
-                MockLogger.ContainsMessage("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "2.0.0"), LogLevel.Info).ShouldBeFalse();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().NotContain(m => m.Contains("Ran BeforeModify: {0} {1}".FormatWith(DependencyName, "2.0.0")));
             }
 
             [Fact]
@@ -5262,7 +4784,8 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_pre_all_hook_script_for_upgraded_version_of_dependency()
             {
-                MockLogger.ContainsMessage("pre-install-all.ps1 hook ran for {0} {1}".FormatWith(DependencyName, "2.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("pre-install-all.ps1 hook ran for {0} {1}".FormatWith(DependencyName, "2.0.0")));
             }
 
             [Fact]
@@ -5270,34 +4793,26 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_run_post_all_hook_script_for_upgraded_version_of_dependency()
             {
-                MockLogger.ContainsMessage("post-install-all.ps1 hook ran for {0} {1}".FormatWith(DependencyName, "2.0.0"), LogLevel.Info).ShouldBeTrue();
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("post-install-all.ps1 hook ran for {0} {1}".FormatWith(DependencyName, "2.0.0")));
             }
 
             [Fact]
             public void Should_have_a_successful_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Success.ShouldBeTrue();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Success.Should().BeTrue());
             }
 
             [Fact]
             public void Should_not_have_inconclusive_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Inconclusive.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Inconclusive.Should().BeFalse());
             }
 
             [Fact]
             public void Should_not_have_warning_package_result()
             {
-                foreach (var packageResult in Results)
-                {
-                    packageResult.Value.Warning.ShouldBeFalse();
-                }
+                Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
             }
         }
     }
