@@ -50,8 +50,8 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void BeforeEachSpec()
             {
-                Configuration = Scenario.pack();
-                Scenario.reset(Configuration);
+                Configuration = Scenario.Pack();
+                Scenario.Reset(Configuration);
 
                 Service = NUnitSetup.Container.GetInstance<INugetService>();
                 MockLogger.Reset();
@@ -60,7 +60,7 @@ namespace chocolatey.tests.integration.scenarios
 
             protected void AddFile(string fileName, string fileContent)
             {
-                Scenario.add_files(new[] { new Tuple<string, string>(fileName, fileContent) });
+                Scenario.AddFiles(new[] { new Tuple<string, string>(fileName, fileContent) });
             }
         }
 
@@ -113,7 +113,7 @@ namespace chocolatey.tests.integration.scenarios
                 {
                     if (string.IsNullOrEmpty(ExpectedSubDirectory))
                     {
-                        return Path.Combine(Scenario.get_top_level(), "test-package." + ExpectedPathVersion + ".nupkg");
+                        return Path.Combine(Scenario.GetTopLevel(), "test-package." + ExpectedPathVersion + ".nupkg");
                     }
 
                     return Path.Combine(ExpectedSubDirectory, "test-package." + ExpectedPathVersion + ".nupkg");
@@ -128,14 +128,14 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Context()
             {
-                Configuration = Scenario.pack();
-                Scenario.reset(Configuration);
-                Scenario.add_files(new[] { new Tuple<string, string>("myPackage.nuspec", GetNuspecContent()) });
+                Configuration = Scenario.Pack();
+                Scenario.Reset(Configuration);
+                Scenario.AddFiles(new[] { new Tuple<string, string>("myPackage.nuspec", GetNuspecContent()) });
 
                 if (!string.IsNullOrEmpty(ExpectedSubDirectory))
                 {
                     Configuration.OutputDirectory = ExpectedSubDirectory;
-                    Scenario.create_directory(Configuration.OutputDirectory);
+                    Scenario.CreateDirectory(Configuration.OutputDirectory);
                 }
 
                 Service = NUnitSetup.Container.GetInstance<INugetService>();
@@ -182,7 +182,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 if (string.IsNullOrEmpty(ExpectedSubDirectory))
                 {
-                    Configuration.Sources.Should().Be(Scenario.get_top_level());
+                    Configuration.Sources.Should().Be(Scenario.GetTopLevel());
                 }
                 else
                 {
@@ -415,10 +415,10 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
 
-                Scenario.reset(Configuration);
+                Scenario.Reset(Configuration);
                 Configuration.Version = "0.1.0";
                 Configuration.PackCommand.Properties.Add("commitId", "1234abcd");
-                Scenario.add_files(new[] { new Tuple<string, string>("myPackage.nuspec", NuspecContentWithVariables) });
+                Scenario.AddFiles(new[] { new Tuple<string, string>("myPackage.nuspec", NuspecContentWithVariables) });
             }
 
             public override void Because()

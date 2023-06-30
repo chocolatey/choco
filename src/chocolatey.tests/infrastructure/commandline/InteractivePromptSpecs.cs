@@ -27,46 +27,46 @@ namespace chocolatey.tests.infrastructure.commandline
     {
         public abstract class InteractivePromptSpecsBase : TinySpec
         {
-            protected Mock<IConsole> console = new Mock<IConsole>();
-            protected IList<string> choices = new List<string>();
-            protected string prompt_value;
+            protected Mock<IConsole> Console = new Mock<IConsole>();
+            protected IList<string> Choices = new List<string>();
+            protected string PromptValue;
 
             public override void Context()
             {
-                prompt_value = "hi";
+                PromptValue = "hi";
 
-                InteractivePrompt.InitializeWith(new Lazy<IConsole>(() => console.Object));
+                InteractivePrompt.InitializeWith(new Lazy<IConsole>(() => Console.Object));
 
-                choices.Add("yes");
-                choices.Add("no");
+                Choices.Add("yes");
+                Choices.Add("no");
             }
 
             public void Should_have_called_Console_ReadLine()
             {
-                console.Verify(c => c.ReadLine(), Times.AtLeastOnce);
+                Console.Verify(c => c.ReadLine(), Times.AtLeastOnce);
             }
         }
 
         public class When_prompting_with_interactivePrompt : InteractivePromptSpecsBase
         {
-            private string default_choice;
-            private Func<string> prompt;
+            private string _defaultChoice;
+            private Func<string> _prompt;
 
             public override void Because()
             {
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
-                prompt = () => InteractivePrompt.PromptForConfirmation(prompt_value, choices, default_choice, requireAnswer: false);
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, _defaultChoice, requireAnswer: false);
             }
 
             [Fact]
             public void Should_error_when_the_choicelist_is_null()
             {
-                choices = null;
+                Choices = null;
                 bool errored = false;
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception)
                 {
@@ -74,19 +74,19 @@ namespace chocolatey.tests.infrastructure.commandline
                 }
 
                 errored.Should().BeTrue();
-                console.Verify(c => c.ReadLine(), Times.Never);
+                Console.Verify(c => c.ReadLine(), Times.Never);
             }
 
             [Fact]
             public void Should_error_when_the_choicelist_is_empty()
             {
-                choices = new List<string>();
+                Choices = new List<string>();
                 bool errored = false;
                 string errorMessage = string.Empty;
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception ex)
                 {
@@ -96,22 +96,22 @@ namespace chocolatey.tests.infrastructure.commandline
 
                 errored.Should().BeTrue();
                 errorMessage.Should().Contain("No choices passed in.");
-                console.Verify(c => c.ReadLine(), Times.Never);
+                Console.Verify(c => c.ReadLine(), Times.Never);
             }
 
             [Fact]
             public void Should_error_when_the_prompt_input_is_null()
             {
-                choices = new List<string>
+                Choices = new List<string>
                 {
                     "bob"
                 };
-                prompt_value = null;
+                PromptValue = null;
                 bool errored = false;
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception)
                 {
@@ -119,24 +119,24 @@ namespace chocolatey.tests.infrastructure.commandline
                 }
 
                 errored.Should().BeTrue();
-                console.Verify(c => c.ReadLine(), Times.Never);
+                Console.Verify(c => c.ReadLine(), Times.Never);
             }
 
             [Fact]
             public void Should_error_when_the_default_choice_is_not_in_list()
             {
-                choices = new List<string>
+                Choices = new List<string>
                 {
                     "bob"
                 };
-                default_choice = "maybe";
+                _defaultChoice = "maybe";
                 bool errored = false;
                 string errorMessage = string.Empty;
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 string result = null;
                 try
                 {
-                    result = prompt();
+                    result = _prompt();
                 }
                 catch (Exception ex)
                 {
@@ -147,17 +147,17 @@ namespace chocolatey.tests.infrastructure.commandline
                 result.Should().NotBe("maybe");
                 errored.Should().BeTrue();
                 errorMessage.Should().Be("Default choice value must be one of the given choices.");
-                console.Verify(c => c.ReadLine(), Times.Never);
+                Console.Verify(c => c.ReadLine(), Times.Never);
             }
         }
 
         public class When_prompting_with_interactivePrompt_without_default_and_answer_is_not_required : InteractivePromptSpecsBase
         {
-            private Func<string> prompt;
+            private Func<string> _prompt;
 
             public override void Because()
             {
-                prompt = () => InteractivePrompt.PromptForConfirmation(prompt_value, choices, null, requireAnswer: false);
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, null, requireAnswer: false);
             }
 
             public override void AfterObservations()
@@ -169,83 +169,83 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void Should_return_null_when_no_answer_given()
             {
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                var result = _prompt();
                 result.Should().BeNull();
             }
 
             [Fact]
             public void Should_return_first_choice_when_1_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("1");
-                var result = prompt();
-                result.Should().Be(choices[0]);
+                Console.Setup(c => c.ReadLine()).Returns("1");
+                var result = _prompt();
+                result.Should().Be(Choices[0]);
             }
 
             [Fact]
             public void Should_return_first_choice_when_value_of_choice_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("yes");
-                var result = prompt();
-                result.Should().Be(choices[0]);
+                Console.Setup(c => c.ReadLine()).Returns("yes");
+                var result = _prompt();
+                result.Should().Be(Choices[0]);
             }
 
             [Fact]
             public void Should_return_second_choice_when_2_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("2");
-                var result = prompt();
-                result.Should().Be(choices[1]);
+                Console.Setup(c => c.ReadLine()).Returns("2");
+                var result = _prompt();
+                result.Should().Be(Choices[1]);
             }
 
             [Fact]
             public void Should_return_null_choice_when_3_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("3");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("3");
+                var result = _prompt();
                 result.Should().BeNull();
             }
 
             [Fact]
             public void Should_return_null_choice_when_4_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("4");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("4");
+                var result = _prompt();
                 result.Should().BeNull();
             }
 
             [Fact]
             public void Should_return_null_choice_when_0_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("0");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("0");
+                var result = _prompt();
                 result.Should().BeNull();
             }
 
             [Fact]
             public void Should_return_null_choice_when_negative_1_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("-1");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("-1");
+                var result = _prompt();
                 result.Should().BeNull();
             }
 
             [Fact]
             public void Should_return_null_choice_when_alphabetical_characters_are_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("abc");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("abc");
+                var result = _prompt();
                 result.Should().BeNull();
             }
         }
 
         public class When_prompting_with_interactivePrompt_without_default_and_answer_is_required : InteractivePromptSpecsBase
         {
-            private Func<string> prompt;
+            private Func<string> _prompt;
 
             public override void Because()
             {
-                prompt = () => InteractivePrompt.PromptForConfirmation(prompt_value, choices, null, requireAnswer: true);
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, null, requireAnswer: true);
             }
 
             public override void AfterObservations()
@@ -259,33 +259,33 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 bool errored = false;
 
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception)
                 {
                     errored = true;
                 }
                 errored.Should().BeTrue();
-                console.Verify(c => c.ReadLine(), Times.AtLeast(8));
+                Console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
 
             [Fact]
             public void Should_return_first_choice_when_1_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("1");
-                var result = prompt();
-                result.Should().Be(choices[0]);
+                Console.Setup(c => c.ReadLine()).Returns("1");
+                var result = _prompt();
+                result.Should().Be(Choices[0]);
             }
 
             [Fact]
             public void Should_return_second_choice_when_2_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("2");
-                var result = prompt();
-                result.Should().Be(choices[1]);
+                Console.Setup(c => c.ReadLine()).Returns("2");
+                var result = _prompt();
+                result.Should().Be(Choices[1]);
             }
 
             [Fact]
@@ -293,27 +293,27 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 bool errored = false;
 
-                console.Setup(c => c.ReadLine()).Returns("3"); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns("3"); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception)
                 {
                     errored = true;
                 }
                 errored.Should().BeTrue();
-                console.Verify(c => c.ReadLine(), Times.AtLeast(8));
+                Console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
         }
 
         public class When_prompting_with_interactivePrompt_with_default_and_answer_is_not_required : InteractivePromptSpecsBase
         {
-            private Func<string> prompt;
+            private Func<string> _prompt;
 
             public override void Because()
             {
-                prompt = () => InteractivePrompt.PromptForConfirmation(prompt_value, choices, choices[1], requireAnswer: false);
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, Choices[1], requireAnswer: false);
             }
 
             public override void AfterObservations()
@@ -325,75 +325,75 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void Should_return_default_when_no_answer_given()
             {
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
-                var result = prompt();
-                result.Should().Be(choices[1]);
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                var result = _prompt();
+                result.Should().Be(Choices[1]);
             }
 
             [Fact]
             public void Should_return_first_choice_when_1_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("1");
-                var result = prompt();
-                result.Should().Be(choices[0]);
+                Console.Setup(c => c.ReadLine()).Returns("1");
+                var result = _prompt();
+                result.Should().Be(Choices[0]);
             }
 
             [Fact]
             public void Should_return_second_choice_when_2_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("2");
-                var result = prompt();
-                result.Should().Be(choices[1]);
+                Console.Setup(c => c.ReadLine()).Returns("2");
+                var result = _prompt();
+                result.Should().Be(Choices[1]);
             }
 
             [Fact]
             public void Should_return_null_choice_when_3_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("3");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("3");
+                var result = _prompt();
                 result.Should().BeNull();
             }
 
             [Fact]
             public void Should_return_null_choice_when_4_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("4");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("4");
+                var result = _prompt();
                 result.Should().BeNull();
             }
 
             [Fact]
             public void Should_return_null_choice_when_0_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("0");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("0");
+                var result = _prompt();
                 result.Should().BeNull();
             }
 
             [Fact]
             public void Should_return_null_choice_when_negative_1_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("-1");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("-1");
+                var result = _prompt();
                 result.Should().BeNull();
             }
 
             [Fact]
             public void Should_return_null_choice_when_alphabetical_characters_are_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("abc");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("abc");
+                var result = _prompt();
                 result.Should().BeNull();
             }
         }
 
         public class When_prompting_with_interactivePrompt_with_default_and_answer_is_required : InteractivePromptSpecsBase
         {
-            private Func<string> prompt;
+            private Func<string> _prompt;
 
             public override void Because()
             {
-                prompt = () => InteractivePrompt.PromptForConfirmation(prompt_value, choices, choices[0], requireAnswer: true);
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, Choices[0], requireAnswer: true);
             }
 
             public override void AfterObservations()
@@ -405,25 +405,25 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void Should_error_when_no_answer_given()
             {
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
-                var result = prompt();
-                result.Should().Be(choices[0]);
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                var result = _prompt();
+                result.Should().Be(Choices[0]);
             }
 
             [Fact]
             public void Should_return_first_choice_when_1_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("1");
-                var result = prompt();
-                result.Should().Be(choices[0]);
+                Console.Setup(c => c.ReadLine()).Returns("1");
+                var result = _prompt();
+                result.Should().Be(Choices[0]);
             }
 
             [Fact]
             public void Should_return_second_choice_when_2_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("2");
-                var result = prompt();
-                result.Should().Be(choices[1]);
+                Console.Setup(c => c.ReadLine()).Returns("2");
+                var result = _prompt();
+                result.Should().Be(Choices[1]);
             }
 
             [Fact]
@@ -431,39 +431,39 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 bool errored = false;
 
-                console.Setup(c => c.ReadLine()).Returns("3"); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns("3"); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception)
                 {
                     errored = true;
                 }
                 errored.Should().BeTrue();
-                console.Verify(c => c.ReadLine(), Times.AtLeast(8));
+                Console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
         }
 
         public class When_prompting_short_with_interactivePrompt_guard_errors : InteractivePromptSpecsBase
         {
-            private Func<string> prompt;
+            private Func<string> _prompt;
 
             public override void Because()
             {
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
-                prompt = () => InteractivePrompt.PromptForConfirmation(prompt_value, choices, defaultChoice: null, requireAnswer: true, shortPrompt: true);
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, defaultChoice: null, requireAnswer: true, shortPrompt: true);
             }
 
             [Fact]
             public void Should_error_when_the_choicelist_is_null()
             {
-                choices = null;
+                Choices = null;
                 bool errored = false;
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception)
                 {
@@ -471,19 +471,19 @@ namespace chocolatey.tests.infrastructure.commandline
                 }
 
                 errored.Should().BeTrue();
-                console.Verify(c => c.ReadLine(), Times.Never);
+                Console.Verify(c => c.ReadLine(), Times.Never);
             }
 
             [Fact]
             public void Should_error_when_the_choicelist_is_empty()
             {
-                choices = new List<string>();
+                Choices = new List<string>();
                 bool errored = false;
                 string errorMessage = string.Empty;
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception ex)
                 {
@@ -493,23 +493,23 @@ namespace chocolatey.tests.infrastructure.commandline
 
                 errored.Should().BeTrue();
                 errorMessage.Should().Contain("No choices passed in.");
-                console.Verify(c => c.ReadLine(), Times.Never);
+                Console.Verify(c => c.ReadLine(), Times.Never);
             }
 
             [Fact]
             public void Should_error_when_the_prompt_input_is_null()
             {
-                choices = new List<string>
+                Choices = new List<string>
                 {
                     "bob"
                 };
-                prompt_value = null;
+                PromptValue = null;
                 bool errored = false;
                 string errorMessage = string.Empty;
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception ex)
                 {
@@ -519,23 +519,23 @@ namespace chocolatey.tests.infrastructure.commandline
 
                 errored.Should().BeTrue();
                 errorMessage.Should().Contain("Value for prompt cannot be null.");
-                console.Verify(c => c.ReadLine(), Times.Never);
+                Console.Verify(c => c.ReadLine(), Times.Never);
             }
 
             [Fact]
             public void Should_error_when_the_choicelist_contains_empty_values()
             {
-                choices = new List<string>
+                Choices = new List<string>
                 {
                     "bob",
                     ""
                 };
                 bool errored = false;
                 string errorMessage = string.Empty;
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception ex)
                 {
@@ -545,23 +545,23 @@ namespace chocolatey.tests.infrastructure.commandline
 
                 errored.Should().BeTrue();
                 errorMessage.Should().Contain("Some choices are empty.");
-                console.Verify(c => c.ReadLine(), Times.Never);
+                Console.Verify(c => c.ReadLine(), Times.Never);
             }
 
             [Fact]
             public void Should_error_when_the_choicelist_has_multiple_items_with_same_first_letter()
             {
-                choices = new List<string>
+                Choices = new List<string>
                 {
                     "sally",
                     "suzy"
                 };
                 bool errored = false;
                 string errorMessage = string.Empty;
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception ex)
                 {
@@ -571,17 +571,17 @@ namespace chocolatey.tests.infrastructure.commandline
 
                 errored.Should().BeTrue();
                 errorMessage.Should().Contain("Multiple choices have the same first letter.");
-                console.Verify(c => c.ReadLine(), Times.Never);
+                Console.Verify(c => c.ReadLine(), Times.Never);
             }
         }
 
         public class When_prompting_short_with_interactivePrompt : InteractivePromptSpecsBase
         {
-            private Func<string> prompt;
+            private Func<string> _prompt;
 
             public override void Because()
             {
-                prompt = () => InteractivePrompt.PromptForConfirmation(prompt_value, choices, defaultChoice: null, requireAnswer: true, shortPrompt: true);
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, defaultChoice: null, requireAnswer: true, shortPrompt: true);
             }
 
             public override void AfterObservations()
@@ -595,48 +595,48 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 bool errored = false;
 
-                console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception)
                 {
                     errored = true;
                 }
                 errored.Should().BeTrue();
-                console.Verify(c => c.ReadLine(), Times.AtLeast(8));
+                Console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
 
             [Fact]
             public void Should_return_yes_when_yes_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("yes");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("yes");
+                var result = _prompt();
                 result.Should().Be("yes");
             }
 
             [Fact]
             public void Should_return_yes_when_y_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("y");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("y");
+                var result = _prompt();
                 result.Should().Be("yes");
             }
 
             [Fact]
             public void Should_return_no_choice_when_no_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("no");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("no");
+                var result = _prompt();
                 result.Should().Be("no");
             }
 
             [Fact]
             public void Should_return_no_choice_when_n_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("n");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("n");
+                var result = _prompt();
                 result.Should().Be("no");
             }
 
@@ -645,33 +645,33 @@ namespace chocolatey.tests.infrastructure.commandline
             {
                 bool errored = false;
 
-                console.Setup(c => c.ReadLine()).Returns("yup"); //Enter pressed
+                Console.Setup(c => c.ReadLine()).Returns("yup"); //Enter pressed
                 try
                 {
-                    prompt();
+                    _prompt();
                 }
                 catch (Exception)
                 {
                     errored = true;
                 }
                 errored.Should().BeTrue();
-                console.Verify(c => c.ReadLine(), Times.AtLeast(8));
+                Console.Verify(c => c.ReadLine(), Times.AtLeast(8));
             }
         }
 
         public class When_prompting_answer_with_dash_with_interactivePrompt : InteractivePromptSpecsBase
         {
-            private Func<string> prompt;
+            private Func<string> _prompt;
 
             public override void Context()
             {
                 base.Context();
-                choices.Add("all - yes to all");
+                Choices.Add("all - yes to all");
             }
 
             public override void Because()
             {
-                prompt = () => InteractivePrompt.PromptForConfirmation(prompt_value, choices, defaultChoice: null, requireAnswer: true, shortPrompt: true);
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, defaultChoice: null, requireAnswer: true, shortPrompt: true);
             }
 
             public override void AfterObservations()
@@ -683,16 +683,16 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void Should_return_all_when_full_all_answer_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("all - yes to all");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("all - yes to all");
+                var result = _prompt();
                 result.Should().Be("all - yes to all");
             }
 
             [Fact]
             public void Should_return_all_when_only_all_is_given()
             {
-                console.Setup(c => c.ReadLine()).Returns("all");
-                var result = prompt();
+                Console.Setup(c => c.ReadLine()).Returns("all");
+                var result = _prompt();
                 result.Should().Be("all - yes to all");
             }
         }

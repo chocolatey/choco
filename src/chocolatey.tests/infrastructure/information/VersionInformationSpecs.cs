@@ -31,35 +31,35 @@ namespace chocolatey.tests.infrastructure.information
 
         public class When_calling_VersionInformation_to_get_current_assembly_version : VersionInformationSpecsBase
         {
-            public string result = null;
+            public string Result = null;
 
             public override void Because()
             {
-                result = VersionInformation.GetCurrentAssemblyVersion();
+                Result = VersionInformation.GetCurrentAssemblyVersion();
             }
 
             [Fact]
             public void Should_not_be_null()
             {
-                result.Should().NotBeNull();
+                Result.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_not_be_empty()
             {
-                result.Should().NotBeEmpty();
+                Result.Should().NotBeEmpty();
             }
 
             [Fact]
             public void Should_be_transferable_to_Version()
             {
-                new Version(result).Should().NotBeNull();
+                new Version(Result).Should().NotBeNull();
             }
 
             [Fact]
             public void Should_not_equal_zero_dot_zero_dot_zero_dot_zero()
             {
-                result.Should().NotBe("0.0.0.0");
+                Result.Should().NotBe("0.0.0.0");
             }
         }
     }

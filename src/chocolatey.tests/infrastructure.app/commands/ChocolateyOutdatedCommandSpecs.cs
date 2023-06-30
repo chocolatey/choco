@@ -31,88 +31,88 @@ namespace chocolatey.tests.infrastructure.app.commands
         [ConcernFor("outdated")]
         public abstract class ChocolateyOutdatedCommandSpecsBase : TinySpec
         {
-            protected ChocolateyOutdatedCommand command;
-            protected Mock<IChocolateyPackageService> packageService = new Mock<IChocolateyPackageService>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateyOutdatedCommand Command;
+            protected Mock<IChocolateyPackageService> PackageService = new Mock<IChocolateyPackageService>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                configuration.Sources = "bob";
-                command = new ChocolateyOutdatedCommand(packageService.Object);
+                Configuration.Sources = "bob";
+                Command = new ChocolateyOutdatedCommand(PackageService.Object);
             }
         }
 
         public class When_implementing_command_for : ChocolateyOutdatedCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void Should_implement_outdated()
             {
-                results.Should().Contain("outdated");
+                _results.Should().Contain("outdated");
             }
         }
 
         public class When_configurating_the_argument_parser : ChocolateyOutdatedCommandSpecsBase
         {
-            private OptionSet optionSet;
+            private OptionSet _optionSet;
 
             public override void Context()
             {
                 base.Context();
-                optionSet = new OptionSet();
+                _optionSet = new OptionSet();
             }
 
             public override void Because()
             {
-                command.ConfigureArgumentParser(optionSet, configuration);
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
             }
 
             [Fact]
             public void Should_add_source_to_the_option_set()
             {
-                optionSet.Contains("source").Should().BeTrue();
+                _optionSet.Contains("source").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_source_to_the_option_set()
             {
-                optionSet.Contains("s").Should().BeTrue();
+                _optionSet.Contains("s").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_user_to_the_option_set()
             {
-                optionSet.Contains("user").Should().BeTrue();
+                _optionSet.Contains("user").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_user_to_the_option_set()
             {
-                optionSet.Contains("u").Should().BeTrue();
+                _optionSet.Contains("u").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_password_to_the_option_set()
             {
-                optionSet.Contains("password").Should().BeTrue();
+                _optionSet.Contains("password").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_password_to_the_option_set()
             {
-                optionSet.Contains("p").Should().BeTrue();
+                _optionSet.Contains("p").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_ignore_pinned_to_the_option_set()
             {
-                optionSet.Contains("ignore-pinned").Should().BeTrue();
+                _optionSet.Contains("ignore-pinned").Should().BeTrue();
             }
         }
 
@@ -120,13 +120,13 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.DryRun(configuration);
+                Command.DryRun(Configuration);
             }
 
             [Fact]
             public void Should_call_service_outdated_noop()
             {
-                packageService.Verify(c => c.OutdatedDryRun(configuration), Times.Once);
+                PackageService.Verify(c => c.OutdatedDryRun(Configuration), Times.Once);
             }
         }
 
@@ -134,13 +134,13 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.Run(configuration);
+                Command.Run(Configuration);
             }
 
             [Fact]
             public void Should_call_service_outdated_run()
             {
-                packageService.Verify(c => c.Outdated(configuration), Times.Once);
+                PackageService.Verify(c => c.Outdated(Configuration), Times.Once);
             }
         }
     }

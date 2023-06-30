@@ -32,31 +32,31 @@ namespace chocolatey.tests.infrastructure.app.commands
         [ConcernFor("unpackself")]
         public abstract class ChocolateyUnpackSelfCommandSpecsBase : TinySpec
         {
-            protected ChocolateyUnpackSelfCommand command;
-            protected Mock<IFileSystem> fileSystem = new Mock<IFileSystem>();
-            protected Mock<IAssembly> assembly = new Mock<IAssembly>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateyUnpackSelfCommand Command;
+            protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
+            protected Mock<IAssembly> Assembly = new Mock<IAssembly>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                command = new ChocolateyUnpackSelfCommand(fileSystem.Object);
-                command.InitializeWith(new Lazy<IAssembly>(() => assembly.Object));
+                Command = new ChocolateyUnpackSelfCommand(FileSystem.Object);
+                Command.InitializeWith(new Lazy<IAssembly>(() => Assembly.Object));
             }
         }
 
         public class When_implementing_command_for : ChocolateyUnpackSelfCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void Should_implement_unpackself()
             {
-                results.Should().Contain("unpackself");
+                _results.Should().Contain("unpackself");
             }
         }
 
@@ -64,7 +64,7 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.DryRun(configuration);
+                Command.DryRun(Configuration);
             }
 
             [Fact]
@@ -90,13 +90,13 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.Run(configuration);
+                Command.Run(Configuration);
             }
 
             [Fact]
             public void Should_call_assembly_file_extractor()
             {
-                assembly.Verify(a => a.GetManifestResourceNames(), Times.Once);
+                Assembly.Verify(a => a.GetManifestResourceNames(), Times.Once);
             }
         }
     }

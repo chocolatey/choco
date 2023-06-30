@@ -39,26 +39,26 @@ namespace chocolatey.tests.integration
 
         private static readonly DotNetFileSystem _fileSystem = new DotNetFileSystem();
 
-        public static string get_top_level()
+        public static string GetTopLevel()
         {
             return _fileSystem.GetDirectoryName(_fileSystem.GetCurrentAssemblyPath());
         }
 
-        public static string get_package_install_path()
+        public static string GetPackageInstallPath()
         {
-            return _fileSystem.CombinePaths(get_top_level(), "lib");
+            return _fileSystem.CombinePaths(GetTopLevel(), "lib");
         }
 
-        public static IEnumerable<string> get_installed_package_paths()
+        public static IEnumerable<string> GetInstalledPackagePaths()
         {
-            return _fileSystem.GetFiles(get_package_install_path(), "*" + NuGetConstants.PackageExtension, SearchOption.AllDirectories);
+            return _fileSystem.GetFiles(GetPackageInstallPath(), "*" + NuGetConstants.PackageExtension, SearchOption.AllDirectories);
         }
 
-        public static void reset(ChocolateyConfiguration config)
+        public static void Reset(ChocolateyConfiguration config)
         {
-            string packagesInstallPath = get_package_install_path();
-            string badPackagesPath = get_package_install_path() + "-bad";
-            string backupPackagesPath = get_package_install_path() + "-bkp";
+            string packagesInstallPath = GetPackageInstallPath();
+            string badPackagesPath = GetPackageInstallPath() + "-bad";
+            string backupPackagesPath = GetPackageInstallPath() + "-bkp";
             string shimsPath = ApplicationParameters.ShimsLocation;
             string hooksPath = ApplicationParameters.HooksLocation;
 
@@ -68,8 +68,8 @@ namespace chocolatey.tests.integration
             _fileSystem.DeleteDirectoryChecked(shimsPath, recursive: true, overrideAttributes: true);
             _fileSystem.DeleteDirectoryChecked(badPackagesPath, recursive: true, overrideAttributes: true);
             _fileSystem.DeleteDirectoryChecked(backupPackagesPath, recursive: true, overrideAttributes: true);
-            _fileSystem.DeleteDirectoryChecked(_fileSystem.CombinePaths(get_top_level(), ".chocolatey"), recursive: true, overrideAttributes: true);
-            _fileSystem.DeleteDirectoryChecked(_fileSystem.CombinePaths(get_top_level(), "extensions"), recursive: true, overrideAttributes: true);
+            _fileSystem.DeleteDirectoryChecked(_fileSystem.CombinePaths(GetTopLevel(), ".chocolatey"), recursive: true, overrideAttributes: true);
+            _fileSystem.DeleteDirectoryChecked(_fileSystem.CombinePaths(GetTopLevel(), "extensions"), recursive: true, overrideAttributes: true);
             _fileSystem.DeleteDirectoryChecked(hooksPath, recursive: true, overrideAttributes: true);
 
             _fileSystem.CreateDirectory(config.CacheLocation);
@@ -78,16 +78,16 @@ namespace chocolatey.tests.integration
             _fileSystem.CreateDirectory(shimsPath);
             _fileSystem.CreateDirectory(badPackagesPath);
             _fileSystem.CreateDirectory(backupPackagesPath);
-            _fileSystem.CreateDirectory(_fileSystem.CombinePaths(get_top_level(), ".chocolatey"));
-            _fileSystem.CreateDirectory(_fileSystem.CombinePaths(get_top_level(), "extensions"));
+            _fileSystem.CreateDirectory(_fileSystem.CombinePaths(GetTopLevel(), ".chocolatey"));
+            _fileSystem.CreateDirectory(_fileSystem.CombinePaths(GetTopLevel(), "extensions"));
 
             PowershellExecutor.AllowUseWindow = false;
         }
 
-        public static void add_packages_to_source_location(ChocolateyConfiguration config, string pattern)
+        public static void AddPackagesToSourceLocation(ChocolateyConfiguration config, string pattern)
         {
             _fileSystem.EnsureDirectoryExists(config.Sources);
-            var contextDir = _fileSystem.CombinePaths(get_top_level(), "context");
+            var contextDir = _fileSystem.CombinePaths(GetTopLevel(), "context");
             var files = _fileSystem.GetFiles(contextDir, pattern, SearchOption.AllDirectories);
 
             foreach (var file in files.OrEmpty())
@@ -96,11 +96,11 @@ namespace chocolatey.tests.integration
             }
         }
 
-        public static void add_machine_source(ChocolateyConfiguration config, string name, string path = null, int priority = 0, bool createDirectory = true)
+        public static void AddMachineSource(ChocolateyConfiguration config, string name, string path = null, int priority = 0, bool createDirectory = true)
         {
             if (string.IsNullOrEmpty(path))
             {
-                path = _fileSystem.CombinePaths(get_top_level(), "PrioritySources", name);
+                path = _fileSystem.CombinePaths(GetTopLevel(), "PrioritySources", name);
             }
 
             if (createDirectory)
@@ -117,14 +117,14 @@ namespace chocolatey.tests.integration
             config.MachineSources.Add(newSource);
         }
 
-        public static string add_packages_to_priority_source_location(ChocolateyConfiguration config, string pattern, int priority = 0, string name = null)
+        public static string AddPackagesToPrioritySourceLocation(ChocolateyConfiguration config, string pattern, int priority = 0, string name = null)
         {
             if (name == null)
             {
                 name = "Priority" + priority;
             }
 
-            var prioritySourceDirectory = _fileSystem.CombinePaths(get_top_level(), "PrioritySources", name);
+            var prioritySourceDirectory = _fileSystem.CombinePaths(GetTopLevel(), "PrioritySources", name);
 
             var machineSource = config.MachineSources.FirstOrDefault(m => m.Name.IsEqualTo(name));
 
@@ -145,7 +145,7 @@ namespace chocolatey.tests.integration
 
             _fileSystem.EnsureDirectoryExists(prioritySourceDirectory);
 
-            var contextDir = _fileSystem.CombinePaths(get_top_level(), "context");
+            var contextDir = _fileSystem.CombinePaths(GetTopLevel(), "context");
             var files = _fileSystem.GetFiles(contextDir, pattern, SearchOption.AllDirectories).OrEmpty().ToList();
 
             if (files.Count == 0)
@@ -161,7 +161,7 @@ namespace chocolatey.tests.integration
             return machineSource.Name;
         }
 
-        public static void remove_packages_from_destination_location(ChocolateyConfiguration config, string pattern)
+        public static void RemovePackagesFromDestinationLocation(ChocolateyConfiguration config, string pattern)
         {
             if (!_fileSystem.DirectoryExists(config.Sources))
             {
@@ -176,7 +176,7 @@ namespace chocolatey.tests.integration
             }
         }
 
-        public static void install_package(ChocolateyConfiguration config, string packageId, string version)
+        public static void InstallPackage(ChocolateyConfiguration config, string packageId, string version)
         {
             if (_service == null)
             {
@@ -192,7 +192,7 @@ namespace chocolatey.tests.integration
             NUnitSetup.MockLogger.Messages.Clear();
         }
 
-        public static void add_files(IEnumerable<Tuple<string, string>> files)
+        public static void AddFiles(IEnumerable<Tuple<string, string>> files)
         {
             foreach (var file in files)
             {
@@ -204,26 +204,26 @@ namespace chocolatey.tests.integration
             }
         }
 
-        public static void create_directory(string directoryPath)
+        public static void CreateDirectory(string directoryPath)
         {
             _fileSystem.CreateDirectory(directoryPath);
         }
 
-        public static void add_changed_version_package_to_source_location(ChocolateyConfiguration config, string pattern, string newVersion)
+        public static void AddChangedVersionPackageToSourceLocation(ChocolateyConfiguration config, string pattern, string newVersion)
         {
             _fileSystem.EnsureDirectoryExists(config.Sources);
-            var contextDir = _fileSystem.CombinePaths(get_top_level(), "context");
+            var contextDir = _fileSystem.CombinePaths(GetTopLevel(), "context");
             var files = _fileSystem.GetFiles(contextDir, pattern, SearchOption.AllDirectories);
 
             foreach (var file in files.OrEmpty())
             {
                 var copyToPath = _fileSystem.CombinePaths(config.Sources, _fileSystem.GetFileName(file));
                 _fileSystem.CopyFile(_fileSystem.GetFullPath(file), copyToPath, overwriteExisting: true);
-                change_package_version(copyToPath, newVersion);
+                ChangePackageVersion(copyToPath, newVersion);
             }
         }
 
-        public static void change_package_version(string existingPackagePath, string newVersion)
+        public static void ChangePackageVersion(string existingPackagePath, string newVersion)
         {
             string packageId;
             XDocument nuspecXml;
@@ -256,9 +256,9 @@ namespace chocolatey.tests.integration
             _fileSystem.MoveFile(existingPackagePath, renamedPath);
         }
 
-        private static ChocolateyConfiguration baseline_configuration()
+        private static ChocolateyConfiguration BaselineConfiguration()
         {
-            delete_test_package_directories();
+            DeleteTestPackageDirectories();
 
             // note that this does not mean an empty configuration. It does get influenced by
             // prior commands, so ensure that all items go back to the default values here
@@ -279,7 +279,7 @@ namespace chocolatey.tests.integration
             config.Information.IsLicensedVersion = false;
             config.AcceptLicense = true;
             config.AllowUnofficialBuild = true;
-            config.CacheLocation = _fileSystem.GetFullPath(_fileSystem.CombinePaths(get_top_level(), "cache"));
+            config.CacheLocation = _fileSystem.GetFullPath(_fileSystem.CombinePaths(GetTopLevel(), "cache"));
             config.CommandExecutionTimeoutSeconds = 2700;
             config.Force = false;
             config.ForceDependencies = false;
@@ -297,7 +297,7 @@ namespace chocolatey.tests.integration
             config.PromptForConfirmation = false;
             config.RegularOutput = true;
             config.SkipPackageInstallProvider = false;
-            config.Sources = _fileSystem.GetFullPath(_fileSystem.CombinePaths(get_top_level(), "packages"));
+            config.Sources = _fileSystem.GetFullPath(_fileSystem.CombinePaths(GetTopLevel(), "packages"));
             config.Version = null;
             config.Debug = true;
             config.AllVersions = false;
@@ -326,49 +326,49 @@ namespace chocolatey.tests.integration
             return config;
         }
 
-        public static ChocolateyConfiguration install()
+        public static ChocolateyConfiguration Install()
         {
-            var config = baseline_configuration();
+            var config = BaselineConfiguration();
             config.CommandName = CommandNameType.Install.ToStringSafe();
 
             return config;
         }
 
-        public static ChocolateyConfiguration upgrade()
+        public static ChocolateyConfiguration Upgrade()
         {
-            var config = baseline_configuration();
+            var config = BaselineConfiguration();
             config.CommandName = CommandNameType.Upgrade.ToStringSafe();
 
             return config;
         }
 
-        public static ChocolateyConfiguration uninstall()
+        public static ChocolateyConfiguration Uninstall()
         {
-            var config = baseline_configuration();
+            var config = BaselineConfiguration();
             config.CommandName = CommandNameType.Uninstall.ToStringSafe();
 
             return config;
         }
 
-        public static ChocolateyConfiguration list()
+        public static ChocolateyConfiguration List()
         {
-            var config = baseline_configuration();
+            var config = BaselineConfiguration();
             config.CommandName = "list";
 
             return config;
         }
 
-        public static ChocolateyConfiguration search()
+        public static ChocolateyConfiguration Search()
         {
-            var config = baseline_configuration();
+            var config = BaselineConfiguration();
             config.CommandName = "search";
 
             return config;
         }
 
-        public static ChocolateyConfiguration info()
+        public static ChocolateyConfiguration Info()
         {
-            var config = baseline_configuration();
+            var config = BaselineConfiguration();
             config.CommandName = "info";
             config.Verbose = true;
             config.ListCommand.Exact = true;
@@ -376,30 +376,30 @@ namespace chocolatey.tests.integration
             return config;
         }
 
-        public static ChocolateyConfiguration pin()
+        public static ChocolateyConfiguration Pin()
         {
-            var config = baseline_configuration();
+            var config = BaselineConfiguration();
             config.CommandName = "pin";
 
             return config;
         }
 
-        public static ChocolateyConfiguration pack()
+        public static ChocolateyConfiguration Pack()
         {
-            var config = baseline_configuration();
+            var config = BaselineConfiguration();
             config.CommandName = "pack";
 
             return config;
         }
 
-        public static ChocolateyConfiguration proxy()
+        public static ChocolateyConfiguration Proxy()
         {
-            return baseline_configuration();
+            return BaselineConfiguration();
         }
 
-        public static void set_configuration_file_setting(string name, string value)
+        public static void SetConfigurationFileSetting(string name, string value)
         {
-            var config = baseline_configuration();
+            var config = BaselineConfiguration();
             config.ConfigCommand.Name = name;
             config.ConfigCommand.ConfigValue = value;
             config.ConfigCommand.Command = ConfigCommandType.Set;
@@ -407,9 +407,9 @@ namespace chocolatey.tests.integration
             configService.SetConfig(config);
         }
 
-        private static void delete_test_package_directories()
+        private static void DeleteTestPackageDirectories()
         {
-            var topDirectory = get_top_level();
+            var topDirectory = GetTopLevel();
 
             var directoriesToClean = new[]
             {

@@ -33,82 +33,82 @@ namespace chocolatey.tests.infrastructure.app.commands
         [ConcernFor("apikey")]
         public abstract class ChocolateyApiKeyCommandSpecsBase : TinySpec
         {
-            protected ChocolateyApiKeyCommand command;
-            protected Mock<IChocolateyConfigSettingsService> configSettingsService = new Mock<IChocolateyConfigSettingsService>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateyApiKeyCommand Command;
+            protected Mock<IChocolateyConfigSettingsService> ConfigSettingsService = new Mock<IChocolateyConfigSettingsService>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                configuration.Sources = "bob";
-                command = new ChocolateyApiKeyCommand(configSettingsService.Object);
+                Configuration.Sources = "bob";
+                Command = new ChocolateyApiKeyCommand(ConfigSettingsService.Object);
             }
         }
 
         public class When_implementing_command_for : ChocolateyApiKeyCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void Should_implement_apikey()
             {
-                results.Should().Contain("apikey");
+                _results.Should().Contain("apikey");
             }
 
             [Fact]
             public void Should_implement_setapikey()
             {
-                results.Should().Contain("setapikey");
+                _results.Should().Contain("setapikey");
             }
         }
 
         public class When_configuring_the_argument_parser : ChocolateyApiKeyCommandSpecsBase
         {
-            private OptionSet optionSet;
+            private OptionSet _optionSet;
 
             public override void Context()
             {
                 base.Context();
-                optionSet = new OptionSet();
+                _optionSet = new OptionSet();
             }
 
             public override void Because()
             {
-                command.ConfigureArgumentParser(optionSet, configuration);
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
             }
 
             [Fact]
             public void Should_clear_previously_set_Source()
             {
-                configuration.Sources.Should().BeNull();
+                Configuration.Sources.Should().BeNull();
             }
 
             [Fact]
             public void Should_add_source_to_the_option_set()
             {
-                optionSet.Contains("source").Should().BeTrue();
+                _optionSet.Contains("source").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_source_to_the_option_set()
             {
-                optionSet.Contains("s").Should().BeTrue();
+                _optionSet.Contains("s").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_apikey_to_the_option_set()
             {
-                optionSet.Contains("apikey").Should().BeTrue();
+                _optionSet.Contains("apikey").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_apikey_to_the_option_set()
             {
-                optionSet.Contains("k").Should().BeTrue();
+                _optionSet.Contains("k").Should().BeTrue();
             }
         }
 
@@ -121,14 +121,14 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_throw_when_key_is_set_without_a_source()
             {
-                configuration.ApiKeyCommand.Key = "bob";
-                configuration.Sources = "";
+                Configuration.ApiKeyCommand.Key = "bob";
+                Configuration.Sources = "";
                 var errored = false;
                 Exception error = null;
 
                 try
                 {
-                    command.Validate(configuration);
+                    Command.Validate(Configuration);
                 }
                 catch (Exception ex)
                 {
@@ -144,30 +144,30 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_continue_when_source_is_set_but_no_key_set()
             {
-                configuration.ApiKeyCommand.Key = "";
-                configuration.Sources = "bob";
-                command.Validate(configuration);
+                Configuration.ApiKeyCommand.Key = "";
+                Configuration.Sources = "bob";
+                Command.Validate(Configuration);
             }
 
             [Fact]
             public void Should_continue_when_both_source_and_key_are_set()
             {
-                configuration.ApiKeyCommand.Key = "bob";
-                configuration.Sources = "bob";
-                command.Validate(configuration);
+                Configuration.ApiKeyCommand.Key = "bob";
+                Configuration.Sources = "bob";
+                Command.Validate(Configuration);
             }
 
             [Fact]
             public void Should_throw_when_key_is_removed_without_a_source()
             {
-                configuration.ApiKeyCommand.Command = ApiKeyCommandType.Remove;
-                configuration.Sources = "";
+                Configuration.ApiKeyCommand.Command = ApiKeyCommandType.Remove;
+                Configuration.Sources = "";
                 var errored = false;
                 Exception error = null;
 
                 try
                 {
-                    command.Validate(configuration);
+                    Command.Validate(Configuration);
                 }
                 catch (Exception ex)
                 {
@@ -183,9 +183,9 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_continue_when_removing_and_source_is_set()
             {
-                configuration.ApiKeyCommand.Command = ApiKeyCommandType.Remove;
-                configuration.Sources = "bob";
-                command.Validate(configuration);
+                Configuration.ApiKeyCommand.Command = ApiKeyCommandType.Remove;
+                Configuration.Sources = "bob";
+                Command.Validate(Configuration);
             }
         }
 
@@ -193,13 +193,13 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.DryRun(configuration);
+                Command.DryRun(Configuration);
             }
 
             [Fact]
             public void Should_call_service_noop()
             {
-                configSettingsService.Verify(c => c.DryRun(configuration), Times.Once);
+                ConfigSettingsService.Verify(c => c.DryRun(Configuration), Times.Once);
             }
         }
 
@@ -208,19 +208,19 @@ namespace chocolatey.tests.infrastructure.app.commands
             public override void Context()
             {
                 base.Context();
-                configuration.Sources = "bob";
-                configuration.ApiKeyCommand.Key = "";
+                Configuration.Sources = "bob";
+                Configuration.ApiKeyCommand.Key = "";
             }
 
             public override void Because()
             {
-                command.Run(configuration);
+                Command.Run(Configuration);
             }
 
             [Fact]
             public void Should_call_service_get_api_key()
             {
-                configSettingsService.Verify(c => c.GetApiKey(configuration, It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Once);
+                ConfigSettingsService.Verify(c => c.GetApiKey(Configuration, It.IsAny<Action<ConfigFileApiKeySetting>>()), Times.Once);
             }
         }
 
@@ -229,20 +229,20 @@ namespace chocolatey.tests.infrastructure.app.commands
             public override void Context()
             {
                 base.Context();
-                configuration.Sources = "bob";
-                configuration.ApiKeyCommand.Key = "bob";
-                configuration.ApiKeyCommand.Command = ApiKeyCommandType.Add;
+                Configuration.Sources = "bob";
+                Configuration.ApiKeyCommand.Key = "bob";
+                Configuration.ApiKeyCommand.Command = ApiKeyCommandType.Add;
             }
 
             public override void Because()
             {
-                command.Run(configuration);
+                Command.Run(Configuration);
             }
 
             [Fact]
             public void Should_call_service_set_api_key()
             {
-                configSettingsService.Verify(c => c.SetApiKey(configuration), Times.Once);
+                ConfigSettingsService.Verify(c => c.SetApiKey(Configuration), Times.Once);
             }
         }
     }
