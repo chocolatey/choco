@@ -19,6 +19,7 @@ namespace chocolatey.infrastructure.adapters
     using System;
     using System.Collections;
     using app;
+    using static chocolatey.StringResources;
 
     public sealed class Environment : IEnvironment
     {
@@ -37,7 +38,7 @@ namespace chocolatey.infrastructure.adapters
             get
             {
                 // ARM64 bit architecture has a x86-32 emulator, so return false
-                if (System.Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ProcessorArchitecture).ToStringSafe().IsEqualTo(ApplicationParameters.Environment.Arm64ProcessorArchitecture))
+                if (System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.ProcessorArchitecture).ToStringSafe().IsEqualTo(ApplicationParameters.Environment.Arm64ProcessorArchitecture))
                 {
                     return false;
                 }

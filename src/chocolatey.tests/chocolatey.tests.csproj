@@ -77,6 +77,12 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>TestKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Chocolatey.NuGet.Commands">
       <HintPath>..\packages\Chocolatey.NuGet.Commands.3.3.0\lib\net472\Chocolatey.NuGet.Commands.dll</HintPath>
@@ -223,6 +229,7 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="TestKey.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\chocolatey\chocolatey.csproj">

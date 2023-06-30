@@ -29,6 +29,7 @@ namespace chocolatey.infrastructure.app.services
     using logging;
     using results;
     using platforms;
+    using static chocolatey.StringResources;
 
     /// <summary>
     ///   Alternative Source for Cygwin
@@ -179,7 +180,7 @@ namespace chocolatey.infrastructure.app.services
                 return setupKey.GetValue("rootdir", string.Empty).ToStringSafe();
             }
 
-            var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
+            var binRoot = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyBinRoot);
             if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
 
             return _fileSystem.CombinePaths(binRoot, "cygwin");

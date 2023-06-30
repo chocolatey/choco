@@ -37,6 +37,7 @@ namespace chocolatey.infrastructure.app.builders
     using platforms;
     using services;
     using tolerance;
+    using static chocolatey.StringResources;
     using Assembly = adapters.Assembly;
     using Container = SimpleInjector.Container;
     using Environment = adapters.Environment;
@@ -503,19 +504,19 @@ namespace chocolatey.infrastructure.app.builders
             config.Information.IsUserRemote = ProcessInformation.UserIsRemote();
             config.Information.IsProcessElevated = ProcessInformation.IsElevated();
 
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("https_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpsProxy)) && string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
-                config.Proxy.Location = Environment.GetEnvironmentVariable("https_proxy");
+                config.Proxy.Location = Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpsProxy);
             }
 
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("http_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpProxy)) && string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
-                config.Proxy.Location = Environment.GetEnvironmentVariable("http_proxy");
+                config.Proxy.Location = Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpProxy);
             }
 
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("no_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.BypassList))
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.System.NoProxy)) && string.IsNullOrWhiteSpace(config.Proxy.BypassList))
             {
-                config.Proxy.BypassList = Environment.GetEnvironmentVariable("no_proxy");
+                config.Proxy.BypassList = Environment.GetEnvironmentVariable(EnvironmentVariables.System.NoProxy);
             }
         }
 
