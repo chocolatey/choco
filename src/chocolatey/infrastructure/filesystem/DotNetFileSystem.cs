@@ -32,6 +32,7 @@ using chocolatey.infrastructure.platforms;
 using chocolatey.infrastructure.tolerance;
 using Assembly = chocolatey.infrastructure.adapters.Assembly;
 using Environment = chocolatey.infrastructure.adapters.Environment;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.filesystem
 {
@@ -128,7 +129,7 @@ namespace chocolatey.infrastructure.filesystem
 
             if (System.Environment.UserName.ContainsSafe(ApplicationParameters.Environment.SystemUserName) || path.ContainsSafe("config\\systemprofile"))
             {
-                path = System.Environment.ExpandEnvironmentVariables(System.Environment.GetEnvironmentVariable(ApplicationParameters.Environment.Temp, EnvironmentVariableTarget.Machine).ToStringSafe());
+                path = System.Environment.ExpandEnvironmentVariables(System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.Temp, EnvironmentVariableTarget.Machine).ToStringSafe());
             }
 
             return path;
@@ -156,7 +157,7 @@ namespace chocolatey.infrastructure.filesystem
 
             if (GetFilenameWithoutExtension(executableName).IsEqualTo(executableName) && isWindows)
             {
-                var pathExtensions = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions).ToStringSafe().Split(new[] { ApplicationParameters.Environment.EnvironmentSeparator }, StringSplitOptions.RemoveEmptyEntries);
+                var pathExtensions = Environment.GetEnvironmentVariable(EnvironmentVariables.System.PathExtensions).ToStringSafe().Split(new[] { ApplicationParameters.Environment.EnvironmentSeparator }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var extension in pathExtensions.OrEmpty())
                 {
                     extensions.Add(extension.StartsWith(".") ? extension : ".{0}".FormatWith(extension));
@@ -174,7 +175,7 @@ namespace chocolatey.infrastructure.filesystem
                 GetCurrentDirectory(),
                 GetDirectoryName(GetCurrentAssemblyPath())
             };
-            searchPaths.AddRange(Environment.GetEnvironmentVariable(ApplicationParameters.Environment.Path).ToStringSafe().Split(new[] { GetPathSeparator() }, StringSplitOptions.RemoveEmptyEntries));
+            searchPaths.AddRange(Environment.GetEnvironmentVariable(EnvironmentVariables.System.Path).ToStringSafe().Split(new[] { GetPathSeparator() }, StringSplitOptions.RemoveEmptyEntries));
 
             foreach (var path in searchPaths.OrEmpty())
             {
@@ -701,7 +702,8 @@ namespace chocolatey.infrastructure.filesystem
             }
 
             // Linux / macOS do not have a SystemDrive environment variable, instead, everything is under "/"
-            var systemDrive = Platform.GetPlatform() == PlatformType.Windows ? Environment.GetEnvironmentVariable("SystemDrive") : "/";
+            var systemDrive = Platform.GetPlatform() == PlatformType.Windows ? Environment.GetEnvironmentVariable(EnvironmentVariables.System.SystemDrive) : "/";
+
             if (CombinePaths(directoryPath, "").IsEqualTo(CombinePaths(systemDrive, "")))
             {
                 throw new ApplicationException("Cannot move or delete the root of the system drive");
@@ -955,7 +957,8 @@ namespace chocolatey.infrastructure.filesystem
             }
 
             // Linux / macOS do not have a SystemDrive environment variable, instead, everything is under "/"
-            var systemDrive = Platform.GetPlatform() == PlatformType.Windows ? Environment.GetEnvironmentVariable("SystemDrive") : "/";
+            var systemDrive = Platform.GetPlatform() == PlatformType.Windows ? Environment.GetEnvironmentVariable(EnvironmentVariables.System.SystemDrive) : "/";
+
             if (CombinePaths(directoryPath, "").IsEqualTo(CombinePaths(systemDrive, "")))
             {
                 throw new ApplicationException("Cannot move or delete the root of the system drive");

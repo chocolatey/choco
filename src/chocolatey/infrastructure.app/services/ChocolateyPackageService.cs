@@ -40,6 +40,7 @@ using chocolatey.infrastructure.results;
 using SimpleInjector;
 using chocolatey.infrastructure.tolerance;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app.services
 {
@@ -542,19 +543,19 @@ Did you know Pro / Business automatically syncs with Programs and
                 pkgInfo.IsPinned = config.PinPackage;
             }
 
-            var toolsLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyToolsLocation);
-            if (!string.IsNullOrWhiteSpace(toolsLocation) && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation)))
+            var toolsLocation = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyToolsLocation);
+            if (!string.IsNullOrWhiteSpace(toolsLocation) && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageInstallLocation)))
             {
                 toolsLocation = _fileSystem.CombinePaths(toolsLocation, packageResult.Name);
                 if (_fileSystem.DirectoryExists(toolsLocation))
                 {
-                    Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, toolsLocation, EnvironmentVariableTarget.Process);
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageInstallLocation, toolsLocation, EnvironmentVariableTarget.Process);
                 }
             }
 
-            if (!powerShellRan && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation)))
+            if (!powerShellRan && string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageInstallLocation)))
             {
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, packageResult.InstallLocation, EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageInstallLocation, packageResult.InstallLocation, EnvironmentVariableTarget.Process);
             }
 
             if (pkgInfo.RegistrySnapshot != null && pkgInfo.RegistrySnapshot.RegistryKeys.Any(k => !string.IsNullOrWhiteSpace(k.InstallLocation)))
@@ -562,11 +563,11 @@ Did you know Pro / Business automatically syncs with Programs and
                 var key = pkgInfo.RegistrySnapshot.RegistryKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k.InstallLocation));
                 if (key != null)
                 {
-                    Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, key.InstallLocation, EnvironmentVariableTarget.Process);
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageInstallLocation, key.InstallLocation, EnvironmentVariableTarget.Process);
                 }
             }
 
-            pkgInfo.DeploymentLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation);
+            pkgInfo.DeploymentLocation = Environment.GetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageInstallLocation);
 
             UpdatePackageInformation(pkgInfo);
             EnsureBadPackagesPathIsClean(packageResult);
@@ -603,7 +604,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".FormatWith(commandName.ToStringSafe(), packageResult.Name));
 
-            var installerDetected = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType);
+            var installerDetected = Environment.GetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyInstallerType);
             if (!string.IsNullOrWhiteSpace(pkgInfo.DeploymentLocation))
             {
                 this.Log().Info(ChocolateyLoggers.Important, "  Deployed to '{0}'".FormatWith(pkgInfo.DeploymentLocation.EscapeCurlyBraces()));
@@ -1300,10 +1301,10 @@ If a package is failing because it is a dependency of another package
  or packages, then you may first need to consider if it needs to be
  removed as packages have dependencies for a reason. If
  you decide that you still want to remove it, head into
- `$env:ChocolateyInstall\lib` and find the package folder you want to
+ `$env:{0}\lib` and find the package folder you want to
  be removed. Then delete the folder for the package. You should use
  this option only as a last resort.
- ");
+ ", EnvironmentVariables.System.ChocolateyInstall);
                 }
 
                 RandomlyNotifyAboutLicensedFeatures(config);
@@ -1643,7 +1644,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, packageExtensionsInstallDirectory, EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageInstallLocation, packageExtensionsInstallDirectory, EnvironmentVariableTarget.Process);
             }
             else
             {
@@ -1742,7 +1743,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, installTemplatePath, EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageInstallLocation, installTemplatePath, EnvironmentVariableTarget.Process);
             }
             else
             {
@@ -2116,7 +2117,7 @@ ATTENTION: You must take manual action to remove {1} from
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, installHookPath, EnvironmentVariableTarget.Process);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageInstallLocation, installHookPath, EnvironmentVariableTarget.Process);
             }
             else
             {

@@ -38,6 +38,7 @@ using chocolatey.infrastructure.tolerance;
 using Assembly = chocolatey.infrastructure.adapters.Assembly;
 using Container = SimpleInjector.Container;
 using Environment = chocolatey.infrastructure.adapters.Environment;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app.builders
 {
@@ -224,13 +225,13 @@ namespace chocolatey.infrastructure.app.builders
                     ApplicationParameters.ConfigSettings.CacheLocation,
                     configFileSettings,
                     string.Empty,
-                    "Cache location if not TEMP folder. Replaces `$env:TEMP` value for choco.exe process. It is highly recommended this be set to make Chocolatey more deterministic in cleanup."
+                    "Cache location if not {0} folder. Replaces `$env:{0}` value for choco.exe process. It is highly recommended this be set to make Chocolatey more deterministic in cleanup.".FormatWith(EnvironmentVariables.System.Temp)
                     )
                 );
 
             if (string.IsNullOrWhiteSpace(config.CacheLocation))
             {
-                config.CacheLocation = fileSystem.GetTempPath(); // System.Environment.GetEnvironmentVariable("TEMP");
+                config.CacheLocation = fileSystem.GetTempPath(); // System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.Temp);
                 // TEMP gets set in EnvironmentSettings, so it may already have
                 // chocolatey in the path when it installs the next package from
                 // the API.
@@ -423,7 +424,7 @@ namespace chocolatey.infrastructure.app.builders
                                 }
                             })
                         .Add("c=|cache=|cachelocation=|cache-location=",
-                             "CacheLocation - Location for download cache, defaults to %TEMP% or value in chocolatey.config file.",
+                             $"CacheLocation - Location for download cache, defaults to %{EnvironmentVariables.System.Temp}% or value in chocolatey.config file.",
                              option => config.CacheLocation = option.UnquoteSafe())
                         .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
                              "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
@@ -509,19 +510,19 @@ namespace chocolatey.infrastructure.app.builders
             config.Information.IsUserRemote = ProcessInformation.UserIsRemote();
             config.Information.IsProcessElevated = ProcessInformation.IsElevated();
 
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("https_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpsProxy)) && string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
-                config.Proxy.Location = Environment.GetEnvironmentVariable("https_proxy");
+                config.Proxy.Location = Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpsProxy);
             }
 
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("http_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpProxy)) && string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
-                config.Proxy.Location = Environment.GetEnvironmentVariable("http_proxy");
+                config.Proxy.Location = Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpProxy);
             }
 
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("no_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.BypassList))
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.System.NoProxy)) && string.IsNullOrWhiteSpace(config.Proxy.BypassList))
             {
-                config.Proxy.BypassList = Environment.GetEnvironmentVariable("no_proxy");
+                config.Proxy.BypassList = Environment.GetEnvironmentVariable(EnvironmentVariables.System.NoProxy);
             }
         }
 

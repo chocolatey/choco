@@ -61,6 +61,12 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>TestKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AnyOf, Version=0.3.0.0, Culture=neutral, PublicKeyToken=b35e6abbb527c6b1, processorArchitecture=MSIL">
       <HintPath>..\packages\AnyOf.0.3.0\lib\net45\AnyOf.dll</HintPath>
@@ -493,6 +499,7 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="TestKey.snk" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\chocolatey.tests\chocolatey.tests.csproj">

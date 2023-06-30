@@ -23,6 +23,7 @@ using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.commands;
 using chocolatey.infrastructure.logging;
 using chocolatey.infrastructure.app.services;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app.commands
 {
@@ -183,7 +184,7 @@ Chocolatey automatically tracks registry changes for ""Programs and
  to reverse the installation done in the install script.
 
 Chocolatey tracks packages, which are the files in
- `$env:ChocolateyInstall\lib\packagename`. These packages may or may not
+ `$env:{0}\lib\packagename`. These packages may or may not
  contain the software (applications/tools) that each package represents.
  The software may actually be installed in Program Files (most native
  installers will install the software there) or elsewhere on the
@@ -209,7 +210,7 @@ NOTE: Synchronizer and AutoUninstaller enhancements in licensed
  because synchronizer ensures the registry snapshot stays up to date
  and licensed enhancements have the ability to inspect more locations
  to determine how to automatically uninstall software.
-");
+", EnvironmentVariables.System.ChocolateyInstall);
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Usage");
             "chocolatey".Log().Info(@"
