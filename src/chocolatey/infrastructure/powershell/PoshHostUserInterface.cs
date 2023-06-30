@@ -131,14 +131,14 @@ namespace chocolatey.infrastructure.powershell
             this.Log().Debug(message.EscapeCurlyBraces());
         }
 
-        private bool hasLoggedStartProgress = false;
+        private bool _hasLoggedStartProgress = false;
         public override void WriteProgress(long sourceId, ProgressRecord record)
         {
             if (record.PercentComplete == -1) return;
 
-            if (!hasLoggedStartProgress)
+            if (!_hasLoggedStartProgress)
             {
-                hasLoggedStartProgress = true;
+                _hasLoggedStartProgress = true;
                 this.Log().Debug(record.Activity.EscapeCurlyBraces());
             }
 

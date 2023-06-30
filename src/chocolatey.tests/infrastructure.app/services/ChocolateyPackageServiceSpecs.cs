@@ -215,7 +215,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact, Categories.Unc]
             public void Should_throw_exception_when_UNC_path_is_passed_to_install_run()
             {
-                var directory = UNCHelper.convert_local_folder_path_to_ip_based_unc_path(Path.Combine(Path.GetPathRoot(Environment.CurrentDirectory), "testing"));
+                var directory = UNCHelper.ConvertLocalFolderPathToIpBasedUncPath(Path.Combine(Path.GetPathRoot(Environment.CurrentDirectory), "testing"));
                 var filePath = Path.Combine(directory, "my-package.nupkg");
                 Configuration.PackageNames = new Uri(filePath).AbsoluteUri;
                 FileSystem.Setup(f => f.GetFilenameWithoutExtension(filePath))

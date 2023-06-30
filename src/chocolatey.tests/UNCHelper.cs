@@ -6,15 +6,15 @@
 
     public static class UNCHelper
     {
-        public static string convert_local_folder_path_to_ip_based_unc_path(string localFolderName)
+        public static string ConvertLocalFolderPathToIpBasedUncPath(string localFolderName)
         {
             var rootFolder = Path.GetPathRoot(localFolderName);
-            var ipAddress = return_machine_ip();
+            var ipAddress = ReturnMachineId();
 
             return string.Format("\\\\{0}\\\\{1}$\\{2}", ipAddress, rootFolder.TrimEnd('\\', ':'), localFolderName.Substring(rootFolder.Length));
         }
 
-        private static IPAddress return_machine_ip()
+        private static IPAddress ReturnMachineId()
         {
             var hostName = Dns.GetHostName();
             var ipEntry = Dns.GetHostEntry(hostName);

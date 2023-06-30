@@ -23,27 +23,27 @@ namespace chocolatey.tests.infrastructure.app.attributes
     {
         public abstract class CommandForAttributeSpecsBase : TinySpec
         {
-            protected CommandForAttribute attribute;
+            protected CommandForAttribute Attribute;
         }
 
         public class When_CommandForAttribute_is_set_with_string : CommandForAttributeSpecsBase
         {
-            private string result;
+            private string _result;
 
             public override void Context()
             {
-                attribute = new CommandForAttribute("bob", "");
+                Attribute = new CommandForAttribute("bob", "");
             }
 
             public override void Because()
             {
-                result = attribute.CommandName;
+                _result = Attribute.CommandName;
             }
 
             [Fact]
             public void Should_be_set_to_the_string()
             {
-                result.Should().Be("bob");
+                _result.Should().Be("bob");
             }
         }
     }

@@ -33,12 +33,12 @@ namespace chocolatey.infrastructure.results
     {
         public bool Inconclusive
         {
-            get { return _messages.Value.Any(x => x.MessageType == ResultType.Inconclusive); }
+            get { return Messages.Any(x => x.MessageType == ResultType.Inconclusive); }
         }
 
         public bool Warning
         {
-            get { return _messages.Value.Any(x => x.MessageType == ResultType.Warn); }
+            get { return Messages.Any(x => x.MessageType == ResultType.Warn); }
         }
 
         public string Name { get; private set; }

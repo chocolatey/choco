@@ -46,16 +46,16 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Context()
             {
-                Configuration = Scenario.upgrade();
-                Scenario.reset(Configuration);
+                Configuration = Scenario.Upgrade();
+                Scenario.Reset(Configuration);
                 Configuration.PackageNames = Configuration.Input = "upgradepackage";
-                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "installpackage*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "badpackage*" +  NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "installpackage", "1.0.0");
-                Scenario.install_package(Configuration, "upgradepackage", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, Configuration.Input + "*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "badpackage*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "installpackage", "1.0.0");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.0.0");
                 Configuration.SkipPackageInstallProvider = true;
-                Scenario.install_package(Configuration, "badpackage", "1.0");
+                Scenario.InstallPackage(Configuration, "badpackage", "1.0");
                 Configuration.SkipPackageInstallProvider = false;
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
@@ -78,7 +78,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_older_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.0.0");
             }
@@ -100,7 +100,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_create_a_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -137,7 +137,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_create_a_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -191,7 +191,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -199,7 +199,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -207,7 +207,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
@@ -215,7 +215,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -321,9 +321,9 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Sources = string.Join(",",
-                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + NuGetConstants.PackageExtension, priority: 1),
-                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, priority: 0));
-                Scenario.install_package(Configuration, "upgradepackage", "1.0.0");
+                    Scenario.AddPackagesToPrioritySourceLocation(Configuration, "upgradepackage.1.0.0" + NuGetConstants.PackageExtension, priority: 1),
+                    Scenario.AddPackagesToPrioritySourceLocation(Configuration, "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, priority: 0));
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.0.0");
             }
 
             public override void Because()
@@ -349,7 +349,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_create_a_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -357,7 +357,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_remove_the_package_from_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -365,7 +365,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_be_the_same_version_of_the_package()
             {
-                var packageFolder = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFolder = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
 
                 using (var reader = new PackageFolderReader(packageFolder))
                 {
@@ -405,7 +405,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                Scenario.install_package(Configuration, "upgradepackage", "1.1.0");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.1.0");
             }
 
             public override void Because()
@@ -431,7 +431,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_create_a_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -439,7 +439,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_remove_the_package_from_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -447,7 +447,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_be_the_same_version_of_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -504,7 +504,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -512,7 +512,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -520,7 +520,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.1-beta2");
             }
@@ -528,7 +528,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
@@ -637,7 +637,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Prerelease = true;
-                Scenario.remove_packages_from_destination_location(Configuration, "upgradepackage.1.1.1-beta2.nupkg");
+                Scenario.RemovePackagesFromDestinationLocation(Configuration, "upgradepackage.1.1.1-beta2.nupkg");
             }
 
             public override void Because()
@@ -655,7 +655,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -663,7 +663,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -671,7 +671,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.1-beta.1");
             }
@@ -679,7 +679,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
@@ -787,7 +787,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Prerelease = true;
-                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-beta");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.1.1-beta");
                 Configuration.Prerelease = false;
             }
 
@@ -806,7 +806,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -814,7 +814,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -822,7 +822,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.1-beta2");
             }
@@ -830,7 +830,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
@@ -937,8 +937,8 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Prerelease = true;
-                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-beta");
-                Scenario.remove_packages_from_destination_location(Configuration, "upgradepackage.1.1.1-beta2.nupkg");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.1.1-beta");
+                Scenario.RemovePackagesFromDestinationLocation(Configuration, "upgradepackage.1.1.1-beta2.nupkg");
                 Configuration.Prerelease = false;
             }
 
@@ -957,7 +957,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -965,7 +965,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -973,7 +973,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.1-beta.1");
             }
@@ -981,7 +981,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
@@ -1088,7 +1088,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Prerelease = true;
-                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-beta.1");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.1.1-beta.1");
                 Configuration.Prerelease = false;
             }
 
@@ -1107,7 +1107,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -1115,7 +1115,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -1123,7 +1123,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.1-beta2");
             }
@@ -1131,7 +1131,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
@@ -1237,7 +1237,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Prerelease = true;
-                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-beta");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.1.1-beta");
                 Configuration.Prerelease = false;
                 Configuration.UpgradeCommand.ExcludePrerelease = true;
             }
@@ -1265,7 +1265,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_create_a_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -1273,7 +1273,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_remove_the_package_from_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -1281,7 +1281,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_be_the_same_version_of_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
@@ -1324,7 +1324,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Prerelease = true;
-                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-beta");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.1.1-beta");
                 Configuration.Prerelease = false;
                 Configuration.UpgradeCommand.ExcludePrerelease = true;
                 Configuration.AllowDowngrade = true;
@@ -1353,7 +1353,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_create_a_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -1361,7 +1361,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_remove_the_package_from_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -1369,7 +1369,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_be_the_same_version_of_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
@@ -1429,7 +1429,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -1437,7 +1437,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -1447,7 +1447,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -1455,7 +1455,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
@@ -1541,7 +1541,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_create_a_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -1549,7 +1549,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_remove_the_package_from_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -1557,7 +1557,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_be_the_same_version_of_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -1623,7 +1623,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_create_a_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -1631,7 +1631,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_remove_the_package_from_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -1639,7 +1639,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_be_the_same_version_of_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -1676,7 +1676,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var packagesConfig = "{0}{1}context{1}testing.packages.config".FormatWith(Scenario.get_top_level(), Path.DirectorySeparatorChar);
+                var packagesConfig = "{0}{1}context{1}testing.packages.config".FormatWith(Scenario.GetTopLevel(), Path.DirectorySeparatorChar);
                 Configuration.PackageNames = Configuration.Input = packagesConfig;
             }
 
@@ -1702,7 +1702,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileToSetReadOnly = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileToSetReadOnly = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
                 var fileSystem = new DotNetFileSystem();
                 fileSystem.EnsureFileAttributeSet(fileToSetReadOnly, FileAttributes.ReadOnly);
             }
@@ -1722,7 +1722,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -1730,7 +1730,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -1740,7 +1740,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -1748,7 +1748,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
@@ -1800,7 +1800,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileToOpen = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileToOpen = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
                 _fileStream = new FileStream(fileToOpen, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read | FileShare.Delete);
             }
 
@@ -1826,7 +1826,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -1834,7 +1834,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -1846,7 +1846,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact, Platform(Exclude = "WindowsServer10")]
             public void Should_have_deleted_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -1856,7 +1856,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact, Platform("WindowsServer10")]
             public void Should_not_have_deleted_the_rollback_on_server()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -1864,7 +1864,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
@@ -1916,7 +1916,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileToOpen = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
+                var fileToOpen = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
                 _fileStream = new FileStream(fileToOpen, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
             }
 
@@ -1936,7 +1936,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_a_package_installed_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -1944,7 +1944,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -1952,7 +1952,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_old_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.0.0");
             }
@@ -1960,7 +1960,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -2007,7 +2007,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileAdded = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "dude.txt");
+                var fileAdded = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "dude.txt");
                 File.WriteAllText(fileAdded, "hellow");
             }
 
@@ -2020,7 +2020,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_keep_the_added_file()
             {
-                var fileAdded = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "dude.txt");
+                var fileAdded = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "dude.txt");
 
                 FileAssert.Exists(fileAdded);
             }
@@ -2028,7 +2028,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
@@ -2036,7 +2036,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -2085,7 +2085,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
+                var fileChanged = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
                 File.WriteAllText(fileChanged, "hellow");
             }
 
@@ -2098,7 +2098,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_update_the_changed_file()
             {
-                var fileChanged = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
+                var fileChanged = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
                 File.ReadAllText(fileChanged).Should().NotBe("hellow");
             }
@@ -2106,7 +2106,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
@@ -2114,7 +2114,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -2175,7 +2175,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_install_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -2254,7 +2254,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_install_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -2262,7 +2262,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_have_a_rollback_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -2316,7 +2316,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_install_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -2383,7 +2383,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_remove_package_from_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -2391,7 +2391,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -2401,7 +2401,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_put_the_package_in_the_lib_bad_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bad", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -2409,7 +2409,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_the_erroring_upgraded_package_in_the_lib_bad_directory()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib-bad", Configuration.PackageNames, "2.0.0", Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib-bad", Configuration.PackageNames, "2.0.0", Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
@@ -2419,7 +2419,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -2471,11 +2471,11 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "hasdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" +  NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "isdependency", "1.0.0");
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
             }
 
             public override void Because()
@@ -2486,7 +2486,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
@@ -2496,7 +2496,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_minimum_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
@@ -2506,7 +2506,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
@@ -2545,11 +2545,11 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "hasdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency.1*" +  NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "isdependency", "1.0.0");
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency.1*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
             }
 
             public override void Because()
@@ -2560,7 +2560,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -2570,7 +2570,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_minimum_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -2580,7 +2580,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -2635,11 +2635,11 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "hasdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency.1*" +  NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "isdependency", "1.0.0");
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency.1*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
                 Configuration.IgnoreDependencies = true;
             }
 
@@ -2651,7 +2651,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
@@ -2661,7 +2661,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_minimum_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -2671,7 +2671,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -2710,11 +2710,11 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "isdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency.1*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" +  NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "isdependency", "1.0.0");
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.1*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
             }
 
             public override void Because()
@@ -2725,7 +2725,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -2735,7 +2735,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_parent_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -2745,7 +2745,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -2784,11 +2784,11 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "isdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" +  NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" +  NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "isdependency", "1.0.0");
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
             }
 
             public override void Because()
@@ -2799,7 +2799,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
@@ -2809,7 +2809,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_parent_package_to_highest_version_that_meets_new_dependency_version()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
@@ -2819,7 +2819,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
@@ -2858,12 +2858,12 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "isdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
                 Configuration.IgnoreDependencies = true;
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
                 Configuration.IgnoreDependencies = false;
             }
 
@@ -2875,7 +2875,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
@@ -2885,7 +2885,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_parent_package_to_highest_version_that_meets_new_dependency_version()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.1.0");
@@ -2895,7 +2895,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
@@ -2934,12 +2934,12 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "isdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
                 Configuration.PinPackage = true;
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
                 Configuration.PinPackage = false;
             }
 
@@ -2951,7 +2951,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package_to_highest_version_in_range()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -2961,7 +2961,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_parent_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -2971,7 +2971,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -3019,13 +3019,13 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "isdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
                 Configuration.PinPackage = true;
                 Configuration.IgnoreDependencies = true;
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
                 Configuration.PinPackage = false;
                 Configuration.IgnoreDependencies = false;
             }
@@ -3038,7 +3038,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package_to_highest_version_in_range()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -3048,7 +3048,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_parent_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -3058,7 +3058,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -3107,15 +3107,15 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "isdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
                 Configuration.PinPackage = true;
-                Scenario.install_package(Configuration, "isexactversiondependency", "1.0.0");
+                Scenario.InstallPackage(Configuration, "isexactversiondependency", "1.0.0");
                 Configuration.PinPackage = false;
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
-                Scenario.remove_packages_from_destination_location(Configuration, "hasdependency.2.0.1" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
+                Scenario.RemovePackagesFromDestinationLocation(Configuration, "hasdependency.2.0.1" + NuGetConstants.PackageExtension);
             }
 
             public override void Because()
@@ -3126,7 +3126,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package_to_highest_version_in_range()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -3136,7 +3136,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_parent_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -3146,7 +3146,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -3194,12 +3194,12 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.PackageNames = Configuration.Input = "isdependency";
-                Scenario.add_packages_to_source_location(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "isdependency", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
                 Configuration.PinPackage = true;
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
                 Configuration.PinPackage = false;
                 Configuration.IgnoreDependencies = true;
             }
@@ -3212,7 +3212,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isdependency", "isdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isdependency", "isdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -3222,7 +3222,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_parent_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "hasdependency", "hasdependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "hasdependency", "hasdependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -3232,7 +3232,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_the_exact_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "isexactversiondependency", "isexactversiondependency.nupkg");
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
@@ -3282,7 +3282,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
 
-                _xmlFilePath = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe.config");
+                _xmlFilePath = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe.config");
             }
 
             public override void Because()
@@ -3297,7 +3297,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -3378,7 +3378,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
 
-                _xmlFilePath = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe.config");
+                _xmlFilePath = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe.config");
 
                 File.WriteAllText(_xmlFilePath, File.ReadAllText(_xmlFilePath) + CommentAdded);
             }
@@ -3395,7 +3395,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -3540,7 +3540,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Prerelease = true;
-                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-beta");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.1.1-beta");
                 Configuration.Prerelease = false;
                 Configuration.PackageNames = Configuration.Input = "all";
             }
@@ -3567,7 +3567,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_upgradepackage()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "upgradepackage", "upgradepackage" +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "upgradepackage", "upgradepackage" + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
@@ -3592,7 +3592,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
                 Configuration.Prerelease = true;
-                Scenario.install_package(Configuration, "upgradepackage", "1.1.1-beta");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.1.1-beta");
                 Configuration.Prerelease = false;
 
                 Configuration.PackageNames = Configuration.Input = "all";
@@ -3622,7 +3622,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_upgrade_upgradepackage()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", "upgradepackage", "upgradepackage" +  NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", "upgradepackage", "upgradepackage" + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     var version = packageReader.NuspecReader.GetVersion();
@@ -3675,7 +3675,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -3683,7 +3683,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -3691,7 +3691,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 FileAssert.Exists(shimFile);
 
@@ -3701,7 +3701,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.1-beta.1");
@@ -3836,10 +3836,10 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                Scenario.add_packages_to_source_location(Configuration, "scriptpackage.hook" + ".1.0.0" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "scriptpackage.hook", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "scriptpackage.hook" + ".1.0.0" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "scriptpackage.hook", "1.0.0");
                 Configuration.PackageNames = Configuration.Input = "scriptpackage.hook";
-                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + ".2.0.0" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, Configuration.Input + ".2.0.0" + NuGetConstants.PackageExtension);
             }
 
             public override void Because()
@@ -3857,7 +3857,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -3865,7 +3865,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -3873,7 +3873,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
@@ -3927,7 +3927,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_a_hooks_folder_for_the_package()
             {
-                var hooksDirectory = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty));
+                var hooksDirectory = Path.Combine(Scenario.GetTopLevel(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty));
 
                 DirectoryAssert.Exists(hooksDirectory);
             }
@@ -3938,7 +3938,7 @@ namespace chocolatey.tests.integration.scenarios
                 var hookScripts = new List<string> { "pre-install-all.ps1", "post-install-all.ps1", "pre-upgrade-all.ps1", "post-upgrade-all.ps1", "pre-uninstall-all.ps1", "post-uninstall-all.ps1" };
                 foreach (string scriptName in hookScripts)
                 {
-                    var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), scriptName);
+                    var hookScriptPath = Path.Combine(Scenario.GetTopLevel(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), scriptName);
                     File.ReadAllText(hookScriptPath).Should().Contain("Write-Output");
                 }
             }
@@ -3946,14 +3946,14 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_remove_files_not_in_upgrade_version()
             {
-                var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), "pre-install-doesnotexist.ps1");
+                var hookScriptPath = Path.Combine(Scenario.GetTopLevel(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), "pre-install-doesnotexist.ps1");
                 FileAssert.DoesNotExist(hookScriptPath);
             }
 
             [Fact]
             public void Should_install_new_files_in_upgrade_version()
             {
-                var hookScriptPath = Path.Combine(Scenario.get_top_level(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), "post-install-doesnotexist.ps1");
+                var hookScriptPath = Path.Combine(Scenario.GetTopLevel(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), "post-install-doesnotexist.ps1");
                 FileAssert.Exists(hookScriptPath);
             }
         }
@@ -3965,8 +3965,8 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                Scenario.add_packages_to_source_location(Configuration, "scriptpackage.hook" + "*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "scriptpackage.hook", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "scriptpackage.hook" + "*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "scriptpackage.hook", "1.0.0");
                 Configuration.PackageNames = Configuration.Input = "upgradepackage";
             }
 
@@ -3985,7 +3985,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -3993,7 +3993,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -4001,7 +4001,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_contain_newer_version_in_directory()
             {
-                var shimFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, "tools", "console.exe");
+                var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
                 File.ReadAllText(shimFile).Should().Be("1.1.0");
             }
@@ -4009,7 +4009,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -4184,8 +4184,8 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                Scenario.add_packages_to_source_location(Configuration, "UpperCase" + "*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "UpperCase", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "UpperCase" + "*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "UpperCase", "1.0.0");
 
                 Configuration.PackageNames = Configuration.Input = "UpperCase";
             }
@@ -4199,7 +4199,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_the_correct_casing_for_the_nuspec()
             {
-                var nuspecFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.ManifestExtension);
+                var nuspecFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.ManifestExtension);
                 FileAssert.Exists(nuspecFile);
             }
 
@@ -4212,7 +4212,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -4220,7 +4220,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -4321,8 +4321,8 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                Scenario.add_packages_to_source_location(Configuration, "unsupportedelements" + "*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "unsupportedelements", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "unsupportedelements" + "*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "unsupportedelements", "1.0.0");
                 Configuration.PackageNames = Configuration.Input = "unsupportedelements";
             }
 
@@ -4341,7 +4341,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -4349,7 +4349,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.1.0");
@@ -4460,7 +4460,7 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                Scenario.add_changed_version_package_to_source_location(Configuration, "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
+                Scenario.AddChangedVersionPackageToSourceLocation(Configuration, "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
                 Configuration.PackageNames = Configuration.Input = "upgradepackage";
             }
 
@@ -4479,7 +4479,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_a_package_in_the_lib_directory()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
                 DirectoryAssert.Exists(packageDir);
             }
@@ -4487,7 +4487,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_delete_the_rollback()
             {
-                var packageDir = Path.Combine(Scenario.get_top_level(), "lib-bkp", Configuration.PackageNames);
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
                 DirectoryAssert.DoesNotExist(packageDir);
             }
@@ -4495,7 +4495,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_package()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToStringSafe().Should().Be(NonNormalizedVersion);
@@ -4657,12 +4657,12 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
 
-                Scenario.add_packages_to_source_location(Configuration, "{0}.*".FormatWith(TargetPackageName) + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "{0}.*".FormatWith(DependencyName) + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "scriptpackage.hook" + "*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, DependencyName, "1.0.0");
-                Scenario.install_package(Configuration, TargetPackageName, "1.0.0");
-                Scenario.install_package(Configuration, "scriptpackage.hook", "1.0.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "{0}.*".FormatWith(TargetPackageName) + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "{0}.*".FormatWith(DependencyName) + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "scriptpackage.hook" + "*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, DependencyName, "1.0.0");
+                Scenario.InstallPackage(Configuration, TargetPackageName, "1.0.0");
+                Scenario.InstallPackage(Configuration, "scriptpackage.hook", "1.0.0");
 
                 Configuration.PackageNames = Configuration.Input = TargetPackageName;
             }
@@ -4675,7 +4675,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_upgrade_the_minimum_version_dependency()
             {
-                var packageFile = Path.Combine(Scenario.get_top_level(), "lib", DependencyName, "{0}.nupkg".FormatWith(DependencyName));
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", DependencyName, "{0}.nupkg".FormatWith(DependencyName));
                 using (var packageReader = new PackageArchiveReader(packageFile))
                 {
                     packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("2.0.0");
