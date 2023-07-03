@@ -160,7 +160,7 @@ Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($
             }
 
             $Output = Invoke-Choco push $PackagePath --source $RepositoryToUse$RepositoryEndpoint @KeyParameter
-
+            Invoke-Choco cache remove
             $VerifyPackagesSplat = @(
                 "--pre"
                 "--source"
@@ -172,15 +172,7 @@ Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($
                 "--version"
                 "$VersionUnderTest-$AddedVersion"
             )
-
-            # Nexus can take a moment to index the package, but we want to validate that it was successfully pushed
-            $Timer =  [System.Diagnostics.Stopwatch]::StartNew()
-            while ($Timer.Elapsed.TotalSeconds -lt 300 -and -not (
-                $Packages = (Invoke-Choco find $PackageUnderTest @VerifyPackagesSplat --Limit-Output).Lines | ConvertFrom-ChocolateyOutput -Command List
-            )) {
-                Write-Verbose "$($PackageUnderTest) was not found on $($RepositoryToUse)$($RepositoryEndpoint). Waiting for 5 seconds before trying again."
-                Start-Sleep -Seconds 5
-            }
+            $Packages = (Invoke-Choco find $PackageUnderTest @VerifyPackagesSplat --Limit-Output).Lines | ConvertFrom-ChocolateyOutput -Command List
         }
 
         AfterAll {
