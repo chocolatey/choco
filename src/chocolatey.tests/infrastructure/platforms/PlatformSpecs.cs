@@ -40,23 +40,23 @@ namespace chocolatey.tests.infrastructure.platforms
 
         public class When_calling_Platform_get_platform : PlatformSpecsBase
         {
-            private PlatformType result;
+            private PlatformType _result;
 
             public override void Because()
             {
-                result = Platform.GetPlatform();
+                _result = Platform.GetPlatform();
             }
 
             [Fact]
             public void Should_not_be_Unknown()
             {
-                result.Should().NotBe(PlatformType.Unknown);
+                _result.Should().NotBe(PlatformType.Unknown);
             }
         }
 
         public class When_calling_Platform_get_platform_on_Windows : PlatformSpecsBase
         {
-            private PlatformType result;
+            private PlatformType _result;
 
             public override void Context()
             {
@@ -66,19 +66,19 @@ namespace chocolatey.tests.infrastructure.platforms
 
             public override void Because()
             {
-                result = Platform.GetPlatform();
+                _result = Platform.GetPlatform();
             }
 
             [Fact]
             public void Should_return_Windows()
             {
-                result.Should().Be(PlatformType.Windows);
+                _result.Should().Be(PlatformType.Windows);
             }
         }
 
         public class When_calling_Platform_get_platform_on_MacOSX : PlatformSpecsBase
         {
-            private PlatformType result;
+            private PlatformType _result;
 
             public override void Context()
             {
@@ -88,19 +88,19 @@ namespace chocolatey.tests.infrastructure.platforms
 
             public override void Because()
             {
-                result = Platform.GetPlatform();
+                _result = Platform.GetPlatform();
             }
 
             [Fact]
             public void Should_return_Mac()
             {
-                result.Should().Be(PlatformType.Mac);
+                _result.Should().Be(PlatformType.Mac);
             }
         }
 
         public class When_calling_Platform_get_platform_on_Linux : PlatformSpecsBase
         {
-            private PlatformType result;
+            private PlatformType _result;
 
             public override void Context()
             {
@@ -111,19 +111,19 @@ namespace chocolatey.tests.infrastructure.platforms
 
             public override void Because()
             {
-                result = Platform.GetPlatform();
+                _result = Platform.GetPlatform();
             }
 
             [Fact]
             public void Should_return_Linux()
             {
-                result.Should().Be(PlatformType.Linux);
+                _result.Should().Be(PlatformType.Linux);
             }
         }
 
         public class When_calling_Platform_get_platform_on_PlatformId_Linux_with_MacOSX_folder_structure : PlatformSpecsBase
         {
-            private PlatformType result;
+            private PlatformType _result;
 
             public override void Context()
             {
@@ -134,13 +134,13 @@ namespace chocolatey.tests.infrastructure.platforms
 
             public override void Because()
             {
-                result = Platform.GetPlatform();
+                _result = Platform.GetPlatform();
             }
 
             [Fact]
             public void Should_return_Mac()
             {
-                result.Should().Be(PlatformType.Mac);
+                _result.Should().Be(PlatformType.Mac);
             }
         }
     }

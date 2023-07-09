@@ -8,7 +8,7 @@
     [CmdletBinding()]
     param()
     if (-not $script:runningVersion) {
-        [NuGet.Versioning.NuGetVersion]$script:runningVersion = ((Invoke-Choco --version).Lines | Where-Object { $_ -NotMatch "please upgrade" }) -join '`r`n'
+        [NuGet.Versioning.NuGetVersion]$script:runningVersion = (Invoke-Choco --version).Lines | Where-Object { $_ -Match "^\d+\.[\d\.]+" } | Select-Object -First 1
     }
 
     $script:runningVersion

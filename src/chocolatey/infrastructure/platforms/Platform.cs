@@ -164,6 +164,7 @@ namespace chocolatey.infrastructure.platforms
         // ReSharper disable MemberCanBePrivate.Local
         // ReSharper disable FieldCanBeMadeReadOnly.Local
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Part of the Windows API calls, and should not be changed.")]
         [StructLayout(LayoutKind.Sequential)]
         private struct OSVERSIONINFOEX
         {

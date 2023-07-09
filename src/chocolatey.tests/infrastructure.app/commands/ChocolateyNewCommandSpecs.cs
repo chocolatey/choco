@@ -33,117 +33,117 @@ namespace chocolatey.tests.infrastructure.app.commands
         [ConcernFor("new")]
         public abstract class ChocolateyNewCommandSpecsBase : TinySpec
         {
-            protected ChocolateyNewCommand command;
-            protected Mock<ITemplateService> templateService = new Mock<ITemplateService>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateyNewCommand Command;
+            protected Mock<ITemplateService> TemplateService = new Mock<ITemplateService>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                command = new ChocolateyNewCommand(templateService.Object);
+                Command = new ChocolateyNewCommand(TemplateService.Object);
             }
         }
 
         public class When_implementing_command_for : ChocolateyNewCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void Should_implement_new()
             {
-                results.Should().Contain("new");
+                _results.Should().Contain("new");
             }
         }
 
         public class When_configurating_the_argument_parser : ChocolateyNewCommandSpecsBase
         {
-            private OptionSet optionSet;
+            private OptionSet _optionSet;
 
             public override void Context()
             {
                 base.Context();
-                optionSet = new OptionSet();
+                _optionSet = new OptionSet();
             }
 
             public override void Because()
             {
-                command.ConfigureArgumentParser(optionSet, configuration);
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
             }
 
             [Fact]
             public void Should_add_automaticpackage_to_the_option_set()
             {
-                optionSet.Contains("automaticpackage").Should().BeTrue();
+                _optionSet.Contains("automaticpackage").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_automaticpackage_to_the_option_set()
             {
-                optionSet.Contains("a").Should().BeTrue();
+                _optionSet.Contains("a").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_name_to_the_option_set()
             {
-                optionSet.Contains("name").Should().BeTrue();
+                _optionSet.Contains("name").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_version_to_the_option_set()
             {
-                optionSet.Contains("version").Should().BeTrue();
+                _optionSet.Contains("version").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_maintainer_to_the_option_set()
             {
-                optionSet.Contains("maintainer").Should().BeTrue();
+                _optionSet.Contains("maintainer").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_outputdirectory_to_the_option_set()
             {
-                optionSet.Contains("outputdirectory").Should().BeTrue();
+                _optionSet.Contains("outputdirectory").Should().BeTrue();
             }
         }
 
         public class When_handling_additional_argument_parsing : ChocolateyNewCommandSpecsBase
         {
-            private readonly IList<string> unparsedArgs = new List<string>();
-            private Action because;
+            private readonly IList<string> _unparsedArgs = new List<string>();
+            private Action _because;
 
             public override void Because()
             {
-                because = () => command.ParseAdditionalArguments(unparsedArgs, configuration);
+                _because = () => Command.ParseAdditionalArguments(_unparsedArgs, Configuration);
             }
 
-            private void reset()
+            private void Reset()
             {
-                configuration.NewCommand.Name = "";
-                unparsedArgs.Clear();
-                configuration.NewCommand.TemplateProperties.Clear();
+                Configuration.NewCommand.Name = "";
+                _unparsedArgs.Clear();
+                Configuration.NewCommand.TemplateProperties.Clear();
             }
 
             [Fact]
             public void Should_not_set_template_properties_if_none_have_been_defined()
             {
-                reset();
-                because();
-                configuration.NewCommand.TemplateProperties.Should().HaveCount(0);
+                Reset();
+                _because();
+                Configuration.NewCommand.TemplateProperties.Should().HaveCount(0);
             }
 
             [Fact]
             public void Should_set_template_properties_when_args_are_separated_by_equals()
             {
-                reset();
-                unparsedArgs.Add("bob=new");
-                because();
+                Reset();
+                _unparsedArgs.Add("bob=new");
+                _because();
 
-                var properties = configuration.NewCommand.TemplateProperties;
+                var properties = Configuration.NewCommand.TemplateProperties;
                 properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
@@ -153,12 +153,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_set_template_properties_only_once()
             {
-                reset();
-                unparsedArgs.Add("bob=one");
-                unparsedArgs.Add("bob=two");
-                because();
+                Reset();
+                _unparsedArgs.Add("bob=one");
+                _unparsedArgs.Add("bob=two");
+                _because();
 
-                var properties = configuration.NewCommand.TemplateProperties;
+                var properties = Configuration.NewCommand.TemplateProperties;
                 properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
@@ -168,12 +168,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_ignore_casing_differences_when_setting_template_properties()
             {
-                reset();
-                unparsedArgs.Add("bob=one");
-                unparsedArgs.Add("Bob=two");
-                because();
+                Reset();
+                _unparsedArgs.Add("bob=one");
+                _unparsedArgs.Add("Bob=two");
+                _because();
 
-                var properties = configuration.NewCommand.TemplateProperties;
+                var properties = Configuration.NewCommand.TemplateProperties;
                 properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
@@ -183,13 +183,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_not_set_template_properties_when_args_are_not_separated_by_equals()
             {
-                reset();
-                configuration.NewCommand.Name = "bill";
-                configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, "bill");
-                unparsedArgs.Add("bob new");
-                because();
+                Reset();
+                Configuration.NewCommand.Name = "bill";
+                Configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, "bill");
+                _unparsedArgs.Add("bob new");
+                _because();
 
-                var properties = configuration.NewCommand.TemplateProperties;
+                var properties = Configuration.NewCommand.TemplateProperties;
                 properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("PackageName");
@@ -199,13 +199,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_not_set_override_configuration_Name_when_unparsed_without_equals()
             {
-                reset();
-                configuration.NewCommand.Name = "bill";
-                configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, "bill");
-                unparsedArgs.Add("bob");
-                because();
+                Reset();
+                Configuration.NewCommand.Name = "bill";
+                Configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, "bill");
+                _unparsedArgs.Add("bob");
+                _because();
 
-                var properties = configuration.NewCommand.TemplateProperties;
+                var properties = Configuration.NewCommand.TemplateProperties;
                 properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("PackageName");
@@ -215,13 +215,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_not_set_override_configuration_Name_when_package_name_is_also_passed()
             {
-                reset();
-                configuration.NewCommand.Name = "bill";
-                configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, "bill");
-                unparsedArgs.Add(TemplateValues.NamePropertyName + "=bob");
-                because();
+                Reset();
+                Configuration.NewCommand.Name = "bill";
+                Configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, "bill");
+                _unparsedArgs.Add(TemplateValues.NamePropertyName + "=bob");
+                _because();
 
-                var properties = configuration.NewCommand.TemplateProperties;
+                var properties = Configuration.NewCommand.TemplateProperties;
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("PackageName");
                 templateProperty.Value.Should().Be("bill");
@@ -230,11 +230,11 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_set_template_properties_when_args_are_separated_by_equals_with_spaces()
             {
-                reset();
-                unparsedArgs.Add("bob = new");
-                because();
+                Reset();
+                _unparsedArgs.Add("bob = new");
+                _because();
 
-                var properties = configuration.NewCommand.TemplateProperties;
+                var properties = Configuration.NewCommand.TemplateProperties;
                 properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
@@ -244,11 +244,11 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_set_template_properties_without_surrounding_quotes()
             {
-                reset();
-                unparsedArgs.Add("bob = \"new this\"");
-                because();
+                Reset();
+                _unparsedArgs.Add("bob = \"new this\"");
+                _because();
 
-                var properties = configuration.NewCommand.TemplateProperties;
+                var properties = Configuration.NewCommand.TemplateProperties;
                 properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
                 templateProperty.Key.Should().Be("bob");
@@ -258,10 +258,10 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_set_template_properties_without_removing_quote()
             {
-                reset();
-                unparsedArgs.Add("bob = 'new \"this'");
-                because();
-                var properties = configuration.NewCommand.TemplateProperties;
+                Reset();
+                _unparsedArgs.Add("bob = 'new \"this'");
+                _because();
+                var properties = Configuration.NewCommand.TemplateProperties;
 
                 properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
@@ -272,10 +272,10 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_set_template_properties_without_surrounding_apostrophes()
             {
-                reset();
-                unparsedArgs.Add("bob = 'new this'");
-                because();
-                var properties = configuration.NewCommand.TemplateProperties;
+                Reset();
+                _unparsedArgs.Add("bob = 'new this'");
+                _because();
+                var properties = Configuration.NewCommand.TemplateProperties;
 
                 properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
@@ -286,10 +286,10 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_set_template_properties_without_removing_apostrophe()
             {
-                reset();
-                unparsedArgs.Add("bob = \"new 'this\"");
-                because();
-                var properties = configuration.NewCommand.TemplateProperties;
+                Reset();
+                _unparsedArgs.Add("bob = \"new 'this\"");
+                _because();
+                var properties = Configuration.NewCommand.TemplateProperties;
 
                 properties.Should().HaveCount(1);
                 var templateProperty = properties.FirstOrDefault();
@@ -307,13 +307,13 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_throw_when_Name_is_not_set()
             {
-                configuration.NewCommand.Name = "";
+                Configuration.NewCommand.Name = "";
                 var errored = false;
                 Exception error = null;
 
                 try
                 {
-                    command.Validate(configuration);
+                    Command.Validate(Configuration);
                 }
                 catch (Exception ex)
                 {
@@ -329,8 +329,8 @@ namespace chocolatey.tests.infrastructure.app.commands
             [Fact]
             public void Should_continue_when_Name_is_set()
             {
-                configuration.NewCommand.Name = "bob";
-                command.Validate(configuration);
+                Configuration.NewCommand.Name = "bob";
+                Command.Validate(Configuration);
             }
         }
 
@@ -338,13 +338,13 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.DryRun(configuration);
+                Command.DryRun(Configuration);
             }
 
             [Fact]
             public void Should_call_service_noop()
             {
-                templateService.Verify(c => c.GenerateDryRun(configuration), Times.Once);
+                TemplateService.Verify(c => c.GenerateDryRun(Configuration), Times.Once);
             }
         }
 
@@ -352,67 +352,67 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.Run(configuration);
+                Command.Run(Configuration);
             }
 
             [Fact]
             public void Should_call_service_generate()
             {
-                templateService.Verify(c => c.Generate(configuration), Times.Once);
+                TemplateService.Verify(c => c.Generate(Configuration), Times.Once);
             }
         }
 
         public class When_handling_arguments_parsing : ChocolateyNewCommandSpecsBase
         {
-            private OptionSet optionSet;
+            private OptionSet _optionSet;
 
             public override void Context()
             {
                 base.Context();
-                optionSet = new OptionSet();
-                command.ConfigureArgumentParser(optionSet, configuration);
+                _optionSet = new OptionSet();
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
             }
 
             public override void Because()
             {
-                optionSet.Parse(new[] { "--name", "Bob", "--automaticpackage", "--template-name", "custom", "--version", "0.42.0", "--maintainer", "Loyd", "--outputdirectory", "c:\\packages" });
+                _optionSet.Parse(new[] { "--name", "Bob", "--automaticpackage", "--template-name", "custom", "--version", "0.42.0", "--maintainer", "Loyd", "--outputdirectory", "c:\\packages" });
             }
 
             [Fact]
             public void Should_name_equal_to_Bob()
             {
-                configuration.NewCommand.Name.Should().Be("Bob");
-                configuration.NewCommand.TemplateProperties[TemplateValues.NamePropertyName].Should().Be("Bob");
+                Configuration.NewCommand.Name.Should().Be("Bob");
+                Configuration.NewCommand.TemplateProperties[TemplateValues.NamePropertyName].Should().Be("Bob");
             }
 
             [Fact]
             public void Should_automaticpackage_equal_to_true()
             {
-                configuration.NewCommand.AutomaticPackage.Should().BeTrue();
+                Configuration.NewCommand.AutomaticPackage.Should().BeTrue();
             }
 
             [Fact]
             public void Should_templatename_equal_to_custom()
             {
-                configuration.NewCommand.TemplateName.Should().Be("custom");
+                Configuration.NewCommand.TemplateName.Should().Be("custom");
             }
 
             [Fact]
             public void Should_version_equal_to_42()
             {
-                configuration.NewCommand.TemplateProperties[TemplateValues.VersionPropertyName].Should().Be("0.42.0");
+                Configuration.NewCommand.TemplateProperties[TemplateValues.VersionPropertyName].Should().Be("0.42.0");
             }
 
             [Fact]
             public void Should_maintainer_equal_to_Loyd()
             {
-                configuration.NewCommand.TemplateProperties[TemplateValues.MaintainerPropertyName].Should().Be("Loyd");
+                Configuration.NewCommand.TemplateProperties[TemplateValues.MaintainerPropertyName].Should().Be("Loyd");
             }
 
             [Fact]
             public void Should_outputdirectory_equal_packages()
             {
-                configuration.OutputDirectory.Should().Be("c:\\packages");
+                Configuration.OutputDirectory.Should().Be("c:\\packages");
             }
         }
     }

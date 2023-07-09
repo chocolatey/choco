@@ -32,95 +32,95 @@ namespace chocolatey.tests.infrastructure.tokens
 
         public class When_using_TokenReplacer : TokenReplacerSpecsBase
         {
-            public ChocolateyConfiguration configuration = new ChocolateyConfiguration();
-            public string name = "bob";
+            public ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
+            public string Name = "bob";
 
             public override void Because()
             {
-                configuration.CommandName = name;
+                Configuration.CommandName = Name;
             }
 
             [Fact]
             public void When_given_brace_brace_CommandName_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[CommandName]]").Should().Be("Hi! My name is " + name);
+                TokenReplacer.ReplaceTokens(Configuration, "Hi! My name is [[CommandName]]").Should().Be("Hi! My name is " + Name);
             }
 
             [Fact]
             public void When_given_brace_CommandName_brace_should_NOT_replace_the_value()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [CommandName]").Should().Be("Hi! My name is [CommandName]");
+                TokenReplacer.ReplaceTokens(Configuration, "Hi! My name is [CommandName]").Should().Be("Hi! My name is [CommandName]");
             }
 
             [Fact]
             public void When_given_a_value_that_is_the_name_of_a_configuration_item_but_is_not_properly_tokenized_it_should_NOT_replace_the_value()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is CommandName").Should().Be("Hi! My name is CommandName");
+                TokenReplacer.ReplaceTokens(Configuration, "Hi! My name is CommandName").Should().Be("Hi! My name is CommandName");
             }
 
             [Fact]
             public void When_given_brace_brace_commandname_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[commandname]]").Should().Be("Hi! My name is " + name);
+                TokenReplacer.ReplaceTokens(Configuration, "Hi! My name is [[commandname]]").Should().Be("Hi! My name is " + Name);
             }
 
             [Fact]
             public void When_given_brace_brace_COMMANDNAME_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[COMMANDNAME]]").Should().Be("Hi! My name is " + name);
+                TokenReplacer.ReplaceTokens(Configuration, "Hi! My name is [[COMMANDNAME]]").Should().Be("Hi! My name is " + Name);
             }
 
             [Fact]
             public void When_given_brace_brace_cOMmAnDnAMe_brace_brace_should_replace_with_the_Name_from_the_configuration()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[cOMmAnDnAMe]]").Should().Be("Hi! My name is " + name);
+                TokenReplacer.ReplaceTokens(Configuration, "Hi! My name is [[cOMmAnDnAMe]]").Should().Be("Hi! My name is " + Name);
             }
 
             [Fact]
             public void If_given_brace_brace_Version_brace_brace_should_NOT_replace_with_the_Name_from_the_configuration()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Go to [[Version]]").Should().NotContain(name);
+                TokenReplacer.ReplaceTokens(Configuration, "Go to [[Version]]").Should().NotContain(Name);
             }
 
             [Fact]
             public void If_given_a_value_that_is_not_set_should_return_that_value_as_string_Empty()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Go to [[Version]]").Should().Be("Go to " + string.Empty);
+                TokenReplacer.ReplaceTokens(Configuration, "Go to [[Version]]").Should().Be("Go to " + string.Empty);
             }
 
             [Fact]
             public void If_given_a_value_that_does_not_exist_should_return_the_original_value_unchanged()
             {
-                TokenReplacer.ReplaceTokens(configuration, "Hi! My name is [[DataBase]]").Should().Be("Hi! My name is [[DataBase]]");
+                TokenReplacer.ReplaceTokens(Configuration, "Hi! My name is [[DataBase]]").Should().Be("Hi! My name is [[DataBase]]");
             }
 
             [Fact]
             public void If_given_an_empty_value_should_return_the_empty_value()
             {
-                TokenReplacer.ReplaceTokens(configuration, "").Should().Be("");
+                TokenReplacer.ReplaceTokens(Configuration, "").Should().Be("");
             }
 
             [Fact]
             public void If_given_an_null_value_should_return_the_ll_value()
             {
-                TokenReplacer.ReplaceTokens(configuration, null).Should().Be("");
+                TokenReplacer.ReplaceTokens(Configuration, null).Should().Be("");
             }
         }
 
         public class When_using_TokenReplacer_with_a_Dictionary : TokenReplacerSpecsBase
         {
-            public Dictionary<string, string> tokens = new Dictionary<string, string>();
-            private readonly string value = "sweet";
+            public Dictionary<string, string> Tokens = new Dictionary<string, string>();
+            private readonly string _value = "sweet";
 
             public override void Because()
             {
-                tokens.Add("dude", value);
+                Tokens.Add("dude", _value);
             }
 
             [Fact]
             public void When_given_a_proper_token_it_should_replace_with_the_dictionary_value()
             {
-                TokenReplacer.ReplaceTokens(tokens, "Hi! My name is [[dude]]").Should().Be("Hi! My name is " + value);
+                TokenReplacer.ReplaceTokens(Tokens, "Hi! My name is [[dude]]").Should().Be("Hi! My name is " + _value);
             }
         }
     }

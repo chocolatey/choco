@@ -26,60 +26,60 @@ namespace chocolatey.tests.infrastructure.commands
     {
         public class When_using_ExternalCommandArgsBuilder : TinySpec
         {
-            private Func<string> buildConfigs;
-            protected IDictionary<string, ExternalCommandArgument> argsDictionary = new Dictionary<string, ExternalCommandArgument>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            private Func<string> _buildConfigs;
+            protected IDictionary<string, ExternalCommandArgument> ArgsDictionary = new Dictionary<string, ExternalCommandArgument>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                configuration.Sources = "yo";
-                configuration.Verbose = true;
-                configuration.ApiKeyCommand.Key = "dude";
-                configuration.CommandName = "with a space";
+                Configuration.Sources = "yo";
+                Configuration.Verbose = true;
+                Configuration.ApiKeyCommand.Key = "dude";
+                Configuration.CommandName = "with a space";
             }
 
             public override void Because()
             {
-                buildConfigs = () => ExternalCommandArgsBuilder.BuildArguments(configuration, argsDictionary);
+                _buildConfigs = () => ExternalCommandArgsBuilder.BuildArguments(Configuration, ArgsDictionary);
             }
 
             [Fact]
             public void Should_add_a_parameter_if_property_value_is_set()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "Sources",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-source "
                     });
-                buildConfigs().Should().Be("-source " + configuration.Sources);
+                _buildConfigs().Should().Be("-source " + Configuration.Sources);
             }
 
             [Fact]
             public void Should_add_a_parameter_if_property_value_is_sub_property()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "ApiKeyCommand.Key",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-apikey "
                     });
-                buildConfigs().Should().Be("-apikey " + configuration.ApiKeyCommand.Key);
+                _buildConfigs().Should().Be("-apikey " + Configuration.ApiKeyCommand.Key);
             }
 
             [Fact]
             public void Should_skip_a_parameter_that_does_not_match_the_case_of_the_property_name_exactly()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "sources",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-source "
                     });
-                buildConfigs().Should().Be("");
+                _buildConfigs().Should().Be("");
             }
 
             [Fact]
@@ -92,163 +92,163 @@ namespace chocolatey.tests.infrastructure.commands
                     {
                         ArgumentOption = "-source "
                     });
-                ExternalCommandArgsBuilder.BuildArguments(configuration, ignoreCaseDictionary).Should().Be("-source yo");
+                ExternalCommandArgsBuilder.BuildArguments(Configuration, ignoreCaseDictionary).Should().Be("-source yo");
             }
 
             [Fact]
             public void Should_not_override_ArgumentValue_with_the_property_value_for_a_parameter()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "Sources",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-source ",
                         ArgumentValue = "bob"
                     });
-                buildConfigs().Should().Be("-source bob");
+                _buildConfigs().Should().Be("-source bob");
             }
 
             [Fact]
             public void Should_skip_a_parameter_if_property_value_has_no_value()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "Version",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-version "
                     });
-                buildConfigs().Should().Be("");
+                _buildConfigs().Should().Be("");
             }
 
             [Fact]
             public void Should_add_a_parameter_when_Required_set_true_even_if_property_has_no_value()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "Version",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "install",
                         Required = true
                     });
-                buildConfigs().Should().Be("install");
+                _buildConfigs().Should().Be("install");
             }
 
             [Fact]
             public void Should_skip_a_parameter_not_found_in_the_properties_object()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "_install_",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "install"
                     });
-                buildConfigs().Should().Be("");
+                _buildConfigs().Should().Be("");
             }
 
             [Fact]
             public void Should_add_a_parameter_not_found_in_the_properties_object_when_Required_set_to_true()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "_install_",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "install",
                         Required = true
                     });
-                buildConfigs().Should().Be("install");
+                _buildConfigs().Should().Be("install");
             }
 
             [Fact]
             public void Should_add_a_boolean_as_a_switch_when_true()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "Verbose",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-verbose"
                     });
-                buildConfigs().Should().Be("-verbose");
+                _buildConfigs().Should().Be("-verbose");
             }
 
             [Fact]
             public void Should_skip_a_boolean_as_a_switch_when_false()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "Prerelease",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-pre"
                     });
-                buildConfigs().Should().Be("");
+                _buildConfigs().Should().Be("");
             }
 
             [Fact]
             public void Should_quote_a_value_when_QuoteValue_is_set_to_true()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "Sources",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-source ",
                         QuoteValue = true
                     });
-                buildConfigs().Should().Be("-source \"yo\"");
+                _buildConfigs().Should().Be("-source \"yo\"");
             }
 
             [Fact]
             public void Should_auto_quote_an_argument_value_with_spaces()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "CommandName",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-command "
                     });
-                buildConfigs().Should().Be("-command \"{0}\"".FormatWith(configuration.CommandName));
+                _buildConfigs().Should().Be("-command \"{0}\"".FormatWith(Configuration.CommandName));
             }
 
             [Fact]
             public void Should_not_quote_an_argument_option_with_spaces()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "Sources",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-source you know = ",
                         QuoteValue = true
                     });
-                buildConfigs().Should().Be("-source you know = \"yo\"");
+                _buildConfigs().Should().Be("-source you know = \"yo\"");
             }
 
             [Fact]
             public void Should_use_only_the_value_when_UseValueOnly_is_set_to_true()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "Sources",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-source ",
                         UseValueOnly = true
                     });
-                buildConfigs().Should().Be("yo");
+                _buildConfigs().Should().Be("yo");
             }
 
             [Fact]
             public void Should_use_only_the_value_when_UseValueOnly_and_Required_is_set_to_true()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "_source_",
                     new ExternalCommandArgument
                     {
@@ -257,55 +257,55 @@ namespace chocolatey.tests.infrastructure.commands
                         UseValueOnly = true,
                         Required = true
                     });
-                buildConfigs().Should().Be("bob");
+                _buildConfigs().Should().Be("bob");
             }
 
             [Fact]
             public void Should_not_add_a_value_when_UseValueOnly_is_set_to_true_and_no_value_is_set()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "Version",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-version ",
                         UseValueOnly = true
                     });
-                buildConfigs().Should().Be("");
+                _buildConfigs().Should().Be("");
             }
 
             [Fact]
             public void Should_separate_arguments_by_one_space()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "_install_",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "install",
                         Required = true
                     });
-                argsDictionary.Add(
+                ArgsDictionary.Add(
                     "Sources",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-source "
                     });
-                buildConfigs().Should().Be("install -source yo");
+                _buildConfigs().Should().Be("install -source yo");
             }
 
             [Fact]
             public void Should_add_items_in_order_based_on_the_dictionary()
             {
-                argsDictionary.Clear();
-                argsDictionary.Add(
+                ArgsDictionary.Clear();
+                ArgsDictionary.Add(
                     "_install_",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "install",
                         Required = true
                     });
-                argsDictionary.Add(
+                ArgsDictionary.Add(
                     "_output_directory_",
                     new ExternalCommandArgument
                     {
@@ -314,21 +314,21 @@ namespace chocolatey.tests.infrastructure.commands
                         QuoteValue = true,
                         Required = true
                     });
-                argsDictionary.Add(
+                ArgsDictionary.Add(
                     "Sources",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-source ",
                         QuoteValue = true
                     });
-                argsDictionary.Add(
+                ArgsDictionary.Add(
                     "_non_interactive_",
                     new ExternalCommandArgument
                     {
                         ArgumentOption = "-noninteractive",
                         Required = true
                     });
-                argsDictionary.Add(
+                ArgsDictionary.Add(
                     "_no_cache_",
                     new ExternalCommandArgument
                     {
@@ -336,7 +336,7 @@ namespace chocolatey.tests.infrastructure.commands
                         Required = true
                     });
 
-                buildConfigs().Should().Be("install -outputdirectory \"bob\" -source \"{0}\" -noninteractive -nocache".FormatWith(configuration.Sources));
+                _buildConfigs().Should().Be("install -outputdirectory \"bob\" -source \"{0}\" -noninteractive -nocache".FormatWith(Configuration.Sources));
             }
         }
     }

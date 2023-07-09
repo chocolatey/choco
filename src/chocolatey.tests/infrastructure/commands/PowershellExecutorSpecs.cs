@@ -38,8 +38,8 @@ namespace chocolatey.tests.infrastructure.commands
 
         public class When_powershellExecutor_is_searching_for_powershell_locations_and_all_locations_exist : PowerShellExecutorSpecsBase
         {
-            private string result = string.Empty;
-            private readonly string expected = Environment.ExpandEnvironmentVariables("%systemroot%\\SysNative\\WindowsPowerShell\\v1.0\\powershell.exe");
+            private string _result = string.Empty;
+            private readonly string _expected = Environment.ExpandEnvironmentVariables("%systemroot%\\SysNative\\WindowsPowerShell\\v1.0\\powershell.exe");
 
             public override void Context()
             {
@@ -49,50 +49,50 @@ namespace chocolatey.tests.infrastructure.commands
 
             public override void Because()
             {
-                result = PowershellExecutor.GetPowerShellLocation(FileSystem.Object);
+                _result = PowershellExecutor.GetPowerShellLocation(FileSystem.Object);
             }
 
             [Fact]
             public void Should_not_return_null()
             {
-                result.Should().NotBeNull();
+                _result.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_find_powershell()
             {
-                result.Should().NotBeEmpty();
+                _result.Should().NotBeEmpty();
             }
 
             [Fact]
             public void Should_return_the_sysnative_path()
             {
-                result.Should().Be(expected);
+                _result.Should().Be(_expected);
             }
         }
 
         public class When_powershellExecutor_is_searching_for_powershell_locations_there_is_no_sysnative : PowerShellExecutorSpecsBase
         {
-            private string result = string.Empty;
-            private readonly string expected = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe");
+            private string _result = string.Empty;
+            private readonly string _expected = Environment.ExpandEnvironmentVariables("%systemroot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe");
 
             public override void Context()
             {
                 base.Context();
 
-                FileSystem.Setup(fs => fs.FileExists(expected)).Returns(true);
-                FileSystem.Setup(fs => fs.FileExists(It.Is<string>(v => v != expected))).Returns(false);
+                FileSystem.Setup(fs => fs.FileExists(_expected)).Returns(true);
+                FileSystem.Setup(fs => fs.FileExists(It.Is<string>(v => v != _expected))).Returns(false);
             }
 
             public override void Because()
             {
-                result = PowershellExecutor.GetPowerShellLocation(FileSystem.Object);
+                _result = PowershellExecutor.GetPowerShellLocation(FileSystem.Object);
             }
 
             [Fact]
             public void Should_return_system32_path()
             {
-                result.Should().Be(expected);
+                _result.Should().Be(_expected);
             }
         }
 

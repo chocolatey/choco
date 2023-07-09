@@ -29,7 +29,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             {
             }
 
-            protected void reset()
+            protected void Reset()
             {
                 MockLogger.Reset();
             }
@@ -44,7 +44,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             [Fact]
             public void Should_not_allow_the_number_of_retries_to_be_zero()
             {
-                reset();
+                Reset();
 
                 Action m = () => FaultTolerance.Retry(
                     0,
@@ -58,7 +58,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             [Fact]
             public void Should_throw_an_error_if_retries_are_reached()
             {
-                reset();
+                Reset();
 
                 Action m = () => FaultTolerance.Retry(2, () => { throw new Exception("YIKES"); }, waitDurationMilliseconds: 0);
 
@@ -68,7 +68,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             [Fact]
             public void Should_log_warning_each_time()
             {
-                reset();
+                Reset();
 
                 try
                 {
@@ -85,7 +85,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             [Fact]
             public void Should_retry_the_number_of_times_specified()
             {
-                reset();
+                Reset();
 
                 var i = 0;
                 try
@@ -110,7 +110,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             [Fact]
             public void Should_return_immediately_when_successful()
             {
-                reset();
+                Reset();
 
                 var i = 0;
                 FaultTolerance.Retry(3, () => { i += 1; }, waitDurationMilliseconds: 0);
@@ -130,7 +130,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             [Fact]
             public void Should_log_an_error_message()
             {
-                reset();
+                Reset();
 
                 FaultTolerance.TryCatchWithLoggingException(
                     () => { throw new Exception("This is the message"); },
@@ -143,7 +143,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             [Fact]
             public void Should_log_the_expected_error_message()
             {
-                reset();
+                Reset();
 
                 FaultTolerance.TryCatchWithLoggingException(
                     () => { throw new Exception("This is the message"); },
@@ -156,7 +156,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             [Fact]
             public void Should_log_a_warning_message_when_set_to_warn()
             {
-                reset();
+                Reset();
 
                 FaultTolerance.TryCatchWithLoggingException(
                     () => { throw new Exception("This is the message"); },
@@ -170,7 +170,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             [Fact]
             public void Should_throw_an_error_if_throwError_set_to_true()
             {
-                reset();
+                Reset();
 
                 Action m = () => FaultTolerance.TryCatchWithLoggingException(
                     () => { throw new Exception("This is the message"); },
@@ -184,7 +184,7 @@ namespace chocolatey.tests.infrastructure.tolerance
             [Fact]
             public void Should_still_throw_an_error_when_warn_is_set_if_throwError_set_to_true()
             {
-                reset();
+                Reset();
 
                 Action m = () => FaultTolerance.TryCatchWithLoggingException(
                     () => { throw new Exception("This is the message"); },

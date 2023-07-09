@@ -39,55 +39,55 @@ namespace chocolatey.tests.infrastructure.app.services
     {
         public abstract class AutomaticUninstallerServiceSpecsBase : TinySpec
         {
-            protected AutomaticUninstallerService service;
-            protected Mock<IChocolateyPackageInformationService> packageInfoService = new Mock<IChocolateyPackageInformationService>();
-            protected Mock<IFileSystem> fileSystem = new Mock<IFileSystem>();
-            protected Mock<IProcess> process = new Mock<IProcess>();
-            protected Mock<IRegistryService> registryService = new Mock<IRegistryService>();
-            protected Mock<ICommandExecutor> commandExecutor = new Mock<ICommandExecutor>();
-            protected ChocolateyConfiguration config = new ChocolateyConfiguration();
-            protected Mock<IPackageMetadata> package = new Mock<IPackageMetadata>();
-            protected ConcurrentDictionary<string, PackageResult> packageResults = new ConcurrentDictionary<string, PackageResult>();
-            protected PackageResult packageResult;
-            protected ChocolateyPackageInformation packageInformation;
-            protected IList<RegistryApplicationKey> registryKeys = new List<RegistryApplicationKey>();
-            protected IInstaller installerType = new CustomInstaller();
+            protected AutomaticUninstallerService Service;
+            protected Mock<IChocolateyPackageInformationService> PackageInfoService = new Mock<IChocolateyPackageInformationService>();
+            protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
+            protected Mock<IProcess> Process = new Mock<IProcess>();
+            protected Mock<IRegistryService> RegistryService = new Mock<IRegistryService>();
+            protected Mock<ICommandExecutor> CommandExecutor = new Mock<ICommandExecutor>();
+            protected ChocolateyConfiguration Config = new ChocolateyConfiguration();
+            protected Mock<IPackageMetadata> Package = new Mock<IPackageMetadata>();
+            protected ConcurrentDictionary<string, PackageResult> PackageResults = new ConcurrentDictionary<string, PackageResult>();
+            protected PackageResult PackageResult;
+            protected ChocolateyPackageInformation PackageInformation;
+            protected IList<RegistryApplicationKey> RegistryKeys = new List<RegistryApplicationKey>();
+            protected IInstaller InstallerType = new CustomInstaller();
 
-            protected readonly string expectedDisplayName = "WinDirStat";
-            protected readonly string originalUninstallString = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe""";
-            protected readonly string expectedUninstallString = @"C:\Program Files (x86)\WinDirStat\Uninstall.exe";
+            protected readonly string ExpectedDisplayName = "WinDirStat";
+            protected readonly string OriginalUninstallString = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe""";
+            protected readonly string ExpectedUninstallString = @"C:\Program Files (x86)\WinDirStat\Uninstall.exe";
 
             public override void Context()
             {
-                CommandExecutor.InitializeWith(new Lazy<IFileSystem>(() => fileSystem.Object), () => process.Object);
+                chocolatey.infrastructure.commands.CommandExecutor.InitializeWith(new Lazy<IFileSystem>(() => FileSystem.Object), () => Process.Object);
 
-                service = new AutomaticUninstallerService(packageInfoService.Object, fileSystem.Object, registryService.Object, commandExecutor.Object);
-                service.WaitForCleanup = false;
-                config.Features.AutoUninstaller = true;
-                config.PromptForConfirmation = false;
-                config.PackageNames = "regular";
-                package.Setup(p => p.Id).Returns("regular");
-                package.Setup(p => p.Version).Returns(new NuGetVersion("1.2.0"));
-                packageResult = new PackageResult(package.Object, "c:\\packages\\thispackage");
-                packageInformation = new ChocolateyPackageInformation(package.Object);
-                registryKeys.Add(
+                Service = new AutomaticUninstallerService(PackageInfoService.Object, FileSystem.Object, RegistryService.Object, CommandExecutor.Object);
+                Service.WaitForCleanup = false;
+                Config.Features.AutoUninstaller = true;
+                Config.PromptForConfirmation = false;
+                Config.PackageNames = "regular";
+                Package.Setup(p => p.Id).Returns("regular");
+                Package.Setup(p => p.Version).Returns(new NuGetVersion("1.2.0"));
+                PackageResult = new PackageResult(Package.Object, "c:\\packages\\thispackage");
+                PackageInformation = new ChocolateyPackageInformation(Package.Object);
+                RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
-                        DisplayName = expectedDisplayName,
+                        DisplayName = ExpectedDisplayName,
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                        UninstallString = originalUninstallString,
+                        UninstallString = OriginalUninstallString,
                         HasQuietUninstall = true,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
-                        InstallerType = installerType.InstallerType,
+                        InstallerType = InstallerType.InstallerType,
                     });
-                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
-                packageInfoService.Setup(s => s.Get(package.Object)).Returns(packageInformation);
-                packageResults.GetOrAdd("regular", packageResult);
+                PackageInformation.RegistrySnapshot = new Registry("123", RegistryKeys);
+                PackageInfoService.Setup(s => s.Get(Package.Object)).Returns(PackageInformation);
+                PackageResults.GetOrAdd("regular", PackageResult);
 
-                fileSystem.Setup(f => f.DirectoryExists(registryKeys.FirstOrDefault().InstallLocation)).Returns(true);
-                registryService.Setup(r => r.InstallerKeyExists(registryKeys.FirstOrDefault().KeyPath)).Returns(true);
-                fileSystem.Setup(f => f.GetFullPath(expectedUninstallString)).Returns(expectedUninstallString);
-                fileSystem.Setup(x => x.FileExists(expectedUninstallString)).Returns(true);
+                FileSystem.Setup(f => f.DirectoryExists(RegistryKeys.FirstOrDefault().InstallLocation)).Returns(true);
+                RegistryService.Setup(r => r.InstallerKeyExists(RegistryKeys.FirstOrDefault().KeyPath)).Returns(true);
+                FileSystem.Setup(f => f.GetFullPath(ExpectedUninstallString)).Returns(ExpectedUninstallString);
+                FileSystem.Setup(x => x.FileExists(ExpectedUninstallString)).Returns(true);
 
                 var field = typeof(ApplicationParameters).GetField("AllowPrompts");
                 field.SetValue(null, false);
@@ -99,12 +99,12 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                config.Features.AutoUninstaller = false;
+                Config.Features.AutoUninstaller = false;
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
@@ -116,13 +116,13 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_not_get_package_information()
             {
-                packageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Never);
+                PackageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Never);
             }
 
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -130,29 +130,29 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_an_autoUninstaller_skip_file_exists : AutomaticUninstallerServiceSpecsBase
         {
-            private string skipFileName = ".skipAutoUninstall";
-            IEnumerable<string> fileList = new List<string>() {"c:\\.skipAutoUninstall"};
+            private string _skipFileName = ".skipAutoUninstall";
+            IEnumerable<string> _fileList = new List<string>() { "c:\\.skipAutoUninstall" };
             public override void Context()
             {
                 base.Context();
-                fileSystem.Setup(f => f.GetFiles(It.IsAny<string>(), ".skipAutoUninstall*", SearchOption.AllDirectories)).Returns(fileList);
+                FileSystem.Setup(f => f.GetFiles(It.IsAny<string>(), ".skipAutoUninstall*", SearchOption.AllDirectories)).Returns(_fileList);
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - Package contains a skip file ('" + skipFileName + "')."), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - Package contains a skip file ('" + _skipFileName + "')."), Times.Once);
             }
 
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -163,12 +163,12 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                packageInformation.RegistrySnapshot = null;
+                PackageInformation.RegistrySnapshot = null;
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
@@ -180,7 +180,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -191,12 +191,12 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                packageInformation.Package = null;
+                PackageInformation.Package = null;
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
@@ -208,7 +208,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -219,12 +219,12 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                packageInformation.RegistrySnapshot = new Registry("123", null);
+                PackageInformation.RegistrySnapshot = new Registry("123", null);
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
@@ -236,7 +236,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -247,26 +247,26 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                fileSystem.ResetCalls();
-                fileSystem.Setup(f => f.DirectoryExists(registryKeys.FirstOrDefault().InstallLocation)).Returns(false);
-                fileSystem.Setup(x => x.FileExists(expectedUninstallString)).Returns(true);
+                FileSystem.ResetCalls();
+                FileSystem.Setup(f => f.DirectoryExists(RegistryKeys.FirstOrDefault().InstallLocation)).Returns(false);
+                FileSystem.Setup(x => x.FileExists(ExpectedUninstallString)).Returns(true);
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".FormatWith(expectedDisplayName)), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".FormatWith(ExpectedDisplayName)), Times.Once);
             }
 
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -277,38 +277,38 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                fileSystem.ResetCalls();
-                registryKeys.Clear();
-                registryKeys.Add(
+                FileSystem.ResetCalls();
+                RegistryKeys.Clear();
+                RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
-                        DisplayName = expectedDisplayName,
+                        DisplayName = ExpectedDisplayName,
                         InstallLocation = string.Empty,
-                        UninstallString = originalUninstallString,
+                        UninstallString = OriginalUninstallString,
                         HasQuietUninstall = true,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat"
                     });
-                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
-                fileSystem.Setup(x => x.FileExists(expectedUninstallString)).Returns(true);
+                PackageInformation.RegistrySnapshot = new Registry("123", RegistryKeys);
+                FileSystem.Setup(x => x.FileExists(ExpectedUninstallString)).Returns(true);
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
+                PackageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
             public void Should_call_command_executor()
             {
-                var args = installerType.BuildUninstallCommandArguments().TrimSafe();
-                commandExecutor.Verify(
-                    c => c.Execute(expectedUninstallString, args, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                var args = InstallerType.BuildUninstallCommandArguments().TrimSafe();
+                CommandExecutor.Verify(
+                    c => c.Execute(ExpectedUninstallString, args, It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Once);
             }
         }
@@ -318,36 +318,36 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                fileSystem.ResetCalls();
-                registryKeys.Clear();
-                registryKeys.Add(
+                FileSystem.ResetCalls();
+                RegistryKeys.Clear();
+                RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
-                        DisplayName = expectedDisplayName,
+                        DisplayName = ExpectedDisplayName,
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
                         UninstallString = string.Empty,
                         HasQuietUninstall = false,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat"
                     });
-                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
-                fileSystem.Setup(x => x.FileExists(expectedUninstallString)).Returns(true);
+                PackageInformation.RegistrySnapshot = new Registry("123", RegistryKeys);
+                FileSystem.Setup(x => x.FileExists(ExpectedUninstallString)).Returns(true);
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' does not have an uninstall string.".FormatWith(expectedDisplayName)), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' does not have an uninstall string.".FormatWith(ExpectedDisplayName)), Times.Once);
             }
 
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -358,25 +358,25 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                registryService.ResetCalls();
-                registryService.Setup(r => r.InstallerKeyExists(registryKeys.FirstOrDefault().KeyPath)).Returns(false);
+                RegistryService.ResetCalls();
+                RegistryService.Setup(r => r.InstallerKeyExists(RegistryKeys.FirstOrDefault().KeyPath)).Returns(false);
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".FormatWith(expectedDisplayName)), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".FormatWith(ExpectedDisplayName)), Times.Once);
             }
 
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -387,28 +387,28 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                fileSystem.ResetCalls();
-                fileSystem.Setup(f => f.DirectoryExists(registryKeys.FirstOrDefault().InstallLocation)).Returns(false);
-                fileSystem.Setup(x => x.FileExists(expectedUninstallString)).Returns(true);
-                registryService.ResetCalls();
-                registryService.Setup(r => r.InstallerKeyExists(registryKeys.FirstOrDefault().KeyPath)).Returns(false);
+                FileSystem.ResetCalls();
+                FileSystem.Setup(f => f.DirectoryExists(RegistryKeys.FirstOrDefault().InstallLocation)).Returns(false);
+                FileSystem.Setup(x => x.FileExists(ExpectedUninstallString)).Returns(true);
+                RegistryService.ResetCalls();
+                RegistryService.Setup(r => r.InstallerKeyExists(RegistryKeys.FirstOrDefault().KeyPath)).Returns(false);
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".FormatWith(expectedDisplayName)), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - '{0}' appears to have been uninstalled already by other means.".FormatWith(ExpectedDisplayName)), Times.Once);
             }
 
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -419,27 +419,27 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                fileSystem.ResetCalls();
-                fileSystem.Setup(f => f.DirectoryExists(registryKeys.FirstOrDefault().InstallLocation)).Returns(true);
-                fileSystem.Setup(f => f.GetFullPath(expectedUninstallString)).Returns(expectedUninstallString);
-                fileSystem.Setup(x => x.FileExists(expectedUninstallString)).Returns(false);
+                FileSystem.ResetCalls();
+                FileSystem.Setup(f => f.DirectoryExists(RegistryKeys.FirstOrDefault().InstallLocation)).Returns(true);
+                FileSystem.Setup(f => f.GetFullPath(ExpectedUninstallString)).Returns(ExpectedUninstallString);
+                FileSystem.Setup(x => x.FileExists(ExpectedUninstallString)).Returns(false);
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_log_why_it_skips_auto_uninstaller()
             {
-                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The uninstaller file no longer exists. \"" + expectedUninstallString + "\""), Times.Once);
+                MockLogger.Verify(l => l.Info(" Skipping auto uninstaller - The uninstaller file no longer exists. \"" + ExpectedUninstallString + "\""), Times.Once);
             }
 
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -449,23 +449,23 @@ namespace chocolatey.tests.infrastructure.app.services
         {
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
+                PackageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
             public void Should_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c =>
                         c.Execute(
-                            expectedUninstallString,
-                            installerType.BuildUninstallCommandArguments().TrimSafe(),
+                            ExpectedUninstallString,
+                            InstallerType.BuildUninstallCommandArguments().TrimSafe(),
                             It.IsAny<int>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
@@ -476,43 +476,43 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_uninstall_string_is_split_by_quotes : AutomaticUninstallerServiceSpecsBase
         {
-            private readonly string uninstallStringWithQuoteSeparation = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe"" ""WinDir Stat""";
+            private readonly string _uninstallStringWithQuoteSeparation = @"""C:\Program Files (x86)\WinDirStat\Uninstall.exe"" ""WinDir Stat""";
 
             public override void Context()
             {
                 base.Context();
-                registryKeys.Clear();
-                registryKeys.Add(
+                RegistryKeys.Clear();
+                RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
-                        DisplayName = expectedDisplayName,
+                        DisplayName = ExpectedDisplayName,
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                        UninstallString = uninstallStringWithQuoteSeparation,
+                        UninstallString = _uninstallStringWithQuoteSeparation,
                         HasQuietUninstall = true,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
-                        InstallerType = installerType.InstallerType,
+                        InstallerType = InstallerType.InstallerType,
                     });
-                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                PackageInformation.RegistrySnapshot = new Registry("123", RegistryKeys);
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
+                PackageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
             public void Should_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c =>
                         c.Execute(
-                            expectedUninstallString,
+                            ExpectedUninstallString,
                             "\"WinDir Stat\"".TrimSafe(),
                             It.IsAny<int>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
@@ -524,44 +524,44 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_uninstall_string_has_ampersand_quot : AutomaticUninstallerServiceSpecsBase
         {
-            private readonly string uninstallStringWithAmpersandQuot = @"&quot;C:\Program Files (x86)\WinDirStat\Uninstall.exe&quot; /SILENT";
+            private readonly string _uninstallStringWithAmpersandQuot = @"&quot;C:\Program Files (x86)\WinDirStat\Uninstall.exe&quot; /SILENT";
 
             public override void Context()
             {
                 base.Context();
-                registryKeys.Clear();
-                registryKeys.Add(
+                RegistryKeys.Clear();
+                RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
-                        DisplayName = expectedDisplayName,
+                        DisplayName = ExpectedDisplayName,
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                        UninstallString = uninstallStringWithAmpersandQuot,
+                        UninstallString = _uninstallStringWithAmpersandQuot,
                         HasQuietUninstall = true,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
-                        InstallerType = installerType.InstallerType,
+                        InstallerType = InstallerType.InstallerType,
                     });
-                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                PackageInformation.RegistrySnapshot = new Registry("123", RegistryKeys);
             }
 
             public override void Because()
             {
                 MockLogger.LogMessagesToConsole = true;
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
+                PackageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
             public void Should_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c =>
                         c.Execute(
-                            expectedUninstallString,
+                            ExpectedUninstallString,
                             "/SILENT".TrimSafe(),
                             It.IsAny<int>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
@@ -573,45 +573,45 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_uninstall_string_has_multiple_file_paths : AutomaticUninstallerServiceSpecsBase
         {
-            private readonly string uninstallStringPointingToPath = @"C:\Programs\WinDirStat\Uninstall.exe D:\Programs\WinDirStat";
-            protected readonly string expectedUninstallStringMultiplePaths = @"C:\Programs\WinDirStat\Uninstall.exe";
+            private readonly string _uninstallStringPointingToPath = @"C:\Programs\WinDirStat\Uninstall.exe D:\Programs\WinDirStat";
+            protected readonly string ExpectedUninstallStringMultiplePaths = @"C:\Programs\WinDirStat\Uninstall.exe";
 
             public override void Context()
             {
                 base.Context();
-                registryKeys.Clear();
-                registryKeys.Add(
+                RegistryKeys.Clear();
+                RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
-                        DisplayName = expectedDisplayName,
+                        DisplayName = ExpectedDisplayName,
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                        UninstallString = uninstallStringPointingToPath,
+                        UninstallString = _uninstallStringPointingToPath,
                         HasQuietUninstall = true,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
-                        InstallerType = installerType.InstallerType,
+                        InstallerType = InstallerType.InstallerType,
                     });
-                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
-                fileSystem.Setup(x => x.FileExists(expectedUninstallStringMultiplePaths)).Returns(true);
+                PackageInformation.RegistrySnapshot = new Registry("123", RegistryKeys);
+                FileSystem.Setup(x => x.FileExists(ExpectedUninstallStringMultiplePaths)).Returns(true);
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
+                PackageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
             public void Should_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c =>
                         c.Execute(
-                            expectedUninstallStringMultiplePaths,
+                            ExpectedUninstallStringMultiplePaths,
                             @"D:\Programs\WinDirStat".TrimSafe(),
                             It.IsAny<int>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
@@ -626,26 +626,26 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                registryKeys.Clear();
-                commandExecutor.ResetCalls();
-                registryKeys.Add(
+                RegistryKeys.Clear();
+                CommandExecutor.ResetCalls();
+                RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                        UninstallString = "{0} {1}".FormatWith(originalUninstallString, "/bob"),
+                        UninstallString = "{0} {1}".FormatWith(OriginalUninstallString, "/bob"),
                         HasQuietUninstall = false,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
-                        InstallerType = InstallerType.Unknown,
+                        InstallerType = chocolatey.infrastructure.app.domain.InstallerType.Unknown,
                     });
-                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
-                fileSystem.Setup(x => x.CombinePaths(config.CacheLocation, "chocolatey", It.IsAny<string>(), It.IsAny<string>())).Returns("");
+                PackageInformation.RegistrySnapshot = new Registry("123", RegistryKeys);
+                FileSystem.Setup(x => x.CombinePaths(Config.CacheLocation, "chocolatey", It.IsAny<string>(), It.IsAny<string>())).Returns("");
             }
 
             // under normal circumstances, it prompts so the user can decide, but if -y is passed it will skip
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
@@ -657,7 +657,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_not_call_command_executor()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
@@ -670,31 +670,31 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                registryKeys.Clear();
-                registryKeys.Add(
+                RegistryKeys.Clear();
+                RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
-                        DisplayName = expectedDisplayName,
+                        DisplayName = ExpectedDisplayName,
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                        UninstallString = originalUninstallString,
+                        UninstallString = OriginalUninstallString,
                         HasQuietUninstall = false,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
                         InstallerType = _installerType.InstallerType,
                     });
-                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                PackageInformation.RegistrySnapshot = new Registry("123", RegistryKeys);
 
-                config.InstallArguments = "/bob /nope";
+                Config.InstallArguments = "/bob /nope";
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
+                PackageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
@@ -702,12 +702,12 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 var uninstallArgs = _installerType.BuildUninstallCommandArguments().TrimSafe();
 
-                uninstallArgs += " {0}".FormatWith(config.InstallArguments);
+                uninstallArgs += " {0}".FormatWith(Config.InstallArguments);
 
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c =>
                         c.Execute(
-                            expectedUninstallString,
+                            ExpectedUninstallString,
                             uninstallArgs,
                             It.IsAny<int>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
@@ -724,42 +724,42 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                registryKeys.Clear();
-                registryKeys.Add(
+                RegistryKeys.Clear();
+                RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
-                        DisplayName = expectedDisplayName,
+                        DisplayName = ExpectedDisplayName,
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                        UninstallString = originalUninstallString,
+                        UninstallString = OriginalUninstallString,
                         HasQuietUninstall = false,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
                         InstallerType = _installerType.InstallerType,
                     });
-                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
+                PackageInformation.RegistrySnapshot = new Registry("123", RegistryKeys);
 
-                config.InstallArguments = "/bob /nope";
-                config.OverrideArguments = true;
+                Config.InstallArguments = "/bob /nope";
+                Config.OverrideArguments = true;
             }
 
             public override void Because()
             {
-                service.Run(packageResult, config);
+                Service.Run(PackageResult, Config);
             }
 
             [Fact]
             public void Should_call_get_package_information()
             {
-                packageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
+                PackageInfoService.Verify(s => s.Get(It.IsAny<IPackageMetadata>()), Times.Once);
             }
 
             [Fact]
             public void Should_call_command_executor_with_only_passed_arguments()
             {
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c =>
                         c.Execute(
-                            expectedUninstallString,
-                            config.InstallArguments,
+                            ExpectedUninstallString,
+                            Config.InstallArguments,
                             It.IsAny<int>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),
@@ -770,47 +770,47 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_AutomaticUninstallerService_defines_uninstall_switches : AutomaticUninstallerServiceSpecsBase
         {
-            private Action because;
-            private readonly string registryUninstallArgs = "/bob";
-            private readonly string logLocation = "c:\\yes\\dude\\1.2.3-beta";
+            private Action _because;
+            private readonly string _registryUninstallArgs = "/bob";
+            private readonly string _logLocation = "c:\\yes\\dude\\1.2.3-beta";
 
             public override void Because()
             {
-                because = () => service.Run(packageResult, config);
+                _because = () => Service.Run(PackageResult, Config);
             }
 
             public void Reset()
             {
                 Context();
-                registryKeys.Clear();
-                commandExecutor.ResetCalls();
+                RegistryKeys.Clear();
+                CommandExecutor.ResetCalls();
             }
 
             private void TestInstallerType(IInstaller installer, bool hasQuietUninstallString)
             {
                 Reset();
-                registryKeys.Add(
+                RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
                         InstallLocation = @"C:\Program Files (x86)\WinDirStat",
-                        UninstallString = "{0} {1}".FormatWith(originalUninstallString, registryUninstallArgs),
+                        UninstallString = "{0} {1}".FormatWith(OriginalUninstallString, _registryUninstallArgs),
                         HasQuietUninstall = hasQuietUninstallString,
                         KeyPath = @"HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WinDirStat",
                         InstallerType = installer.InstallerType,
                     });
-                packageInformation.RegistrySnapshot = new Registry("123", registryKeys);
-                fileSystem.Setup(x => x.CombinePaths(config.CacheLocation, "chocolatey", It.IsAny<string>(), It.IsAny<string>())).Returns(logLocation);
+                PackageInformation.RegistrySnapshot = new Registry("123", RegistryKeys);
+                FileSystem.Setup(x => x.CombinePaths(Config.CacheLocation, "chocolatey", It.IsAny<string>(), It.IsAny<string>())).Returns(_logLocation);
 
-                because();
+                _because();
 
-                var installerTypeArgs = installer.BuildUninstallCommandArguments().TrimSafe().Replace(InstallTokens.PackageLocation, logLocation);
+                var installerTypeArgs = installer.BuildUninstallCommandArguments().TrimSafe().Replace(InstallTokens.PackageLocation, _logLocation);
 
-                var uninstallArgs = !hasQuietUninstallString ? registryUninstallArgs.TrimSafe() + " " + installerTypeArgs : registryUninstallArgs.TrimSafe();
+                var uninstallArgs = !hasQuietUninstallString ? _registryUninstallArgs.TrimSafe() + " " + installerTypeArgs : _registryUninstallArgs.TrimSafe();
 
-                commandExecutor.Verify(
+                CommandExecutor.Verify(
                     c =>
                         c.Execute(
-                            expectedUninstallString,
+                            ExpectedUninstallString,
                             uninstallArgs.TrimSafe(),
                             It.IsAny<int>(),
                             It.IsAny<Action<object, DataReceivedEventArgs>>(),

@@ -32,7 +32,7 @@ namespace chocolatey.tests
     {
         public static MockLogger MockLogger { get; set; }
 
-        private static readonly string InstallLocationVariable = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName);
+        private static readonly string _installLocationVariable = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName);
 
         [OneTimeSetUp]
         public virtual void BeforeEverything()
@@ -48,7 +48,7 @@ namespace chocolatey.tests
         [OneTimeTearDown]
         public void AfterEverything()
         {
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, InstallLocationVariable);
+            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, _installLocationVariable);
         }
     }
 

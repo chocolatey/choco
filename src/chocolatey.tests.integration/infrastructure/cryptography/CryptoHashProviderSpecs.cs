@@ -41,26 +41,26 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
 
         public class When_HashProvider_provides_a_hash : CryptoHashProviderSpecsBase
         {
-            private string result;
-            private string filePath;
+            private string _result;
+            private string _filePath;
 
             public override void Context()
             {
                 base.Context();
-                filePath = FileSystem.CombinePaths(ContextDirectory, "testing.packages.config");
+                _filePath = FileSystem.CombinePaths(ContextDirectory, "testing.packages.config");
             }
 
             public override void Because()
             {
-                result = Provider.ComputeFileHash(filePath);
+                _result = Provider.ComputeFileHash(_filePath);
             }
 
             [Fact]
             public void Should_provide_the_correct_hash_based_on_a_checksum()
             {
-                var expected = BitConverter.ToString(SHA256.Create().ComputeHash(File.ReadAllBytes(filePath))).Replace("-", string.Empty);
+                var expected = BitConverter.ToString(SHA256.Create().ComputeHash(File.ReadAllBytes(_filePath))).Replace("-", string.Empty);
 
-                result.Should().Be(expected);
+                _result.Should().Be(expected);
             }
         }
     }

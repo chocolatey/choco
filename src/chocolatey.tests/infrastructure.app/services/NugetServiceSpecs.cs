@@ -34,48 +34,48 @@ namespace chocolatey.tests.infrastructure.app.services
     {
         public abstract class NugetServiceSpecsBase : TinySpec
         {
-            protected NugetService service;
-            protected Mock<IChocolateyPackageInformationService> packageInfoService = new Mock<IChocolateyPackageInformationService>();
-            protected Mock<IFileSystem> fileSystem = new Mock<IFileSystem>();
-            protected Mock<ILogger> nugetLogger = new Mock<ILogger>();
-            protected Mock<IFilesService> filesService = new Mock<IFilesService>();
-            protected Mock<IPackageMetadata> package = new Mock<IPackageMetadata>();
-            protected Mock<IPackageDownloader> packageDownloader = new Mock<IPackageDownloader>();
-            protected Mock<IRuleService> ruleService = new Mock<IRuleService>();
+            protected NugetService Service;
+            protected Mock<IChocolateyPackageInformationService> PackageInfoService = new Mock<IChocolateyPackageInformationService>();
+            protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
+            protected Mock<ILogger> NugetLogger = new Mock<ILogger>();
+            protected Mock<IFilesService> FilesService = new Mock<IFilesService>();
+            protected Mock<IPackageMetadata> Package = new Mock<IPackageMetadata>();
+            protected Mock<IPackageDownloader> PackageDownloader = new Mock<IPackageDownloader>();
+            protected Mock<IRuleService> RuleService = new Mock<IRuleService>();
 
             public override void Context()
             {
-                fileSystem.ResetCalls();
-                nugetLogger.ResetCalls();
-                packageInfoService.ResetCalls();
-                filesService.ResetCalls();
-                package.ResetCalls();
+                FileSystem.ResetCalls();
+                NugetLogger.ResetCalls();
+                PackageInfoService.ResetCalls();
+                FilesService.ResetCalls();
+                Package.ResetCalls();
 
-                service = new NugetService(fileSystem.Object, nugetLogger.Object, packageInfoService.Object, filesService.Object, ruleService.Object);
+                Service = new NugetService(FileSystem.Object, NugetLogger.Object, PackageInfoService.Object, FilesService.Object, RuleService.Object);
             }
         }
 
         public class When_NugetService_backs_up_changed_files : NugetServiceSpecsBase
         {
-            private Action because;
-            private ChocolateyPackageInformation packageInfo;
-            private const string filePath = "c:\\tests";
-            private PackageFiles packageFiles;
-            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private Action _because;
+            private ChocolateyPackageInformation _packageInfo;
+            private const string FilePath = "c:\\tests";
+            private PackageFiles _packageFiles;
+            private readonly ChocolateyConfiguration _config = new ChocolateyConfiguration();
 
             public override void Context()
             {
                 base.Context();
-                package.Setup(x => x.Id).Returns("bob");
-                packageInfo = new ChocolateyPackageInformation(package.Object);
-                packageInfo.FilesSnapshot = new PackageFiles();
-                packageFiles = new PackageFiles();
-                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
+                Package.Setup(x => x.Id).Returns("bob");
+                _packageInfo = new ChocolateyPackageInformation(Package.Object);
+                _packageInfo.FilesSnapshot = new PackageFiles();
+                _packageFiles = new PackageFiles();
+                FileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
             }
 
             public override void Because()
             {
-                because = () => service.BackupChangedFiles(filePath, config, packageInfo);
+                _because = () => Service.BackupChangedFiles(FilePath, _config, _packageInfo);
             }
 
             [Fact]
@@ -85,22 +85,22 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var packageFile = new PackageFile
                 {
-                    Path = filePath,
+                    Path = FilePath,
                     Checksum = "1234"
                 };
-                packageFiles.Files.Add(packageFile);
-                packageInfo.FilesSnapshot = packageFiles;
+                _packageFiles.Files.Add(packageFile);
+                _packageInfo.FilesSnapshot = _packageFiles;
 
                 var fileSystemFiles = new List<string>()
                 {
-                    filePath
+                    FilePath
                 };
-                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
-                filesService.Setup(x => x.CaptureSnapshot(It.IsAny<string>(), config)).Returns(packageFiles);
+                FileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
+                FilesService.Setup(x => x.CaptureSnapshot(It.IsAny<string>(), _config)).Returns(_packageFiles);
 
-                because();
+                _because();
 
-                fileSystem.Verify(x => x.CopyFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
+                FileSystem.Verify(x => x.CopyFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
             }
 
             [Fact]
@@ -110,84 +110,84 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var packageFile = new PackageFile
                 {
-                    Path = filePath,
+                    Path = FilePath,
                     Checksum = "1234"
                 };
-                packageFiles.Files.Add(packageFile);
-                packageInfo.FilesSnapshot = packageFiles;
+                _packageFiles.Files.Add(packageFile);
+                _packageInfo.FilesSnapshot = _packageFiles;
 
                 var packageFileWithUpdatedChecksum = new PackageFile
                 {
-                    Path = filePath,
+                    Path = FilePath,
                     Checksum = "4321"
                 };
 
                 var fileSystemFiles = new List<string>()
                 {
-                    filePath
+                    FilePath
                 };
-                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
+                FileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
                 var updatedPackageFiles = new PackageFiles();
                 updatedPackageFiles.Files = new List<PackageFile>
                 {
                     packageFileWithUpdatedChecksum
                 };
-                filesService.Setup(x => x.CaptureSnapshot(It.IsAny<string>(), config)).Returns(updatedPackageFiles);
+                FilesService.Setup(x => x.CaptureSnapshot(It.IsAny<string>(), _config)).Returns(updatedPackageFiles);
 
-                because();
+                _because();
 
-                fileSystem.Verify(x => x.CopyFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
+                FileSystem.Verify(x => x.CopyFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Once);
             }
         }
 
         public class When_NugetService_removes_installation_files_on_uninstall : NugetServiceSpecsBase
         {
-            private Action because;
-            private ChocolateyPackageInformation packageInfo;
-            private const string filePath = "c:\\tests";
-            private IList<PackageFile> packageFiles;
+            private Action _because;
+            private ChocolateyPackageInformation _packageInfo;
+            private const string FilePath = "c:\\tests";
+            private IList<PackageFile> _packageFiles;
 
             public override void Context()
             {
                 base.Context();
-                package.Setup(x => x.Id).Returns("bob");
-                packageInfo = new ChocolateyPackageInformation(package.Object);
-                packageInfo.FilesSnapshot = new PackageFiles();
-                packageFiles = new List<PackageFile>();
-                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
+                Package.Setup(x => x.Id).Returns("bob");
+                _packageInfo = new ChocolateyPackageInformation(Package.Object);
+                _packageInfo.FilesSnapshot = new PackageFiles();
+                _packageFiles = new List<PackageFile>();
+                FileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
             }
 
             public override void Because()
             {
-                because = () => service.RemoveInstallationFiles(package.Object, packageInfo);
+                _because = () => Service.RemoveInstallationFiles(Package.Object, _packageInfo);
             }
 
             [Fact]
             public void Should_do_nothing_if_the_directory_no_longer_exists()
             {
                 Context();
-                fileSystem.ResetCalls();
-                fileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(false);
+                FileSystem.ResetCalls();
+                FileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(false);
 
                 var packageFile = new PackageFile
                 {
-                    Path = filePath,
+                    Path = FilePath,
                     Checksum = "1234"
                 };
-                packageFiles.Add(packageFile);
-                packageInfo.FilesSnapshot.Files = packageFiles.ToList();
+                _packageFiles.Add(packageFile);
+                _packageInfo.FilesSnapshot.Files = _packageFiles.ToList();
 
                 var fileSystemFiles = new List<string>()
                 {
-                    filePath
+                    FilePath
                 };
-                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
-                filesService.Setup(x => x.GetPackageFile(It.IsAny<string>())).Returns(packageFile);
+                FileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
+                FilesService.Setup(x => x.GetPackageFile(It.IsAny<string>())).Returns(packageFile);
 
-                because();
+                _because();
 
-                filesService.Verify(x => x.GetPackageFile(It.IsAny<string>()), Times.Never);
-                fileSystem.Verify(x => x.DeleteFile(filePath), Times.Never);
+                FilesService.Verify(x => x.GetPackageFile(It.IsAny<string>()), Times.Never);
+                FileSystem.Verify(x => x.DeleteFile(FilePath), Times.Never);
             }
 
             [Fact]
@@ -197,23 +197,23 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var packageFile = new PackageFile
                 {
-                    Path = filePath,
+                    Path = FilePath,
                     Checksum = "1234"
                 };
-                packageFiles.Add(packageFile);
-                packageInfo.FilesSnapshot.Files = packageFiles.ToList();
+                _packageFiles.Add(packageFile);
+                _packageInfo.FilesSnapshot.Files = _packageFiles.ToList();
 
                 var fileSystemFiles = new List<string>()
                 {
-                    filePath
+                    FilePath
                 };
-                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
-                filesService.Setup(x => x.GetPackageFile(It.IsAny<string>())).Returns(packageFile);
-                fileSystem.Setup(x => x.FileExists(filePath)).Returns(true);
+                FileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
+                FilesService.Setup(x => x.GetPackageFile(It.IsAny<string>())).Returns(packageFile);
+                FileSystem.Setup(x => x.FileExists(FilePath)).Returns(true);
 
-                because();
+                _because();
 
-                fileSystem.Verify(x => x.DeleteFile(filePath));
+                FileSystem.Verify(x => x.DeleteFile(FilePath));
             }
 
             [Fact]
@@ -223,28 +223,28 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var packageFile = new PackageFile
                 {
-                    Path = filePath,
+                    Path = FilePath,
                     Checksum = "1234"
                 };
                 var packageFileWithUpdatedChecksum = new PackageFile
                 {
-                    Path = filePath,
+                    Path = FilePath,
                     Checksum = "4321"
                 };
-                packageFiles.Add(packageFile);
-                packageInfo.FilesSnapshot.Files = packageFiles.ToList();
+                _packageFiles.Add(packageFile);
+                _packageInfo.FilesSnapshot.Files = _packageFiles.ToList();
 
                 var fileSystemFiles = new List<string>()
                 {
-                    filePath
+                    FilePath
                 };
-                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
-                filesService.Setup(x => x.GetPackageFile(It.IsAny<string>())).Returns(packageFileWithUpdatedChecksum);
-                fileSystem.Setup(x => x.FileExists(filePath)).Returns(true);
+                FileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
+                FilesService.Setup(x => x.GetPackageFile(It.IsAny<string>())).Returns(packageFileWithUpdatedChecksum);
+                FileSystem.Setup(x => x.FileExists(FilePath)).Returns(true);
 
-                because();
+                _because();
 
-                fileSystem.Verify(x => x.DeleteFile(filePath), Times.Never);
+                FileSystem.Verify(x => x.DeleteFile(FilePath), Times.Never);
             }
 
             [Fact]
@@ -254,7 +254,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var packageFile = new PackageFile
                 {
-                    Path = filePath,
+                    Path = FilePath,
                     Checksum = "1234"
                 };
                 var packageFileNotInOriginal = new PackageFile
@@ -262,39 +262,39 @@ namespace chocolatey.tests.infrastructure.app.services
                     Path = "c:\\files",
                     Checksum = "4321"
                 };
-                packageFiles.Add(packageFile);
+                _packageFiles.Add(packageFile);
 
-                packageInfo.FilesSnapshot.Files = packageFiles.ToList();
+                _packageInfo.FilesSnapshot.Files = _packageFiles.ToList();
 
                 var fileSystemFiles = new List<string>()
                 {
-                    filePath
+                    FilePath
                 };
 
-                fileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
-                filesService.Setup(x => x.GetPackageFile(It.IsAny<string>())).Returns(packageFileNotInOriginal);
-                fileSystem.Setup(x => x.FileExists(filePath)).Returns(false);
+                FileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
+                FilesService.Setup(x => x.GetPackageFile(It.IsAny<string>())).Returns(packageFileNotInOriginal);
+                FileSystem.Setup(x => x.FileExists(FilePath)).Returns(false);
 
-                because();
+                _because();
 
-                fileSystem.Verify(x => x.DeleteFile(filePath), Times.Never);
+                FileSystem.Verify(x => x.DeleteFile(FilePath), Times.Never);
             }
         }
 
         public class When_NugetService_pack_noop : NugetServiceSpecsBase
         {
-            private Action because;
-            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private Action _because;
+            private readonly ChocolateyConfiguration _config = new ChocolateyConfiguration();
 
             public override void Context()
             {
                 base.Context();
-                fileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\projects\\chocolatey");
+                FileSystem.Setup(x => x.GetCurrentDirectory()).Returns("c:\\projects\\chocolatey");
             }
 
             public override void Because()
             {
-                because = () => service.PackDryRun(config);
+                _because = () => Service.PackDryRun(_config);
             }
 
             public override void AfterEachSpec()
@@ -307,7 +307,7 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 Context();
 
-                because();
+                _because();
 
                 var infos = MockLogger.MessagesFor(tests.LogLevel.Info);
                 infos.Should().ContainSingle();
@@ -319,9 +319,9 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 Context();
 
-                config.OutputDirectory = "c:\\packages";
+                _config.OutputDirectory = "c:\\packages";
 
-                because();
+                _because();
 
                 var infos = MockLogger.MessagesFor(tests.LogLevel.Info);
                 infos.Should().ContainSingle();

@@ -33,49 +33,49 @@ namespace chocolatey.tests.infrastructure.guards
 
         public class When_Ensure_is_being_set_to_a_type : EnsureSpecsBase
         {
-            private object result;
-            private readonly object bob = "something";
+            private object _result;
+            private readonly object _bob = "something";
 
             public override void Because()
             {
-                result = Ensure.That(() => bob);
+                _result = Ensure.That(() => _bob);
             }
 
             [Fact]
             public void Should_return_a_type_of_object_for_ensuring()
             {
-                result.Should().BeOfType<Ensure<object>>();
+                _result.Should().BeOfType<Ensure<object>>();
             }
 
             [Fact]
             public void Should_have_the_value_specified()
             {
-                var bobEnsure = result as Ensure<object>;
-                bobEnsure.Value.Should().Be(bob);
+                var bobEnsure = _result as Ensure<object>;
+                bobEnsure.Value.Should().Be(_bob);
             }
         }
 
         public class When_Ensure_is_a_string_type : EnsureSpecsBase
         {
-            private object result;
-            private readonly string bob = "something";
+            private object _result;
+            private readonly string _bob = "something";
 
             public override void Because()
             {
-                result = Ensure.That(() => bob);
+                _result = Ensure.That(() => _bob);
             }
 
             [Fact]
             public void Should_return_a_ensure_string_type()
             {
-                result.Should().BeOfType<EnsureString>();
+                _result.Should().BeOfType<EnsureString>();
             }
 
             [Fact]
             public void Should_have_the_value_specified()
             {
-                var bobEnsure = result as EnsureString;
-                bobEnsure.Value.Should().Be(bob);
+                var bobEnsure = _result as EnsureString;
+                bobEnsure.Value.Should().Be(_bob);
             }
         }
 
@@ -367,9 +367,9 @@ namespace chocolatey.tests.infrastructure.guards
 
         public class When_testing_Ensure_meets_against_a_string_value_that_passes : EnsureSpecsBase
         {
-            private object exceptionType;
-            private string exceptionMessage = string.Empty;
-            private bool exceptionActionInvoked;
+            private object _exceptionType;
+            private string _exceptionMessage = string.Empty;
+            private bool _exceptionActionInvoked;
 
             public override void Because()
             {
@@ -381,33 +381,33 @@ namespace chocolatey.tests.infrastructure.guards
                         s => s == s.ToLower(),
                         (name, value) =>
                         {
-                            exceptionActionInvoked = true;
+                            _exceptionActionInvoked = true;
                             throw new ApplicationException("this is what we throw.");
                         });
                 }
                 catch (Exception ex)
                 {
-                    exceptionType = ex;
-                    exceptionMessage = ex.Message;
+                    _exceptionType = ex;
+                    _exceptionMessage = ex.Message;
                 }
             }
 
             [Fact]
             public void Should_not_invoke_the_exceptionAction()
             {
-                exceptionActionInvoked.Should().BeFalse();
+                _exceptionActionInvoked.Should().BeFalse();
             }
 
             [Fact]
             public void Should_not_return_a_specified_exception_since_there_was_no_failure()
             {
-                exceptionType.Should().BeNull();
+                _exceptionType.Should().BeNull();
             }
 
             [Fact]
             public void Should_not_return_the_specified_error_message()
             {
-                exceptionMessage.Should().NotContain("this is what we throw.");
+                _exceptionMessage.Should().NotContain("this is what we throw.");
             }
 
             [Fact]
@@ -419,9 +419,9 @@ namespace chocolatey.tests.infrastructure.guards
 
         public class When_testing_Ensure_meets_against_a_string_value_that_fails : EnsureSpecsBase
         {
-            private object exceptionType;
-            private string exceptionMessage = string.Empty;
-            private bool exceptionActionInvoked;
+            private object _exceptionType;
+            private string _exceptionMessage = string.Empty;
+            private bool _exceptionActionInvoked;
 
             public override void Because()
             {
@@ -433,33 +433,33 @@ namespace chocolatey.tests.infrastructure.guards
                         s => s == s.ToLower(),
                         (name, value) =>
                         {
-                            exceptionActionInvoked = true;
+                            _exceptionActionInvoked = true;
                             throw new ApplicationException("this is what we throw.");
                         });
                 }
                 catch (Exception ex)
                 {
-                    exceptionType = ex;
-                    exceptionMessage = ex.Message;
+                    _exceptionType = ex;
+                    _exceptionMessage = ex.Message;
                 }
             }
 
             [Fact]
             public void Should_invoke_the_exceptionAction()
             {
-                exceptionActionInvoked.Should().BeTrue();
+                _exceptionActionInvoked.Should().BeTrue();
             }
 
             [Fact]
             public void Should_return_the_specified_exception_of_type_ApplicationException()
             {
-                exceptionType.Should().BeOfType<ApplicationException>();
+                _exceptionType.Should().BeOfType<ApplicationException>();
             }
 
             [Fact]
             public void Should_return_the_specified_error_message()
             {
-                exceptionMessage.Should().Contain("this is what we throw.");
+                _exceptionMessage.Should().Contain("this is what we throw.");
             }
 
             [Fact]
@@ -471,9 +471,9 @@ namespace chocolatey.tests.infrastructure.guards
 
         public class When_testing_Ensure_meets_against_a_null_value_without_guarding_the_value : EnsureSpecsBase
         {
-            private object exceptionType;
-            private string exceptionMessage = string.Empty;
-            private bool exceptionActionInvoked;
+            private object _exceptionType;
+            private string _exceptionMessage = string.Empty;
+            private bool _exceptionActionInvoked;
 
             public override void Because()
             {
@@ -485,39 +485,39 @@ namespace chocolatey.tests.infrastructure.guards
                         s => s == s.ToLower(),
                         (name, value) =>
                         {
-                            exceptionActionInvoked = true;
+                            _exceptionActionInvoked = true;
                             throw new ApplicationException("this is what we throw.");
                         });
                 }
                 catch (Exception ex)
                 {
-                    exceptionType = ex;
-                    exceptionMessage = ex.Message;
+                    _exceptionType = ex;
+                    _exceptionMessage = ex.Message;
                 }
             }
 
             [Fact]
             public void Should_not_invoke_the_exceptionAction()
             {
-                exceptionActionInvoked.Should().BeFalse();
+                _exceptionActionInvoked.Should().BeFalse();
             }
 
             [Fact]
             public void Should_throw_an_error()
             {
-                exceptionType.Should().NotBeNull();
+                _exceptionType.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_not_return_the_specified_exception_of_type_ApplicationException()
             {
-                exceptionType.Should().NotBeOfType<ApplicationException>();
+                _exceptionType.Should().NotBeOfType<ApplicationException>();
             }
 
             [Fact]
             public void Should_not_return_the_specified_error_message()
             {
-                exceptionMessage.Should().NotContain("this is what we throw.");
+                _exceptionMessage.Should().NotContain("this is what we throw.");
             }
 
             //[Fact]

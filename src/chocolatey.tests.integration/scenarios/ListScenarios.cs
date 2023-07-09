@@ -35,12 +35,12 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Context()
             {
-                Configuration = Scenario.list();
-                Scenario.reset(Configuration);
-                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "installpackage", "1.0.0");
-                Scenario.install_package(Configuration, "upgradepackage", "1.0.0");
+                Configuration = Scenario.List();
+                Scenario.Reset(Configuration);
+                Scenario.AddPackagesToSourceLocation(Configuration, Configuration.Input + "*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "installpackage", "1.0.0");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.0.0");
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
                 Configuration.ListCommand.LocalOnly = true;
@@ -207,8 +207,8 @@ namespace chocolatey.tests.integration.scenarios
             public override void Context()
             {
                 base.Context();
-                Scenario.add_packages_to_source_location(Configuration, "UpperCase" + "*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "UpperCase", "1.1.0");
+                Scenario.AddPackagesToSourceLocation(Configuration, "UpperCase" + "*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "UpperCase", "1.1.0");
             }
 
             public override void Because()

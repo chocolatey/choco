@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -134,9 +134,12 @@ namespace chocolatey.infrastructure.app.configuration
 
         private static void SetLicensedEnvironment(ChocolateyConfiguration config)
         {
-            if (!config.Information.IsLicensedVersion) return;
-
             Environment.SetEnvironmentVariable("ChocolateyLicenseType", config.Information.LicenseType);
+
+            if (!(config.Information.IsLicensedVersion && config.Information.IsLicensedAssemblyLoaded))
+            {
+                return;
+            }
 
             var licenseAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name.IsEqualTo("chocolatey.licensed"));
 

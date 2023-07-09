@@ -50,11 +50,11 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_FilesService_reads_from_files : FilesServiceSpecsBase
         {
-            private Func<PackageFiles> because;
+            private Func<PackageFiles> _because;
 
             public override void Because()
             {
-                because = () => Service.ReadPackageSnapshot("fake path");
+                _because = () => Service.ReadPackageSnapshot("fake path");
             }
 
             [Fact]
@@ -64,7 +64,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 FileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
                 XmlService.Setup(x => x.Deserialize<PackageFiles>(It.IsAny<string>())).Returns(new PackageFiles());
 
-                because();
+                _because();
             }
 
             [Fact]
@@ -73,7 +73,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 Context();
                 FileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(false);
 
-                because();
+                _because();
 
                 XmlService.Verify(x => x.Deserialize<PackageFiles>(It.IsAny<string>()), Times.Never);
             }
@@ -81,52 +81,52 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_FilesService_saves_files : FilesServiceSpecsBase
         {
-            private Action because;
-            private PackageFiles files;
+            private Action _because;
+            private PackageFiles _files;
 
             public override void Because()
             {
-                because = () => Service.SavePackageSnapshot(files, "fake path");
+                _because = () => Service.SavePackageSnapshot(_files, "fake path");
             }
 
             [Fact]
             public void Should_save_if_the_snapshot_is_not_null()
             {
                 Context();
-                files = new PackageFiles();
+                _files = new PackageFiles();
 
-                because();
+                _because();
 
-                XmlService.Verify(x => x.Serialize(files, It.IsAny<string>()), Times.Once());
+                XmlService.Verify(x => x.Serialize(_files, It.IsAny<string>()), Times.Once());
             }
 
             [Fact]
             public void Should_not_do_anything_if_the_snapshot_is_null()
             {
                 Context();
-                files = null;
+                _files = null;
 
-                because();
+                _because();
 
-                XmlService.Verify(x => x.Serialize(files, It.IsAny<string>()), Times.Never);
+                XmlService.Verify(x => x.Serialize(_files, It.IsAny<string>()), Times.Never);
             }
         }
 
         public class When_FilesService_captures_files_and_install_directory_reports_choco_install_location : FilesServiceSpecsBase
         {
-            private PackageFiles result;
-            private PackageResult packageResult;
-            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private PackageFiles _result;
+            private PackageResult _packageResult;
+            private readonly ChocolateyConfiguration _config = new ChocolateyConfiguration();
 
             public override void Context()
             {
                 base.Context();
-                packageResult = new PackageResult("bob", "1.2.3", ApplicationParameters.InstallLocation);
+                _packageResult = new PackageResult("bob", "1.2.3", ApplicationParameters.InstallLocation);
             }
 
             public override void Because()
             {
-                result = Service.CaptureSnapshot(packageResult, config);
+                _result = Service.CaptureSnapshot(_packageResult, _config);
             }
 
             [Fact]
@@ -138,31 +138,31 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_return_a_warning_if_the_install_directory_matches_choco_install_location()
             {
-                packageResult.Warning.Should().BeTrue();
+                _packageResult.Warning.Should().BeTrue();
             }
 
             [Fact]
             public void Should_return_null()
             {
-                result.Should().BeNull();
+                _result.Should().BeNull();
             }
         }
 
         public class When_FilesService_captures_files_and_install_directory_reports_packages_location : FilesServiceSpecsBase
         {
-            private PackageFiles result;
-            private PackageResult packageResult;
-            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private PackageFiles _result;
+            private PackageResult _packageResult;
+            private readonly ChocolateyConfiguration _config = new ChocolateyConfiguration();
 
             public override void Context()
             {
                 base.Context();
-                packageResult = new PackageResult("bob", "1.2.3", ApplicationParameters.PackagesLocation);
+                _packageResult = new PackageResult("bob", "1.2.3", ApplicationParameters.PackagesLocation);
             }
 
             public override void Because()
             {
-                result = Service.CaptureSnapshot(packageResult, config);
+                _result = Service.CaptureSnapshot(_packageResult, _config);
             }
 
             [Fact]
@@ -174,31 +174,31 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_return_a_warning_if_the_install_directory_matches_choco_install_location()
             {
-                packageResult.Warning.Should().BeTrue();
+                _packageResult.Warning.Should().BeTrue();
             }
 
             [Fact]
             public void Should_return_null()
             {
-                result.Should().BeNull();
+                _result.Should().BeNull();
             }
         }
 
         public class When_FilesService_captures_files_and_package_result_is_null : FilesServiceSpecsBase
         {
-            private PackageFiles result;
-            private PackageResult packageResult;
-            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
+            private PackageFiles _result;
+            private PackageResult _packageResult;
+            private readonly ChocolateyConfiguration _config = new ChocolateyConfiguration();
 
             public override void Context()
             {
                 base.Context();
-                packageResult = null;
+                _packageResult = null;
             }
 
             public override void Because()
             {
-                result = Service.CaptureSnapshot(packageResult, config);
+                _result = Service.CaptureSnapshot(_packageResult, _config);
             }
 
             [Fact]
@@ -210,23 +210,23 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_return_a_non_null_object()
             {
-                result.Should().NotBeNull();
+                _result.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_return_empty_package_files()
             {
-                result.Files.Should().BeEmpty();
+                _result.Files.Should().BeEmpty();
             }
         }
 
         public class When_FilesService_captures_files_happy_path : FilesServiceSpecsBase
         {
-            private PackageFiles result;
-            private PackageResult packageResult;
-            private readonly ChocolateyConfiguration config = new ChocolateyConfiguration();
-            private readonly string installDirectory = ApplicationParameters.PackagesLocation + "\\bob";
-            private readonly IList<string> files = new List<string>
+            private PackageFiles _result;
+            private PackageResult _packageResult;
+            private readonly ChocolateyConfiguration _config = new ChocolateyConfiguration();
+            private readonly string _installDirectory = ApplicationParameters.PackagesLocation + "\\bob";
+            private readonly IList<string> _files = new List<string>
             {
                 "file1",
                 "file2"
@@ -235,39 +235,39 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                packageResult = new PackageResult("bob", "1.2.3", installDirectory);
+                _packageResult = new PackageResult("bob", "1.2.3", _installDirectory);
 
-                FileSystem.Setup(x => x.GetFiles(ApplicationParameters.PackagesLocation + "\\bob", It.IsAny<string>(), SearchOption.AllDirectories)).Returns(files);
+                FileSystem.Setup(x => x.GetFiles(ApplicationParameters.PackagesLocation + "\\bob", It.IsAny<string>(), SearchOption.AllDirectories)).Returns(_files);
                 HashProvider.Setup(x => x.ComputeFileHash(It.IsAny<string>())).Returns("yes");
             }
 
             public override void Because()
             {
-                result = Service.CaptureSnapshot(packageResult, config);
+                _result = Service.CaptureSnapshot(_packageResult, _config);
             }
 
             [Fact]
             public void Should_return_a_PackageFiles_object()
             {
-                result.Should().NotBeNull();
+                _result.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_contain_package_files()
             {
-                result.Files.Should().NotBeEmpty();
+                _result.Files.Should().NotBeEmpty();
             }
 
             [Fact]
             public void Should_contain_the_correct_number_of_package_files()
             {
-                result.Files.Should().HaveCount(files.Count);
+                _result.Files.Should().HaveCount(_files.Count);
             }
 
             [Fact]
             public void Should_call_hash_provider_for_each_file()
             {
-                HashProvider.Verify(x => x.ComputeFileHash(It.IsAny<string>()), Times.Exactly(files.Count));
+                HashProvider.Verify(x => x.ComputeFileHash(It.IsAny<string>()), Times.Exactly(_files.Count));
             }
         }
     }

@@ -28,28 +28,28 @@ namespace chocolatey.tests.infrastructure.app.commands
         [ConcernFor("help")]
         public abstract class ChocolateyHelpCommandSpecsBase : TinySpec
         {
-            protected ChocolateyHelpCommand command;
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateyHelpCommand Command;
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                command = new ChocolateyHelpCommand(null);
+                Command = new ChocolateyHelpCommand(null);
             }
         }
 
         public class When_implementing_command_for : ChocolateyHelpCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void Should_implement_help()
             {
-                results.Should().Contain("help");
+                _results.Should().Contain("help");
             }
         }
     }

@@ -107,6 +107,8 @@ object ChocolateyDockerWin : BuildType({
         param("env.vcsroot.branch", "%vcsroot.branch%")
         param("env.Git_Branch", "%teamcity.build.vcs.branch.Chocolatey_ChocolateyVcsRoot%")
         param("teamcity.git.fetchAllHeads", "true")
+        password("env.DOCKER_USER", "%system.DockerUsername%", display = ParameterDisplay.HIDDEN, readOnly = true)
+        password("env.DOCKER_PASSWORD", "%system.DockerPassword%", display = ParameterDisplay.HIDDEN, readOnly = true)
     }
 
     vcs {
@@ -155,12 +157,15 @@ object ChocolateyPosix : BuildType({
 
     params {
         param("env.CAKE_NUGET_SOURCE", "") // The Cake version we use has issues with authing to our private source on Linux
+        param("env.PRIMARY_NUGET_SOURCE", "") // As above there are issues with authing to our private source on Linux
         param("env.CHOCOLATEY_VERSION", "%dep.Chocolatey.build.number%")
         param("env.CHOCOLATEY_OFFICIAL_KEY", "%system.teamcity.build.checkoutDir%/chocolatey.official.snk")
         password("env.GITHUB_PAT", "%system.GitHubPAT%", display = ParameterDisplay.HIDDEN, readOnly = true)
         param("env.vcsroot.branch", "%vcsroot.branch%")
         param("env.Git_Branch", "%teamcity.build.vcs.branch.Chocolatey_ChocolateyVcsRoot%")
         param("teamcity.git.fetchAllHeads", "true")
+        password("env.DOCKER_USER", "%system.DockerUsername%", display = ParameterDisplay.HIDDEN, readOnly = true)
+        password("env.DOCKER_PASSWORD", "%system.DockerPassword%", display = ParameterDisplay.HIDDEN, readOnly = true)
     }
 
     vcs {

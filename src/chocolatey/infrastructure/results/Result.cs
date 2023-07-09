@@ -25,16 +25,30 @@ namespace chocolatey.infrastructure.results
     /// </summary>
     public class Result : IResult
     {
-        protected readonly Lazy<List<ResultMessage>> _messages = new Lazy<List<ResultMessage>>();
+        // Should this just be private, instead of a protected field?
+        protected readonly Lazy<List<ResultMessage>> LazyMessages;
+
+        public Result()
+        {
+            LazyMessages = new Lazy<List<ResultMessage>>();
+#pragma warning disable CS0618 // Type or member is obsolete
+            _messages = LazyMessages;
+#pragma warning restore CS0618 // Type or member is obsolete
+        }
 
         public bool Success
         {
-            get { return !_messages.Value.Any(x => x.MessageType == ResultType.Error); }
+            get { return !LazyMessages.Value.Any(x => x.MessageType == ResultType.Error); }
         }
 
         public ICollection<ResultMessage> Messages
         {
-            get { return _messages.Value; }
+            get { return LazyMessages.Value; }
         }
+
+#pragma warning disable IDE1006 // Naming Styles
+        [Obsolete("This field is deprecated and will be removed in v3. Use LazyMessages or Messages instead.")]
+        protected readonly Lazy<List<ResultMessage>> _messages;
+#pragma warning restore IDE1006 // Naming Styles
     }
 }

@@ -41,53 +41,53 @@ namespace chocolatey.tests.infrastructure.app.commands
         [ConcernFor("pin")]
         public abstract class ChocolateyPinCommandSpecsBase : TinySpec
         {
-            protected ChocolateyPinCommand command;
-            protected Mock<IChocolateyPackageInformationService> packageInfoService = new Mock<IChocolateyPackageInformationService>();
-            protected Mock<ILogger> nugetLogger = new Mock<ILogger>();
-            protected Mock<INugetService> nugetService = new Mock<INugetService>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
-            protected Mock<IPackageMetadata> package = new Mock<IPackageMetadata>();
-            protected Mock<IPackageMetadata> pinnedPackage = new Mock<IPackageMetadata>();
-            protected Mock<IPackageMetadata> mingwPackage = new Mock<IPackageMetadata>();
-            protected Mock<IPackageMetadata> gstreamerMingwPackage = new Mock<IPackageMetadata>();
+            protected ChocolateyPinCommand Command;
+            protected Mock<IChocolateyPackageInformationService> PackageInfoService = new Mock<IChocolateyPackageInformationService>();
+            protected Mock<ILogger> NugetLogger = new Mock<ILogger>();
+            protected Mock<INugetService> NugetService = new Mock<INugetService>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
+            protected Mock<IPackageMetadata> Package = new Mock<IPackageMetadata>();
+            protected Mock<IPackageMetadata> PinnedPackage = new Mock<IPackageMetadata>();
+            protected Mock<IPackageMetadata> MingwPackage = new Mock<IPackageMetadata>();
+            protected Mock<IPackageMetadata> GstreamerMingwPackage = new Mock<IPackageMetadata>();
 
             public override void Context()
             {
                 //MockLogger = new MockLogger();
                 //Log.InitializeWith(MockLogger);
-                configuration.Sources = "https://localhost/somewhere/out/there";
-                command = new ChocolateyPinCommand(packageInfoService.Object, nugetLogger.Object, nugetService.Object);
+                Configuration.Sources = "https://localhost/somewhere/out/there";
+                Command = new ChocolateyPinCommand(PackageInfoService.Object, NugetLogger.Object, NugetService.Object);
 
-                package = new Mock<IPackageMetadata>();
-                package.Setup(p => p.Id).Returns("regular");
-                package.Setup(p => p.Version).Returns(new NuGetVersion("1.2.0"));
-                packageInfoService.Setup(s => s.Get(package.Object)).Returns(
-                    new ChocolateyPackageInformation(package.Object)
+                Package = new Mock<IPackageMetadata>();
+                Package.Setup(p => p.Id).Returns("regular");
+                Package.Setup(p => p.Version).Returns(new NuGetVersion("1.2.0"));
+                PackageInfoService.Setup(s => s.Get(Package.Object)).Returns(
+                    new ChocolateyPackageInformation(Package.Object)
                     {
                         IsPinned = false
                     });
-                pinnedPackage = new Mock<IPackageMetadata>();
-                pinnedPackage.Setup(p => p.Id).Returns("pinned");
-                pinnedPackage.Setup(p => p.Version).Returns(new NuGetVersion("1.1.0"));
-                packageInfoService.Setup(s => s.Get(pinnedPackage.Object)).Returns(
-                    new ChocolateyPackageInformation(pinnedPackage.Object)
+                PinnedPackage = new Mock<IPackageMetadata>();
+                PinnedPackage.Setup(p => p.Id).Returns("pinned");
+                PinnedPackage.Setup(p => p.Version).Returns(new NuGetVersion("1.1.0"));
+                PackageInfoService.Setup(s => s.Get(PinnedPackage.Object)).Returns(
+                    new ChocolateyPackageInformation(PinnedPackage.Object)
                     {
                         IsPinned = true
                     });
 
-                mingwPackage = new Mock<IPackageMetadata>();
-                mingwPackage.Setup(p => p.Id).Returns("mingw");
-                mingwPackage.Setup(p => p.Version).Returns(new NuGetVersion("1.0.0"));
-                packageInfoService.Setup(s => s.Get(mingwPackage.Object)).Returns(
-                    new ChocolateyPackageInformation(mingwPackage.Object)
+                MingwPackage = new Mock<IPackageMetadata>();
+                MingwPackage.Setup(p => p.Id).Returns("mingw");
+                MingwPackage.Setup(p => p.Version).Returns(new NuGetVersion("1.0.0"));
+                PackageInfoService.Setup(s => s.Get(MingwPackage.Object)).Returns(
+                    new ChocolateyPackageInformation(MingwPackage.Object)
                     {
                         IsPinned = true
                     });
-                gstreamerMingwPackage = new Mock<IPackageMetadata>();
-                gstreamerMingwPackage.Setup(p => p.Id).Returns("gstreamer-mingw");
-                gstreamerMingwPackage.Setup(p => p.Version).Returns(new NuGetVersion("1.0.0"));
-                packageInfoService.Setup(s => s.Get(gstreamerMingwPackage.Object)).Returns(
-                    new ChocolateyPackageInformation(gstreamerMingwPackage.Object)
+                GstreamerMingwPackage = new Mock<IPackageMetadata>();
+                GstreamerMingwPackage.Setup(p => p.Id).Returns("gstreamer-mingw");
+                GstreamerMingwPackage.Setup(p => p.Version).Returns(new NuGetVersion("1.0.0"));
+                PackageInfoService.Setup(s => s.Get(GstreamerMingwPackage.Object)).Returns(
+                    new ChocolateyPackageInformation(GstreamerMingwPackage.Object)
                     {
                         IsPinned = true
                     });
@@ -95,74 +95,74 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public void Reset()
             {
-                packageInfoService.ResetCalls();
-                nugetService.ResetCalls();
+                PackageInfoService.ResetCalls();
+                NugetService.ResetCalls();
             }
         }
 
         public class When_implementing_command_for : ChocolateyPinCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void Should_implement_source()
             {
-                results.Should().Contain("pin");
+                _results.Should().Contain("pin");
             }
         }
 
         public class When_configurating_the_argument_parser : ChocolateyPinCommandSpecsBase
         {
-            private OptionSet optionSet;
+            private OptionSet _optionSet;
 
             public override void Context()
             {
                 base.Context();
-                optionSet = new OptionSet();
+                _optionSet = new OptionSet();
             }
 
             public override void Because()
             {
-                command.ConfigureArgumentParser(optionSet, configuration);
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
             }
 
             [Fact]
             public void Should_add_name_to_the_option_set()
             {
-                optionSet.Contains("name").Should().BeTrue();
+                _optionSet.Contains("name").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_name_to_the_option_set()
             {
-                optionSet.Contains("n").Should().BeTrue();
+                _optionSet.Contains("n").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_version_to_the_option_set()
             {
-                optionSet.Contains("version").Should().BeTrue();
+                _optionSet.Contains("version").Should().BeTrue();
             }
         }
 
         public class When_handling_additional_argument_parsing : ChocolateyPinCommandSpecsBase
         {
-            private readonly IList<string> unparsedArgs = new List<string>();
-            private Action because;
+            private readonly IList<string> _unparsedArgs = new List<string>();
+            private Action _because;
 
             public override void Because()
             {
-                because = () => command.ParseAdditionalArguments(unparsedArgs, configuration);
+                _because = () => Command.ParseAdditionalArguments(_unparsedArgs, Configuration);
             }
 
             public new void Reset()
             {
-                unparsedArgs.Clear();
+                _unparsedArgs.Clear();
                 base.Reset();
             }
 
@@ -170,24 +170,24 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_use_the_first_unparsed_arg_as_the_subcommand()
             {
                 Reset();
-                unparsedArgs.Add("list");
-                because();
+                _unparsedArgs.Add("list");
+                _because();
 
-                configuration.PinCommand.Command.Should().Be(PinCommandType.List);
+                Configuration.PinCommand.Command.Should().Be(PinCommandType.List);
             }
 
             [Fact]
             public void Should_throw_when_more_than_one_unparsed_arg_is_passed()
             {
                 Reset();
-                unparsedArgs.Add("wtf");
-                unparsedArgs.Add("bbq");
+                _unparsedArgs.Add("wtf");
+                _unparsedArgs.Add("bbq");
                 var errored = false;
                 Exception error = null;
 
                 try
                 {
-                    because();
+                    _because();
                 }
                 catch (Exception ex)
                 {
@@ -205,109 +205,109 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_accept_add_as_the_subcommand()
             {
                 Reset();
-                unparsedArgs.Add("add");
-                because();
+                _unparsedArgs.Add("add");
+                _because();
 
-                configuration.PinCommand.Command.Should().Be(PinCommandType.Add);
+                Configuration.PinCommand.Command.Should().Be(PinCommandType.Add);
             }
 
             [Fact]
             public void Should_accept_uppercase_add_as_the_subcommand()
             {
                 Reset();
-                unparsedArgs.Add("ADD");
-                because();
+                _unparsedArgs.Add("ADD");
+                _because();
 
-                configuration.PinCommand.Command.Should().Be(PinCommandType.Add);
+                Configuration.PinCommand.Command.Should().Be(PinCommandType.Add);
             }
 
             [Fact]
             public void Should_remove_add_as_the_subcommand()
             {
                 Reset();
-                unparsedArgs.Add("remove");
-                because();
+                _unparsedArgs.Add("remove");
+                _because();
 
-                configuration.PinCommand.Command.Should().Be(PinCommandType.Remove);
+                Configuration.PinCommand.Command.Should().Be(PinCommandType.Remove);
             }
 
             [Fact]
             public void Should_set_unrecognized_values_to_list_as_the_subcommand()
             {
                 Reset();
-                unparsedArgs.Add("wtf");
-                because();
+                _unparsedArgs.Add("wtf");
+                _because();
 
-                configuration.PinCommand.Command.Should().Be(PinCommandType.List);
+                Configuration.PinCommand.Command.Should().Be(PinCommandType.List);
             }
 
             [Fact]
             public void Should_default_to_list_as_the_subcommand()
             {
                 Reset();
-                because();
+                _because();
 
-                configuration.PinCommand.Command.Should().Be(PinCommandType.List);
+                Configuration.PinCommand.Command.Should().Be(PinCommandType.List);
             }
 
             [Fact]
             public void Should_handle_passing_in_an_empty_string()
             {
                 Reset();
-                unparsedArgs.Add(" ");
-                because();
+                _unparsedArgs.Add(" ");
+                _because();
 
-                configuration.PinCommand.Command.Should().Be(PinCommandType.List);
+                Configuration.PinCommand.Command.Should().Be(PinCommandType.List);
             }
 
             [Fact]
             public void Should_set_config_sources_to_local_only()
             {
                 Reset();
-                because();
+                _because();
 
-                configuration.Sources.Should().Be(ApplicationParameters.PackagesLocation);
+                Configuration.Sources.Should().Be(ApplicationParameters.PackagesLocation);
             }
 
             [Fact]
             public void Should_set_config_local_only_to_true()
             {
                 Reset();
-                because();
+                _because();
 
-                configuration.ListCommand.LocalOnly.Should().BeTrue();
+                Configuration.ListCommand.LocalOnly.Should().BeTrue();
             }
 
             [Fact]
             public void Should_set_config_all_versions_to_true()
             {
                 Reset();
-                because();
+                _because();
 
-                configuration.AllVersions.Should().BeTrue();
+                Configuration.AllVersions.Should().BeTrue();
             }
         }
 
         public class When_validating : ChocolateyPinCommandSpecsBase
         {
-            private Action because;
+            private Action _because;
 
             public override void Because()
             {
-                because = () => command.Validate(configuration);
+                _because = () => Command.Validate(Configuration);
             }
 
             [Fact]
             public void Should_throw_when_command_is_not_list_and_name_is_not_set()
             {
-                configuration.PinCommand.Command = PinCommandType.Add;
-                configuration.PinCommand.Name = "";
+                Configuration.PinCommand.Command = PinCommandType.Add;
+                Configuration.PinCommand.Name = "";
                 var errored = false;
                 Exception error = null;
 
                 try
                 {
-                    because();
+                    _because();
                 }
                 catch (Exception ex)
                 {
@@ -318,23 +318,23 @@ namespace chocolatey.tests.infrastructure.app.commands
                 errored.Should().BeTrue();
                 error.Should().NotBeNull();
                 error.Should().BeOfType<ApplicationException>();
-                error.Message.Should().Be("When specifying the subcommand '{0}', you must also specify --name.".FormatWith(configuration.PinCommand.Command.ToStringSafe().ToLower()));
+                error.Message.Should().Be("When specifying the subcommand '{0}', you must also specify --name.".FormatWith(Configuration.PinCommand.Command.ToStringSafe().ToLower()));
             }
 
             [Fact]
             public void Should_continue_when_command_is_list_and_name_is_not_set()
             {
-                configuration.PinCommand.Command = PinCommandType.List;
-                configuration.PinCommand.Name = "";
-                because();
+                Configuration.PinCommand.Command = PinCommandType.List;
+                Configuration.PinCommand.Name = "";
+                _because();
             }
 
             [Fact]
             public void Should_continue_when_command_is_not_list_and_name_is_set()
             {
-                configuration.PinCommand.Command = PinCommandType.List;
-                configuration.PinCommand.Name = "bob";
-                because();
+                Configuration.PinCommand.Command = PinCommandType.List;
+                Configuration.PinCommand.Name = "bob";
+                _because();
             }
         }
 
@@ -342,7 +342,7 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.DryRun(configuration);
+                Command.DryRun(Configuration);
             }
 
             [Fact]
@@ -366,21 +366,21 @@ namespace chocolatey.tests.infrastructure.app.commands
             public override void Context()
             {
                 base.Context();
-                configuration.Sources = ApplicationParameters.PackagesLocation;
-                configuration.ListCommand.LocalOnly = true;
-                configuration.AllVersions = true;
+                Configuration.Sources = ApplicationParameters.PackagesLocation;
+                Configuration.ListCommand.LocalOnly = true;
+                Configuration.AllVersions = true;
                 var packageResults = new[]
                 {
-                    new PackageResult(package.Object, null),
-                    new PackageResult(pinnedPackage.Object, null)
+                    new PackageResult(Package.Object, null),
+                    new PackageResult(PinnedPackage.Object, null)
                 };
-                nugetService.Setup(n => n.List(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
-                configuration.PinCommand.Command = PinCommandType.List;
+                NugetService.Setup(n => n.List(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
+                Configuration.PinCommand.Command = PinCommandType.List;
             }
 
             public override void Because()
             {
-                command.Run(configuration);
+                Command.Run(Configuration);
             }
 
             [Fact]
@@ -415,16 +415,16 @@ namespace chocolatey.tests.infrastructure.app.commands
             public override void Context()
             {
                 base.Context();
-                configuration.Sources = ApplicationParameters.PackagesLocation;
-                configuration.ListCommand.LocalOnly = true;
-                configuration.AllVersions = true;
+                Configuration.Sources = ApplicationParameters.PackagesLocation;
+                Configuration.ListCommand.LocalOnly = true;
+                Configuration.AllVersions = true;
 
                 var packageResults = new[]
                 {
-                    new PackageResult(package.Object, null),
-                    new PackageResult(pinnedPackage.Object, null)
+                    new PackageResult(Package.Object, null),
+                    new PackageResult(PinnedPackage.Object, null)
                 };
-                nugetService.Setup(n => n.List(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
+                NugetService.Setup(n => n.List(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
             }
 
             public new void Reset()
@@ -448,10 +448,10 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_call_nuget_service_list_run_when_command_is_list()
             {
                 Reset();
-                configuration.PinCommand.Command = PinCommandType.List;
-                command.Run(configuration);
+                Configuration.PinCommand.Command = PinCommandType.List;
+                Command.Run(Configuration);
 
-                nugetService.Verify(n => n.List(It.IsAny<ChocolateyConfiguration>()), Times.Once);
+                NugetService.Verify(n => n.List(It.IsAny<ChocolateyConfiguration>()), Times.Once);
             }
 
             [Fact]
@@ -459,24 +459,24 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 Reset();
 
-                configuration.PinCommand.Name = "regular";
-                configuration.PinCommand.Command = PinCommandType.Add;
+                Configuration.PinCommand.Name = "regular";
+                Configuration.PinCommand.Command = PinCommandType.Add;
 
-                command.SetPin(configuration);
+                Command.SetPin(Configuration);
 
-                packageInfoService.Verify(s => s.Save(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
+                PackageInfoService.Verify(s => s.Save(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
             }
 
             [Fact]
             public void Should_remove_pin_when_command_is_remove()
             {
                 Reset();
-                configuration.PinCommand.Name = "pinned";
-                configuration.PinCommand.Command = PinCommandType.Remove;
+                Configuration.PinCommand.Name = "pinned";
+                Configuration.PinCommand.Command = PinCommandType.Remove;
 
-                command.SetPin(configuration);
+                Command.SetPin(Configuration);
 
-                packageInfoService.Verify(s => s.Save(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
+                PackageInfoService.Verify(s => s.Save(It.IsAny<ChocolateyPackageInformation>()), Times.Once);
             }
         }
 
@@ -485,16 +485,16 @@ namespace chocolatey.tests.infrastructure.app.commands
             public override void Context()
             {
                 base.Context();
-                configuration.Sources = ApplicationParameters.PackagesLocation;
-                configuration.ListCommand.LocalOnly = true;
-                configuration.AllVersions = true;
+                Configuration.Sources = ApplicationParameters.PackagesLocation;
+                Configuration.ListCommand.LocalOnly = true;
+                Configuration.AllVersions = true;
 
                 var packageResults = new[]
                 {
-                    new PackageResult(mingwPackage.Object, null),
-                    new PackageResult(gstreamerMingwPackage.Object, null)
+                    new PackageResult(MingwPackage.Object, null),
+                    new PackageResult(GstreamerMingwPackage.Object, null)
                 };
-                nugetService.Setup(n => n.List(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
+                NugetService.Setup(n => n.List(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
             }
 
             public new void Reset()
@@ -517,22 +517,22 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_call_nuget_service_list_run_when_command_is_list()
             {
                 Reset();
-                configuration.PinCommand.Command = PinCommandType.List;
-                command.Run(configuration);
+                Configuration.PinCommand.Command = PinCommandType.List;
+                Command.Run(Configuration);
 
-                nugetService.Verify(n => n.List(It.IsAny<ChocolateyConfiguration>()), Times.Once);
+                NugetService.Verify(n => n.List(It.IsAny<ChocolateyConfiguration>()), Times.Once);
             }
 
             [Fact]
             public void Should_remove_pin_from_correct_package()
             {
                 Reset();
-                configuration.PinCommand.Name = "mingw";
-                configuration.PinCommand.Command = PinCommandType.Remove;
+                Configuration.PinCommand.Name = "mingw";
+                Configuration.PinCommand.Command = PinCommandType.Remove;
 
-                command.SetPin(configuration);
+                Command.SetPin(Configuration);
 
-                packageInfoService.Verify(s =>
+                PackageInfoService.Verify(s =>
                     s.Save(It.Is<ChocolateyPackageInformation>(n =>
                         n.Package.Id.Equals("mingw"))), Times.Once);
             }

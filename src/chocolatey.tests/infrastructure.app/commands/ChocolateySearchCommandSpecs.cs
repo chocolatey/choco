@@ -32,131 +32,131 @@ namespace chocolatey.tests.infrastructure.app.commands
         [ConcernFor("search")]
         public abstract class ChocolateySearchCommandSpecsBase : TinySpec
         {
-            protected ChocolateySearchCommand command;
-            protected Mock<IChocolateyPackageService> packageService = new Mock<IChocolateyPackageService>();
-            protected ChocolateyConfiguration configuration = new ChocolateyConfiguration();
+            protected ChocolateySearchCommand Command;
+            protected Mock<IChocolateyPackageService> PackageService = new Mock<IChocolateyPackageService>();
+            protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
 
             public override void Context()
             {
-                configuration.Sources = "bob";
-                command = new ChocolateySearchCommand(packageService.Object);
+                Configuration.Sources = "bob";
+                Command = new ChocolateySearchCommand(PackageService.Object);
             }
         }
 
         public class When_implementing_command_for : ChocolateySearchCommandSpecsBase
         {
-            private List<string> results;
+            private List<string> _results;
 
             public override void Because()
             {
-                results = command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
+                _results = Command.GetType().GetCustomAttributes(typeof(CommandForAttribute), false).Cast<CommandForAttribute>().Select(a => a.CommandName).ToList();
             }
 
             [Fact]
             public void Should_not_implement_list()
             {
-                results.Should().NotContain("list");
+                _results.Should().NotContain("list");
             }
 
             [Fact]
             public void Should_implement_search()
             {
-                results.Should().Contain("search");
+                _results.Should().Contain("search");
             }
 
             [Fact]
             public void Should_implement_find()
             {
-                results.Should().Contain("find");
+                _results.Should().Contain("find");
             }
         }
 
         public class When_configurating_the_argument_parser_for_search_command : ChocolateySearchCommandSpecsBase
         {
-            private OptionSet optionSet;
+            private OptionSet _optionSet;
 
             public override void Context()
             {
                 base.Context();
-                optionSet = new OptionSet();
-                configuration.CommandName = "search";
+                _optionSet = new OptionSet();
+                Configuration.CommandName = "search";
             }
 
             public override void Because()
             {
-                command.ConfigureArgumentParser(optionSet, configuration);
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
             }
 
             [Fact]
             public void Should_add_source_to_the_option_set()
             {
-                optionSet.Contains("source").Should().BeTrue();
+                _optionSet.Contains("source").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_source_to_the_option_set()
             {
-                optionSet.Contains("s").Should().BeTrue();
+                _optionSet.Contains("s").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_prerelease_to_the_option_set()
             {
-                optionSet.Contains("prerelease").Should().BeTrue();
+                _optionSet.Contains("prerelease").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_prerelease_to_the_option_set()
             {
-                optionSet.Contains("pre").Should().BeTrue();
+                _optionSet.Contains("pre").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_includeprograms_to_the_option_set()
             {
-                optionSet.Contains("includeprograms").Should().BeTrue();
+                _optionSet.Contains("includeprograms").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_includeprograms_to_the_option_set()
             {
-                optionSet.Contains("i").Should().BeTrue();
+                _optionSet.Contains("i").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_allversions_to_the_option_set()
             {
-                optionSet.Contains("allversions").Should().BeTrue();
+                _optionSet.Contains("allversions").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_allversions_to_the_option_set()
             {
-                optionSet.Contains("a").Should().BeTrue();
+                _optionSet.Contains("a").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_user_to_the_option_set()
             {
-                optionSet.Contains("user").Should().BeTrue();
+                _optionSet.Contains("user").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_user_to_the_option_set()
             {
-                optionSet.Contains("u").Should().BeTrue();
+                _optionSet.Contains("u").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_password_to_the_option_set()
             {
-                optionSet.Contains("password").Should().BeTrue();
+                _optionSet.Contains("password").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_password_to_the_option_set()
             {
-                optionSet.Contains("p").Should().BeTrue();
+                _optionSet.Contains("p").Should().BeTrue();
             }
         }
 
@@ -164,129 +164,129 @@ namespace chocolatey.tests.infrastructure.app.commands
         [NUnit.Framework.TestFixture("find")]
         public class When_configurating_the_argument_parser : ChocolateySearchCommandSpecsBase
         {
-            private OptionSet optionSet;
+            private OptionSet _optionSet;
 
             public When_configurating_the_argument_parser(string commandName)
             {
-                configuration.CommandName = commandName;
+                Configuration.CommandName = commandName;
             }
 
             public override void Context()
             {
                 base.Context();
-                optionSet = new OptionSet();
+                _optionSet = new OptionSet();
             }
 
             public override void Because()
             {
-                command.ConfigureArgumentParser(optionSet, configuration);
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
             }
 
             [Fact]
             public void Should_add_source_to_the_option_set()
             {
-                optionSet.Contains("source").Should().BeTrue();
+                _optionSet.Contains("source").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_source_to_the_option_set()
             {
-                optionSet.Contains("s").Should().BeTrue();
+                _optionSet.Contains("s").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_prerelease_to_the_option_set()
             {
-                optionSet.Contains("prerelease").Should().BeTrue();
+                _optionSet.Contains("prerelease").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_prerelease_to_the_option_set()
             {
-                optionSet.Contains("pre").Should().BeTrue();
+                _optionSet.Contains("pre").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_includeprograms_to_the_option_set()
             {
-                optionSet.Contains("includeprograms").Should().BeTrue();
+                _optionSet.Contains("includeprograms").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_includeprograms_to_the_option_set()
             {
-                optionSet.Contains("i").Should().BeTrue();
+                _optionSet.Contains("i").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_allversions_to_the_option_set()
             {
-                optionSet.Contains("allversions").Should().BeTrue();
+                _optionSet.Contains("allversions").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_allversions_to_the_option_set()
             {
-                optionSet.Contains("a").Should().BeTrue();
+                _optionSet.Contains("a").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_user_to_the_option_set()
             {
-                optionSet.Contains("user").Should().BeTrue();
+                _optionSet.Contains("user").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_user_to_the_option_set()
             {
-                optionSet.Contains("u").Should().BeTrue();
+                _optionSet.Contains("u").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_password_to_the_option_set()
             {
-                optionSet.Contains("password").Should().BeTrue();
+                _optionSet.Contains("password").Should().BeTrue();
             }
 
             [Fact]
             public void Should_add_short_version_of_password_to_the_option_set()
             {
-                optionSet.Contains("p").Should().BeTrue();
+                _optionSet.Contains("p").Should().BeTrue();
             }
         }
 
         public class When_handling_additional_argument_parsing : ChocolateySearchCommandSpecsBase
         {
-            private readonly IList<string> unparsedArgs = new List<string>();
-            private readonly string source = "https://somewhereoutthere";
-            private Action because;
+            private readonly IList<string> _unparsedArgs = new List<string>();
+            private readonly string _source = "https://somewhereoutthere";
+            private Action _because;
 
             public override void Context()
             {
                 base.Context();
-                unparsedArgs.Add("pkg1");
-                unparsedArgs.Add("pkg2");
-                configuration.Sources = source;
+                _unparsedArgs.Add("pkg1");
+                _unparsedArgs.Add("pkg2");
+                Configuration.Sources = _source;
             }
 
             public override void Because()
             {
-                because = () => command.ParseAdditionalArguments(unparsedArgs, configuration);
+                _because = () => Command.ParseAdditionalArguments(_unparsedArgs, Configuration);
             }
 
             [Fact]
             public void Should_set_unparsed_arguments_to_configuration_input()
             {
-                because();
-                configuration.Input.Should().Be("pkg1 pkg2");
+                _because();
+                Configuration.Input.Should().Be("pkg1 pkg2");
             }
 
             [Fact]
             public void Should_leave_source_as_set()
             {
-                configuration.ListCommand.LocalOnly = false;
-                because();
-                configuration.Sources.Should().Be(source);
+                Configuration.ListCommand.LocalOnly = false;
+                _because();
+                Configuration.Sources.Should().Be(_source);
             }
         }
 
@@ -295,18 +295,18 @@ namespace chocolatey.tests.infrastructure.app.commands
             public override void Context()
             {
                 base.Context();
-                configuration.CommandName = "search";
+                Configuration.CommandName = "search";
             }
 
             public override void Because()
             {
-                command.DryRun(configuration);
+                Command.DryRun(Configuration);
             }
 
             [Fact]
             public void Should_call_service_list_noop()
             {
-                packageService.Verify(c => c.ListDryRun(configuration), Times.Once);
+                PackageService.Verify(c => c.ListDryRun(Configuration), Times.Once);
             }
         }
 
@@ -314,13 +314,13 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.DryRun(configuration);
+                Command.DryRun(Configuration);
             }
 
             [Fact]
             public void Should_call_service_list_noop()
             {
-                packageService.Verify(c => c.ListDryRun(configuration), Times.Once);
+                PackageService.Verify(c => c.ListDryRun(Configuration), Times.Once);
             }
 
             [Fact]
@@ -335,18 +335,18 @@ namespace chocolatey.tests.infrastructure.app.commands
             public override void Context()
             {
                 base.Context();
-                configuration.CommandName = "search";
+                Configuration.CommandName = "search";
             }
 
             public override void Because()
             {
-                command.Run(configuration);
+                Command.Run(Configuration);
             }
 
             [Fact]
             public void Should_call_service_list_run()
             {
-                packageService.Verify(c => c.List(configuration), Times.Once);
+                PackageService.Verify(c => c.List(Configuration), Times.Once);
             }
         }
 
@@ -354,13 +354,13 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                command.Run(configuration);
+                Command.Run(Configuration);
             }
 
             [Fact]
             public void Should_call_service_list_run()
             {
-                packageService.Verify(c => c.List(configuration), Times.Once);
+                PackageService.Verify(c => c.List(Configuration), Times.Once);
             }
 
             [Fact]
@@ -376,12 +376,12 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public When_outputting_help_message(string commandName)
             {
-                configuration.CommandName = commandName;
+                Configuration.CommandName = commandName;
             }
 
             public override void Because()
             {
-                command.HelpMessage(configuration);
+                Command.HelpMessage(Configuration);
             }
         }
     }

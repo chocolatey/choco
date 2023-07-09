@@ -130,26 +130,21 @@ namespace chocolatey.tests.infrastructure.filesystem
 
         public class When_finding_paths_to_executables_with_dotNetFileSystem : DotNetFileSystemSpecsBase
         {
-            public Mock<IEnvironment> _environment = new Mock<IEnvironment>();
+            public Mock<IEnvironment> Environment = new Mock<IEnvironment>();
 
             public override void Context()
             {
                 base.Context();
-                _environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions)).Returns(".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL");
-                _environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.Path)).Returns(
+                Environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions)).Returns(".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL");
+                Environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.Path)).Returns(
                     @"C:\ProgramData\Chocolatey\bin{0}C:\Program Files\Microsoft\Web Platform Installer\{0}C:\Users\yes\AppData\Roaming\Boxstarter{0}C:\tools\ChocolateyPackageUpdater{0}C:\Windows\system32{0}C:\Windows{0}C:\Windows\System32\Wbem{0}C:\Windows\System32\WindowsPowerShell\v1.0\{0}"
                         .FormatWith(Path.PathSeparator)
                 );
-                FileSystem.InitializeWith(new Lazy<IEnvironment>(() => _environment.Object));
+                FileSystem.InitializeWith(new Lazy<IEnvironment>(() => Environment.Object));
             }
 
             public override void Because()
             {
-            }
-
-            private void reset()
-            {
-                _environment.ResetCalls();
             }
 
             [Fact]
@@ -192,17 +187,17 @@ namespace chocolatey.tests.infrastructure.filesystem
 
         public class When_finding_paths_to_executables_with_dotNetFileSystem_with_empty_path_extensions : DotNetFileSystemSpecsBase
         {
-            public Mock<IEnvironment> _environment = new Mock<IEnvironment>();
+            public Mock<IEnvironment> Environment = new Mock<IEnvironment>();
 
             public override void Context()
             {
                 base.Context();
-                _environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions)).Returns(string.Empty);
-                _environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.Path)).Returns(
+                Environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions)).Returns(string.Empty);
+                Environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.Path)).Returns(
                     "/usr/local/bin{0}/usr/bin/{0}/bin{0}/usr/sbin{0}/sbin"
                         .FormatWith(Path.PathSeparator)
                 );
-                FileSystem.InitializeWith(new Lazy<IEnvironment>(() => _environment.Object));
+                FileSystem.InitializeWith(new Lazy<IEnvironment>(() => Environment.Object));
             }
 
             public override void Because()

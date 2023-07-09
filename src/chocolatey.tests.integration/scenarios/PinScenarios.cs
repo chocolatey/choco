@@ -44,13 +44,13 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Context()
             {
-                Configuration = Scenario.pin();
-                Scenario.reset(Configuration);
-                Scenario.add_packages_to_source_location(Configuration, Configuration.Input + "*" + NuGetConstants.PackageExtension);
-                Scenario.add_packages_to_source_location(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
-                Scenario.install_package(Configuration, "installpackage", "1.0.0");
-                Scenario.install_package(Configuration, "upgradepackage", "1.0.0");
-                Scenario.install_package(Configuration, "hasdependency", "1.0.0");
+                Configuration = Scenario.Pin();
+                Scenario.Reset(Configuration);
+                Scenario.AddPackagesToSourceLocation(Configuration, Configuration.Input + "*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "installpackage*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "installpackage", "1.0.0");
+                Scenario.InstallPackage(Configuration, "upgradepackage", "1.0.0");
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.0");
 
                 var commands = NUnitSetup.Container.GetAllInstances<ICommand>();
                 Service = commands.Where(

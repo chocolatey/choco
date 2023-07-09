@@ -67,10 +67,10 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
 
             public override void Context()
             {
-                Configuration = Scenario.proxy();
-                Scenario.set_configuration_file_setting(ConfigurationFileProxySettingName, string.Empty);
-                Scenario.set_configuration_file_setting(ConfigurationFileProxyBypassSettingName, string.Empty);
-                Scenario.reset(Configuration);
+                Configuration = Scenario.Proxy();
+                Scenario.SetConfigurationFileSetting(ConfigurationFileProxySettingName, string.Empty);
+                Scenario.SetConfigurationFileSetting(ConfigurationFileProxyBypassSettingName, string.Empty);
+                Scenario.Reset(Configuration);
                 Container = NUnitSetup.Container;
                 License = new ChocolateyLicense();
                 Environment = new Mock<IEnvironment>();
@@ -125,7 +125,7 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
 
                 if (ConfigSet)
                 {
-                    Scenario.set_configuration_file_setting(ConfigurationFileProxySettingName, ConfigurationFileProxyValue);
+                    Scenario.SetConfigurationFileSetting(ConfigurationFileProxySettingName, ConfigurationFileProxyValue);
                 }
 
                 if (ArgumentSet)
@@ -187,7 +187,7 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
 
                 if (ConfigSet)
                 {
-                    Scenario.set_configuration_file_setting(ConfigurationFileProxyBypassSettingName, ConfigurationFileProxyValue);
+                    Scenario.SetConfigurationFileSetting(ConfigurationFileProxyBypassSettingName, ConfigurationFileProxyValue);
                 }
 
                 if (EnvironmentVariableSet)

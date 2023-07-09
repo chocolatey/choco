@@ -31,8 +31,8 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Context()
             {
-                Configuration = Scenario.info();
-                Scenario.reset(Configuration);
+                Configuration = Scenario.Info();
+                Scenario.Reset(Configuration);
 
                 Service = NUnitSetup.Container.GetInstance<IChocolateyPackageService>();
             }
@@ -53,8 +53,8 @@ namespace chocolatey.tests.integration.scenarios
 
             public override void Context()
             {
-                Configuration = Scenario.info();
-                Scenario.reset(Configuration);
+                Configuration = Scenario.Info();
+                Scenario.Reset(Configuration);
 
                 Command = NUnitSetup.Container.GetAllInstances<ICommand>()
                     .Where(c => c.GetType() == typeof(ChocolateyInfoCommand)).First();
@@ -77,7 +77,7 @@ namespace chocolatey.tests.integration.scenarios
                 Configuration.PackageNames = Configuration.Input = "installpackage";
 
                 Configuration.Sources = "PackageOutput";
-                Scenario.add_packages_to_source_location(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
             }
 
             [Fact]
@@ -114,7 +114,7 @@ namespace chocolatey.tests.integration.scenarios
                 Configuration.PackageNames = Configuration.Input = "installpackage";
 
                 Configuration.Sources = "PackageOutput";
-                Scenario.add_packages_to_source_location(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
 
                 Configuration.Version = "1.0.0";
             }
@@ -153,7 +153,7 @@ namespace chocolatey.tests.integration.scenarios
                 Configuration.PackageNames = Configuration.Input = "installpackage";
 
                 Configuration.Sources = "PackageOutput";
-                Scenario.add_packages_to_source_location(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
 
                 Configuration.Version = "01.0.0.0";
             }
@@ -196,7 +196,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 Configuration.Sources = "PackageOutput";
 
-                Scenario.add_changed_version_package_to_source_location(Configuration, "installpackage.1.0.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
+                Scenario.AddChangedVersionPackageToSourceLocation(Configuration, "installpackage.1.0.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
             }
 
             [Fact]
@@ -237,7 +237,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 Configuration.Sources = "PackageOutput";
 
-                Scenario.add_changed_version_package_to_source_location(Configuration, "installpackage.1.0.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
+                Scenario.AddChangedVersionPackageToSourceLocation(Configuration, "installpackage.1.0.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
 
                 Configuration.Version = "4.0.1";
             }
@@ -280,7 +280,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 Configuration.Sources = "PackageOutput";
 
-                Scenario.add_changed_version_package_to_source_location(Configuration, "installpackage.1.0.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
+                Scenario.AddChangedVersionPackageToSourceLocation(Configuration, "installpackage.1.0.0" + NuGetConstants.PackageExtension, NonNormalizedVersion);
 
                 Configuration.Version = NonNormalizedVersion;
             }
@@ -366,7 +366,7 @@ namespace chocolatey.tests.integration.scenarios
 
                 Configuration.PackageNames = Configuration.Input = "installpackage";
                 Configuration.Sources = "PackageOutput";
-                Scenario.add_packages_to_source_location(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "installpackage.*" + NuGetConstants.PackageExtension);
             }
 
             [Fact]
@@ -416,7 +416,7 @@ namespace chocolatey.tests.integration.scenarios
                 base.Context();
 
                 Configuration.PackageNames = Configuration.Input = "test-package";
-                Configuration.Sources = Scenario.add_packages_to_priority_source_location(Configuration, "test-package.*" + NuGetConstants.PackageExtension, priority: 1);
+                Configuration.Sources = Scenario.AddPackagesToPrioritySourceLocation(Configuration, "test-package.*" + NuGetConstants.PackageExtension, priority: 1);
             }
 
             [Fact]
@@ -447,7 +447,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_set_source_to_expected_value()
             {
                 var expectedSource = "file:///" + Path.Combine(
-                    Scenario.get_top_level(),
+                    Scenario.GetTopLevel(),
                     "PrioritySources",
                     "Priority1").Replace('\\', '/');
 
@@ -470,8 +470,8 @@ namespace chocolatey.tests.integration.scenarios
 
                 Configuration.PackageNames = Configuration.Input = "upgradepackage";
                 Configuration.Sources = string.Join(",",
-                    Scenario.add_packages_to_priority_source_location(Configuration, "upgradepackage.1.0.0" + NuGetConstants.PackageExtension, priority: 1),
-                    Scenario.add_packages_to_priority_source_location(Configuration,
+                    Scenario.AddPackagesToPrioritySourceLocation(Configuration, "upgradepackage.1.0.0" + NuGetConstants.PackageExtension, priority: 1),
+                    Scenario.AddPackagesToPrioritySourceLocation(Configuration,
                       "upgradepackage.1.1.0" + NuGetConstants.PackageExtension, priority: 0));
             }
 
@@ -503,7 +503,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_set_source_to_expected_value()
             {
                 var expectedSource = "file:///" + Path.Combine(
-                    Scenario.get_top_level(),
+                    Scenario.GetTopLevel(),
                     "PrioritySources",
                     "Priority1").Replace('\\', '/');
 
