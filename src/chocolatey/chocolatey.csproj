@@ -200,6 +200,7 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
+    <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="infrastructure.app\attributes\MultiServiceAttribute.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyCacheCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
