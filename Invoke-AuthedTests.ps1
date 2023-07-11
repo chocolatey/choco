@@ -2,7 +2,7 @@
 #Requires -RunAsAdministrator
 <#
     .SYNOPSIS
-    Prepares a system to test as thought it was test kitchen...
+    Prepares a system to test as though it was Test Kitchen.
 #>
 param(
     # Path to place Chocolatey test related artifacts.
@@ -17,7 +17,7 @@ param(
     [string]
     $RemoteRepository,
 
-    # API Key used by the remote repository for pushing packages
+    # API Key used by the remote repository for pushing packages.
     [string]
     $ApiKey
 )
