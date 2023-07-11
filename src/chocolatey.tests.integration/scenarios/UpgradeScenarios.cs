@@ -3825,6 +3825,48 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        public class When_upgrading_all_packages_multiple_upgraded_packages : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.1.*");
+                Scenario.InstallPackage(Configuration, "isdependency", "1.0.0");
+                Configuration.PackageNames = Configuration.Input = "all";
+            }
+
+            public override void Because()
+            {
+                Results = Service.Upgrade(Configuration);
+            }
+
+            [Fact]
+            public void Should_report_start_of_list_for_upgraded_packages_only()
+            {
+                var startOfLists = MockLogger.Messages["Debug"].Where(m => m == "--- Start of List ---");
+                startOfLists.Should().HaveCount(3);
+            }
+
+            [Fact]
+            public void Should_upgrade_packages_with_upgrades()
+            {
+                var upgradePackageResult = Results.Where(x => (x.Key == "upgradepackage" || x.Key == "isdependency")).ToList();
+                upgradePackageResult.Should().HaveCount(2);
+                upgradePackageResult.ForEach(r =>
+                {
+                    r.Value.Version.Should().Be("1.1.0");
+                });
+            }
+
+            [Fact]
+            public void Should_skip_packages_without_upgrades()
+            {
+                var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
+                installPackageResult.Should().ContainSingle("installpackage must be there once");
+                installPackageResult.First().Value.Version.Should().Be("1.0.0");
+            }
+        }
+
         public class When_upgrading_an_existing_hook_package : ScenariosBase
         {
             private PackageResult _packageResult;
