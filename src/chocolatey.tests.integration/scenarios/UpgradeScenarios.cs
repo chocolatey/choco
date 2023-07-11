@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2021 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,12 +19,9 @@ namespace chocolatey.tests.integration.scenarios
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Configuration;
     using System.IO;
     using System.Linq;
-    using System.Threading;
     using System.Xml.XPath;
-    using chocolatey.infrastructure.app.commands;
     using chocolatey.infrastructure.app.configuration;
     using chocolatey.infrastructure.app.services;
     using chocolatey.infrastructure.filesystem;
@@ -33,7 +30,6 @@ namespace chocolatey.tests.integration.scenarios
     using NuGet.Packaging;
     using NUnit.Framework;
     using FluentAssertions;
-    using static chocolatey.tests.integration.scenarios.InstallScenarios;
 
     public class UpgradeScenarios
     {
