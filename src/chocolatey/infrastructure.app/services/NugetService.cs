@@ -803,6 +803,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         _fileSystem.DeleteFile(pathResolver.GetInstalledPackageFilePath(packageDependencyInfo));
 
+                        this.Log().Info("Downloading package from source '{0}'".FormatWith(packageDependencyInfo.Source));
+                        this.Log().Debug("Package download location '{0}'".FormatWith(packageDependencyInfo.DownloadUri));
+
                         ChocolateyProgressInfo.ShouldDisplayDownloadProgress = config.Features.ShowDownloadProgress;
 
                         using (var downloadResult = downloadResource.GetDownloadResourceResultAsync(
@@ -1484,6 +1487,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 var downloadResource = endpoint.DownloadResource;
 
                                 _fileSystem.DeleteFile(pathResolver.GetInstalledPackageFilePath(packageDependencyInfo));
+
+                                this.Log().Info("Downloading package from source '{0}'".FormatWith(packageDependencyInfo.Source));
+                                this.Log().Debug("Package download location '{0}'".FormatWith(packageDependencyInfo.DownloadUri));
 
                                 ChocolateyProgressInfo.ShouldDisplayDownloadProgress = config.Features.ShowDownloadProgress;
 
