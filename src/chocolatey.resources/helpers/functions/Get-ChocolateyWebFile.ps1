@@ -134,6 +134,9 @@ from the url resource.
 OPTIONAL switch to force download of file every time, even if the file
 already exists.
 
+.PARAMETER Credentials
+OPTIONAL A System.Net.ICredentials-Object that can be used for downloading files from a server which requires user authentication.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -198,6 +201,7 @@ Get-FtpFile
         [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
         [parameter(Mandatory = $false)][switch] $getOriginalFileName,
         [parameter(Mandatory = $false)][switch] $forceDownload,
+        [parameter(Mandatory = $false)][System.Net.ICredentials] $credentials = $null,
         [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
     )
 
@@ -287,7 +291,7 @@ Get-FtpFile
     if ($url.StartsWith('http:')) {
         try {
             $httpsUrl = $url.Replace("http://", "https://")
-            Get-WebHeaders -Url $httpsUrl -ErrorAction "Stop" | Out-Null
+            Get-WebHeaders -Url $httpsUrl -Credentials $credentials -ErrorAction "Stop" | Out-Null
             $url = $httpsUrl
             Write-Warning "Url has SSL/TLS available, switching to HTTPS for download"
         }
@@ -301,7 +305,7 @@ Get-FtpFile
             $fileFullPath = $fileFullPath -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
             $fileDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
             $originalFileName = [System.IO.Path]::GetFileName($fileFullPath)
-            $fileFullPath = Get-WebFileName -Url $url -DefaultName $originalFileName
+            $fileFullPath = Get-WebFileName -Url $url -DefaultName $originalFileName -Credentials $credentials
             $fileFullPath = Join-Path $fileDirectory $fileFullPath
             $fileFullPath = [System.IO.Path]::GetFullPath($fileFullPath)
         }
@@ -324,7 +328,7 @@ Get-FtpFile
     $headers = @{}
     if ($url.StartsWith('http')) {
         try {
-            $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
+            $headers = Get-WebHeaders -Url $url -Credentials $credentials -ErrorAction "Stop"
         }
         catch {
             if ($PSVersionTable.PSVersion -lt (New-Object 'Version' 3, 0)) {
@@ -333,7 +337,7 @@ Get-FtpFile
                 $originalProtocol = [System.Net.ServicePointManager]::SecurityProtocol
                 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Ssl3
                 try {
-                    $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
+                    $headers = Get-WebHeaders -Url $url -Credentials $credentials -ErrorAction "Stop"
                 }
                 catch {
                     Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"
@@ -369,7 +373,7 @@ Get-FtpFile
         if ($needsDownload) {
             Write-Host "Downloading $packageName $bitPackage
   from `'$url`'"
-            Get-WebFile -Url $url -FileName $fileFullPath -Options $options
+            Get-WebFile -Url $url -FileName $fileFullPath -Options $options -Credentials $credentials
         }
         else {
             Write-Debug "$($packageName)'s requested file has already been downloaded. Using cached copy at

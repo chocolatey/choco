@@ -159,6 +159,9 @@ Usage of this parameter will prevent Uninstall-ChocolateyZipPackage
 from working, extracted files will have to be cleaned up with
 Remove-Item or a similar command instead.
 
+.PARAMETER Credentials
+OPTIONAL A System.Net.ICredentials-Object that can be used for downloading files from a server which requires user authentication.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -200,6 +203,7 @@ Get-ChocolateyUnzip
         [alias("fileFullPath")][parameter(Mandatory = $false)][string] $file = '',
         [alias("fileFullPath64")][parameter(Mandatory = $false)][string] $file64 = '',
         [parameter(Mandatory = $false)][switch] $disableLogging,
+        [parameter(Mandatory = $false)][System.Net.ICredentials] $credentials = $null,
         [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
     )
 
@@ -225,6 +229,6 @@ Get-ChocolateyUnzip
         $url64bit = $file64
     }
 
-    $filePath = Get-ChocolateyWebFile $packageName $downloadFilePath $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName
+    $filePath = Get-ChocolateyWebFile $packageName $downloadFilePath $url $url64bit -checkSum $checkSum -checksumType $checksumType -checkSum64 $checkSum64 -checksumType64 $checksumType64 -options $options -getOriginalFileName -Credentials $credentials
     Get-ChocolateyUnzip "$filePath" $unzipLocation $specificFolder $packageName -disableLogging:$disableLogging
 }

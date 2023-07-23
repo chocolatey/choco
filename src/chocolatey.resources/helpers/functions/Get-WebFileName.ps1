@@ -53,6 +53,9 @@ from the url response.
 The user agent to use as part of the request. Defaults to 'chocolatey
 command line'.
 
+.PARAMETER Credentials
+OPTIONAL A System.Net.ICredentials-Object that can be used for downloading files from a server which requires user authentication.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -69,6 +72,7 @@ Get-ChocolateyWebFile
         [parameter(Mandatory = $false, Position = 0)][string] $url = '',
         [parameter(Mandatory = $true, Position = 1)][string] $defaultName,
         [parameter(Mandatory = $false)][string] $userAgent = 'chocolatey command line',
+        [parameter(Mandatory = $false)][System.Net.ICredentials] $credentials = $null,
         [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
     )
 
@@ -107,7 +111,10 @@ Get-ChocolateyWebFile
     }
 
     $defaultCreds = [System.Net.CredentialCache]::DefaultCredentials
-    if ($defaultCreds -ne $null) {
+    if ($null -ne $credentials) {
+        $request.Credentials = $credentials
+    }
+    elseif ($defaultCreds -ne $null) {
         $request.Credentials = $defaultCreds
     }
 
