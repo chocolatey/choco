@@ -199,7 +199,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 errorred.Should().BeTrue();
                 error.Should().NotBeNull();
                 error.Should().BeOfType<ApplicationException>();
-                error.Message.Should().Contain("Default push source configuration is not set.");
+                error.Message.Should().Contain("The default push source configuration is not set.");
             }
 
             [Fact]
