@@ -78,7 +78,7 @@ namespace chocolatey.infrastructure.app.validations
                     result.Add(new ValidationResult
                     {
                         ExitCode = 0,
-                        Message = "System Cache directory is not locked down to administrators. Remove the directory '{0}' to have Chocolatey CLI create it with the proper permissions.".FormatWith(cacheFolderPath),
+                        Message = "System Cache directory is not locked down to administrators.\nRemove the directory '{0}' to have Chocolatey CLI create it with the proper permissions.".FormatWith(cacheFolderPath).SplitOnSpace(linePrefix: "   "),
                         Status = ValidationStatus.Warning
                     });
                 }
@@ -106,7 +106,7 @@ namespace chocolatey.infrastructure.app.validations
                 result.Add(new ValidationResult
                 {
                     ExitCode = 1, // Should we error?
-                    Message = "System Cache directory was not created, or could not be locked down to administrators.",
+                    Message = "System Cache directory was not created, or could not be locked down to administrators.".SplitOnSpace(linePrefix: "   "),
                     Status = ValidationStatus.Error
                 });
             }
