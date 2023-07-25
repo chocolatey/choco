@@ -23,6 +23,8 @@ namespace chocolatey.infrastructure.filesystem
     using System.IO;
     using System.Linq;
     using System.Runtime.InteropServices;
+    using System.Security.AccessControl;
+    using System.Security.Principal;
     using System.Text;
     using System.Threading;
     using adapters;
@@ -646,19 +648,7 @@ namespace chocolatey.infrastructure.filesystem
 
         public void CreateDirectory(string directoryPath)
         {
-            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to create directory \"{0}\".".FormatWith(GetFullPath(directoryPath)));
-            AllowRetries(
-                () =>
-                {
-                    try
-                    {
-                        Directory.CreateDirectory(directoryPath);
-                    }
-                    catch (IOException)
-                    {
-                        Alphaleonis.Win32.Filesystem.Directory.CreateDirectory(directoryPath);
-                    }
-                });
+            CreateDirectory(directoryPath, isSilent: false);
         }
 
         public void MoveDirectory(string directoryPath, string newDirectoryPath)
@@ -762,19 +752,139 @@ namespace chocolatey.infrastructure.filesystem
             EnsureDirectoryExists(directoryPath, false);
         }
 
-        private void EnsureDirectoryExists(string directoryPath, bool ignoreError)
+        public bool IsLockedDirectory(string directoryPath)
+        {
+            try
+            {
+                var permissions = Directory.GetAccessControl(directoryPath);
+
+                var rules = permissions.GetAccessRules(includeExplicit: true, includeInherited: true, typeof(NTAccount));
+                var builtinAdmins = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null).Translate(typeof(NTAccount));
+                var localSystem = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null).Translate(typeof(NTAccount));
+
+                foreach (FileSystemAccessRule rule in rules)
+                {
+                    if (rule.IdentityReference != builtinAdmins && rule.IdentityReference != localSystem &&
+                        AllowsAnyFlag(rule, FileSystemRights.CreateFiles, FileSystemRights.AppendData, FileSystemRights.WriteExtendedAttributes, FileSystemRights.WriteAttributes))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.Log().Debug("Unable to read directory '{0}'.", directoryPath);
+                this.Log().Debug("Exception: {0}", ex.Message);
+
+                // If we do not have access, we assume the directory is locked.
+                return true;
+            }
+        }
+
+        public bool LockDirectory(string directoryPath)
+        {
+            try
+            {
+                EnsureDirectoryExists(directoryPath, ignoreError: false, isSilent: true);
+
+                this.Log().Debug(" - Folder Created = Success");
+
+                var permissions = Directory.GetAccessControl(directoryPath);
+
+                var rules = permissions.GetAccessRules(includeExplicit: true, includeInherited: true, typeof(NTAccount));
+
+                // We first need to remove all rules
+                foreach (FileSystemAccessRule rule in rules)
+                {
+                    permissions.RemoveAccessRuleAll(rule);
+                }
+
+                this.Log().Debug(" - Pending normal access removed = Checked");
+
+                var bultinAdmins = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null).Translate(typeof(NTAccount));
+                var localsystem = new SecurityIdentifier(WellKnownSidType.LocalSystemSid, null).Translate(typeof(NTAccount));
+                var builtinUsers = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null).Translate(typeof(NTAccount));
+
+                var inheritanceFlags = InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit;
+
+                permissions.SetAccessRule(new FileSystemAccessRule(bultinAdmins, FileSystemRights.FullControl, inheritanceFlags, PropagationFlags.None, AccessControlType.Allow));
+                permissions.SetAccessRule(new FileSystemAccessRule(localsystem, FileSystemRights.FullControl, inheritanceFlags, PropagationFlags.None, AccessControlType.Allow));
+                permissions.SetAccessRule(new FileSystemAccessRule(builtinUsers, FileSystemRights.ReadAndExecute, inheritanceFlags, PropagationFlags.None, AccessControlType.Allow));
+                this.Log().Debug(" - Pending write permissions for Administrators = Checked");
+
+                permissions.SetOwner(bultinAdmins);
+                this.Log().Debug(" - Pending Administrators as Owners = Checked");
+
+                permissions.SetAccessRuleProtection(isProtected: true, preserveInheritance: false);
+                this.Log().Debug(" - Pending removing inheritance with no copy = Checked");
+
+                Directory.SetAccessControl(directoryPath, permissions);
+                this.Log().Debug(" - Access Permissions updated = Success");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                this.Log().Debug(" - Access Permissions updated = Failure");
+                this.Log().Debug("Exception: {0}", ex.Message);
+
+                return false;
+            }
+        }
+
+        private bool AllowsAnyFlag(FileSystemAccessRule rule, params FileSystemRights[] flags)
+        {
+            foreach (var flag in flags)
+            {
+                if (rule.AccessControlType == AccessControlType.Allow && rule.FileSystemRights.HasFlag(flag))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void CreateDirectory(string directoryPath, bool isSilent)
+        {
+            if (!isSilent)
+            {
+                this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to create directory \"{0}\".".FormatWith(GetFullPath(directoryPath)));
+            }
+
+            AllowRetries(
+                () =>
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(directoryPath);
+                    }
+                    catch (IOException)
+                    {
+                        Alphaleonis.Win32.Filesystem.Directory.CreateDirectory(directoryPath);
+                    }
+                }, isSilent: isSilent);
+        }
+
+        private void EnsureDirectoryExists(string directoryPath, bool ignoreError, bool isSilent = false)
         {
             if (!DirectoryExists(directoryPath))
             {
                 try
                 {
-                    CreateDirectory(directoryPath);
+                    CreateDirectory(directoryPath, isSilent);
                 }
                 catch (SystemException e)
                 {
                     if (!ignoreError)
                     {
-                        this.Log().Error("Cannot create directory \"{0}\". Error was:{1}{2}", GetFullPath(directoryPath), Environment.NewLine, e);
+                        if (!isSilent)
+                        {
+                            this.Log().Error("Cannot create directory \"{0}\". Error was:{1}{2}", GetFullPath(directoryPath), Environment.NewLine, e);
+                        }
+
                         throw;
                     }
                 }

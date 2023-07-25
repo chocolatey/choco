@@ -82,7 +82,8 @@ namespace chocolatey.infrastructure.app.registration
 
             registrator.RegisterService<IValidation>(
                 typeof(GlobalConfigurationValidation),
-                typeof(SystemStateValidation));
+                typeof(SystemStateValidation),
+                typeof(CacheFolderLockdownValidation));
 
             // Rule registrations
             registrator.RegisterService<IRuleService, RuleService>();
