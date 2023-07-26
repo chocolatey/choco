@@ -84,7 +84,7 @@ namespace chocolatey.infrastructure.app.validations
    being ignored due to the current Chocolatey configuration.  If you
    want to halt when this occurs, then either set the global feature
    using:
-     choco feature enable -name={0}
+     choco feature enable --name=""{0}""
    or pass the option --exit-when-reboot-detected.
 ".FormatWith(ApplicationParameters.Features.ExitOnRebootDetected),
                         Status = ValidationStatus.Warning,

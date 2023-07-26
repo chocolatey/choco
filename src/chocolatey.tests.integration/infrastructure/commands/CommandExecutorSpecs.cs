@@ -27,12 +27,12 @@ namespace chocolatey.tests.integration.infrastructure.commands
     {
         public abstract class CommandExecutorSpecsBase : TinySpec
         {
-            protected readonly IFileSystem fileSystem = new DotNetFileSystem();
-            protected CommandExecutor commandExecutor;
+            protected readonly IFileSystem FileSystem = new DotNetFileSystem();
+            protected CommandExecutor CommandExecutor;
 
             public override void Context()
             {
-                commandExecutor = new CommandExecutor(fileSystem);
+                CommandExecutor = new CommandExecutor(FileSystem);
             }
         }
 
@@ -40,8 +40,8 @@ namespace chocolatey.tests.integration.infrastructure.commands
         [Platform(Exclude = "Mono")]
         public class When_CommandExecutor_errors : CommandExecutorSpecsBase
         {
-            private int result;
-            private string errorOutput;
+            private int _result;
+            private string _errorOutput;
 
             public override void Context()
             {
@@ -50,13 +50,13 @@ namespace chocolatey.tests.integration.infrastructure.commands
 
             public override void Because()
             {
-                result = commandExecutor.Execute(
+                _result = CommandExecutor.Execute(
                     "cmd.exe",
                     "/c bob123123",
                     ApplicationParameters.DefaultWaitForExitInSeconds,
-                    fileSystem.GetCurrentDirectory(),
+                    FileSystem.GetCurrentDirectory(),
                     null,
-                    (s, e) => { errorOutput += e.Data; },
+                    (s, e) => { _errorOutput += e.Data; },
                     updateProcessPath: false,
                     allowUseWindow: false);
             }
@@ -64,19 +64,19 @@ namespace chocolatey.tests.integration.infrastructure.commands
             [Fact]
             public void Should_not_return_an_exit_code_of_zero()
             {
-                result.Should().NotBe(0);
+                _result.Should().NotBe(0);
             }
 
             [Fact]
             public void Should_contain_error_output()
             {
-                errorOutput.Should().NotBeNull();
+                _errorOutput.Should().NotBeNull();
             }
 
             [Fact]
             public void Should_message_the_error()
             {
-                errorOutput.Should().Be("'bob123123' is not recognized as an internal or external command,operable program or batch file.");
+                _errorOutput.Should().Be("'bob123123' is not recognized as an internal or external command,operable program or batch file.");
             }
         }
 
@@ -84,25 +84,25 @@ namespace chocolatey.tests.integration.infrastructure.commands
         [Platform(Exclude = "Mono")]
         public class When_CommandExecutor_is_given_a_nonexisting_process : CommandExecutorSpecsBase
         {
-            private string result;
-            private string errorOutput;
+            private string _result;
+            private string _errorOutput;
 
             public override void Because()
             {
                 try
                 {
-                    commandExecutor.Execute("noprocess.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, null, (s, e) => { errorOutput += e.Data; });
+                    CommandExecutor.Execute("noprocess.exe", "/c bob123123", ApplicationParameters.DefaultWaitForExitInSeconds, null, (s, e) => { _errorOutput += e.Data; });
                 }
                 catch (Exception e)
                 {
-                    result = e.Message;
+                    _result = e.Message;
                 }
             }
 
             [Fact]
             public void Should_have_an_error_message()
             {
-                result.Should().NotBeNull();
+                _result.Should().NotBeNull();
             }
         }
     }

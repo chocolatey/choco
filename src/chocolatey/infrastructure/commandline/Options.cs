@@ -284,12 +284,13 @@ namespace chocolatey.infrastructure.commandline
 		Required,
 	}
 
-	public abstract class Option {
-		string prototype, description;
-		string[] names;
-		OptionValueType type;
-		int count;
-		string[] separators;
+    public abstract class Option
+    {
+        string _prototype, _description;
+        string[] _names;
+        OptionValueType _type;
+        int _count;
+        string[] _separators;
 
 		protected Option (string prototype, string description)
 			: this (prototype, description, 1)
@@ -305,45 +306,45 @@ namespace chocolatey.infrastructure.commandline
 			if (maxValueCount < 0)
 				throw new ArgumentOutOfRangeException ("maxValueCount");
 
-			this.prototype   = prototype;
-			this.names       = prototype.Split ('|');
-			this.description = description;
-			this.count       = maxValueCount;
-			this.type        = ParsePrototype ();
+            this._prototype = prototype;
+            this._names = prototype.Split('|');
+            this._description = description;
+            this._count = maxValueCount;
+            this._type = ParsePrototype();
 
-			if (this.count == 0 && type != OptionValueType.None)
-				throw new ArgumentException (
-						"Cannot provide maxValueCount of 0 for OptionValueType.Required or " +
-							"OptionValueType.Optional.",
-						"maxValueCount");
-			if (this.type == OptionValueType.None && maxValueCount > 1)
-				throw new ArgumentException (
-						string.Format ("Cannot provide maxValueCount of {0} for OptionValueType.None.", maxValueCount),
-						"maxValueCount");
-			if (Array.IndexOf (names, "<>") >= 0 &&
-					((names.Length == 1 && this.type != OptionValueType.None) ||
-					 (names.Length > 1 && this.MaxValueCount > 1)))
-				throw new ArgumentException (
-						"The default option handler '<>' cannot require values.",
-						"prototype");
-		}
+            if (this._count == 0 && _type != OptionValueType.None)
+                throw new ArgumentException(
+                        "Cannot provide maxValueCount of 0 for OptionValueType.Required or " +
+                            "OptionValueType.Optional.",
+                        "maxValueCount");
+            if (this._type == OptionValueType.None && maxValueCount > 1)
+                throw new ArgumentException(
+                        string.Format("Cannot provide maxValueCount of {0} for OptionValueType.None.", maxValueCount),
+                        "maxValueCount");
+            if (Array.IndexOf(_names, "<>") >= 0 &&
+                    ((_names.Length == 1 && this._type != OptionValueType.None) ||
+                     (_names.Length > 1 && this.MaxValueCount > 1)))
+                throw new ArgumentException(
+                        "The default option handler '<>' cannot require values.",
+                        "prototype");
+        }
 
-		public string           Prototype       {get {return prototype;}}
-		public string           Description     {get {return description;}}
-		public OptionValueType  OptionValueType {get {return type;}}
-		public int              MaxValueCount   {get {return count;}}
+        public string Prototype { get { return _prototype; } }
+        public string Description { get { return _description; } }
+        public OptionValueType OptionValueType { get { return _type; } }
+        public int MaxValueCount { get { return _count; } }
 
-		public string[] GetNames ()
-		{
-			return (string[]) names.Clone ();
-		}
+        public string[] GetNames()
+        {
+            return (string[])_names.Clone();
+        }
 
-		public string[] GetValueSeparators ()
-		{
-			if (separators == null)
-				return new string [0];
-			return (string[]) separators.Clone ();
-		}
+        public string[] GetValueSeparators()
+        {
+            if (_separators == null)
+                return new string[0];
+            return (string[])_separators.Clone();
+        }
 
 		protected static T Parse<T> (string value, OptionContext c)
 		{
@@ -363,48 +364,50 @@ namespace chocolatey.infrastructure.commandline
 			return t;
 		}
 
-		internal string[] Names           {get {return names;}}
-		internal string[] ValueSeparators {get {return separators;}}
+        internal string[] Names { get { return _names; } }
+        internal string[] ValueSeparators { get { return _separators; } }
 
-		static readonly char[] NameTerminator = new char[]{'=', ':'};
+        static readonly char[] _nameTerminator = new char[] { '=', ':' };
 
-		private OptionValueType ParsePrototype ()
-		{
-			char type = '\0';
-			List<string> seps = new List<string> ();
-			for (int i = 0; i < names.Length; ++i) {
-				string name = names [i];
-				if (name.Length == 0)
-					throw new ArgumentException ("Empty option names are not supported.", "prototype");
+        private OptionValueType ParsePrototype()
+        {
+            char type = '\0';
+            List<string> seps = new List<string>();
+            for (int i = 0; i < _names.Length; ++i)
+            {
+                string name = _names[i];
+                if (name.Length == 0)
+                    throw new ArgumentException("Empty option names are not supported.", "prototype");
 
-				int end = name.IndexOfAny (NameTerminator);
-				if (end == -1)
-					continue;
-				names [i] = name.Substring (0, end);
-				if (type == '\0' || type == name [end])
-					type = name [end];
-				else
-					throw new ArgumentException (
-							string.Format ("Conflicting option types: '{0}' vs. '{1}'.", type, name [end]),
-							"prototype");
-				AddSeparators (name, end, seps);
-			}
+                int end = name.IndexOfAny(_nameTerminator);
+                if (end == -1)
+                    continue;
+                _names[i] = name.Substring(0, end);
+                if (type == '\0' || type == name[end])
+                    type = name[end];
+                else
+                    throw new ArgumentException(
+                            string.Format("Conflicting option types: '{0}' vs. '{1}'.", type, name[end]),
+                            "prototype");
+                AddSeparators(name, end, seps);
+            }
 
 			if (type == '\0')
 				return OptionValueType.None;
 
-			if (count <= 1 && seps.Count != 0)
-				throw new ArgumentException (
-						string.Format ("Cannot provide key/value separators for Options taking {0} value(s).", count),
-						"prototype");
-			if (count > 1) {
-				if (seps.Count == 0)
-					this.separators = new string[]{":", "="};
-				else if (seps.Count == 1 && seps [0].Length == 0)
-					this.separators = null;
-				else
-					this.separators = seps.ToArray ();
-			}
+            if (_count <= 1 && seps.Count != 0)
+                throw new ArgumentException(
+                        string.Format("Cannot provide key/value separators for Options taking {0} value(s).", _count),
+                        "prototype");
+            if (_count > 1)
+            {
+                if (seps.Count == 0)
+                    this._separators = new string[] { ":", "=" };
+                else if (seps.Count == 1 && seps[0].Length == 0)
+                    this._separators = null;
+                else
+                    this._separators = seps.ToArray();
+            }
 
 			return type == '=' ? OptionValueType.Required : OptionValueType.Optional;
 		}
@@ -506,15 +509,16 @@ namespace chocolatey.infrastructure.commandline
 
         public OptionSet(Converter<string, string> localizer)
             : base(StringComparer.OrdinalIgnoreCase)
-		{
-			this.localizer = localizer;
-		}
+        {
+            this._localizer = localizer;
+        }
 
-		Converter<string, string> localizer;
+        Converter<string, string> _localizer;
 
-		public Converter<string, string> MessageLocalizer {
-			get {return localizer;}
-		}
+        public Converter<string, string> MessageLocalizer
+        {
+            get { return _localizer; }
+        }
 
 		protected override string GetKeyForItem (Option item)
 		{
@@ -588,22 +592,23 @@ namespace chocolatey.infrastructure.commandline
 			return this;
 		}
 
-		sealed class ActionOption : Option {
-			Action<OptionValueCollection> action;
+        sealed class ActionOption : Option
+        {
+            Action<OptionValueCollection> _action;
 
-			public ActionOption (string prototype, string description, int count, Action<OptionValueCollection> action)
-				: base (prototype, description, count)
-			{
-				if (action == null)
-					throw new ArgumentNullException ("action");
-				this.action = action;
-			}
+            public ActionOption(string prototype, string description, int count, Action<OptionValueCollection> action)
+                : base(prototype, description, count)
+            {
+                if (action == null)
+                    throw new ArgumentNullException("action");
+                this._action = action;
+            }
 
-			protected override void OnParseComplete (OptionContext c)
-			{
-				action (c.OptionValues);
-			}
-		}
+            protected override void OnParseComplete(OptionContext c)
+            {
+                _action(c.OptionValues);
+            }
+        }
 
 		public OptionSet Add (string prototype, Action<string> action)
 		{
@@ -635,41 +640,43 @@ namespace chocolatey.infrastructure.commandline
 			return this;
 		}
 
-		sealed class ActionOption<T> : Option {
-			Action<T> action;
+        sealed class ActionOption<T> : Option
+        {
+            Action<T> _action;
 
-			public ActionOption (string prototype, string description, Action<T> action)
-				: base (prototype, description, 1)
-			{
-				if (action == null)
-					throw new ArgumentNullException ("action");
-				this.action = action;
-			}
+            public ActionOption(string prototype, string description, Action<T> action)
+                : base(prototype, description, 1)
+            {
+                if (action == null)
+                    throw new ArgumentNullException("action");
+                this._action = action;
+            }
 
-			protected override void OnParseComplete (OptionContext c)
-			{
-				action (Parse<T> (c.OptionValues [0], c));
-			}
-		}
+            protected override void OnParseComplete(OptionContext c)
+            {
+                _action(Parse<T>(c.OptionValues[0], c));
+            }
+        }
 
-		sealed class ActionOption<TKey, TValue> : Option {
-			OptionAction<TKey, TValue> action;
+        sealed class ActionOption<TKey, TValue> : Option
+        {
+            OptionAction<TKey, TValue> _action;
 
-			public ActionOption (string prototype, string description, OptionAction<TKey, TValue> action)
-				: base (prototype, description, 2)
-			{
-				if (action == null)
-					throw new ArgumentNullException ("action");
-				this.action = action;
-			}
+            public ActionOption(string prototype, string description, OptionAction<TKey, TValue> action)
+                : base(prototype, description, 2)
+            {
+                if (action == null)
+                    throw new ArgumentNullException("action");
+                this._action = action;
+            }
 
-			protected override void OnParseComplete (OptionContext c)
-			{
-				action (
-						Parse<TKey> (c.OptionValues [0], c),
-						Parse<TValue> (c.OptionValues [1], c));
-			}
-		}
+            protected override void OnParseComplete(OptionContext c)
+            {
+                _action(
+                        Parse<TKey>(c.OptionValues[0], c),
+                        Parse<TValue>(c.OptionValues[1], c));
+            }
+        }
 
 		public OptionSet Add<T> (string prototype, Action<T> action)
 		{
@@ -763,27 +770,29 @@ namespace chocolatey.infrastructure.commandline
 			return false;
 		}
 
-		private readonly Regex ValueOption = new Regex (
-			@"^(?<flag>--|-|/)(?<name>[^:=]+)((?<sep>[:=])(?<value>.*))?$");
+        private readonly Regex _valueOption = new Regex(
+            @"^(?<flag>--|-|/)(?<name>[^:=]+)((?<sep>[:=])(?<value>.*))?$");
 
 		protected bool GetOptionParts (string argument, out string flag, out string name, out string sep, out string value)
 		{
 			if (argument == null)
 				throw new ArgumentNullException ("argument");
 
-			flag = name = sep = value = null;
-			Match m = ValueOption.Match (argument);
-			if (!m.Success) {
-				return false;
-			}
-			flag  = m.Groups ["flag"].Value;
-			name  = m.Groups ["name"].Value;
-			if (m.Groups ["sep"].Success && m.Groups ["value"].Success) {
-				sep   = m.Groups ["sep"].Value;
-				value = m.Groups ["value"].Value;
-			}
-			return true;
-		}
+            flag = name = sep = value = null;
+            Match m = _valueOption.Match(argument);
+            if (!m.Success)
+            {
+                return false;
+            }
+            flag = m.Groups["flag"].Value;
+            name = m.Groups["name"].Value;
+            if (m.Groups["sep"].Success && m.Groups["value"].Success)
+            {
+                sep = m.Groups["sep"].Value;
+                value = m.Groups["value"].Value;
+            }
+            return true;
+        }
 
 		protected virtual bool Parse (string argument, OptionContext c)
 		{
@@ -830,24 +839,26 @@ namespace chocolatey.infrastructure.commandline
 			return false;
 		}
 
-		private void ParseValue (string option, OptionContext c)
-		{
-			if (option != null)
-				foreach (string o in c.Option.ValueSeparators != null
-						? option.Split (c.Option.ValueSeparators, StringSplitOptions.None)
-						: new string[]{option}) {
-					c.OptionValues.Add (o);
-				}
-			if (c.OptionValues.Count == c.Option.MaxValueCount ||
-					c.Option.OptionValueType == OptionValueType.Optional)
-				c.Option.Invoke (c);
-			else if (c.OptionValues.Count > c.Option.MaxValueCount) {
-				throw new OptionException (localizer (string.Format (
-								"Error: Found {0} option values when expecting {1}.",
-								c.OptionValues.Count, c.Option.MaxValueCount)),
-						c.OptionName);
-			}
-		}
+        private void ParseValue(string option, OptionContext c)
+        {
+            if (option != null)
+                foreach (string o in c.Option.ValueSeparators != null
+                        ? option.Split(c.Option.ValueSeparators, StringSplitOptions.None)
+                        : new string[] { option })
+                {
+                    c.OptionValues.Add(o);
+                }
+            if (c.OptionValues.Count == c.Option.MaxValueCount ||
+                    c.Option.OptionValueType == OptionValueType.Optional)
+                c.Option.Invoke(c);
+            else if (c.OptionValues.Count > c.Option.MaxValueCount)
+            {
+                throw new OptionException(_localizer(string.Format(
+                                "Error: Found {0} option values when expecting {1}.",
+                                c.OptionValues.Count, c.Option.MaxValueCount)),
+                        c.OptionName);
+            }
+        }
 
 		private bool ParseBool (string option, string n, OptionContext c)
 		{
@@ -866,22 +877,24 @@ namespace chocolatey.infrastructure.commandline
 			return false;
 		}
 
-		private bool ParseBundledValue (string f, string n, OptionContext c)
-		{
-            IDictionary<Option,string> normalOptions = new Dictionary<Option, string>();
-			if (f != "-")
-				return false;
-			for (int i = 0; i < n.Length; ++i) {
-				Option p;
-				string opt = f + n [i].ToString ();
-				string rn = n [i].ToString ();
-				if (!Contains (rn)) {
-					if (i == 0)
-						return false;
-					throw new OptionException (string.Format (localizer (
-									"Cannot bundle unregistered option '{0}'."), opt), opt);
-				}
-				p = this [rn];
+        private bool ParseBundledValue(string f, string n, OptionContext c)
+        {
+            IDictionary<Option, string> normalOptions = new Dictionary<Option, string>();
+            if (f != "-")
+                return false;
+            for (int i = 0; i < n.Length; ++i)
+            {
+                Option p;
+                string opt = f + n[i].ToString();
+                string rn = n[i].ToString();
+                if (!Contains(rn))
+                {
+                    if (i == 0)
+                        return false;
+                    throw new OptionException(string.Format(_localizer(
+                                    "Cannot bundle unregistered option '{0}'."), opt), opt);
+                }
+                p = this[rn];
 
                 switch (p.OptionValueType)
                 {
@@ -936,15 +949,16 @@ namespace chocolatey.infrastructure.commandline
 					o.Write (new string (' ', OptionWidth));
 				}
 
-				List<string> lines = GetLines (localizer (GetDescription (p.Description)));
-				o.WriteLine (lines [0]);
-				string prefix = new string (' ', OptionWidth+2);
-				for (int i = 1; i < lines.Count; ++i) {
-					o.Write (prefix);
-					o.WriteLine (lines [i]);
-				}
-			}
-		}
+                List<string> lines = GetLines(_localizer(GetDescription(p.Description)));
+                o.WriteLine(lines[0]);
+                string prefix = new string(' ', OptionWidth + 2);
+                for (int i = 1; i < lines.Count; ++i)
+                {
+                    o.Write(prefix);
+                    o.WriteLine(lines[i]);
+                }
+            }
+        }
 
 		bool WriteOptionPrototype (TextWriter o, Option p, ref int written)
 		{
@@ -970,24 +984,28 @@ namespace chocolatey.infrastructure.commandline
 				Write (o, ref written, names [i]);
 			}
 
-			if (p.OptionValueType == OptionValueType.Optional ||
-					p.OptionValueType == OptionValueType.Required) {
-				if (p.OptionValueType == OptionValueType.Optional) {
-					Write (o, ref written, localizer ("["));
-				}
-				Write (o, ref written, localizer ("=" + GetArgumentName (0, p.MaxValueCount, p.Description)));
-				string sep = p.ValueSeparators != null && p.ValueSeparators.Length > 0
-					? p.ValueSeparators [0]
-					: " ";
-				for (int c = 1; c < p.MaxValueCount; ++c) {
-					Write (o, ref written, localizer (sep + GetArgumentName (c, p.MaxValueCount, p.Description)));
-				}
-				if (p.OptionValueType == OptionValueType.Optional) {
-					Write (o, ref written, localizer ("]"));
-				}
-			}
-			return true;
-		}
+            if (p.OptionValueType == OptionValueType.Optional ||
+                    p.OptionValueType == OptionValueType.Required)
+            {
+                if (p.OptionValueType == OptionValueType.Optional)
+                {
+                    Write(o, ref written, _localizer("["));
+                }
+                Write(o, ref written, _localizer("=" + GetArgumentName(0, p.MaxValueCount, p.Description)));
+                string sep = p.ValueSeparators != null && p.ValueSeparators.Length > 0
+                    ? p.ValueSeparators[0]
+                    : " ";
+                for (int c = 1; c < p.MaxValueCount; ++c)
+                {
+                    Write(o, ref written, _localizer(sep + GetArgumentName(c, p.MaxValueCount, p.Description)));
+                }
+                if (p.OptionValueType == OptionValueType.Optional)
+                {
+                    Write(o, ref written, _localizer("]"));
+                }
+            }
+            return true;
+        }
 
 		static int GetNextOptionIndex (string[] names, int i)
 		{

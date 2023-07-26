@@ -970,8 +970,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             var projectContext = new ChocolateyNuGetProjectContext(config, _nugetLogger);
 
             var configIgnoreDependencies = config.IgnoreDependencies;
-            SetPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; });
+            var allLocalPackages = SetPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; }).ToList();
             config.IgnoreDependencies = configIgnoreDependencies;
+            var localPackageListValid = true;
 
             config.CreateBackup();
 
@@ -981,7 +982,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 // before we start reading it.
                 config.RevertChanges();
 
-                var allLocalPackages = GetInstalledPackages(config).ToList();
+                if (!localPackageListValid)
+                {
+                    allLocalPackages = GetInstalledPackages(config).ToList();
+                    localPackageListValid = true;
+                }
+
                 var installedPackage = allLocalPackages.FirstOrDefault(p => p.Name.IsEqualTo(packageName));
                 var packagesToInstall = new List<IPackageSearchMetadata>();
                 var packagesToUninstall = new HashSet<PackageResult>();
@@ -1013,6 +1019,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
 
                     string logMessage = @"{0} is not installed. Installing...".FormatWith(packageName);
+                    localPackageListValid = false;
 
                     if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
 
@@ -1100,7 +1107,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var packageResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(availablePackage, pathResolver.GetInstallPath(availablePackage.Identity)));
                 if (installedPackage.PackageMetadata.Version > availablePackage.Identity.Version && (!config.AllowDowngrade || (config.AllowDowngrade && version == null)))
                 {
-                    string logMessage = "{0} v{1} is newer than the most recent.{2} You must be smarter than the average bear...".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, Environment.NewLine);
+                    string logMessage = "{0} v{1} is newer than the most recent.".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version);
                     packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
 
                     if (!config.UpgradeCommand.NotifyOnlyAvailableUpgrades)
@@ -1177,6 +1184,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                     if (performAction)
                     {
+                        localPackageListValid = false;
 
                         NugetCommon.GetPackageDependencies(availablePackage.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
 
@@ -1207,14 +1215,27 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     null,
                                     null));
 
+                        // For an initial attempt at finding a package resolution solution, check for all parent packages (i.e. locally installed packages
+                        // that take a dependency on the package that is currently being upgraded) and find the depdendencies associated with these packages.
+                        // NOTE: All the latest availble package version, as well as the specifically requested package version (if applicable) will be
+                        // searched for.  If this don't provide enough information to obtain a solution, then a follow up query in the catch block for this
+                        // section of the code will be completed.
                         var parentInfos = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
                         NugetCommon.GetPackageParents(availablePackage.Identity.Id, parentInfos, localPackagesDependencyInfos).GetAwaiter().GetResult();
                         foreach (var parentPackage in parentInfos)
                         {
-                            foreach (var packageVersion in NugetList.FindAllPackageVersions(parentPackage.Id, config, _nugetLogger, sourceCacheContext, remoteEndpoints))
+                            if (version != null)
                             {
-                                NugetCommon.GetPackageDependencies(packageVersion.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
+                                var requestedPackageDependency = NugetList.FindPackage(parentPackage.Id, config, _nugetLogger, sourceCacheContext, remoteEndpoints, version);
+
+                                if (requestedPackageDependency != null)
+                                {
+                                    NugetCommon.GetPackageDependencies(requestedPackageDependency.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
+                                }
                             }
+
+                            var availablePackageDependency = NugetList.FindPackage(parentPackage.Id, config, _nugetLogger, sourceCacheContext, remoteEndpoints);
+                            NugetCommon.GetPackageDependencies(availablePackageDependency.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
                         }
 
                         var removedSources = RemovePinnedSourceDependencies(sourcePackageDependencyInfos, allLocalPackages);
@@ -1251,17 +1272,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         //var allPackagesIdentities = allLocalPackages.Select(p => p.SearchMetadata.Identity).ToList();
                         var allPackagesReferences = allPackagesIdentities.Select(p => new PackageReference(p, NuGetFramework.AnyFramework));
 
-                        var resolverContext = new PackageResolverContext(
-                            dependencyBehavior: DependencyBehavior.Highest,
-                            targetIds: targetIdsToInstall,
-                            requiredPackageIds: allPackagesIdentities.Select(p => p.Id),
-                            packagesConfig: allPackagesReferences,
-                            preferredVersions: allPackagesIdentities,
-                            availablePackages: sourcePackageDependencyInfos,
-                            packageSources: remoteRepositories.Select(s => s.PackageSource),
-                            log: _nugetLogger
-                        );
-
                         IEnumerable<SourcePackageDependencyInfo> resolvedPackages = new List<SourcePackageDependencyInfo>();
                         if (config.IgnoreDependencies)
                         {
@@ -1291,6 +1301,17 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                         else
                         {
+                            var resolverContext = new PackageResolverContext(
+                                dependencyBehavior: DependencyBehavior.Highest,
+                                targetIds: targetIdsToInstall,
+                                requiredPackageIds: allPackagesIdentities.Select(p => p.Id),
+                                packagesConfig: allPackagesReferences,
+                                preferredVersions: allPackagesIdentities,
+                                availablePackages: sourcePackageDependencyInfos,
+                                packageSources: remoteRepositories.Select(s => s.PackageSource),
+                                log: _nugetLogger
+                            );
+
                             try
                             {
                                 resolvedPackages = dependencyResolver.Resolve(resolverContext, CancellationToken.None)
@@ -1306,15 +1327,66 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     packagesToUninstall.AddRange(allLocalPackages.Where(p => resolvedPackages.Select(x => x.Id).Contains(p.Name, StringComparer.OrdinalIgnoreCase)));
                                 }
                             }
-                            catch (NuGetResolverConstraintException ex)
+                            catch (NuGetResolverConstraintException)
                             {
-                                var logMessage = GetDependencyResolutionErrorMessage(ex);
-                                this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                                this.Log().Warn("Re-attempting package dependency resolution using additional available package information...");
 
-                                foreach (var pkgMetadata in packagesToInstall)
+                                try
                                 {
-                                    var errorResult = packageResultsToReturn.GetOrAdd(pkgMetadata.Identity.Id, new PackageResult(pkgMetadata, pathResolver.GetInstallPath(pkgMetadata.Identity)));
-                                    errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                                    // If for some reason, it hasn't been possible to find a solution from the resolverContext, it could be that
+                                    // we haven't provided enough information about the available package versions in the sourcePackageDependencyInfos
+                                    // object.  If we get here, assume that this is the case and re-attempt the upgrade, by pulling in ALL the
+                                    // dependency information, rather than only the latest package version, and specified package version.
+
+                                    // NOTE: There is duplication of work here, compared to what is done above, but further refactoring of this
+                                    // entire method would need to be done in order to make it more usable/maintable going forward. In the
+                                    // interim, the duplication is "acceptable" as it is hoped that the need to find ALL package dependencies
+                                    // will be the edge case, and not the rule.
+                                    foreach (var parentPackage in parentInfos)
+                                    {
+                                        foreach (var packageVersion in NugetList.FindAllPackageVersions(parentPackage.Id, config, _nugetLogger, sourceCacheContext, remoteEndpoints))
+                                        {
+                                            NugetCommon.GetPackageDependencies(packageVersion.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
+                                        }
+                                    }
+
+                                    resolverContext = new PackageResolverContext(
+                                        dependencyBehavior: DependencyBehavior.Highest,
+                                        targetIds: targetIdsToInstall,
+                                        requiredPackageIds: allPackagesIdentities.Select(p => p.Id),
+                                        packagesConfig: allPackagesReferences,
+                                        preferredVersions: allPackagesIdentities,
+                                        availablePackages: sourcePackageDependencyInfos,
+                                        packageSources: remoteRepositories.Select(s => s.PackageSource),
+                                        log: _nugetLogger
+                                    );
+
+                                    resolvedPackages = dependencyResolver.Resolve(resolverContext, CancellationToken.None)
+                                        .Select(p => sourcePackageDependencyInfos.SingleOrDefault(x => PackageIdentityComparer.Default.Equals(x, p)));
+
+                                    if (!config.ForceDependencies)
+                                    {
+                                        var identitiesToUninstall = packagesToUninstall.Select(x => x.Identity);
+                                        resolvedPackages = resolvedPackages.Where(p => !(localPackagesDependencyInfos.Contains(p) && !identitiesToUninstall.Contains(p)));
+
+                                        // If forcing dependencies, then dependencies already added to packages to remove.
+                                        // If not forcing dependencies, then package needs to be removed so it can be upgraded to the new version required by the parent
+                                        packagesToUninstall.AddRange(allLocalPackages.Where(p => resolvedPackages.Select(x => x.Id).Contains(p.Name, StringComparer.OrdinalIgnoreCase)));
+                                    }
+                                }
+                                catch (NuGetResolverConstraintException nestedEx)
+                                {
+                                    // If we get here, both the inital attempt to resolve a solution didn't work, as well as a second
+                                    // attempt using all available package versions didn't work, so this time around we hard fail, and
+                                    // provide information to the user about the conflicts for the package resolution.
+                                    var logMessage = GetDependencyResolutionErrorMessage(nestedEx);
+                                    this.Log().Error(ChocolateyLoggers.Important, logMessage);
+
+                                    foreach (var pkgMetadata in packagesToInstall)
+                                    {
+                                        var errorResult = packageResultsToReturn.GetOrAdd(pkgMetadata.Identity.Id, new PackageResult(pkgMetadata, pathResolver.GetInstallPath(pkgMetadata.Identity)));
+                                        errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                                    }
                                 }
                             }
                             catch (Exception ex)

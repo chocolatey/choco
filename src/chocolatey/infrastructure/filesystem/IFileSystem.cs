@@ -444,6 +444,10 @@ namespace chocolatey.infrastructure.filesystem
         /// <param name="isSilent">Should this method be silent? false by default</param>
         void DeleteDirectoryChecked(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent);
 
+        bool IsLockedDirectory(string directoryPath);
+
+        bool LockDirectory(string directoryPath);
+
         #endregion
 
         /// <summary>
