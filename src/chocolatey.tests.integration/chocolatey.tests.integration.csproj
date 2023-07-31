@@ -80,22 +80,22 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Chocolatey.NuGet.Common">
-      <HintPath>..\packages\Chocolatey.NuGet.Common.3.4.0\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Common.3.4.2\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Configuration">
-      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.4.0\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.4.2\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Frameworks">
-      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.4.0\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.4.2\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Packaging">
-      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.4.0\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.4.2\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Protocol">
-      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.4.0\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.4.2\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Versioning">
-      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.4.0\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.4.2\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="FluentAssertions, Version=6.11.0.0, Culture=neutral, PublicKeyToken=33f2691a05b67b6a, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentAssertions.6.11.0\lib\net47\FluentAssertions.dll</HintPath>

@@ -707,7 +707,7 @@ Chocolatey uses [Microsoft.Web.Xdt](https://www.nuget.org/packages/Microsoft.Web
   It also applies even if Microsoft knew or should have known about the possibility of the damages. The above limitation or exclusion may not apply to you because your country may not allow the exclusion or limitation of incidental, consequential or other damages.
 ```
 
-### Chocolatey.NuGet.Client @ 3.4.0
+### Chocolatey.NuGet.Client @ 3.4.2
 
 Chocolatey uses [NuGet.Client](https://github.com/NuGet/NuGet.Client) [(modified)](https://github.com/chocolatey/NuGet.Client) to work with packaging.
 [License terms](https://github.com/NuGet/NuGet.Client/blob/72f9f2b2eab28c9d91a22065c55aa7702abf7e01/LICENSE.txt):
