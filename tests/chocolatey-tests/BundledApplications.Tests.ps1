@@ -2,7 +2,7 @@
 
 Describe 'Ensuring correct version of <Name> is installed' -Tag BundledApplications -ForEach @(
     @{ Name = 'shimgen' ; Version = '2.0.0' ; ChocolateyVersion = '2.0.0-alpha' ; IsSigned = $true }
-    @{ Name = '7z' ; Version = '21.07' ; ChocolateyVersion = '1.1.0' ; IsSigned = $false }
+    @{ Name = '7z' ; Version = '23.01' ; ChocolateyVersion = '2.2.1-alpha' ; IsSigned = $false }
 ) -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0")) {
     Context '<Name> is correctly installed' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan $ChocolateyVersion)) {
         BeforeAll {
