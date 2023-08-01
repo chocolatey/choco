@@ -11,7 +11,7 @@
 
   <Product Name="$(var.ProductName)" Id="*" UpgradeCode="$(var.ProductCode)" Language="1033" Manufacturer="$(var.ProductVendor)" Codepage="1252" Version="$(var.ProductVersion)">
     <Package Id='*' Platform='x86' Keywords='Installer' Description="$(var.ProductName)" Comments="$(var.ProductSummary)" InstallScope="perMachine" InstallerVersion="200" Compressed="yes" />
-    <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="!(loc.NewerVersionInstalled)" />
+    <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="!(loc.NewerVersionInstalled)" Disallow="yes" DisallowUpgradeErrorMessage="!(loc.UpgradeNotAllowed)" />
     <Media Id="1" Cabinet="$(var.ArtifactName).cab" EmbedCab="yes" />
 
     <!-- Installation Properties -->

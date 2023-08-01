@@ -5,5 +5,6 @@
     <String Id="ProfileAdditionDescription" Overridable="yes">Add the Chocolatey Helpers to your PowerShell Profile to enable tab-completions.
 Defaults to adding to the AllUsersAllHosts profile.</String>
     <String Id="RequiresDotNet48" Overridable="yes">This application requires .NET Framework 4.8. Please install the .NET Framework then run this installer again.</String>
+    <String Id="UpgradeNotAllowed" Overridable="yes">UPGRADE FAILURE: Chocolatey CLI cannot be upgraded via the MSI. Please run 'choco upgrade chocolatey' from an elevated terminal window.</String>
     <String Id="ToolsFolderDescription" Overridable="yes">Sets the location for the Tools Folder</String>
 </WixLocalization>
