@@ -6,6 +6,7 @@ issue-labels-include:
 - Bug
 - Improvement
 - Documentation
+- Dependency Change
 issue-labels-exclude:
 - Internal Refactoring
 - BuildAutomation

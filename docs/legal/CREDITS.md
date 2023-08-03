@@ -6,7 +6,7 @@
   - [Contributors](#contributors)
 - [Third Party Licenses - Development](#third-party-licenses---development)
 - [Third Party Licenses - Runtime](#third-party-licenses---runtime)
-  - [7-Zip @ 21.07](#7-zip--2107)
+  - [7-Zip @ 23.01](#7-zip--2301)
   - [AlphaFS @ 2.1.3](#alphafs--213)
   - [Checksum @ 0.2.0](#checksum--020)
   - [log4net @ 2.0.12](#log4net--2012)
@@ -73,7 +73,7 @@ We would like to credit other super sweet tools/frameworks that aid in the devel
 Chocolatey CLI (choco) uses a number of 3rd-party components.
 Their details are below.
 
-### 7-Zip @ 21.07
+### 7-Zip @ 23.01
 
 Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives.
 [License terms](http://www.7-zip.org/license.txt):
@@ -84,7 +84,7 @@ Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives.
   License for use and distribution
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  7-Zip Copyright (C) 1999-2022 Igor Pavlov.
+  7-Zip Copyright (C) 1999-2023 Igor Pavlov.
 
   The licenses for files are:
 
@@ -707,7 +707,7 @@ Chocolatey uses [Microsoft.Web.Xdt](https://www.nuget.org/packages/Microsoft.Web
   It also applies even if Microsoft knew or should have known about the possibility of the damages. The above limitation or exclusion may not apply to you because your country may not allow the exclusion or limitation of incidental, consequential or other damages.
 ```
 
-### Chocolatey.NuGet.Client @ 3.4.0
+### Chocolatey.NuGet.Client @ 3.4.2
 
 Chocolatey uses [NuGet.Client](https://github.com/NuGet/NuGet.Client) [(modified)](https://github.com/chocolatey/NuGet.Client) to work with packaging.
 [License terms](https://github.com/NuGet/NuGet.Client/blob/72f9f2b2eab28c9d91a22065c55aa7702abf7e01/LICENSE.txt):
