@@ -52,6 +52,17 @@ namespace Chocolatey.PowerShell.Shared
         }
 
         /// <summary>
+        /// Gets the directory that Chocolatey is installed in.
+        /// </summary>
+        protected string ChocolateyInstallLocation
+        {
+            get
+            {
+                return PSHelper.GetInstallLocation(this);
+            }
+        }
+
+        /// <summary>
         /// For compatibility reasons, we always add the -IgnoredArguments parameter, so that newly added parameters
         /// won't break things too much if a package is run with an older version of Chocolatey.
         /// </summary>
