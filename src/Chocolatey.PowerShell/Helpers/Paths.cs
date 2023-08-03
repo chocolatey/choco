@@ -162,5 +162,41 @@ namespace Chocolatey.PowerShell.Helpers
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the file path corresponding to the desired <paramref name="pathType"/>.
+        /// </summary>
+        /// <param name="pathType">The type of path to retrieve the value for.</param>
+        /// <returns>The requested path as a string.</returns>
+        /// <exception cref="NotImplementedException">If the provided path type is not implemented.</exception>
+        public static string GetChocolateyPathType(PSCmdlet cmdlet, ChocolateyPathType pathType)
+        {
+            switch (pathType)
+            {
+                case ChocolateyPathType.PackagePath:
+                    var path = EnvironmentHelper.GetVariable(EnvironmentVariables.ChocolateyPackageFolder);
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        return path;
+                    }
+
+                    path = EnvironmentHelper.GetVariable(EnvironmentVariables.PackageFolder);
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        return path;
+                    }
+                    else
+                    {
+                        var installPath = GetChocolateyPathType(cmdlet, ChocolateyPathType.InstallPath);
+                        var packageName = Environment.GetEnvironmentVariable(EnvironmentVariables.ChocolateyPackageName);
+
+                        return PSHelper.CombinePaths(cmdlet, installPath, "lib", packageName);
+                    }
+                case ChocolateyPathType.InstallPath:
+                    return PSHelper.GetInstallLocation(cmdlet);
+                default:
+                    throw new NotImplementedException($"The path value for type '{pathType}' is not known.");
+            };
+        }
     }
 }

@@ -64,5 +64,16 @@ namespace Chocolatey.PowerShell.Shared
         [Browsable(false)]
         public const string ChocolateyAllowEmptyChecksumsSecure = nameof(ChocolateyAllowEmptyChecksumsSecure);
 
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Browsable(false)]
+        public const string ChocolateyPackageName = nameof(ChocolateyPackageName);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Browsable(false)]
+        public const string ChocolateyPackageFolder = nameof(ChocolateyPackageFolder);
+
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Browsable(false)]
+        public const string PackageFolder = nameof(PackageFolder);
     }
 }
