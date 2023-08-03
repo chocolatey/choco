@@ -62,6 +62,7 @@
       <Link>Shared\StringResources.cs</Link>
     </Compile>
     <Compile Include="Commands\GetChocolateyConfigValueCommand.cs" />
+    <Compile Include="Commands\GetChocolateyPathCommand.cs" />
     <Compile Include="Commands\AssertValidChecksumCommand.cs" />
     <Compile Include="Helpers\ConfigHelper.cs" />
     <Compile Include="Shared\ChecksumExeNotFoundException.cs" />
@@ -86,6 +87,7 @@
     </Compile>
     <Compile Include="Shared\ChecksumType.cs" />
     <Compile Include="Shared\ChocolateyCmdlet.cs" />
+    <Compile Include="Shared\ChocolateyPathType.cs" />
     <Compile Include="Shared\EnvironmentNames.cs" />
     <Compile Include="Shared\EnvironmentVariables.cs" />
     <Compile Include="Win32\NativeMethods.cs" />
