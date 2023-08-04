@@ -1310,7 +1310,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     }
                                 }
                             }
-
                         }
                         else
                         {
