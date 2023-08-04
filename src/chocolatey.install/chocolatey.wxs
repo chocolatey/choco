@@ -11,7 +11,7 @@
 
   <Product Name="$(var.ProductName)" Id="*" UpgradeCode="$(var.ProductCode)" Language="1033" Manufacturer="$(var.ProductVendor)" Codepage="1252" Version="$(var.ProductVersion)">
     <Package Id='*' Platform='x86' Keywords='Installer' Description="$(var.ProductName)" Comments="$(var.ProductSummary)" InstallScope="perMachine" InstallerVersion="200" Compressed="yes" />
-    <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="!(loc.NewerVersionInstalled)" />
+    <MajorUpgrade Schedule="afterInstallInitialize" DowngradeErrorMessage="!(loc.NewerVersionInstalled)" Disallow="yes" DisallowUpgradeErrorMessage="!(loc.UpgradeNotAllowed)" />
     <Media Id="1" Cabinet="$(var.ArtifactName).cab" EmbedCab="yes" />
 
     <!-- Installation Properties -->
@@ -23,10 +23,6 @@
     <Property Id="ARPNOREPAIR" Value="yes" Secure="yes" />      <!-- Remove repair from post-install options, as it will not work with the script method -->
     <Property Id="ARPNOMODIFY" Value="yes" Secure="yes" />      <!-- Remove modify from post-install options, as it will not work with the script method -->
 
-    <CustomAction Id="SetHelpersDirectoryPath" Property="HelpersDirectoryPath" Value="[INSTALLDIR]\\helpers" />
-    <CustomAction Id="SetRedirectsDirectoryPath" Property="RedirectsDirectoryPath" Value="[INSTALLDIR]\\redirects" />
-    <CustomAction Id="SetToolsDirectoryPath" Property="ToolsDirectoryPath" Value="[INSTALLDIR]\\tools" />
-
     <PropertyRef Id="WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED" />
     <Condition Message="!(loc.RequiresDotNet48)">
       <![CDATA[Installed OR WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED]]>
@@ -35,17 +31,13 @@
     <!-- Custom Actions to Install Chocolatey -->
     <SetProperty Id="InstallChocolatey"
       Before="InstallChocolatey"
-      Sequence="execute" 
+      Sequence="execute"
       Value="&quot;[SystemFolder]\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -Command &quot;$env:ChocolateyInstall='[INSTALLDIR]'; &amp; '[#ChocolateyInstall]' -ChocolateyDownloadUrl '[#ChocolateyNupkg]' -UseNativeUnzip&quot;" />
     <CustomAction Id="InstallChocolatey" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="yes" />
 
     <!-- Custom Additions to the InstallExecuteSequence (e.g. the actions above) -->
     <InstallExecuteSequence>
       <Custom Action="InstallChocolatey" After="InstallFiles"><![CDATA[NOT Installed]]></Custom>
-      <!-- Set these values during the uninstall such that we can remove the folders -->
-      <Custom Action="SetHelpersDirectoryPath" Before="CostInitialize"><![CDATA[Installed]]></Custom>
-      <Custom Action="SetRedirectsDirectoryPath" Before="CostInitialize"><![CDATA[Installed]]></Custom>
-      <Custom Action="SetToolsDirectoryPath" Before="CostInitialize"><![CDATA[Installed]]></Custom>
     </InstallExecuteSequence>
 
     <!-- Installation Layout - primarily 'temporary' install files, unlike most MSI installers, as we run the standard install script -->
@@ -54,14 +46,6 @@
         <Directory Id="INSTALLDIR" Name="chocolatey">
           <Component Id="ChocolateyInstallDirectory" Guid="{9E538CD6-6F07-43E5-B8E2-ED31995F3D1C}" Win64="no">
             <CreateFolder />
-            <RemoveFile Id="ChocoEXE" On="uninstall" Name="choco.exe" />
-            <RemoveFile Id="ChocoIgnore" On="uninstall" Name="choco.exe.ignore" />
-            <RemoveFile Id="ChocoManifest" On="uninstall" Name="choco.exe.manifest" />
-            <RemoveFile Id="ChocoCredits" On="uninstall" Name="CREDITS.txt" />
-            <RemoveFile Id="ChocoLicense" On="uninstall" Name="LICENSE.txt" />
-            <util:RemoveFolderEx Id="HelpersDirectory" On="uninstall" Property="HelpersDirectoryPath" />
-            <util:RemoveFolderEx Id="RedirectsDirectory" On="uninstall" Property="RedirectsDirectoryPath" />
-            <util:RemoveFolderEx Id="ToolsDirectory" On="uninstall" Property="ToolsDirectoryPath" />
             <Environment Id="ChocolateyInstallEnvVar" Action="set" Name="ChocolateyInstall" Permanent="no" System="yes" Value="[INSTALLDIR]" />
           </Component>
         </Directory>

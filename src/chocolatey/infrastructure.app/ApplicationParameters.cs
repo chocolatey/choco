@@ -74,6 +74,9 @@ namespace chocolatey.infrastructure.app
               System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)
             : CommonAppDataChocolatey;
         public static readonly string HttpCacheUserLocation = _fileSystem.CombinePaths(UserProfilePath, ".chocolatey", "http-cache");
+        // CommonAppDataChocolatey is always set to ProgramData\Chocolatey.
+        // So we append HttpCache to that name if it is possible.
+        public static readonly string HttpCacheSystemLocation = CommonAppDataChocolatey + "HttpCache";
         public static readonly string HttpCacheLocation = GetHttpCacheLocation();
 
         public static readonly string UserLicenseFileLocation = _fileSystem.CombinePaths(UserProfilePath, "chocolatey.license.xml");
@@ -112,9 +115,7 @@ namespace chocolatey.infrastructure.app
         {
             if (ProcessInformation.IsElevated() || string.IsNullOrEmpty(System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile, System.Environment.SpecialFolderOption.DoNotVerify)))
             {
-                // CommonAppDataChocolatey is always set to ProgramData\Chocolatey.
-                // So we append HttpCache to that name if it is possible.
-                return CommonAppDataChocolatey + "HttpCache";
+                return HttpCacheSystemLocation;
             }
             else
             {

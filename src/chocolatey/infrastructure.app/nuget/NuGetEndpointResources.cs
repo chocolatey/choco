@@ -153,7 +153,32 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 if (!_resolvingFailed)
                 {
-                    this.Log().Warn(ex.InnerException.Message);
+                    // Unwrap the AggregateException as its surface message is useless
+                    Exception error = ex.InnerException;
+                    this.Log().Warn(error.Message);
+
+                    // Enumerate the inner exceptions, log all but the last one in the list to debug
+                    string message = null;
+                    foreach (var err in error.InnerException.Enumerate())
+                    {
+                        if (message != null)
+                        {
+                            this.Log().Debug(message);
+                        }
+
+                        message = err.Message;
+                        error = err;
+                    }
+
+                    // If the last error in the list isn't the only one, write its message as a warning.
+                    // Typically the deepest/last error in the InnerExceptions will be a relevant and
+                    // actionable error.
+                    if (error != ex.InnerException && message != null)
+                    {
+                        this.Log().Warn(message);
+                    }
+
+                    this.Log().Warn("For more information on this issue and guidance in resolving the problem, see https://ch0.co/t/svcidx");
                     _resolvingFailed = true;
                 }
             }

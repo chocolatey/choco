@@ -71,7 +71,7 @@ namespace chocolatey.infrastructure.app.commands
                 }
                 else
                 {
-                    throw new ApplicationException("Default push source configuration is not set. Please pass a source to push to, such as --source={0}".FormatWith(ApplicationParameters.ChocolateyCommunityFeedPushSource));
+                    throw new ApplicationException("The default push source configuration is not set. Either pass a source to push to, such as `--source=\"'{0}'\"`, or set the `defaultPushSource` configuration value, for example `choco config set --name=\"'defaultPushSource'\" --value=\"'{0}'\"`.".FormatWith(ApplicationParameters.ChocolateyCommunityFeedPushSource));
                 }
             }
 

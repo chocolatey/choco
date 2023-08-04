@@ -17,10 +17,15 @@
 namespace chocolatey
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Security;
+    using System.Text;
     using System.Text.RegularExpressions;
+    using System.Threading;
+    using System.Web.UI;
     using infrastructure.app;
     using infrastructure.logging;
 
@@ -48,6 +53,81 @@ namespace chocolatey
                 "chocolatey".Log().Error(ChocolateyLoggers.Important, "{0} had an error formatting string:{1} {2}", ApplicationParameters.Name, Environment.NewLine, ex.Message);
                 return input;
             }
+        }
+
+        /// <summary>
+        /// Splits any Newline elements and ensures that each line is no longer than the configured <paramref name="maxLineLength"/>.
+        /// Lines longer than the specified line length will be split on the last non-letter or digit before the max length.
+        /// </summary>
+        /// <param name="input">The input to split any lines on.</param>
+        /// <param name="linePrefix">The line prefix used for all lines not being the first line.</param>
+        /// <param name="maxLineLength">Maximum length of the line.</param>
+        /// <returns>The splitted formatted lines.</returns>
+        /// <remarks>Not recommended to be used in hot paths.</remarks>
+        public static string SplitOnSpace(this string input, string linePrefix = "", int maxLineLength = 70)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return string.Empty;
+            }
+
+            var sb = new StringBuilder(input.Length);
+            var firstLine = true;
+            var stack = new Stack<string>(input.Split('\n').Reverse());
+
+            while (stack.Count > 0)
+            {
+                var currentLine = stack.Pop();
+
+                if (currentLine.Length <= maxLineLength)
+                {
+                    if (!firstLine && !string.IsNullOrEmpty(currentLine))
+                    {
+                        sb.Append(linePrefix);
+                    }
+
+                    sb.AppendLine(currentLine.TrimEnd());
+                }
+                else
+                {
+                    var index = 70 - 1;
+
+                    for (; index >= 0; index--)
+                    {
+                        if (char.IsWhiteSpace(currentLine[index]) || !char.IsLetterOrDigit(currentLine[index]))
+                        {
+                            break;
+                        }
+                    }
+
+                    if (index <= 0)
+                    {
+                        index = maxLineLength;
+                    }
+
+                    if (!firstLine)
+                    {
+                        sb.Append(linePrefix);
+                    }
+
+                    var subLine = currentLine.Substring(0, index);
+                    sb.AppendLine(subLine.TrimEnd());
+
+                    if (stack.Count > 0)
+                    {
+                        var nextLine = currentLine.Substring(index + 1).TrimStart() + stack.Pop();
+                        stack.Push(nextLine);
+                    }
+                    else
+                    {
+                        stack.Push(currentLine.Substring(index + 1).TrimStart());
+                    }
+                }
+
+                firstLine = false;
+            }
+
+            return sb.ToString();
         }
 
         /// <summary>

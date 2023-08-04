@@ -32,6 +32,7 @@ namespace chocolatey.infrastructure.app.commands
     public class ChocolateyCacheCommand : ChocolateyCommandBase, ICommand
     {
         private readonly IFileSystem _fileSystem;
+        private const string LockDirectoryName = ".locks";
 
         public ChocolateyCacheCommand(IFileSystem fileSystem)
         {
@@ -135,7 +136,7 @@ namespace chocolatey.infrastructure.app.commands
                     _fileSystem.DeleteFile(fileToRemove);
                 }
 
-                foreach (var directoryToRemove in _fileSystem.GetDirectories(cacheLocation))
+                foreach (var directoryToRemove in _fileSystem.GetDirectories(cacheLocation).Where(d => !_fileSystem.GetFileName(d).IsEqualTo(LockDirectoryName)))
                 {
                     if (!_fileSystem.GetFiles(directoryToRemove, "*", SearchOption.AllDirectories).Any())
                     {
@@ -145,7 +146,7 @@ namespace chocolatey.infrastructure.app.commands
             }
             else
             {
-                foreach (var directoryToRemove in _fileSystem.GetDirectories(cacheLocation))
+                foreach (var directoryToRemove in _fileSystem.GetDirectories(cacheLocation).Where(d => !_fileSystem.GetFileName(d).IsEqualTo(LockDirectoryName)))
                 {
                     _fileSystem.DeleteDirectoryChecked(directoryToRemove, recursive: true);
                 }
@@ -256,7 +257,7 @@ However, the System HTTP Cache will only be considered if running in an elevated
         private void ListCachedItems(ChocolateyConfiguration configuration, string cacheLocation)
         {
             var cachedFiles = _fileSystem.GetFiles(cacheLocation, "*.dat", SearchOption.AllDirectories);
-            var cachedDirectories = _fileSystem.GetDirectories(cacheLocation);
+            var cachedDirectories = _fileSystem.GetDirectories(cacheLocation).Where(d => !_fileSystem.GetFileName(d).IsEqualTo(LockDirectoryName));
             var expirationTimer = GetCacheExpiration(configuration);
             
             var expiredFiles = cachedFiles.Where(f => _fileSystem.GetFileModifiedDate(f) < expirationTimer);

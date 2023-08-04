@@ -4,6 +4,7 @@
     <String Id="NewerVersionInstalled" Overridable="yes">A newer version of Chocolatey is already installed.</String>
     <String Id="ProfileAdditionDescription" Overridable="yes">Add the Chocolatey Helpers to your PowerShell Profile to enable tab-completions.
 Defaults to adding to the AllUsersAllHosts profile.</String>
-    <String Id="RequiresDotNet48" Overridable="yes">This application requires .NET Framework 4.8. Please install the .NET Framework then run this installer again.</String>
-    <String Id="ToolsFolderDescription" Overridable="yes">Sets the location for the Tools Folder</String>
+    <String Id="RequiresDotNet48" Overridable="yes">Chocolatey CLI requires .NET Framework 4.8. Please install the .NET Framework then run this installer again.</String>
+    <String Id="UpgradeNotAllowed" Overridable="yes">The Chocolatey CLI MSI is intended for installation only. Please run 'choco upgrade chocolatey' from an elevated terminal window to upgrade.</String>
+    <String Id="ToolsFolderDescription" Overridable="yes">Sets the location for the Tools Folder.</String>
 </WixLocalization>

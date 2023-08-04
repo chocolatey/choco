@@ -140,8 +140,16 @@ namespace chocolatey.infrastructure.app.nuget
 
             if (source == null)
             {
-                this.Log().Debug("Asking user for credentials for '{0}'".FormatWith(uri.OriginalString));
-                return Task.FromResult(new CredentialResponse(GetUserCredentials(uri, proxy, credentialType)));
+                ICredentials credential = CredentialCache.DefaultNetworkCredentials;
+
+                if (isRetry)
+                {
+                    this.Log().Debug("This is a retry attempt. Asking user for credentials for '{0}'".FormatWith(uri.OriginalString));
+                    credential = GetUserCredentials(uri, proxy, credentialType);
+
+                }
+
+                return Task.FromResult(new CredentialResponse(credential));
             }
             else
             {
