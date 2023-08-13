@@ -548,6 +548,33 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
+    Context 'Upgrading a package where parent only contain pre-releases' -Tag Testing {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $null = Invoke-Choco install isdependency --version 1.0.0
+            $null = Invoke-Choco install hasstabledependency
+
+            $Output = Invoke-Choco upgrade isdependency --version 2.0.0
+        }
+
+        It "Should exit with sucess (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should report successful upgrade" {
+            $Output.Lines | Should -Contain "isdependency v2.0.0" -Because $Output.String
+            $Output.Lines | Should -Contain "Chocolatey upgraded 1/1 packages." -Because $Output.String
+        }
+
+        It "Should have upgraded the correct files" {
+            $ExpectedFile = "${env:ChocolateyInstall}/lib/isdependency/isdependency"
+            "$ExpectedFile.nupkg" | Should -Exist
+            $NuspecContent = [xml](Get-Content "$ExpectedFile.nuspec")
+            $NuspecContent.package.metadata.version | Should -Be "2.0.0"
+        }
+    }
+
     # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

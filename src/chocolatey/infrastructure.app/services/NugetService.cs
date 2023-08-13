@@ -1234,8 +1234,21 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 }
                             }
 
+                            var configPrerelease = config.Prerelease;
+                            config.Prerelease = parentPackage.Version.IsPrerelease;
+
                             var availablePackageDependency = NugetList.FindPackage(parentPackage.Id, config, _nugetLogger, sourceCacheContext, remoteEndpoints);
-                            NugetCommon.GetPackageDependencies(availablePackageDependency.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
+
+                            config.Prerelease = configPrerelease;
+
+                            if (availablePackageDependency != null)
+                            {
+                                NugetCommon.GetPackageDependencies(availablePackageDependency.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
+                            }
+                            else
+                            {
+                                this.Log().Warn("Unable to find the parent package '{0}'.", parentPackage.Id);
+                            }
                         }
 
                         var removedSources = RemovePinnedSourceDependencies(sourcePackageDependencyInfos, allLocalPackages);
@@ -1297,7 +1310,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     }
                                 }
                             }
-
                         }
                         else
                         {
