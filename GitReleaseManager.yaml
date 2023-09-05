@@ -1,30 +1,30 @@
 issue-labels-include:
-- Breaking Change
-- Deprecate
-- Feature
-- C4B Feature
-- Bug
-- Improvement
-- Documentation
-- Dependency Change
+  - Breaking Change
+  - Deprecate
+  - Feature
+  - C4B Feature
+  - Bug
+  - Improvement
+  - Documentation
+  - Dependency Change
 issue-labels-exclude:
-- Internal Refactoring
-- BuildAutomation
-- NO RELEASE NOTES
+  - Internal Refactoring
+  - BuildAutomation
+  - NO RELEASE NOTES
 issue-labels-alias:
-    - name:    Documentation
-      header:  Documentation
-      plural:  Documentation
-    - name: Bug
-      header: Bug Fix
-      plural: Bug Fixes
-    - name: Deprecate
-      header: Deprecated Feature
-      plural: Deprecated Features
+  - name:    Documentation
+    header:  Documentation
+    plural:  Documentation
+  - name:    Bug
+    header:  Bug Fix
+    plural:  Bug Fixes
+  - name:    Deprecate
+    header:  Deprecated Feature
+    plural:  Deprecated Features
 create:
-    include-sha-section: true
-    sha-section-heading: "SHA256 Hashes of the release artifacts"
-    sha-section-line-format: "- `{1}\t{0}`"
+  include-sha-section: true
+  sha-section-heading: "SHA256 Hashes of the release artifacts"
+  sha-section-line-format: "- `{1}\t{0}`"
 close:
   use-issue-comments: true
   issue-comment: |-
