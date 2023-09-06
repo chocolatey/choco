@@ -1,1 +1,6 @@
-- {{ issue.title }} - see [#{{ issue.number }}]({{ issue.html_url }}).
+{{
+    if issue_label == "Bug" || issue_label == "Bug Fix" || issue_label == "Bug Fixes"
+}}- Fix - {{ issue.title }} - see [#{{ issue.number }}]({{ issue.html_url }}).
+{{  else
+}}- {{ issue.title }} - see [#{{ issue.number }}]({{ issue.html_url }}).
+{{  end -}}
