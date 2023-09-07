@@ -44,6 +44,7 @@ namespace chocolatey.infrastructure.app.services
         private const string ArgsFile = ".arguments";
         private const string ExtraFile = ".extra";
         private const string VersionOverrideFile = ".version";
+        private const string DeploymentLocationFile = ".deploymentLocation";
 
         // We need to store the package identifiers we have warned about
         // to prevent duplicated outputs.
@@ -179,6 +180,20 @@ A corrupt .registry file exists at {0}.
                  );
             }
 
+            var locationFile = _fileSystem.CombinePaths(pkgStorePath, DeploymentLocationFile);
+            if (_fileSystem.FileExists(locationFile))
+            {
+                FaultTolerance.TryCatchWithLoggingException(
+                    () =>
+                    {
+                        packageInformation.DeploymentLocation = _fileSystem.ReadFile(locationFile);
+                    },
+                    "Unable to read deployment location file",
+                    throwError: false,
+                    logWarningInsteadOfError: true
+                );
+            }
+
             return packageInformation;
         }
 
@@ -279,6 +294,21 @@ A corrupt .registry file exists at {0}.
             else
             {
                 _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, PinFile));
+            }
+
+            if (!string.IsNullOrWhiteSpace(packageInformation.DeploymentLocation))
+            {
+                var locationFile = _fileSystem.CombinePaths(pkgStorePath, DeploymentLocationFile);
+                if (_fileSystem.FileExists(locationFile))
+                {
+                    _fileSystem.DeleteFile(locationFile);
+                }
+                
+                _fileSystem.WriteFile(locationFile, packageInformation.DeploymentLocation);
+            }
+            else
+            {
+                _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, DeploymentLocationFile));
             }
         }
 

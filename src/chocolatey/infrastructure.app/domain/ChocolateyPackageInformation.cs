@@ -36,5 +36,6 @@ namespace chocolatey.infrastructure.app.domain
         public bool HasSilentUninstall { get; set; }
         public bool IsPinned { get; set; }
         public string ExtraInformation { get; set; }
+        public string DeploymentLocation { get; set; }
     }
 }
