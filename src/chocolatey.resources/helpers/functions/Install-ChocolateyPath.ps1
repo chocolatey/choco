@@ -80,7 +80,8 @@ Get-ToolsLocation
     #get the PATH variable
     Update-SessionEnvironment
     $envPath = $env:PATH
-    if (!$envPath.ToLower().Contains($pathToInstall.ToLower())) {
+    $statementTerminator = ";"
+    if ($envPath -inotmatch ("(^|$statementTerminator)" + [regex]::escape($pathToInstall) + "\\?($statementTerminator|`$)")) {
         try {
             Write-Host "PATH environment variable does not have $pathToInstall in it. Adding..."
         }
@@ -90,7 +91,6 @@ Get-ToolsLocation
 
         $actualPath = Get-EnvironmentVariable -Name 'Path' -Scope $pathType -PreserveVariables
 
-        $statementTerminator = ";"
         #does the path end in ';'?
         $hasStatementTerminator = $actualPath -ne $null -and $actualPath.EndsWith($statementTerminator)
         # if the last digit is not ;, then we are adding it
