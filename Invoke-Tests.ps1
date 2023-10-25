@@ -97,7 +97,7 @@ try {
     $PesterConfiguration = [PesterConfiguration]@{
         Run        = @{
             PassThru = $true
-            Path     = "$PSScriptRoot/tests/chocolatey-tests"
+            Path     = "$PSScriptRoot/tests/pester-tests"
         }
         TestResult = @{
             Enabled       = $true
