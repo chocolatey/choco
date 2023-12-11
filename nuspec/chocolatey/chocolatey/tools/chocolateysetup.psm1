@@ -167,7 +167,7 @@ The packages themselves go to `'$chocolateyLibPath`'
 A shim file for the command line goes to `'$chocolateyExePath`'
   and points to an executable in `'$yourPkgPath`'.
 
-Creating Chocolatey folders if they do not already exist.
+Creating Chocolatey CLI folders if they do not already exist.
 
 "@ | Write-Output
 
@@ -206,12 +206,12 @@ Creating Chocolatey folders if they do not already exist.
 
     if ($script:DotNetInstallRequiredReboot) {
         @"
-Chocolatey (choco.exe) is nearly ready.
+Chocolatey CLI (choco.exe) is nearly ready.
 You need to restart this machine prior to using choco.
 "@ | Write-Output
     } else {
         @"
-Chocolatey (choco.exe) is now ready.
+Chocolatey CLI (choco.exe) is now ready.
 You can call choco from anywhere, command line or powershell by typing choco.
 Run choco /? for a list of functions.
 You may need to shut down and restart powershell and/or consoles
@@ -819,7 +819,7 @@ function Install-DotNet48IfMissing {
         $s = [System.Diagnostics.Process]::Start($psi);
         $s.WaitForExit();
         if ($s.ExitCode -eq 1641 -or $s.ExitCode -eq 3010) {
-          Write-Warning ".NET Framework 4.8 was installed, but a reboot is required before using Chocolatey."
+          Write-Warning ".NET Framework 4.8 was installed, but a reboot is required before using Chocolatey CLI."
           $script:DotNetInstallRequiredReboot = $true
         } elseif ($s.ExitCode -ne 0) {
             if ($netFx48InstallTries -ge 2) {
@@ -834,16 +834,16 @@ function Install-DotNet48IfMissing {
 }
 
 function Invoke-Chocolatey-Initial {
-    Write-Debug "Initializing Chocolatey files, etc by running Chocolatey..."
+    Write-Debug "Initializing Chocolatey files, etc by running Chocolatey CLI..."
 
     try {
         $chocoInstallationFolder = Get-ChocolateyInstallFolder
         $chocoExe = Join-Path -Path $chocoInstallationFolder -ChildPath "choco.exe"
         $runResult = & $chocoExe -v
-        Write-Debug "Chocolatey execution completed successfully."
+        Write-Debug "Chocolatey CLI execution completed successfully."
     }
     catch {
-        Write-ChocolateyWarning "Unable to run Chocolatey at this time:`n$($runResult)"
+        Write-ChocolateyWarning "Unable to run Chocolatey CLI at this time:`n$($runResult)"
     }
 }
 
