@@ -56,7 +56,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Outputs Error Message" {
@@ -72,7 +72,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {
@@ -94,7 +94,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {
@@ -116,7 +116,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {
@@ -138,7 +138,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {
@@ -161,7 +161,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Displays serialize error" {
@@ -179,7 +179,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {
@@ -201,7 +201,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {
@@ -223,7 +223,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {
@@ -245,7 +245,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {
@@ -267,7 +267,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {
@@ -299,7 +299,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {
@@ -328,7 +328,7 @@ Describe "choco pack" -Tag Chocolatey, PackCommand {
         }
 
         It "'choco pack' exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays Chocolatey name with version" {

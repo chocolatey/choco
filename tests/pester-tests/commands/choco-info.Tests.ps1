@@ -29,7 +29,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays <Title> with value <Value>" -ForEach $infoItems {
@@ -101,7 +101,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the package mvcmusicstore-db 1.2.0" {
@@ -134,7 +134,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the package mvcmusicstore-db 1.2.0" {
@@ -155,7 +155,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs a warning message that installed side by side package is deprecated" {
@@ -174,7 +174,7 @@ Describe "choco info" -Tag Chocolatey, InfoCommand {
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Outputs warning about unable to retrieve packages from source' {

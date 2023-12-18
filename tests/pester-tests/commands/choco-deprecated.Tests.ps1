@@ -76,7 +76,7 @@ Describe "Deprecated Chocolatey Helper Commands" -Skip:(-not (Test-ChocolateyVer
     }
 
     It 'should exit success (0)' {
-        $Output.ExitCode | Should -Be 0
+        $Output.ExitCode | Should -Be 0 -Because $Output.String
     }
 
     It 'should warn that Get-BinRoot is deprecated' {

@@ -34,7 +34,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Lists available features" {
@@ -121,7 +121,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs a message indicating that it disabled the feature" {
@@ -145,7 +145,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs a message indicating that it enabled the feature" {
@@ -169,7 +169,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs a message indicating that it disabled the feature" {
@@ -189,7 +189,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Outputs a message indicating it didn't find the feature in question" {
@@ -206,7 +206,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Outputs a message indicating it didn't find the feature in question" {

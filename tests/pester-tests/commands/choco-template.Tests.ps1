@@ -29,7 +29,7 @@ Describe "choco <_>" -ForEach @(
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the templates expected" {
@@ -52,7 +52,7 @@ Describe "choco <_>" -ForEach @(
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the templates expected" {
@@ -75,7 +75,7 @@ Describe "choco <_>" -ForEach @(
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Displays error with correct format" {
@@ -93,7 +93,7 @@ Describe "choco <_>" -ForEach @(
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays template information" {
@@ -140,7 +140,7 @@ Describe "choco <_>" -ForEach @(
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays template name and version" {
@@ -160,7 +160,7 @@ Describe "choco <_>" -ForEach @(
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the templates marking the default as expected" {
@@ -185,7 +185,7 @@ Describe "choco <_>" -ForEach @(
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the templates marking the default as expected" {
@@ -208,7 +208,7 @@ Describe "choco <_>" -ForEach @(
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays <Name> template information" -ForEach @(

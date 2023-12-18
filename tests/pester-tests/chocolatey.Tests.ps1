@@ -77,7 +77,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         It "Outputs the version when run with --version" {
             $Output = Invoke-Choco --version
             $script:CurrentVersion = $Output.String
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
             $LastExitCode | Should -Be 0
             ($Output.String -split '-' | Select-Object -First 1) -as [version] | Should -BeTrue
         }
@@ -333,7 +333,7 @@ exit $error.count
         }
 
         It 'should exit Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'should <removal> shim <_> on upgrade' -ForEach $RemovedShims {
@@ -356,7 +356,7 @@ exit $error.count
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Should remove the invalid configuration file' {
