@@ -407,7 +407,7 @@ Describe "choco uninstall" -Tag Chocolatey, UninstallCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Uninstall package successfully" {
