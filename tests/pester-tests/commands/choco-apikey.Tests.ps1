@@ -27,7 +27,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Only displays chocolatey name with version" {
@@ -42,7 +42,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Only displays chocolatey name with version" {
@@ -57,7 +57,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Only displays chocolatey name with version" {
@@ -71,7 +71,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Only displays chocolatey name with version" {
@@ -104,7 +104,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays chocolatey name with version" {
@@ -148,7 +148,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays chocolatey name with version" {
@@ -195,7 +195,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays chocolatey name with version" {
@@ -243,7 +243,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays chocolatey name with version" {
@@ -275,7 +275,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays chocolatey name with version" {
@@ -299,7 +299,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays chocolatey name with version" {
@@ -317,7 +317,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Displays chocolatey name with version" {
@@ -337,7 +337,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays chocolatey name with version" {
@@ -358,7 +358,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays chocolatey name with version" {
