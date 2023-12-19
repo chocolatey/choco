@@ -1645,6 +1645,7 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
     Context "Installing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
         BeforeAll {
             $paths = Restore-ChocolateyInstallSnapshot
+            $features = Get-chocolateyFeature
 
             $Output = Invoke-Choco install install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePath)" --no-progress
         }

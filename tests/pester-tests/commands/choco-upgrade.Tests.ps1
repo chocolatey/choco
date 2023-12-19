@@ -264,6 +264,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     Context "Upgrading non-existing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
         BeforeAll {
             $paths = Restore-ChocolateyInstallSnapshot
+            $features = Get-chocolateyFeature
 
             $Output = Invoke-Choco upgrade install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePath)" --no-progress
         }
@@ -331,6 +332,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     Context "Upgrading non-existing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
         BeforeAll {
             $paths = Restore-ChocolateyInstallSnapshot
+            $features = Get-chocolateyFeature
 
             $Output = Invoke-Choco upgrade install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePath)" --no-progress
         }
