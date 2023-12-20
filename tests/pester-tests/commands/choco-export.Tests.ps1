@@ -76,7 +76,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays description of command" {
@@ -133,7 +133,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
 
         It "Exits with success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         # NOTE: There is no output other than the header, and possibly the unofficial statement
@@ -184,7 +184,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
 
         It "Exits with success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         # NOTE: There is no output other than the header, and possibly the unofficial statement
@@ -226,7 +226,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
 
         It "Exits with success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         # NOTE: There is no output other than the header, and possibly the unofficial statement
@@ -277,7 +277,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
 
         It "Exits with success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         # NOTE: There is no output other than the header, and possibly the unofficial statement
@@ -319,7 +319,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
 
         It "Exits with success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         # NOTE: There is no output other than the header, and possibly the unofficial statement
@@ -387,7 +387,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
 
         It "Exits with success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         # NOTE: There is no output other than the header, and possibly the unofficial statement
@@ -415,7 +415,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Reports unable to export packages" {
@@ -439,7 +439,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Reports unable to export packages" {
@@ -459,7 +459,7 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Displays help page" {

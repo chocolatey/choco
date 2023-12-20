@@ -491,7 +491,7 @@ To upgrade a local, or remote file, you may use:
 
         # This was broken in v1.3.1
         It "Exits with Success (0)" -Tag Broken {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs a message showing that installation was successful" {
@@ -513,7 +513,7 @@ To upgrade a local, or remote file, you may use:
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs line with package name version and old version" {

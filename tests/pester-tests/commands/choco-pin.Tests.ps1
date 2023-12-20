@@ -30,7 +30,7 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
         }
 
         It "Exits with ExitCode 0" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Has no Pins listed" {
@@ -48,7 +48,7 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
         }
 
         It "Exits with ExitCode 0" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Lists the new Pin" {
@@ -67,7 +67,7 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
         }
 
         It "Exits with ExitCode 0" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Lists the Pins" {
@@ -85,7 +85,7 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
         }
 
         It "Exits with ExitCode 0" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Sets the Pin" {
@@ -105,7 +105,7 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
         }
 
         It "Exits with ExitCode 0" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Changes Nothing" {
@@ -123,7 +123,7 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
         }
 
         It "Exits with ExitCode 1" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Outputs a message indicating the failure" {
@@ -146,7 +146,7 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
         }
 
         It "Exits with ExitCode 0" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Removed the Pin" {
@@ -163,7 +163,7 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
         }
 
         It "Exits with ExitCode 0" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Changes Nothing" {
@@ -179,7 +179,7 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
         }
 
         It "Exits with ExitCode 1" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Outputs a message indicating the failure" {
