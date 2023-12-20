@@ -34,4 +34,4 @@ close:
     - [GitHub Release](https://github.com/{owner}/{repository}/releases/tag/{milestone})
     - [Chocolatey Package](https://chocolatey.org/packages/chocolatey/{milestone})
 
-    Your **[GitReleaseManager](https://github.com/GitTools/GitReleaseManager)** bot :package::rocket:
+    Your **[GitReleaseManager](https://github.com/GitTools/GitReleaseManager)** bot :package: :rocket:
