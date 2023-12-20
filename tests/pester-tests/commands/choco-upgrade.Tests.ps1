@@ -22,7 +22,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed a package to the lib directory" {
@@ -56,7 +56,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -94,7 +94,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the package to the lib directory" {
@@ -135,7 +135,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Output should include pinned package" {
@@ -160,7 +160,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Outputs running curl script with correct arguments' {
@@ -201,7 +201,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Outputs running curl script with correct arguments' {
@@ -248,7 +248,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
         }
 
         It "Installs successfully and exits with success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Installed the packages to the lib directory" {
@@ -264,6 +264,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     Context "Upgrading non-existing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
         BeforeAll {
             $paths = Restore-ChocolateyInstallSnapshot
+            $features = Get-chocolateyFeature
 
             $Output = Invoke-Choco upgrade install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePath)" --no-progress
         }
@@ -331,6 +332,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
     Context "Upgrading non-existing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
         BeforeAll {
             $paths = Restore-ChocolateyInstallSnapshot
+            $features = Get-chocolateyFeature
 
             $Output = Invoke-Choco upgrade install-chocolateyzip --version 3.21.2 --confirm "$_" "$($paths.CachePath)" --no-progress
         }
@@ -474,7 +476,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
             $PackageUnderTest = "hasinnoinstaller"
             $PackageVersion   = '6.2.0.3'
 
-            # We are purposely using the --reduce-nupkg-only option (both here and in the next call to Invoke-Choco), to make the 
+            # We are purposely using the --reduce-nupkg-only option (both here and in the next call to Invoke-Choco), to make the
             # test as close to default operation, when running both in the context of OSS and CLE. It was found during testing, that
             # the Package Optimizer would remove the application installer, which is the file that is being locked during the test,
             # which means then that the test doesn't actually test what we want it to. We are locking the exe here instead of say a
@@ -613,7 +615,7 @@ Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
 
         # This was broken in v1.0.0
         It "Exits with Success (0)" -Tag Broken {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs a message showing that installation was successful" {

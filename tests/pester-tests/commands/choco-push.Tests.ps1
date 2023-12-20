@@ -52,7 +52,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Should Report the actual cause of the error" {
@@ -83,7 +83,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Should Report the actual cause of the error" {
@@ -114,7 +114,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Should Report the actual cause of the error" {

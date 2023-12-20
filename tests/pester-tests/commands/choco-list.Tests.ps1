@@ -41,7 +41,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Lists available packages once" {
@@ -68,7 +68,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Contains packages and versions with a space between them" {
@@ -90,7 +90,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Shows each instance of an available package" {
@@ -116,7 +116,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Shows each instance of an available package" {
@@ -146,7 +146,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Shows version <_> of the package" -ForEach @("1.1.0"; "1.0.0") {
@@ -164,7 +164,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Shows version <_> of local package" -ForEach @("2.0.0"; "1.1.0") {
@@ -183,7 +183,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should contain packages and version with a space between them" {
@@ -213,7 +213,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should contain packages and version with a space between them" {
@@ -235,7 +235,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should not contain packages and version with a space between them" {
@@ -257,7 +257,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should contain package name(s)" {
@@ -282,7 +282,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Outputs an appropriate message to indicate the failure to search no sources, and nothing else" {
@@ -296,7 +296,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should contain packages and version with a space between them" {
@@ -346,7 +346,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the package <_>" -ForEach @("mvcmusicstore-db 1.2.0"; "mvcmusicstore-web 1.2.0") {
@@ -369,7 +369,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the package <_>" -ForEach @("mvcmusicstore-db 1.2.0"; "mvcmusicstore-web 1.2.0") {
@@ -390,7 +390,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should list package isexactversiondependency v<_>" -ForEach @("1.0.1"; "1.0.0"; "2.0.0"; "1.1.0") {
@@ -410,7 +410,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should list package isexactversiondependency v<_>" -ForEach @("1.0.1"; "1.0.0"; "2.0.0"; "1.1.0"; "1.0.0-beta") {
@@ -440,7 +440,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ListCommand, SearchComma
         }
 
         It 'Exits with Success (0)' {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It 'Outputs warning about unable to contact source' {
