@@ -17,7 +17,7 @@ Describe "choco version" -Tag Chocolatey, VersionCommand -Skip:(Test-ChocolateyV
         }
 
         It "Exits successfully (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Reports that the command is deprecated" {
@@ -36,7 +36,7 @@ Describe "choco version" -Tag Chocolatey, VersionCommand -Skip:(Test-ChocolateyV
         }
 
         It "Exits successfully (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Outputs Help for Version" {

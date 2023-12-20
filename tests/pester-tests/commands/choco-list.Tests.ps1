@@ -21,7 +21,7 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should contain packages and version with a space between them" {
@@ -43,7 +43,7 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should not contain packages and version with a space between them" {
@@ -65,7 +65,7 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should contain package name(s)" {
@@ -87,7 +87,7 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should contain package isexactversiondependency" {
@@ -105,7 +105,7 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
 
         It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Should output expected error message" {
@@ -119,7 +119,7 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
 
         It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Should not output the error message" {
