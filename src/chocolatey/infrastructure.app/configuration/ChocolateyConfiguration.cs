@@ -561,6 +561,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ExitOnRebootDetected { get; set; }
         public bool LogValidationResultsOnWarnings { get; set; }
         public bool UsePackageRepositoryOptimizations { get; set; }
+        public bool UsePackageHashValidation { get; set; }
     }
 
     //todo: #2565 retrofit other command configs this way
