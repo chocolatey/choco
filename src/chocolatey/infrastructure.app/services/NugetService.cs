@@ -50,6 +50,7 @@ namespace chocolatey.infrastructure.app.services
     using NuGet.Resolver;
     using NuGet.Versioning;
     using chocolatey.infrastructure.services;
+    using cryptography;
 
     //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 
@@ -811,7 +812,45 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                    NuGetEnvironment.GetFolderPath(NuGetFolderPath.Temp),
                                    _nugetLogger, CancellationToken.None).GetAwaiter().GetResult())
                         {
-                            //TODO, do check on downloadResult
+                            if (!config.Features.UsePackageHashValidation)
+                            {
+                                this.Log().Debug("Skipping package hash validation");
+                            }
+                            else if (packageDependencyInfo.PackageHash is null)
+                            {
+                                // Folder based sources and v3 api based sources do not provide package hashes when getting metadata
+                                this.Log().Debug("Source does not provide a package hash, skipping package checksum validation");
+                            }
+                            else
+                            {
+                                var hashInfo = HashConverter.ConvertHashToHex(packageDependencyInfo.PackageHash);
+
+                                if (hashInfo.hashType == CryptoHashProviderType.Sha512)
+                                {
+                                    using (var metadataFileStream =
+                                           downloadResult.PackageReader.GetStream(PackagingCoreConstants.NupkgMetadataFileExtension))
+                                    {
+                                        var metadataFileContents = NupkgMetadataFileFormat.Read(metadataFileStream, _nugetLogger,
+                                            PackagingCoreConstants.NupkgMetadataFileExtension);
+                                        if (hashInfo.convertedHash.Equals(metadataFileContents.ContentHash, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            this.Log().Debug("Package checksum matches expected checksum");
+                                        }
+                                        else
+                                        {
+                                            var errorMessage =
+                                                "Package checksum '{0}' did not match expected checksum '{1}'"
+                                                    .FormatWith(metadataFileContents.ContentHash,
+                                                        hashInfo.convertedHash);
+                                            throw new InvalidDataException(errorMessage);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    this.Log().Warn("Server is not providing a sha512 checksum, cannot validate package checksum.");
+                                }
+                            }
 
                             nugetProject.InstallPackageAsync(
                                 packageDependencyInfo,
@@ -1493,7 +1532,45 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                            NuGetEnvironment.GetFolderPath(NuGetFolderPath.Temp),
                                            _nugetLogger, CancellationToken.None).GetAwaiter().GetResult())
                                 {
-                                    //TODO, do check on downloadResult
+                                    if (!config.Features.UsePackageHashValidation)
+                                    {
+                                        this.Log().Debug("Skipping package hash validation");
+                                    }
+                                    else if (packageDependencyInfo.PackageHash is null)
+                                    {
+                                        // Folder based sources and v3 api based sources do not provide package hashes when getting metadata
+                                        this.Log().Debug("Source does not provide a package hash, skipping package checksum validation");
+                                    }
+                                    else
+                                    {
+                                        var hashInfo = HashConverter.ConvertHashToHex(packageDependencyInfo.PackageHash);
+
+                                        if (hashInfo.hashType == CryptoHashProviderType.Sha512)
+                                        {
+                                            using (var metadataFileStream =
+                                                   downloadResult.PackageReader.GetStream(PackagingCoreConstants.NupkgMetadataFileExtension))
+                                            {
+                                                var metadataFileContents = NupkgMetadataFileFormat.Read(metadataFileStream, _nugetLogger,
+                                                    PackagingCoreConstants.NupkgMetadataFileExtension);
+                                                if (hashInfo.convertedHash.Equals(metadataFileContents.ContentHash, StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    this.Log().Debug("Package checksum matches expected checksum");
+                                                }
+                                                else
+                                                {
+                                                    var errorMessage =
+                                                        "Package checksum '{0}' did not match expected checksum '{1}'"
+                                                            .FormatWith(metadataFileContents.ContentHash,
+                                                                hashInfo.convertedHash);
+                                                    throw new InvalidDataException(errorMessage);
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            this.Log().Warn("Server is not providing a sha512 checksum, cannot validate package checksum.");
+                                        }
+                                    }
 
                                     nugetProject.InstallPackageAsync(
                                         packageDependencyInfo,
