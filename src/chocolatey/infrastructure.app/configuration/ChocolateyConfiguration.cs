@@ -734,6 +734,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class ExportCommandConfiguration
     {
         public bool IncludeVersionNumbers { get; set; }
+        public bool IncludeRememberedPackageArguments { get; set; }
 
         public string OutputFilePath { get; set; }
     }
