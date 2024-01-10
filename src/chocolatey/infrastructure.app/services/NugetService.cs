@@ -24,15 +24,17 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Chocolatey.NuGet.Frameworks;
 using chocolatey.infrastructure.adapters;
-using chocolatey.infrastructure.app.utility;
-using chocolatey.infrastructure.commandline;
 using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.app.utility;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.cryptography;
 using chocolatey.infrastructure.guards;
 using chocolatey.infrastructure.logging;
-using chocolatey.infrastructure.app.nuget;
 using chocolatey.infrastructure.platforms;
 using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.services;
 using chocolatey.infrastructure.tolerance;
 using DateTime = chocolatey.infrastructure.adapters.DateTime;
 using Environment = System.Environment;
@@ -47,7 +49,6 @@ using NuGet.ProjectManagement;
 using NuGet.Protocol.Core.Types;
 using NuGet.Resolver;
 using NuGet.Versioning;
-using chocolatey.infrastructure.services;
 
 namespace chocolatey.infrastructure.app.services
 {
@@ -842,7 +843,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                    NuGetEnvironment.GetFolderPath(NuGetFolderPath.Temp),
                                    _nugetLogger, CancellationToken.None).GetAwaiter().GetResult())
                         {
-                            //TODO, do check on downloadResult
+                            ValidatePackageHash(config, packageDependencyInfo, downloadResult);
 
                             nugetProject.InstallPackageAsync(
                                 packageDependencyInfo,
@@ -1596,7 +1597,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                            NuGetEnvironment.GetFolderPath(NuGetFolderPath.Temp),
                                            _nugetLogger, CancellationToken.None).GetAwaiter().GetResult())
                                 {
-                                    //TODO, do check on downloadResult
+                                    ValidatePackageHash(config, packageDependencyInfo, downloadResult);
 
                                     nugetProject.InstallPackageAsync(
                                         packageDependencyInfo,
@@ -2967,6 +2968,52 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 if (customAction != null)
                 {
                     customAction.Invoke();
+                }
+            }
+        }
+
+        private void ValidatePackageHash(ChocolateyConfiguration config, SourcePackageDependencyInfo packageDependencyInfo, DownloadResourceResult downloadResult)
+        {
+            if (!config.Features.UsePackageHashValidation)
+            {
+                this.Log().Debug("Skipping package hash validation as feature '{0}' is not enabled.".FormatWith(ApplicationParameters.Features.UsePackageHashValidation));
+            }
+            else if (packageDependencyInfo.PackageHash is null)
+            {
+                // Folder based sources and v3 api based sources do not provide package hashes when getting metadata
+                this.Log().Debug("Source does not provide a package hash, skipping package hash validation.");
+            }
+            else
+            {
+                var hashInfo = HashConverter.ConvertHashToHex(packageDependencyInfo.PackageHash);
+
+                if (hashInfo.HashType == CryptoHashProviderType.Sha512)
+                {
+                    using (var metadataFileStream = downloadResult.PackageReader.GetStream(PackagingCoreConstants.NupkgMetadataFileExtension))
+                    {
+                        var metadataFileContents = NupkgMetadataFileFormat.Read(metadataFileStream, 
+                                                                                _nugetLogger,
+                                                                                PackagingCoreConstants.NupkgMetadataFileExtension);
+
+                        var metadataFileHashInfo = HashConverter.ConvertHashToHex(metadataFileContents.ContentHash);
+
+                        if (hashInfo.ConvertedHash.Equals(metadataFileHashInfo.ConvertedHash, StringComparison.OrdinalIgnoreCase))
+                        {
+                            this.Log().Debug("Package hash matches expected hash.");
+                        }
+                        else
+                        {
+                            var errorMessage = "Package hash '{0}' did not match expected hash '{1}'."
+                                    .FormatWith(metadataFileContents.ContentHash,
+                                                hashInfo.ConvertedHash);
+
+                            throw new InvalidDataException(errorMessage);
+                        }
+                    }
+                }
+                else
+                {
+                    this.Log().Warn("Source is not providing a SHA512 hash, cannot validate package hash.");
                 }
             }
         }
