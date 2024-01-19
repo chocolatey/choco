@@ -26,4 +26,8 @@ $thisDirectory = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
 . $thisDirectory\functions\Update-SessionEnvironment.ps1
 . $thisDirectory\ChocolateyTabExpansion.ps1
 
-Export-ModuleMember -Alias refreshenv -Function 'Update-SessionEnvironment', 'TabExpansion'
+$funcs = @('Update-SessionEnvironment')
+if ($PSVersionTable.PSVersion.Major -lt 7 -or ($PSVersionTable.PSVersion.Major -eq 7 -and $PSVersionTable.PSVersion.Minor -lt 4)) { 
+    $funcs += 'TabExpansion' # Legacy TabExpansion function is only used up to PowerShell v7.3.x
+}
+Export-ModuleMember -Alias refreshenv -Function $funcs
