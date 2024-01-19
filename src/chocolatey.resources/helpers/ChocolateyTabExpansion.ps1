@@ -263,24 +263,48 @@ if ($PowerTab_RegisterTabExpansion) {
     return
 }
 
-if (Test-Path Function:\TabExpansion) {
-    Rename-Item Function:\TabExpansion TabExpansionBackup
-}
+# PowerShell up to v7.3.x: use a custom TabExpansion function.
+if ($PSVersionTable.PSVersion.Major -lt 7 -or ($PSVersionTable.PSVersion.Major -eq 7 -and $PSVersionTable.PSVersion.Minor -lt 4)) { 
+    if (Test-Path Function:\TabExpansion) {
+        Rename-Item Function:\TabExpansion TabExpansionBackup
+    }
 
-function TabExpansion($line, $lastWord) {
-    $lastBlock = [System.Text.RegularExpressions.Regex]::Split($line, '[|;]')[-1].TrimStart()
+    function TabExpansion($line, $lastWord) {
+        $lastBlock = [System.Text.RegularExpressions.Regex]::Split($line, '[|;]')[-1].TrimStart()
+    
 
-    switch -regex ($lastBlock) {
-        # Execute Chocolatey tab completion for all choco-related commands
-        "^$(Get-AliasPattern choco) (.*)" {
-            ChocolateyTabExpansion $lastBlock
-        }
-
-        # Fall back on existing tab expansion
-        default {
-            if (Test-Path Function:\TabExpansionBackup) {
-                TabExpansionBackup $line $lastWord
+        switch -regex ($lastBlock) {
+            # Execute Chocolatey tab completion for all choco-related commands
+            "^$(Get-AliasPattern choco) (.*)" {
+                ChocolateyTabExpansion $lastBlock
+            }
+    
+            # Fall back on existing tab expansion
+            default {
+                if (Test-Path Function:\TabExpansionBackup) {
+                    TabExpansionBackup $line $lastWord
+                }
             }
         }
+    }
+} else { # PowerShell v7.4+: use the Register-ArgumentCompleter cmdlet (PowerShell no longer calls TabExpansion)
+    function script:Get-AliasNames($exe) {
+        @($exe, "$exe.exe") + @(Get-Alias | Where-Object { $_.Definition -eq $exe } | Select-Object -Exp Name)
+    }
+    
+    Register-ArgumentCompleter -Native -CommandName (Get-AliasNames choco) -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorColumn)
+    
+        # NOTE:
+        # * The stringified form of $commandAst is the command's own command line (irrespective of
+        #   whether other statements are on the same line or whether it is part of a pipeline).
+        # * However, trailing whitespace is trimmed in the string representation of $commandAst. 
+        #   Therefore, when the actual command line ends in space(s), they must be added back
+        #   so that ChocolateyTabExpansion recognizes the start of a new argument.
+        $ownCommandLine = [string] $commandAst
+        $ownCommandLine = $ownCommandLine.Substring(0, [Math]::Min($ownCommandLine.Length, $cursorColumn))
+        $ownCommandLine += ' ' * ($cursorColumn - $ownCommandLine.Length)
+    
+        ChocolateyTabExpansion $ownCommandLine
     }
 }
