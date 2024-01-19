@@ -38,7 +38,7 @@ internal packages.
 None
 
 .OUTPUTS
-None
+Returns the passed in $unzipLocation.
 
 .PARAMETER PackageName
 The name of the package - while this is an arbitrary value, it's
