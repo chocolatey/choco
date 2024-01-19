@@ -289,7 +289,7 @@ if ($PSVersionTable.PSVersion.Major -lt 7 -or ($PSVersionTable.PSVersion.Major -
     }
 } else { # PowerShell v7.4+: use the Register-ArgumentCompleter cmdlet (PowerShell no longer calls TabExpansion)
     function script:Get-AliasNames($exe) {
-        @($exe, "$exe.exe") + @(Get-Alias | Where-Object { $_.Definition -eq $exe } | Select-Object -Exp Name)
+        @($exe) + @(Get-Alias | Where-Object { $_.Definition -eq $exe } | Select-Object -Exp Name)
     }
     
     Register-ArgumentCompleter -Native -CommandName (Get-AliasNames choco) -ScriptBlock {
