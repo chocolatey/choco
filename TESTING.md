@@ -1,5 +1,20 @@
 # Testing Chocolatey
 
+- [Testing Overview](#testing-overview)
+- [Testing Terminology](#testing-terminology)
+- [Writing Tests](#writing-tests)
+  - [A Test Or Group Of Tests Should Be Self Contained.](#a-test-or-group-of-tests-should-be-self-contained)
+  - [Tests Should Not Depend Upon The Order That They Are Executed.](#tests-should-not-depend-upon-the-order-that-they-are-executed)
+  - [Assertions Should Be Consistent.](#assertions-should-be-consistent)
+  - [Tests Should Not Be Skipped By A Version Check Of The Product Being Tested.](#tests-should-not-be-skipped-by-a-version-check-of-the-product-being-tested)
+  - [Tests Should Not Contain Ambiguous Statements.](#tests-should-not-contain-ambiguous-statements)
+- [Running Tests](#running-tests)
+  - [NUnit Tests](#nunit-tests)
+  - [NUnit Integration Tests](#nunit-integration-tests)
+  - [All NUnit Integration Tests](#all-nunit-integration-tests)
+  - [Skipping NUnit Tests](#skipping-nunit-tests)
+  - [Pester Tests](#pester-tests)
+
 Tests for Chocolatey are written in C# or in PowerShell depending on what type of test is being created.
 
 * NUnit Unit Tests are written in C# and found in the `chocolatey.tests` project. They are individual tests of the various Chocolatey components.
@@ -23,26 +38,80 @@ With the way the testing framework is designed, it is helpful to gain an underst
 - You can ***not*** click on a file and attempt to run/debug automated tests. You will see the following message: "The target type doesn't contain tests from a known test framework or a 'Main' method."
 - You also cannot run all tests within a file by selecting somewhere outside a testing class and attempting to run tests. You will see the message above.
 
-Some quick notes on testing terminology (still a WIP):
-
-- Testing - anything done to test, whether manual, automated, or otherwise.
-- Automated Testing - Any type of written test that can be run in an automated way, typically in the form of C# tests.
-- Spec / Fact / Observation - these are synonyms for a test or validation.
-- System Under Test (SUT) - the code or concern you are testing.
-- Mock / Fake / Stub / Double - an object that provides a known state back to the system under test when the system under test interacts with other objects. This can be done with unit and whitebox integration testing. This allows for actual unit testing as most units (classes/functions) depend on working with other units (classes/functions) to get or set information and state. While each of [these are slightly different](https://martinfowler.com/articles/mocksArentStubs.html), the basic functionality is that they are standing in for other production code.
-- Concern - an area of production code you are testing in e.g. "Concern for AutoUninstallerService".
-- Regression Test Suite / Regression Suite - The automated tests that are in the form of code.
-- Whitebox Testing - tests where you access the internals of the application.
-  - Unit Testing - We define a unit as a class and a method in C#. In PowerShell this is per function. If it involves another class or function, you have graduated to an integration. This is where Mocks come in to ensure no outside state is introduced.
-  - Whitebox Integration Testing - testing anything that is more than a unit.
-  - System Integration Testing - testing anything that goes out of the bounds of the written production code. Typically when running the code to get or set some state is where you will see this. And yes, even using DateTime.Now counts as system integration testing as it accesses something external to the application. This is why you will see we insulate those calls to something in the application so they can be easily tested against.
-- Blackbox Testing - tests where you do not access internals of the application
-  - Physical Integration Testing - This is where you are testing the application with other components such as config files.
-  - Blackbox Integration Testing / End to End Testing - This is where you are testing inputs and outputs of the system.
-
 As far as testing goes, unit tests are extremely quick feedback and great for longer term maintenance, where black box tests give you the most coverage, but are the slowest feedback loops and typically the most frail. Each area of testing has strengths and weaknesses and it's good to understand each of them.
 
 **NOTE**: One of the hardest forms of automated testing is unit testing, as it almost always requires faking out other parts of the system (also known as mocking).
+
+## Testing Terminology
+
+Some quick notes on testing terminology (still a WIP):
+
+- **Testing** - anything done to test, whether manual, automated, or otherwise.
+- **Automated Testing** - Any type of written test that can be run in an automated way, typically in the form of C# tests.
+- **Spec / Fact / Observation** - these are synonyms for a test or validation.
+- **System Under Test (SUT)** - the code or concern you are testing.
+- **Mock / Fake / Stub / Double** - an object that provides a known state back to the system under test when the system under test interacts with other objects. This can be done with unit and whitebox integration testing. This allows for actual unit testing as most units (classes/functions) depend on working with other units (classes/functions) to get or set information and state. While each of [these are slightly different](https://martinfowler.com/articles/mocksArentStubs.html), the basic functionality is that they are standing in for other production code.
+- **Concern** - an area of production code you are testing in e.g. "Concern for AutoUninstallerService".
+- **Regression Test Suite / Regression Suite** - The automated tests that are in the form of code.
+- **Whitebox Testing** - tests where you access the internals of the application.
+  - **Unit Testing** - We define a unit as a class and a method in C#. In PowerShell this is per function. If it involves another class or function, you have graduated to an integration. This is where Mocks come in to ensure no outside state is introduced.
+  - **Whitebox Integration Testing** - testing anything that is more than a unit.
+  - **System Integration Testing** - testing anything that goes out of the bounds of the written production code. Typically when running the code to get or set some state is where you will see this. And yes, even using DateTime.Now counts as system integration testing as it accesses something external to the application. This is why you will see we insulate those calls to something in the application so they can be easily tested against.
+- **Blackbox Testing** - tests where you do not access internals of the application
+  - **Physical Integration Testing** - This is where you are testing the application with other components such as config files.
+  - **Blackbox Integration Testing / End to End Testing** - This is where you are testing inputs and outputs of the system.
+- **Version Gate** - A check that is performed to ensure certain versions are in use before performing tests.
+- **Test Structure** - All components that make up a single test. In Pester this would be a `Describe` or `Context` block. In Nunit this would be the containing class.
+
+## Writing Tests
+
+The purpose of the tests we write for Chocolatey products is to ensure that we do not regress on issues that have been fixed.
+Part of ensuring that is to do the best we can to reduce test flakiness.
+Below is a list of words.
+
+### A Test Or Group Of Tests Should Be Self Contained.
+
+Everything needed for a test to pass consistently should be within a single test structure.
+Whenever possible, you should be able to select any test case and run it without failure.
+
+### Tests Should Not Depend Upon The Order That They Are Executed.
+
+Coinciding with that tests should be self container, they should also not depend on other tests running in a specific order.
+If a test requires a previous test to pass, it is beneficial to have some validation that the previous test passed and to fail early if it did not.
+
+For example: suppose `Test B` relies on `Test A` having completed successfully.
+Further, `Test B` when successful takes between ten and twenty-five minutes to complete.
+`Test B` is already written to fail after thirty minutes, but makes no accounting for `Test A`.
+If `Test A` fails, then it is already known that `Test B` will fail, but it will potentially wait thirty minutes to fail.
+Whereas, if a verification of `Test A` were performed early in `Test B`, it could return failure within a minute, shortening the feedback loop significantly.
+
+### Assertions Should Be Consistent.
+
+Some assertions need to be made in multiple tests.
+When this happens, the assertions should be made in a consistent manner.
+
+For example: many Pester tests execute Chocolatey CLI, then assert that the exit code was as expected.
+All of the Pester tests should therefore assert the exit code in the same manner.
+Previously, the Pester tests contained multiple different ways of checking the exit code, and sometimes would display the command output on error.
+Efforts have been taken to make this consistent so that when a failure occurs, the command output is displayed.
+
+### Tests Should Not Be Skipped By A Version Check Of The Product Being Tested.
+
+Sometimes tests are written for features that are coming in a future version.
+In those instances, a version gate would be used.
+It is expected that the tests being run will be for the version being built from the same point in the repository.
+As such, we should not be skipping tests due to a version mismatch.
+
+The exception to this rule is tests that require another product of a specific version.
+For example: a test that requires Chocolatey Licensed Extension version 6.1 or greater, but is a part of the Chocolatey CLI tests.
+
+### Tests Should Not Contain Ambiguous Statements.
+
+Whenever possible, it should be possible to identify exactly when a line of code will be executed during a test run.
+
+Currently all Pester tests are run against Pester 5.x.
+As such, code that is within a `.Tests.ps1` file, but not within any Pester specific script block will generally be executed during the `BeforeDiscovery` phase.
+However, this execution pattern is not necessarily guaranteed and
 
 ## Running Tests
 
@@ -62,7 +131,7 @@ The `shouldRunOpenCover` argument is required when running the integration tests
 
 ### Skipping NUnit Tests
 
-If you need to skip the execution of tests, you can run the following: `./build.bat --testExecutionType=none`, or `./build.sh --testExecutionType=none`.
+If you need to skip the execution of tests, you can run the following: `./build.bat --shouldRunTests=false`, or `./build.sh --shouldRunTests=false`.
 
 ### Pester Tests
 
