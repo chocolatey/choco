@@ -21,6 +21,7 @@ namespace chocolatey.infrastructure.services
 
     public interface IRuleService
     {
+        IReadOnlyList<ImmutableRule> GetAllAvailableRules();
         IEnumerable<RuleResult> ValidateRules(string filePath);
 
 #pragma warning disable IDE1006
