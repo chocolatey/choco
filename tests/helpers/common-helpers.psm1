@@ -21,7 +21,7 @@ $script:originalChocolateyInstall = $env:ChocolateyInstall
 Get-ChildItem -Path $PSScriptRoot\common -Filter *.ps1 -Recurse | ForEach-Object { . $_.FullName }
 
 # Prepare information that will be useful for troubleshooting.
-$Output = Invoke-Choco list -lo
+$Output = Invoke-Choco list
 # Saving to log file as those are currently the only files picked up by Team City
 $Output.Lines | Out-File $env:ChocolateyInstall\Logs\LocalPackages.log
 # Removing any existing snapshot logs to enable local testing without needing to clean the snapshot folder
