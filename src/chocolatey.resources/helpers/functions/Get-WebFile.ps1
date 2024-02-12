@@ -199,7 +199,12 @@ Get-WebFileName
                     $req.UserAgent = $options.headers.$key
                 }
                 Default {
-                    $req.Headers.Add($key, $options.headers.$key)
+                    if ([System.Net.WebHeaderCollection]::IsRestricted($key)) {
+                        Write-Warning "Skipping restricted header `'$key`' not currently supported by Chocolatey"
+                    }
+                    else {
+                        $req.Headers.Add($key, $options.headers.$key)
+                    }
                 }
             }
         }
