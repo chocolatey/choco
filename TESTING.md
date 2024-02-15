@@ -7,7 +7,7 @@
   - [Tests Should Not Depend Upon The Order That They Are Executed.](#tests-should-not-depend-upon-the-order-that-they-are-executed)
   - [Assertions Should Be Consistent.](#assertions-should-be-consistent)
   - [Tests Should Not Be Skipped By A Version Check Of The Product Being Tested.](#tests-should-not-be-skipped-by-a-version-check-of-the-product-being-tested)
-  - [Tests Should Not Contain Ambiguous Statements.](#tests-should-not-contain-ambiguous-statements)
+  - [Pester Specific: All Test Code Should Be Within Pester Controlled Blocks.](#pester-specific-all-test-code-should-be-within-pester-controlled-blocks)
 - [Running Tests](#running-tests)
   - [NUnit Tests](#nunit-tests)
   - [NUnit Integration Tests](#nunit-integration-tests)
@@ -67,7 +67,6 @@ Some quick notes on testing terminology (still a WIP):
 
 The purpose of the tests we write for Chocolatey products is to ensure that we do not regress on issues that have been fixed.
 Part of ensuring that is to do the best we can to reduce test flakiness.
-Below is a list of words.
 
 ### A Test Or Group Of Tests Should Be Self Contained.
 
@@ -76,7 +75,7 @@ Whenever possible, you should be able to select any test case and run it without
 
 ### Tests Should Not Depend Upon The Order That They Are Executed.
 
-Coinciding with that tests should be self container, they should also not depend on other tests running in a specific order.
+Expanding on the previous rule that tests should be self contained, they should also not depend on other tests running in a specific order.
 If a test requires a previous test to pass, it is beneficial to have some validation that the previous test passed and to fail early if it did not.
 
 For example: suppose `Test B` relies on `Test A` having completed successfully.
@@ -105,13 +104,14 @@ As such, we should not be skipping tests due to a version mismatch.
 The exception to this rule is tests that require another product of a specific version.
 For example: a test that requires Chocolatey Licensed Extension version 6.1 or greater, but is a part of the Chocolatey CLI tests.
 
-### Tests Should Not Contain Ambiguous Statements.
+### Pester Specific: All Test Code Should Be Within Pester Controlled Blocks.
 
-Whenever possible, it should be possible to identify exactly when a line of code will be executed during a test run.
+Currently Pester tests are targeted at Pester 5.x.
+The guidance of [Pester](https://pester.dev/docs/usage/discovery-and-run#execution-order) is for all test code to be within `It`, `BeforeAll`, `BeforeEach`, `AfterAll`, or `AfterEach` blocks.
+To quote [Pester's documentation](https://pester.dev/docs/usage/test-file-structure#beforediscovery):
 
-Currently all Pester tests are run against Pester 5.x.
-As such, code that is within a `.Tests.ps1` file, but not within any Pester specific script block will generally be executed during the `BeforeDiscovery` phase.
-However, this execution pattern is not necessarily guaranteed and
+> In Pester5 the mantra is to put all code in Pester controlled blocks.
+> No code should be directly in the script, or directly in `Describe` or `Context` block without wrapping it in some other block.
 
 ## Running Tests
 
