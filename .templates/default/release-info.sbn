@@ -1,9 +1,9 @@
 {{
     if issues.count > 0
         if commits.count > 0
-}}As part of this release we had [{{ commits.count }} {{ commits.count | string.pluralize "commit" "commits" }}]({{ commits.html_url }}) which resulted in [{{ issues.count }} {{ issues.count | string.pluralize "issue" "issues" }}]({{ milestone.target.html_url }}?closed=1) being closed.
+}}As part of this release we had [{{ commits.count }} {{ commits.count | string.pluralize "commit" "commits" }}]({{ commits.html_url }}) which resulted in [{{ issues.count }} {{ issues.count | string.pluralize "issue" "issues" }}]({{ milestone.target.html_url }}?{{ milestone.query_string }}) being closed.
 {{      else
-}}As part of this release we had [{{ issues.count }} {{ issues.count | string.pluralize "issue" "issues" }}]({{ milestone.target.html_url }}?closed=1) closed.
+}}As part of this release we had [{{ issues.count }} {{ issues.count | string.pluralize "issue" "issues" }}]({{ milestone.target.html_url }}?{{ milestone.query_string }}) closed.
 {{      end
     else if commits.count > 0
 }}As part of this release we had [{{ commits.count }} {{ commits.count | string.pluralize "commit" "commits" }}]({{ commits.html_url }}).
