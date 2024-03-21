@@ -166,8 +166,7 @@ export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig:/Library/Frameworks/Mono.framewo
  * Set your permissions correctly:
 
 ```sh
-chmod +x build.sh
-chmod +x zip.sh
+chmod +x *.sh
 ```
 
 ##### Build Process:
