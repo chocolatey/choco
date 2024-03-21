@@ -5,18 +5,21 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.Dependencies
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.pullRequests
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.finishBuildTrigger
+import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.ScheduleTrigger
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.schedule
 import jetbrains.buildServer.configs.kotlin.v2019_2.vcs.GitVcsRoot
 
 project {
     buildType(Chocolatey)
+    buildType(ChocolateySchd)
+    buildType(ChocolateyQA)
     buildType(ChocolateyDockerWin)
     buildType(ChocolateyPosix)
 }
 
 object Chocolatey : BuildType({
     id = AbsoluteId("Chocolatey")
-    name = "Build"
+    name = "Chocolatey CLI (Built with Unit Tests)"
 
     artifactRules = """
     """.trimIndent()
@@ -59,8 +62,7 @@ object Chocolatey : BuildType({
         script {
             name = "Call Cake"
             scriptContent = """
-                IF "%teamcity.build.triggeredBy%" == "Schedule Trigger" (SET TestType=all) ELSE (SET TestType=unit)
-                call build.official.bat --verbosity=diagnostic --target=CI --testExecutionType=%%TestType%% --shouldRunOpenCover=false
+                build.official.bat --verbosity=diagnostic --target=CI --testExecutionType=unit --shouldRunOpenCover=false
             """.trimIndent()
         }
     }
@@ -69,6 +71,74 @@ object Chocolatey : BuildType({
         vcs {
             branchFilter = ""
         }
+    }
+
+    features {
+        pullRequests {
+            provider = github {
+                authType = token {
+                    token = "%system.GitHubPAT%"
+                }
+            }
+        }
+    }
+
+    requirements {
+        doesNotExist("docker.server.version")
+    }
+})
+
+object ChocolateySchd : BuildType({
+    id = AbsoluteId("ChocolateySchd")
+    name = "Chocolatey CLI (Scheduled Integration Testing)"
+
+    artifactRules = """
+    """.trimIndent()
+
+    params {
+        param("env.vcsroot.branch", "%vcsroot.branch%")
+        param("env.Git_Branch", "%teamcity.build.vcs.branch.Chocolatey_ChocolateyVcsRoot%")
+        param("teamcity.git.fetchAllHeads", "true")
+        password("env.GITHUB_PAT", "%system.GitHubPAT%", display = ParameterDisplay.HIDDEN, readOnly = true)
+    }
+
+    vcs {
+        root(DslContext.settingsRoot)
+
+        branchFilter = """
+            +:*
+        """.trimIndent()
+    }
+
+    steps {
+        powerShell {
+            name = "Prerequisites"
+            scriptMode = script {
+                content = """
+                    if ((Get-WindowsFeature -Name NET-Framework-Features).InstallState -ne 'Installed') {
+                        Install-WindowsFeature -Name NET-Framework-Features
+                    }
+
+                    choco install windows-sdk-7.1 netfx-4.0.3-devpack --confirm --no-progress
+                    exit ${'$'}LastExitCode
+                """.trimIndent()
+            }
+        }
+
+        step {
+            name = "Include Signing Keys"
+            type = "PrepareSigningEnvironment"
+        }
+
+        script {
+            name = "Call Cake"
+            scriptContent = """
+                build.official.bat --verbosity=diagnostic --target=CI --testExecutionType=all --shouldRunOpenCover=false --shouldRunAnalyze=false --shouldRunIlMerge=false --shouldObfuscateOutputAssemblies=false --shouldRunChocolatey=false --shouldRunNuGet=false
+            """.trimIndent()
+        }
+    }
+
+    triggers {
         schedule {
             schedulingPolicy = daily {
                 hour = 2
@@ -82,13 +152,74 @@ object Chocolatey : BuildType({
         }
     }
 
-    features {
-        pullRequests {
-            provider = github {
-                authType = token {
-                    token = "%system.GitHubPAT%"
-                }
+    requirements {
+        doesNotExist("docker.server.version")
+    }
+})
+
+object ChocolateyQA : BuildType({
+    id = AbsoluteId("ChocolateyQA")
+    name = "Chocolatey CLI (SonarQube)"
+
+    artifactRules = """
+    """.trimIndent()
+
+    params {
+        param("env.vcsroot.branch", "%vcsroot.branch%")
+        param("env.Git_Branch", "%teamcity.build.vcs.branch.Chocolatey_ChocolateyVcsRoot%")
+        param("env.SONARQUBE_ID", "choco")
+        param("teamcity.git.fetchAllHeads", "true")
+        password("env.GITHUB_PAT", "%system.GitHubPAT%", display = ParameterDisplay.HIDDEN, readOnly = true)
+    }
+
+    vcs {
+        root(DslContext.settingsRoot)
+
+        branchFilter = """
+            +:*
+        """.trimIndent()
+    }
+
+    steps {
+        powerShell {
+            name = "Prerequisites"
+            scriptMode = script {
+                content = """
+                    if ((Get-WindowsFeature -Name NET-Framework-Features).InstallState -ne 'Installed') {
+                        Install-WindowsFeature -Name NET-Framework-Features
+                    }
+
+                    choco install windows-sdk-7.1 netfx-4.0.3-devpack --confirm --no-progress
+                    exit ${'$'}LastExitCode
+                """.trimIndent()
             }
+        }
+
+        step {
+            name = "Include Signing Keys"
+            type = "PrepareSigningEnvironment"
+        }
+
+        script {
+            name = "Call Cake"
+            scriptContent = """
+                build.official.bat --verbosity=diagnostic --target=CI --testExecutionType=none --shouldRunAnalyze=false --shouldRunIlMerge=false --shouldObfuscateOutputAssemblies=false --shouldRunChocolatey=false --shouldRunNuGet=false --shouldRunSonarQube=true --shouldRunDependencyCheck=true
+            """.trimIndent()
+        }
+    }
+
+    triggers {
+        schedule {
+            schedulingPolicy = weekly {
+                dayOfWeek = ScheduleTrigger.DAY.Saturday
+                hour = 2
+                minute = 45
+            }
+            branchFilter = """
+                +:<default>
+            """.trimIndent()
+            triggerBuild = always()
+			withPendingChangesOnly = false
         }
     }
 
