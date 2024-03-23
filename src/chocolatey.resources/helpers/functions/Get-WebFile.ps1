@@ -66,6 +66,9 @@ Silences the progress output.
 .PARAMETER Options
 OPTIONAL - Specify custom headers.
 
+.PARAMETER Credentials
+OPTIONAL A System.Net.ICredentials-Object that can be used for downloading files from a server which requires user authentication.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -88,6 +91,7 @@ Get-WebFileName
         [parameter(Mandatory = $false)][switch] $Passthru,
         [parameter(Mandatory = $false)][switch] $quiet,
         [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
+        [parameter(Mandatory = $false)][System.Net.ICredentials] $credentials = $null,
         [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
     )
 
@@ -110,7 +114,10 @@ Get-WebFileName
 
     $req = [System.Net.HttpWebRequest]::Create($url);
     $defaultCreds = [System.Net.CredentialCache]::DefaultCredentials
-    if ($defaultCreds -ne $null) {
+    if ($null -ne $credentials) {
+        $req.Credentials = $credentials
+    }
+    elseif ($defaultCreds -ne $null) {
         $req.Credentials = $defaultCreds
     }
 

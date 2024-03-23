@@ -107,6 +107,9 @@ Will be used for VsixUrl if VsixUrl is empty.
 This parameter provides compatibility, but should not be used directly
 and not with the community package repository until January 2018.
 
+.PARAMETER Credentials
+OPTIONAL A System.Net.ICredentials-Object that can be used for downloading files from a server which requires user authentication.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -144,6 +147,7 @@ Install-ChocolateyZipPackage
         [parameter(Mandatory = $false)][string] $checksumType = '',
         [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
         [alias("fileFullPath")][parameter(Mandatory = $false)][string] $file = '',
+        [parameter(Mandatory = $false)][System.Net.ICredentials] $credentials = $null,
         [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
     )
 
@@ -193,7 +197,7 @@ Install-ChocolateyZipPackage
     if ($installer) {
         $download = "$env:TEMP\$($packageName.Replace(' ','')).vsix"
         try {
-            Get-ChocolateyWebFile $packageName $download $vsixUrl -checksum $checksum -checksumType $checksumType -Options $options
+            Get-ChocolateyWebFile $packageName $download $vsixUrl -checksum $checksum -checksumType $checksumType -Options $options -Credentials $credentials
         }
         catch {
             throw "There were errors attempting to retrieve the vsix from $vsixUrl. The error message was '$_'."

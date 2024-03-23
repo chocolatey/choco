@@ -136,6 +136,9 @@ The recommendation is to use at least SHA256.
 .PARAMETER Options
 OPTIONAL - Specify custom headers.
 
+.PARAMETER Credentials
+OPTIONAL A System.Net.ICredentials-Object that can be used for downloading files from a server which requires user authentication.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -187,13 +190,14 @@ Install-ChocolateyZipPackage
         [parameter(Mandatory = $false)][string] $checksum64 = '',
         [parameter(Mandatory = $false)][string] $checksumType64 = '',
         [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
+        [parameter(Mandatory = $false)][System.Net.ICredentials] $credentials = $null,
         [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
     )
 
     Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
     if ($url -ne '') {
-        Get-ChocolateyWebFile $packageName $psFileFullPath $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -Options $options
+        Get-ChocolateyWebFile $packageName $psFileFullPath $url $url64bit -checksum $checksum -checksumType $checksumType -checksum64 $checksum64 -checksumType64 $checksumType64 -Options $options -Credentials $credentials
     }
 
     if ($env:chocolateyPackageName -ne $null -and $env:chocolateyPackageName -eq $env:ChocolateyInstallDirectoryPackage) {
