@@ -74,6 +74,9 @@ namespace chocolatey.infrastructure.app.commands
                             configuration.Features.UsePackageRepositoryOptimizations = false;
                         }
                     })
+	        .Add(StringResources.Options.DISPLAY_HEADERS,
+		    StringResources.OptionDescriptions.DISPLAY_HEADERS,
+		    option => configuration.DisplayHeaders = true)
                 ;
         }
 

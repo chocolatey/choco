@@ -62,6 +62,10 @@ namespace chocolatey.infrastructure.app.services
 
         public virtual IEnumerable<ChocolateySource> ListSources(ChocolateyConfiguration configuration)
         {
+	    if (!configuration.RegularOutput && configuration.DisplayHeaders)
+	    {
+	        this.Log().Info("SourceId|Location|Disabled|UserName|Certificate|Priority|BypassProxy|AllowSelfService|AdminOnly");
+	    }
             var list = new List<ChocolateySource>();
             foreach (var source in ConfigFileSettings.Sources.OrEmpty().OrderBy(s => s.Id))
             {
@@ -218,6 +222,11 @@ namespace chocolatey.infrastructure.app.services
 
         public void ListFeatures(ChocolateyConfiguration configuration)
         {
+	    if (!configuration.RegularOutput && configuration.DisplayHeaders)
+	    {
+	        this.Log().Info("FeatureName|Enabled|Description");
+	    }
+
             foreach (var feature in ConfigFileSettings.Features.OrEmpty().OrderBy(f => f.Name))
             {
                 if (configuration.RegularOutput)
@@ -387,6 +396,11 @@ namespace chocolatey.infrastructure.app.services
 
         public void ListConfig(ChocolateyConfiguration configuration)
         {
+	    if (!configuration.RegularOutput && configuration.DisplayHeaders)
+	    {
+	        this.Log().Info("Name|Value|Description");
+	    }
+
             foreach (var config in ConfigFileSettings.ConfigSettings.OrEmpty().OrderBy(c => c.Key))
             {
                 if (configuration.RegularOutput)

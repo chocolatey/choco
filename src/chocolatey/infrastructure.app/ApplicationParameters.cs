@@ -226,6 +226,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string LogValidationResultsOnWarnings = "logValidationResultsOnWarnings";
             public static readonly string UsePackageRepositoryOptimizations = "usePackageRepositoryOptimizations";
             public static readonly string DisableCompatibilityChecks = "disableCompatibilityChecks";
+            public static readonly string AlwaysDisplayHeaders = "alwaysDisplayHeaders";
         }
 
         public static class Messages
