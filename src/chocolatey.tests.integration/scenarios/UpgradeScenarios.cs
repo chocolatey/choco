@@ -266,6 +266,26 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void Should_contain_message_with_source()
+            {
+                var message = "Downloading package from source '{0}'".FormatWith(Configuration.Sources);
+
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToString()).WhoseValue.Should()
+                    .Contain(message);
+            }
+
+            [Fact]
+            public void Should_contain_message_with_download_uri()
+            {
+                var packagePath = "file:///{0}/{1}.{2}{3}".FormatWith(Configuration.Sources.Replace("\\", "/"), Configuration.PackageNames,
+                    "1.1.0", NuGetConstants.PackageExtension);
+                var message = "Package download location '{0}'".FormatWith(packagePath);
+
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToString()).WhoseValue.Should()
+                    .Contain(message);
+            }
+
+            [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyBeforeModify_script_for_original_package()
