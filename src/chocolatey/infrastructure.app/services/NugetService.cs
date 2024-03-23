@@ -1045,7 +1045,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var pkgInfo = _packageInfoService.Get(installedPackage.PackageMetadata);
                 bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
 
-                if (isPinned && config.OutdatedCommand.IgnorePinned)
+                if (isPinned && config.OutdatedCommand.IgnorePinned && !config.UpgradeCommand.IgnorePin)
                 {
                     continue;
                 }
@@ -1174,12 +1174,21 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                     if (isPinned)
                     {
-                        string logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
-                        packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                        packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
-
-                        continue;
+                        if (!config.UpgradeCommand.IgnorePin)
+                        {
+                            string logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                            if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                            continue;
+                        }
+                        else
+                        {
+                            string logMessage = "{0} is pinned. Upgrading pinned package anyway as ignore pin is specified".format_with(packageName);
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                            if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                            config.PinPackage = true;
+                        }
                     }
 
                     if (performAction)

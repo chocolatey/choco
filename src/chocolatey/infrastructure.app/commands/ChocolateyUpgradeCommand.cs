@@ -235,6 +235,10 @@ namespace chocolatey.infrastructure.app.commands
                     "Skip hooks - Do not run hook scripts. Available in 1.2.0+",
                     option => configuration.SkipHookScripts = option != null
                     )
+                .Add("ignore-pin",
+                    "Ignore Pin(s) - Bypass any pins and upgrade the packages anyways. Defaults to false. Available in 2.3.0+",
+                    option => configuration.UpgradeCommand.IgnorePin = option != null
+                    )
                 ;
         }
 
