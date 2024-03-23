@@ -129,6 +129,9 @@ namespace chocolatey.infrastructure.app.commands
                             configuration.Features.UsePackageRepositoryOptimizations = false;
                         }
                     })
+                  .Add("include-configured-sources",
+                    "Include Configured Sources - When using --source, this appends the sources that are saved in the configuration by the source command.  Available in 2.3.0+",
+                    option => configuration.IncludeConfiguredSources = option != null)
                 ;
         }
 

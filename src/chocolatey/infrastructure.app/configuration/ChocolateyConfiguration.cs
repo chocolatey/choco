@@ -262,6 +262,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string Sources { get; set; }
 
         public string SourceType { get; set; }
+        public bool IncludeConfiguredSources { get; set; }
 
         // top level commands
 
