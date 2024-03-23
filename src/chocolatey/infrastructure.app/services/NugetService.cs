@@ -183,6 +183,7 @@ that uses these options.");
             foreach (var pkg in NugetList.GetPackages(config, _nugetLogger, _fileSystem))
             {
                 var package = pkg; // for lamda access
+                string packageArgumentsUnencrypted = null;
 
                 ChocolateyPackageMetadata packageLocalMetadata;
                 string packageInstallLocation = null;
@@ -207,6 +208,10 @@ that uses these options.");
                         }
                     }
 
+                    if (!string.IsNullOrWhiteSpace(packageInfo.Arguments))
+                    {
+                        packageArgumentsUnencrypted = "\n Remembered Package Arguments: " + (packageInfo.Arguments.contains(" --") && packageInfo.Arguments.to_string().Length > 4 ? packageInfo.Arguments : NugetEncryptionUtility.DecryptString(packageInfo.Arguments));
+                    }
                 }
 
                 if (!config.QuietOutput)
@@ -231,7 +236,7 @@ that uses these options.");
  Tags: {9}
  Software Site: {10}
  Software License: {11}{12}{13}{14}{15}{16}
- Description: {17}{18}
+ Description: {17}{18}{19}
 ".FormatWith(
                                 package.Title.EscapeCurlyBraces(),
                                 package.Published.GetValueOrDefault().UtcDateTime.ToShortDateString(),
@@ -265,7 +270,8 @@ that uses these options.");
                                 !string.IsNullOrWhiteSpace(package.BugTrackerUrl.ToStringSafe()) ? "{0} Issues: {1}".FormatWith(Environment.NewLine, package.BugTrackerUrl.ToStringSafe()) : string.Empty,
                                 package.Summary != null && !string.IsNullOrWhiteSpace(package.Summary.ToStringSafe()) ? "\r\n Summary: {0}".FormatWith(package.Summary.EscapeCurlyBraces().ToStringSafe()) : string.Empty,
                                 package.Description.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  "),
-                                !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty
+                                !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty,
+                                packageArgumentsUnencrypted != null ? packageArgumentsUnencrypted : string.Empty
                             ));
 
 
