@@ -30,6 +30,7 @@ namespace chocolatey.infrastructure.app.services
     using logging;
     using results;
     using platforms;
+    using static chocolatey.StringResources;
 
     /// <summary>
     ///   Alternative Source for Installing Python packages
@@ -244,7 +245,7 @@ namespace chocolatey.infrastructure.app.services
 
             if (string.IsNullOrWhiteSpace(topLevelPath))
             {
-                var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
+                var binRoot = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyBinRoot);
                 if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
 
                 topLevelPath = _fileSystem.CombinePaths(binRoot, "python");

@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.information
     using System.Runtime.InteropServices;
     using System.Security.Principal;
     using platforms;
+    using static chocolatey.StringResources;
 
     public sealed class ProcessInformation
     {
@@ -118,12 +119,12 @@ namespace chocolatey.infrastructure.information
 
         public static bool UserIsTerminalServices()
         {
-            return Environment.GetEnvironmentVariable("SESSIONNAME").ToStringSafe().ContainsSafe("rdp-");
+            return Environment.GetEnvironmentVariable(EnvironmentVariables.System.SessionName).ToStringSafe().ContainsSafe("rdp-");
         }
 
         public static bool UserIsRemote()
         {
-            return UserIsTerminalServices() || Environment.GetEnvironmentVariable("SESSIONNAME").ToStringSafe() == string.Empty;
+            return UserIsTerminalServices() || Environment.GetEnvironmentVariable(EnvironmentVariables.System.SessionName).ToStringSafe() == string.Empty;
         }
 
         public static bool UserIsSystem()

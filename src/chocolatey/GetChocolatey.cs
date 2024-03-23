@@ -43,6 +43,7 @@ namespace chocolatey
     using IFileSystem = infrastructure.filesystem.IFileSystem;
     using ILog = infrastructure.logging.ILog;
     using System.Linq;
+    using static chocolatey.StringResources;
 
     /// <summary>
     /// Entry point for API
@@ -490,19 +491,19 @@ namespace chocolatey
             string chocolateyInstall = string.Empty;
 
 #if !DEBUG
-            chocolateyInstall = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, EnvironmentVariableTarget.Machine);
+            chocolateyInstall = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall, EnvironmentVariableTarget.Machine);
             if (string.IsNullOrWhiteSpace(chocolateyInstall))
             {
-                chocolateyInstall = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, EnvironmentVariableTarget.User);
+                chocolateyInstall = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall, EnvironmentVariableTarget.User);
             }
 #endif
 
             if (string.IsNullOrWhiteSpace(chocolateyInstall))
             {
-                chocolateyInstall = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName);
+                chocolateyInstall = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall);
             }
 
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, chocolateyInstall);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall, chocolateyInstall);
         }
 
         private void ExtractResources()
