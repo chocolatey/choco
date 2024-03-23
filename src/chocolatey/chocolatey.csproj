@@ -270,6 +270,7 @@
     <Compile Include="infrastructure.app\utility\ArgumentsUtility.cs" />
     <Compile Include="infrastructure.app\utility\PackageUtility.cs" />
     <Compile Include="infrastructure.app\validations\SystemStateValidation.cs" />
+    <Compile Include="infrastructure\cryptography\HashConverter.cs" />
     <Compile Include="infrastructure\filesystem\FileSystem.cs" />
     <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="infrastructure\information\ExtensionInformation.cs" />
