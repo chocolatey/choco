@@ -71,7 +71,7 @@ namespace chocolatey.infrastructure.app.commands
             if ((configuration.ConfigCommand.Command == ConfigCommandType.List
                  || !string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name)
                 )
-                && unparsedArguments.Count > 1) throw new ApplicationException("A single features command must be listed. Please see the help menu for those commands");
+                && unparsedArguments.Count > 1) throw new ApplicationException("A single config command must be listed. Please see the help menu for those commands.");
 
             if (string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name) && unparsedArguments.Count >= 2)
             {
