@@ -543,6 +543,8 @@ Did you know Pro / Business automatically syncs with Programs and
                 if (key != null) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, key.InstallLocation, EnvironmentVariableTarget.Process);
             }
 
+            pkgInfo.SoftwareInstallLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation);
+
             UpdatePackageInformation(pkgInfo);
             EnsureBadPackagesPathIsClean(config, packageResult);
             EventManager.Publish(new HandlePackageResultCompletedMessage(packageResult, config, commandName));
@@ -578,11 +580,10 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".FormatWith(commandName.ToStringSafe(), packageResult.Name));
 
-            var installLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation);
             var installerDetected = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType);
-            if (!string.IsNullOrWhiteSpace(installLocation))
+            if (!string.IsNullOrWhiteSpace(pkgInfo.SoftwareInstallLocation))
             {
-                this.Log().Info(ChocolateyLoggers.Important, "  Software installed to '{0}'".FormatWith(installLocation.EscapeCurlyBraces()));
+                this.Log().Info(ChocolateyLoggers.Important, "  Software installed to '{0}'".FormatWith(pkgInfo.SoftwareInstallLocation.EscapeCurlyBraces()));
             }
             else if (!string.IsNullOrWhiteSpace(installerDetected))
             {

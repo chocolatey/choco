@@ -44,6 +44,7 @@ namespace chocolatey.infrastructure.app.services
         private const string ArgsFile = ".arguments";
         private const string ExtraFile = ".extra";
         private const string VersionOverrideFile = ".version";
+        private const string SoftwareInstallLocationFile = ".softwareLocation";
 
         // We need to store the package identifiers we have warned about
         // to prevent duplicated outputs.
@@ -163,6 +164,20 @@ A corrupt .registry file exists at {0}.
                  );
             }
 
+            var locationFile = _fileSystem.CombinePaths(pkgStorePath, SoftwareInstallLocationFile);
+            if (_fileSystem.FileExists(locationFile))
+            {
+                FaultTolerance.TryCatchWithLoggingException(
+                    () =>
+                    {
+                        packageInformation.SoftwareInstallLocation = _fileSystem.ReadFile(locationFile);
+                    },
+                    "Unable to read software location file",
+                    throwError: false,
+                    logWarningInsteadOfError: true
+                );
+            }
+
             return packageInformation;
         }
 
@@ -247,6 +262,17 @@ A corrupt .registry file exists at {0}.
             else
             {
                 _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, PinFile));
+            }
+
+            if (!string.IsNullOrWhiteSpace(packageInformation.SoftwareInstallLocation))
+            {
+                var locationFile = _fileSystem.CombinePaths(pkgStorePath, SoftwareInstallLocationFile);
+                if (_fileSystem.FileExists(locationFile)) _fileSystem.DeleteFile(locationFile);
+                _fileSystem.WriteFile(locationFile, packageInformation.SoftwareInstallLocation);
+            }
+            else
+            {
+                _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, SoftwareInstallLocationFile));
             }
         }
 
