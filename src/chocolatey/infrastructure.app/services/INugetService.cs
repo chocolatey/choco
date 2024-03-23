@@ -20,6 +20,7 @@ namespace chocolatey.infrastructure.app.services
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using configuration;
+    using domain;
     using results;
 
     public interface INugetService : ISourceRunner
@@ -66,6 +67,15 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The configuration</param>
         IEnumerable<PackageResult> GetInstalledPackages(ChocolateyConfiguration config);
+
+        /// <summary>
+        /// Gets the configuration from remembered arguments
+        /// </summary>
+        /// <param name="config">The original configuration.</param>
+        /// <param name="packageInfo">The package information.</param>
+        /// <returns>The modified configuration, so it can be used</returns>
+        ChocolateyConfiguration GetPackageConfigFromRememberedArguments(ChocolateyConfiguration config,
+            ChocolateyPackageInformation packageInfo);
 
 #pragma warning disable IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
