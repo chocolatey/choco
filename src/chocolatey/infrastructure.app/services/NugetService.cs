@@ -482,7 +482,7 @@ folder.");
             _fileSystem.EnsureDirectoryExists(ApplicationParameters.PackagesLocation);
             var packageResultsToReturn = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
-            //todo: #23 handle all
+            SetRemotePackageNamesIfAllSpecified(config, () => { });
 
             NuGetVersion version = !string.IsNullOrWhiteSpace(config.Version) ? NuGetVersion.Parse(config.Version) : null;
             if (config.Force) config.AllowDowngrade = true;
@@ -970,7 +970,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             var projectContext = new ChocolateyNuGetProjectContext(config, _nugetLogger);
 
             var configIgnoreDependencies = config.IgnoreDependencies;
-            var allLocalPackages = SetPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; }).ToList();
+            var allLocalPackages = SetLocalPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; }).ToList();
             config.IgnoreDependencies = configIgnoreDependencies;
             var localPackageListValid = true;
 
@@ -1591,7 +1591,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             var outdatedPackages = new ConcurrentDictionary<string, PackageResult>();
 
-            var allPackages = SetPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; });
+            var allPackages = SetLocalPackageNamesIfAllSpecified(config, () => { config.IgnoreDependencies = true; });
             var packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty().ToList();
 
             config.CreateBackup();
@@ -2141,7 +2141,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 }
             }
 
-            SetPackageNamesIfAllSpecified(config, () =>
+            SetLocalPackageNamesIfAllSpecified(config, () =>
                 {
                     // force remove the item, ignore the dependencies
                     // as those are going to be picked up anyway
@@ -2682,7 +2682,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             return installedPackages;
         }
 
-        private IEnumerable<PackageResult> SetPackageNamesIfAllSpecified(ChocolateyConfiguration config, Action customAction)
+        private IEnumerable<PackageResult> SetLocalPackageNamesIfAllSpecified(ChocolateyConfiguration config, Action customAction)
         {
             var allPackages = GetInstalledPackages(config);
             if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
@@ -2728,6 +2728,33 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             }
 
             return allPackages;
+        }
+
+        private void SetRemotePackageNamesIfAllSpecified(ChocolateyConfiguration config, Action customAction)
+        {
+            if (config.PackageNames.is_equal_to(ApplicationParameters.AllPackages))
+            {
+                foreach (string repositoryUrl in ApplicationParameters.PublicNugetSources)
+                {
+                    if (config.Sources.contains(repositoryUrl))
+                    {
+                        throw new ApplicationException("Installing all packages from {0} is not supported.{1}Only internal nuget repositories are supported."
+                            .format_with(repositoryUrl, Environment.NewLine));
+                    }
+                }
+
+                var isQuiet = config.QuietOutput;
+                config.QuietOutput = true;
+                var input = config.Input;
+                config.Input = string.Empty;
+                var remotePackageList = list_run(config).Select(p => p.Name).ToList();
+                config.QuietOutput = isQuiet;
+                config.Input = input;
+
+                config.PackageNames = remotePackageList.@join(ApplicationParameters.PackageNamesSeparator);
+
+                if (customAction != null) customAction.Invoke();
+            }
         }
 
 #pragma warning disable IDE1006
