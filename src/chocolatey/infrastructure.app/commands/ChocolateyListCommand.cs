@@ -95,7 +95,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Prerelease - Include Prereleases? Defaults to false.",
                      option => configuration.Prerelease = option != null)
                 .Add("i|includeprograms|include-programs",
-                     "IncludePrograms - Filters out apps Chocolatey has listed as packages and includes those in the list. Defaults to false.",
+                     "IncludePrograms - Also list applications not managed by Chocolatey. Defaults to false.",
                      option => configuration.ListCommand.IncludeRegistryPrograms = option != null)
                 .Add("version=",
                      "Version - Specific version of a package to return.",
