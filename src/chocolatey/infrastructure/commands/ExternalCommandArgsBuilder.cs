@@ -62,7 +62,10 @@ namespace chocolatey.infrastructure.commands
                     }
                 }
             }
-            if (arguments.Length == 0) return string.Empty;
+            if (arguments.Length == 0)
+            {
+                return string.Empty;
+            }
 
             return arguments.Remove(arguments.Length - 1, 1).ToString();
         }
@@ -72,7 +75,10 @@ namespace chocolatey.infrastructure.commands
             foreach (var prop in properties.OrEmpty())
             {
                 //todo: #2587 need a better way of handling
-                if (prop.Name == "MachineSources") continue;
+                if (prop.Name == "MachineSources")
+                {
+                    continue;
+                }
 
                 if (prop.PropertyType.IsBuiltinType())
                 {

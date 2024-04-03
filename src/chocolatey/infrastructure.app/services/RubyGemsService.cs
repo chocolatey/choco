@@ -116,7 +116,10 @@ namespace chocolatey.infrastructure.app.services
 
         public void EnsureSourceAppInstalled(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                throw new NotImplementedException("This source is not supported on non-Windows systems");
+            }
 
             var runnerConfig = new ChocolateyConfiguration
             {
@@ -165,7 +168,11 @@ namespace chocolatey.infrastructure.app.services
                 stdOutAction: (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         if (!config.QuietOutput)
                         {
                             this.Log().Info(logMessage.EscapeCurlyBraces());
@@ -177,7 +184,11 @@ namespace chocolatey.infrastructure.app.services
                     },
                 stdErrAction: (s, e) =>
                     {
-                        if (string.IsNullOrWhiteSpace(e.Data)) return;
+                        if (string.IsNullOrWhiteSpace(e.Data))
+                        {
+                            return;
+                        }
+
                         this.Log().Error(() => "{0}".FormatWith(e.Data.EscapeCurlyBraces()));
                     },
                 updateProcessPath: false
@@ -213,7 +224,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                             if (_installingRegex.IsMatch(logMessage))
@@ -238,7 +253,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                             var packageName = GetValueFromOutput(logMessage, _packageNameErrorRegex, PackageNameGroup);

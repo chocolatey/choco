@@ -38,10 +38,14 @@ namespace chocolatey.infrastructure.guards
         private static MemberExpression GetNameOnRight(this Expression e)
         {
             if (e is LambdaExpression lambdaExpr)
+            {
                 return GetNameOnRight(lambdaExpr.Body);
+            }
 
             if (e is MemberExpression memberExpr)
+            {
                 return memberExpr;
+            }
 
             if (e is MethodCallExpression methodExpr)
             {

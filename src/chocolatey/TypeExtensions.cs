@@ -30,7 +30,10 @@ namespace chocolatey
         /// <returns>true if meets criteria for system type</returns>
         public static bool IsBuiltinType(this Type type)
         {
-            if (type == null) return false;
+            if (type == null)
+            {
+                return false;
+            }
 
             // if all else fails, check to see if the namespace is at system.
             return type.IsPrimitive
@@ -46,7 +49,10 @@ namespace chocolatey
         /// <returns>true if enumerable</returns>
         public static bool IsCollectionType(this Type type)
         {
-            if (type == null) return false;
+            if (type == null)
+            {
+                return false;
+            }
 
             // Surely we can do a check around "is ICollection" / "is ICollection<>" here?
             return type.IsArray

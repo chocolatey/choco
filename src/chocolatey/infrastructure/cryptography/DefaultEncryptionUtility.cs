@@ -28,7 +28,10 @@ namespace chocolatey.infrastructure.cryptography
 
         public string EncryptString(string cleartextValue)
         {
-            if (string.IsNullOrWhiteSpace(cleartextValue)) return null;
+            if (string.IsNullOrWhiteSpace(cleartextValue))
+            {
+                return null;
+            }
 
             var decryptedByteArray = Encoding.UTF8.GetBytes(cleartextValue);
             byte[] encryptedByteArray;

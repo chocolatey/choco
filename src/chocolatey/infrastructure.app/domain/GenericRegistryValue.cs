@@ -40,7 +40,10 @@ namespace chocolatey.infrastructure.app.domain
 
         bool IEquatable<GenericRegistryValue>.Equals(GenericRegistryValue other)
         {
-            if (other == null) return false;
+            if (other == null)
+            {
+                return false;
+            }
 
             return ParentKeyName.IsEqualTo(other.ParentKeyName)
                    && Name.IsEqualTo(other.Name)

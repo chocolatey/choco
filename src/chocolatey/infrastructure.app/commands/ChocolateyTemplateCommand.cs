@@ -64,7 +64,11 @@ namespace chocolatey.infrastructure.app.commands
 
             if (command == TemplateCommandType.Unknown)
             {
-                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                if (!string.IsNullOrWhiteSpace(unparsedCommand))
+                {
+                    this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                }
+
                 command = TemplateCommandType.List;
             }
 

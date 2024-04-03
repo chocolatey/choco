@@ -246,7 +246,10 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     var exactPackage = FindPackage(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoryResources, version);
 
-                    if (exactPackage == null) return new List<IPackageSearchMetadata>().AsQueryable();
+                    if (exactPackage == null)
+                    {
+                        return new List<IPackageSearchMetadata>().AsQueryable();
+                    }
 
                     return new List<IPackageSearchMetadata>()
                     {

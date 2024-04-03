@@ -65,9 +65,14 @@ namespace chocolatey.infrastructure.platforms
                         & FileSystem.DirectoryExists("/System")
                         & FileSystem.DirectoryExists("/Users")
                         & FileSystem.DirectoryExists("/Volumes"))
+                    {
                         return PlatformType.Mac;
+                    }
                     else
+                    {
                         return PlatformType.Linux;
+                    }
+
                 default:
                     return PlatformType.Windows;
             }

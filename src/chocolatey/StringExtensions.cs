@@ -42,7 +42,10 @@ namespace chocolatey
         /// <returns>A formatted string, or <see cref="string.Empty"/> if <paramref name="input"/> is null.</returns>
         public static string FormatWith(this string input, params object[] formatting)
         {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return string.Empty;
+            }
 
             try
             {
@@ -137,7 +140,10 @@ namespace chocolatey
         /// <returns></returns>
         public static string TrimSafe(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return string.Empty;
+            }
 
             return input.Trim();
         }
@@ -149,7 +155,10 @@ namespace chocolatey
         /// <returns></returns>
         public static string ToLowerSafe(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return string.Empty;
+            }
 
             return input.ToLower();
         }
@@ -161,7 +170,10 @@ namespace chocolatey
         /// <returns></returns>
         public static string ToStringSafe(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return string.Empty;
+            }
 
             return input;
         }
@@ -175,7 +187,10 @@ namespace chocolatey
         {
             var secureString = new SecureString();
 
-            if (string.IsNullOrWhiteSpace(input)) return secureString;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return secureString;
+            }
 
             foreach (char character in input)
             {
@@ -187,7 +202,10 @@ namespace chocolatey
 
         public static string FromSecureStringSafe(this SecureString input)
         {
-            if (input == null) return string.Empty;
+            if (input == null)
+            {
+                return string.Empty;
+            }
 
             IntPtr unmanagedString = IntPtr.Zero;
             try
@@ -210,7 +228,10 @@ namespace chocolatey
         /// <returns></returns>
         public static string QuoteIfContainsSpaces(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input)) return input;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return input;
+            }
 
             if (_spacePattern.IsMatch(input))
             {
@@ -250,7 +271,10 @@ namespace chocolatey
         /// <returns></returns>
         public static string UnquoteSafe(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return string.Empty;
+            }
 
             if (input.StartsWith(" "))
             {
@@ -271,7 +295,10 @@ namespace chocolatey
 
         public static string EscapeCurlyBraces(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return string.Empty;
+            }
 
             return _openBraceRegex.Replace(_closeBraceRegex.Replace(input,"}}"),"{{");
         }
@@ -283,9 +310,15 @@ namespace chocolatey
         /// <returns>The input, but with double quotes if there is a pipe character found in the string.</returns>
         public static string QuoteIfContainsPipe(this string input)
         {
-            if (string.IsNullOrWhiteSpace(input)) return input.ToStringSafe();
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                return input.ToStringSafe();
+            }
 
-            if (input.ContainsSafe("|")) return "\"{0}\"".FormatWith(input);
+            if (input.ContainsSafe("|"))
+            {
+                return "\"{0}\"".FormatWith(input);
+            }
 
             return input;
         }

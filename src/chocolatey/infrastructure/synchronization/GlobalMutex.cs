@@ -83,12 +83,18 @@ namespace chocolatey.infrastructure.synchronization
             {
                 using (new GlobalMutex(timeout))
                 {
-                    if (action != null) action.Invoke();
+                    if (action != null)
+                    {
+                        action.Invoke();
+                    }
                 }
             }
             else
             {
-                if (action != null) action.Invoke();
+                if (action != null)
+                {
+                    action.Invoke();
+                }
             }
         }
 
@@ -107,12 +113,18 @@ namespace chocolatey.infrastructure.synchronization
             {
                 using (new GlobalMutex(timeout))
                 {
-                    if (func != null) returnValue = func.Invoke();
+                    if (func != null)
+                    {
+                        returnValue = func.Invoke();
+                    }
                 }
             }
             else
             {
-                if (func != null) returnValue = func.Invoke();
+                if (func != null)
+                {
+                    returnValue = func.Invoke();
+                }
             }
 
             return returnValue;

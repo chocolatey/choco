@@ -43,14 +43,20 @@ namespace chocolatey.infrastructure.app.services
 
         public PackageFiles ReadPackageSnapshot(string filePath)
         {
-            if (!_fileSystem.FileExists(filePath)) return null;
+            if (!_fileSystem.FileExists(filePath))
+            {
+                return null;
+            }
 
             return _xmlService.Deserialize<PackageFiles>(filePath);
         }
 
         private string GetPackageInstallDirectory(PackageResult packageResult)
         {
-            if (packageResult == null) return null;
+            if (packageResult == null)
+            {
+                return null;
+            }
 
             var installDirectory = packageResult.InstallLocation;
             return PackageInstallDirectoryIsCorrect(installDirectory, logMessage => packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage))) ? installDirectory : null;
@@ -58,12 +64,19 @@ namespace chocolatey.infrastructure.app.services
 
         private bool PackageInstallDirectoryIsCorrect(string directory, Action<string> errorAction = null)
         {
-            if (directory.ToStringSafe().IsEqualTo(string.Empty)) return false;
+            if (directory.ToStringSafe().IsEqualTo(string.Empty))
+            {
+                return false;
+            }
 
             if (directory.IsEqualTo(ApplicationParameters.InstallLocation) || directory.IsEqualTo(ApplicationParameters.PackagesLocation))
             {
                 var logMessage = "Install location is not specific enough:{0} Erroneous install location captured as '{1}'".FormatWith(Environment.NewLine, directory);
-                if (errorAction != null) errorAction.Invoke(logMessage);
+                if (errorAction != null)
+                {
+                    errorAction.Invoke(logMessage);
+                }
+
                 this.Log().Error(logMessage);
                 return false;
             }
@@ -73,40 +86,71 @@ namespace chocolatey.infrastructure.app.services
 
         public void SavePackageSnapshot(PackageFiles snapshot, string filePath)
         {
-            if (snapshot == null) return;
+            if (snapshot == null)
+            {
+                return;
+            }
 
             _xmlService.Serialize(snapshot, filePath);
         }
 
         public void EnsureCompatibleFileAttributes(PackageResult packageResult, ChocolateyConfiguration config)
         {
-            if (packageResult == null) return;
+            if (packageResult == null)
+            {
+                return;
+            }
+
             var installDirectory = GetPackageInstallDirectory(packageResult);
-            if (installDirectory == null) return;
+            if (installDirectory == null)
+            {
+                return;
+            }
 
             EnsureCompatibleFileAttributes(installDirectory, config);
         }
 
         public void EnsureCompatibleFileAttributes(string directory, ChocolateyConfiguration config)
         {
-            if (!PackageInstallDirectoryIsCorrect(directory)) return;
+            if (!PackageInstallDirectoryIsCorrect(directory))
+            {
+                return;
+            }
 
             foreach (var file in _fileSystem.GetFiles(directory, "*.*", SearchOption.AllDirectories))
             {
                 var filePath = _fileSystem.GetFullPath(file);
                 var fileInfo = _fileSystem.GetFileInfoFor(filePath);
 
-                if (_fileSystem.IsSystemFile(fileInfo)) _fileSystem.EnsureFileAttributeRemoved(filePath, FileAttributes.System);
-                if (_fileSystem.IsReadOnlyFile(fileInfo)) _fileSystem.EnsureFileAttributeRemoved(filePath, FileAttributes.ReadOnly);
-                if (_fileSystem.IsHiddenFile(fileInfo)) _fileSystem.EnsureFileAttributeRemoved(filePath, FileAttributes.Hidden);
+                if (_fileSystem.IsSystemFile(fileInfo))
+                {
+                    _fileSystem.EnsureFileAttributeRemoved(filePath, FileAttributes.System);
+                }
+
+                if (_fileSystem.IsReadOnlyFile(fileInfo))
+                {
+                    _fileSystem.EnsureFileAttributeRemoved(filePath, FileAttributes.ReadOnly);
+                }
+
+                if (_fileSystem.IsHiddenFile(fileInfo))
+                {
+                    _fileSystem.EnsureFileAttributeRemoved(filePath, FileAttributes.Hidden);
+                }
             }
         }
 
         public PackageFiles CaptureSnapshot(PackageResult packageResult, ChocolateyConfiguration config)
         {
-            if (packageResult == null) return new PackageFiles();
+            if (packageResult == null)
+            {
+                return new PackageFiles();
+            }
+
             var installDirectory = GetPackageInstallDirectory(packageResult);
-            if (installDirectory == null) return null;
+            if (installDirectory == null)
+            {
+                return null;
+            }
 
             return CaptureSnapshot(installDirectory, config);
         }
@@ -115,7 +159,10 @@ namespace chocolatey.infrastructure.app.services
         {
             var packageFiles = new PackageFiles();
 
-            if (!PackageInstallDirectoryIsCorrect(directory)) return packageFiles;
+            if (!PackageInstallDirectoryIsCorrect(directory))
+            {
+                return packageFiles;
+            }
 
             this.Log().Debug(() => "Capturing package files in '{0}'".FormatWith(directory));
             //gather all files in the folder

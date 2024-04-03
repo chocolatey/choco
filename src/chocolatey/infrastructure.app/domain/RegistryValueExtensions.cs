@@ -24,7 +24,10 @@ namespace chocolatey.infrastructure.app.domain
     {
         public static string AsXmlSafeString(this RegistryKey key, string name)
         {
-            if (key == null) return string.Empty;
+            if (key == null)
+            {
+                return string.Empty;
+            }
 
             // Since it is possible that registry keys contain characters that are not valid
             // in XML files, ensure that all content is escaped, prior to serialization

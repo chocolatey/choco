@@ -25,10 +25,16 @@ namespace chocolatey.infrastructure.tokens
     {
         public static string ReplaceTokens<TConfig>(TConfig configuration, string textToReplace, string tokenPrefix = "[[", string tokenSuffix = "]]")
         {
-            if (string.IsNullOrEmpty(textToReplace)) return string.Empty;
+            if (string.IsNullOrEmpty(textToReplace))
+            {
+                return string.Empty;
+            }
 
             IDictionary<string, string> dictionary = CreateDictionaryFromConfiguration(configuration);
-            if (dictionary.Count == 0) return textToReplace;
+            if (dictionary.Count == 0)
+            {
+                return textToReplace;
+            }
 
             var regex = new Regex("{0}(?<key>\\w+){1}".FormatWith(Regex.Escape(tokenPrefix), Regex.Escape(tokenSuffix)));
 
@@ -52,7 +58,10 @@ namespace chocolatey.infrastructure.tokens
 
         private static IDictionary<string, string> CreateDictionaryFromConfiguration<TConfig>(TConfig configuration)
         {
-            if (configuration is IDictionary<string, string>) return configuration as IDictionary<string, string>;
+            if (configuration is IDictionary<string, string>)
+            {
+                return configuration as IDictionary<string, string>;
+            }
 
             var propertyDictionary = new Dictionary<string, string>();
             foreach (PropertyInfo property in configuration.GetType().GetProperties())

@@ -60,7 +60,10 @@ namespace chocolatey.console
 
                 string loggingLocation = ApplicationParameters.LoggingLocation;
                 //no file system at this point
-                if (!Directory.Exists(loggingLocation)) Directory.CreateDirectory(loggingLocation);
+                if (!Directory.Exists(loggingLocation))
+                {
+                    Directory.CreateDirectory(loggingLocation);
+                }
 
                 Log4NetAppenderConfiguration.Configure(loggingLocation, excludeLoggerNames: ChocolateyLoggers.Trace.ToStringSafe());
                 Bootstrap.Initialize();
@@ -178,7 +181,10 @@ namespace chocolatey.console
                     "chocolatey".Log().Error(ChocolateyLoggers.LogFileOnly, () => "More Details: {0}".FormatWith(ex.ToString()));
                 }
 
-                if (Environment.ExitCode == 0) Environment.ExitCode = 1;
+                if (Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 1;
+                }
             }
             finally
             {
@@ -228,7 +234,10 @@ namespace chocolatey.console
 
         private static void ReportVersionAndExitIfRequested(string[] args, ChocolateyConfiguration config)
         {
-            if (args == null || args.Length == 0) return;
+            if (args == null || args.Length == 0)
+            {
+                return;
+            }
 
             var firstArg = args.FirstOrDefault();
             if (firstArg.IsEqualTo("-v") || firstArg.IsEqualTo("--version"))

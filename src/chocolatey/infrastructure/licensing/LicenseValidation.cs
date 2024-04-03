@@ -39,7 +39,10 @@ namespace chocolatey.infrastructure.licensing
 
             string licenseFile = ApplicationParameters.LicenseFileLocation;
             var userLicenseFile = ApplicationParameters.UserLicenseFileLocation;
-            if (File.Exists(userLicenseFile)) licenseFile = userLicenseFile;
+            if (File.Exists(userLicenseFile))
+            {
+                licenseFile = userLicenseFile;
+            }
 
             // no IFileSystem at this point
             if (!File.Exists(licenseFile))
@@ -139,10 +142,16 @@ namespace chocolatey.infrastructure.licensing
         {
             var args = Environment.GetCommandLineArgs();
             // I think this check is incorrect??? if --version is supposed to return false, it can return true at this point?
-            if (args == null || args.Length < 2) return true;
+            if (args == null || args.Length < 2)
+            {
+                return true;
+            }
 
             var firstArg = args[1].ToStringSafe();
-            if (firstArg.IsEqualTo("-v") || firstArg.IsEqualTo("--version")) return false;
+            if (firstArg.IsEqualTo("-v") || firstArg.IsEqualTo("--version"))
+            {
+                return false;
+            }
 
             return true;
         }

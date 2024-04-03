@@ -85,7 +85,10 @@ namespace chocolatey.infrastructure.registration
                 LoadComponentRegistry(componentRegistry, container, extensions);
             }
 
-            if (_verifyContainer) container.Verify();
+            if (_verifyContainer)
+            {
+                container.Verify();
+            }
 
             return container;
         }

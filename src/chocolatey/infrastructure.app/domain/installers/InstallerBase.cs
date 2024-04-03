@@ -41,11 +41,20 @@ namespace chocolatey.infrastructure.app.domain.installers
         {
             var args = new StringBuilder();
             args.Append("{0} {1} {2}".FormatWith(SilentInstall, NoReboot, OtherInstallOptions).TrimSafe());
-            if (languageRequested) args.AppendFormat(" {0}", Language);
+            if (languageRequested)
+            {
+                args.AppendFormat(" {0}", Language);
+            }
             //MSI may have issues with 1622 - opening a log file location
-            if (logFile) args.AppendFormat(" {0}", LogFile);
+            if (logFile)
+            {
+                args.AppendFormat(" {0}", LogFile);
+            }
             // custom install location must be last for NSIS
-            if (customInstallLocation) args.AppendFormat(" {0}", CustomInstallLocation);
+            if (customInstallLocation)
+            {
+                args.AppendFormat(" {0}", CustomInstallLocation);
+            }
 
             return args.ToString();
         }

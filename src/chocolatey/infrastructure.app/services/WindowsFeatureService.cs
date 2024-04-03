@@ -158,14 +158,20 @@ namespace chocolatey.infrastructure.app.services
 
         public void EnsureSourceAppInstalled(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                throw new NotImplementedException("This source is not supported on non-Windows systems");
+            }
 
             EnsureExecutablePathSet();
         }
 
         private void EnsureExecutablePathSet()
         {
-            if (!string.IsNullOrWhiteSpace(_exePath)) return;
+            if (!string.IsNullOrWhiteSpace(_exePath))
+            {
+                return;
+            }
 
             foreach (var location in _exeLocations)
             {
@@ -176,7 +182,10 @@ namespace chocolatey.infrastructure.app.services
                 }
             }
 
-            if (string.IsNullOrWhiteSpace(_exePath)) throw new FileNotFoundException("Unable to find suitable location for the executable. Searched the following locations: '{0}'".FormatWith(string.Join("; ", _exeLocations)));
+            if (string.IsNullOrWhiteSpace(_exePath))
+            {
+                throw new FileNotFoundException("Unable to find suitable location for the executable. Searched the following locations: '{0}'".FormatWith(string.Join("; ", _exeLocations)));
+            }
         }
 
         public void ListDryRun(ChocolateyConfiguration config)
@@ -200,7 +209,11 @@ namespace chocolatey.infrastructure.app.services
                 stdOutAction: (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         if (!config.QuietOutput)
                         {
                             this.Log().Info(logMessage.EscapeCurlyBraces());
@@ -212,7 +225,11 @@ namespace chocolatey.infrastructure.app.services
                     },
                 stdErrAction: (s, e) =>
                     {
-                        if (string.IsNullOrWhiteSpace(e.Data)) return;
+                        if (string.IsNullOrWhiteSpace(e.Data))
+                        {
+                            return;
+                        }
+
                         this.Log().Error(() => "{0}".FormatWith(e.Data.EscapeCurlyBraces()));
                     },
                 updateProcessPath: false,
@@ -297,7 +314,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                             if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -314,7 +335,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -368,7 +393,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                             if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -385,7 +414,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                             results.Messages.Add(new ResultMessage(ResultType.Error, logMessage));

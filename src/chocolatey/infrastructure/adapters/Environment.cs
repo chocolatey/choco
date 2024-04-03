@@ -63,7 +63,10 @@ namespace chocolatey.infrastructure.adapters
 
         public string ExpandEnvironmentVariables(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) return name;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return name;
+            }
 
             return System.Environment.ExpandEnvironmentVariables(name);
         }

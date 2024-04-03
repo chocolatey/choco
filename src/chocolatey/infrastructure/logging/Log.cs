@@ -34,7 +34,10 @@ namespace chocolatey.infrastructure.logging
         public static void InitializeWith<T>(bool resetLoggers = true) where T : ILog, new()
         {
             _logType = typeof (T);
-            if (resetLoggers) LogExtensions.ResetLoggers();
+            if (resetLoggers)
+            {
+                LogExtensions.ResetLoggers();
+            }
         }
 
         /// <summary>
@@ -47,7 +50,10 @@ namespace chocolatey.infrastructure.logging
         {
             _logType = loggerType.GetType();
             _logger = loggerType;
-            if (resetLoggers) LogExtensions.ResetLoggers();
+            if (resetLoggers)
+            {
+                LogExtensions.ResetLoggers();
+            }
         }
 
         /// <summary>

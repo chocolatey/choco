@@ -43,37 +43,55 @@ namespace chocolatey.infrastructure.logging
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Debug(string message, params object[] formatting)
         {
-            if (_logger.IsDebugEnabled) Log(Level.Debug, DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsDebugEnabled)
+            {
+                Log(Level.Debug, DecorateMessageWithAuditInformation(message), formatting);
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Debug(Func<string> message)
         {
-            if (_logger.IsDebugEnabled) Log(Level.Debug, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            if (_logger.IsDebugEnabled)
+            {
+                Log(Level.Debug, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Info(string message, params object[] formatting)
         {
-            if (_logger.IsInfoEnabled) Log(Level.Info, DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsInfoEnabled)
+            {
+                Log(Level.Info, DecorateMessageWithAuditInformation(message), formatting);
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Info(Func<string> message)
         {
-            if (_logger.IsInfoEnabled) Log(Level.Info, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            if (_logger.IsInfoEnabled)
+            {
+                Log(Level.Info, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Warn(string message, params object[] formatting)
         {
-            if (_logger.IsWarnEnabled) Log(Level.Warn, DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsWarnEnabled)
+            {
+                Log(Level.Warn, DecorateMessageWithAuditInformation(message), formatting);
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Warn(Func<string> message)
         {
-            if (_logger.IsWarnEnabled) Log(Level.Warn, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            if (_logger.IsWarnEnabled)
+            {
+                Log(Level.Warn, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]

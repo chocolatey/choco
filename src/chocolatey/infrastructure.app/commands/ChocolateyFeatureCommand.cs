@@ -59,7 +59,11 @@ namespace chocolatey.infrastructure.app.commands
             Enum.TryParse(unparsedCommand, true, out command);
             if (command == FeatureCommandType.Unknown)
             {
-                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                if (!string.IsNullOrWhiteSpace(unparsedCommand))
+                {
+                    this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                }
+
                 command = FeatureCommandType.List;
             }
 
@@ -157,7 +161,10 @@ If you find other exit codes that we have not yet documented, please
         public virtual bool MayRequireAdminAccess()
         {
             var config = Config.GetConfigurationSettings();
-            if (config == null) return true;
+            if (config == null)
+            {
+                return true;
+            }
 
             return config.FeatureCommand.Command != FeatureCommandType.List;
         }

@@ -140,7 +140,10 @@ namespace chocolatey.infrastructure.app.services
 
         public void EnsureSourceAppInstalled(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                throw new NotImplementedException("This source is not supported on non-Windows systems");
+            }
 
             var runnerConfig = new ChocolateyConfiguration
             {
@@ -180,7 +183,10 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
-            if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
+            if (string.IsNullOrWhiteSpace(binRoot))
+            {
+                binRoot = "c:\\tools";
+            }
 
             return _fileSystem.CombinePaths(binRoot, "cygwin");
         }
@@ -227,7 +233,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                             if (_installedRegex.IsMatch(logMessage))
@@ -241,7 +251,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
                         },
                     updateProcessPath: false,

@@ -25,7 +25,11 @@ namespace chocolatey.infrastructure.information
         public static string GetCurrentAssemblyVersion(IAssembly assembly = null)
         {
             string version = null;
-            if (assembly == null) assembly = Assembly.GetExecutingAssembly();
+            if (assembly == null)
+            {
+                assembly = Assembly.GetExecutingAssembly();
+            }
+
             string location = assembly != null ? assembly.Location : string.Empty;
 
             if (!string.IsNullOrEmpty(location))
@@ -52,7 +56,11 @@ namespace chocolatey.infrastructure.information
         public static string GetCurrentInformationalVersion(IAssembly assembly = null)
         {
             string version = null;
-            if (assembly == null) assembly = Assembly.GetExecutingAssembly();
+            if (assembly == null)
+            {
+                assembly = Assembly.GetExecutingAssembly();
+            }
+
             string location = assembly != null ? assembly.Location : string.Empty;
 
             if (!string.IsNullOrEmpty(location))
@@ -78,7 +86,10 @@ namespace chocolatey.infrastructure.information
 
         public static string GetMinimumChocolateyVersion(IAssembly assembly = null)
         {
-            if (assembly == null) assembly = Assembly.GetExecutingAssembly();
+            if (assembly == null)
+            {
+                assembly = Assembly.GetExecutingAssembly();
+            }
 
             var attributeData = assembly.UnderlyingType.GetCustomAttributesData();
             foreach (var attribute in attributeData)

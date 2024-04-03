@@ -172,7 +172,10 @@ namespace chocolatey.infrastructure.app.services
 
         public void EnsureSourceAppInstalled(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                throw new NotImplementedException("This source is not supported on non-Windows systems");
+            }
 
             //ensure at least python 2.7.9 is installed
             var python = _fileSystem.GetExecutablePath("python");
@@ -212,7 +215,10 @@ namespace chocolatey.infrastructure.app.services
 
         private void EnsureExecutablePathSet()
         {
-            if (!string.IsNullOrWhiteSpace(_exePath)) return;
+            if (!string.IsNullOrWhiteSpace(_exePath))
+            {
+                return;
+            }
 
             var python = _fileSystem.GetExecutablePath("python");
 
@@ -245,7 +251,10 @@ namespace chocolatey.infrastructure.app.services
             if (string.IsNullOrWhiteSpace(topLevelPath))
             {
                 var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
-                if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
+                if (string.IsNullOrWhiteSpace(binRoot))
+                {
+                    binRoot = "c:\\tools";
+                }
 
                 topLevelPath = _fileSystem.CombinePaths(binRoot, "python");
             }
@@ -256,7 +265,10 @@ namespace chocolatey.infrastructure.app.services
                 _exePath = pipPath;
             }
 
-            if (string.IsNullOrWhiteSpace(_exePath)) throw new FileNotFoundException("Unable to find pip");
+            if (string.IsNullOrWhiteSpace(_exePath))
+            {
+                throw new FileNotFoundException("Unable to find pip");
+            }
         }
 
         private string BuildArguments(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
@@ -302,7 +314,11 @@ namespace chocolatey.infrastructure.app.services
                 stdOutAction: (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         if (!config.QuietOutput)
                         {
                             this.Log().Info(logMessage.EscapeCurlyBraces());
@@ -314,7 +330,11 @@ namespace chocolatey.infrastructure.app.services
                     },
                 stdErrAction: (s, e) =>
                     {
-                        if (string.IsNullOrWhiteSpace(e.Data)) return;
+                        if (string.IsNullOrWhiteSpace(e.Data))
+                        {
+                            return;
+                        }
+
                         this.Log().Error(() => "{0}".FormatWith(e.Data.EscapeCurlyBraces()));
                     },
                 updateProcessPath: false,
@@ -359,7 +379,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -379,7 +403,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -438,7 +466,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -458,7 +490,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -505,7 +541,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -525,7 +565,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))

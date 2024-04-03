@@ -83,7 +83,10 @@ namespace chocolatey.infrastructure.logging
             EnableTraceSource("s_CacheTraceSource", logging, this);  //System.Net.Cache
 
             var isEnabled = logging.GetField("s_LoggingEnabled", BindingFlags.NonPublic | BindingFlags.Static);
-            if (isEnabled !=null) isEnabled.SetValue(null, true);
+            if (isEnabled !=null)
+            {
+                isEnabled.SetValue(null, true);
+            }
         }
 
         private static void EnableTraceSource(string fieldName, Type logging, TraceListener listener)

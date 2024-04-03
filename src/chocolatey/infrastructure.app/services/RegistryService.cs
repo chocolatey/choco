@@ -64,14 +64,20 @@ namespace chocolatey.infrastructure.app.services
         private void AddKey(IList<RegistryKey> keys, RegistryHive hive, RegistryView view)
         {
             var key = OpenKey(hive, view);
-            if (key != null) keys.Add(key);
+            if (key != null)
+            {
+                keys.Add(key);
+            }
         }
 
         public Registry GetInstallerKeys()
         {
             var snapshot = new Registry();
             var windowsIdentity = WindowsIdentity.GetCurrent();
-            if (windowsIdentity != null) snapshot.User = windowsIdentity.User.ToStringSafe();
+            if (windowsIdentity != null)
+            {
+                snapshot.User = windowsIdentity.User.ToStringSafe();
+            }
 
             IList<RegistryKey> keys = new List<RegistryKey>();
             if (Environment.Is64BitOperatingSystem)
@@ -120,7 +126,10 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="snapshot">The snapshot.</param>
         public void UpdateSnapshot(RegistryKey key, Registry snapshot)
         {
-            if (key == null) return;
+            if (key == null)
+            {
+                return;
+            }
 
             FaultTolerance.TryCatchWithLoggingException(
                 () =>
@@ -251,7 +260,10 @@ namespace chocolatey.infrastructure.app.services
         private void GetMsiInformation(RegistryApplicationKey appKey, RegistryKey key)
         {
             var userDataProductKeyId = GetMsiUserDataKey(key.Name);
-            if (string.IsNullOrWhiteSpace(userDataProductKeyId)) return;
+            if (string.IsNullOrWhiteSpace(userDataProductKeyId))
+            {
+                return;
+            }
 
             var hklm = OpenKey(RegistryHive.LocalMachine, RegistryView.Default);
             if (Environment.Is64BitOperatingSystem)
@@ -263,7 +275,10 @@ namespace chocolatey.infrastructure.app.services
              () =>
              {
                  var msiRegistryKey = hklm.OpenSubKey(UninstallerMsiMachineKeyName, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
-                 if (msiRegistryKey == null) return;
+                 if (msiRegistryKey == null)
+                 {
+                     return;
+                 }
 
                  foreach (var subKeyName in msiRegistryKey.GetSubKeyNames())
                  {
@@ -271,7 +286,10 @@ namespace chocolatey.infrastructure.app.services
                          () => msiRegistryKey.OpenSubKey("{0}\\Products\\{1}\\InstallProperties".FormatWith(subKeyName, userDataProductKeyId), RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
                          "Failed to open subkey named '{0}' for '{1}', likely due to permissions".FormatWith(subKeyName, msiRegistryKey.Name),
                          logWarningInsteadOfError: true);
-                     if (msiProductKey == null) continue;
+                     if (msiProductKey == null)
+                     {
+                         continue;
+                     }
 
                      appKey.InstallLocation = SetIfEmpty(appKey.InstallLocation, msiProductKey.AsXmlSafeString("InstallLocation"));
                      // informational
@@ -322,7 +340,10 @@ namespace chocolatey.infrastructure.app.services
 
         private string SetIfEmpty(string current, string proposed)
         {
-            if (string.IsNullOrWhiteSpace(current)) return proposed;
+            if (string.IsNullOrWhiteSpace(current))
+            {
+                return proposed;
+            }
 
             return current;
         }
@@ -335,7 +356,10 @@ namespace chocolatey.infrastructure.app.services
         {
             _userDataKey.Clear();
             var match = _guidRegex.Match(name);
-            if (!match.Success) return string.Empty;
+            if (!match.Success)
+            {
+                return string.Empty;
+            }
 
             for (int i = 0; i < 3; i++)
             {
@@ -508,7 +532,10 @@ namespace chocolatey.infrastructure.app.services
                             "Could not get registry value '{0}' from key '{1}'".FormatWith(registryValue, key.Name),
                             logWarningInsteadOfError: true);
 
-                        if (value != null) break;
+                        if (value != null)
+                        {
+                            break;
+                        }
                     }
                 }
             }

@@ -65,7 +65,10 @@ namespace chocolatey.infrastructure.app.services
             var list = new List<ChocolateySource>();
             foreach (var source in ConfigFileSettings.Sources.OrEmpty().OrderBy(s => s.Id))
             {
-                if (SkipSource(source, configuration)) continue;
+                if (SkipSource(source, configuration))
+                {
+                    continue;
+                }
 
                 if (!configuration.QuietOutput)
                 {
@@ -133,7 +136,10 @@ namespace chocolatey.infrastructure.app.services
                 ConfigFileSettings.Sources.Add(source);
 
                 _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                if (!configuration.QuietOutput) this.Log().Warn(() => "Added {0} - {1} (Priority {2})".FormatWith(source.Id, source.Value, source.Priority));
+                if (!configuration.QuietOutput)
+                {
+                    this.Log().Warn(() => "Added {0} - {1} (Priority {2})".FormatWith(source.Id, source.Value, source.Priority));
+                }
             }
             else
             {
@@ -150,7 +156,10 @@ namespace chocolatey.infrastructure.app.services
                     configuration.SourceCommand.VisibleToAdminsOnly == source.VisibleToAdminsOnly
                     )
                 {
-                    if (!configuration.QuietOutput) this.Log().Warn(NoChangeMessage);
+                    if (!configuration.QuietOutput)
+                    {
+                        this.Log().Warn(NoChangeMessage);
+                    }
                 }
                 else
                 {
@@ -165,7 +174,10 @@ namespace chocolatey.infrastructure.app.services
                     source.VisibleToAdminsOnly = configuration.SourceCommand.VisibleToAdminsOnly;
 
                     _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                    if (!configuration.QuietOutput) this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".FormatWith(source.Id, source.Value, source.Priority));
+                    if (!configuration.QuietOutput)
+                    {
+                        this.Log().Warn(() => "Updated {0} - {1} (Priority {2})".FormatWith(source.Id, source.Value, source.Priority));
+                    }
                 }
             }
         }
@@ -178,11 +190,17 @@ namespace chocolatey.infrastructure.app.services
                 ConfigFileSettings.Sources.Remove(source);
                 _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
 
-                if (!configuration.QuietOutput) this.Log().Warn(() => "Removed {0}".FormatWith(source.Id));
+                if (!configuration.QuietOutput)
+                {
+                    this.Log().Warn(() => "Removed {0}".FormatWith(source.Id));
+                }
             }
             else
             {
-                if (!configuration.QuietOutput) this.Log().Warn(NoChangeMessage);
+                if (!configuration.QuietOutput)
+                {
+                    this.Log().Warn(NoChangeMessage);
+                }
             }
         }
 
@@ -193,11 +211,17 @@ namespace chocolatey.infrastructure.app.services
             {
                 source.Disabled = true;
                 _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                if (!configuration.QuietOutput) this.Log().Warn(() => "Disabled {0}".FormatWith(source.Id));
+                if (!configuration.QuietOutput)
+                {
+                    this.Log().Warn(() => "Disabled {0}".FormatWith(source.Id));
+                }
             }
             else
             {
-                if (!configuration.QuietOutput) this.Log().Warn(NoChangeMessage);
+                if (!configuration.QuietOutput)
+                {
+                    this.Log().Warn(NoChangeMessage);
+                }
             }
         }
 
@@ -208,11 +232,17 @@ namespace chocolatey.infrastructure.app.services
             {
                 source.Disabled = false;
                 _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
-                if (!configuration.QuietOutput) this.Log().Warn(() => "Enabled {0}".FormatWith(source.Id));
+                if (!configuration.QuietOutput)
+                {
+                    this.Log().Warn(() => "Enabled {0}".FormatWith(source.Id));
+                }
             }
             else
             {
-                if (!configuration.QuietOutput) this.Log().Warn(NoChangeMessage);
+                if (!configuration.QuietOutput)
+                {
+                    this.Log().Warn(NoChangeMessage);
+                }
             }
         }
 
@@ -363,7 +393,10 @@ namespace chocolatey.infrastructure.app.services
                     _xmlService.Serialize(ConfigFileSettings, ApplicationParameters.GlobalConfigFileLocation);
                     this.Log().Info(() => "Updated API key for {0}".FormatWith(configuration.Sources));
                 }
-                else this.Log().Warn(NoChangeMessage);
+                else
+                {
+                    this.Log().Warn(NoChangeMessage);
+                }
             }
         }
 
@@ -404,14 +437,21 @@ namespace chocolatey.infrastructure.app.services
         public void GetConfig(ChocolateyConfiguration configuration)
         {
             var config = GetConfigValue(configuration.ConfigCommand.Name);
-            if (config == null) throw new ApplicationException("No configuration value by the name '{0}'".FormatWith(configuration.ConfigCommand.Name));
+            if (config == null)
+            {
+                throw new ApplicationException("No configuration value by the name '{0}'".FormatWith(configuration.ConfigCommand.Name));
+            }
+
             this.Log().Info("{0}".FormatWith(config.Value));
         }
 
         public ConfigFileConfigSetting GetConfigValue(string configKeyName)
         {
             var config = ConfigFileSettings.ConfigSettings.FirstOrDefault(p => p.Key.IsEqualTo(configKeyName));
-            if (config == null) return null;
+            if (config == null)
+            {
+                return null;
+            }
 
             return config;
         }

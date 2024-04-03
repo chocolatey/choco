@@ -115,19 +115,28 @@ namespace chocolatey.infrastructure.app.commands
                       "IgnoreChecksums - Ignore checksums provided by the package. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.ChecksumFiles, configuration.Features.ChecksumFiles.ToStringSafe()),
                       option =>
                       {
-                          if (option != null) configuration.Features.ChecksumFiles = false;
+                          if (option != null)
+                          {
+                              configuration.Features.ChecksumFiles = false;
+                          }
                       })
                 .Add("allowemptychecksum|allowemptychecksums|allow-empty-checksums",
                       "Allow Empty Checksums - Allow packages to have empty/missing checksums for downloaded resources from non-secure locations (HTTP, FTP). Use this switch is not recommended if using sources that download resources from the internet. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.ToStringSafe()),
                       option =>
                       {
-                          if (option != null) configuration.Features.AllowEmptyChecksums = true;
+                          if (option != null)
+                          {
+                              configuration.Features.AllowEmptyChecksums = true;
+                          }
                       })
                  .Add("allowemptychecksumsecure|allowemptychecksumssecure|allow-empty-checksums-secure",
                       "Allow Empty Checksums Secure - Allow packages to have empty checksums for downloaded resources from secure locations (HTTPS). Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.AllowEmptyChecksumsSecure, configuration.Features.AllowEmptyChecksumsSecure.ToStringSafe()),
                       option =>
                       {
-                          if (option != null) configuration.Features.AllowEmptyChecksumsSecure = true;
+                          if (option != null)
+                          {
+                              configuration.Features.AllowEmptyChecksumsSecure = true;
+                          }
                       })
                 .Add("requirechecksum|requirechecksums|require-checksums",
                       "Require Checksums - Requires packages to have checksums for downloaded resources (both non-secure and secure). Overrides the default feature '{0}' set to '{1}' and '{2}' set to '{3}'.".FormatWith(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.ToStringSafe(), ApplicationParameters.Features.AllowEmptyChecksumsSecure, configuration.Features.AllowEmptyChecksumsSecure.ToStringSafe()),
@@ -194,13 +203,19 @@ namespace chocolatey.infrastructure.app.commands
                      "Use Remembered Options for Upgrade - use the arguments and options used during install for upgrade. Does not override arguments being passed at runtime. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configuration.Features.UseRememberedArgumentsForUpgrades.ToStringSafe()),
                      option =>
                      {
-                         if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = true;
+                         if (option != null)
+                         {
+                             configuration.Features.UseRememberedArgumentsForUpgrades = true;
+                         }
                      })
                 .Add("ignorerememberedargs|ignorerememberedarguments|ignorerememberedoptions|ignore-remembered-args|ignore-remembered-arguments|ignore-remembered-options",
                      "Ignore Remembered Options for Upgrade - ignore the arguments and options used during install for upgrade. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configuration.Features.UseRememberedArgumentsForUpgrades.ToStringSafe()),
                      option =>
                      {
-                         if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = false;
+                         if (option != null)
+                         {
+                             configuration.Features.UseRememberedArgumentsForUpgrades = false;
+                         }
                      })
                 .Add("exitwhenrebootdetected|exit-when-reboot-detected",
                      "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}. Overrides the default feature '{3}' set to '{4}'.".FormatWith

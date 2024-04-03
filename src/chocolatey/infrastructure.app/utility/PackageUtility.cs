@@ -30,8 +30,15 @@ namespace chocolatey.infrastructure.app.utility
         /// <returns>true if the package is a dependency, false if the package is the one specified or a virtual/semi-virtual</returns>
         public static bool PackageIdHasDependencySuffix(ChocolateyConfiguration config, string packageName)
         {
-            if (string.IsNullOrWhiteSpace(config.PackageNames)) return true;
-            if (string.IsNullOrWhiteSpace(packageName)) return true;
+            if (string.IsNullOrWhiteSpace(config.PackageNames))
+            {
+                return true;
+            }
+
+            if (string.IsNullOrWhiteSpace(packageName))
+            {
+                return true;
+            }
 
             foreach (var package in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
             {

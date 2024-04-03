@@ -69,7 +69,10 @@ namespace chocolatey.infrastructure.commandline
 
         public void Dispose()
         {
-            if (_isDisposing) return;
+            if (_isDisposing)
+            {
+                return;
+            }
 
             _isDisposing = true;
             _responseThread.Abort();

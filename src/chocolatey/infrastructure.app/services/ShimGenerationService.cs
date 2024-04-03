@@ -91,7 +91,11 @@ namespace chocolatey.infrastructure.app.services
             var exeFiles = _fileSystem.GetFiles(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
             foreach (string file in exeFiles.OrEmpty())
             {
-                if (_fileSystem.FileExists(file + ".ignore")) continue;
+                if (_fileSystem.FileExists(file + ".ignore"))
+                {
+                    continue;
+                }
+
                 bool isGui = _fileSystem.FileExists(file + ".gui");
                 //todo: #2586 v2 be able to determine gui automatically
 
@@ -107,12 +111,20 @@ namespace chocolatey.infrastructure.app.services
                     _shimGenExePath, argsForPackage, configuration.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            if (string.IsNullOrWhiteSpace(e.Data))
+                            {
+                                return;
+                            }
+
                             this.Log().Debug(() => " [ShimGen] {0}".FormatWith(e.Data.EscapeCurlyBraces()));
                         },
                     (s, e) =>
                         {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            if (string.IsNullOrWhiteSpace(e.Data))
+                            {
+                                return;
+                            }
+
                             this.Log().Error(() => " [ShimGen] {0}".FormatWith(e.Data.EscapeCurlyBraces()));
                         },
                     updateProcessPath: true
@@ -136,7 +148,10 @@ namespace chocolatey.infrastructure.app.services
             var exeFiles = _fileSystem.GetFiles(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
             foreach (string file in exeFiles.OrEmpty())
             {
-                if (_fileSystem.FileExists(file + ".ignore")) continue;
+                if (_fileSystem.FileExists(file + ".ignore"))
+                {
+                    continue;
+                }
 
                 var shimLocation = _fileSystem.CombinePaths(ApplicationParameters.ShimsLocation, _fileSystem.GetFileName(file));
                 this.Log().Debug(() => "Removing shim for {0} at '{1}".FormatWith(_fileSystem.GetFileName(file), shimLocation));

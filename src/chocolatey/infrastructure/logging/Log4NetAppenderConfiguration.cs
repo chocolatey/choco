@@ -208,7 +208,10 @@ namespace chocolatey.infrastructure.logging
         /// <param name="excludeLoggerNames">Loggers, such as a trace logger, to exclude from file appender.</param>
         private static void SetFileAppender(string outputDirectory, params string[] excludeLoggerNames)
         {
-            if (excludeLoggerNames == null) excludeLoggerNames = new string[] {};
+            if (excludeLoggerNames == null)
+            {
+                excludeLoggerNames = new string[] {};
+            }
 
             if (!_alreadyConfiguredFileAppender)
             {
@@ -271,7 +274,10 @@ namespace chocolatey.infrastructure.logging
         /// <param name="excludeAppenderNames">Appenders, such as a verbose console appender, to exclude from debug.</param>
         public static void EnableDebugLoggingIf(bool enableDebug, params string[] excludeAppenderNames)
         {
-            if (excludeAppenderNames == null) excludeAppenderNames = new string[] { };
+            if (excludeAppenderNames == null)
+            {
+                excludeAppenderNames = new string[] { };
+            }
 
             if (enableDebug)
             {
@@ -350,7 +356,10 @@ namespace chocolatey.infrastructure.logging
                         appender.AddFilter(new log4net.Filter.LevelRangeFilter { LevelMin = minLevel, LevelMax = Level.Fatal });
                     }
 
-                    if (appender != null && appender.GetType() == typeof(RollingFileAppender)) fileAppenders.Add(appender);
+                    if (appender != null && appender.GetType() == typeof(RollingFileAppender))
+                    {
+                        fileAppenders.Add(appender);
+                    }
                 }
 
                 foreach (ILogger log in logRepository.GetCurrentLoggers().Where(l => l.Name.IsEqualTo("Trace")).OrEmpty())
@@ -384,11 +393,18 @@ namespace chocolatey.infrastructure.logging
 
         public static void SetupAdditionalLogFile(string logFileLocation)
         {
-            if (string.IsNullOrWhiteSpace(logFileLocation)) return;
+            if (string.IsNullOrWhiteSpace(logFileLocation))
+            {
+                return;
+            }
 
             var logDirectory = Path.GetDirectoryName(logFileLocation);
             var logFileName = Path.GetFileNameWithoutExtension(logFileLocation);
-            if (!string.IsNullOrWhiteSpace(logDirectory) && !Directory.Exists(logDirectory)) Directory.CreateDirectory(logDirectory);
+            if (!string.IsNullOrWhiteSpace(logDirectory) && !Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
+
             var layout = new PatternLayout
             {
                 ConversionPattern = "%date %property{pid} [%-5level] - %message%newline"

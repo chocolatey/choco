@@ -43,7 +43,11 @@ namespace chocolatey.infrastructure.app.services
             if (string.IsNullOrWhiteSpace(installDirectory) || installDirectory.IsEqualTo(ApplicationParameters.InstallLocation) || installDirectory.IsEqualTo(ApplicationParameters.PackagesLocation))
             {
                 var logMessage = "Install location is not specific enough, cannot capture files:{0} Erroneous install location captured as '{1}'".FormatWith(Environment.NewLine, installDirectory);
-                if (packageResult != null) packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                if (packageResult != null)
+                {
+                    packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                }
+
                 this.Log().Error(logMessage);
                 return;
             }

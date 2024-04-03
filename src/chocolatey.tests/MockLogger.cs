@@ -63,7 +63,10 @@ namespace chocolatey.tests
             {
                 foreach (var message in messageLevel.Value.OrEmpty())
                 {
-                    if (message.Contains(expectedMessage)) messageCount++;
+                    if (message.Contains(expectedMessage))
+                    {
+                        messageCount++;
+                    }
                 }
             }
 
@@ -75,7 +78,10 @@ namespace chocolatey.tests
             int messageCount = 0;
             foreach (var message in MessagesFor(level).OrEmpty())
             {
-                if (message.Contains(expectedMessage)) messageCount++;
+                if (message.Contains(expectedMessage))
+                {
+                    messageCount++;
+                }
             }
 
             return messageCount;

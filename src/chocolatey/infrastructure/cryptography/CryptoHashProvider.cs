@@ -86,7 +86,10 @@ namespace chocolatey.infrastructure.cryptography
 
         public string ComputeFileHash(string filePath)
         {
-            if (!_fileSystem.FileExists(filePath)) return string.Empty;
+            if (!_fileSystem.FileExists(filePath))
+            {
+                return string.Empty;
+            }
 
             try
             {
@@ -136,9 +139,12 @@ namespace chocolatey.infrastructure.cryptography
         public static string ComputeStringHash(string originalText, CryptoHashProviderType providerType)
         {
             IHashAlgorithm hashAlgorithm = GetHashAlgorithmStatic(providerType);
-            if (hashAlgorithm == null) return string.Empty;
+            if (hashAlgorithm == null)
+            {
+                return string.Empty;
+            }
 
-             var hash = hashAlgorithm.ComputeHash(Encoding.ASCII.GetBytes(originalText));
+            var hash = hashAlgorithm.ComputeHash(Encoding.ASCII.GetBytes(originalText));
              return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
 

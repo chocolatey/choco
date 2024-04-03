@@ -63,7 +63,10 @@ namespace chocolatey.tests
         [OneTimeSetUp]
         public void Setup()
         {
-            if (MockLogger != null) MockLogger.Reset();
+            if (MockLogger != null)
+            {
+                MockLogger.Reset();
+            }
             //Log.InitializeWith(MockLogger);
             NugetCommon.ClearRepositoriesCache();
             Context();

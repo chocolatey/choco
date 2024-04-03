@@ -53,7 +53,10 @@ namespace chocolatey.infrastructure.app.tasks
 
         public void Shutdown()
         {
-            if (_subscription != null) _subscription.Dispose();
+            if (_subscription != null)
+            {
+                _subscription.Dispose();
+            }
         }
 
         private void HandleMessage(PreRunMessage message)

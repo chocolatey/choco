@@ -100,7 +100,10 @@ A corrupt .registry file exists at {0}.
             {
                 if (_fileSystem.FileExists(_fileSystem.CombinePaths(pkgStorePath, RegistrySnapshotBadFile)))
                 {
-                    if (_config.RegularOutput) this.Log().Warn(deserializationErrorMessage);
+                    if (_config.RegularOutput)
+                    {
+                        this.Log().Warn(deserializationErrorMessage);
+                    }
                 }
                 else
                 {
@@ -109,16 +112,22 @@ A corrupt .registry file exists at {0}.
             }
             catch (Exception e)
             {
-                if (_config.RegularOutput) this.Log().Warn(@"A .registry file at '{0}'
+                if (_config.RegularOutput)
+                {
+                    this.Log().Warn(@"A .registry file at '{0}'
  has errored attempting to read it. This file will be renamed to
  '{1}' The error:
  {2}
  ".FormatWith(_fileSystem.CombinePaths(pkgStorePath, RegistrySnapshotFile), _fileSystem.CombinePaths(pkgStorePath, RegistrySnapshotBadFile), e.ToString()));
+                }
 
                 FaultTolerance.TryCatchWithLoggingException(
                     () =>
                     {
-                        if (_config.RegularOutput) this.Log().Warn(deserializationErrorMessage);
+                        if (_config.RegularOutput)
+                        {
+                            this.Log().Warn(deserializationErrorMessage);
+                        }
 
                         // rename the bad registry file so that it isn't processed again
                         _fileSystem.MoveFile(_fileSystem.CombinePaths(pkgStorePath, RegistrySnapshotFile), _fileSystem.CombinePaths(pkgStorePath, RegistrySnapshotBadFile));
@@ -144,9 +153,16 @@ A corrupt .registry file exists at {0}.
             packageInformation.HasSilentUninstall = _fileSystem.FileExists(_fileSystem.CombinePaths(pkgStorePath, SilentUninstallerFile));
             packageInformation.IsPinned = _fileSystem.FileExists(_fileSystem.CombinePaths(pkgStorePath, PinFile));
             var argsFile = _fileSystem.CombinePaths(pkgStorePath, ArgsFile);
-            if (_fileSystem.FileExists(argsFile)) packageInformation.Arguments = _fileSystem.ReadFile(argsFile);
+            if (_fileSystem.FileExists(argsFile))
+            {
+                packageInformation.Arguments = _fileSystem.ReadFile(argsFile);
+            }
+
             var extraInfoFile = _fileSystem.CombinePaths(pkgStorePath, ExtraFile);
-            if (_fileSystem.FileExists(extraInfoFile)) packageInformation.ExtraInformation = _fileSystem.ReadFile(extraInfoFile);
+            if (_fileSystem.FileExists(extraInfoFile))
+            {
+                packageInformation.ExtraInformation = _fileSystem.ReadFile(extraInfoFile);
+            }
 
             var versionOverrideFile = _fileSystem.CombinePaths(pkgStorePath, VersionOverrideFile);
             if (_fileSystem.FileExists(versionOverrideFile))
@@ -173,7 +189,11 @@ A corrupt .registry file exists at {0}.
 
             if (packageInformation.Package == null)
             {
-                if (_config.RegularOutput) this.Log().Debug("No package information to save as package is null.");
+                if (_config.RegularOutput)
+                {
+                    this.Log().Debug("No package information to save as package is null.");
+                }
+
                 return;
             }
 
@@ -202,7 +222,11 @@ A corrupt .registry file exists at {0}.
             if (!string.IsNullOrWhiteSpace(packageInformation.Arguments))
             {
                 var argsFile = _fileSystem.CombinePaths(pkgStorePath, ArgsFile);
-                if (_fileSystem.FileExists(argsFile)) _fileSystem.DeleteFile(argsFile);
+                if (_fileSystem.FileExists(argsFile))
+                {
+                    _fileSystem.DeleteFile(argsFile);
+                }
+
                 _fileSystem.WriteFile(argsFile, packageInformation.Arguments);
             }
             else
@@ -213,7 +237,11 @@ A corrupt .registry file exists at {0}.
             if (!string.IsNullOrWhiteSpace(packageInformation.ExtraInformation))
             {
                 var extraFile = _fileSystem.CombinePaths(pkgStorePath, ExtraFile);
-                if (_fileSystem.FileExists(extraFile)) _fileSystem.DeleteFile(extraFile);
+                if (_fileSystem.FileExists(extraFile))
+                {
+                    _fileSystem.DeleteFile(extraFile);
+                }
+
                 _fileSystem.WriteFile(extraFile, packageInformation.ExtraInformation);
             }
             else
@@ -224,7 +252,11 @@ A corrupt .registry file exists at {0}.
             if (packageInformation.VersionOverride != null)
             {
                 var versionOverrideFile = _fileSystem.CombinePaths(pkgStorePath, VersionOverrideFile);
-                if (_fileSystem.FileExists(versionOverrideFile)) _fileSystem.DeleteFile(versionOverrideFile);
+                if (_fileSystem.FileExists(versionOverrideFile))
+                {
+                    _fileSystem.DeleteFile(versionOverrideFile);
+                }
+
                 _fileSystem.WriteFile(versionOverrideFile, packageInformation.VersionOverride.ToNormalizedStringChecked());
             }
             else
@@ -253,7 +285,11 @@ A corrupt .registry file exists at {0}.
         public void Remove(IPackageMetadata package)
         {
             var pkgStorePath = GetStorePath(_fileSystem, package.Id, package.Version);
-            if (_config.RegularOutput) this.Log().Info("Removing Package Information for {0}".FormatWith(pkgStorePath));
+            if (_config.RegularOutput)
+            {
+                this.Log().Info("Removing Package Information for {0}".FormatWith(pkgStorePath));
+            }
+
             _fileSystem.DeleteDirectoryChecked(pkgStorePath, recursive: true);
         }
 

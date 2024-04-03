@@ -383,7 +383,10 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    if (packageResult.Value.Name.IsEqualTo("missingpackage")) continue;
+                    if (packageResult.Value.Name.IsEqualTo("missingpackage"))
+                    {
+                        continue;
+                    }
 
                     DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }

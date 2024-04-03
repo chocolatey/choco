@@ -75,18 +75,27 @@ namespace chocolatey
         /// <remarks>Borrowed heavily from http://dhvik.blogspot.com/2009/05/assemblynamegetpublickeytoken-tostring.html </remarks>
         public static string GetPublicKeyToken(this IAssembly assembly)
         {
-            if (assembly == null) return string.Empty;
+            if (assembly == null)
+            {
+                return string.Empty;
+            }
 
             return assembly.GetName().GetPublicKeyTokenString();
         }
 
         public static string GetPublicKeyTokenString(this AssemblyName assemblyName)
         {
-            if (assemblyName == null) return string.Empty;
+            if (assemblyName == null)
+            {
+                return string.Empty;
+            }
 
             byte[] publicKeyToken = assemblyName.GetPublicKeyToken();
 
-            if (publicKeyToken == null || publicKeyToken.Length == 0) return string.Empty;
+            if (publicKeyToken == null || publicKeyToken.Length == 0)
+            {
+                return string.Empty;
+            }
 
             return publicKeyToken.Select(x => x.ToString("x2")).Aggregate((x, y) => x + y);
         }

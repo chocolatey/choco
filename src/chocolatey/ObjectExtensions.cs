@@ -32,7 +32,10 @@ namespace chocolatey
         /// <returns><see cref="string.Empty"/> if <paramref name="input"/> is null, otherwise <paramref name="input"/>.ToString()</returns>
         public static string ToStringSafe(this object input)
         {
-            if (input == null) return string.Empty;
+            if (input == null)
+            {
+                return string.Empty;
+            }
 
             return input.ToString();
         }

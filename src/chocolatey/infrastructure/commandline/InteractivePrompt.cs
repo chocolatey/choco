@@ -43,7 +43,11 @@ namespace chocolatey.infrastructure.commandline
 
         public static string PromptForConfirmation(string prompt, IEnumerable<string> choices, string defaultChoice, bool requireAnswer, bool allowShortAnswer = true, bool shortPrompt = false, int repeat = 10, int timeoutInSeconds = 0)
         {
-            if (repeat < 0) throw new ApplicationException("Too many bad attempts. Stopping before application crash.");
+            if (repeat < 0)
+            {
+                throw new ApplicationException("Too many bad attempts. Stopping before application crash.");
+            }
+
             Ensure.That(() => prompt).NotNull();
             Ensure.That(() => choices).NotNull();
             Ensure
@@ -106,7 +110,11 @@ namespace chocolatey.infrastructure.commandline
                                 "[{0}]{1}".FormatWith(choice.Substring(0,1).ToUpperInvariant(), choice.Substring(1, choice.Length - 1)) :
                                 choice;
 
-                    if (counter != 1) Console.Write("/");
+                    if (counter != 1)
+                    {
+                        Console.Write("/");
+                    }
+
                     Console.Write(choicePrompt);
                 }
 
@@ -116,7 +124,10 @@ namespace chocolatey.infrastructure.commandline
             Console.Write(shortPrompt ? "): " : "> ");
 
             var selection = timeoutInSeconds == 0 ? Console.ReadLine() : Console.ReadLine(timeoutInSeconds * 1000);
-            if (shortPrompt) Console.WriteLine();
+            if (shortPrompt)
+            {
+                Console.WriteLine();
+            }
 
             if (string.IsNullOrWhiteSpace(selection) && !string.IsNullOrWhiteSpace(defaultChoice))
             {
@@ -189,7 +200,11 @@ namespace chocolatey.infrastructure.commandline
                     info = possibleNonInteractive ? Console.ReadKey(TimeoutInSeconds * 1000) : Console.ReadKey(true);
                 }
             }
-            for (int i = 0; i < password.Length; i++) Console.Write("*");
+            for (int i = 0; i < password.Length; i++)
+            {
+                Console.Write("*");
+            }
+
             System.Console.WriteLine("");
 
             return password;

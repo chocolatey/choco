@@ -75,14 +75,21 @@ namespace chocolatey.infrastructure.filesystem
             {
                 var methodName = string.Empty;
                 var stackFrame = new System.Diagnostics.StackFrame(1);
-                if (stackFrame != null) methodName = stackFrame.GetMethod().Name;
+                if (stackFrame != null)
+                {
+                    methodName = stackFrame.GetMethod().Name;
+                }
+
                 throw new ApplicationException("Path to combine cannot be empty. Tried to combine null with '{0}'.{1}".FormatWith(string.Join(",", rightItems), string.IsNullOrWhiteSpace(methodName) ? string.Empty : " Method called from '{0}'".FormatWith(methodName)));
             }
 
             var combinedPath = Platform.GetPlatform() == PlatformType.Windows ? leftItem : leftItem.Replace('\\', '/');
             foreach (var rightItem in rightItems)
             {
-                if (rightItem.Contains(":")) throw new ApplicationException("Cannot combine a path with ':' attempted to combine '{0}' with '{1}'".FormatWith(rightItem, combinedPath));
+                if (rightItem.Contains(":"))
+                {
+                    throw new ApplicationException("Cannot combine a path with ':' attempted to combine '{0}' with '{1}'".FormatWith(rightItem, combinedPath));
+                }
 
                 var rightSide = Platform.GetPlatform() == PlatformType.Windows ? rightItem : rightItem.Replace('\\', '/');
                 if (rightSide.StartsWith(Path.DirectorySeparatorChar.ToStringSafe()) || rightSide.StartsWith(Path.AltDirectorySeparatorChar.ToStringSafe()))
@@ -100,7 +107,10 @@ namespace chocolatey.infrastructure.filesystem
 
         public string GetFullPath(string path)
         {
-            if (string.IsNullOrWhiteSpace(path)) return path;
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return path;
+            }
 
             try
             {
@@ -136,7 +146,10 @@ namespace chocolatey.infrastructure.filesystem
 
         public string GetExecutablePath(string executableName)
         {
-            if (string.IsNullOrWhiteSpace(executableName)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(executableName))
+            {
+                return string.Empty;
+            }
 
             var isWindows = Platform.GetPlatform() == PlatformType.Windows;
             IList<string> extensions = new List<string>();
@@ -166,7 +179,10 @@ namespace chocolatey.infrastructure.filesystem
                 foreach (var extension in extensions.OrEmpty())
                 {
                     var possiblePath = CombinePaths(path, "{0}{1}".FormatWith(executableName, extension.ToLowerSafe()));
-                    if (FileExists(possiblePath)) return possiblePath;
+                    if (FileExists(possiblePath))
+                    {
+                        return possiblePath;
+                    }
                 }
             }
 
@@ -186,7 +202,11 @@ namespace chocolatey.infrastructure.filesystem
 
         public IEnumerable<string> GetFiles(string directoryPath, string pattern = "*.*", SearchOption option = SearchOption.TopDirectoryOnly)
         {
-            if (string.IsNullOrWhiteSpace(directoryPath)) return new List<string>();
+            if (string.IsNullOrWhiteSpace(directoryPath))
+            {
+                return new List<string>();
+            }
+
             if (!DirectoryExists(directoryPath))
             {
                 this.Log().Warn("Directory '{0}' does not exist.".FormatWith(directoryPath));
@@ -198,7 +218,10 @@ namespace chocolatey.infrastructure.filesystem
 
         public IEnumerable<string> GetFiles(string directoryPath, string[] extensions, SearchOption option = SearchOption.TopDirectoryOnly)
         {
-            if (string.IsNullOrWhiteSpace(directoryPath)) return new List<string>();
+            if (string.IsNullOrWhiteSpace(directoryPath))
+            {
+                return new List<string>();
+            }
 
             return Directory.EnumerateFiles(directoryPath, "*.*", option)
                             .Where(f => extensions.Any(x => f.EndsWith(x, StringComparison.OrdinalIgnoreCase)));
@@ -223,14 +246,20 @@ namespace chocolatey.infrastructure.filesystem
 
         public string GetFilenameWithoutExtension(string filePath)
         {
-            if (Platform.GetPlatform() == PlatformType.Windows) return Path.GetFileNameWithoutExtension(filePath);
+            if (Platform.GetPlatform() == PlatformType.Windows)
+            {
+                return Path.GetFileNameWithoutExtension(filePath);
+            }
 
             return Path.GetFileNameWithoutExtension(filePath.Replace('\\', '/'));
         }
 
         public string GetFileExtension(string filePath)
         {
-            if (Platform.GetPlatform() == PlatformType.Windows) return Path.GetExtension(filePath);
+            if (Platform.GetPlatform() == PlatformType.Windows)
+            {
+                return Path.GetExtension(filePath);
+            }
 
             return Path.GetExtension(filePath.Replace('\\', '/'));
         }
@@ -578,14 +607,20 @@ namespace chocolatey.infrastructure.filesystem
 
         public IEnumerable<string> GetDirectories(string directoryPath)
         {
-            if (!DirectoryExists(directoryPath)) return new List<string>();
+            if (!DirectoryExists(directoryPath))
+            {
+                return new List<string>();
+            }
 
             return Directory.EnumerateDirectories(directoryPath);
         }
 
         public IEnumerable<string> GetDirectories(string directoryPath, string pattern, SearchOption option = SearchOption.TopDirectoryOnly)
         {
-            if (!DirectoryExists(directoryPath)) return new List<string>();
+            if (!DirectoryExists(directoryPath))
+            {
+                return new List<string>();
+            }
 
             return Directory.EnumerateDirectories(directoryPath, pattern, option);
         }
@@ -658,11 +693,17 @@ namespace chocolatey.infrastructure.filesystem
 
         public void MoveDirectory(string directoryPath, string newDirectoryPath, bool useFileMoveFallback, bool isSilent)
         {
-            if (string.IsNullOrWhiteSpace(directoryPath) || string.IsNullOrWhiteSpace(newDirectoryPath)) throw new ApplicationException("You must provide a directory to move from or to.");
+            if (string.IsNullOrWhiteSpace(directoryPath) || string.IsNullOrWhiteSpace(newDirectoryPath))
+            {
+                throw new ApplicationException("You must provide a directory to move from or to.");
+            }
 
             // Linux / macOS do not have a SystemDrive environment variable, instead, everything is under "/"
             var systemDrive = Platform.GetPlatform() == PlatformType.Windows ? Environment.GetEnvironmentVariable("SystemDrive") : "/";
-            if (CombinePaths(directoryPath, "").IsEqualTo(CombinePaths(systemDrive, ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
+            if (CombinePaths(directoryPath, "").IsEqualTo(CombinePaths(systemDrive, "")))
+            {
+                throw new ApplicationException("Cannot move or delete the root of the system drive");
+            }
 
             try
             {
@@ -694,7 +735,10 @@ namespace chocolatey.infrastructure.filesystem
                 foreach (var file in GetFiles(directoryPath, "*.*", SearchOption.AllDirectories).OrEmpty())
                 {
                     var destinationFile = file.Replace(directoryPath, newDirectoryPath);
-                    if (FileExists(destinationFile)) DeleteFile(destinationFile, isSilent);
+                    if (FileExists(destinationFile))
+                    {
+                        DeleteFile(destinationFile, isSilent);
+                    }
 
                     EnsureDirectoryExists(GetDirectoryName(destinationFile), ignoreError: true);
                     this.Log().Debug(ChocolateyLoggers.Verbose, "Moving '{0}'{1} to '{2}'".FormatWith(file, Environment.NewLine, destinationFile));
@@ -903,11 +947,17 @@ namespace chocolatey.infrastructure.filesystem
 
         public void DeleteDirectory(string directoryPath, bool recursive, bool overrideAttributes, bool isSilent)
         {
-            if (string.IsNullOrWhiteSpace(directoryPath)) throw new ApplicationException("You must provide a directory to delete.");
+            if (string.IsNullOrWhiteSpace(directoryPath))
+            {
+                throw new ApplicationException("You must provide a directory to delete.");
+            }
 
             // Linux / macOS do not have a SystemDrive environment variable, instead, everything is under "/"
             var systemDrive = Platform.GetPlatform() == PlatformType.Windows ? Environment.GetEnvironmentVariable("SystemDrive") : "/";
-            if (CombinePaths(directoryPath, "").IsEqualTo(CombinePaths(systemDrive, ""))) throw new ApplicationException("Cannot move or delete the root of the system drive");
+            if (CombinePaths(directoryPath, "").IsEqualTo(CombinePaths(systemDrive, "")))
+            {
+                throw new ApplicationException("Cannot move or delete the root of the system drive");
+            }
 
             if (overrideAttributes)
             {
@@ -916,13 +966,28 @@ namespace chocolatey.infrastructure.filesystem
                     var filePath = GetFullPath(file);
                     var fileInfo = GetFileInfoFor(filePath);
 
-                    if (IsSystemFile(fileInfo)) EnsureFileAttributeRemoved(filePath, FileAttributes.System);
-                    if (IsReadOnlyFile(fileInfo)) EnsureFileAttributeRemoved(filePath, FileAttributes.ReadOnly);
-                    if (IsHiddenFile(fileInfo)) EnsureFileAttributeRemoved(filePath, FileAttributes.Hidden);
+                    if (IsSystemFile(fileInfo))
+                    {
+                        EnsureFileAttributeRemoved(filePath, FileAttributes.System);
+                    }
+
+                    if (IsReadOnlyFile(fileInfo))
+                    {
+                        EnsureFileAttributeRemoved(filePath, FileAttributes.ReadOnly);
+                    }
+
+                    if (IsHiddenFile(fileInfo))
+                    {
+                        EnsureFileAttributeRemoved(filePath, FileAttributes.Hidden);
+                    }
                 }
             }
 
-            if (!isSilent) this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to delete directory \"{0}\".".FormatWith(GetFullPath(directoryPath)));
+            if (!isSilent)
+            {
+                this.Log().Debug(ChocolateyLoggers.Verbose, () => "Attempting to delete directory \"{0}\".".FormatWith(GetFullPath(directoryPath)));
+            }
+
             AllowRetries(
                 () =>
                 {
@@ -1018,10 +1083,22 @@ namespace chocolatey.infrastructure.filesystem
             file.Read(buffer, 0, 5);
             file.Close();
 
-            if (buffer[0] == 0xef && buffer[1] == 0xbb && buffer[2] == 0xbf) enc = Encoding.UTF8;
-            else if (buffer[0] == 0xfe && buffer[1] == 0xff) enc = Encoding.Unicode;
-            else if (buffer[0] == 0 && buffer[1] == 0 && buffer[2] == 0xfe && buffer[3] == 0xff) enc = Encoding.UTF32;
-            else if (buffer[0] == 0x2b && buffer[1] == 0x2f && buffer[2] == 0x76) enc = Encoding.UTF7;
+            if (buffer[0] == 0xef && buffer[1] == 0xbb && buffer[2] == 0xbf)
+            {
+                enc = Encoding.UTF8;
+            }
+            else if (buffer[0] == 0xfe && buffer[1] == 0xff)
+            {
+                enc = Encoding.Unicode;
+            }
+            else if (buffer[0] == 0 && buffer[1] == 0 && buffer[2] == 0xfe && buffer[3] == 0xff)
+            {
+                enc = Encoding.UTF32;
+            }
+            else if (buffer[0] == 0x2b && buffer[1] == 0x2f && buffer[2] == 0x76)
+            {
+                enc = Encoding.UTF7;
+            }
 
             //assume xml is utf8
             //if (enc == Encoding.Default && get_file_extension(filePath).is_equal_to(".xml")) enc = Encoding.UTF8;

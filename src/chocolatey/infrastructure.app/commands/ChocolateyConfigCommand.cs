@@ -62,7 +62,11 @@ namespace chocolatey.infrastructure.app.commands
             Enum.TryParse(unparsedCommand, true, out command);
             if (command == ConfigCommandType.Unknown)
             {
-                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                if (!string.IsNullOrWhiteSpace(unparsedCommand))
+                {
+                    this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                }
+
                 command = ConfigCommandType.List;
             }
 
@@ -71,7 +75,10 @@ namespace chocolatey.infrastructure.app.commands
             if ((configuration.ConfigCommand.Command == ConfigCommandType.List
                  || !string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name)
                 )
-                && unparsedArguments.Count > 1) throw new ApplicationException("A single features command must be listed. Please see the help menu for those commands");
+                && unparsedArguments.Count > 1)
+            {
+                throw new ApplicationException("A single features command must be listed. Please see the help menu for those commands");
+            }
 
             if (string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name) && unparsedArguments.Count >= 2)
             {
@@ -85,8 +92,15 @@ namespace chocolatey.infrastructure.app.commands
 
         public virtual void Validate(ChocolateyConfiguration configuration)
         {
-            if (configuration.ConfigCommand.Command != ConfigCommandType.List && string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name)) throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name by option or position.".FormatWith(configuration.ConfigCommand.Command.ToStringSafe().ToLower()));
-            if (configuration.ConfigCommand.Command == ConfigCommandType.Set && string.IsNullOrWhiteSpace(configuration.ConfigCommand.ConfigValue)) throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --value by option or position.".FormatWith(configuration.ConfigCommand.Command.ToStringSafe().ToLower()));
+            if (configuration.ConfigCommand.Command != ConfigCommandType.List && string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name))
+            {
+                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name by option or position.".FormatWith(configuration.ConfigCommand.Command.ToStringSafe().ToLower()));
+            }
+
+            if (configuration.ConfigCommand.Command == ConfigCommandType.Set && string.IsNullOrWhiteSpace(configuration.ConfigCommand.ConfigValue))
+            {
+                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --value by option or position.".FormatWith(configuration.ConfigCommand.Command.ToStringSafe().ToLower()));
+            }
         }
 
         public virtual void HelpMessage(ChocolateyConfiguration configuration)
@@ -167,7 +181,10 @@ Config shown in action: https://raw.githubusercontent.com/wiki/chocolatey/choco/
         public virtual bool MayRequireAdminAccess()
         {
             var config = Config.GetConfigurationSettings();
-            if (config == null) return true;
+            if (config == null)
+            {
+                return true;
+            }
 
             return config.ConfigCommand.Command != ConfigCommandType.List;
         }

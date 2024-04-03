@@ -239,7 +239,10 @@ namespace chocolatey.infrastructure.app.builders
             }
 
             // if it is still empty, use temp in the Chocolatey install directory.
-            if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "temp");
+            if (string.IsNullOrWhiteSpace(config.CacheLocation))
+            {
+                config.CacheLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "temp");
+            }
 
             var commandExecutionTimeoutSeconds = 0;
             var commandExecutionTimeout = SetConfigItem(
@@ -531,9 +534,13 @@ namespace chocolatey.infrastructure.app.builders
 
                 if (licensedConfigBuilder == null)
                 {
-                    if (config.RegularOutput) "chocolatey".Log().Warn(ChocolateyLoggers.Important,
+                    if (config.RegularOutput)
+                    {
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important,
                         @"Unable to set licensed configuration. Please upgrade to a newer
  licensed version (choco upgrade chocolatey.extension).");
+                    }
+
                     return;
                 }
                 try
@@ -551,7 +558,11 @@ namespace chocolatey.infrastructure.app.builders
                 catch (Exception ex)
                 {
                     var isDebug = ApplicationParameters.IsDebugModeCliPrimitive();
-                    if (config.Debug) isDebug = true;
+                    if (config.Debug)
+                    {
+                        isDebug = true;
+                    }
+
                     var message = isDebug ? ex.ToString() : ex.Message;
 
                     if (isDebug && ex.InnerException != null)

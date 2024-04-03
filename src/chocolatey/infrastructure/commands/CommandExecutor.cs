@@ -245,12 +245,18 @@ namespace chocolatey.infrastructure.commands
 
         private static void LogOutput(object sender, DataReceivedEventArgs e)
         {
-            if (e != null) "chocolatey".Log().Info(e.Data.EscapeCurlyBraces());
+            if (e != null)
+            {
+                "chocolatey".Log().Info(e.Data.EscapeCurlyBraces());
+            }
         }
 
         private static void LogError(object sender, DataReceivedEventArgs e)
         {
-            if (e != null) "chocolatey".Log().Error(e.Data.EscapeCurlyBraces());
+            if (e != null)
+            {
+                "chocolatey".Log().Error(e.Data.EscapeCurlyBraces());
+            }
         }
 
 

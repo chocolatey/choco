@@ -57,7 +57,10 @@ namespace chocolatey.infrastructure.app.runners
  Try choco -? for command reference/help.".FormatWith(config.CommandName));
                 }
 
-                if (isConsole) Environment.ExitCode = 1;
+                if (isConsole)
+                {
+                    Environment.ExitCode = 1;
+                }
             }
             else
             {
@@ -132,9 +135,15 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             if (!config.Features.FailOnInvalidOrMissingLicense ||
                 config.CommandName.TrimSafe().IsEqualTo("feature") ||
                 config.CommandName.TrimSafe().IsEqualTo("features")
-            ) return;
+            )
+            {
+                return;
+            }
 
-            if (!config.Information.IsLicensedVersion) throw new ApplicationException("License is missing or invalid.");
+            if (!config.Information.IsLicensedVersion)
+            {
+                throw new ApplicationException("License is missing or invalid.");
+            }
         }
 
         public void Run(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
@@ -286,10 +295,16 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         public void WarnIfAdminAndNeedsElevation(ChocolateyConfiguration config)
         {
-            if (config.HelpRequested) return;
+            if (config.HelpRequested)
+            {
+                return;
+            }
 
             // skip when commands will set or for background mode
-            if (!config.Features.ShowNonElevatedWarnings) return;
+            if (!config.Features.ShowNonElevatedWarnings)
+            {
+                return;
+            }
 
             var shouldWarn = (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator)
                           || (!config.Information.IsUserAdministrator && ApplicationParameters.InstallLocation.IsEqualTo(ApplicationParameters.CommonAppDataChocolatey));

@@ -70,7 +70,10 @@ namespace chocolatey.infrastructure.app.runners
                             // if debug is bundled with local options, it may not get picked up when global
                             // options are parsed. Attempt to set it again once local options are set.
                             // This does mean some output from debug will be missed (but not much)
-                            if (config.Debug) Log4NetAppenderConfiguration.EnableDebugLoggingIf(config.Debug, "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Verbose.ToStringSafe()), "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Trace.ToStringSafe()));
+                            if (config.Debug)
+                            {
+                                Log4NetAppenderConfiguration.EnableDebugLoggingIf(config.Debug, "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Verbose.ToStringSafe()), "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Trace.ToStringSafe()));
+                            }
 
                             command.ParseAdditionalArguments(unparsedArgs, config);
 

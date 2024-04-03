@@ -25,7 +25,10 @@ namespace chocolatey.infrastructure.information
     {
         public static bool UserIsAdministrator()
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) return false;
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                return false;
+            }
 
             var isAdmin = false;
 
@@ -38,7 +41,10 @@ namespace chocolatey.infrastructure.information
 
                     // Any version of Windows less than 6 does not have UAC
                     // so bail with the answer from the above check
-                    if (Platform.GetVersion().Major < 6) return isAdmin;
+                    if (Platform.GetVersion().Major < 6)
+                    {
+                        return isAdmin;
+                    }
 
                     if (!isAdmin)
                     {
@@ -74,7 +80,10 @@ namespace chocolatey.infrastructure.information
                             if (!successfulCall)
                             {
                                 "chocolatey".Log().Warn("Error during native GetTokenInformation call - {0}".FormatWith(Marshal.GetLastWin32Error()));
-                                if (tokenInformation != IntPtr.Zero) Marshal.FreeHGlobal(tokenInformation);
+                                if (tokenInformation != IntPtr.Zero)
+                                {
+                                    Marshal.FreeHGlobal(tokenInformation);
+                                }
                             }
 
                             var elevationType = (TokenElevationType)Marshal.ReadInt32(tokenInformation);
@@ -91,7 +100,10 @@ namespace chocolatey.infrastructure.information
                         }
                         finally
                         {
-                            if (tokenInformation != IntPtr.Zero) Marshal.FreeHGlobal(tokenInformation);
+                            if (tokenInformation != IntPtr.Zero)
+                            {
+                                Marshal.FreeHGlobal(tokenInformation);
+                            }
                         }
                     }
                 }
@@ -102,7 +114,10 @@ namespace chocolatey.infrastructure.information
 
         public static bool IsElevated()
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) return false;
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                return false;
+            }
 
             using (var identity = WindowsIdentity.GetCurrent(TokenAccessLevels.Query | TokenAccessLevels.Duplicate))
             {
@@ -128,7 +143,10 @@ namespace chocolatey.infrastructure.information
 
         public static bool UserIsSystem()
         {
-             if (Platform.GetPlatform() != PlatformType.Windows) return false;
+             if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                return false;
+            }
 
             var isSystem = false;
 

@@ -164,7 +164,10 @@ namespace chocolatey.infrastructure.app.nuget
                         if (machineSource != null)
                         {
                             bypassProxy = machineSource.BypassProxy;
-                            if (bypassProxy) "chocolatey".Log().Debug("Source '{0}' is configured to bypass proxies.".FormatWith(source));
+                            if (bypassProxy)
+                            {
+                                "chocolatey".Log().Debug("Source '{0}' is configured to bypass proxies.".FormatWith(source));
+                            }
 
                             if (!string.IsNullOrWhiteSpace(machineSource.Certificate))
                             {
@@ -290,7 +293,10 @@ namespace chocolatey.infrastructure.app.nuget
             ISet<SourcePackageDependencyInfo> dependencyInfos
         )
         {
-            if (dependencyInfos.Contains(package)) return;
+            if (dependencyInfos.Contains(package))
+            {
+                return;
+            }
 
             var metadata = allLocalPackages
                 .FirstOrDefault(p => p.PackageMetadata.Id.Equals(package.Id, StringComparison.OrdinalIgnoreCase) && p.PackageMetadata.Version.Equals(package.Version))
@@ -340,7 +346,11 @@ namespace chocolatey.infrastructure.app.nuget
                     null,
                     null);
 
-                if (dependencyInfos.Contains(result)) return;
+                if (dependencyInfos.Contains(result))
+                {
+                    return;
+                }
+
                 dependencyInfos.Add(result);
 
                 foreach (var dependency in dependencies)
@@ -359,7 +369,10 @@ namespace chocolatey.infrastructure.app.nuget
             ISet<PackageDependency> dependencyCache,
             ChocolateyConfiguration configuration)
         {
-            if (availablePackages.Contains(package)) return;
+            if (availablePackages.Contains(package))
+            {
+                return;
+            }
 
             var dependencyInfoResources = resources.DependencyInfoResources();
 
@@ -381,12 +394,19 @@ namespace chocolatey.infrastructure.app.nuget
                     "chocolatey".Log().Warn(ex.InnerException.Message);
                 }
 
-                if (dependencyInfo == null) continue;
+                if (dependencyInfo == null)
+                {
+                    continue;
+                }
 
                 availablePackages.Add(dependencyInfo);
                 foreach (var dependency in dependencyInfo.Dependencies)
                 {
-                    if (dependencyCache.Contains(dependency)) continue;
+                    if (dependencyCache.Contains(dependency))
+                    {
+                        continue;
+                    }
+
                     dependencyCache.Add(dependency);
                     await GetPackageDependencies(
                         dependency.Id, framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration);
@@ -425,12 +445,19 @@ namespace chocolatey.infrastructure.app.nuget
                     "chocolatey".Log().Warn(ex.InnerException.Message);
                 }
 
-                if (!dependencyInfos.Any()) continue;
+                if (!dependencyInfos.Any())
+                {
+                    continue;
+                }
 
                 availablePackages.AddRange(dependencyInfos);
                 foreach (var dependency in dependencyInfos.SelectMany(p => p.Dependencies))
                 {
-                    if (dependencyCache.Contains(dependency)) continue;
+                    if (dependencyCache.Contains(dependency))
+                    {
+                        continue;
+                    }
+
                     dependencyCache.Add(dependency);
 
                     // Recursion is fun, kids
@@ -446,7 +473,11 @@ namespace chocolatey.infrastructure.app.nuget
         {
             foreach (var package in locallyInstalledPackages.Where(p => !parentPackages.Contains(p)))
             {
-                if (parentPackages.Contains(package)) continue;
+                if (parentPackages.Contains(package))
+                {
+                    continue;
+                }
+
                 if (package.Dependencies.Any(p => p.Id.Equals(packageId, StringComparison.OrdinalIgnoreCase)))
                 {
                     parentPackages.Add(package);

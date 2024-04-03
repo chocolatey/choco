@@ -51,7 +51,10 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="isSilent">Log messages?</param>
         public static void Retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
-            if (action == null) return;
+            if (action == null)
+            {
+                return;
+            }
 
             var success = Retry(
                 numberOfTries,
@@ -78,13 +81,24 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="isSilent">Log messages?</param>
         public static T Retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
-            if (function == null) return default(T);
-            if (numberOfTries == 0) throw new ApplicationException("You must specify a number of tries greater than zero.");
+            if (function == null)
+            {
+                return default(T);
+            }
+
+            if (numberOfTries == 0)
+            {
+                throw new ApplicationException("You must specify a number of tries greater than zero.");
+            }
+
             var returnValue = default(T);
 
             var debugging = InDebugMode();
             var logLocation = ChocolateyLoggers.Normal;
-            if (isSilent) logLocation = ChocolateyLoggers.LogFileOnly;
+            if (isSilent)
+            {
+                logLocation = ChocolateyLoggers.LogFileOnly;
+            }
 
             for (int i = 1; i <= numberOfTries; i++)
             {
@@ -129,7 +143,10 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="isSilent">Log messages?</param>
         public static void TryCatchWithLoggingException(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
         {
-            if (action == null) return;
+            if (action == null)
+            {
+                return;
+            }
 
             var success = TryCatchWithLoggingException(
                 () =>
@@ -158,11 +175,18 @@ namespace chocolatey.infrastructure.tolerance
         /// <returns>The return value from the function</returns>
         public static T TryCatchWithLoggingException<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
         {
-            if (function == null) return default(T);
+            if (function == null)
+            {
+                return default(T);
+            }
+
             var returnValue = default(T);
 
             var logLocation = ChocolateyLoggers.Normal;
-            if (isSilent) logLocation = ChocolateyLoggers.LogFileOnly;
+            if (isSilent)
+            {
+                logLocation = ChocolateyLoggers.LogFileOnly;
+            }
 
             try
             {

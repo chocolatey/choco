@@ -119,7 +119,10 @@ namespace chocolatey.infrastructure.app.services
                     userProvidedUninstallArguments = config.InstallArguments;
                     userOverrideUninstallArguments = config.OverrideArguments;
 
-                    if (!string.IsNullOrWhiteSpace(userProvidedUninstallArguments)) this.Log().Debug(ChocolateyLoggers.Verbose, " Using user passed {2}uninstaller args for {0}:'{1}'".FormatWith(package.Id, userProvidedUninstallArguments.EscapeCurlyBraces(), userOverrideUninstallArguments ? "overriding " : string.Empty));
+                    if (!string.IsNullOrWhiteSpace(userProvidedUninstallArguments))
+                    {
+                        this.Log().Debug(ChocolateyLoggers.Verbose, " Using user passed {2}uninstaller args for {0}:'{1}'".FormatWith(package.Id, userProvidedUninstallArguments.EscapeCurlyBraces(), userOverrideUninstallArguments ? "overriding " : string.Empty));
+                    }
                 }
             }
 
@@ -237,7 +240,10 @@ namespace chocolatey.infrastructure.app.services
                     shortPrompt: true,
                     timeoutInSeconds: timeout
                     );
-                if (selection.IsEqualTo("yes")) skipUninstaller = false;
+                if (selection.IsEqualTo("yes"))
+                {
+                    skipUninstaller = false;
+                }
 
                 if (skipUninstaller)
                 {
@@ -253,12 +259,20 @@ namespace chocolatey.infrastructure.app.services
                 config.CommandExecutionTimeoutSeconds,
                 (s, e) =>
                 {
-                    if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
+                    if (e == null || string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        return;
+                    }
+
                     this.Log().Info(() => " [AutoUninstaller] {0}".FormatWith(e.Data.EscapeCurlyBraces()));
                 },
                 (s, e) =>
                 {
-                    if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
+                    if (e == null || string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        return;
+                    }
+
                     this.Log().Error(() => " [AutoUninstaller] {0}".FormatWith(e.Data.EscapeCurlyBraces()));
                 },
                 updateProcessPath: false);

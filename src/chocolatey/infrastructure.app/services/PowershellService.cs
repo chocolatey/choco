@@ -91,10 +91,16 @@ namespace chocolatey.infrastructure.app.services
             List<string> hookScriptPaths = new List<string>();
 
             // If skipping hook scripts, return an empty list
-            if (configuration.SkipHookScripts) return hookScriptPaths;
+            if (configuration.SkipHookScripts)
+            {
+                return hookScriptPaths;
+            }
 
             // If hooks directory doesn't exist, return an empty list to prevent directory not exist warnings
-            if (!_fileSystem.DirectoryExists(ApplicationParameters.HooksLocation)) return hookScriptPaths;
+            if (!_fileSystem.DirectoryExists(ApplicationParameters.HooksLocation))
+            {
+                return hookScriptPaths;
+            }
 
             string filenameBase;
 
@@ -294,7 +300,11 @@ namespace chocolatey.infrastructure.app.services
                             );
                         }
 
-                        if (selection.IsEqualTo("yes")) shouldRun = true;
+                        if (selection.IsEqualTo("yes"))
+                        {
+                            shouldRun = true;
+                        }
+
                         if (selection.IsEqualTo("all - yes to all"))
                         {
                             configuration.PromptForConfirmation = false;
@@ -404,7 +414,10 @@ namespace chocolatey.infrastructure.app.services
                 configuration.CommandExecutionTimeoutSeconds,
                 (s, e) =>
                 {
-                    if (string.IsNullOrWhiteSpace(e.Data)) return;
+                    if (string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        return;
+                    }
                     //inspect for different streams
                     if (e.Data.StartsWith("DEBUG:"))
                     {
@@ -425,7 +438,11 @@ namespace chocolatey.infrastructure.app.services
                 },
                 (s, e) =>
                 {
-                    if (string.IsNullOrWhiteSpace(e.Data)) return;
+                    if (string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        return;
+                    }
+
                     result.StandardErrorWritten = true;
                     this.Log().Error(() => " " + e.Data.EscapeCurlyBraces());
                 });
@@ -435,7 +452,10 @@ namespace chocolatey.infrastructure.app.services
 
         public void PreparePowerShellEnvironment(IPackageSearchMetadata package, ChocolateyConfiguration configuration, string packageDirectory)
         {
-            if (package == null) return;
+            if (package == null)
+            {
+                return;
+            }
 
             EnvironmentSettings.UpdateEnvironmentVariables();
             EnvironmentSettings.SetEnvironmentVariables(configuration);
@@ -561,8 +581,15 @@ namespace chocolatey.infrastructure.app.services
 
                 // we build against v1 - everything should update in a kosher manner to the newest, but it may not.
                 var assembly = TryLoadVersionedAssembly(requestedAssembly, new Version(5, 0, 0, 0)) ?? TryLoadVersionedAssembly(requestedAssembly, new Version(4, 0, 0, 0));
-                if (assembly == null) assembly = TryLoadVersionedAssembly(requestedAssembly, new Version(3, 0, 0, 0));
-                if (assembly == null) assembly = TryLoadVersionedAssembly(requestedAssembly, new Version(1, 0, 0, 0));
+                if (assembly == null)
+                {
+                    assembly = TryLoadVersionedAssembly(requestedAssembly, new Version(3, 0, 0, 0));
+                }
+
+                if (assembly == null)
+                {
+                    assembly = TryLoadVersionedAssembly(requestedAssembly, new Version(1, 0, 0, 0));
+                }
 
                 return assembly;
             };
@@ -572,7 +599,10 @@ namespace chocolatey.infrastructure.app.services
 
         private System.Reflection.Assembly TryLoadVersionedAssembly(AssemblyName requestedAssembly, Version version)
         {
-            if (requestedAssembly == null) return null;
+            if (requestedAssembly == null)
+            {
+                return null;
+            }
 
             requestedAssembly.Version = version;
 
@@ -587,7 +617,10 @@ namespace chocolatey.infrastructure.app.services
             }
             catch (Exception ex)
             {
-                if (requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase)) return null;
+                if (requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
+                {
+                    return null;
+                }
 
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Attempting to load assembly {0} failed:{1} {2}".FormatWith(requestedAssembly.Name, Environment.NewLine, ex.Message.EscapeCurlyBraces()));
 
@@ -697,7 +730,10 @@ try {
 ";
                     pipeline.Commands.Add(new Command(outputRedirectionFixScript, isScript: true, useLocalScope: false));
 
-                    if (additionalActionsBeforeScript != null) additionalActionsBeforeScript.Invoke(pipeline);
+                    if (additionalActionsBeforeScript != null)
+                    {
+                        additionalActionsBeforeScript.Invoke(pipeline);
+                    }
 
                     pipeline.Commands.Add(new Command(commandToRun, isScript: true, useLocalScope: false));
 
@@ -717,7 +753,10 @@ try {
                             if (scriptStackTrace != null)
                             {
                                 var scriptError = scriptStackTrace.GetValue(record, null).ToStringSafe();
-                                if (!string.IsNullOrWhiteSpace(scriptError)) errorStackTrace = scriptError;
+                                if (!string.IsNullOrWhiteSpace(scriptError))
+                                {
+                                    errorStackTrace = scriptError;
+                                }
                             }
                         }
                         this.Log().Error("ERROR: {0}{1}".FormatWith(ex.Message.EscapeCurlyBraces(), !config.Debug ? string.Empty : "{0} {1}".FormatWith(Environment.NewLine, errorStackTrace.EscapeCurlyBraces())));
@@ -739,12 +778,20 @@ try {
                             case PipelineState.Failed:
                             case PipelineState.Stopping:
                             case PipelineState.Stopped:
-                                if (host.ExitCode == 0) host.SetShouldExit(1);
+                                if (host.ExitCode == 0)
+                                {
+                                    host.SetShouldExit(1);
+                                }
+
                                 host.HostException = pipeline.PipelineStateInfo.Reason;
                                 break;
 
                             case PipelineState.Completed:
-                                if (host.ExitCode == -1) host.SetShouldExit(0);
+                                if (host.ExitCode == -1)
+                                {
+                                    host.SetShouldExit(0);
+                                }
+
                                 break;
                         }
                     }

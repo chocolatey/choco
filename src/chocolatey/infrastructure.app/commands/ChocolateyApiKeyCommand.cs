@@ -212,7 +212,10 @@ If you find other exit codes that we have not yet documented, please
         public virtual bool MayRequireAdminAccess()
         {
             var config = Config.GetConfigurationSettings();
-            if (config == null) return true;
+            if (config == null)
+            {
+                return true;
+            }
 
             return !string.IsNullOrWhiteSpace(config.ApiKeyCommand.Key);
         }

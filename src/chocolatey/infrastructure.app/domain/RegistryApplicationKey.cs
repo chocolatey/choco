@@ -107,14 +107,20 @@ namespace chocolatey.infrastructure.app.domain
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(this, obj)) return true;
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
 
             return Equals(obj as RegistryApplicationKey);
         }
 
         bool IEquatable<RegistryApplicationKey>.Equals(RegistryApplicationKey other)
         {
-            if (ReferenceEquals(other, null)) return false;
+            if (ReferenceEquals(other, null))
+            {
+                return false;
+            }
 
             return DisplayName.ToStringSafe().IsEqualTo(other.DisplayName)
                    && DisplayVersion.IsEqualTo(other.DisplayVersion)

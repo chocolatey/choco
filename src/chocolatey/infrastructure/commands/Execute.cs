@@ -62,7 +62,10 @@ namespace chocolatey.infrastructure.commands
         /// <returns>The results of the function if completes within timespan, otherwise returns the default value.</returns>
         public T Command<T>(Func<T> function, T timeoutDefaultValue)
         {
-            if (function == null) return timeoutDefaultValue;
+            if (function == null)
+            {
+                return timeoutDefaultValue;
+            }
 
             var cancelToken = new CancellationTokenSource();
             cancelToken.Token.ThrowIfCancellationRequested();
@@ -78,7 +81,10 @@ namespace chocolatey.infrastructure.commands
                 task.Wait(_timespan);
             }
 
-            if (task.IsCompleted) return task.Result;
+            if (task.IsCompleted)
+            {
+                return task.Result;
+            }
 
             cancelToken.Cancel();
             this.Log().Warn(ChocolateyLoggers.Important,() => @"Chocolatey timed out waiting for the command to finish. The timeout
@@ -104,7 +110,10 @@ namespace chocolatey.infrastructure.commands
         /// <returns>True if it finishes executing, false otherwise.</returns>
         public bool Command(Action action)
         {
-            if (action == null) return false;
+            if (action == null)
+            {
+                return false;
+            }
 
             var completed = false;
 

@@ -49,7 +49,10 @@ namespace chocolatey.infrastructure.xml
         /// <returns></returns>
         public static implicit operator string(XmlCData cdata)
         {
-            if (cdata != null) return cdata._value.ToStringSafe();
+            if (cdata != null)
+            {
+                return cdata._value.ToStringSafe();
+            }
 
             return string.Empty;
         }

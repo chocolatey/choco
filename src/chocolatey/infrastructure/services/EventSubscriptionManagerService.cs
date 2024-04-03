@@ -44,8 +44,15 @@ namespace chocolatey.infrastructure.services
 
         public IDisposable Subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
         {
-            if (filter == null) filter = (message) => true;
-            if (handleError == null) handleError = (ex) => { };
+            if (filter == null)
+            {
+                filter = (message) => true;
+            }
+
+            if (handleError == null)
+            {
+                handleError = (ex) => { };
+            }
 
             var subscription = _subject.OfType<Event>().AsObservable()
                                        .Where(filter)

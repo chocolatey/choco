@@ -413,7 +413,11 @@ namespace chocolatey
             var success = EnsureOriginalConfiguration(args,
                 (config) =>
                 {
-                    if (action != null) action.Invoke(config);
+                    if (action != null)
+                    {
+                        action.Invoke(config);
+                    }
+
                     return true;
                 });
         }
