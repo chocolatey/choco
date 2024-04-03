@@ -133,6 +133,10 @@ using System.Linq;
 using NDesk.Options;
 #endif
 
+
+// Disable anything this file runs into, we generally don't put much maintenance in here.
+#pragma warning disable IDE0003, IDE0006, IDE0007, IDE0008,IDE0011, IDE0032, IDE0040, IDE0046, IDE0049, IDE0055, IDE0075, IDE1006
+
 namespace chocolatey.infrastructure.commandline
 {
 
@@ -242,8 +246,8 @@ namespace chocolatey.infrastructure.commandline
 	}
 
 	public class OptionContext {
-		private Option                option;
-		private string                name;
+        private Option                option;
+        private string                name;
 		private int                   index;
 		private OptionSet             set;
 		private OptionValueCollection c;
@@ -1147,3 +1151,5 @@ namespace chocolatey.infrastructure.commandline
 
     // ReSharper restore InconsistentNaming
 }
+
+#pragma warning restore IDE0003, IDE0006, IDE0007, IDE0008,IDE0011, IDE0032, IDE0040, IDE0046, IDE0049, IDE0055, IDE0075, IDE1006
