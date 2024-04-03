@@ -126,7 +126,7 @@ namespace chocolatey.infrastructure.commands
             return argument.ArgumentValue;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string build_arguments(object properties, IDictionary<string, ExternalCommandArgument> configToArgNames)
             => BuildArguments(properties, configToArgNames);
@@ -138,6 +138,6 @@ namespace chocolatey.infrastructure.commands
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         private static string quote_arg_value_if_required(ExternalCommandArgument argument)
             => QuoteArgumentValueIfRequired(argument);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

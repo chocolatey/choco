@@ -82,7 +82,7 @@ namespace chocolatey.infrastructure.commands
             throw new FileNotFoundException("Unable to find suitable location for PowerShell. Searched the following locations: '{0}'".FormatWith(string.Join("; ", _powershellLocations)));
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static int execute(
             string command,
@@ -95,6 +95,6 @@ namespace chocolatey.infrastructure.commands
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_powershell_location(IFileSystem fileSystem)
             => GetPowerShellLocation(fileSystem);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -197,7 +197,7 @@ namespace chocolatey.infrastructure.services
                 increaseRetryByMilliseconds: 200);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public XmlType deserialize<XmlType>(string xmlFilePath)
             => Deserialize<XmlType>(xmlFilePath);
@@ -213,6 +213,6 @@ namespace chocolatey.infrastructure.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent)
             => Serialize<XmlType>(xmlType, xmlFilePath, isSilent);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

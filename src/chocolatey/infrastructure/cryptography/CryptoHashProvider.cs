@@ -142,7 +142,7 @@ namespace chocolatey.infrastructure.cryptography
              return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void set_hash_algorithm(CryptoHashProviderType algorithmType)
             => SetHashAlgorithm(algorithmType);
@@ -170,6 +170,6 @@ namespace chocolatey.infrastructure.cryptography
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string hash_value(string originalText, CryptoHashProviderType providerType)
             => ComputeStringHash(originalText, providerType);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

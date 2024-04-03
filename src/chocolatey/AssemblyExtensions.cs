@@ -139,7 +139,7 @@ namespace chocolatey
             return result;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_manifest_string(this IAssembly assembly, string manifestResourceStreamLocation)
             => GetManifestString(assembly, manifestResourceStreamLocation);
@@ -163,6 +163,6 @@ namespace chocolatey
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IEnumerable<IExtensionModule> get_extension_modules(this IAssembly assembly)
             => GetExtensionModules(assembly);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

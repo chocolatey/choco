@@ -226,7 +226,7 @@ namespace chocolatey.infrastructure.information
             TokenElevationTypeLimited
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool user_is_administrator()
             => UserIsAdministrator();
@@ -246,6 +246,6 @@ namespace chocolatey.infrastructure.information
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool user_is_system()
             => UserIsSystem();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

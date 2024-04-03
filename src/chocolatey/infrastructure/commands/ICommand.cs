@@ -66,7 +66,7 @@ namespace chocolatey.infrastructure.commands
         /// <returns></returns>
         bool MayRequireAdminAccess();
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration);
 
@@ -87,6 +87,6 @@ namespace chocolatey.infrastructure.commands
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         bool may_require_admin_access();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

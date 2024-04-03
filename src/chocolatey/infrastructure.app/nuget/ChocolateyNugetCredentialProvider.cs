@@ -194,10 +194,10 @@ namespace chocolatey.infrastructure.app.nuget
             return credentials;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ICredentials get_credentials_from_user(Uri uri, IWebProxy proxy, CredentialRequestType credentialType)
             => GetUserCredentials(uri, proxy, credentialType);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

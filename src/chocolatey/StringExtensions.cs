@@ -290,7 +290,7 @@ namespace chocolatey
             return input;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string format_with(this string input, params object[] formatting)
             => FormatWith(input, formatting);
@@ -338,6 +338,6 @@ namespace chocolatey
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string quote_if_pipe_found(this string input)
             => QuoteIfContainsPipe(input);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -53,7 +53,7 @@ namespace chocolatey
                    || type.Namespace.Contains("System.Collections");
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool is_built_in_system_type(this Type type)
             => IsBuiltinType(type);
@@ -61,6 +61,6 @@ namespace chocolatey
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool is_collections_type(this Type type)
             => IsCollectionType(type);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

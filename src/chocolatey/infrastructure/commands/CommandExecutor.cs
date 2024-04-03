@@ -254,7 +254,7 @@ namespace chocolatey.infrastructure.commands
         }
 
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IFileSystem> file_system, Func<IProcess> process_initializer)
@@ -331,6 +331,6 @@ namespace chocolatey.infrastructure.commands
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         private static void log_error(object sender, DataReceivedEventArgs e)
             => LogError(sender, e);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

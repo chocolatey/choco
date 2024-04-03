@@ -1030,7 +1030,7 @@ namespace chocolatey.infrastructure.filesystem
         }
 
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void initialize_with(Lazy<IEnvironment> environment)
             => InitializeWith(environment);
@@ -1258,6 +1258,6 @@ namespace chocolatey.infrastructure.filesystem
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public Encoding get_file_encoding(string filePath)
             => GetFileEncoding(filePath);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

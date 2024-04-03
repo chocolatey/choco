@@ -48,7 +48,7 @@ namespace chocolatey
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string to_string(this object input)
             => ToStringSafe(input);
@@ -56,6 +56,6 @@ namespace chocolatey
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static T deep_copy<T>(this T other)
             => DeepCopy(other);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

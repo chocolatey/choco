@@ -229,7 +229,7 @@ If you find other exit codes that we have not yet documented, please
             return config.PinCommand.Command != PinCommandType.List;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -257,6 +257,6 @@ If you find other exit codes that we have not yet documented, please
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual bool may_require_admin_access()
             => MayRequireAdminAccess();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

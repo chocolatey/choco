@@ -28,7 +28,7 @@ namespace chocolatey.infrastructure.app.services
     [Obsolete("This interface is deprecated and will be removed in v3.")]
     public interface ISourceRunner : IBootstrappableSourceRunner, ICountSourceRunner, IListSourceRunner, IInstallSourceRunner, IUpgradeSourceRunner, IUninstallSourceRunner
     {
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -51,7 +51,7 @@ namespace chocolatey.infrastructure.app.services
         void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 
     public interface IAlternativeSourceRunner

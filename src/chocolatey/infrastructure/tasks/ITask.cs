@@ -36,12 +36,12 @@ namespace chocolatey.infrastructure.tasks
         /// </summary>
         void Shutdown();
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void initialize();
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void shutdown();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

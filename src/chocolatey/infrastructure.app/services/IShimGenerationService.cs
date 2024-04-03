@@ -36,11 +36,11 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="packageResult">The package result.</param>
         void Uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void install(ChocolateyConfiguration configuration, PackageResult packageResult);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void uninstall(ChocolateyConfiguration configuration, PackageResult packageResult);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

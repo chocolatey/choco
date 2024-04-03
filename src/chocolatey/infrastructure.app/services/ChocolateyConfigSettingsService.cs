@@ -511,7 +511,7 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void noop(ChocolateyConfiguration configuration)
             => DryRun(configuration);
@@ -595,6 +595,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         protected void validate_supported_feature(ConfigFileFeatureSetting feature)
             => ValidateSupportedFeature(feature);
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
     }
 }

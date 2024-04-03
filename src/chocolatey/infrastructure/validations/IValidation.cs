@@ -34,9 +34,9 @@ namespace chocolatey.infrastructure.validations
         /// <returns>The validation results</returns>
         ICollection<ValidationResult> Validate(ChocolateyConfiguration config);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         ICollection<ValidationResult> validate(ChocolateyConfiguration config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

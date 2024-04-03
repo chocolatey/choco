@@ -121,7 +121,7 @@ NOTE: This command should only be used when installing Chocolatey, not
             return true;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -149,6 +149,6 @@ NOTE: This command should only be used when installing Chocolatey, not
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual bool may_require_admin_access()
             => MayRequireAdminAccess();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

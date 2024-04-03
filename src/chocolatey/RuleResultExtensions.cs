@@ -42,10 +42,10 @@ namespace chocolatey
                 .Where(r => string.IsNullOrEmpty(r.Id) || (!r.Id.StartsWith("CHCU") && !r.Id.StartsWith("CHCD")));
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IEnumerable<RuleResult> where_unsupported_or_deprecated(this IEnumerable<RuleResult> ruleResults, bool inverse = false)
             => WhereUnsupportedOrDeprecated(ruleResults, inverse);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

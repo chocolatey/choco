@@ -403,7 +403,7 @@ namespace chocolatey.infrastructure.app.services
             return packageResults;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public const string PACKAGE_NAME_GROUP = PackageNameGroup;
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -452,6 +452,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
             => Uninstall(config, continueAction, beforeUninstallAction);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

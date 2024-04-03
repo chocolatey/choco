@@ -66,7 +66,7 @@ namespace chocolatey
             return default(TEnum);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_description_or_value(this Enum enumeration)
             => DescriptionOrValue(enumeration);
@@ -75,6 +75,6 @@ namespace chocolatey
         public static TEnum parse_enum_from_description<TEnum>(this string description)
             where TEnum : struct, Enum
             => ParseEnumDescription<TEnum>(description);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

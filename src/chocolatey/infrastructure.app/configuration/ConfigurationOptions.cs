@@ -178,7 +178,7 @@ namespace chocolatey.infrastructure.app.configuration
             optionSet.WriteOptionDescriptions(Console.Out);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IConsole> console)
@@ -196,6 +196,6 @@ namespace chocolatey.infrastructure.app.configuration
                                                                     Action validateConfiguration,
                                                                     Action helpMessage)
             => ParseArgumentsAndUpdateConfiguration(args, configuration, setOptions, afterParse, validateConfiguration, helpMessage);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -1847,7 +1847,7 @@ ATTENTION: You must take manual action to remove {1} from
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual int count_run(ChocolateyConfiguration config)
             => Count(config);
@@ -1935,6 +1935,6 @@ ATTENTION: You must take manual action to remove {1} from
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)
             => UnmarkPackagePending(packageResult, config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

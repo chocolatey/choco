@@ -138,10 +138,10 @@ namespace chocolatey.infrastructure.adapters
             return new Assembly(value);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IAssembly set_assembly(System.Reflection.Assembly value)
             => SetAssembly(value);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

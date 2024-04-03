@@ -2730,7 +2730,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             return allPackages;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
             => EnsureSourceAppInstalled(config, ensureAction);
@@ -2864,6 +2864,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config)
             => GetInstalledPackages(config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

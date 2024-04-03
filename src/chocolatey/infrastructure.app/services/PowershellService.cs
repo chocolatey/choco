@@ -759,7 +759,7 @@ try {
             return result;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void noop_action(PackageResult packageResult, CommandNameType command)
             => DryRunAction(packageResult, command);
@@ -803,6 +803,6 @@ try {
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList)
             => RunHost(config, chocoPowerShellScript, additionalActionsBeforeScript, hookPreScriptPathList, hookPostScriptPathList);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -56,7 +56,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             return "{0} {1} {2}".FormatWith(SilentUninstall, NoReboot, OtherUninstallOptions).TrimSafe();
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual string build_install_command_arguments(bool logFile, bool customInstallLocation, bool languageRequested)
             => BuildInstallCommandArguments(logFile, customInstallLocation, languageRequested);
@@ -64,7 +64,7 @@ namespace chocolatey.infrastructure.app.domain.installers
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual string build_uninstall_command_arguments()
             => BuildUninstallCommandArguments();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
 
     }
 }

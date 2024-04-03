@@ -544,7 +544,7 @@ namespace chocolatey.infrastructure.app.registration
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void register_assembly_commands(IAssembly assembly)
             => RegisterAssemblyCommands(assembly);
@@ -580,6 +580,6 @@ namespace chocolatey.infrastructure.app.registration
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void register_validator(Func<Type, bool> validation_func)
             => RegisterValidator(validation_func);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

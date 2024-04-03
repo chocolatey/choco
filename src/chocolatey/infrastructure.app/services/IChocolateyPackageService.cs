@@ -123,7 +123,7 @@ namespace chocolatey.infrastructure.app.services
         ConcurrentDictionary<string, PackageResult> Uninstall(ChocolateyConfiguration config);
 
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         int count_run(ChocolateyConfiguration config);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -152,6 +152,6 @@ namespace chocolatey.infrastructure.app.services
         void uninstall_noop(ChocolateyConfiguration config);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

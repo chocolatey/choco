@@ -74,7 +74,7 @@ namespace chocolatey.infrastructure.tokens
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string replace_tokens<TConfig>(TConfig configuration, string textToReplace, string tokenPrefix = "[[", string tokenSuffix = "]]")
             => ReplaceTokens(configuration, textToReplace, tokenPrefix, tokenSuffix);
@@ -82,6 +82,6 @@ namespace chocolatey.infrastructure.tokens
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IEnumerable<string> get_tokens(string textWithTokens, string tokenPrefix = "[[", string tokenSuffix = "]]")
             => GetTokens(textWithTokens, tokenPrefix, tokenSuffix);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

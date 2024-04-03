@@ -29,9 +29,9 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="config">The configuration.</param>
         void Run(PackageResult packageResult, ChocolateyConfiguration config);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void run(PackageResult packageResult, ChocolateyConfiguration config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

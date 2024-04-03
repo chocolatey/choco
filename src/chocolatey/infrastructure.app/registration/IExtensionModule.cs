@@ -23,9 +23,9 @@ namespace chocolatey.infrastructure.app.registration
     {
         void RegisterDependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void register_dependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

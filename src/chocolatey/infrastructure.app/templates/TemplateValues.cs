@@ -85,7 +85,7 @@ namespace chocolatey.infrastructure.app.templates
         public static readonly string VersionPropertyName = "PackageVersion";
         public static readonly string MaintainerPropertyName = "MaintainerName";
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void set_normal()
             => SetNormal();
@@ -93,6 +93,6 @@ namespace chocolatey.infrastructure.app.templates
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void set_auto()
             => SetAutomatic();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -72,7 +72,7 @@ namespace chocolatey.infrastructure.app.services
 
         PowerShellExecutionResults RunHost(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void install_noop(PackageResult packageResult);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -89,6 +89,6 @@ namespace chocolatey.infrastructure.app.services
         void prepare_powershell_environment(IPackageSearchMetadata package, ChocolateyConfiguration configuration, string packageDirectory);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

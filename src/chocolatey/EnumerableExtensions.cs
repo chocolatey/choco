@@ -122,7 +122,7 @@ namespace chocolatey
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IEnumerable<T> or_empty_list_if_null<T>(this IEnumerable<T> source)
             => OrEmpty(source);
@@ -142,6 +142,6 @@ namespace chocolatey
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static int get_sequence_hash_code<T>(this IEnumerable<T> source)
             => SequenceHashCode<T>(source);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

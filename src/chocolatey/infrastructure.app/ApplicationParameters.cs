@@ -251,10 +251,10 @@ namespace chocolatey.infrastructure.app
             return isDebug;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool is_debug_mode_cli_primitive()
             => IsDebugModeCliPrimitive();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

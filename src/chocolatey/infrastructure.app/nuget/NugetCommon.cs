@@ -59,14 +59,14 @@ namespace chocolatey.infrastructure.app.nuget
         [Obsolete("This member is unused and should probably be removed.")]
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE1006 // Naming
         [EditorBrowsable(EditorBrowsableState.Never)]
         [Obsolete("This member is unused and should probably be removed.")]
         public static void initialize_with(Lazy<IConsole> console)
         {
             _console = console;
         }
-#pragma warning restore IDE1006
+#pragma warning restore IDE1006 // Naming
 
         [Obsolete("This member is unused and should probably be removed.")]
         private static IConsole Console
@@ -74,9 +74,11 @@ namespace chocolatey.infrastructure.app.nuget
             get { return _console.Value; }
         }
 
+#pragma warning disable IDE0022 // Block body for methods
         [Obsolete("This overload is obsolete and will be removed in a future version.")]
         public static ChocolateyPackagePathResolver GetPathResolver(ChocolateyConfiguration configuration, IFileSystem nugetPackagesFileSystem)
             => GetPathResolver(nugetPackagesFileSystem);
+#pragma warning restore IDE0022 // Block body for methods
 
         public static ChocolateyPackagePathResolver GetPathResolver(IFileSystem nugetPackagesFileSystem)
         {

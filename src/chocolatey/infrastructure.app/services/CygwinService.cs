@@ -275,7 +275,7 @@ namespace chocolatey.infrastructure.app.services
             return string.Empty;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public const string CYGWIN_PACKAGE = CygwinPackage;
 
@@ -300,6 +300,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
             => Install(config, continueAction, beforeModifyAction);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

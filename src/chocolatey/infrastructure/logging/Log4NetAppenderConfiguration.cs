@@ -416,7 +416,7 @@ namespace chocolatey.infrastructure.logging
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void initialize_with(Lazy<IConsole> console)
             => InitializeWith(console);
@@ -440,6 +440,6 @@ namespace chocolatey.infrastructure.logging
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void configure_additional_log_file(string logFileLocation)
             => SetupAdditionalLogFile(logFileLocation);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

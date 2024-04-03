@@ -230,7 +230,7 @@ namespace chocolatey.infrastructure.app.services
             return errored;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public PackageFiles read_from_file(string filePath)
             => ReadPackageSnapshot(filePath);
@@ -258,6 +258,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public PackageFile get_package_file(string file)
             => GetPackageFile(file);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -166,7 +166,7 @@ choco outdated: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/g
             return false;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -194,6 +194,6 @@ choco outdated: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/g
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual bool may_require_admin_access()
             => MayRequireAdminAccess();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

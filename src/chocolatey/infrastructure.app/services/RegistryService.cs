@@ -516,7 +516,7 @@ namespace chocolatey.infrastructure.app.services
             return value;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public Registry get_installer_keys()
             => GetInstallerKeys();
@@ -560,6 +560,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static GenericRegistryValue get_value(RegistryHiveType hive, string subKeyPath, string registryValue)
             => GetRegistryValue(hive, subKeyPath, registryValue);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }
