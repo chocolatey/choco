@@ -201,7 +201,7 @@ namespace chocolatey.infrastructure.information
         /// Passed to <see cref="GetTokenInformation"/> to specify what
         /// information about the token to return.
         /// </summary>
-        enum TokenInformationType
+        private enum TokenInformationType
         {
             TokenUser = 1,
             TokenGroups,
@@ -237,7 +237,7 @@ namespace chocolatey.infrastructure.information
         /// <summary>
         /// The elevation type for a user token.
         /// </summary>
-        enum TokenElevationType
+        private enum TokenElevationType
         {
             TokenElevationTypeDefault = 1,
             TokenElevationTypeFull,

@@ -131,7 +131,7 @@ namespace chocolatey.tests.infrastructure.app.services
         public class When_an_autoUninstaller_skip_file_exists : AutomaticUninstallerServiceSpecsBase
         {
             private string _skipFileName = ".skipAutoUninstall";
-            IEnumerable<string> _fileList = new List<string>() { "c:\\.skipAutoUninstall" };
+            private IEnumerable<string> _fileList = new List<string>() { "c:\\.skipAutoUninstall" };
             public override void Context()
             {
                 base.Context();
@@ -665,7 +665,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_AutomaticUninstallerService_is_passed_uninstall_arguments_from_command_line : AutomaticUninstallerServiceSpecsBase
         {
-            IInstaller _installerType = new InnoSetupInstaller();
+            private IInstaller _installerType = new InnoSetupInstaller();
 
             public override void Context()
             {
@@ -719,7 +719,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_AutomaticUninstallerService_is_passed_overriding_uninstall_arguments_from_command_line : AutomaticUninstallerServiceSpecsBase
         {
-            IInstaller _installerType = new InnoSetupInstaller();
+            private IInstaller _installerType = new InnoSetupInstaller();
 
             public override void Context()
             {
