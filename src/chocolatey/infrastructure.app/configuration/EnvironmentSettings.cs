@@ -194,7 +194,7 @@ namespace chocolatey.infrastructure.app.configuration
                 }
                 try
                 {
-                    object componentClass = Activator.CreateInstance(licensedEnvironmentSettings);
+                    var componentClass = Activator.CreateInstance(licensedEnvironmentSettings);
 
                     licensedEnvironmentSettings.InvokeMember(
                         SetEnvironmentMethod,
@@ -357,7 +357,7 @@ namespace chocolatey.infrastructure.app.configuration
                 StringSplitOptions.RemoveEmptyEntries
                 );
 
-            foreach (string originalValue in originalValues.OrEmpty())
+            foreach (var originalValue in originalValues.OrEmpty())
             {
                 if (!items.Contains(originalValue, StringComparer.InvariantCultureIgnoreCase))
                 {

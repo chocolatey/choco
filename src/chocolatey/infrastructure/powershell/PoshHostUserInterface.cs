@@ -174,7 +174,7 @@ namespace chocolatey.infrastructure.powershell
                 }
                 else
                 {
-                    string[] label = GetHotkeyAndLabel(field.Label);
+                    var label = GetHotkeyAndLabel(field.Label);
                     this.Log().Warn(label[1].EscapeCurlyBraces());
                 }
 
@@ -215,7 +215,7 @@ namespace chocolatey.infrastructure.powershell
         {
             var result = new[] { string.Empty, string.Empty };
             //Do not use StringSplitOptions.RemoveEmptyEntries, it causes issues here
-            string[] fragments = input.Split('&');
+            var fragments = input.Split('&');
             if (fragments.Length == 2)
             {
                 if (fragments[1].Length > 0)
@@ -245,11 +245,11 @@ namespace chocolatey.infrastructure.powershell
                 this.Log().Warn(ChocolateyLoggers.Important, message.EscapeCurlyBraces());
             }
 
-            string[,] promptData = BuildHotkeysAndLabels(choices);
+            var promptData = BuildHotkeysAndLabels(choices);
 
             // Format the overall choice prompt string to display.
             var choicePrompt = new StringBuilder();
-            for (int element = 0; element < choices.Count; element++)
+            for (var element = 0; element < choices.Count; element++)
             {
                 choicePrompt.Append(string.Format(
                     CultureInfo.CurrentCulture,
@@ -266,14 +266,14 @@ namespace chocolatey.infrastructure.powershell
             while (true)
             {
                 this.Log().Warn(choicePrompt.ToString().EscapeCurlyBraces());
-                string selection = ReadLine().TrimSafe().ToUpper(CultureInfo.CurrentCulture);
+                var selection = ReadLine().TrimSafe().ToUpper(CultureInfo.CurrentCulture);
 
                 if (selection.Length == 0)
                 {
                     return defaultChoice;
                 }
 
-                for (int i = 0; i < choices.Count; i++)
+                for (var i = 0; i < choices.Count; i++)
                 {
                     if (promptData[0, i] == selection)
                     {
@@ -289,9 +289,9 @@ namespace chocolatey.infrastructure.powershell
         {
             var choiceSelections = new string[2, choices.Count];
 
-            for (int i = 0; i < choices.Count; ++i)
+            for (var i = 0; i < choices.Count; ++i)
             {
-                string[] hotkeyAndLabel = GetHotkeyAndLabel(choices[i].Label);
+                var hotkeyAndLabel = GetHotkeyAndLabel(choices[i].Label);
                 choiceSelections[0, i] = hotkeyAndLabel[0];
                 choiceSelections[1, i] = hotkeyAndLabel[1];
             }
@@ -319,7 +319,7 @@ namespace chocolatey.infrastructure.powershell
             if (string.IsNullOrWhiteSpace(userName))
             {
                 this.Log().Warn("Please provide username:");
-                string selection = ReadLine().TrimSafe().ToUpper(CultureInfo.CurrentCulture);
+                var selection = ReadLine().TrimSafe().ToUpper(CultureInfo.CurrentCulture);
 
                 if (selection.Length == 0)
                 {

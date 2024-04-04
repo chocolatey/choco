@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.licensing
 
             var regularLogOutput = ShouldLogErrorsToConsole();
 
-            string licenseFile = ApplicationParameters.LicenseFileLocation;
+            var licenseFile = ApplicationParameters.LicenseFileLocation;
             var userLicenseFile = ApplicationParameters.UserLicenseFileLocation;
             if (File.Exists(userLicenseFile))
             {

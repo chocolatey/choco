@@ -121,7 +121,7 @@ namespace chocolatey.infrastructure.platforms
 
             //https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832.aspx
             //switch doesn't like a double, but a string is fine?!
-            string majorMinor = version.Major + "." + version.Minor;
+            var majorMinor = version.Major + "." + version.Minor;
             switch (majorMinor)
             {
                 case "10.0":

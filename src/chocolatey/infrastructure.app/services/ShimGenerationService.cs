@@ -89,14 +89,14 @@ namespace chocolatey.infrastructure.app.services
 
             //gather all .exes in the folder
             var exeFiles = _fileSystem.GetFiles(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
-            foreach (string file in exeFiles.OrEmpty())
+            foreach (var file in exeFiles.OrEmpty())
             {
                 if (_fileSystem.FileExists(file + ".ignore"))
                 {
                     continue;
                 }
 
-                bool isGui = _fileSystem.FileExists(file + ".gui");
+                var isGui = _fileSystem.FileExists(file + ".gui");
                 //todo: #2586 v2 be able to determine gui automatically
 
                 var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _shimGenArguments);
@@ -146,7 +146,7 @@ namespace chocolatey.infrastructure.app.services
         {
             //gather all .exes in the folder
             var exeFiles = _fileSystem.GetFiles(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
-            foreach (string file in exeFiles.OrEmpty())
+            foreach (var file in exeFiles.OrEmpty())
             {
                 if (_fileSystem.FileExists(file + ".ignore"))
                 {

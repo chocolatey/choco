@@ -69,7 +69,7 @@ namespace chocolatey.infrastructure.information
                         "chocolatey".Log().Debug(@"User may be subject to UAC, checking for a split token (not 100%
  effective).");
 
-                        int tokenInfLength = Marshal.SizeOf(typeof(int));
+                        var tokenInfLength = Marshal.SizeOf(typeof(int));
                         IntPtr tokenInformation = Marshal.AllocHGlobal(tokenInfLength);
 
                         try

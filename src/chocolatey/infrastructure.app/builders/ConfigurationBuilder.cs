@@ -411,7 +411,7 @@ namespace chocolatey.infrastructure.app.builders
                              "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds. Supply '0' to disable the timeout.".FormatWith(config.CommandExecutionTimeoutSeconds.ToStringSafe()),
                             option =>
                             {
-                                int timeout = 0;
+                                var timeout = 0;
                                 var timeoutString = option.UnquoteSafe();
                                 int.TryParse(timeoutString, out timeout);
                                 if (timeout > 0 || timeoutString.IsEqualTo("0"))
@@ -545,7 +545,7 @@ namespace chocolatey.infrastructure.app.builders
                 }
                 try
                 {
-                    object componentClass = Activator.CreateInstance(licensedConfigBuilder);
+                    var componentClass = Activator.CreateInstance(licensedConfigBuilder);
 
                     licensedConfigBuilder.InvokeMember(
                         SetConfigurationMethod,

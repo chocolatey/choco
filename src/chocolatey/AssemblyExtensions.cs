@@ -38,7 +38,7 @@ namespace chocolatey
         /// <returns></returns>
         public static string GetManifestString(this IAssembly assembly, string manifestResourceStreamLocation)
         {
-            string manifestFileText = "";
+            var manifestFileText = "";
 
             using (Stream manifestFileStream = assembly.GetManifestResourceStream(manifestResourceStreamLocation))
             {
@@ -90,7 +90,7 @@ namespace chocolatey
                 return string.Empty;
             }
 
-            byte[] publicKeyToken = assemblyName.GetPublicKeyToken();
+            var publicKeyToken = assemblyName.GetPublicKeyToken();
 
             if (publicKeyToken == null || publicKeyToken.Length == 0)
             {

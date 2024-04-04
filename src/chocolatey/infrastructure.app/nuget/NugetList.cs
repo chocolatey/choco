@@ -50,13 +50,13 @@ namespace chocolatey.infrastructure.app.nuget
         public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem, ChocolateySourceCacheContext cacheContext)
         {
             var packageRepositoriesResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem, cacheContext);
-            string searchTermLower = configuration.Input.ToLowerSafe();
+            var searchTermLower = configuration.Input.ToLowerSafe();
 
-            SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
+            var searchFilter = new SearchFilter(configuration.Prerelease);
             searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
             searchFilter.OrderBy = SearchOrderBy.DownloadCount;
 
-            int totalCount = 0;
+            var totalCount = 0;
             foreach (var searchResource in packageRepositoriesResources.SearchResources())
             {
                 totalCount += searchResource.SearchCountAsync(searchTermLower, searchFilter, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
@@ -72,9 +72,9 @@ namespace chocolatey.infrastructure.app.nuget
 
             var cacheContext = new ChocolateySourceCacheContext(configuration);
             var packageRepositoryResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem, cacheContext);
-            string searchTermLower = configuration.Input.ToLowerSafe();
+            var searchTermLower = configuration.Input.ToLowerSafe();
 
-            SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
+            var searchFilter = new SearchFilter(configuration.Prerelease);
             searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
             searchFilter.OrderBy = SearchOrderBy.Id;
 

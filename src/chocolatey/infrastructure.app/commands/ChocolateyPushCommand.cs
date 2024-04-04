@@ -98,7 +98,7 @@ namespace chocolatey.infrastructure.app.commands
             {
                 if (remoteSource.Scheme == "http" && remoteSource.Host != "localhost")
                 {
-                    string errorMessage =
+                    var errorMessage =
                         @"WARNING! The specified source '{0}' is not secure.
  Sending apikey over insecure channels leaves your data susceptible to
  hackers. Please update your source to a more secure source and try again.

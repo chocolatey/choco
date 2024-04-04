@@ -58,7 +58,7 @@ namespace chocolatey.infrastructure.registration
 // ReSharper restore InconsistentNaming
         {
             var ex = e.ExceptionObject as Exception;
-            string exceptionMessage = string.Empty;
+            var exceptionMessage = string.Empty;
             if (ex != null)
             {
                 exceptionMessage = ex.ToString();

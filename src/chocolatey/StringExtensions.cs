@@ -192,7 +192,7 @@ namespace chocolatey
                 return secureString;
             }
 
-            foreach (char character in input)
+            foreach (var character in input)
             {
                 secureString.AppendChar(character);
             }

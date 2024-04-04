@@ -425,7 +425,7 @@ namespace chocolatey.infrastructure.filesystem
             EnsureDirectoryExists(GetDirectoryName(destinationFilePath), ignoreError: true);
 
             //Private Declare Function apiCopyFile Lib "kernel32" Alias "CopyFileA" _
-            int success = CopyFileW(sourceFilePath, destinationFilePath, overwriteExisting ? 0 : 1);
+            var success = CopyFileW(sourceFilePath, destinationFilePath, overwriteExisting ? 0 : 1);
             //if (success == 0)
             //{
             //    var error = Marshal.GetLastWin32Error();

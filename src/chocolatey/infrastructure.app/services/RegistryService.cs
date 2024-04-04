@@ -361,7 +361,7 @@ namespace chocolatey.infrastructure.app.services
                 return string.Empty;
             }
 
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 var fullGroup = match.Groups["ReverseFull{0}".FormatWith(i + 1)];
                 if (fullGroup != null)
@@ -369,13 +369,13 @@ namespace chocolatey.infrastructure.app.services
                     _userDataKey.Append(fullGroup.Value.ToCharArray().Reverse().ToArray());
                 }
             }
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
             {
                 var pairsGroup = match.Groups["ReversePairs{0}".FormatWith(i + 1)];
                 if (pairsGroup != null)
                 {
                     var pairValue = pairsGroup.Value;
-                    for (int j = 0; j < pairValue.Length - 1; j++)
+                    for (var j = 0; j < pairValue.Length - 1; j++)
                     {
                         _userDataKey.Append("{1}{0}".FormatWith(pairValue[j], pairValue[j + 1]));
                         j++;

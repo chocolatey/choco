@@ -58,7 +58,7 @@ namespace chocolatey.tests
 
         public int ContainsMessageCount(string expectedMessage)
         {
-            int messageCount = 0;
+            var messageCount = 0;
             foreach (var messageLevel in Messages)
             {
                 foreach (var message in messageLevel.Value.OrEmpty())
@@ -75,7 +75,7 @@ namespace chocolatey.tests
 
         public int ContainsMessageCount(string expectedMessage, LogLevel level)
         {
-            int messageCount = 0;
+            var messageCount = 0;
             foreach (var message in MessagesFor(level).OrEmpty())
             {
                 if (message.Contains(expectedMessage))

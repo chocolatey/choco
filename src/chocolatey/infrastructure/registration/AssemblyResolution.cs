@@ -338,7 +338,7 @@ namespace chocolatey.infrastructure.registration
 
             if (Directory.Exists(ApplicationParameters.ExtensionsLocation))
             {
-                bool extensionsFound = false;
+                var extensionsFound = false;
                 foreach (var extensionDll in Directory.EnumerateFiles(ApplicationParameters.ExtensionsLocation, requestedAssembly.Name + ".dll", SearchOption.AllDirectories))
                 {
                     extensionsFound = true;

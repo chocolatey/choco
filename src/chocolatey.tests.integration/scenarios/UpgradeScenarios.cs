@@ -3974,7 +3974,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_install_hook_scripts_to_folder()
             {
                 var hookScripts = new List<string> { "pre-install-all.ps1", "post-install-all.ps1", "pre-upgrade-all.ps1", "post-upgrade-all.ps1", "pre-uninstall-all.ps1", "post-uninstall-all.ps1" };
-                foreach (string scriptName in hookScripts)
+                foreach (var scriptName in hookScripts)
                 {
                     var hookScriptPath = Path.Combine(Scenario.GetTopLevel(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), scriptName);
                     File.ReadAllText(hookScriptPath).Should().Contain("Write-Output");

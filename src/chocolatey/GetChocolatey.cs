@@ -101,7 +101,7 @@ namespace chocolatey
             _container = SimpleInjectorContainer.Container;
             if (initializeLogging)
             {
-                string loggingLocation = ApplicationParameters.LoggingLocation;
+                var loggingLocation = ApplicationParameters.LoggingLocation;
                 var fileSystem = _container.GetInstance<IFileSystem>();
                 fileSystem.EnsureDirectoryExists(loggingLocation);
 
@@ -491,7 +491,7 @@ namespace chocolatey
 
         private void EnsureEnvironment()
         {
-            string chocolateyInstall = string.Empty;
+            var chocolateyInstall = string.Empty;
 
 #if !DEBUG
             chocolateyInstall = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, EnvironmentVariableTarget.Machine);

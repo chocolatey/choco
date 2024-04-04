@@ -47,7 +47,7 @@ namespace chocolatey.infrastructure.app.runners
 
             IList<string> commandArgs = new List<string>();
             //shift the first arg off
-            int count = 0;
+            var count = 0;
             foreach (var arg in args)
             {
                 if (count == 0)

@@ -125,7 +125,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void GetFiles_should_return_files_that_meet_the_pattern()
             {
-                string filePath = FileSystem.CombinePaths(ContextPath, "chocolateyInstall.ps1");
+                var filePath = FileSystem.CombinePaths(ContextPath, "chocolateyInstall.ps1");
 
                 FileSystem.WriteFile(filePath, "yo");
                 var actual = FileSystem.GetFiles(ContextPath, "chocolateyInstall.ps1", SearchOption.AllDirectories).ToList();
@@ -139,7 +139,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Platform(Exclude = "Mono")]
             public void GetFiles_should_return_files_that_meet_the_pattern_regardless_of_case()
             {
-                string filePath = FileSystem.CombinePaths(ContextPath, "chocolateyInstall.ps1");
+                var filePath = FileSystem.CombinePaths(ContextPath, "chocolateyInstall.ps1");
 
                 FileSystem.WriteFile(filePath, "yo");
                 var actual = FileSystem.GetFiles(ContextPath, "chocolateyinstall.ps1", SearchOption.AllDirectories).ToList();

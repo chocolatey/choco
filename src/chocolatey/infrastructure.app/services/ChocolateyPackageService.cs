@@ -463,7 +463,7 @@ Did you know Pro / Business automatically syncs with Programs and
             var pkgInfo = GetPackageInformation(packageResult, config);
 
             // initialize this here so it can be used for the install location later
-            bool powerShellRan = false;
+            var powerShellRan = false;
 
             if (packageResult.Success && config.Information.PlatformType == PlatformType.Windows)
             {
@@ -1633,7 +1633,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
                     () => _fileSystem.CopyDirectory(extensionFolderToCopy, packageExtensionsInstallDirectory, overwriteExisting: true),
                     "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".FormatWith(Environment.NewLine, extensionFolderToCopy, packageExtensionsInstallDirectory));
 
-                string logMessage = " Installed/updated {0} extensions.".FormatWith(extensionsFolderName);
+                var logMessage = " Installed/updated {0} extensions.".FormatWith(extensionsFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
@@ -1641,7 +1641,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             }
             else
             {
-                string logMessage = " Uninstalled {0} extensions.".FormatWith(extensionsFolderName);
+                var logMessage = " Uninstalled {0} extensions.".FormatWith(extensionsFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }
@@ -1732,7 +1732,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
                     },
                     "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".FormatWith(Environment.NewLine, templatesFolderToCopy, installTemplatePath));
 
-                string logMessage = " Installed/updated {0} template.".FormatWith(templateFolderName);
+                var logMessage = " Installed/updated {0} template.".FormatWith(templateFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
@@ -1740,7 +1740,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             }
             else
             {
-                string logMessage = " Uninstalled {0} template.".FormatWith(templateFolderName);
+                var logMessage = " Uninstalled {0} template.".FormatWith(templateFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }
@@ -1756,7 +1756,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             FaultTolerance.TryCatchWithLoggingException(
                 () =>
                 {
-                    string badPackageInstallPath = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
+                    var badPackageInstallPath = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
                     if (_fileSystem.DirectoryExists(badPackageInstallPath))
                     {
                         _fileSystem.DeleteDirectory(badPackageInstallPath, recursive: true);
@@ -2101,7 +2101,7 @@ ATTENTION: You must take manual action to remove {1} from
                     },
                     "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".FormatWith(Environment.NewLine, hookFolderToCopy, installHookPath));
 
-                string logMessage = " Installed/updated {0} hook.".FormatWith(hookFolderName);
+                var logMessage = " Installed/updated {0} hook.".FormatWith(hookFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
@@ -2109,7 +2109,7 @@ ATTENTION: You must take manual action to remove {1} from
             }
             else
             {
-                string logMessage = " Uninstalled {0} hook.".FormatWith(hookFolderName);
+                var logMessage = " Uninstalled {0} hook.".FormatWith(hookFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }

@@ -24,9 +24,9 @@ namespace chocolatey.infrastructure.filesystem
         public static byte[] ReadFileBytes(string filePath)
         {
             byte[] fileBytes = null;
-            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
-                using (BinaryReader binaryReader = new BinaryReader(fs))
+                using (var binaryReader = new BinaryReader(fs))
                 {
                     fileBytes = binaryReader.ReadBytes((int)fs.Length);
                 }

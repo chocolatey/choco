@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.app.commands
             }
 
             var command = ApiKeyCommandType.Unknown;
-            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
+            var unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
 
             if (!Enum.TryParse(unparsedCommand, true, out command) || command == ApiKeyCommandType.Unknown)
             {
@@ -194,7 +194,7 @@ If you find other exit codes that we have not yet documented, please
                 default:
                     _configSettingsService.GetApiKey(configuration, (key) =>
                     {
-                        string authenticatedString = string.IsNullOrWhiteSpace(key.Key) ? string.Empty : "(Authenticated)";
+                        var authenticatedString = string.IsNullOrWhiteSpace(key.Key) ? string.Empty : "(Authenticated)";
 
                         if (configuration.RegularOutput)
                         {

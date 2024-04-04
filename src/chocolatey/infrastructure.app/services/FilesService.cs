@@ -167,7 +167,7 @@ namespace chocolatey.infrastructure.app.services
             this.Log().Debug(() => "Capturing package files in '{0}'".FormatWith(directory));
             //gather all files in the folder
             var files = _fileSystem.GetFiles(directory, pattern: "*.*", option: SearchOption.AllDirectories);
-            foreach (string file in files.OrEmpty().Where(f => !f.EndsWith(ApplicationParameters.PackagePendingFileName)))
+            foreach (var file in files.OrEmpty().Where(f => !f.EndsWith(ApplicationParameters.PackagePendingFileName)))
             {
                 packageFiles.Files.Add(GetPackageFile(file));
             }

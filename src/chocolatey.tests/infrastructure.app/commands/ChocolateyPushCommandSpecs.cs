@@ -135,7 +135,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_allow_a_path_to_the_nupkg_to_be_passed_in()
             {
                 Reset();
-                string nupkgPath = "./some/path/to.nupkg";
+                var nupkgPath = "./some/path/to.nupkg";
                 _unparsedArgs.Add(nupkgPath);
                 _because();
                 Configuration.Input.Should().Be(nupkgPath);

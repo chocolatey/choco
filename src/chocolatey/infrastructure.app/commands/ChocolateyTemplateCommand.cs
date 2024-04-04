@@ -59,7 +59,7 @@ namespace chocolatey.infrastructure.app.commands
             }
 
             var command = TemplateCommandType.Unknown;
-            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
+            var unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
             Enum.TryParse(unparsedCommand, true, out command);
 
             if (command == TemplateCommandType.Unknown)

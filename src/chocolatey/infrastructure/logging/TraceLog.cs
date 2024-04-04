@@ -64,7 +64,7 @@ namespace chocolatey.infrastructure.logging
                 {
                     //// force initialization
                     HttpWebRequest.Create("http://localhost");
-                    Thread waitForInitializationThread = new Thread(() =>
+                    var waitForInitializationThread = new Thread(() =>
                     {
                         while (!(bool)isInitialized.GetValue(null))
                         {

@@ -48,7 +48,7 @@ namespace chocolatey.infrastructure.extractors
                 var fileText = assembly.GetManifestString(manifestLocation);
                 if (string.IsNullOrWhiteSpace(fileText))
                 {
-                    string errorMessage = "Could not find a file in the manifest resource stream of '{0}' at '{1}'.".FormatWith(assembly.FullName, manifestLocation);
+                    var errorMessage = "Could not find a file in the manifest resource stream of '{0}' at '{1}'.".FormatWith(assembly.FullName, manifestLocation);
                     "chocolatey".Log().Error(() => errorMessage);
                     throw new FileNotFoundException(errorMessage);
                 }

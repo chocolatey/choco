@@ -112,7 +112,7 @@ namespace chocolatey.infrastructure.registration
                 {
                     var registrations = container.GetCurrentRegistrations();
 
-                    object componentClass = Activator.CreateInstance(componentRegistry);
+                    var componentClass = Activator.CreateInstance(componentRegistry);
 
                     componentRegistry.InvokeMember(
                         RegisterComponentsMethod,

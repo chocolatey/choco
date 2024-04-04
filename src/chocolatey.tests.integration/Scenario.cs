@@ -56,11 +56,11 @@ namespace chocolatey.tests.integration
 
         public static void Reset(ChocolateyConfiguration config)
         {
-            string packagesInstallPath = GetPackageInstallPath();
-            string badPackagesPath = GetPackageInstallPath() + "-bad";
-            string backupPackagesPath = GetPackageInstallPath() + "-bkp";
-            string shimsPath = ApplicationParameters.ShimsLocation;
-            string hooksPath = ApplicationParameters.HooksLocation;
+            var packagesInstallPath = GetPackageInstallPath();
+            var badPackagesPath = GetPackageInstallPath() + "-bad";
+            var backupPackagesPath = GetPackageInstallPath() + "-bkp";
+            var shimsPath = ApplicationParameters.ShimsLocation;
+            var hooksPath = ApplicationParameters.HooksLocation;
 
             _fileSystem.DeleteDirectoryChecked(config.CacheLocation, recursive: true, overrideAttributes: true);
             _fileSystem.DeleteDirectoryChecked(config.Sources, recursive: true, overrideAttributes: true);

@@ -58,7 +58,7 @@ namespace chocolatey.console
             {
                 AddAssemblyResolver();
 
-                string loggingLocation = ApplicationParameters.LoggingLocation;
+                var loggingLocation = ApplicationParameters.LoggingLocation;
                 //no file system at this point
                 if (!Directory.Exists(loggingLocation))
                 {

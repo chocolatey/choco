@@ -52,7 +52,7 @@ namespace chocolatey.infrastructure.commands
                 _powershell = GetPowerShellLocation(fileSystem);
             }
             //-NoProfile -NoLogo -ExecutionPolicy unrestricted -Command "[System.Threading.Thread]::CurrentThread.CurrentCulture = ''; [System.Threading.Thread]::CurrentThread.CurrentUICulture = '';& '%DIR%chocolatey.ps1' %PS_ARGS%"
-            string arguments = "-NoProfile -NoLogo -ExecutionPolicy Bypass -Command \"{0}\"".FormatWith(command);
+            var arguments = "-NoProfile -NoLogo -ExecutionPolicy Bypass -Command \"{0}\"".FormatWith(command);
 
             return CommandExecutor.ExecuteStatic(
                 _powershell,

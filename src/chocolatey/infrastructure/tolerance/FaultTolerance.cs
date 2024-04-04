@@ -100,7 +100,7 @@ namespace chocolatey.infrastructure.tolerance
                 logLocation = ChocolateyLoggers.LogFileOnly;
             }
 
-            for (int i = 1; i <= numberOfTries; i++)
+            for (var i = 1; i <= numberOfTries; i++)
             {
                 try
                 {
@@ -115,7 +115,7 @@ namespace chocolatey.infrastructure.tolerance
                         throw;
                     }
 
-                    int retryWait = waitDurationMilliseconds + (i*increaseRetryByMilliseconds);
+                    var retryWait = waitDurationMilliseconds + (i*increaseRetryByMilliseconds);
 
                     var exceptionMessage = debugging ? ex.ToString() : ex.Message;
 

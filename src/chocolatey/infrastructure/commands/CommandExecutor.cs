@@ -157,7 +157,7 @@ namespace chocolatey.infrastructure.commands
                                   bool waitForExit
             )
         {
-            int exitCode = -1;
+            var exitCode = -1;
             if (updateProcessPath)
             {
                 process = FileSystem.GetFullPath(process);

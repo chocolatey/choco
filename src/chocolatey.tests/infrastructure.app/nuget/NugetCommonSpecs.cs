@@ -174,8 +174,8 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _because();
 
                 // Change this when the NuGet version is updated.
-                string nugetClientVersion = "6.4.1";
-                string expectedUserAgentString = "{0}/{1} via NuGet Client/{2}".FormatWith(ApplicationParameters.UserAgent, _configuration.Information.ChocolateyProductVersion, nugetClientVersion);
+                var nugetClientVersion = "6.4.1";
+                var expectedUserAgentString = "{0}/{1} via NuGet Client/{2}".FormatWith(ApplicationParameters.UserAgent, _configuration.Information.ChocolateyProductVersion, nugetClientVersion);
                 UserAgent.UserAgentString.Should().StartWith(expectedUserAgentString);
             }
         }

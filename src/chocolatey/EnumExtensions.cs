@@ -32,7 +32,7 @@ namespace chocolatey
         /// <param name="enumeration">The enumeration item.</param>
         public static string DescriptionOrValue(this Enum enumeration)
         {
-            string description = enumeration.ToString();
+            var description = enumeration.ToString();
 
             Type type = enumeration.GetType();
             MemberInfo[] memberInfo = type.GetMember(description);

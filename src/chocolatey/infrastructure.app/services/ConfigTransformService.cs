@@ -116,7 +116,7 @@ namespace chocolatey.infrastructure.app.services
                                         this.Log().Debug(() => "Creating backup configuration file for '{0}'.".FormatWith(targetFile));
                                         _fileSystem.CopyFile(targetFile, backupTargetFile, overwriteExisting: true);
 
-                                        bool succeeded = transformation.Apply(document);
+                                        var succeeded = transformation.Apply(document);
                                         if (succeeded)
                                         {
                                             this.Log().Debug(() => "Transform applied successfully for '{0}'".FormatWith(targetFile));

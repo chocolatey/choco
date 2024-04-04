@@ -169,13 +169,13 @@ namespace chocolatey.infrastructure.app.nuget
                 return CredentialCache.DefaultCredentials;
             }
 
-            string message = credentialType == CredentialRequestType.Proxy ?
+            var message = credentialType == CredentialRequestType.Proxy ?
                                  "Please provide proxy credentials:" :
                                  "Please provide credentials for: {0}".FormatWith(uri.OriginalString);
             this.Log().Info(ChocolateyLoggers.Important, message);
 
             Console.Write("User name: ");
-            string username = Console.ReadLine();
+            var username = Console.ReadLine();
             Console.Write("Password: ");
             var password = InteractivePrompt.GetPassword(_config.PromptForConfirmation);
 

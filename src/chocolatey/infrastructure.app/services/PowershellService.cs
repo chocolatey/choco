@@ -88,7 +88,7 @@ namespace chocolatey.infrastructure.app.services
 
         private IEnumerable<string> GetHookScripts(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command, bool isPreHook)
         {
-            List<string> hookScriptPaths = new List<string>();
+            var hookScriptPaths = new List<string>();
 
             // If skipping hook scripts, return an empty list
             if (configuration.SkipHookScripts)
@@ -252,7 +252,7 @@ namespace chocolatey.infrastructure.app.services
             foreach (var hookScriptPath in hookPreScriptPathList.Concat(hookPostScriptPathList).OrEmpty())
             {
                 this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".FormatWith(chocoPowerShellScript));
-                string hookScriptContents = _fileSystem.ReadFile(hookScriptPath);
+                var hookScriptContents = _fileSystem.ReadFile(hookScriptPath);
                 this.Log().Debug(() => hookScriptContents.EscapeCurlyBraces());
             }
 
@@ -262,12 +262,12 @@ namespace chocolatey.infrastructure.app.services
 
                 var package = packageResult.SearchMetadata;
                 PreparePowerShellEnvironment(package, configuration, packageDirectory);
-                bool shouldRun = !configuration.PromptForConfirmation;
+                var shouldRun = !configuration.PromptForConfirmation;
 
                 if (!string.IsNullOrEmpty(chocoPowerShellScript))
                 {
                     this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".FormatWith(chocoPowerShellScript));
-                    string chocoPowerShellScriptContents = _fileSystem.ReadFile(chocoPowerShellScript);
+                    var chocoPowerShellScriptContents = _fileSystem.ReadFile(chocoPowerShellScript);
                     // leave this way, doesn't take it through formatting.
                     this.Log().Debug(() => chocoPowerShellScriptContents.EscapeCurlyBraces());
 
@@ -644,7 +644,7 @@ namespace chocolatey.infrastructure.app.services
 
             var result = new PowerShellExecutionResults();
 
-            string commandToRun = WrapScriptWithModule(chocoPowerShellScript, hookPreScriptPathList, hookPostScriptPathList, config);
+            var commandToRun = WrapScriptWithModule(chocoPowerShellScript, hookPreScriptPathList, hookPostScriptPathList, config);
             var host = new PoshHost(config);
             this.Log().Debug(() => "Calling built-in PowerShell host with ['{0}']".FormatWith(commandToRun.EscapeCurlyBraces()));
 
@@ -672,7 +672,7 @@ namespace chocolatey.infrastructure.app.services
                     // Write-Output
                     pipeline.Output.DataReady += (sender, args) =>
                     {
-                        PipelineReader<PSObject> reader = sender as PipelineReader<PSObject>;
+                        var reader = sender as PipelineReader<PSObject>;
 
                         if (reader != null)
                         {
@@ -686,7 +686,7 @@ namespace chocolatey.infrastructure.app.services
                     // Write-Error
                     pipeline.Error.DataReady += (sender, args) =>
                     {
-                        PipelineReader<object> reader = sender as PipelineReader<object>;
+                        var reader = sender as PipelineReader<object>;
 
                         if (reader != null)
                         {

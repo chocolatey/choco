@@ -57,7 +57,7 @@ namespace chocolatey
         /// <returns>Instance of a logger for the object.</returns>
         public static ILog Log<T>(this T type)
         {
-            string objectName = typeof (T).FullName;
+            var objectName = typeof (T).FullName;
             return Log(objectName);
         }
 

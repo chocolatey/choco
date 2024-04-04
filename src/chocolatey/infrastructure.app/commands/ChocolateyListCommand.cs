@@ -151,8 +151,8 @@ namespace chocolatey.infrastructure.app.commands
 
             foreach (var argument in unparsedArguments)
             {
-                bool isUnsupportedArgument = _unsupportedArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
-                bool isUnsupportedRegistryProgramsArgument = _unsupportedIncludeRegistryProgramsArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
+                var isUnsupportedArgument = _unsupportedArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
+                var isUnsupportedRegistryProgramsArgument = _unsupportedIncludeRegistryProgramsArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
 
                 if (isUnsupportedArgument || isUnsupportedRegistryProgramsArgument)
                 {

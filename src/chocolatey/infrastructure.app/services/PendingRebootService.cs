@@ -69,7 +69,7 @@ namespace chocolatey.infrastructure.app.services
             var activeName = GetRegistryKeyString(path.FormatWith("ActiveComputerName"), "ComputerName");
             var pendingName = GetRegistryKeyString(path.FormatWith("ComputerName"), "ComputerName");
 
-            bool result = !string.IsNullOrWhiteSpace(activeName) &&
+            var result = !string.IsNullOrWhiteSpace(activeName) &&
                           !string.IsNullOrWhiteSpace(pendingName) &&
                           activeName != pendingName;
 

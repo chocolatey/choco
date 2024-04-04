@@ -189,8 +189,8 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_throw_exception()
             {
-                bool errored = false;
-                string errorMessage = string.Empty;
+                var errored = false;
+                var errorMessage = string.Empty;
 
                 try
                 {
@@ -212,8 +212,8 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 _config.OutputDirectory = "c:\\packages";
 
-                bool errored = false;
-                string errorMessage = string.Empty;
+                var errored = false;
+                var errorMessage = string.Empty;
 
                 try
                 {

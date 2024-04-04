@@ -36,7 +36,7 @@ namespace chocolatey.infrastructure.information
 
         public override bool Equals(object obj)
         {
-            ExtensionInformation information = obj as ExtensionInformation;
+            var information = obj as ExtensionInformation;
             return !ReferenceEquals(information, null) &&
                    Name == information.Name &&
                    Version == information.Version;
@@ -47,7 +47,7 @@ namespace chocolatey.infrastructure.information
             // We do this in an uncheched statement so there won't be any arithmetic exceptions
             unchecked
             {
-                int hashCode = 14;
+                var hashCode = 14;
                 hashCode = (hashCode * 6)
                     + EqualityComparer<string>.Default.GetHashCode(Name)
                     + EqualityComparer<string>.Default.GetHashCode(Version);

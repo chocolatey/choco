@@ -38,9 +38,9 @@ namespace chocolatey.infrastructure.tokens
 
             var regex = new Regex("{0}(?<key>\\w+){1}".FormatWith(Regex.Escape(tokenPrefix), Regex.Escape(tokenSuffix)));
 
-            string output = regex.Replace(textToReplace, m =>
+            var output = regex.Replace(textToReplace, m =>
                 {
-                    string key = "";
+                    var key = "";
 
                     var originalKey = m.Groups["key"].Value;
                     key = originalKey.ToLowerSafe();
@@ -49,7 +49,7 @@ namespace chocolatey.infrastructure.tokens
                         return tokenPrefix + originalKey + tokenSuffix;
                     }
 
-                    string value = dictionary[key];
+                    var value = dictionary[key];
                     return value;
                 });
 

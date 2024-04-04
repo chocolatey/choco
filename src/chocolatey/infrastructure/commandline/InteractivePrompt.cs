@@ -93,7 +93,7 @@ namespace chocolatey.infrastructure.commandline
 
             "chocolatey".Log().Info(shortPrompt ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, prompt);
 
-            int counter = 1;
+            var counter = 1;
             IDictionary<int, string> choiceDictionary = new Dictionary<int, string>();
             foreach (var choice in choices.OrEmpty())
             {
@@ -135,7 +135,7 @@ namespace chocolatey.infrastructure.commandline
                 return defaultChoice;
             }
 
-            int selected = -1;
+            var selected = -1;
             if (!int.TryParse(selection, out selected) || selected <= 0 || selected > (counter - 1))
             {
                 // check to see if value was passed
@@ -189,7 +189,7 @@ namespace chocolatey.infrastructure.commandline
                     {
                         password = password.Substring(0, password.Length - 1);
                         // get the location of the cursor
-                        int pos = System.Console.CursorLeft;
+                        var pos = System.Console.CursorLeft;
                         // move the cursor to the left by one character
                         System.Console.SetCursorPosition(pos - 1, System.Console.CursorTop);
                         // replace it with space
@@ -200,7 +200,7 @@ namespace chocolatey.infrastructure.commandline
                     info = possibleNonInteractive ? Console.ReadKey(TimeoutInSeconds * 1000) : Console.ReadKey(true);
                 }
             }
-            for (int i = 0; i < password.Length; i++)
+            for (var i = 0; i < password.Length; i++)
             {
                 Console.Write("*");
             }

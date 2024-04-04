@@ -69,7 +69,7 @@ namespace chocolatey.infrastructure.app.commands
             }
 
             var command = PinCommandType.Unknown;
-            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
+            var unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
             Enum.TryParse(unparsedCommand, true, out command);
 
             if (command == PinCommandType.Unknown)
@@ -210,7 +210,7 @@ If you find other exit codes that we have not yet documented, please
 
             var pkgInfo = _packageInfoService.Get(installedPackage.PackageMetadata);
 
-            bool changeMessage = pkgInfo.IsPinned != addingAPin;
+            var changeMessage = pkgInfo.IsPinned != addingAPin;
 
             pkgInfo.IsPinned = addingAPin;
             _packageInfoService.Save(pkgInfo);

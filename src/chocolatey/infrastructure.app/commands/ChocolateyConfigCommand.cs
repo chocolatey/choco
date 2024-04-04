@@ -58,7 +58,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             var command = ConfigCommandType.Unknown;
-            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().ToStringSafe().Replace("-", string.Empty);
+            var unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().ToStringSafe().Replace("-", string.Empty);
             Enum.TryParse(unparsedCommand, true, out command);
             if (command == ConfigCommandType.Unknown)
             {

@@ -280,7 +280,7 @@ namespace chocolatey.infrastructure.app.services
             if (!installer.ValidUninstallExitCodes.Contains(exitCode))
             {
                 Environment.ExitCode = exitCode;
-                string logMessage = " Auto uninstaller failed. Please remove machine installation manually.{0} Exit code was {1}".FormatWith(Environment.NewLine, exitCode);
+                var logMessage = " Auto uninstaller failed. Please remove machine installation manually.{0} Exit code was {1}".FormatWith(Environment.NewLine, exitCode);
                 this.Log().Error(() => logMessage.EscapeCurlyBraces());
                 packageResult.Messages.Add(new ResultMessage(config.Features.FailOnAutoUninstaller ? ResultType.Error : ResultType.Warn, logMessage));
             }

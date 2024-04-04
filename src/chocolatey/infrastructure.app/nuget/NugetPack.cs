@@ -33,7 +33,7 @@ namespace chocolatey.infrastructure.app.nuget
             ExcludeFiles(builder.Files);
 
             // Track if the package file was already present on disk
-            bool isExistingPackage = fileSystem.FileExists(outputPath);
+            var isExistingPackage = fileSystem.FileExists(outputPath);
             try
             {
                 using (Stream stream = fileSystem.CreateFile(outputPath))

@@ -66,8 +66,8 @@ namespace chocolatey
         /// </summary>
         public static IEnumerable<T> LastDistinct<T>(this IEnumerable<T> source, IEqualityComparer<T> equalityComparer, IComparer<T> comparer)
         {
-            bool first = true;
-            bool maxElementHasValue = false;
+            var first = true;
+            var maxElementHasValue = false;
             var previousElement = default(T);
             var maxElement = default(T);
 

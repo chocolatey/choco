@@ -30,7 +30,7 @@ namespace chocolatey.infrastructure.information
                 assembly = Assembly.GetExecutingAssembly();
             }
 
-            string location = assembly != null ? assembly.Location : string.Empty;
+            var location = assembly != null ? assembly.Location : string.Empty;
 
             if (!string.IsNullOrEmpty(location))
             {
@@ -61,7 +61,7 @@ namespace chocolatey.infrastructure.information
                 assembly = Assembly.GetExecutingAssembly();
             }
 
-            string location = assembly != null ? assembly.Location : string.Empty;
+            var location = assembly != null ? assembly.Location : string.Empty;
 
             if (!string.IsNullOrEmpty(location))
             {
