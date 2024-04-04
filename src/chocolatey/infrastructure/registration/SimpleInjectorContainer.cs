@@ -119,7 +119,7 @@ namespace chocolatey.infrastructure.registration
                         BindingFlags.InvokeMethod,
                         null,
                         componentClass,
-                        new Object[] { container }
+                        new object[] { container }
                         );
                 }
             }

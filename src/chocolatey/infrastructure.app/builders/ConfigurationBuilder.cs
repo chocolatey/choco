@@ -552,7 +552,7 @@ namespace chocolatey.infrastructure.app.builders
                         BindingFlags.InvokeMethod,
                         null,
                         componentClass,
-                        new Object[] { config, configFileSettings }
+                        new object[] { config, configFileSettings }
                         );
                 }
                 catch (Exception ex)

@@ -109,7 +109,7 @@ namespace chocolatey.infrastructure.app.nuget
                 "chocolatey".Log().Debug("Using proxy server '{0}'.".FormatWith(configuration.Proxy.Location));
                 var proxy = new System.Net.WebProxy(configuration.Proxy.Location, true);
 
-                if (!String.IsNullOrWhiteSpace(configuration.Proxy.User) && !String.IsNullOrWhiteSpace(configuration.Proxy.EncryptedPassword))
+                if (!string.IsNullOrWhiteSpace(configuration.Proxy.User) && !string.IsNullOrWhiteSpace(configuration.Proxy.EncryptedPassword))
                 {
                     proxy.Credentials = new NetworkCredential(configuration.Proxy.User, NugetEncryptionUtility.DecryptString(configuration.Proxy.EncryptedPassword));
                 }

@@ -213,7 +213,7 @@ namespace chocolatey.infrastructure.powershell
         /// </returns>
         private static string[] GetHotkeyAndLabel(string input)
         {
-            var result = new[] { String.Empty, String.Empty };
+            var result = new[] { string.Empty, string.Empty };
             //Do not use StringSplitOptions.RemoveEmptyEntries, it causes issues here
             string[] fragments = input.Split('&');
             if (fragments.Length == 2)
@@ -251,14 +251,14 @@ namespace chocolatey.infrastructure.powershell
             var choicePrompt = new StringBuilder();
             for (int element = 0; element < choices.Count; element++)
             {
-                choicePrompt.Append(String.Format(
+                choicePrompt.Append(string.Format(
                     CultureInfo.CurrentCulture,
                     "[{0}] {1} ",
                     promptData[0, element],
                     promptData[1, element]));
             }
 
-            choicePrompt.Append(String.Format(
+            choicePrompt.Append(string.Format(
                 CultureInfo.CurrentCulture,
                 "(default is \"{0}\")",
                 promptData[0, defaultChoice]));

@@ -80,11 +80,11 @@ namespace chocolatey.infrastructure.adapters
 
         AssemblyName GetName();
 
-        Type GetType(String name);
+        Type GetType(string name);
 
-        Type GetType(String name, bool throwOnError);
+        Type GetType(string name, bool throwOnError);
 
-        Type GetType(String name, bool throwOnError, bool ignoreCase);
+        Type GetType(string name, bool throwOnError, bool ignoreCase);
 
         Type[] GetTypes();
 

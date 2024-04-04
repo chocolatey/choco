@@ -201,7 +201,7 @@ namespace chocolatey.infrastructure.app.configuration
                         BindingFlags.InvokeMethod,
                         null,
                         componentClass,
-                        new Object[] { config }
+                        new object[] { config }
                         );
                 }
                 catch (Exception ex)

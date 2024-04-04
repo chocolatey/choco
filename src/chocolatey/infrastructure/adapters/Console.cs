@@ -443,7 +443,7 @@ namespace chocolatey.infrastructure.adapters
             /// <summary> A CoOrd structure that contains the column and row coordinates of the cursor in the console screen buffer. </summary>
             internal COORD dwCursorPosition;
             /// <summary> The attributes of the characters written to a screen buffer by the WriteFile and WriteConsole functions, or echoed to a screen buffer by the ReadFile and ReadConsole functions. </summary>
-            internal System.Int16 wAttributes;
+            internal short wAttributes;
             /// <summary> A SmallRect structure that contains the console screen buffer coordinates of the upper-left and lower-right corners of the display window. </summary>
             internal SMALL_RECT srWindow;
             /// <summary> A CoOrd structure that contains the maximum size of the console window, in character columns and rows, given the current screen buffer size and font and the screen size. </summary>
@@ -461,9 +461,9 @@ namespace chocolatey.infrastructure.adapters
         private struct COORD
         {
             /// <summary> The horizontal coordinate or column value. </summary>
-            internal System.Int16 X;
+            internal short X;
             /// <summary> The vertical coordinate or row value. </summary>
-            internal System.Int16 Y;
+            internal short Y;
         }
 
         /// <summary>
@@ -475,13 +475,13 @@ namespace chocolatey.infrastructure.adapters
         private struct SMALL_RECT
         {
             /// <summary> The x-coordinate of the upper left corner of the rectangle. </summary>
-            internal System.Int16 Left;
+            internal short Left;
             /// <summary> The y-coordinate of the upper left corner of the rectangle. </summary>
-            internal System.Int16 Top;
+            internal short Top;
             /// <summary> The x-coordinate of the lower right corner of the rectangle. </summary>
-            internal System.Int16 Right;
+            internal short Right;
             /// <summary> The y-coordinate of the lower right corner of the rectangle. </summary>
-            internal System.Int16 Bottom;
+            internal short Bottom;
         }
 
         private enum StdHandle

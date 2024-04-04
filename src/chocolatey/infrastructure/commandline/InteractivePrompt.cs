@@ -70,7 +70,7 @@ namespace chocolatey.infrastructure.commandline
                 Ensure
                     .That(() => choices)
                     .Meets(
-                        c => !c.Any(String.IsNullOrWhiteSpace),
+                        c => !c.Any(string.IsNullOrWhiteSpace),
                         (name, value) => { throw new ApplicationException("Some choices are empty. Please ensure you provide no empty choices."); });
 
                 Ensure

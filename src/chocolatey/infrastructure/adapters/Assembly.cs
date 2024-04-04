@@ -66,17 +66,17 @@ namespace chocolatey.infrastructure.adapters
             return UnderlyingType.GetName();
         }
 
-        public Type GetType(String name)
+        public Type GetType(string name)
         {
             return UnderlyingType.GetType(name);
         }
 
-        public Type GetType(String name, bool throwOnError)
+        public Type GetType(string name, bool throwOnError)
         {
             return UnderlyingType.GetType(name,throwOnError);
         }
 
-        public Type GetType(String name, bool throwOnError, bool ignoreCase)
+        public Type GetType(string name, bool throwOnError, bool ignoreCase)
         {
             return UnderlyingType.GetType(name,throwOnError, ignoreCase);
         }

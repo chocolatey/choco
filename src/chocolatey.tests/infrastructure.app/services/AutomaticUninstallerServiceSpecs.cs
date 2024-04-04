@@ -123,7 +123,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -153,7 +153,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -181,7 +181,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -209,7 +209,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -237,7 +237,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -267,7 +267,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -348,7 +348,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -377,7 +377,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -409,7 +409,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -440,7 +440,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -658,7 +658,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }

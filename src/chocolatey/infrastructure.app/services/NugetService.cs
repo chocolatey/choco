@@ -625,7 +625,7 @@ folder.");
  NOTE: When you specify explicit sources, it overrides default sources.
 If the package version is a prerelease and you didn't specify `--pre`,
  the package may not be found.{2}{3}".FormatWith(packageName, config.Sources, string.IsNullOrWhiteSpace(config.Version)
-                            ? String.Empty
+                            ? string.Empty
                             : @"
 Version was specified as '{0}'. It is possible that version
  does not exist for '{1}' at the source specified.".FormatWith(config.Version, packageName),
