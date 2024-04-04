@@ -109,9 +109,10 @@ namespace chocolatey.infrastructure.platforms
             var name = "Windows";
             var isServer = false;
 
-            var osVersionInfo = new OSVERSIONINFOEX();
-
-            osVersionInfo.dwOSVersionInfoSize = Marshal.SizeOf(typeof (OSVERSIONINFOEX));
+            var osVersionInfo = new OSVERSIONINFOEX
+            {
+                dwOSVersionInfoSize = Marshal.SizeOf(typeof(OSVERSIONINFOEX))
+            };
             var success = GetVersionEx(ref osVersionInfo);
             if (success)
             {

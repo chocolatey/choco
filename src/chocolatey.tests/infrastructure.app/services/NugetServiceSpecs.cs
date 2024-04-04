@@ -67,8 +67,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
                 Package.Setup(x => x.Id).Returns("bob");
-                _packageInfo = new ChocolateyPackageInformation(Package.Object);
-                _packageInfo.FilesSnapshot = new PackageFiles();
+                _packageInfo = new ChocolateyPackageInformation(Package.Object)
+                {
+                    FilesSnapshot = new PackageFiles()
+                };
                 _packageFiles = new PackageFiles();
                 FileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
             }
@@ -127,10 +129,12 @@ namespace chocolatey.tests.infrastructure.app.services
                     FilePath
                 };
                 FileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
-                var updatedPackageFiles = new PackageFiles();
-                updatedPackageFiles.Files = new List<PackageFile>
+                var updatedPackageFiles = new PackageFiles
+                {
+                    Files = new List<PackageFile>
                 {
                     packageFileWithUpdatedChecksum
+                }
                 };
                 FilesService.Setup(x => x.CaptureSnapshot(It.IsAny<string>(), _config)).Returns(updatedPackageFiles);
 
@@ -151,8 +155,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
                 Package.Setup(x => x.Id).Returns("bob");
-                _packageInfo = new ChocolateyPackageInformation(Package.Object);
-                _packageInfo.FilesSnapshot = new PackageFiles();
+                _packageInfo = new ChocolateyPackageInformation(Package.Object)
+                {
+                    FilesSnapshot = new PackageFiles()
+                };
                 _packageFiles = new List<PackageFile>();
                 FileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
             }

@@ -52,9 +52,11 @@ namespace chocolatey.infrastructure.app.nuget
             var packageRepositoriesResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem, cacheContext);
             var searchTermLower = configuration.Input.ToLowerSafe();
 
-            var searchFilter = new SearchFilter(configuration.Prerelease);
-            searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
-            searchFilter.OrderBy = SearchOrderBy.DownloadCount;
+            var searchFilter = new SearchFilter(configuration.Prerelease)
+            {
+                IncludeDelisted = configuration.ListCommand.LocalOnly,
+                OrderBy = SearchOrderBy.DownloadCount
+            };
 
             var totalCount = 0;
             foreach (var searchResource in packageRepositoriesResources.SearchResources())
@@ -74,9 +76,11 @@ namespace chocolatey.infrastructure.app.nuget
             var packageRepositoryResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem, cacheContext);
             var searchTermLower = configuration.Input.ToLowerSafe();
 
-            var searchFilter = new SearchFilter(configuration.Prerelease);
-            searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
-            searchFilter.OrderBy = SearchOrderBy.Id;
+            var searchFilter = new SearchFilter(configuration.Prerelease)
+            {
+                IncludeDelisted = configuration.ListCommand.LocalOnly,
+                OrderBy = SearchOrderBy.Id
+            };
 
             if (configuration.ListCommand.OrderByPopularity)
             {

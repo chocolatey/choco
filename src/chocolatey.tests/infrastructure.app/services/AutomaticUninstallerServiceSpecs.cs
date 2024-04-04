@@ -61,8 +61,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 chocolatey.infrastructure.commands.CommandExecutor.InitializeWith(new Lazy<IFileSystem>(() => FileSystem.Object), () => Process.Object);
 
-                Service = new AutomaticUninstallerService(PackageInfoService.Object, FileSystem.Object, RegistryService.Object, CommandExecutor.Object);
-                Service.WaitForCleanup = false;
+                Service = new AutomaticUninstallerService(PackageInfoService.Object, FileSystem.Object, RegistryService.Object, CommandExecutor.Object)
+                {
+                    WaitForCleanup = false
+                };
                 Config.Features.AutoUninstaller = true;
                 Config.PromptForConfirmation = false;
                 Config.PackageNames = "regular";
