@@ -23,72 +23,67 @@ namespace chocolatey.infrastructure.adapters
 {
     public sealed class Assembly : IAssembly
     {
-        private readonly System.Reflection.Assembly _assembly;
-
         private Assembly(System.Reflection.Assembly assembly)
         {
-            _assembly = assembly;
+            UnderlyingType = assembly;
         }
 
         public string FullName
         {
-            get { return _assembly.FullName; }
+            get { return UnderlyingType.FullName; }
         }
 
         public string Location
         {
-            get { return _assembly.Location; }
+            get { return UnderlyingType.Location; }
         }
 
         public string CodeBase
         {
-            get { return _assembly.CodeBase; }
+            get { return UnderlyingType.CodeBase; }
         }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public System.Reflection.Assembly UnderlyingType
-        {
-            get { return _assembly; }
-        }
+        public System.Reflection.Assembly UnderlyingType { get; }
 
         public string[] GetManifestResourceNames()
         {
-            return _assembly.GetManifestResourceNames();
+            return UnderlyingType.GetManifestResourceNames();
         }
 
         public Stream GetManifestResourceStream(string name)
         {
-            return _assembly.GetManifestResourceStream(name);
+            return UnderlyingType.GetManifestResourceStream(name);
         }
 
         public Stream GetManifestResourceStream(Type type, string name)
         {
-            return _assembly.GetManifestResourceStream(type, name);
+            return UnderlyingType.GetManifestResourceStream(type, name);
         }
 
         public AssemblyName GetName()
         {
-            return _assembly.GetName();
+            return UnderlyingType.GetName();
         }
 
         public Type GetType(String name)
         {
-            return _assembly.GetType(name);
+            return UnderlyingType.GetType(name);
         }
 
         public Type GetType(String name, bool throwOnError)
         {
-            return _assembly.GetType(name,throwOnError);
+            return UnderlyingType.GetType(name,throwOnError);
         }
 
         public Type GetType(String name, bool throwOnError, bool ignoreCase)
         {
-            return _assembly.GetType(name,throwOnError, ignoreCase);
+            return UnderlyingType.GetType(name,throwOnError, ignoreCase);
         }
 
         public Type[] GetTypes()
         {
-            return _assembly.GetTypes();
+            return UnderlyingType.GetTypes();
         }
 
         public static IAssembly Load(byte[] rawAssembly)

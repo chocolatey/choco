@@ -38,16 +38,11 @@ namespace chocolatey.infrastructure.registration
         private const string RegisterComponentsMethod = "RegisterComponents";
 
 #if DEBUG
-        private static bool _verifyContainer = true;
 #else
         private static bool _verifyContainer = false;
 #endif
 
-        public static bool VerifyContainer
-        {
-            get { return _verifyContainer; }
-            set { _verifyContainer = value; }
-        }
+        public static bool VerifyContainer { get; set; } = true;
 
         /// <summary>
         ///   Add a component registry class to the container.
@@ -85,7 +80,7 @@ namespace chocolatey.infrastructure.registration
                 LoadComponentRegistry(componentRegistry, container, extensions);
             }
 
-            if (_verifyContainer)
+            if (VerifyContainer)
             {
                 container.Verify();
             }

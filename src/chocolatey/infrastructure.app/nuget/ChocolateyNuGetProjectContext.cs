@@ -23,7 +23,7 @@ namespace chocolatey.infrastructure.app.nuget
             //TODO, set client policy correctly here with settings, fix in chocolatey implementation of ISettings for this purpose
             var chocolateyNugetSettings = new ChocolateyNuGetSettings(config);
             var clientPolicyContext = ClientPolicyContext.GetClientPolicy(chocolateyNugetSettings, logger);
-            _extractionContext = new PackageExtractionContext(
+            PackageExtractionContext = new PackageExtractionContext(
                 PackageSaveMode.Nupkg | PackageSaveMode.Nuspec | PackageSaveMode.Files,
                 XmlDocFileSaveMode.None,
                 clientPolicyContext,
@@ -31,8 +31,6 @@ namespace chocolatey.infrastructure.app.nuget
                 );
             _logger = logger;
         }
-
-        private PackageExtractionContext _extractionContext;
 
         public void Log(MessageLevel level, string message, params object[] args)
         {
@@ -74,17 +72,7 @@ namespace chocolatey.infrastructure.app.nuget
             return FileConflictAction.OverwriteAll;
         }
 
-        public PackageExtractionContext PackageExtractionContext
-        {
-            get
-            {
-                return _extractionContext;
-            }
-            set
-            {
-                _extractionContext = value;
-            }
-        }
+        public PackageExtractionContext PackageExtractionContext { get; set; }
 
         public ISourceControlManagerProvider SourceControlManagerProvider => null;
         public ExecutionContext ExecutionContext => null;

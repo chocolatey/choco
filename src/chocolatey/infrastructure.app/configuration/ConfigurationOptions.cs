@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.app.configuration
 
         public static void ClearOptions()
         {
-            _optionSet.Clear();
+            OptionSet.Clear();
         }
 
         private static IConsole Console
@@ -46,12 +46,7 @@ namespace chocolatey.infrastructure.app.configuration
             get { return _console.Value; }
         }
 
-        private static readonly OptionSet _optionSet = new OptionSet();
-
-        public static OptionSet OptionSet
-        {
-            get { return _optionSet; }
-        }
+        public static OptionSet OptionSet { get; } = new OptionSet();
 
         /// <summary>
         ///   Parses arguments and updates the configuration
@@ -72,9 +67,9 @@ namespace chocolatey.infrastructure.app.configuration
             IList<string> unparsedArguments = new List<string>();
 
             // add help only once
-            if (_optionSet.Count == 0)
+            if (OptionSet.Count == 0)
             {
-                _optionSet
+                OptionSet
                     .Add("?|help|h",
                         "Prints out the help menu.",
                         option => configuration.HelpRequested = option != null)
@@ -85,16 +80,16 @@ namespace chocolatey.infrastructure.app.configuration
 
             if (setOptions != null)
             {
-                setOptions(_optionSet);
+                setOptions(OptionSet);
             }
 
             try
             {
-                unparsedArguments = _optionSet.Parse(args);
+                unparsedArguments = OptionSet.Parse(args);
             }
             catch (OptionException)
             {
-                ShowHelp(_optionSet, helpMessage);
+                ShowHelp(OptionSet, helpMessage);
                 configuration.UnsuccessfulParsing = true;
             }
 
@@ -146,7 +141,7 @@ namespace chocolatey.infrastructure.app.configuration
                     return;
                 }
 
-                ShowHelp(_optionSet, helpMessage);
+                ShowHelp(OptionSet, helpMessage);
             }
             else
             {

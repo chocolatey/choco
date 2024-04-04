@@ -27,14 +27,8 @@ namespace chocolatey.infrastructure.commands
 {
     public sealed class PowershellExecutor
     {
-        private static bool _allowUseWindow = true;
-
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static bool AllowUseWindow
-        {
-            get { return _allowUseWindow; }
-            set { _allowUseWindow = value; }
-        }
+        public static bool AllowUseWindow { get; set; } = true;
 
         private static readonly IList<string> _powershellLocations = new List<string>
             {
@@ -68,7 +62,7 @@ namespace chocolatey.infrastructure.commands
                 stdOutAction: stdOutAction,
                 stdErrAction: stdErrAction,
                 updateProcessPath: true,
-                allowUseWindow: _allowUseWindow
+                allowUseWindow: AllowUseWindow
                 );
         }
 
