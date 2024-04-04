@@ -13,20 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commandline;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.logging;
-    using chocolatey.infrastructure.results;
-
     [CommandFor("list", "lists local packages")]
     public class ChocolateyListCommand : IListCommand<PackageResult>
     {

@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using chocolatey.infrastructure.app.configuration;
+
 namespace chocolatey.infrastructure.configuration
 {
-    using System;
-    using System.ComponentModel;
-    using app.configuration;
-
     /// <summary>
     ///   Configuration initialization
     /// </summary>

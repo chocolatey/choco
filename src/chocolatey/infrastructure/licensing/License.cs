@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.registration;
+
 namespace chocolatey.infrastructure.licensing
 {
-    using System;
-    using app;
-    using information;
-    using logging;
-    using registration;
-
     public static class License
     {
         public static ChocolateyLicense ValidateLicense()

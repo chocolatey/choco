@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.app.attributes;
-    using configuration;
-    using domain;
-    using results;
-
     [MultiService]
     [Obsolete("This interface is deprecated and will be removed in v3.")]
     public interface ISourceRunner : IBootstrappableSourceRunner, ICountSourceRunner, IListSourceRunner, IInstallSourceRunner, IUpgradeSourceRunner, IUninstallSourceRunner

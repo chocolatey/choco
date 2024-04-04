@@ -13,21 +13,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.nuget;
-    using chocolatey.infrastructure.commandline;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.logging;
-
     [CommandFor("cache", "Manage the local HTTP caches used to store queries", Version = "2.1.0")]
     public class ChocolateyCacheCommand : ChocolateyCommandBase, ICommand
     {

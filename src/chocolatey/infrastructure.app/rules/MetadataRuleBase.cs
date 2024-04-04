@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using chocolatey.infrastructure.rules;
+using NuGet.Packaging;
+
 namespace chocolatey.infrastructure.app.rules
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml.Linq;
-    using chocolatey.infrastructure.rules;
-    using NuGet.Packaging;
-
     public abstract class MetadataRuleBase : IMetadataRule
     {
         private IDictionary<string, ImmutableRule> _cachedRules;

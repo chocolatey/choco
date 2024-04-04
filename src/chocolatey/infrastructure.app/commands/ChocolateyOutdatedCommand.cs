@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using attributes;
-    using commandline;
-    using configuration;
-    using infrastructure.commands;
-    using logging;
-    using services;
-
     [CommandFor("outdated", "retrieves information about packages that are outdated. Similar to upgrade all --noop")]
     public class ChocolateyOutdatedCommand : ICommand
     {

@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.registration;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.licensing;
+using chocolatey.infrastructure.logging;
+using SimpleInjector;
+
 namespace chocolatey.infrastructure.registration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using System.Reflection;
-    using app;
-    using app.registration;
-    using chocolatey.infrastructure.information;
-    using chocolatey.infrastructure.licensing;
-    using logging;
-    using SimpleInjector;
-
     /// <summary>
     ///   The inversion container
     /// </summary>

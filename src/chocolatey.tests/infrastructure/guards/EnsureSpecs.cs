@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.guards;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.guards
 {
-    using System;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.guards;
-    using Moq;
-    using FluentAssertions;
-
     public class EnsureSpecs
     {
         public abstract class EnsureSpecsBase : TinySpec

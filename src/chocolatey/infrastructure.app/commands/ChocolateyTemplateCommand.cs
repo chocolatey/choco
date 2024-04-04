@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.app.templates;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using attributes;
-    using chocolatey.infrastructure.results;
-    using commandline;
-    using configuration;
-    using domain;
-    using infrastructure.commands;
-    using logging;
-    using services;
-    using templates;
-
     [CommandFor("template", "get information about installed templates")]
     [CommandFor("templates", "get information about installed templates (alias for template)")]
     public class ChocolateyTemplateCommand : ICommand

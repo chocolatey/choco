@@ -14,27 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.domain.installers;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.results;
+using Moq;
+using NuGet.Packaging;
+using NuGet.Versioning;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.tests.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.domain.installers;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.results;
-    using Moq;
-    using NuGet.Packaging;
-    using NuGet.Versioning;
-    using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
-
     public class AutomaticUninstallerServiceSpecs
     {
         public abstract class AutomaticUninstallerServiceSpecsBase : TinySpec

@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey.infrastructure.commands
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using logging;
-
     /// <summary>
     /// Execute a method or function
     /// </summary>

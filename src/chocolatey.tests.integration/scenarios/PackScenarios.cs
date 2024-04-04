@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Xml;
+
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+
+using NuGet.Packaging;
+
+using NUnit.Framework;
+
+using FluentAssertions;
+using FluentAssertions.Execution;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System;
-    using System.IO;
-    using System.Xml;
-
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-
-    using NuGet.Packaging;
-
-    using NUnit.Framework;
-
-    using FluentAssertions;
-    using FluentAssertions.Execution;
-
     public class PackScenarios
     {
         [ConcernFor("pack")]

@@ -13,18 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.logging;
-
     /// <summary>
     /// A base class for any Chocolatey commands which need to utilise shared logic.
     /// </summary>

@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using SimpleInjector;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using System;
-    using System.Collections.Generic;
-    using SimpleInjector;
-
     internal class SimpleInjectorContainerResolver : IContainerResolver
     {
         private readonly Container _container;

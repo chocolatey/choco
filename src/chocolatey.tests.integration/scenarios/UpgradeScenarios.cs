@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.XPath;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.results;
+using NuGet.Configuration;
+using NuGet.Packaging;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Xml.XPath;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.results;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class UpgradeScenarios
     {
         [ConcernFor("upgrade")]

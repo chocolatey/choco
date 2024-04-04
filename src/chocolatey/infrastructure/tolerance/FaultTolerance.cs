@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey.infrastructure.tolerance
 {
-    using System;
-    using System.Threading;
-    using configuration;
-    using logging;
-
     /// <summary>
     /// Provides methods that are able to tolerate faults and recover
     /// </summary>

@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Security.Principal;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using Environment = System.Environment;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.information;
+
 namespace chocolatey.infrastructure.app
 {
-    using System;
-    using System.Security.Principal;
-    using adapters;
-    using filesystem;
-    using Environment = System.Environment;
-    using chocolatey.infrastructure.platforms;
-    using chocolatey.infrastructure.information;
-
     /// <summary>
     ///   Application constants and settings for the application
     /// </summary>

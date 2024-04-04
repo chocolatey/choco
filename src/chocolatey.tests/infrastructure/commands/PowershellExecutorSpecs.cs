@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.filesystem;
+using Moq;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.commands
 {
-    using System;
-    using System.IO;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.filesystem;
-    using Moq;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class PowershellExecutorSpecs
     {
         public abstract class PowerShellExecutorSpecsBase : TinySpec

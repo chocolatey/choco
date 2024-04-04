@@ -15,16 +15,15 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
+using NuGet.Configuration;
+using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using NuGet.Versioning;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
 namespace chocolatey.infrastructure.app.domain
 {
-    using System.Collections.Generic;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-    using NuGet.Packaging.Core;
-    using NuGet.Versioning;
-    using IFileSystem = filesystem.IFileSystem;
-
     public  class ChocolateyPackageMetadata : IPackageMetadata
     {
         public ChocolateyPackageMetadata(NuspecReader reader)

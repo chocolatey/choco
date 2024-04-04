@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Web.UI;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Runtime.InteropServices;
-    using System.Security;
-    using System.Text;
-    using System.Text.RegularExpressions;
-    using System.Threading;
-    using System.Web.UI;
-    using infrastructure.app;
-    using infrastructure.logging;
-
     /// <summary>
     ///   Extensions for string
     /// </summary>

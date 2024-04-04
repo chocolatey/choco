@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using chocolatey.infrastructure.services;
+
 namespace chocolatey.infrastructure.events
 {
-    using System;
-    using System.ComponentModel;
-    using services;
-
     public static class EventManager
     {
         private static Func<IEventSubscriptionManagerService> _messageSubscriptionManager = () => new EventSubscriptionManagerService();

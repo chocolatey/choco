@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+
 namespace chocolatey.infrastructure.adapters
 {
-    using System;
-    using System.Diagnostics;
-
     // ReSharper disable InconsistentNaming
 
     public interface IProcess : IDisposable

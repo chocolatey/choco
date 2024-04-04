@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.app.events;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.tasks;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.tolerance;
+
 namespace chocolatey.infrastructure.app.tasks
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using events;
-    using filesystem;
-    using infrastructure.events;
-    using infrastructure.services;
-    using infrastructure.tasks;
-    using logging;
-    using tolerance;
-
     public class RemovePendingPackagesTask : ITask
     {
         private readonly IFileSystem _fileSystem;

@@ -14,22 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Microsoft.Win32;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using Microsoft.Win32;
-    using configuration;
-    using domain;
-    using filesystem;
-    using infrastructure.commands;
-    using logging;
-    using results;
-    using platforms;
-
     /// <summary>
     ///   Alternative Source for Cygwin
     /// </summary>

@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.attributes;
+using System;
+
 namespace chocolatey.infrastructure.tasks
 {
-    using chocolatey.infrastructure.app.attributes;
-    using System;
-
     /// <summary>
     ///   Interface for all runners.
     /// </summary>

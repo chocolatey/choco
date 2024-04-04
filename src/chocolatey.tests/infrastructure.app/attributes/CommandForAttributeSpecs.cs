@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.attributes;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.attributes
 {
-    using chocolatey.infrastructure.app.attributes;
-    using FluentAssertions;
-
     public class CommandForAttributeSpecs
     {
         public abstract class CommandForAttributeSpecsBase : TinySpec

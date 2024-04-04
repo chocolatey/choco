@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
 namespace chocolatey
 {
-    using System;
-    using System.IO;
-    using System.Runtime.Serialization.Formatters.Binary;
-
     /// <summary>
     ///   Extensions for Object
     /// </summary>

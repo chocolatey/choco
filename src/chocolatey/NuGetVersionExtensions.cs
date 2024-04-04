@@ -13,11 +13,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using NuGet.Versioning;
+using System;
+
 namespace chocolatey
 {
-    using NuGet.Versioning;
-    using System;
-
     /// <summary>
     /// Helper methods for dealing with the the nuget version returned by
     /// the NuGet.Client libraries to ensure they can be easily used.

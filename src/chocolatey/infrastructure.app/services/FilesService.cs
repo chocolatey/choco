@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Linq;
+using System.Runtime.ConstrainedExecution;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.cryptography;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Runtime.ConstrainedExecution;
-    using configuration;
-    using cryptography;
-    using domain;
-    using filesystem;
-    using infrastructure.services;
-    using logging;
-    using results;
-
     public sealed class FilesService : IFilesService
     {
         private readonly IXmlService _xmlService;

@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Xml.Serialization;
+using Microsoft.Win32;
+using chocolatey.infrastructure.xml;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-    using System.Xml.Serialization;
-    using Microsoft.Win32;
-    using xml;
-
     [Serializable]
     [XmlType("key")]
     public class RegistryApplicationKey : IEquatable<RegistryApplicationKey>

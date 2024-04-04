@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Microsoft.Web.XmlTransform;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.synchronization;
+using chocolatey.infrastructure.tolerance;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using Microsoft.Web.XmlTransform;
-    using configuration;
-    using filesystem;
-    using results;
-    using synchronization;
-    using tolerance;
-
     public class ConfigTransformService : IConfigTransformService
     {
         private readonly IFileSystem _fileSystem;

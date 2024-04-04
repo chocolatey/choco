@@ -14,33 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.cryptography;
+using chocolatey.infrastructure.extractors;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.licensing;
+using chocolatey.infrastructure.logging;
+using Microsoft.Win32;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.tolerance;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+using Container = SimpleInjector.Container;
+using Environment = chocolatey.infrastructure.adapters.Environment;
+
 namespace chocolatey.infrastructure.app.builders
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using adapters;
-    using chocolatey.infrastructure.app.commands;
-    using configuration;
-    using cryptography;
-    using extractors;
-    using filesystem;
-    using information;
-    using infrastructure.services;
-    using licensing;
-    using logging;
-    using Microsoft.Win32;
-    using nuget;
-    using platforms;
-    using services;
-    using tolerance;
-    using Assembly = adapters.Assembly;
-    using Container = SimpleInjector.Container;
-    using Environment = adapters.Environment;
-
     /// <summary>
     ///   Responsible for gathering all configuration related information and producing the ChocolateyConfig
     /// </summary>

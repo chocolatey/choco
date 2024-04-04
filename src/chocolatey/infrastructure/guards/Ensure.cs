@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Linq.Expressions;
+
 namespace chocolatey.infrastructure.guards
 {
-    using System;
-    using System.IO;
-    using System.Linq.Expressions;
-
     public static class Ensure
     {
         public static EnsureString That(Expression<Func<string>> expression)

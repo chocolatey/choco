@@ -13,13 +13,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.attributes;
+using NuGet.Packaging;
+
 namespace chocolatey.infrastructure.rules
 {
-    using System;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.app.attributes;
-    using NuGet.Packaging;
-
     [MultiService]
     public interface IMetadataRule
     {

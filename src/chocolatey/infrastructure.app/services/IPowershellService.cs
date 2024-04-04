@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Management.Automation.Runspaces;
+using chocolatey.infrastructure.app.configuration;
+using NuGet.Packaging;
+using NuGet.Protocol.Core.Types;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Management.Automation.Runspaces;
-    using configuration;
-    using NuGet.Packaging;
-    using NuGet.Protocol.Core.Types;
-    using results;
-
     public interface IPowershellService
     {
         /// <summary>

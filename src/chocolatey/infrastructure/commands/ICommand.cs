@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commandline;
+
 namespace chocolatey.infrastructure.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using app.configuration;
-    using commandline;
-
     /// <summary>
     ///   Commands that can be configured and run
     /// </summary>

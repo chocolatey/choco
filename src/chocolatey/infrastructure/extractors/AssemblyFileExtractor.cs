@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.tolerance;
+
 namespace chocolatey.infrastructure.extractors
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using adapters;
-    using filesystem;
-    using tolerance;
-
     /// <summary>
     ///   Extracts resources from an assembly.
     /// </summary>

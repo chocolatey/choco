@@ -1,25 +1,25 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.results;
+
+using NuGet;
+using NuGet.Configuration;
+
+using NUnit.Framework;
+
+using FluentAssertions;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.platforms;
-    using chocolatey.infrastructure.results;
-
-    using NuGet;
-    using NuGet.Configuration;
-
-    using NUnit.Framework;
-
-    using FluentAssertions;
-
     public class InfoScenarios
     {
         [ConcernFor("info")]

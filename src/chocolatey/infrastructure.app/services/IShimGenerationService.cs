@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.results;
+using System;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using configuration;
-    using results;
-    using System;
-
     public interface IShimGenerationService
     {
         /// <summary>

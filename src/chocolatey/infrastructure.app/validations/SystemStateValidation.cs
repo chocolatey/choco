@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.validations;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.validations
 {
-    using System;
-    using System.Collections.Generic;
-    using configuration;
-    using infrastructure.validations;
-    using services;
-
     /// <summary>
     ///   Performs validation against the current System State.  This
     ///   includes things like pending reboot requirement.  Any errors

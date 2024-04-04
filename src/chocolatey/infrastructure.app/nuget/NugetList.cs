@@ -14,22 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using chocolatey.infrastructure.tolerance;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using NuGet.Common;
+using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using chocolatey.infrastructure.tolerance;
-    using configuration;
-    using filesystem;
-    using NuGet.Common;
-    using NuGet.Packaging;
-    using NuGet.Packaging.Core;
-    using NuGet.Protocol.Core.Types;
-    using NuGet.Versioning;
-
     public static class NugetList
     {
         public static int LastPackageLimitUsed { get; private set; }

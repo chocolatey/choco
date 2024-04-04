@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using chocolatey.infrastructure.services;
+using chocolatey.tests.infrastructure.events.context;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.events
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Threading;
-    using chocolatey.infrastructure.services;
-    using context;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class EventSubscriptionManagerSpecs
     {
         public abstract class EventSubscriptionManagerSpecsBase : TinySpec

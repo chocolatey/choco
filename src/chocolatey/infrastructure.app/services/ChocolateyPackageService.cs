@@ -14,35 +14,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.IO;
+using System.Linq;
+using System.Text;
+using chocolatey.infrastructure.app.registration;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.events;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.nuget;
+using NuGet.Configuration;
+using NuGet.Packaging;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.results;
+using SimpleInjector;
+using chocolatey.infrastructure.tolerance;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.ComponentModel.Design;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using chocolatey.infrastructure.app.registration;
-    using commandline;
-    using configuration;
-    using domain;
-    using events;
-    using infrastructure.commands;
-    using infrastructure.events;
-    using infrastructure.services;
-    using logging;
-    using nuget;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-    using NuGet.Protocol.Core.Types;
-    using NuGet.Versioning;
-    using platforms;
-    using results;
-    using SimpleInjector;
-    using tolerance;
-    using IFileSystem = filesystem.IFileSystem;
-
     public class ChocolateyPackageService : IChocolateyPackageService
     {
         private readonly INugetService _nugetService;

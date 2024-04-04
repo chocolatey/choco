@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.templates;
+using chocolatey.infrastructure.tokens;
+using chocolatey.infrastructure.app.nuget;
+using NuGet.Common;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using configuration;
-    using infrastructure.services;
-    using logging;
-    using templates;
-    using tokens;
-    using nuget;
-    using NuGet.Common;
-    using IFileSystem = filesystem.IFileSystem;
-
     public class TemplateService : ITemplateService
     {
         private readonly UTF8Encoding _utf8WithoutBOM = new UTF8Encoding(false);

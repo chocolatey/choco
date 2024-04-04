@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Xml;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.tolerance;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Text;
-    using System.Xml;
-    using attributes;
-    using commandline;
-    using configuration;
-    using filesystem;
-    using infrastructure.commands;
-    using logging;
-    using services;
-    using tolerance;
-
     [CommandFor("export", "exports list of currently installed packages")]
     public class ChocolateyExportCommand : ICommand
     {

@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.adapters;
+using System;
+using DateTime = System.DateTime;
+
 namespace chocolatey.infrastructure.licensing
 {
-    using adapters;
-    using System;
-    using DateTime = System.DateTime;
-
     public sealed class ChocolateyLicense
     {
         public string Id { get; set; }

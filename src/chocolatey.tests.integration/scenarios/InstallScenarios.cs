@@ -14,28 +14,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Xml.XPath;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.results;
+using NuGet.Configuration;
+using NuGet.Packaging;
+using NUnit.Framework;
+using FluentAssertions;
+using FluentAssertions.Execution;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Xml.XPath;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.results;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-    using NUnit.Framework;
-    using FluentAssertions;
-    using FluentAssertions.Execution;
-    using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
-
     public class InstallScenarios
     {
         [ConcernFor("install")]

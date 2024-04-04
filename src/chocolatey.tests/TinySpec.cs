@@ -16,15 +16,15 @@
 // specific language governing permissions and limitations under the License.
 // ==============================================================================
 
+using System;
+using NUnit.Framework;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.logging;
+using System.IO;
+using chocolatey.infrastructure.app.nuget;
+
 namespace chocolatey.tests
 {
-    using System;
-    using NUnit.Framework;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.logging;
-    using System.IO;
-    using chocolatey.infrastructure.app.nuget;
-
     // ReSharper disable InconsistentNaming
 
     [SetUpFixture]

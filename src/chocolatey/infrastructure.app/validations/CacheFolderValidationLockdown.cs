@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.validations;
+
 namespace chocolatey.infrastructure.app.validations
 {
-    using System;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.information;
-    using chocolatey.infrastructure.validations;
-
     public sealed class CacheFolderLockdownValidation : IValidation
     {
         private readonly IFileSystem _fileSystem;

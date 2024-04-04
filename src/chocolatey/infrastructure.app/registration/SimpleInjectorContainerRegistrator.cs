@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.services;
+using NuGet.Packaging;
+using SimpleInjector;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.services;
-    using infrastructure.commands;
-    using infrastructure.events;
-    using infrastructure.services;
-    using NuGet.Packaging;
-    using SimpleInjector;
-    using Assembly = adapters.Assembly;
-
     internal sealed class SimpleInjectorContainerRegistrator : IContainerRegistrator, ICloneable
     {
         internal List<Func<Type, bool>> ValidationHandlers = new List<Func<Type, bool>>();

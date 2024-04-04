@@ -14,44 +14,44 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Security;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using chocolatey.infrastructure.adapters;
+using Alphaleonis.Win32.Filesystem;
+using Chocolatey.NuGet.Frameworks;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.logging;
+using NuGet;
+using NuGet.Common;
+using NuGet.Configuration;
+using NuGet.Credentials;
+using NuGet.PackageManagement;
+using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using NuGet.ProjectManagement;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
+using chocolatey.infrastructure.results;
+using Console = chocolatey.infrastructure.adapters.Console;
+using Environment = chocolatey.infrastructure.adapters.Environment;
+using System.Collections.Concurrent;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Net;
-    using System.Net.Http;
-    using System.Net.Security;
-    using System.Runtime.CompilerServices;
-    using System.Security.Cryptography.X509Certificates;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using adapters;
-    using Alphaleonis.Win32.Filesystem;
-    using Chocolatey.NuGet.Frameworks;
-    using infrastructure.configuration;
-    using configuration;
-    using domain;
-    using filesystem;
-    using logging;
-    using NuGet;
-    using NuGet.Common;
-    using NuGet.Configuration;
-    using NuGet.Credentials;
-    using NuGet.PackageManagement;
-    using NuGet.Packaging;
-    using NuGet.Packaging.Core;
-    using NuGet.ProjectManagement;
-    using NuGet.Protocol;
-    using NuGet.Protocol.Core.Types;
-    using NuGet.Versioning;
-    using results;
-    using Console = adapters.Console;
-    using Environment = adapters.Environment;
-    using System.Collections.Concurrent;
-
     public sealed class NugetCommon
     {
         private static readonly ConcurrentDictionary<string, SourceRepository> _repositories = new ConcurrentDictionary<string, SourceRepository>();

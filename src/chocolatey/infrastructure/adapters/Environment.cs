@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using chocolatey.infrastructure.app;
+
 namespace chocolatey.infrastructure.adapters
 {
-    using System;
-    using System.Collections;
-    using app;
-
     public sealed class Environment : IEnvironment
     {
         public OperatingSystem OSVersion

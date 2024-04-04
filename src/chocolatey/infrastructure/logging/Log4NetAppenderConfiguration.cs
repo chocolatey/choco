@@ -14,26 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using log4net;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Core;
+using log4net.Filter;
+using log4net.Layout;
+using log4net.Repository;
+using log4net.Repository.Hierarchy;
+using chocolatey.infrastructure.platforms;
+using Console = chocolatey.infrastructure.adapters.Console;
+
 namespace chocolatey.infrastructure.logging
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Linq;
-    using adapters;
-    using app;
-    using log4net;
-    using log4net.Appender;
-    using log4net.Config;
-    using log4net.Core;
-    using log4net.Filter;
-    using log4net.Layout;
-    using log4net.Repository;
-    using log4net.Repository.Hierarchy;
-    using platforms;
-    using Console = adapters.Console;
-
     public sealed class Log4NetAppenderConfiguration
     {
         private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof(Log4NetAppenderConfiguration));

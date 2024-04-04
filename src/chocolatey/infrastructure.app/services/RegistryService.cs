@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.Text;
+using System.Text.RegularExpressions;
+using Microsoft.Win32;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.tolerance;
+using Registry = chocolatey.infrastructure.app.domain.Registry;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Security.AccessControl;
-    using System.Security.Principal;
-    using System.Text;
-    using System.Text.RegularExpressions;
-    using Microsoft.Win32;
-    using domain;
-    using filesystem;
-    using infrastructure.services;
-    using tolerance;
-    using Registry = domain.Registry;
-
     /// <summary>
     ///   Allows comparing registry
     /// </summary>

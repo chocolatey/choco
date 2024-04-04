@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.adapters
 {
-    using System;
-    using System.IO;
-    using System.Runtime.InteropServices;
-    using app;
-    using commandline;
-    using platforms;
-
     /// <summary>
     /// Adapter for System.Console
     /// </summary>

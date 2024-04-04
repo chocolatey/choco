@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+
 namespace chocolatey.infrastructure.filesystem
 {
-    using System;
-    using System.IO;
-
     public static class FileSystem
     {
         public static byte[] ReadFileBytes(string filePath)

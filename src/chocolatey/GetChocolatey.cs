@@ -14,36 +14,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Reflection;
-    using infrastructure.licensing;
-    using SimpleInjector;
-    using infrastructure.app;
-    using infrastructure.app.builders;
-    using infrastructure.app.configuration;
-    using infrastructure.app.runners;
-    using infrastructure.configuration;
-    using infrastructure.extractors;
-    using infrastructure.logging;
-    using infrastructure.registration;
-    using infrastructure.synchronization;
-    using log4net;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using chocolatey.infrastructure.licensing;
+using SimpleInjector;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.builders;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.runners;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.extractors;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.registration;
+using chocolatey.infrastructure.synchronization;
+using log4net;
 
 #if !NoResources
 
-    using resources;
+using chocolatey.resources;
 
 #endif
 
-    using Assembly = infrastructure.adapters.Assembly;
-    using IFileSystem = infrastructure.filesystem.IFileSystem;
-    using ILog = infrastructure.logging.ILog;
-    using System.Linq;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using ILog = chocolatey.infrastructure.logging.ILog;
+using System.Linq;
 
+namespace chocolatey
+{
     /// <summary>
     /// Entry point for API
     /// </summary>

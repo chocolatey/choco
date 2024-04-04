@@ -14,25 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Xml.Linq;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.guards;
+using chocolatey.infrastructure.platforms;
+using NuGet.Configuration;
+using NuGet.Packaging;
+
 namespace chocolatey.tests.integration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.IO.Compression;
-    using System.Linq;
-    using System.Xml.Linq;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.guards;
-    using chocolatey.infrastructure.platforms;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-
     public class Scenario
     {
         private static IChocolateyPackageService _service;

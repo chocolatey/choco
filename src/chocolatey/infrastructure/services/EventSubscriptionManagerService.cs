@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.guards;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey.infrastructure.services
 {
-    using System;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
-    using events;
-    using guards;
-    using logging;
-
     /// <summary>
     ///   Implementation of IEventSubscriptionManagerService
     /// </summary>

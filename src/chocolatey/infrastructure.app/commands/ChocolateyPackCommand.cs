@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using attributes;
-    using commandline;
-    using configuration;
-    using infrastructure.commands;
-    using logging;
-    using services;
-
     [CommandFor("pack", "packages nuspec, scripts, and other Chocolatey package resources into a nupkg file")]
     public class ChocolateyPackCommand : ICommand
     {

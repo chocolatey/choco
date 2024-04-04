@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.cryptography;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.ComponentModel;
-    using System.Text;
-    using adapters;
-    using cryptography;
-
     public static class NugetEncryptionUtility
     {
         private static Lazy<IEncryptionUtility> _encryptionUtility = new Lazy<IEncryptionUtility>(() => new DefaultEncryptionUtility());

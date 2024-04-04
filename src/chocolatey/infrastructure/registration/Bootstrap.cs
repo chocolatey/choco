@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.app;
+using log4net;
+using chocolatey.infrastructure.logging;
+using ILog = log4net.ILog;
+
 namespace chocolatey.infrastructure.registration
 {
-    using System;
-    using app;
-    using log4net;
-    using logging;
-    using ILog = log4net.ILog;
-
     /// <summary>
     ///   Application bootstrapping - sets up logging and errors for the app domain
     /// </summary>

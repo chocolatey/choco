@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.domain;
+using NuGet.Packaging;
+using System;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using domain;
-    using NuGet.Packaging;
-    using System;
-
     public interface IChocolateyPackageInformationService
     {
         ChocolateyPackageInformation Get(IPackageMetadata package);

@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.rules;
+
 namespace chocolatey.infrastructure.services
 {
-    using System;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.rules;
-
     public interface IRuleService
     {
         IEnumerable<RuleResult> ValidateRules(string filePath);

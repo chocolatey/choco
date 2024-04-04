@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.filesystem;
+using Environment = System.Environment;
+using HashAlgorithm = chocolatey.infrastructure.adapters.HashAlgorithm;
+
 namespace chocolatey.infrastructure.cryptography
 {
-    using System;
-    using System.IO;
-    using System.Runtime.InteropServices;
-    using System.Security.Cryptography;
-    using System.Text;
-    using adapters;
-    using app;
-    using filesystem;
-    using Environment = System.Environment;
-    using HashAlgorithm = adapters.HashAlgorithm;
-
     public class CryptoHashProvider : IHashProvider
     {
         private readonly IFileSystem _fileSystem;

@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using configuration;
-    using filesystem;
-    using infrastructure.commands;
-    using results;
-
     public class ShimGenerationService : IShimGenerationService
     {
         private readonly IFileSystem _fileSystem;

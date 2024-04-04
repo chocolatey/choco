@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.app.attributes
 {
-    using System;
-
     [AttributeUsage(AttributeTargets.Interface, Inherited = true, AllowMultiple = false)]
     internal sealed class MultiServiceAttribute : Attribute
     {

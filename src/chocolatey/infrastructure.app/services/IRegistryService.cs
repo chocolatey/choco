@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.domain;
+using Microsoft.Win32;
+using Registry = chocolatey.infrastructure.app.domain.Registry;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using domain;
-    using Microsoft.Win32;
-    using Registry = domain.Registry;
-
     public interface IRegistryService
     {
         Registry GetInstallerKeys();

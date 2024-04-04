@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.utility;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.platforms;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.utility
 {
-    using chocolatey.infrastructure.app.utility;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.platforms;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class PackageUtilitySpecs
     {
         public abstract class PackageUtilitySpecsBase : TinySpec

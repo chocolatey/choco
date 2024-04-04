@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-
     /// <summary>
     /// This class contains the default source types that are implemented in
     /// the Chocolatey CLI codebase. This is replacing the enumeration previously

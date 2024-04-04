@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Reactive.Subjects;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.services;
+using Moq;
+
 namespace chocolatey.tests.integration
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Reactive.Subjects;
-    using chocolatey.infrastructure.events;
-    using chocolatey.infrastructure.services;
-    using Moq;
-
     public class MockEventSubscriptionManager : Mock<IEventSubscriptionManagerService>, IEventSubscriptionManagerService
     {
         private readonly Lazy<ConcurrentDictionary<Type, IList<object>>> _messages = new Lazy<ConcurrentDictionary<Type, IList<object>>>();

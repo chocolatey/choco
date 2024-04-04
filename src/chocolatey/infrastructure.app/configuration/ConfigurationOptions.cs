@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.commandline;
+using Console = chocolatey.infrastructure.adapters.Console;
+
 namespace chocolatey.infrastructure.app.configuration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using adapters;
-    using commandline;
-    using Console = adapters.Console;
-
     public static class ConfigurationOptions
     {
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());

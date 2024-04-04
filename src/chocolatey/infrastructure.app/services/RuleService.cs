@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using chocolatey.infrastructure.guards;
+using chocolatey.infrastructure.rules;
+using chocolatey.infrastructure.services;
+using NuGet.Configuration;
+using NuGet.Packaging;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using chocolatey.infrastructure.guards;
-    using chocolatey.infrastructure.rules;
-    using chocolatey.infrastructure.services;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-
     public class RuleService : IRuleService
     {
         private readonly IMetadataRule[] _rules;

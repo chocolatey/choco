@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.information
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using System.Security.Principal;
-    using platforms;
-
     public sealed class ProcessInformation
     {
         public static bool UserIsAdministrator()

@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using chocolatey.infrastructure.app.configuration;
+using NuGet.Common;
+using NuGet.Packaging;
+using NuGet.ProjectManagement;
+using chocolatey.infrastructure.logging;
+using NuGet.Configuration;
+using NuGet.Packaging.Signing;
 
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System.Xml.Linq;
-    using configuration;
-    using NuGet.Common;
-    using NuGet.Packaging;
-    using NuGet.ProjectManagement;
-    using logging;
-    using NuGet.Configuration;
-    using NuGet.Packaging.Signing;
-
     public class ChocolateyNuGetProjectContext : INuGetProjectContext
     {
         private readonly ILogger _logger;

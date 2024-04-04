@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
+using System.Net;
+using System.Text.RegularExpressions;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.logging;
+using NuGet.Credentials;
+using System.Threading.Tasks;
+using NuGet.Configuration;
+using System.Threading;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.Linq;
-    using System.Net;
-    using System.Text.RegularExpressions;
-    using commandline;
-    using configuration;
-    using logging;
-    using NuGet.Credentials;
-    using System.Threading.Tasks;
-    using NuGet.Configuration;
-    using System.Threading;
-
     public sealed class ChocolateyNugetCredentialProvider : ICredentialProvider
     {
         private readonly ChocolateyConfiguration _config;

@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+
 namespace chocolatey.infrastructure.app.domain.installers
 {
-    using System;
-    using System.Collections.Generic;
-
     public interface IInstaller
     {
         InstallerType InstallerType { get; }

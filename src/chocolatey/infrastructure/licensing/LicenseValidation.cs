@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.logging;
+using Rhino.Licensing;
+
 namespace chocolatey.infrastructure.licensing
 {
-    using System;
-    using System.IO;
-    using app;
-    using logging;
-    using Rhino.Licensing;
-
     public sealed class LicenseValidation
     {
         private const string PublicKey =

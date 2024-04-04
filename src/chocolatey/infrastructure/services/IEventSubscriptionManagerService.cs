@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.events;
+
 namespace chocolatey.infrastructure.services
 {
-    using System;
-    using events;
-
     /// <summary>
     ///   Interface for EventSubscriptionManagerService
     /// </summary>

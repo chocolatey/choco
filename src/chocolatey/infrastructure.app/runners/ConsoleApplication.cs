@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using SimpleInjector;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.validations;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.utility;
+using chocolatey.infrastructure.app.validations;
+
 namespace chocolatey.infrastructure.app.runners
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using SimpleInjector;
-    using configuration;
-    using infrastructure.validations;
-    using logging;
-    using utility;
-    using validations;
-
     /// <summary>
     ///   Console application responsible for running chocolatey
     /// </summary>

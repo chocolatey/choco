@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+
 namespace chocolatey.infrastructure.adapters
 {
-    using System;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Reflection;
-
     public sealed class Assembly : IAssembly
     {
         private readonly System.Reflection.Assembly _assembly;

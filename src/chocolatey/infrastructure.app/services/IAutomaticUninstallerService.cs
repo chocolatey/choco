@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.results;
+using System;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using configuration;
-    using domain;
-    using results;
-    using System;
-
     /// <summary>
     /// The automagic uninstaller service
     /// </summary>

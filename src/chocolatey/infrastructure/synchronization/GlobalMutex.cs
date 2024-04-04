@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.Threading;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.synchronization
 {
-    using System;
-    using System.Security.AccessControl;
-    using System.Security.Principal;
-    using System.Threading;
-    using logging;
-    using platforms;
-
     /// <summary>
     ///   global mutex used for synchronizing multiple processes based on appguid
     /// </summary>

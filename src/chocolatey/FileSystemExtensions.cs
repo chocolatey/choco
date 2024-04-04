@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.registration;
+
 namespace chocolatey
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.logging;
-    using chocolatey.infrastructure.registration;
-
     public static class FileSystemExtensions
     {
         internal static IEnumerable<IAssembly> GetExtensionAssemblies(this IFileSystem fileSystem)

@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using chocolatey.infrastructure.cryptography;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.tolerance;
+using chocolatey.infrastructure.synchronization;
+
 namespace chocolatey.infrastructure.services
 {
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Text;
-    using System.Xml;
-    using System.Xml.Serialization;
-    using cryptography;
-    using filesystem;
-    using tolerance;
-    using synchronization;
-
     /// <summary>
     ///   XML interaction
     /// </summary>

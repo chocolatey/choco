@@ -14,27 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.Text;
+using System.Threading;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.tolerance;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+using Environment = chocolatey.infrastructure.adapters.Environment;
+
 namespace chocolatey.infrastructure.filesystem
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Runtime.InteropServices;
-    using System.Security.AccessControl;
-    using System.Security.Principal;
-    using System.Text;
-    using System.Threading;
-    using adapters;
-    using app;
-    using logging;
-    using platforms;
-    using tolerance;
-    using Assembly = adapters.Assembly;
-    using Environment = adapters.Environment;
-
     /// <summary>
     ///   Implementation of IFileSystem for Dot Net
     /// </summary>

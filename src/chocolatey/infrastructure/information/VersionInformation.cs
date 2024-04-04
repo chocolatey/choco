@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+using chocolatey.infrastructure.adapters;
+
 namespace chocolatey.infrastructure.information
 {
-    using System;
-    using System.Diagnostics;
-    using adapters;
-
     public sealed class VersionInformation
     {
         public static string GetCurrentAssemblyVersion(IAssembly assembly = null)

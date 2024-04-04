@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text.RegularExpressions;
+
 namespace chocolatey.infrastructure.tokens
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Text.RegularExpressions;
-
     public sealed class TokenReplacer
     {
         public static string ReplaceTokens<TConfig>(TConfig configuration, string textToReplace, string tokenPrefix = "[[", string tokenSuffix = "]]")

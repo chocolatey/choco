@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.ComponentModel;
+
 namespace chocolatey
 {
-    using System.ComponentModel;
-
     public static class StringResources
     {
         /// <summary>

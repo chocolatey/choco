@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.guards;
+using chocolatey.infrastructure.logging;
+using Console = chocolatey.infrastructure.adapters.Console;
+
 namespace chocolatey.infrastructure.commandline
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using adapters;
-    using guards;
-    using logging;
-    using Console = adapters.Console;
-
     public class InteractivePrompt
     {
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());

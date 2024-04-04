@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.runners;
+using chocolatey.infrastructure.filesystem;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+
 namespace chocolatey.infrastructure.registration
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading;
-    using adapters;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.runners;
-    using filesystem;
-    using Assembly = adapters.Assembly;
-
     public class AssemblyResolution
     {
         private const int LockResolutionTimeoutSeconds = 5;

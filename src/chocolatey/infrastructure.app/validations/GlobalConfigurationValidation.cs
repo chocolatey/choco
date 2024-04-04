@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.validations;
+
 namespace chocolatey.infrastructure.app.validations
 {
-    using System;
-    using System.Collections.Generic;
-    using configuration;
-    using infrastructure.validations;
-
     /// <summary>
     ///   Performs top level validation checks against the current
     ///   Chocolatey Configuration object to ensure that everything is

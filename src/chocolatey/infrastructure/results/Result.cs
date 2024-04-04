@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace chocolatey.infrastructure.results
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     /// <summary>
     ///   Outcome from some work performed
     /// </summary>

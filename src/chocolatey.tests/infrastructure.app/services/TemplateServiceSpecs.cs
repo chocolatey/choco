@@ -14,25 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.app.templates;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.services;
+using Moq;
+using NuGet.Common;
+using NUnit.Framework;
+using FluentAssertions;
+using LogLevel = chocolatey.tests.LogLevel;
+
 namespace chocolatey.tests.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.app.templates;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.services;
-    using Moq;
-    using NuGet.Common;
-    using NUnit.Framework;
-    using FluentAssertions;
-    using LogLevel = tests.LogLevel;
-
     public class TemplateServiceSpecs
     {
         public abstract class TemplateServiceSpecsBase : TinySpec

@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.app.templates;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using attributes;
-    using commandline;
-    using configuration;
-    using infrastructure.commands;
-    using logging;
-    using services;
-    using templates;
-
     [CommandFor("new", "creates template files for creating a new Chocolatey package")]
     public class ChocolateyNewCommand : ICommand
     {

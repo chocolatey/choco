@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.configuration;
+using NuGet.Packaging;
+using NuGet.Versioning;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.tolerance;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using configuration;
-    using domain;
-    using infrastructure.configuration;
-    using NuGet.Packaging;
-    using NuGet.Versioning;
-    using results;
-    using tolerance;
-    using IFileSystem = filesystem.IFileSystem;
-
     public class ChocolateyPackageInformationService : IChocolateyPackageInformationService
     {
         private readonly IFileSystem _fileSystem;

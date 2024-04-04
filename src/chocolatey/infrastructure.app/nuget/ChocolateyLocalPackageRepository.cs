@@ -14,19 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.Versioning;
+using System.Threading;
+using chocolatey.infrastructure.filesystem;
+using NuGet.Common;
+using NuGet.Packaging;
+using NuGet.ProjectManagement;
+using NuGet.Versioning;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Runtime.Versioning;
-    using System.Threading;
-    using filesystem;
-    using NuGet.Common;
-    using NuGet.Packaging;
-    using NuGet.ProjectManagement;
-    using NuGet.Versioning;
 
     // ReSharper disable InconsistentNaming
     /*

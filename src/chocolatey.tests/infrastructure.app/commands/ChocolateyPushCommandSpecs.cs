@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commandline;
+using Moq;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commandline;
-    using Moq;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class ChocolateyPushCommandSpecs
     {
         [ConcernFor("push")]

@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.adapters
 {
-    using System;
-
     public interface IEncryptionUtility
     {
         string EncryptString(string cleartextValue);

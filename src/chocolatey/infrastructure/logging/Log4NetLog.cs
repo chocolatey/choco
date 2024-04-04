@@ -15,16 +15,15 @@
 // limitations under the License.
 
 using log4net.Config;
+using System;
+using System.Runtime;
+using log4net;
+using log4net.Core;
 
 [assembly: XmlConfigurator(Watch = true)]
 
 namespace chocolatey.infrastructure.logging
 {
-    using System;
-    using System.Runtime;
-    using log4net;
-    using log4net.Core;
-
     /// <summary>
     ///   Log4net logger implementing special ILog class
     /// </summary>

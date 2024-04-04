@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using attributes;
-    using chocolatey.infrastructure.app.domain;
-    using commandline;
-    using configuration;
-    using infrastructure.commands;
-    using infrastructure.configuration;
-    using logging;
-    using services;
-
     [CommandFor("apikey", "retrieves, saves or deletes an API key for a particular source")]
     [CommandFor("setapikey", "retrieves, saves or deletes an API key for a particular source (alias for apikey)")]
     public class ChocolateyApiKeyCommand : ICommand

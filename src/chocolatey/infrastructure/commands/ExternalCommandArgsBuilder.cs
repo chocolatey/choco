@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
+
 namespace chocolatey.infrastructure.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Text;
-
     /// <summary>
     ///   Responsible for setting up arguments for an external command to be executed
     /// </summary>

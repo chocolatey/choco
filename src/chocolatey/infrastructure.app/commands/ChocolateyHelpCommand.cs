@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using SimpleInjector;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using attributes;
-    using commandline;
-    using configuration;
-    using infrastructure.commands;
-    using logging;
-    using SimpleInjector;
-
     [CommandFor("help", "displays top level help information for choco")]
     public class ChocolateyHelpCommand : ICommand
     {

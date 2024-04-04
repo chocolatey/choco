@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using configuration;
-    using domain;
-    using results;
-
     /// <summary>
     /// The files service for capturing and handling file snapshots.
     /// </summary>

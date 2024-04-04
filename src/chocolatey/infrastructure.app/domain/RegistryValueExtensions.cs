@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Security;
+using Microsoft.Win32;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-    using System.Security;
-    using Microsoft.Win32;
-
     public static class RegistryValueExtensions
     {
         public static string AsXmlSafeString(this RegistryKey key, string name)

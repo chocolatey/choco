@@ -14,39 +14,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.console
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using Microsoft.Win32;
-    using chocolatey.infrastructure.information;
-    using infrastructure.app;
-    using infrastructure.app.builders;
-    using infrastructure.app.configuration;
-    using infrastructure.app.runners;
-    using infrastructure.commandline;
-    using infrastructure.extractors;
-    using infrastructure.licensing;
-    using infrastructure.logging;
-    using infrastructure.platforms;
-    using infrastructure.registration;
-    using infrastructure.tolerance;
-    using SimpleInjector;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Microsoft.Win32;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.builders;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.runners;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.extractors;
+using chocolatey.infrastructure.licensing;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.registration;
+using chocolatey.infrastructure.tolerance;
+using SimpleInjector;
 
 #if !NoResources
 
-    using resources;
+using chocolatey.resources;
 
 #endif
 
-    using Assembly = infrastructure.adapters.Assembly;
-    using Console = System.Console;
-    using Environment = System.Environment;
-    using IFileSystem = infrastructure.filesystem.IFileSystem;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+using Console = System.Console;
+using Environment = System.Environment;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
+namespace chocolatey.console
+{
     public sealed class Program
     {
         private static void Main(string[] args)

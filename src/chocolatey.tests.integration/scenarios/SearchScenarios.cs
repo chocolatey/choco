@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.results;
+using NuGet.Configuration;
+using NUnit.Framework;
+using FluentAssertions;
+using System.IO;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.results;
-    using NuGet.Configuration;
-    using NUnit.Framework;
-    using FluentAssertions;
-    using System.IO;
-
     public class SearchScenarios
     {
         [ConcernFor("search")]

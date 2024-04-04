@@ -13,10 +13,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.commands
 {
-    using System;
-
     public sealed class ExitCodeDescription
     {
         public ExitCodeDescription(string description, params int[] exitCodes)

@@ -14,43 +14,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Threading;
+using Chocolatey.NuGet.Frameworks;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.utility;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.guards;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.tolerance;
+using DateTime = chocolatey.infrastructure.adapters.DateTime;
+using Environment = System.Environment;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using NuGet.Common;
+using NuGet.Configuration;
+using NuGet.PackageManagement;
+using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using NuGet.Protocol;
+using NuGet.ProjectManagement;
+using NuGet.Protocol.Core.Types;
+using NuGet.Resolver;
+using NuGet.Versioning;
+using chocolatey.infrastructure.services;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Text.RegularExpressions;
-    using System.Threading;
-    using Chocolatey.NuGet.Frameworks;
-    using adapters;
-    using chocolatey.infrastructure.app.utility;
-    using commandline;
-    using configuration;
-    using domain;
-    using guards;
-    using logging;
-    using nuget;
-    using platforms;
-    using results;
-    using tolerance;
-    using DateTime = adapters.DateTime;
-    using Environment = System.Environment;
-    using IFileSystem = filesystem.IFileSystem;
-    using NuGet.Common;
-    using NuGet.Configuration;
-    using NuGet.PackageManagement;
-    using NuGet.Packaging;
-    using NuGet.Packaging.Core;
-    using NuGet.Protocol;
-    using NuGet.ProjectManagement;
-    using NuGet.Protocol.Core.Types;
-    using NuGet.Resolver;
-    using NuGet.Versioning;
-    using chocolatey.infrastructure.services;
-
     //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 
     public class NugetService : INugetService

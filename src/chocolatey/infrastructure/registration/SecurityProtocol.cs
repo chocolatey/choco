@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Net;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey.infrastructure.registration
 {
-    using System;
-    using System.Net;
-    using app.configuration;
-    using logging;
-
     [Obsolete("This type is deprecated and will be removed in v3.")]
     public sealed class SecurityProtocol
     {

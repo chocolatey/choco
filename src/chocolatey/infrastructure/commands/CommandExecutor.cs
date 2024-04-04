@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.platforms;
+using Process = chocolatey.infrastructure.adapters.Process;
+
 namespace chocolatey.infrastructure.commands
 {
-    using System;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.IO;
-    using adapters;
-    using filesystem;
-    using logging;
-    using platforms;
-    using Process = adapters.Process;
-
     public sealed class CommandExecutor : ICommandExecutor
     {
         public CommandExecutor(IFileSystem fileSystem)

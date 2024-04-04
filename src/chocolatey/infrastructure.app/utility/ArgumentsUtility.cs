@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.app.utility
 {
-    using System;
-
     //todo: #2560 maybe find a better name/location for this
 
     public static class ArgumentsUtility

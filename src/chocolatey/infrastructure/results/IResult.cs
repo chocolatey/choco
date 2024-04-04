@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+
 namespace chocolatey.infrastructure.results
 {
-    using System.Collections.Generic;
-
     /// <summary>
     ///   Outcome from some work performed.
     /// </summary>

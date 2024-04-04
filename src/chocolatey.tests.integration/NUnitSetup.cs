@@ -14,27 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.builders;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.licensing;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.registration;
+using NUnit.Framework;
+using SimpleInjector;
 [assembly: chocolatey.tests.Categories.Integration]
 
 namespace chocolatey.tests.integration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.builders;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.licensing;
-    using chocolatey.infrastructure.platforms;
-    using chocolatey.infrastructure.registration;
-    using NUnit.Framework;
-    using SimpleInjector;
-
     // ReSharper disable InconsistentNaming
 
     [SetUpFixture]

@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.logging;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.filesystem;
+using NuGet.Common;
+using NuGet.Protocol.Core.Types;
+using System.Net.Http;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using configuration;
-    using logging;
-    using System.Collections.Generic;
-    using System.Linq;
-    using filesystem;
-    using NuGet.Common;
-    using NuGet.Protocol.Core.Types;
-    using System.Net.Http;
-
     public class NugetPush
     {
         [Obsolete("This overload is deprecated and will be removed in v3.")]

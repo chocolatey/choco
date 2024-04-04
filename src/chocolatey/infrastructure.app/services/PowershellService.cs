@@ -14,33 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Management.Automation;
+using System.Management.Automation.Runspaces;
+using System.Reflection;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.cryptography;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.registration;
+using chocolatey.infrastructure.logging;
+using NuGet.Packaging;
+using NuGet.Protocol.Core.Types;
+using chocolatey.infrastructure.powershell;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.app.utility;
+using CryptoHashProvider = chocolatey.infrastructure.cryptography.CryptoHashProvider;
+using Environment = System.Environment;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Management.Automation;
-    using System.Management.Automation.Runspaces;
-    using System.Reflection;
-    using adapters;
-    using commandline;
-    using configuration;
-    using cryptography;
-    using domain;
-    using infrastructure.commands;
-    using infrastructure.registration;
-    using logging;
-    using NuGet.Packaging;
-    using NuGet.Protocol.Core.Types;
-    using powershell;
-    using results;
-    using utility;
-    using CryptoHashProvider = cryptography.CryptoHashProvider;
-    using Environment = System.Environment;
-    using IFileSystem = filesystem.IFileSystem;
-
     public class PowershellService : IPowershellService
     {
         private readonly IFileSystem _fileSystem;

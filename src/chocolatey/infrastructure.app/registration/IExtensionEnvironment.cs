@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using System;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.app.configuration;
-
     /// <summary>
     /// Placeholder for the future to prevent the need for a breaking release of Chocolatey Licensed Extension.
     /// </summary>

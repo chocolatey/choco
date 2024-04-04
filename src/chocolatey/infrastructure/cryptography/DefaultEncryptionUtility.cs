@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.cryptography
 {
-    using System;
-    using System.Security.Cryptography;
-    using System.Text;
-    using adapters;
-    using platforms;
-
     public class DefaultEncryptionUtility : IEncryptionUtility
     {
         private readonly byte[] _entropyBytes = Encoding.UTF8.GetBytes("Chocolatey");

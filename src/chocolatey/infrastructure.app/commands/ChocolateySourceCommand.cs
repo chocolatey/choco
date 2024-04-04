@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using attributes;
-    using chocolatey.infrastructure.results;
-    using commandline;
-    using configuration;
-    using domain;
-    using infrastructure.commands;
-    using infrastructure.configuration;
-    using logging;
-    using services;
-
     [CommandFor("source", "view and configure default sources")]
     [CommandFor("sources", "view and configure default sources (alias for source)")]
     public class ChocolateySourceCommand : IListCommand<ChocolateySource>

@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Management.Automation;
+using System.Management.Automation.Host;
+using System.Security;
+using System.Text;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.logging;
+using Console = chocolatey.infrastructure.adapters.Console;
+
 namespace chocolatey.infrastructure.powershell
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Globalization;
-    using System.Management.Automation;
-    using System.Management.Automation.Host;
-    using System.Security;
-    using System.Text;
-    using app.configuration;
-    using commandline;
-    using logging;
-    using Console = adapters.Console;
-
     public class PoshHostUserInterface : PSHostUserInterface
     {
         private readonly ChocolateyConfiguration _configuration;

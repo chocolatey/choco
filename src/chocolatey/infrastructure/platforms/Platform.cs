@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using Environment = chocolatey.infrastructure.adapters.Environment;
+
 namespace chocolatey.infrastructure.platforms
 {
-    using System;
-    using System.ComponentModel;
-    using System.Runtime.InteropServices;
-    using adapters;
-    using filesystem;
-    using Environment = adapters.Environment;
-
     /// <summary>
     ///   OS Platform detection
     /// </summary>

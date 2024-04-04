@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+
 namespace chocolatey.infrastructure.commandline
 {
-    using System;
-    using System.Threading;
-
     /// <summary>
     ///   Because sometimes you to timeout a readline instead of blocking infinitely.
     /// </summary>

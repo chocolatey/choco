@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+using System.Net;
+using System.Reflection;
+using System.Threading;
+using log4net.Util;
+
 namespace chocolatey.infrastructure.logging
 {
-    using System;
-    using System.Diagnostics;
-    using System.Net;
-    using System.Reflection;
-    using System.Threading;
-    using log4net.Util;
-
     public class TraceLog : TraceListener
     {
         public TraceLog()

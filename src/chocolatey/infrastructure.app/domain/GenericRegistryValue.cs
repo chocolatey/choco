@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-
     public class GenericRegistryValue : IEquatable<GenericRegistryValue>
     {
         public string ParentKeyName { get; set; }

@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.commands;
-    using FluentAssertions;
-
     public class ExternalCommandArgsBuilderSpecs
     {
         public class When_using_ExternalCommandArgsBuilder : TinySpec

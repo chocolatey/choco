@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using System;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using configuration;
-    using System;
-
     public interface ITemplateService
     {
         void GenerateDryRun(ChocolateyConfiguration configuration);

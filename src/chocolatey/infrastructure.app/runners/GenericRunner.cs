@@ -14,29 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.app.events;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.registration;
+using chocolatey.infrastructure.tasks;
+using SimpleInjector;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.logging;
+using Console = System.Console;
+using Environment = System.Environment;
+
 namespace chocolatey.infrastructure.app.runners
 {
-    using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.app.services;
-    using events;
-    using filesystem;
-    using infrastructure.events;
-    using infrastructure.registration;
-    using infrastructure.tasks;
-    using SimpleInjector;
-    using adapters;
-    using attributes;
-    using commandline;
-    using configuration;
-    using domain;
-    using infrastructure.commands;
-    using infrastructure.configuration;
-    using logging;
-    using Console = System.Console;
-    using Environment = System.Environment;
-
     public sealed class GenericRunner
     {
         private ICommand FindCommand(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)

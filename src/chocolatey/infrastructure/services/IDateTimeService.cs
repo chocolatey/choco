@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.services
 {
-    using System;
-
     /// <summary>
     ///   This handles date/time information
     /// </summary>

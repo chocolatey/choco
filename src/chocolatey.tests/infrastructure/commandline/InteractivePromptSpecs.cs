@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.commandline;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.commandline
 {
-    using System;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.commandline;
-    using Moq;
-    using FluentAssertions;
-
     public class InteractivePromptSpecs
     {
         public abstract class InteractivePromptSpecsBase : TinySpec

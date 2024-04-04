@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using chocolatey.infrastructure.app.configuration;
+using NuGet.Configuration;
+using NuGet.Packaging.Signing;
 
 namespace chocolatey.infrastructure.app.nuget
 {
-    using configuration;
-    using NuGet.Configuration;
-    using NuGet.Packaging.Signing;
-
     public class ChocolateyNuGetSettings : ISettings
     {
         //private ClientPolicyContext
