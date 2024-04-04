@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.information
         public override bool Equals(object obj)
         {
             var information = obj as ExtensionInformation;
-            return !ReferenceEquals(information, null) &&
+            return information is object &&
                    Name == information.Name &&
                    Version == information.Version;
         }

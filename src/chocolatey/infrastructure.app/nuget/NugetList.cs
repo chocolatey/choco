@@ -424,7 +424,7 @@ namespace chocolatey.infrastructure.app.nuget
                 return true;
             }
 
-            if (ReferenceEquals(x, null) || ReferenceEquals(y, null))
+            if (x is null || y is null)
             {
                 return false;
             }
@@ -433,7 +433,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public int GetHashCode(IPackageSearchMetadata obj)
         {
-            if (ReferenceEquals(obj, null))
+            if (obj is null)
             {
                 return 0;
             }
@@ -450,7 +450,7 @@ namespace chocolatey.infrastructure.app.nuget
                 return true;
             }
 
-            if (ReferenceEquals(x, null) || ReferenceEquals(y, null))
+            if (x is null || y is null)
             {
                 return false;
             }
@@ -460,7 +460,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public int GetHashCode(IPackageSearchMetadata obj)
         {
-            if (ReferenceEquals(obj, null))
+            if (obj is null)
             {
                 return 0;
             }

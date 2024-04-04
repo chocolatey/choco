@@ -117,7 +117,7 @@ namespace chocolatey.infrastructure.app.domain
 
         bool IEquatable<RegistryApplicationKey>.Equals(RegistryApplicationKey other)
         {
-            if (ReferenceEquals(other, null))
+            if (other is null)
             {
                 return false;
             }
