@@ -538,7 +538,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 HandleExtensionPackages(config, packageResult);
                 HandleTemplatePackages(config, packageResult);
                 HandleHookPackages(config, packageResult);
-                pkgInfo.Arguments = CaptureArguments(config, packageResult);
+                pkgInfo.Arguments = CaptureArguments(config);
                 pkgInfo.IsPinned = config.PinPackage;
             }
 
@@ -567,7 +567,7 @@ Did you know Pro / Business automatically syncs with Programs and
             }
 
             UpdatePackageInformation(pkgInfo);
-            EnsureBadPackagesPathIsClean(config, packageResult);
+            EnsureBadPackagesPathIsClean(packageResult);
             EventManager.Publish(new HandlePackageResultCompletedMessage(packageResult, config, commandName));
 
             UnmarkPackagePending(packageResult, config);
@@ -650,7 +650,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             _packageInfoService.Save(pkgInfo);
         }
 
-        private string CaptureArguments(ChocolateyConfiguration config, PackageResult packageResult)
+        private string CaptureArguments(ChocolateyConfiguration config)
         {
             var arguments = new StringBuilder();
 
@@ -1563,7 +1563,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
                 _packageInfoService.Remove(packageResult.PackageMetadata);
             }
 
-            EnsureBadPackagesPathIsClean(config, packageResult);
+            EnsureBadPackagesPathIsClean(packageResult);
             RemoveBackupIfExists(packageResult);
             HandleExtensionPackages(config, packageResult);
             HandleTemplatePackages(config, packageResult);
@@ -1746,7 +1746,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             }
         }
 
-        private void EnsureBadPackagesPathIsClean(ChocolateyConfiguration config, PackageResult packageResult)
+        private void EnsureBadPackagesPathIsClean(PackageResult packageResult)
         {
             if (packageResult.InstallLocation == null)
             {

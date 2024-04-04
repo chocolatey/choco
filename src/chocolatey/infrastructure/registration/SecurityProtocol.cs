@@ -24,9 +24,9 @@ namespace chocolatey.infrastructure.registration
     [Obsolete("This type is deprecated and will be removed in v3.")]
     public sealed class SecurityProtocol
     {
-#pragma warning disable IDE0022, IDE1006
+#pragma warning disable IDE0022, IDE0060, IDE1006
         public static void set_protocol(ChocolateyConfiguration config, bool provideWarning)
             => HttpsSecurity.Reset();
-#pragma warning restore IDE0022, IDE1006
+#pragma warning restore IDE0022, IDE0060, IDE1006
     }
 }

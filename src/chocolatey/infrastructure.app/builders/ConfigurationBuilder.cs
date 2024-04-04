@@ -77,14 +77,16 @@ namespace chocolatey.infrastructure.app.builders
         /// <param name="container">The container.</param>
         /// <param name="license">The license.</param>
         /// <param name="notifyWarnLoggingAction">Notify warn logging action</param>
+        #pragma warning disable IDE0060 // Unused method parameter
         public static void SetupConfiguration(IList<string> args, ChocolateyConfiguration config, Container container, ChocolateyLicense license, Action<string> notifyWarnLoggingAction)
+        #pragma warning restore IDE0060 // Unused method parameter
         {
             var fileSystem = container.GetInstance<IFileSystem>();
             var xmlService = container.GetInstance<IXmlService>();
             var configFileSettings = GetConfigFileSettings(fileSystem, xmlService);
             // must be done prior to setting the file configuration
             AddOrRemoveLicensedSource(license, configFileSettings);
-            SetFileConfiguration(config, configFileSettings, fileSystem, notifyWarnLoggingAction);
+            SetFileConfiguration(config, configFileSettings, fileSystem);
             ConfigurationOptions.ClearOptions();
             SetGlobalOptions(args, config, container);
             SetEnvironmentOptions(config);
@@ -153,7 +155,7 @@ namespace chocolatey.infrastructure.app.builders
             configFileSettings.Sources.RemoveWhere(s => s.Id.IsEqualTo(configSource.Id) && !NugetEncryptionUtility.DecryptString(s.Password).IsEqualTo(license.Id));
         }
 
-        private static void SetFileConfiguration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem, Action<string> notifyWarnLoggingAction)
+        private static void SetFileConfiguration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
             SetSourcesInPriorityOrder(config, configFileSettings);
             SetMachineSources(config, configFileSettings);

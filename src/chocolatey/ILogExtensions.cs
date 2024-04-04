@@ -31,16 +31,20 @@ namespace chocolatey
         public static bool LogTraceMessages = true;
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
+        #pragma warning disable IDE0060 // Unused method parameter
         public static void Trace(this ILog logger, string message, params object[] formatting)
+        #pragma warning restore IDE0060 // Unused method parameter
         {
-           if (LogTraceMessages)
+            if (LogTraceMessages)
             {
                 ChocolateyLoggers.Trace.ToStringSafe().Log().Debug(message, formatting);
             }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
+        #pragma warning disable IDE0060 // Unused method parameter
         public static void Trace(this ILog logger, Func<string> message)
+        #pragma warning restore IDE0060 // Unused method parameter
         {
             if (LogTraceMessages)
             {

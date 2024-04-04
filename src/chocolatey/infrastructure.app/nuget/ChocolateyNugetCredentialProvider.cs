@@ -159,8 +159,9 @@ namespace chocolatey.infrastructure.app.nuget
             return Task.FromResult(new CredentialResponse(new NetworkCredential(source.Username, NugetEncryptionUtility.DecryptString(source.EncryptedPassword))));
         }
 
-
+        #pragma warning disable IDE0060 // unused method parameter
         public ICredentials GetUserCredentials(Uri uri, IWebProxy proxy, CredentialRequestType credentialType)
+        #pragma warning restore IDE0060 // unused method parameter
         {
             if (!_config.Information.IsInteractive)
             {

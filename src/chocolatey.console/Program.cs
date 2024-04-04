@@ -110,7 +110,7 @@ namespace chocolatey.console
 
                 ReportVersionAndExitIfRequested(args, config);
 
-                TrapExitScenarios(config);
+                TrapExitScenarios();
 
                 if (config.RegularOutput)
                 {
@@ -249,7 +249,7 @@ namespace chocolatey.console
             }
         }
 
-        private static void TrapExitScenarios(ChocolateyConfiguration config)
+        private static void TrapExitScenarios()
         {
             ExitScenarioHandler.SetHandler();
         }

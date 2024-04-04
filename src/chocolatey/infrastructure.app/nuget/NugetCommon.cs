@@ -96,7 +96,9 @@ namespace chocolatey.infrastructure.app.nuget
             return Repository.Factory.GetCoreV3(nugetSource);
         }
 
+        #pragma warning disable IDE0060 // unused method parameter (nugetLogger)
         public static IEnumerable<SourceRepository> GetRemoteRepositories(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
+        #pragma warning restore IDE0060 // unused method parameter (nugetLogger)
         {
             // Set user agent for all NuGet library calls. Should not affect any HTTP calls that Chocolatey itself would make.
             UserAgent.SetUserAgentString(new UserAgentStringBuilder("{0}/{1} via NuGet Client".FormatWith(ApplicationParameters.UserAgent, configuration.Information.ChocolateyProductVersion)));

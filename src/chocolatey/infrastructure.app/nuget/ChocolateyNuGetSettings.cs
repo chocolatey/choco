@@ -15,7 +15,9 @@ namespace chocolatey.infrastructure.app.nuget
         private const string ConfigSectionName = "config";
         //private SettingSection _configSettingSection;
 
+        #pragma warning disable IDE0060 // unused method parameter
         public ChocolateyNuGetSettings(ChocolateyConfiguration config)
+        #pragma warning restore IDE0060 // unused method parameter
         {
             //new SettingSection
             //_clientCertItem =

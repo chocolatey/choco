@@ -45,7 +45,9 @@ namespace chocolatey.infrastructure.app.configuration
             get { return _environmentInitializer.Value; }
         }
 
+        #pragma warning disable IDE0060 // Unused method parameter
         public static void ResetEnvironmentVariables(ChocolateyConfiguration config)
+        #pragma warning restore IDE0060 // Unused method parameter
         {
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType, null);
