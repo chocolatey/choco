@@ -169,9 +169,11 @@ namespace chocolatey.infrastructure.filesystem
             // Gets the path to an executable based on looking in current
             // working directory, next to the running process, then among the
             // derivatives of Path and Pathext variables, applied in order.
-            var searchPaths = new List<string>();
-            searchPaths.Add(GetCurrentDirectory());
-            searchPaths.Add(GetDirectoryName(GetCurrentAssemblyPath()));
+            var searchPaths = new List<string>
+            {
+                GetCurrentDirectory(),
+                GetDirectoryName(GetCurrentAssemblyPath())
+            };
             searchPaths.AddRange(Environment.GetEnvironmentVariable(ApplicationParameters.Environment.Path).ToStringSafe().Split(new[] { GetPathSeparator() }, StringSplitOptions.RemoveEmptyEntries));
 
             foreach (var path in searchPaths.OrEmpty())

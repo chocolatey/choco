@@ -85,13 +85,16 @@ namespace chocolatey.tests.infrastructure.commands
             [Fact]
             public void Should_add_a_parameter_that_does_not_match_the_case_of_the_property_name_when_dictionary_ignores_case()
             {
-                IDictionary<string, ExternalCommandArgument> ignoreCaseDictionary = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase);
-                ignoreCaseDictionary.Add(
-                    "sources",
-                    new ExternalCommandArgument
+                IDictionary<string, ExternalCommandArgument> ignoreCaseDictionary = new Dictionary<string, ExternalCommandArgument>(StringComparer.InvariantCultureIgnoreCase)
+                {
                     {
-                        ArgumentOption = "-source "
-                    });
+                        "sources",
+                        new ExternalCommandArgument
+                        {
+                            ArgumentOption = "-source "
+                        }
+                    }
+                };
                 ExternalCommandArgsBuilder.BuildArguments(Configuration, ignoreCaseDictionary).Should().Be("-source yo");
             }
 
