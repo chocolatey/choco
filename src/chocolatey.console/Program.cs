@@ -191,7 +191,12 @@ namespace chocolatey.console
 #if DEBUG
                 "chocolatey".Log().Info(() => "Exiting with {0}".FormatWith(Environment.ExitCode));
 #endif
-                PauseIfDebug();
+                // Chocolatey Agent runs Chocolatey CLI with --run-actual. If that's the case we don't want to pause on debug.
+                if (!args.Any(a => a.IsEqualTo("--run-actual")))
+                {
+                    PauseIfDebug();
+                }
+
                 Bootstrap.Shutdown();
                 Environment.Exit(Environment.ExitCode);
             }
