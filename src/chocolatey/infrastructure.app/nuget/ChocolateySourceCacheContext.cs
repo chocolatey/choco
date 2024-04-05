@@ -47,7 +47,10 @@ namespace chocolatey.infrastructure.app.nuget
                 return _generatedChocolateyTempFolder;
             }
 
-            set => Interlocked.CompareExchange(ref _generatedChocolateyTempFolder, value, comparand: null);
+            set
+            {
+                Interlocked.CompareExchange(ref _generatedChocolateyTempFolder, value, comparand: null);
+            }
         }
 
         /// <summary>
