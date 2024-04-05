@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.app.events
 
         public PostRunMessage(ChocolateyConfiguration configuration)
         {
-            this.Configuration = configuration;
+            Configuration = configuration;
         }
     }
 
@@ -39,7 +39,7 @@ namespace chocolatey.infrastructure.app.events
         public PostRunMessage(TCommand command, ChocolateyConfiguration configuration, object[] state)
         {
             Command = command;
-            this.Configuration = configuration;
+            Configuration = configuration;
             State = state;
         }
     }

@@ -108,7 +108,7 @@ namespace chocolatey.infrastructure.app.configuration
 
             // Runtime type lookup ensures this also fully works with derived classes (for example: licensed configuration)
             // without needing to re-implement this method / make it overridable.
-            var t = this.GetType();
+            var t = GetType();
 
             var backup = removeBackup ? _configurationBackups.Pop() : _configurationBackups.Peek();
 
