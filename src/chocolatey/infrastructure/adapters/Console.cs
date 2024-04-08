@@ -327,6 +327,7 @@ namespace chocolatey.infrastructure.adapters
             return defaultConsoleBuffer;
         }
 
+        #pragma warning disable IDE1006 // naming conventions
         /// <summary>
         /// Contains information about a console screen buffer.
         /// </summary>
@@ -346,6 +347,7 @@ namespace chocolatey.infrastructure.adapters
             /// <summary> A CoOrd structure that contains the maximum size of the console window, in character columns and rows, given the current screen buffer size and font and the screen size. </summary>
             internal COORD dwMaximumWindowSize;
         }
+        #pragma warning restore IDE1006 // naming conventions
 
         /// <summary>
         /// Defines the coordinates of a character cell in a console screen buffer.

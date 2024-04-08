@@ -33,7 +33,7 @@ namespace chocolatey.infrastructure.app.registration
 
     internal sealed class SimpleInjectorContainerRegistrator : IContainerRegistrator, ICloneable
     {
-        internal List<Func<Type, bool>> _validationHandlers = new List<Func<Type, bool>>();
+        internal List<Func<Type, bool>> ValidationHandlers = new List<Func<Type, bool>>();
 
         // We need to store the aliases for the commands to prevent them from
         // being overridden when the original class implementing these hasn't been removed.
@@ -76,7 +76,7 @@ namespace chocolatey.infrastructure.app.registration
             cloned._registeredCommands = _registeredCommands.DeepCopy();
             cloned._singletonServices = _singletonServices.DeepCopy();
             cloned._transientServices = _transientServices.DeepCopy();
-            cloned._validationHandlers = new List<Func<Type, bool>>();
+            cloned.ValidationHandlers = new List<Func<Type, bool>>();
 
             return cloned;
         }
@@ -221,7 +221,7 @@ namespace chocolatey.infrastructure.app.registration
 
         public void RegisterValidator(Func<Type, bool> validation_func)
         {
-            _validationHandlers.Add(validation_func);
+            ValidationHandlers.Add(validation_func);
         }
 
         public void RegisterSourceRunner<TService>() where TService : class
@@ -356,7 +356,7 @@ namespace chocolatey.infrastructure.app.registration
 
         private bool CanRegisterService(Type serviceType)
         {
-            foreach (var validator in _validationHandlers)
+            foreach (var validator in ValidationHandlers)
             {
                 if (!validator(serviceType))
                 {

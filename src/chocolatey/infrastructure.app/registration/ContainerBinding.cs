@@ -150,7 +150,7 @@ choco feature enable --name=""disableCompatibilityChecks""",
                         }
 
                         this.Log().Debug("Calling registration module '{0}' in extension '{1}'!", registration.GetType().Name, assemblyName);
-                        clonedRegistrator._validationHandlers.Clear();
+                        clonedRegistrator.ValidationHandlers.Clear();
                         clonedRegistrator.RegisterValidator((instanceType) => ValidateMinimumChocolateyVersion(instanceType, chocoVersion));
                         registration.RegisterDependencies(clonedRegistrator, configuration.DeepCopy());
                         hasRegisteredDependencies = !clonedRegistrator.RegistrationFailed;
