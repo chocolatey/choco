@@ -185,11 +185,39 @@ namespace chocolatey.infrastructure.app.domain
         public string Copyright { get; }
         public string Icon { get; }
         public string Readme { get; }
-        public IEnumerable<FrameworkAssemblyReference> FrameworkReferences => null;
-        public IEnumerable<PackageReferenceSet> PackageAssemblyReferences => null;
+        public IEnumerable<FrameworkAssemblyReference> FrameworkReferences
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public IEnumerable<PackageReferenceSet> PackageAssemblyReferences
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         public IEnumerable<PackageDependencyGroup> DependencyGroups { get; }
-        public Version MinClientVersion => null;
-        public IEnumerable<ManifestContentFiles> ContentFiles => null;
+        public Version MinClientVersion
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public IEnumerable<ManifestContentFiles> ContentFiles
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         public IEnumerable<PackageType> PackageTypes { get; }
         public RepositoryMetadata Repository { get; }
         public LicenseMetadata LicenseMetadata { get; }

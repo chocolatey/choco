@@ -4492,8 +4492,21 @@ namespace chocolatey.tests.integration.scenarios
         {
             private PackageResult _packageResult;
 
-            protected virtual string NonNormalizedVersion => "2.02.0.0";
-            protected virtual string NormalizedVersion => "2.2.0";
+            protected virtual string NonNormalizedVersion
+            {
+                get
+                {
+                    return "2.02.0.0";
+                }
+            }
+
+            protected virtual string NormalizedVersion
+            {
+                get
+                {
+                    return "2.2.0";
+                }
+            }
 
             public override void Context()
             {
@@ -4633,8 +4646,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_upgrading_an_existing_package_specifying_normalized_version : When_upgrading_an_existing_package_non_normalized_version
         {
-            protected override string NormalizedVersion => "2.2.0";
-            protected override string NonNormalizedVersion => "2.02.0.0";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "2.2.0";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "2.02.0.0";
+                }
+            }
 
             public override void Context()
             {
@@ -4645,8 +4671,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_upgrading_an_existing_package_specifying_non_normalized_version : When_upgrading_an_existing_package_non_normalized_version
         {
-            protected override string NormalizedVersion => "2.2.0";
-            protected override string NonNormalizedVersion => "2.02.0.0";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "2.2.0";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "2.02.0.0";
+                }
+            }
 
             public override void Context()
             {
@@ -4657,14 +4696,40 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_upgrading_an_existing_package_with_multiple_leading_zeros : When_upgrading_an_existing_package_non_normalized_version
         {
-            protected override string NormalizedVersion => "4.4.5.1";
-            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "4.4.5.1";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "0004.0004.00005.01";
+                }
+            }
         }
 
         public class When_upgrading_an_existing_package_with_multiple_leading_zeros_specifying_normalized_version : When_upgrading_an_existing_package_non_normalized_version
         {
-            protected override string NormalizedVersion => "4.4.5.1";
-            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "4.4.5.1";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "0004.0004.00005.01";
+                }
+            }
 
             public override void Context()
             {
@@ -4675,8 +4740,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_upgrading_an_existing_package_with_multiple_leading_zeros_specifying_non_normalized_version : When_upgrading_an_existing_package_non_normalized_version
         {
-            protected override string NormalizedVersion => "4.4.5.1";
-            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "4.4.5.1";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "0004.0004.00005.01";
+                }
+            }
 
             public override void Context()
             {

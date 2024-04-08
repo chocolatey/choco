@@ -74,8 +74,22 @@ namespace chocolatey.infrastructure.app.nuget
 
         public PackageExtractionContext PackageExtractionContext { get; set; }
 
-        public ISourceControlManagerProvider SourceControlManagerProvider => null;
-        public ExecutionContext ExecutionContext => null;
+        public ISourceControlManagerProvider SourceControlManagerProvider
+        {
+            get
+            {
+                return null;
+            }
+        }
+
+        public ExecutionContext ExecutionContext
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         public XDocument OriginalPackagesConfig { get; set; }
         public NuGetActionType ActionType { get; set; }
         public Guid OperationId { get; set; }
