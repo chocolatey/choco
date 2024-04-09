@@ -149,7 +149,8 @@ namespace chocolatey.infrastructure.services
                         {
                             AutoFlush = true
                         }
-                        ){
+                        )
+                        {
                             xmlSerializer.Serialize(streamWriter, xmlType);
                             streamWriter.Flush();
 

@@ -77,9 +77,9 @@ namespace chocolatey.infrastructure.app.builders
         /// <param name="container">The container.</param>
         /// <param name="license">The license.</param>
         /// <param name="notifyWarnLoggingAction">Notify warn logging action</param>
-        #pragma warning disable IDE0060 // Unused method parameter
+#pragma warning disable IDE0060 // Unused method parameter
         public static void SetupConfiguration(IList<string> args, ChocolateyConfiguration config, Container container, ChocolateyLicense license, Action<string> notifyWarnLoggingAction)
-        #pragma warning restore IDE0060 // Unused method parameter
+#pragma warning restore IDE0060 // Unused method parameter
         {
             var fileSystem = container.GetInstance<IFileSystem>();
             var xmlService = container.GetInstance<IXmlService>();
@@ -466,7 +466,7 @@ namespace chocolatey.infrastructure.app.builders
                                     config.CacheExpirationInMinutes = -1;
                                 }
                             });
-                        ;
+                    ;
                 },
                 (unparsedArgs) =>
                 {

@@ -62,7 +62,7 @@ namespace chocolatey.infrastructure.app.validations
 
             if (result)
             {
-                var commandsToErrorOn = new List<string> {"install", "uninstall", "upgrade"};
+                var commandsToErrorOn = new List<string> { "install", "uninstall", "upgrade" };
 
                 if (!commandsToErrorOn.Contains(config.CommandName.ToLowerInvariant()))
                 {

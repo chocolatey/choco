@@ -38,16 +38,24 @@ namespace chocolatey.infrastructure.app.nuget
         }
 
         public override string GetInstallPath(PackageIdentity packageIdentity)
-            => GetInstallPath(packageIdentity.Id);
+        {
+            return GetInstallPath(packageIdentity.Id);
+        }
 
         public string GetInstallPath(string packageId)
-            => _filesystem.CombinePaths(RootDirectory, packageId);
+        {
+            return _filesystem.CombinePaths(RootDirectory, packageId);
+        }
 
         [Obsolete("This overload will be removed in a future version.")]
         public string GetInstallPath(string id, NuGetVersion version)
-            => GetInstallPath(id);
+        {
+            return GetInstallPath(id);
+        }
 
         public override string GetPackageFileName(PackageIdentity packageIdentity)
-            => packageIdentity.Id + NuGetConstants.PackageExtension;
+        {
+            return packageIdentity.Id + NuGetConstants.PackageExtension;
+        }
     }
 }

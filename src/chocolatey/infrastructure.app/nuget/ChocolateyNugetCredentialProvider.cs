@@ -120,7 +120,7 @@ namespace chocolatey.infrastructure.app.nuget
                 // find the source that is the closest match
                 foreach (var candidateSource in candidateSources.OrEmpty())
                 {
-                    var candidateRegEx = new Regex(Regex.Escape(candidateSource.Key.TrimEnd('/')),RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+                    var candidateRegEx = new Regex(Regex.Escape(candidateSource.Key.TrimEnd('/')), RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
                     if (candidateRegEx.IsMatch(uri.OriginalString.TrimEnd('/')))
                     {
                         this.Log().Debug("Source selected will be '{0}'".FormatWith(candidateSource.Key.TrimEnd('/')));
@@ -159,9 +159,9 @@ namespace chocolatey.infrastructure.app.nuget
             return Task.FromResult(new CredentialResponse(new NetworkCredential(source.Username, NugetEncryptionUtility.DecryptString(source.EncryptedPassword))));
         }
 
-        #pragma warning disable IDE0060 // unused method parameter
+#pragma warning disable IDE0060 // unused method parameter
         public ICredentials GetUserCredentials(Uri uri, IWebProxy proxy, CredentialRequestType credentialType)
-        #pragma warning restore IDE0060 // unused method parameter
+#pragma warning restore IDE0060 // unused method parameter
         {
             if (!_config.Information.IsInteractive)
             {
@@ -187,10 +187,10 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             var credentials = new NetworkCredential
-                {
-                    UserName = username,
-                    Password = password
-                };
+            {
+                UserName = username,
+                Password = password
+            };
 
             return credentials;
         }

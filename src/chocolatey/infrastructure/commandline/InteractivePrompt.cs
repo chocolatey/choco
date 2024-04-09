@@ -98,7 +98,7 @@ namespace chocolatey.infrastructure.commandline
             foreach (var choice in choices.OrEmpty())
             {
                 choiceDictionary.Add(counter, choice);
-                "chocolatey".Log().Info(shortPrompt ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Normal," {0}) {1}{2}".FormatWith(counter, choice.ToStringSafe(), choice.IsEqualTo(defaultChoice) ? " [Default - Press Enter]" : ""));
+                "chocolatey".Log().Info(shortPrompt ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Normal, " {0}) {1}{2}".FormatWith(counter, choice.ToStringSafe(), choice.IsEqualTo(defaultChoice) ? " [Default - Press Enter]" : ""));
                 if (shortPrompt)
                 {
                     var choicePrompt = choice.IsEqualTo(defaultChoice) ?
@@ -107,7 +107,7 @@ namespace chocolatey.infrastructure.commandline
                                 "[{0}]".FormatWith(choice.ToUpperInvariant())
                         :
                             shortPrompt ?
-                                "[{0}]{1}".FormatWith(choice.Substring(0,1).ToUpperInvariant(), choice.Substring(1, choice.Length - 1)) :
+                                "[{0}]{1}".FormatWith(choice.Substring(0, 1).ToUpperInvariant(), choice.Substring(1, choice.Length - 1)) :
                                 choice;
 
                     if (counter != 1)

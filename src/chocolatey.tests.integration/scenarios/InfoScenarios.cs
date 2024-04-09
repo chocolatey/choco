@@ -398,7 +398,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Results[0].Source.Should().Be(
                     ((Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://") + Path.Combine(Environment.CurrentDirectory, "PackageOutput"))
-                    .Replace("\\","/"));
+                    .Replace("\\", "/"));
             }
 
             [Fact]
@@ -422,7 +422,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_show_only_one_result()
             {
-                Results.Should().ContainSingle( "Expected 1 package to be returned!");
+                Results.Should().ContainSingle("Expected 1 package to be returned!");
             }
 
             [Fact]
@@ -478,7 +478,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_show_only_one_result()
             {
-                Results.Should().ContainSingle( "Expected 1 package to be returned!");
+                Results.Should().ContainSingle("Expected 1 package to be returned!");
             }
 
             [Fact]

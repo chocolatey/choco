@@ -144,23 +144,23 @@ namespace chocolatey.infrastructure.app.services
             }
 
             // split on " /" and " -" for quite a bit more accuracy
-            IList<string> uninstallArgsSplit = key.UninstallString.ToStringSafe().Replace("&quot;","\"").Replace("&apos;","'").Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            IList<string> uninstallArgsSplit = key.UninstallString.ToStringSafe().Replace("&quot;", "\"").Replace("&apos;", "'").Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             var uninstallExe = uninstallArgsSplit.DefaultIfEmpty(string.Empty).FirstOrDefault().TrimSafe();
             if (uninstallExe.Count(u => u == '"') > 2)
             {
-                uninstallExe = uninstallExe.Split(new []{" \""}, StringSplitOptions.RemoveEmptyEntries).First();
+                uninstallExe = uninstallExe.Split(new[] { " \"" }, StringSplitOptions.RemoveEmptyEntries).First();
             }
 
             if (uninstallExe.Count(u => u == ':') > 1)
             {
                 try
                 {
-                    var firstMatch = Regex.Match(uninstallExe, @"\s+\w\:",RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+                    var firstMatch = Regex.Match(uninstallExe, @"\s+\w\:", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
                     uninstallExe = uninstallExe.Substring(0, firstMatch.Index);
                 }
                 catch (Exception ex)
                 {
-                   this.Log().Debug("Error splitting the uninstall string:{0} {1}".FormatWith(Environment.NewLine,ex.ToStringSafe()));
+                    this.Log().Debug("Error splitting the uninstall string:{0} {1}".FormatWith(Environment.NewLine, ex.ToStringSafe()));
                 }
             }
             var uninstallArgs = key.UninstallString.ToStringSafe().Replace("&quot;", "\"").Replace("&apos;", "'").Replace(uninstallExe.ToStringSafe(), string.Empty).TrimSafe();
@@ -199,7 +199,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 if (userOverrideUninstallArguments)
                 {
-                    this.Log().Debug(() => " Replacing original uninstall arguments of '{0}' with '{1}'".FormatWith(uninstallArgs.EscapeCurlyBraces(),userProvidedUninstallArguments.EscapeCurlyBraces()));
+                    this.Log().Debug(() => " Replacing original uninstall arguments of '{0}' with '{1}'".FormatWith(uninstallArgs.EscapeCurlyBraces(), userProvidedUninstallArguments.EscapeCurlyBraces()));
                     uninstallArgs = userProvidedUninstallArguments;
                 }
                 else

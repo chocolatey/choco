@@ -419,7 +419,7 @@ namespace chocolatey.infrastructure.app.nuget
 #pragma warning restore IDE0022, IDE1006
     }
 
-    public class ComparePackageSearchMetadataIdOnly: IEqualityComparer<IPackageSearchMetadata>
+    public class ComparePackageSearchMetadataIdOnly : IEqualityComparer<IPackageSearchMetadata>
     {
         public bool Equals(IPackageSearchMetadata x, IPackageSearchMetadata y)
         {

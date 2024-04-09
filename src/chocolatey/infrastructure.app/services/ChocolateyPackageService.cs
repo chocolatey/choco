@@ -1899,7 +1899,7 @@ ATTENTION: You must take manual action to remove {1} from
 
             if (rollback)
             {
-             var destination = _fileSystem.CombinePaths(ApplicationParameters.PackagesLocation, packageResult.Identity.Id);
+                var destination = _fileSystem.CombinePaths(ApplicationParameters.PackagesLocation, packageResult.Identity.Id);
                 _filesService.MovePackageUsingBackupStrategy(rollbackDirectory, destination, restoreSource: false);
             }
 

@@ -259,13 +259,13 @@ However, the System HTTP Cache will only be considered if running in an elevated
             var cachedFiles = _fileSystem.GetFiles(cacheLocation, "*.dat", SearchOption.AllDirectories);
             var cachedDirectories = _fileSystem.GetDirectories(cacheLocation).Where(d => !_fileSystem.GetFileName(d).IsEqualTo(LockDirectoryName));
             var expirationTimer = GetCacheExpiration(configuration);
-            
+
             var expiredFiles = cachedFiles.Where(f => _fileSystem.GetFileModifiedDate(f) < expirationTimer);
 
             this.Log().Info("We found {0} cached sources.", cachedDirectories.Count());
             this.Log().Info("We found {0} cached items for all sources, where {1} items have expired.", cachedFiles.Count(), expiredFiles.Count());
         }
-        
+
         #region Obsoleted methods
 
         [Obsolete("Will be removed in v3. Use ConfigureArgumentParser instead!")]

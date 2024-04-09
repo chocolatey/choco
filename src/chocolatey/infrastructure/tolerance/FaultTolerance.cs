@@ -115,7 +115,7 @@ namespace chocolatey.infrastructure.tolerance
                         throw;
                     }
 
-                    var retryWait = waitDurationMilliseconds + (i*increaseRetryByMilliseconds);
+                    var retryWait = waitDurationMilliseconds + (i * increaseRetryByMilliseconds);
 
                     var exceptionMessage = debugging ? ex.ToString() : ex.Message;
 

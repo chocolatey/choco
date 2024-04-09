@@ -87,7 +87,7 @@ namespace chocolatey.infrastructure.commands
             }
 
             cancelToken.Cancel();
-            this.Log().Warn(ChocolateyLoggers.Important,() => @"Chocolatey timed out waiting for the command to finish. The timeout
+            this.Log().Warn(ChocolateyLoggers.Important, () => @"Chocolatey timed out waiting for the command to finish. The timeout
  specified (or the default value) was '{0}' seconds. Perhaps try a
  higher `--execution-timeout`? See `choco -h` for details.".FormatWith(_timespan.TotalSeconds));
 

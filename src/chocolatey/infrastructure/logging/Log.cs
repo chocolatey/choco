@@ -23,7 +23,7 @@ namespace chocolatey.infrastructure.logging
     /// </summary>
     public static class Log
     {
-        private static Type _logType = typeof (NullLog);
+        private static Type _logType = typeof(NullLog);
         private static ILog _logger;
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace chocolatey.infrastructure.logging
         /// <param name="resetLoggers">Should other loggers be reset?</param>
         public static void InitializeWith<T>(bool resetLoggers = true) where T : ILog, new()
         {
-            _logType = typeof (T);
+            _logType = typeof(T);
             if (resetLoggers)
             {
                 LogExtensions.ResetLoggers();

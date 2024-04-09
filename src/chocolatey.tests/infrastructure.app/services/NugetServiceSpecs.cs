@@ -317,7 +317,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var infos = MockLogger.MessagesFor(tests.LogLevel.Info);
                 infos.Should().ContainSingle();
-                infos.Should().HaveElementAt(0,"Chocolatey would have searched for a nuspec file in \"c:\\projects\\chocolatey\" and attempted to compile it.");
+                infos.Should().HaveElementAt(0, "Chocolatey would have searched for a nuspec file in \"c:\\projects\\chocolatey\" and attempted to compile it.");
             }
 
             [Fact]
@@ -331,7 +331,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var infos = MockLogger.MessagesFor(tests.LogLevel.Info);
                 infos.Should().ContainSingle();
-                infos.Should().HaveElementAt(0,"Chocolatey would have searched for a nuspec file in \"c:\\packages\" and attempted to compile it.");
+                infos.Should().HaveElementAt(0, "Chocolatey would have searched for a nuspec file in \"c:\\packages\" and attempted to compile it.");
             }
         }
     }

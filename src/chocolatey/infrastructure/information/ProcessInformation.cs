@@ -143,7 +143,7 @@ namespace chocolatey.infrastructure.information
 
         public static bool UserIsSystem()
         {
-             if (Platform.GetPlatform() != PlatformType.Windows)
+            if (Platform.GetPlatform() != PlatformType.Windows)
             {
                 return false;
             }

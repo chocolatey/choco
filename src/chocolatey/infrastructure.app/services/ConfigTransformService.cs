@@ -63,7 +63,7 @@ namespace chocolatey.infrastructure.app.services
                 var targetFilesTest = targetFiles as IList<string> ?? targetFiles.ToList();
                 if (!targetFilesTest.Any())
                 {
-                    targetFiles = new[] {transformFile.Replace(ApplicationParameters.ConfigFileTransformExtension, string.Empty)};
+                    targetFiles = new[] { transformFile.Replace(ApplicationParameters.ConfigFileTransformExtension, string.Empty) };
                     this.Log().Debug(() => "No matching files found for transform {0}.{1} Creating '{2}'".FormatWith(_fileSystem.GetFileName(transformFile), Environment.NewLine, targetFiles.FirstOrDefault()));
                 }
 
@@ -89,7 +89,7 @@ namespace chocolatey.infrastructure.app.services
                                     // backup and let the transform to its thing instead.
                                     if (_fileSystem.FileExists(backupTargetFile))
                                     {
-                                        this.Log().Debug(()=> "Restoring backup configuration file for '{0}'.".FormatWith(targetFile));
+                                        this.Log().Debug(() => "Restoring backup configuration file for '{0}'.".FormatWith(targetFile));
                                         _fileSystem.CopyFile(backupTargetFile, targetFile, overwriteExisting: true);
                                     }
                                 },
@@ -103,7 +103,7 @@ namespace chocolatey.infrastructure.app.services
 
                                 using (var transformation = new XmlTransformation(_fileSystem.ReadFile(transformFile), isTransformAFile: false, logger: null))
                                 {
-                                    using (var document = new XmlTransformableDocument {PreserveWhitespace = true})
+                                    using (var document = new XmlTransformableDocument { PreserveWhitespace = true })
                                     {
                                         using (var inputStream = _fileSystem.OpenFileReadonly(targetFile))
                                         {

@@ -67,7 +67,7 @@ namespace chocolatey.infrastructure.app.configuration
                 return false;
             }
 
-            var item = (ConfigFileSourceSetting) obj;
+            var item = (ConfigFileSourceSetting)obj;
 
             return (Id == item.Id)
                 && (Value == item.Value)

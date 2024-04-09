@@ -78,7 +78,7 @@ namespace chocolatey.infrastructure.extractors
                         fileSystem.EnsureDirectoryExists(fileSystem.GetDirectoryName(filePath));
                         fileSystem.WriteFile(filePath, () => assembly.GetManifestStream(manifestLocation));
                     },
-                   errorMessage:"Unable to extract binary",
+                   errorMessage: "Unable to extract binary",
                    throwError: throwError,
                    logWarningInsteadOfError: false,
                    logDebugInsteadOfError: !throwError,

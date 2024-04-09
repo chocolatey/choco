@@ -43,7 +43,8 @@ namespace chocolatey.infrastructure.registration
         /// <param name="assemblyFileLocation">The assembly file location. Typically the path to the DLL on disk.</param>
         /// <returns>An assembly</returns>
         /// <exception cref="Exception">Unable to enter synchronized code to determine assembly loading</exception>
-        public static IAssembly ResolveOrLoadAssembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation) {
+        public static IAssembly ResolveOrLoadAssembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation)
+        {
             return ResolveOrLoadAssembly(assemblySimpleName, publicKeyToken, assemblyFileLocation, false);
         }
 

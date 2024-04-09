@@ -75,7 +75,7 @@ namespace chocolatey.infrastructure.app.commands
             if (string.IsNullOrWhiteSpace(configuration.NewCommand.Name))
             {
                 configuration.NewCommand.Name = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault(arg => !arg.StartsWith("-") && !arg.ContainsSafe("="));
-                var property = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().Split(new[] {'='}, StringSplitOptions.RemoveEmptyEntries);
+                var property = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
                 if (property.Length == 1)
                 {
                     configuration.NewCommand.TemplateProperties.Add(TemplateValues.NamePropertyName, configuration.NewCommand.Name);

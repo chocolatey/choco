@@ -145,7 +145,7 @@ namespace chocolatey.infrastructure.cryptography
             }
 
             var hash = hashAlgorithm.ComputeHash(Encoding.ASCII.GetBytes(originalText));
-             return BitConverter.ToString(hash).Replace("-", string.Empty);
+            return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
 
 #pragma warning disable IDE0022, IDE1006

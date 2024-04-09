@@ -255,7 +255,7 @@ that uses these options.");
                                         package.PackageTestResultStatus,
                                         package.PackageValidationResultDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
                                     ),
-                                (package.DownloadCount == null || package.DownloadCount <= 0)  ? "n/a" : package.DownloadCount.ToStringSafe(),
+                                (package.DownloadCount == null || package.DownloadCount <= 0) ? "n/a" : package.DownloadCount.ToStringSafe(),
                                 (package.VersionDownloadCount == null || package.VersionDownloadCount <= 0) ? "n/a" : package.VersionDownloadCount.ToStringSafe(),
                                 package.PackageDetailsUrl == null || string.IsNullOrWhiteSpace(package.PackageDetailsUrl.AbsoluteUri) ? string.Empty : " " + package.PackageDetailsUrl.AbsoluteUri,
                                 !string.IsNullOrWhiteSpace(package.PackageSourceUrl.ToStringSafe())
@@ -2867,7 +2867,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             var allPackages = GetInstalledPackages(config);
             if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
             {
-                var packagesToUpdate= allPackages.Select(p => p.Name).ToList();
+                var packagesToUpdate = allPackages.Select(p => p.Name).ToList();
 
                 if (!string.IsNullOrWhiteSpace(config.UpgradeCommand.PackageNamesToSkip))
                 {

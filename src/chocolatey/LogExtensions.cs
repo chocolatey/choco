@@ -55,11 +55,11 @@ namespace chocolatey
         /// <typeparam name="T"></typeparam>
         /// <param name="type">The type to get the logger for.</param>
         /// <returns>Instance of a logger for the object.</returns>
-        #pragma warning disable IDE0060 // Unused method parameter
+#pragma warning disable IDE0060 // Unused method parameter
         public static ILog Log<T>(this T type)
-        #pragma warning restore IDE0060 // Unused method parameter
+#pragma warning restore IDE0060 // Unused method parameter
         {
-            var objectName = typeof (T).FullName;
+            var objectName = typeof(T).FullName;
             return Log(objectName);
         }
 

@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.app.commands
         private readonly IFileSystem _fileSystem;
 
 #if !NoResources
-        private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => adapters.Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)));
+        private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => adapters.Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)));
 #else
         private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>();
 #endif

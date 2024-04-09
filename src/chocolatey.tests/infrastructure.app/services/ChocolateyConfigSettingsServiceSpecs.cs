@@ -167,8 +167,8 @@ namespace chocolatey.tests.integration.infrastructure.app.services
 
                     Service.DisableFeature(config);
                 };
-                    action.Should().Throw<ApplicationException>()
-                        .WithMessage("Feature '{0}' is not supported.".FormatWith(FeatureName));
+                action.Should().Throw<ApplicationException>()
+                    .WithMessage("Feature '{0}' is not supported.".FormatWith(FeatureName));
             }
         }
 

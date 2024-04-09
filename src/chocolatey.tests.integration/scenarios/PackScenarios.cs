@@ -1142,7 +1142,7 @@ namespace chocolatey.tests.integration.scenarios
   </files>
 </package>";
 
-    private const string NuspecContentWithFormatableMinClientVersion = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        private const string NuspecContentWithFormatableMinClientVersion = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
   <metadata minClientVersion=""{0}"">
     <id>test-package</id>

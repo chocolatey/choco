@@ -24,7 +24,7 @@ using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
 namespace chocolatey.infrastructure.app.domain
 {
-    public  class ChocolateyPackageMetadata : IPackageMetadata
+    public class ChocolateyPackageMetadata : IPackageMetadata
     {
         public ChocolateyPackageMetadata(NuspecReader reader)
         {

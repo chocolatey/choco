@@ -147,7 +147,7 @@ A corrupt .registry file exists at {0}.
                     "Unable to read files snapshot file",
                     throwError: false,
                     logWarningInsteadOfError: true,
-                    isSilent:true
+                    isSilent: true
                  );
 
             packageInformation.HasSilentUninstall = _fileSystem.FileExists(_fileSystem.CombinePaths(pkgStorePath, SilentUninstallerFile));

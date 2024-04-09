@@ -71,7 +71,7 @@ namespace chocolatey.infrastructure.app.validations
                     ExitCode = 1
                 };
 
-                var commandsToErrorOn = new List<string> {"install", "uninstall", "upgrade"};
+                var commandsToErrorOn = new List<string> { "install", "uninstall", "upgrade" };
                 if (!commandsToErrorOn.Contains(config.CommandName.ToLowerInvariant()))
                 {
                     validationResult.Status = ValidationStatus.Warning;

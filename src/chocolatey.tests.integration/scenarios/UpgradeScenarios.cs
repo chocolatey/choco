@@ -3517,7 +3517,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_upgrade_packages_with_upgrades()
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
-                upgradePackageResult.Should().ContainSingle( "upgradepackage must be there once");
+                upgradePackageResult.Should().ContainSingle("upgradepackage must be there once");
                 upgradePackageResult.First().Value.Version.Should().Be("1.1.0");
             }
 
@@ -3525,7 +3525,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_skip_packages_without_upgrades()
             {
                 var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
-                installPackageResult.Should().ContainSingle( "installpackage must be there once");
+                installPackageResult.Should().ContainSingle("installpackage must be there once");
                 installPackageResult.First().Value.Version.Should().Be("1.0.0");
             }
         }
@@ -3556,7 +3556,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_upgrade_packages_with_upgrades()
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
-                upgradePackageResult.Should().ContainSingle( "upgradepackage must be there once");
+                upgradePackageResult.Should().ContainSingle("upgradepackage must be there once");
                 upgradePackageResult.First().Value.Version.Should().Be("1.1.1-beta2");
             }
 
@@ -3577,7 +3577,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_skip_packages_without_upgrades()
             {
                 var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
-                installPackageResult.Should().ContainSingle( "installpackage must be there once");
+                installPackageResult.Should().ContainSingle("installpackage must be there once");
                 installPackageResult.First().Value.Version.Should().Be("1.0.0");
             }
         }
@@ -3610,7 +3610,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_upgrade_packages_with_upgrades()
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
-                upgradePackageResult.Should().ContainSingle( "upgradepackage must be there once");
+                upgradePackageResult.Should().ContainSingle("upgradepackage must be there once");
                 // available version will show as last stable
                 upgradePackageResult.First().Value.Version.Should().Be("1.1.0");
             }
@@ -3632,7 +3632,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_skip_packages_without_upgrades()
             {
                 var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
-                installPackageResult.Should().ContainSingle( "installpackage must be there once");
+                installPackageResult.Should().ContainSingle("installpackage must be there once");
                 installPackageResult.First().Value.Version.Should().Be("1.0.0");
             }
         }
@@ -3659,7 +3659,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_a_single_package_result()
             {
-                Results.Should().ContainSingle( "The returned package results do not have a single value!");
+                Results.Should().ContainSingle("The returned package results do not have a single value!");
             }
 
             [Fact]

@@ -66,7 +66,8 @@ namespace chocolatey.infrastructure.app.runners
                         commandArgs,
                         config,
                         (optionSet) => command.ConfigureArgumentParser(optionSet, config),
-                        (unparsedArgs) => {
+                        (unparsedArgs) =>
+                        {
                             // if debug is bundled with local options, it may not get picked up when global
                             // options are parsed. Attempt to set it again once local options are set.
                             // This does mean some output from debug will be missed (but not much)
@@ -91,7 +92,8 @@ namespace chocolatey.infrastructure.app.runners
                                 }
                             }
                         },
-                        () => {
+                        () =>
+                        {
                             this.Log().Debug(() => "Performing validation checks.");
                             command.Validate(config);
 

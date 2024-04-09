@@ -84,7 +84,7 @@ namespace chocolatey.tests.infrastructure.app.commands
         {
             public override void Because()
             {
-                
+
             }
 
             public override void BeforeEachSpec()

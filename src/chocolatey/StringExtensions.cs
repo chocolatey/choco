@@ -300,7 +300,7 @@ namespace chocolatey
                 return string.Empty;
             }
 
-            return _openBraceRegex.Replace(_closeBraceRegex.Replace(input,"}}"),"{{");
+            return _openBraceRegex.Replace(_closeBraceRegex.Replace(input, "}}"), "{{");
         }
 
         /// <summary>

@@ -104,7 +104,7 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
         [TestFixture(false, false, false, true, TestName = "Argument Set")]
         public class WhenProxyConfigurationTests : ProxyConfigurationBase
         {
-            public WhenProxyConfigurationTests(bool system, bool environment, bool config, bool argument) : base(system, environment, config, argument) {}
+            public WhenProxyConfigurationTests(bool system, bool environment, bool config, bool argument) : base(system, environment, config, argument) { }
             public override void Context()
             {
                 base.Context();

@@ -81,7 +81,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
                 infos.Should().ContainSingle();
-                infos.Should().HaveElementAt(0,"Would have generated a new package specification at c:\\chocolatey\\Bob");
+                infos.Should().HaveElementAt(0, "Would have generated a new package specification at c:\\chocolatey\\Bob");
             }
 
             [Fact]
@@ -93,7 +93,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
                 infos.Should().ContainSingle();
-                infos.Should().HaveElementAt(0,"Would have generated a new package specification at c:\\packages\\Bob");
+                infos.Should().HaveElementAt(0, "Would have generated a new package specification at c:\\packages\\Bob");
             }
         }
 
@@ -133,7 +133,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var debugs = MockLogger.MessagesFor(LogLevel.Debug);
                 debugs.Should().ContainSingle();
-                debugs.Should().HaveElementAt(0,"Bob");
+                debugs.Should().HaveElementAt(0, "Bob");
             }
 
             [Fact]
@@ -145,11 +145,11 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var debugs = MockLogger.MessagesFor(LogLevel.Debug);
                 debugs.Should().ContainSingle();
-                debugs.Should().HaveElementAt(0,"Bob");
+                debugs.Should().HaveElementAt(0, "Bob");
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
                 infos.Should().ContainSingle();
-                infos.Should().HaveElementAt(0,string.Format(@"Generating template to a file{0} at 'c:\packages\bob.nuspec'", Environment.NewLine));
+                infos.Should().HaveElementAt(0, string.Format(@"Generating template to a file{0} at 'c:\packages\bob.nuspec'", Environment.NewLine));
             }
         }
 
@@ -295,8 +295,8 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var directories = _directoryCreated.ToList();
                 directories.Should().HaveCount(2, "There should be 2 directories, but there was: " + string.Join(", ", directories));
-                directories.Should().HaveElementAt(0,"c:\\chocolatey\\Bob");
-                directories.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\tools");
+                directories.Should().HaveElementAt(0, "c:\\chocolatey\\Bob");
+                directories.Should().HaveElementAt(1, "c:\\chocolatey\\Bob\\tools");
 
                 _files.Should().HaveCount(2, "There should be 2 files, but there was: " + string.Join(", ", _files));
                 _files.Should().HaveElementAt(0, "c:\\chocolatey\\Bob\\__name_replace__.nuspec");
@@ -314,8 +314,8 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var directories = _directoryCreated.ToList();
                 directories.Should().HaveCount(2, "There should be 2 directories, but there was: " + string.Join(", ", directories));
-                directories.Should().HaveElementAt(0,"c:\\packages\\Bob");
-                directories.Should().HaveElementAt(1,"c:\\packages\\Bob\\tools");
+                directories.Should().HaveElementAt(0, "c:\\packages\\Bob");
+                directories.Should().HaveElementAt(1, "c:\\packages\\Bob\\tools");
 
                 _files.Should().HaveCount(2, "There should be 2 files, but there was: " + string.Join(", ", _files));
                 _files.Should().HaveElementAt(0, "c:\\packages\\Bob\\__name_replace__.nuspec");
@@ -393,9 +393,9 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var directories = _directoryCreated.ToList();
                 directories.Should().HaveCount(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
-                directories.Should().HaveElementAt(0,"c:\\chocolatey\\Bob");
-                directories.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\tools");
-                directories.Should().HaveElementAt(2,"c:\\chocolatey\\Bob\\tools\\lower");
+                directories.Should().HaveElementAt(0, "c:\\chocolatey\\Bob");
+                directories.Should().HaveElementAt(1, "c:\\chocolatey\\Bob\\tools");
+                directories.Should().HaveElementAt(2, "c:\\chocolatey\\Bob\\tools\\lower");
 
                 _files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", _files));
                 _files.Should().HaveElementAt(0, "c:\\chocolatey\\Bob\\__name_replace__.nuspec");
@@ -415,9 +415,9 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var directories = _directoryCreated.ToList();
                 directories.Should().HaveCount(3, "There should be 3 directories, but there was: " + string.Join(", ", directories));
-                directories.Should().HaveElementAt(0,"c:\\packages\\Bob");
-                directories.Should().HaveElementAt(1,"c:\\packages\\Bob\\tools");
-                directories.Should().HaveElementAt(2,"c:\\packages\\Bob\\tools\\lower");
+                directories.Should().HaveElementAt(0, "c:\\packages\\Bob");
+                directories.Should().HaveElementAt(1, "c:\\packages\\Bob\\tools");
+                directories.Should().HaveElementAt(2, "c:\\packages\\Bob\\tools\\lower");
 
                 _files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", _files));
                 _files.Should().HaveElementAt(0, "c:\\packages\\Bob\\__name_replace__.nuspec");
@@ -497,11 +497,11 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var directories = _directoryCreated.ToList();
                 directories.Should().HaveCount(5, "There should be 5 directories, but there was: " + string.Join(", ", directories));
-                directories.Should().HaveElementAt(0,"c:\\chocolatey\\Bob");
-                directories.Should().HaveElementAt(1,"c:\\chocolatey\\Bob\\tools");
-                directories.Should().HaveElementAt(2,"c:\\chocolatey\\Bob\\tools\\lower");
-                directories.Should().HaveElementAt(3,"c:\\chocolatey\\Bob\\empty");
-                directories.Should().HaveElementAt(4,"c:\\chocolatey\\Bob\\empty\\nested");
+                directories.Should().HaveElementAt(0, "c:\\chocolatey\\Bob");
+                directories.Should().HaveElementAt(1, "c:\\chocolatey\\Bob\\tools");
+                directories.Should().HaveElementAt(2, "c:\\chocolatey\\Bob\\tools\\lower");
+                directories.Should().HaveElementAt(3, "c:\\chocolatey\\Bob\\empty");
+                directories.Should().HaveElementAt(4, "c:\\chocolatey\\Bob\\empty\\nested");
 
                 _files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", _files));
                 _files.Should().HaveElementAt(0, "c:\\chocolatey\\Bob\\__name_replace__.nuspec");
@@ -521,11 +521,11 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var directories = _directoryCreated.ToList();
                 directories.Should().HaveCount(5, "There should be 5 directories, but there was: " + string.Join(", ", directories));
-                directories.Should().HaveElementAt(0,"c:\\packages\\Bob");
-                directories.Should().HaveElementAt(1,"c:\\packages\\Bob\\tools");
-                directories.Should().HaveElementAt(2,"c:\\packages\\Bob\\tools\\lower");
-                directories.Should().HaveElementAt(3,"c:\\packages\\Bob\\empty");
-                directories.Should().HaveElementAt(4,"c:\\packages\\Bob\\empty\\nested");
+                directories.Should().HaveElementAt(0, "c:\\packages\\Bob");
+                directories.Should().HaveElementAt(1, "c:\\packages\\Bob\\tools");
+                directories.Should().HaveElementAt(2, "c:\\packages\\Bob\\tools\\lower");
+                directories.Should().HaveElementAt(3, "c:\\packages\\Bob\\empty");
+                directories.Should().HaveElementAt(4, "c:\\packages\\Bob\\empty\\nested");
 
                 _files.Should().HaveCount(4, "There should be 4 files, but there was: " + string.Join(", ", _files));
                 _files.Should().HaveElementAt(0, "c:\\packages\\Bob\\__name_replace__.nuspec");
@@ -850,7 +850,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var infos = MockLogger.MessagesFor(LogLevel.Info);
                 infos.Should().ContainSingle();
-                infos.Should().HaveElementAt(0,"Would have listed templates in {0}".FormatWith(ApplicationParameters.TemplatesLocation));
+                infos.Should().HaveElementAt(0, "Would have listed templates in {0}".FormatWith(ApplicationParameters.TemplatesLocation));
             }
 
             [Fact]

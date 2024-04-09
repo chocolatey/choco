@@ -371,7 +371,7 @@ namespace chocolatey.infrastructure.filesystem
         {
             MoveFile(filePath, newFilePath, isSilent: false);
         }
-        
+
         public void MoveFile(string filePath, string newFilePath, bool isSilent)
         {
             EnsureDirectoryExists(GetDirectoryName(newFilePath), ignoreError: true);
@@ -770,7 +770,7 @@ namespace chocolatey.infrastructure.filesystem
                 var destinationFile = file.Replace(sourceDirectoryPath, destinationDirectoryPath);
                 EnsureDirectoryExists(GetDirectoryName(destinationFile), ignoreError: true);
                 //this.Log().Debug(ChocolateyLoggers.Verbose, "Copying '{0}' {1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
-                
+
                 try
                 {
                     CopyFile(file, destinationFile, overwriteExisting, isSilent);
@@ -1156,7 +1156,7 @@ namespace chocolatey.infrastructure.filesystem
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public string get_file_name(string filePath)
-            => GetFileName( filePath);
+            => GetFileName(filePath);
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public string get_file_name_without_extension(string filePath)

@@ -45,9 +45,9 @@ namespace chocolatey.infrastructure.app.configuration
             get { return _environmentInitializer.Value; }
         }
 
-        #pragma warning disable IDE0060 // Unused method parameter
+#pragma warning disable IDE0060 // Unused method parameter
         public static void ResetEnvironmentVariables(ChocolateyConfiguration config)
-        #pragma warning restore IDE0060 // Unused method parameter
+#pragma warning restore IDE0060 // Unused method parameter
         {
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType, null);
@@ -311,7 +311,7 @@ namespace chocolatey.infrastructure.app.configuration
             // add back in process items
             updatedPath += GetProcessOnlyItems(updatedPath, originalPath);
             updatedPathExt += GetProcessOnlyItems(updatedPathExt, originalPathExt);
-            updatedPsModulePath = "{0};{1}".FormatWith(GetProcessOnlyItems(updatedPsModulePath, originalPsModulePath),updatedPsModulePath);
+            updatedPsModulePath = "{0};{1}".FormatWith(GetProcessOnlyItems(updatedPsModulePath, originalPsModulePath), updatedPsModulePath);
 
             if (!updatedPsModulePath.ContainsSafe(ApplicationParameters.PowerShellModulePathProcessProgramFiles))
             {

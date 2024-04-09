@@ -73,12 +73,12 @@ namespace chocolatey.infrastructure.adapters
 
         public Type GetType(string name, bool throwOnError)
         {
-            return UnderlyingType.GetType(name,throwOnError);
+            return UnderlyingType.GetType(name, throwOnError);
         }
 
         public Type GetType(string name, bool throwOnError, bool ignoreCase)
         {
-            return UnderlyingType.GetType(name,throwOnError, ignoreCase);
+            return UnderlyingType.GetType(name, throwOnError, ignoreCase);
         }
 
         public Type[] GetTypes()
@@ -98,7 +98,7 @@ namespace chocolatey.infrastructure.adapters
 
         public static IAssembly LoadFile(string path)
         {
-           return new Assembly(System.Reflection.Assembly.LoadFile(path));
+            return new Assembly(System.Reflection.Assembly.LoadFile(path));
         }
 
         public static IAssembly GetAssembly(Type type)

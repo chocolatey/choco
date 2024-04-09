@@ -92,12 +92,12 @@ namespace chocolatey.infrastructure.commands
                         var arg = configToArgNames[propName];
                         var propType = prop.PropertyType;
                         var propValue = prop.GetValue(obj, null).ToStringSafe().QuoteIfContainsSpaces();
-                        if (propType == typeof (bool) && propValue.IsEqualTo(bool.FalseString))
+                        if (propType == typeof(bool) && propValue.IsEqualTo(bool.FalseString))
                         {
                             continue;
                         }
 
-                        if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof (bool))
+                        if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof(bool))
                         {
                             if (string.IsNullOrWhiteSpace(propValue))
                             {

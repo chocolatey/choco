@@ -37,7 +37,7 @@ namespace chocolatey.infrastructure.services
         {
             Ensure.That(() => eventMessage).NotNull();
 
-            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Sending message '{0}' out if there are subscribers...".FormatWith(typeof (Event).Name));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Sending message '{0}' out if there are subscribers...".FormatWith(typeof(Event).Name));
 
             _subject.OnNext(eventMessage);
         }

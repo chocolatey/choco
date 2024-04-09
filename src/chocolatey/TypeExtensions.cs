@@ -38,7 +38,7 @@ namespace chocolatey
             // if all else fails, check to see if the namespace is at system.
             return type.IsPrimitive
                    || type.IsValueType
-                   || (type == typeof (string))
+                   || (type == typeof(string))
                    || type.Namespace.Equals("System", StringComparison.Ordinal);
         }
 

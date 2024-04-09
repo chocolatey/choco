@@ -198,7 +198,7 @@ namespace chocolatey.infrastructure.app.services
                     else if (_templateBinaryExtensions.Contains(fileExtension))
                     {
                         this.Log().Debug(" Treating template file ('{0}') as binary instead of replacing templated values.".FormatWith(_fileSystem.GetFileName(file)));
-                        _fileSystem.CopyFile(file, packageFileLocation, overwriteExisting:true);
+                        _fileSystem.CopyFile(file, packageFileLocation, overwriteExisting: true);
                     }
                     else if (templateParameterCachePath.IsEqualTo(file))
                     {

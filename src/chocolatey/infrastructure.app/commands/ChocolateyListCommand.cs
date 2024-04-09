@@ -252,7 +252,7 @@ If you find other exit codes that we have not yet documented, please
         {
             // Would have liked to have done this in the Validate method, but can't, since the SourceType
             // hasn't yet been set, since the sources have not yet been parsed.
-            if (config.ListCommand.ExplicitSource && config.SourceType ==  SourceTypes.Normal)
+            if (config.ListCommand.ExplicitSource && config.SourceType == SourceTypes.Normal)
             {
                 throw new ApplicationException("When using the '--source' option with the 'choco list' command, only a named alternative source can be provided.");
             }

@@ -39,7 +39,7 @@ namespace chocolatey
 
             if (memberInfo != null && memberInfo.Length > 0)
             {
-                var attrib = memberInfo[0].GetCustomAttributes(typeof (DescriptionAttribute), false).Cast<DescriptionAttribute>().SingleOrDefault();
+                var attrib = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).Cast<DescriptionAttribute>().SingleOrDefault();
 
                 if (attrib != null)
                 {
@@ -53,13 +53,13 @@ namespace chocolatey
         public static TEnum ParseEnumDescription<TEnum>(this string description)
             where TEnum : struct, Enum
         {
-            Type type = typeof (TEnum);
+            Type type = typeof(TEnum);
             foreach (var fieldInfo in type.GetFields())
             {
-                var attr = fieldInfo.GetCustomAttributes(typeof (DescriptionAttribute), false).Cast<DescriptionAttribute>().SingleOrDefault();
+                var attr = fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).Cast<DescriptionAttribute>().SingleOrDefault();
                 if (attr != null && attr.Description.Equals(description, StringComparison.Ordinal))
                 {
-                    return (TEnum) fieldInfo.GetValue(null);
+                    return (TEnum)fieldInfo.GetValue(null);
                 }
             }
 

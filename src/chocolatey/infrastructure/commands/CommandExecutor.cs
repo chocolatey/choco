@@ -97,7 +97,7 @@ namespace chocolatey.infrastructure.commands
                           stdErrAction,
                           updateProcessPath,
                           allowUseWindow,
-                          waitForExit:true
+                          waitForExit: true
                );
         }
 
@@ -177,14 +177,14 @@ namespace chocolatey.infrastructure.commands
             "chocolatey".Log().Debug(() => "Calling command ['\"{0}\" {1}']".FormatWith(process.EscapeCurlyBraces(), arguments.EscapeCurlyBraces()));
 
             var psi = new ProcessStartInfo(process.UnquoteSafe(), arguments)
-                {
-                    UseShellExecute = false,
-                    WorkingDirectory = workingDirectory,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = !allowUseWindow,
-                    WindowStyle = ProcessWindowStyle.Minimized,
-                };
+            {
+                UseShellExecute = false,
+                WorkingDirectory = workingDirectory,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = !allowUseWindow,
+                WindowStyle = ProcessWindowStyle.Minimized,
+            };
 
             using (var p = _initializeProcess())
             {

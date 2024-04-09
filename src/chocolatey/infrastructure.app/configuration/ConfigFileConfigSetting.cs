@@ -43,7 +43,7 @@ namespace chocolatey.infrastructure.app.configuration
                 return false;
             }
 
-            var item = (ConfigFileConfigSetting) obj;
+            var item = (ConfigFileConfigSetting)obj;
 
             return (Key == item.Key)
                    && (Value == item.Value)

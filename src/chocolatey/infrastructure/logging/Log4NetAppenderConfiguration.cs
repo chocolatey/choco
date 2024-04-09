@@ -210,7 +210,7 @@ namespace chocolatey.infrastructure.logging
         {
             if (excludeLoggerNames == null)
             {
-                excludeLoggerNames = new string[] {};
+                excludeLoggerNames = new string[] { };
             }
 
             if (!_alreadyConfiguredFileAppender)
@@ -218,23 +218,23 @@ namespace chocolatey.infrastructure.logging
                 _alreadyConfiguredFileAppender = true;
 
                 var layout = new PatternLayout
-                    {
-                        ConversionPattern = "%date %property{pid} [%-5level] - %message%newline"
-                    };
+                {
+                    ConversionPattern = "%date %property{pid} [%-5level] - %message%newline"
+                };
                 layout.ActivateOptions();
 
                 var app = new RollingFileAppender
-                    {
-                        Name = "{0}.changes.log.appender".FormatWith(ApplicationParameters.Name),
-                        File = Path.Combine(Path.GetFullPath(outputDirectory), ApplicationParameters.LoggingFile),
-                        Layout = layout,
-                        AppendToFile = true,
-                        RollingStyle = RollingFileAppender.RollingMode.Size,
-                        MaxFileSize = 1024 * 1024 * 10,
-                        MaxSizeRollBackups = 50,
-                        LockingModel = new FileAppender.MinimalLock(),
-                        PreserveLogFileNameExtension = true,
-                    };
+                {
+                    Name = "{0}.changes.log.appender".FormatWith(ApplicationParameters.Name),
+                    File = Path.Combine(Path.GetFullPath(outputDirectory), ApplicationParameters.LoggingFile),
+                    Layout = layout,
+                    AppendToFile = true,
+                    RollingStyle = RollingFileAppender.RollingMode.Size,
+                    MaxFileSize = 1024 * 1024 * 10,
+                    MaxSizeRollBackups = 50,
+                    LockingModel = new FileAppender.MinimalLock(),
+                    PreserveLogFileNameExtension = true,
+                };
                 app.ActivateOptions();
 
                 var infoOnlyAppender = new RollingFileAppender

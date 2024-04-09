@@ -39,7 +39,7 @@ namespace chocolatey.infrastructure.information
 
             if (string.IsNullOrEmpty(version))
             {
-                var attributes= assembly.UnderlyingType.GetCustomAttributesData();
+                var attributes = assembly.UnderlyingType.GetCustomAttributesData();
                 foreach (var attribute in attributes)
                 {
                     if (attribute.ToStringSafe().Contains("AssemblyFileVersion"))

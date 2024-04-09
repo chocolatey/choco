@@ -146,12 +146,12 @@ namespace chocolatey.infrastructure.app.services
                 logWarningInsteadOfError: true);
 
             var appKey = new RegistryApplicationKey
-                {
-                    KeyPath = key.Name,
-                    RegistryView = key.View,
-                    DefaultValue = key.AsXmlSafeString(""),
-                    DisplayName = key.AsXmlSafeString("DisplayName")
-                };
+            {
+                KeyPath = key.Name,
+                RegistryView = key.View,
+                DefaultValue = key.AsXmlSafeString(""),
+                DisplayName = key.AsXmlSafeString("DisplayName")
+            };
 
             if (string.IsNullOrWhiteSpace(appKey.DisplayName))
             {
@@ -236,17 +236,17 @@ namespace chocolatey.infrastructure.app.services
                 {
                     //if (appKey.is_in_programs_and_features() && appKey.InstallerType == InstallerType.Unknown)
                     //{
-                        foreach (var name in key.GetValueNames())
+                    foreach (var name in key.GetValueNames())
+                    {
+                        //var kind = key.GetValueKind(name);
+                        var value = key.AsXmlSafeString(name);
+                        if (name.IsEqualTo("QuietUninstallString") || name.IsEqualTo("UninstallString"))
                         {
-                            //var kind = key.GetValueKind(name);
-                            var value = key.AsXmlSafeString(name);
-                            if (name.IsEqualTo("QuietUninstallString") || name.IsEqualTo("UninstallString"))
-                            {
-                                Console.WriteLine("key - {0}|{1}={2}|Type detected={3}|install location={4}".FormatWith(key.Name, name, value.ToStringSafe(), appKey.InstallerType.ToStringSafe(),appKey.InstallLocation.ToStringSafe()));
-                            }
-
-                            //Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".format_with(key.Name, name, kind, value.to_string()));
+                            Console.WriteLine("key - {0}|{1}={2}|Type detected={3}|install location={4}".FormatWith(key.Name, name, value.ToStringSafe(), appKey.InstallerType.ToStringSafe(), appKey.InstallLocation.ToStringSafe()));
                         }
+
+                        //Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".format_with(key.Name, name, kind, value.to_string()));
+                    }
                     //}
                 }
 

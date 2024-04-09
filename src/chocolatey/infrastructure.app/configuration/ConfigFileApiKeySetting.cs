@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.configuration
                 return false;
             }
 
-            var item = (ConfigFileApiKeySetting) obj;
+            var item = (ConfigFileApiKeySetting)obj;
 
             return (Source == item.Source)
                    && (Key == item.Key);

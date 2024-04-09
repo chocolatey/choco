@@ -58,7 +58,7 @@ namespace chocolatey.infrastructure.licensing
                     {
                         "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, @"Files found in directory '{0}' but not a
  valid license file. License should be named '{1}'.".FormatWith(licenseDirectory, licenseFileName));
-                        "chocolatey".Log().Warn(ChocolateyLoggers.Important,@" Rename license file to '{0}' to allow commercial features.".FormatWith(licenseFileName));
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, @" Rename license file to '{0}' to allow commercial features.".FormatWith(licenseFileName));
                     }
                 }
 

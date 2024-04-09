@@ -46,7 +46,7 @@ namespace chocolatey.infrastructure.app.configuration
                 return false;
             }
 
-            var item = (ConfigFileFeatureSetting) obj;
+            var item = (ConfigFileFeatureSetting)obj;
 
             return (Name == item.Name)
                    && (Enabled == item.Enabled)

@@ -139,9 +139,9 @@ namespace chocolatey.tests.infrastructure.app.commands
                 [NUnit.Framework.TestCase("--localonly")]
                 [NUnit.Framework.TestCase("-li")]
                 [NUnit.Framework.TestCase("-lai")]
-                #pragma warning disable IDE0060 // Unused argument
+#pragma warning disable IDE0060 // Unused argument
                 public void Should_throw_on_unsupported_argument(string argument)
-                #pragma warning restore IDE0060 // Unused argument
+#pragma warning restore IDE0060 // Unused argument
                 {
                     Configuration.RegularOutput = true;
                     var errored = false;

@@ -118,7 +118,7 @@ namespace chocolatey
             unchecked
             {
                 return source.Aggregate(seed, (current, item) =>
-                    (current*modifier) + item.GetHashCode());
+                    (current * modifier) + item.GetHashCode());
             }
         }
 

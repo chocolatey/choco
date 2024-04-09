@@ -27,7 +27,7 @@ namespace chocolatey.infrastructure.registration
     /// </summary>
     public sealed class Bootstrap
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof (Bootstrap));
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(Bootstrap));
 
         /// <summary>
         ///   Initializes this instance.
@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.registration
         /// </param>
 // ReSharper disable InconsistentNaming
         private static void DomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
-// ReSharper restore InconsistentNaming
+        // ReSharper restore InconsistentNaming
         {
             var ex = e.ExceptionObject as Exception;
             var exceptionMessage = string.Empty;

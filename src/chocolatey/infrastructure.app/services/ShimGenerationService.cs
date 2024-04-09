@@ -48,28 +48,28 @@ namespace chocolatey.infrastructure.app.services
         private void SetupShimgenArgsDictionary()
         {
             _shimGenArguments.Add("_file_path_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--path=",
-                    ArgumentValue = PathToken,
-                    QuoteValue = true,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--path=",
+                ArgumentValue = PathToken,
+                QuoteValue = true,
+                Required = true
+            });
 
             _shimGenArguments.Add("_output_directory_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--output=",
-                    ArgumentValue = OutputToken,
-                    QuoteValue = true,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--output=",
+                ArgumentValue = OutputToken,
+                QuoteValue = true,
+                Required = true
+            });
 
             _shimGenArguments.Add("_icon_path_", new ExternalCommandArgument
-                {
-                    ArgumentOption = " --iconpath=",
-                    ArgumentValue = IconPathToken,
-                    QuoteValue = true,
-                    Required = true
-                });
+            {
+                ArgumentOption = " --iconpath=",
+                ArgumentValue = IconPathToken,
+                QuoteValue = true,
+                Required = true
+            });
 
             //_shimGenArguments.Add("_gui_", new ExternalCommandArgument { ArgumentOption = "--gui", Required = false });
         }

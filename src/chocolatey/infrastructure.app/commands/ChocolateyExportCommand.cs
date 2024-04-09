@@ -59,7 +59,7 @@ namespace chocolatey.infrastructure.app.commands
         {
             configuration.Input = string.Join(" ", unparsedArguments);
 
-            if (string.IsNullOrWhiteSpace(configuration.ExportCommand.OutputFilePath) && unparsedArguments.Count >=1)
+            if (string.IsNullOrWhiteSpace(configuration.ExportCommand.OutputFilePath) && unparsedArguments.Count >= 1)
             {
                 configuration.ExportCommand.OutputFilePath = unparsedArguments[0];
             }

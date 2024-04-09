@@ -135,7 +135,7 @@ namespace chocolatey.infrastructure.results
 
         public PackageIdentity Identity
         {
-            get { return new PackageIdentity(Name, NuGetVersion.Parse(Version));  }
+            get { return new PackageIdentity(Name, NuGetVersion.Parse(Version)); }
         }
     }
 }
