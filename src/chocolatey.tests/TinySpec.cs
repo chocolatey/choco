@@ -24,6 +24,7 @@ namespace chocolatey.tests
     using chocolatey.infrastructure.logging;
     using System.IO;
     using chocolatey.infrastructure.app.nuget;
+    using static chocolatey.StringResources;
 
     // ReSharper disable InconsistentNaming
 
@@ -32,12 +33,12 @@ namespace chocolatey.tests
     {
         public static MockLogger MockLogger { get; set; }
 
-        private static readonly string _installLocationVariable = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName);
+        private static readonly string _installLocationVariable = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall);
 
         [OneTimeSetUp]
         public virtual void BeforeEverything()
         {
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, string.Empty);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall, string.Empty);
             MockLogger = new MockLogger();
             Log.InitializeWith(MockLogger);
             // do not log trace messages
@@ -48,7 +49,7 @@ namespace chocolatey.tests
         [OneTimeTearDown]
         public void AfterEverything()
         {
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, _installLocationVariable);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall, _installLocationVariable);
         }
     }
 
