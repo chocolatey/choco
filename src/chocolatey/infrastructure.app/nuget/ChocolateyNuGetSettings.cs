@@ -3,20 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using chocolatey.infrastructure.app.configuration;
+using NuGet.Configuration;
+using NuGet.Packaging.Signing;
 
 namespace chocolatey.infrastructure.app.nuget
 {
-    using configuration;
-    using NuGet.Configuration;
-    using NuGet.Packaging.Signing;
-
     public class ChocolateyNuGetSettings : ISettings
     {
         //private ClientPolicyContext
         private const string ConfigSectionName = "config";
         //private SettingSection _configSettingSection;
 
+#pragma warning disable IDE0060 // unused method parameter
         public ChocolateyNuGetSettings(ChocolateyConfiguration config)
+#pragma warning restore IDE0060 // unused method parameter
         {
             //new SettingSection
             //_clientCertItem =
@@ -29,9 +30,15 @@ namespace chocolatey.infrastructure.app.nuget
             this.Log().Warn("NuGet tried to add an item to section {0}".FormatWith(sectionName));
         }
 
-        public IList<string> GetConfigFilePaths() => Enumerable.Empty<string>().ToList();
+        public IList<string> GetConfigFilePaths()
+        {
+            return Enumerable.Empty<string>().ToList();
+        }
 
-        public IList<string> GetConfigRoots() => Enumerable.Empty<string>().ToList();
+        public IList<string> GetConfigRoots()
+        {
+            return Enumerable.Empty<string>().ToList();
+        }
 
         public SettingSection GetSection(string sectionName)
         {
@@ -40,7 +47,7 @@ namespace chocolatey.infrastructure.app.nuget
                 case ConfigSectionName:
                     //TODO fix
                     return null;
-                    //break;
+                //break;
                 default:
                     return null;
             }

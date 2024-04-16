@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.platforms;
+using NUnit.Framework;
+using FluentAssertions;
+using FluentAssertions.Extensions;
+
 namespace chocolatey.tests.integration.infrastructure.filesystem
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.platforms;
-    using NUnit.Framework;
-    using FluentAssertions;
-    using FluentAssertions.Extensions;
-
     public class DotNetFileSystemSpecs
     {
         public abstract class DotNetFileSystemSpecsBase : TinySpec
@@ -125,7 +125,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Fact]
             public void GetFiles_should_return_files_that_meet_the_pattern()
             {
-                string filePath = FileSystem.CombinePaths(ContextPath, "chocolateyInstall.ps1");
+                var filePath = FileSystem.CombinePaths(ContextPath, "chocolateyInstall.ps1");
 
                 FileSystem.WriteFile(filePath, "yo");
                 var actual = FileSystem.GetFiles(ContextPath, "chocolateyInstall.ps1", SearchOption.AllDirectories).ToList();
@@ -139,7 +139,7 @@ namespace chocolatey.tests.integration.infrastructure.filesystem
             [Platform(Exclude = "Mono")]
             public void GetFiles_should_return_files_that_meet_the_pattern_regardless_of_case()
             {
-                string filePath = FileSystem.CombinePaths(ContextPath, "chocolateyInstall.ps1");
+                var filePath = FileSystem.CombinePaths(ContextPath, "chocolateyInstall.ps1");
 
                 FileSystem.WriteFile(filePath, "yo");
                 var actual = FileSystem.GetFiles(ContextPath, "chocolateyinstall.ps1", SearchOption.AllDirectories).ToList();

@@ -14,27 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.domain.installers;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.results;
+using Moq;
+using NuGet.Packaging;
+using NuGet.Versioning;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.tests.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.domain.installers;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.results;
-    using Moq;
-    using NuGet.Packaging;
-    using NuGet.Versioning;
-    using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
-
     public class AutomaticUninstallerServiceSpecs
     {
         public abstract class AutomaticUninstallerServiceSpecsBase : TinySpec
@@ -61,8 +61,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 chocolatey.infrastructure.commands.CommandExecutor.InitializeWith(new Lazy<IFileSystem>(() => FileSystem.Object), () => Process.Object);
 
-                Service = new AutomaticUninstallerService(PackageInfoService.Object, FileSystem.Object, RegistryService.Object, CommandExecutor.Object);
-                Service.WaitForCleanup = false;
+                Service = new AutomaticUninstallerService(PackageInfoService.Object, FileSystem.Object, RegistryService.Object, CommandExecutor.Object)
+                {
+                    WaitForCleanup = false
+                };
                 Config.Features.AutoUninstaller = true;
                 Config.PromptForConfirmation = false;
                 Config.PackageNames = "regular";
@@ -123,7 +125,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -131,7 +133,7 @@ namespace chocolatey.tests.infrastructure.app.services
         public class When_an_autoUninstaller_skip_file_exists : AutomaticUninstallerServiceSpecsBase
         {
             private string _skipFileName = ".skipAutoUninstall";
-            IEnumerable<string> _fileList = new List<string>() { "c:\\.skipAutoUninstall" };
+            private IEnumerable<string> _fileList = new List<string>() { "c:\\.skipAutoUninstall" };
             public override void Context()
             {
                 base.Context();
@@ -153,7 +155,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -181,7 +183,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -209,7 +211,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -237,7 +239,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -267,7 +269,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -348,7 +350,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -377,7 +379,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -409,7 +411,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -440,7 +442,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
@@ -658,14 +660,14 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_not_call_command_executor()
             {
                 CommandExecutor.Verify(
-                    c => c.Execute(It.IsAny<String>(), It.IsAny<String>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
+                    c => c.Execute(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<Action<object, DataReceivedEventArgs>>(), It.IsAny<bool>()),
                     Times.Never);
             }
         }
 
         public class When_AutomaticUninstallerService_is_passed_uninstall_arguments_from_command_line : AutomaticUninstallerServiceSpecsBase
         {
-            IInstaller _installerType = new InnoSetupInstaller();
+            private IInstaller _installerType = new InnoSetupInstaller();
 
             public override void Context()
             {
@@ -719,7 +721,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
         public class When_AutomaticUninstallerService_is_passed_overriding_uninstall_arguments_from_command_line : AutomaticUninstallerServiceSpecsBase
         {
-            IInstaller _installerType = new InnoSetupInstaller();
+            private IInstaller _installerType = new InnoSetupInstaller();
 
             public override void Context()
             {

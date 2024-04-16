@@ -14,43 +14,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Threading;
+using Chocolatey.NuGet.Frameworks;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.utility;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.guards;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.tolerance;
+using DateTime = chocolatey.infrastructure.adapters.DateTime;
+using Environment = System.Environment;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using NuGet.Common;
+using NuGet.Configuration;
+using NuGet.PackageManagement;
+using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using NuGet.Protocol;
+using NuGet.ProjectManagement;
+using NuGet.Protocol.Core.Types;
+using NuGet.Resolver;
+using NuGet.Versioning;
+using chocolatey.infrastructure.services;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Net;
-    using System.Text.RegularExpressions;
-    using System.Threading;
-    using Chocolatey.NuGet.Frameworks;
-    using adapters;
-    using chocolatey.infrastructure.app.utility;
-    using commandline;
-    using configuration;
-    using domain;
-    using guards;
-    using logging;
-    using nuget;
-    using platforms;
-    using results;
-    using tolerance;
-    using DateTime = adapters.DateTime;
-    using Environment = System.Environment;
-    using IFileSystem = filesystem.IFileSystem;
-    using NuGet.Common;
-    using NuGet.Configuration;
-    using NuGet.PackageManagement;
-    using NuGet.Packaging;
-    using NuGet.Packaging.Core;
-    using NuGet.Protocol;
-    using NuGet.ProjectManagement;
-    using NuGet.Protocol.Core.Types;
-    using NuGet.Resolver;
-    using NuGet.Versioning;
-    using chocolatey.infrastructure.services;
-
     //todo: #2575 - this monolith is too large. Refactor once test coverage is up.
 
     public class NugetService : INugetService
@@ -121,7 +121,7 @@ install them.
                 }
             }
 
-            int? pageValue = config.ListCommand.Page;
+            var pageValue = config.ListCommand.Page;
             try
             {
                 var sourceCacheContext = new ChocolateySourceCacheContext(config);
@@ -144,7 +144,7 @@ install them.
 
         public virtual IEnumerable<PackageResult> List(ChocolateyConfiguration config)
         {
-            int count = 0;
+            var count = 0;
 
             var sources = config.Sources;
             var prerelease = config.Prerelease;
@@ -178,8 +178,16 @@ it is possible that incomplete package lists are returned from a command
 that uses these options.");
             }
 
-            if (config.RegularOutput) this.Log().Debug(() => "Running list with the following filter = '{0}'".FormatWith(config.Input));
-            if (config.RegularOutput) this.Log().Debug(ChocolateyLoggers.Verbose, () => "--- Start of List ---");
+            if (config.RegularOutput)
+            {
+                this.Log().Debug(() => "Running list with the following filter = '{0}'".FormatWith(config.Input));
+            }
+
+            if (config.RegularOutput)
+            {
+                this.Log().Debug(ChocolateyLoggers.Verbose, () => "--- Start of List ---");
+            }
+
             foreach (var pkg in NugetList.GetPackages(config, _nugetLogger, _fileSystem))
             {
                 var package = pkg; // for lamda access
@@ -223,7 +231,9 @@ that uses these options.");
                             ))
                         );
 
-                        if (config.Verbose && !config.ListCommand.IdOnly) this.Log().Info(() =>
+                        if (config.Verbose && !config.ListCommand.IdOnly)
+                        {
+                            this.Log().Info(() =>
                             @" Title: {0} | Published: {1}{2}{3}
  Number of Downloads: {4} | Downloads for this version: {5}
  Package url{6}
@@ -245,7 +255,7 @@ that uses these options.");
                                         package.PackageTestResultStatus,
                                         package.PackageValidationResultDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
                                     ),
-                                (package.DownloadCount == null || package.DownloadCount <= 0)  ? "n/a" : package.DownloadCount.ToStringSafe(),
+                                (package.DownloadCount == null || package.DownloadCount <= 0) ? "n/a" : package.DownloadCount.ToStringSafe(),
                                 (package.VersionDownloadCount == null || package.VersionDownloadCount <= 0) ? "n/a" : package.VersionDownloadCount.ToStringSafe(),
                                 package.PackageDetailsUrl == null || string.IsNullOrWhiteSpace(package.PackageDetailsUrl.AbsoluteUri) ? string.Empty : " " + package.PackageDetailsUrl.AbsoluteUri,
                                 !string.IsNullOrWhiteSpace(package.PackageSourceUrl.ToStringSafe())
@@ -267,8 +277,7 @@ that uses these options.");
                                 package.Description.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  "),
                                 !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty
                             ));
-
-
+                        }
                     }
                     else
                     {
@@ -291,7 +300,11 @@ that uses these options.");
                 }
             }
 
-            if (config.RegularOutput) this.Log().Debug(ChocolateyLoggers.Verbose, () => "--- End of List ---");
+            if (config.RegularOutput)
+            {
+                this.Log().Debug(ChocolateyLoggers.Verbose, () => "--- End of List ---");
+            }
+
             if (config.RegularOutput && !config.QuietOutput)
             {
                 this.Log().Warn(() => @"{0} packages {1}.".FormatWith(count, config.ListCommand.LocalOnly ? "installed" : "found"));
@@ -336,7 +349,7 @@ that uses these options.");
                     return filesFound.FirstOrDefault();
                 };
 
-            string filePath = !string.IsNullOrWhiteSpace(config.Input) ? config.Input : getLocalFiles.Invoke(_fileSystem);
+            var filePath = !string.IsNullOrWhiteSpace(config.Input) ? config.Input : getLocalFiles.Invoke(_fileSystem);
             Ensure.That(() => filePath).Meets((file) => _fileSystem.GetFileExtension(file).IsEqualTo(extension) && _fileSystem.FileExists(file),
                                               (name, value) => { throw new ArgumentException("File specified is either not found or not a {0} file. '{1}'".FormatWith(extension, value)); });
 
@@ -349,7 +362,10 @@ that uses these options.");
             ValidateNuspec(nuspecFilePath, config);
 
             var nuspecDirectory = _fileSystem.GetFullPath(_fileSystem.GetDirectoryName(nuspecFilePath));
-            if (string.IsNullOrWhiteSpace(nuspecDirectory)) nuspecDirectory = _fileSystem.GetCurrentDirectory();
+            if (string.IsNullOrWhiteSpace(nuspecDirectory))
+            {
+                nuspecDirectory = _fileSystem.GetCurrentDirectory();
+            }
 
             // Use case-insensitive properties like "nuget pack".
             var properties = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
@@ -377,18 +393,18 @@ that uses these options.");
             var propertyProvider = new DictionaryPropertyProvider(properties);
 
             //Allows empty directories to be distributed in templates via .template packages, issue #1003
-            bool includeEmptyDirectories = true;
+            var includeEmptyDirectories = true;
             //No need to be deterministic, it's ok to include timestamps
-            bool deterministic = false;
+            var deterministic = false;
             var builder = new PackageBuilder(nuspecFilePath, nuspecDirectory, propertyProvider.GetPropertyValue, includeEmptyDirectories, deterministic, _nugetLogger);
             if (!string.IsNullOrWhiteSpace(config.Version))
             {
                 builder.Version = new NuGetVersion(config.Version);
             }
 
-            string outputFile = builder.Id + "." + builder.Version.ToNormalizedStringChecked() + NuGetConstants.PackageExtension;
-            string outputFolder = config.OutputDirectory ?? _fileSystem.GetCurrentDirectory();
-            string outputPath = _fileSystem.CombinePaths(outputFolder, outputFile);
+            var outputFile = builder.Id + "." + builder.Version.ToNormalizedStringChecked() + NuGetConstants.PackageExtension;
+            var outputFolder = config.OutputDirectory ?? _fileSystem.GetCurrentDirectory();
+            var outputPath = _fileSystem.CombinePaths(outputFolder, outputFile);
 
             config.Sources = outputFolder;
 
@@ -412,15 +428,18 @@ that uses these options.");
 
         public void PushDryRun(ChocolateyConfiguration config)
         {
-            string nupkgFilePath = GetPackageFileOrThrow(config, NuGetConstants.PackageExtension);
+            var nupkgFilePath = GetPackageFileOrThrow(config, NuGetConstants.PackageExtension);
             this.Log().Info(() => "Would have attempted to push '{0}' to source '{1}'.".FormatWith(_fileSystem.GetFileName(nupkgFilePath), config.Sources));
         }
 
         public virtual void Push(ChocolateyConfiguration config)
         {
-            string nupkgFilePath = GetPackageFileOrThrow(config, NuGetConstants.PackageExtension);
-            string nupkgFileName = _fileSystem.GetFileName(nupkgFilePath);
-            if (config.RegularOutput) this.Log().Info(() => "Attempting to push {0} to {1}".FormatWith(nupkgFileName, config.Sources));
+            var nupkgFilePath = GetPackageFileOrThrow(config, NuGetConstants.PackageExtension);
+            var nupkgFileName = _fileSystem.GetFileName(nupkgFilePath);
+            if (config.RegularOutput)
+            {
+                this.Log().Info(() => "Attempting to push {0} to {1}".FormatWith(nupkgFileName, config.Sources));
+            }
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
             NugetPush.PushPackage(config, _fileSystem.GetFullPath(nupkgFilePath), _nugetLogger, nupkgFileName, _fileSystem, sourceCacheContext);
@@ -485,7 +504,10 @@ folder.");
             //todo: #23 handle all
 
             NuGetVersion version = !string.IsNullOrWhiteSpace(config.Version) ? NuGetVersion.Parse(config.Version) : null;
-            if (config.Force) config.AllowDowngrade = true;
+            if (config.Force)
+            {
+                config.AllowDowngrade = true;
+            }
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
             var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
@@ -539,7 +561,7 @@ folder.");
 
             config.CreateBackup();
 
-            foreach (string packageName in packageNames.OrEmpty())
+            foreach (var packageName in packageNames.OrEmpty())
             {
                 // We need to ensure we are using a clean configuration file
                 // before we start reading it.
@@ -555,13 +577,13 @@ folder.");
 
                 if (Platform.GetPlatform() != PlatformType.Windows && !packageName.EndsWith(".template"))
                 {
-                    string logMessage = "{0} is not a supported package on non-Windows systems.{1}Only template packages are currently supported.".FormatWith(packageName, Environment.NewLine);
+                    var logMessage = "{0} is not a supported package on non-Windows systems.{1}Only template packages are currently supported.".FormatWith(packageName, Environment.NewLine);
                     this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                 }
 
                 if (installedPackage != null && (version == null || version == installedPackage.PackageMetadata.Version) && !config.Force)
                 {
-                    string logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
+                    var logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
                     var nullResult = packageResultsToReturn.GetOrAdd(packageName, installedPackage);
                     nullResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                     nullResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
@@ -582,7 +604,7 @@ folder.");
 
                 if (installedPackage != null && version != null && version < installedPackage.PackageMetadata.Version && !config.AllowDowngrade)
                 {
-                    string logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to install older versions.".FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
+                    var logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to install older versions.".FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
                     var nullResult = packageResultsToReturn.GetOrAdd(packageName, installedPackage);
                     nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
@@ -603,7 +625,7 @@ folder.");
  NOTE: When you specify explicit sources, it overrides default sources.
 If the package version is a prerelease and you didn't specify `--pre`,
  the package may not be found.{2}{3}".FormatWith(packageName, config.Sources, string.IsNullOrWhiteSpace(config.Version)
-                            ? String.Empty
+                            ? string.Empty
                             : @"
 Version was specified as '{0}'. It is possible that version
  does not exist for '{1}' at the source specified.".FormatWith(config.Version, packageName),
@@ -708,7 +730,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             {
                                 var forcedResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Identity.Id, packageToUninstall);
                                 forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Removing old version"));
-                                string logMessage = "{0}:{1} {2}".FormatWith("Unable to remove existing package", Environment.NewLine, ex.Message);
+                                var logMessage = "{0}:{1} {2}".FormatWith("Unable to remove existing package", Environment.NewLine, ex.Message);
                                 this.Log().Warn(logMessage);
                                 forcedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                             }
@@ -763,7 +785,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             .GetAwaiter().GetResult();
                     }
 
-                    bool shouldAddForcedResultMessage = false;
+                    var shouldAddForcedResultMessage = false;
 
                     var packageToUninstall = packagesToUninstall.FirstOrDefault(p => p.PackageMetadata.Id.Equals(packageDependencyInfo.Id, StringComparison.OrdinalIgnoreCase));
                     if (packageToUninstall != null)
@@ -784,11 +806,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         {
                             var forcedResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
                             forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
-                            string logMessage = "{0}:{1} {2}".FormatWith("Unable to remove existing package prior to forced reinstall", Environment.NewLine, ex.Message);
+                            var logMessage = "{0}:{1} {2}".FormatWith("Unable to remove existing package prior to forced reinstall", Environment.NewLine, ex.Message);
                             this.Log().Warn(logMessage);
                             forcedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                             forcedResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                            if (continueAction != null) continueAction.Invoke(forcedResult, config);
+                            if (continueAction != null)
+                            {
+                                continueAction.Invoke(forcedResult, config);
+                            }
 
                             continue;
                         }
@@ -839,7 +864,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         ));
 
                         var packageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath));
-                        if (shouldAddForcedResultMessage) packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
+                        if (shouldAddForcedResultMessage)
+                        {
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
+                        }
+
                         packageResult.InstallLocation = installedPath;
                         packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
@@ -855,8 +884,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             packageResult.Messages.Add(new ResultMessage(ResultType.Warn, message));
                         }
 
-                        if (continueAction != null) continueAction.Invoke(packageResult, config);
-
+                        if (continueAction != null)
+                        {
+                            continueAction.Invoke(packageResult, config);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -865,15 +896,25 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         if (webException != null)
                         {
                             var response = webException.Response as HttpWebResponse;
-                            if (response != null && !string.IsNullOrWhiteSpace(response.StatusDescription)) message += " {0}".FormatWith(response.StatusDescription);
+                            if (response != null && !string.IsNullOrWhiteSpace(response.StatusDescription))
+                            {
+                                message += " {0}".FormatWith(response.StatusDescription);
+                            }
                         }
 
                         var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".FormatWith(packageDependencyInfo.Id, Environment.NewLine, message);
                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
                         var errorResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, new PackageResult(packageDependencyInfo.Id, version.ToFullStringChecked(), null));
                         errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                        if (errorResult.ExitCode == 0) errorResult.ExitCode = 1;
-                        if (continueAction != null) continueAction.Invoke(errorResult, config);
+                        if (errorResult.ExitCode == 0)
+                        {
+                            errorResult.ExitCode = 1;
+                        }
+
+                        if (continueAction != null)
+                        {
+                            continueAction.Invoke(errorResult, config);
+                        }
                     }
                 }
             }
@@ -934,8 +975,15 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 rollbackDirectory = _fileSystem.GetFullPath(rollbackDirectory);
             }
 
-            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.DirectoryExists(rollbackDirectory)) return;
-            if (!rollbackDirectory.StartsWith(ApplicationParameters.PackageBackupLocation) || rollbackDirectory.IsEqualTo(ApplicationParameters.PackageBackupLocation)) return;
+            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.DirectoryExists(rollbackDirectory))
+            {
+                return;
+            }
+
+            if (!rollbackDirectory.StartsWith(ApplicationParameters.PackageBackupLocation) || rollbackDirectory.IsEqualTo(ApplicationParameters.PackageBackupLocation))
+            {
+                return;
+            }
 
             FaultTolerance.TryCatchWithLoggingException(
                 () => _fileSystem.DeleteDirectoryChecked(rollbackDirectory, recursive: true),
@@ -961,7 +1009,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             NuGetVersion version = !string.IsNullOrWhiteSpace(config.Version) ? NuGetVersion.Parse(config.Version) : null;
 
-            if (config.Force) config.AllowDowngrade = true;
+            if (config.Force)
+            {
+                config.AllowDowngrade = true;
+            }
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
             var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
@@ -976,7 +1027,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             config.CreateBackup();
 
-            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
+            foreach (var packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
             {
                 // We need to ensure we are using a clean configuration file
                 // before we start reading it.
@@ -1000,28 +1051,37 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 {
                     if (config.UpgradeCommand.FailOnNotInstalled)
                     {
-                        string failLogMessage = "{0} is not installed. Cannot upgrade a non-existent package.".FormatWith(packageName);
+                        var failLogMessage = "{0} is not installed. Cannot upgrade a non-existent package.".FormatWith(packageName);
                         var result = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                         result.Messages.Add(new ResultMessage(ResultType.Error, failLogMessage));
-                        if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, failLogMessage);
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Error(ChocolateyLoggers.Important, failLogMessage);
+                        }
 
                         continue;
                     }
 
                     if (config.Features.SkipPackageUpgradesWhenNotInstalled)
                     {
-                        string warnLogMessage = "{0} is not installed and skip non-installed option selected. Skipping...".FormatWith(packageName);
+                        var warnLogMessage = "{0} is not installed and skip non-installed option selected. Skipping...".FormatWith(packageName);
                         var result = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                         result.Messages.Add(new ResultMessage(ResultType.Warn, warnLogMessage));
-                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, warnLogMessage);
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Warn(ChocolateyLoggers.Important, warnLogMessage);
+                        }
 
                         continue;
                     }
 
-                    string logMessage = @"{0} is not installed. Installing...".FormatWith(packageName);
+                    var logMessage = @"{0} is not installed. Installing...".FormatWith(packageName);
                     localPackageListValid = false;
 
-                    if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                    if (config.RegularOutput)
+                    {
+                        this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                    }
 
                     var packageNames = config.PackageNames;
                     config.PackageNames = packageName;
@@ -1043,7 +1103,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 }
 
                 var pkgInfo = _packageInfoService.Get(installedPackage.PackageMetadata);
-                bool isPinned = pkgInfo != null && pkgInfo.IsPinned;
+                var isPinned = pkgInfo != null && pkgInfo.IsPinned;
 
                 if (isPinned && config.OutdatedCommand.IgnorePinned)
                 {
@@ -1056,7 +1116,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (version != null && version < installedPackage.PackageMetadata.Version && !config.AllowDowngrade)
                 {
-                    string logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to upgrade to older versions.".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, Environment.NewLine);
+                    var logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to upgrade to older versions.".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, Environment.NewLine);
                     var nullResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
                     nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
@@ -1076,15 +1136,21 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (availablePackage == null)
                 {
-                    if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated) continue;
+                    if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated)
+                    {
+                        continue;
+                    }
 
-                    string logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"; Source(s): \"{3}\"".FormatWith(packageName, Environment.NewLine, config.Version, config.Sources);
+                    var logMessage = "{0} was not found with the source(s) listed.{1} If you specified a particular version and are receiving this message, it is possible that the package name exists but the version does not.{1} Version: \"{2}\"; Source(s): \"{3}\"".FormatWith(packageName, Environment.NewLine, config.Version, config.Sources);
                     var unfoundResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(packageName, version.ToFullStringChecked(), null));
 
                     if (config.UpgradeCommand.FailOnUnfound)
                     {
                         unfoundResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                        if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, "{0}{1}".FormatWith(Environment.NewLine, logMessage));
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Error(ChocolateyLoggers.Important, "{0}{1}".FormatWith(Environment.NewLine, logMessage));
+                        }
                     }
                     else
                     {
@@ -1107,7 +1173,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var packageResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(availablePackage, pathResolver.GetInstallPath(availablePackage.Identity)));
                 if (installedPackage.PackageMetadata.Version > availablePackage.Identity.Version && (!config.AllowDowngrade || (config.AllowDowngrade && version == null)))
                 {
-                    string logMessage = "{0} v{1} is newer than the most recent.".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version);
+                    var logMessage = "{0} v{1} is newer than the most recent.".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version);
                     packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
 
                     if (!config.UpgradeCommand.NotifyOnlyAvailableUpgrades)
@@ -1127,7 +1193,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (installedPackage.PackageMetadata.Version == availablePackage.Identity.Version)
                 {
-                    string logMessage = "{0} v{1} is the latest version available based on your source(s).".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version);
+                    var logMessage = "{0} v{1} is the latest version available based on your source(s).".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version);
 
                     if (!config.Force)
                     {
@@ -1152,14 +1218,17 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
 
                     packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
-                    if (config.RegularOutput) this.Log().Info(logMessage);
+                    if (config.RegularOutput)
+                    {
+                        this.Log().Info(logMessage);
+                    }
                 }
 
                 if ((availablePackage.Identity.Version > installedPackage.PackageMetadata.Version) || config.Force || (availablePackage.Identity.Version < installedPackage.PackageMetadata.Version && config.AllowDowngrade))
                 {
                     if (availablePackage.Identity.Version > installedPackage.PackageMetadata.Version)
                     {
-                        string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version);
+                        var logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version);
                         packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
                         if (config.RegularOutput)
@@ -1174,10 +1243,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                     if (isPinned)
                     {
-                        string logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
+                        var logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
                         packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                         packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        }
 
                         continue;
                     }
@@ -1304,7 +1376,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     {
                                         var forcedResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Identity.Id, packageToUninstall);
                                         forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Removing old version"));
-                                        string logMessage = "{0}:{1} {2}".FormatWith("Unable to remove existing package", Environment.NewLine, ex.Message);
+                                        var logMessage = "{0}:{1} {2}".FormatWith("Unable to remove existing package", Environment.NewLine, ex.Message);
                                         this.Log().Warn(logMessage);
                                         forcedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                                     }
@@ -1466,11 +1538,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     {
                                         var forcedResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
                                         forcedResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
-                                        string logMessage = "{0}:{1} {2}".FormatWith("Unable to remove existing package prior to upgrade", Environment.NewLine, ex.Message);
+                                        var logMessage = "{0}:{1} {2}".FormatWith("Unable to remove existing package prior to upgrade", Environment.NewLine, ex.Message);
                                         this.Log().Warn(logMessage);
                                         //forcedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
                                         forcedResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                                        if (continueAction != null) continueAction.Invoke(forcedResult, config);
+                                        if (continueAction != null)
+                                        {
+                                            continueAction.Invoke(forcedResult, config);
+                                        }
 
                                         continue;
                                     }
@@ -1539,7 +1614,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     packageResult.Messages.Add(new ResultMessage(ResultType.Warn, message));
                                 }
 
-                                if (continueAction != null) continueAction.Invoke(upgradePackageResult, config);
+                                if (continueAction != null)
+                                {
+                                    continueAction.Invoke(upgradePackageResult, config);
+                                }
 
                                 if (packageToUninstall != null)
                                 {
@@ -1559,15 +1637,25 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 if (webException != null)
                                 {
                                     var response = webException.Response as HttpWebResponse;
-                                    if (response != null && !string.IsNullOrWhiteSpace(response.StatusDescription)) message += " {0}".FormatWith(response.StatusDescription);
+                                    if (response != null && !string.IsNullOrWhiteSpace(response.StatusDescription))
+                                    {
+                                        message += " {0}".FormatWith(response.StatusDescription);
+                                    }
                                 }
 
                                 var logMessage = "{0} not upgraded. An error occurred during installation:{1} {2}".FormatWith(packageName, Environment.NewLine, message);
                                 this.Log().Error(ChocolateyLoggers.Important, logMessage);
                                 var errorResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, new PackageResult(packageDependencyInfo.Id, version.ToFullStringChecked(), null));
                                 errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                                if (errorResult.ExitCode == 0) errorResult.ExitCode = 1;
-                                if (continueAction != null) continueAction.Invoke(errorResult, config);
+                                if (errorResult.ExitCode == 0)
+                                {
+                                    errorResult.ExitCode = 1;
+                                }
+
+                                if (continueAction != null)
+                                {
+                                    continueAction.Invoke(errorResult, config);
+                                }
                             }
                         }
                     }
@@ -1605,13 +1693,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var installedPackage = allPackages.FirstOrDefault(p => string.Equals(p.Name, packageName, StringComparison.OrdinalIgnoreCase));
 
                 var pkgInfo = _packageInfoService.Get(installedPackage.PackageMetadata);
-                bool isPinned = pkgInfo.IsPinned;
+                var isPinned = pkgInfo.IsPinned;
 
                 // if the package is pinned and we are skipping pinned,
                 // move on quickly
                 if (isPinned && config.OutdatedCommand.IgnorePinned)
                 {
-                    string pinnedLogMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
+                    var pinnedLogMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
                     var pinnedPackageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
                     pinnedPackageResult.Messages.Add(new ResultMessage(ResultType.Debug, pinnedLogMessage));
                     pinnedPackageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, pinnedLogMessage));
@@ -1629,9 +1717,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (latestPackage == null)
                 {
-                    if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated) continue;
+                    if (config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated)
+                    {
+                        continue;
+                    }
 
-                    string unfoundLogMessage = "{0} was not found with the source(s) listed.{1} Source(s): \"{2}\"".FormatWith(packageName, Environment.NewLine, config.Sources);
+                    var unfoundLogMessage = "{0} was not found with the source(s) listed.{1} Source(s): \"{2}\"".FormatWith(packageName, Environment.NewLine, config.Sources);
                     var unfoundResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
                     unfoundResult.Messages.Add(new ResultMessage(ResultType.Warn, unfoundLogMessage));
                     unfoundResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, unfoundLogMessage));
@@ -1640,11 +1731,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     continue;
                 }
 
-                if (latestPackage.Identity.Version <= installedPackage.PackageMetadata.Version) continue;
+                if (latestPackage.Identity.Version <= installedPackage.PackageMetadata.Version)
+                {
+                    continue;
+                }
 
                 var packageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(latestPackage, pathResolver.GetInstallPath(latestPackage.Identity)));
 
-                string logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).{3} Source(s): \"{4}\"".FormatWith(installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version, Environment.NewLine, config.Sources);
+                var logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).{3} Source(s): \"{4}\"".FormatWith(installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version, Environment.NewLine, config.Sources);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
                 this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version, isPinned.ToStringSafe().ToLowerSafe()));
@@ -1666,7 +1760,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         /// <returns>The original unmodified configuration, so it can be reset after upgrade</returns>
         protected virtual ChocolateyConfiguration SetConfigFromRememberedArguments(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
         {
-            if (!config.Features.UseRememberedArgumentsForUpgrades || string.IsNullOrWhiteSpace(packageInfo.Arguments)) return config;
+            if (!config.Features.UseRememberedArgumentsForUpgrades || string.IsNullOrWhiteSpace(packageInfo.Arguments))
+            {
+                return config;
+            }
 
             var packageArgumentsUnencrypted = packageInfo.Arguments.ContainsSafe(" --") && packageInfo.Arguments.ToStringSafe().Length > 4 ? packageInfo.Arguments : NugetEncryptionUtility.DecryptString(packageInfo.Arguments);
 
@@ -1687,7 +1784,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 if (packageArgumentSplit.Length == 2)
                 {
                     optionValue = packageArgumentSplit[1].ToStringSafe().UnquoteSafe();
-                    if (optionValue.StartsWith("'")) optionValue.UnquoteSafe();
+                    if (optionValue.StartsWith("'"))
+                    {
+                        optionValue.UnquoteSafe();
+                    }
                 }
 
                 if (sensitiveArgs)
@@ -1702,10 +1802,25 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             ConfigurationOptions.OptionSet.Parse(packageArguments);
 
             // there may be overrides from the user running upgrade
-            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Username)) config.SourceCommand.Username = originalConfig.SourceCommand.Username;
-            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Password)) config.SourceCommand.Password = originalConfig.SourceCommand.Password;
-            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Certificate)) config.SourceCommand.Certificate = originalConfig.SourceCommand.Certificate;
-            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword)) config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Username))
+            {
+                config.SourceCommand.Username = originalConfig.SourceCommand.Username;
+            }
+
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Password))
+            {
+                config.SourceCommand.Password = originalConfig.SourceCommand.Password;
+            }
+
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Certificate))
+            {
+                config.SourceCommand.Certificate = originalConfig.SourceCommand.Certificate;
+            }
+
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword))
+            {
+                config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
+            }
 
             return originalConfig;
         }
@@ -1889,7 +2004,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         protected virtual void EnsurePackageFilesHaveCompatibleAttributes(ChocolateyConfiguration config, IPackageMetadata installedPackage)
         {
             var installDirectory = GetInstallDirectory(installedPackage);
-            if (!_fileSystem.DirectoryExists(installDirectory)) return;
+            if (!_fileSystem.DirectoryExists(installDirectory))
+            {
+                return;
+            }
 
             _filesService.EnsureCompatibleFileAttributes(installDirectory, config);
         }
@@ -1941,7 +2059,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         public virtual void BackupChangedFiles(string packageInstallPath, ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
         {
-            if (packageInfo == null || packageInfo.Package == null) return;
+            if (packageInfo == null || packageInfo.Package == null)
+            {
+                return;
+            }
 
             var version = packageInfo.Package.Version.ToNormalizedStringChecked();
 
@@ -1968,7 +2089,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         if (!currentFile.Checksum.IsEqualTo(installedFile.Checksum))
                         {
                             // skip nupkgs if they are different
-                            if (_fileSystem.GetFileExtension(currentFile.Path).IsEqualTo(".nupkg")) continue;
+                            if (_fileSystem.GetFileExtension(currentFile.Path).IsEqualTo(".nupkg"))
+                            {
+                                continue;
+                            }
 
                             var backupName = "{0}.{1}".FormatWith(_fileSystem.GetFileName(currentFile.Path), version);
                             FaultTolerance.TryCatchWithLoggingException(
@@ -2010,7 +2134,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             this.Log().Debug(ChocolateyLoggers.Verbose, "Ensuring removal of package cache files.");
             var cacheDirectory = _fileSystem.CombinePaths(config.CacheLocation, installedPackage.Id, installedPackage.Version.ToNormalizedStringChecked());
 
-            if (!_fileSystem.DirectoryExists(cacheDirectory)) return;
+            if (!_fileSystem.DirectoryExists(cacheDirectory))
+            {
+                return;
+            }
 
             FaultTolerance.TryCatchWithLoggingException(
                                        () => _fileSystem.DeleteDirectoryChecked(cacheDirectory, recursive: true),
@@ -2066,7 +2193,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             foreach (var packageResult in results.OrEmpty())
             {
                 var package = packageResult.Value.PackageMetadata;
-                if (package != null) this.Log().Warn("Would have uninstalled {0} v{1}.".FormatWith(package.Id, package.Version.ToFullStringChecked()));
+                if (package != null)
+                {
+                    this.Log().Warn("Would have uninstalled {0} v{1}.".FormatWith(package.Id, package.Version.ToFullStringChecked()));
+                }
             }
         }
 
@@ -2153,7 +2283,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             var packageVersionsToRemove = new List<PackageResult>();
 
-            foreach (string packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
+            foreach (var packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
             {
                 // We need to ensure we are using a clean configuration file
                 // before we start reading it.
@@ -2172,11 +2302,15 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (installedPackageVersions.Count == 0)
                 {
-                    string logMessage = "{0} is not installed. Cannot uninstall a non-existent package.".FormatWith(packageName);
+                    var logMessage = "{0} is not installed. Cannot uninstall a non-existent package.".FormatWith(packageName);
                     var missingResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                     missingResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
-                    if (config.RegularOutput) this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    if (config.RegularOutput)
+                    {
+                        this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                    }
+
                     continue;
                 }
 
@@ -2208,18 +2342,32 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             requireAnswer: true,
                             allowShortAnswer: false);
 
-                        if (string.IsNullOrWhiteSpace(selection)) continue;
-                        if (selection.IsEqualTo(abortChoice)) continue;
+                        if (string.IsNullOrWhiteSpace(selection))
+                        {
+                            continue;
+                        }
+
+                        if (selection.IsEqualTo(abortChoice))
+                        {
+                            continue;
+                        }
+
                         if (selection.IsEqualTo(allVersionsChoice))
                         {
                             packageVersionsToRemove.AddRange(installedPackageVersions.ToList());
-                            if (config.RegularOutput) this.Log().Info(() => "You selected to remove all versions of {0}".FormatWith(packageName));
+                            if (config.RegularOutput)
+                            {
+                                this.Log().Info(() => "You selected to remove all versions of {0}".FormatWith(packageName));
+                            }
                         }
                         else
                         {
                             PackageResult pkg = installedPackageVersions.FirstOrDefault((p) => p.Version.IsEqualTo(selection));
                             packageVersionsToRemove.Add(pkg);
-                            if (config.RegularOutput) this.Log().Info(() => "You selected {0} v{1}".FormatWith(pkg.Name, pkg.Version));
+                            if (config.RegularOutput)
+                            {
+                                this.Log().Info(() => "You selected {0} v{1}".FormatWith(pkg.Name, pkg.Version));
+                            }
                         }
                     }
                 }
@@ -2241,7 +2389,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     var pinnedResult = packageResultsToReturn.GetOrAdd(installedPackage.Name, new PackageResult(installedPackage.Name, null, null));
                     pinnedResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                     pinnedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                    if (config.RegularOutput) this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                    if (config.RegularOutput)
+                    {
+                        this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                    }
+
                     continue;
                 }
 
@@ -2314,7 +2466,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             var logMessage = "{0}{1} v{2}{3}".FormatWith(Environment.NewLine, packageToUninstall.Name, packageToUninstall.Version.ToStringSafe(), config.Force ? " (forced)" : string.Empty);
                             packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
-                            if (continueAction != null) continueAction.Invoke(packageResult, config);
+                            if (continueAction != null)
+                            {
+                                continueAction.Invoke(packageResult, config);
+                            }
 
                             if (packageToUninstall != null)
                             {
@@ -2356,7 +2511,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             var result = packageResultsToReturn.GetOrAdd(packageToUninstall.Name + "." + packageToUninstall.Version.ToStringSafe(), new PackageResult(packageToUninstall.PackageMetadata, pathResolver.GetInstallPath(packageToUninstall.PackageMetadata.Id)));
                             result.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
-                            if (result.ExitCode == 0) result.ExitCode = 1;
+                            if (result.ExitCode == 0)
+                            {
+                                result.ExitCode = 1;
+                            }
 
                             if (config.Features.StopOnFirstPackageFailure)
                             {
@@ -2370,7 +2528,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 {
                     // continue action won't be found b/c we are not actually uninstalling (this is noop)
                     var result = packageResultsToReturn.GetOrAdd(installedPackage.Name + "." + installedPackage.Version.ToStringSafe(), new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
-                    if (continueAction != null) continueAction.Invoke(result, config);
+                    if (continueAction != null)
+                    {
+                        continueAction.Invoke(result, config);
+                    }
                 }
             }
 
@@ -2522,7 +2683,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             var installDir = _fileSystem.CombinePaths(ApplicationParameters.PackagesLocation, removedPackage.Id);
             var nupkg = _fileSystem.CombinePaths(installDir, nupkgFile);
 
-            if (!_fileSystem.FileExists(nupkg)) return;
+            if (!_fileSystem.FileExists(nupkg))
+            {
+                return;
+            }
 
             FaultTolerance.TryCatchWithLoggingException(
                 () => _fileSystem.DeleteFile(nupkg),
@@ -2532,7 +2696,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         protected void NormalizeNuspecCasing(IPackageSearchMetadata packageMetadata, string packageLocation)
         {
-            if (Platform.GetPlatform() == PlatformType.Windows) return;
+            if (Platform.GetPlatform() == PlatformType.Windows)
+            {
+                return;
+            }
+
             this.Log().Debug(ChocolateyLoggers.Verbose, "Fixing nuspec casing if required");
 
             var expectedNuspec = _fileSystem.CombinePaths(packageLocation, "{0}{1}"
@@ -2561,7 +2729,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 foreach (var file in _fileSystem.GetFiles(installDir, "*.*", SearchOption.AllDirectories).OrEmpty())
                 {
                     var fileSnapshot = pkgInfo.FilesSnapshot.Files.FirstOrDefault(f => f.Path.IsEqualTo(file));
-                    if (fileSnapshot == null) continue;
+                    if (fileSnapshot == null)
+                    {
+                        continue;
+                    }
 
                     var filesystemFileChecksum = _filesService.GetPackageFile(file).Checksum;
 
@@ -2573,7 +2744,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                     if (fileSnapshot.Checksum == filesystemFileChecksum)
                     {
-                        if (!_fileSystem.FileExists(file)) continue;
+                        if (!_fileSystem.FileExists(file))
+                        {
+                            continue;
+                        }
 
                         try
                         {
@@ -2612,11 +2786,17 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 foreach (var file in _fileSystem.GetFiles(installDir, "*.*", SearchOption.AllDirectories).OrEmpty())
                 {
                     var fileSnapshot = pkgInfo.FilesSnapshot.Files.FirstOrDefault(f => f.Path.IsEqualTo(file));
-                    if (fileSnapshot == null) continue;
+                    if (fileSnapshot == null)
+                    {
+                        continue;
+                    }
 
                     if (fileSnapshot.Checksum == _filesService.GetPackageFile(file).Checksum)
                     {
-                        if (!_fileSystem.FileExists(file)) continue;
+                        if (!_fileSystem.FileExists(file))
+                        {
+                            continue;
+                        }
 
                         FaultTolerance.TryCatchWithLoggingException(
                             () => _fileSystem.DeleteFile(file),
@@ -2687,7 +2867,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             var allPackages = GetInstalledPackages(config);
             if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
             {
-                var packagesToUpdate= allPackages.Select(p => p.Name).ToList();
+                var packagesToUpdate = allPackages.Select(p => p.Name).ToList();
 
                 if (!string.IsNullOrWhiteSpace(config.UpgradeCommand.PackageNamesToSkip))
                 {
@@ -2724,13 +2904,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 config.PackageNames = packagesToUpdate.Join(ApplicationParameters.PackageNamesSeparator);
 
-                if (customAction != null) customAction.Invoke();
+                if (customAction != null)
+                {
+                    customAction.Invoke();
+                }
             }
 
             return allPackages;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
             => EnsureSourceAppInstalled(config, ensureAction);
@@ -2864,6 +3047,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config)
             => GetInstalledPackages(config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

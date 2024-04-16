@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Runtime.InteropServices;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using Environment = chocolatey.infrastructure.adapters.Environment;
+
 namespace chocolatey.infrastructure.platforms
 {
-    using System;
-    using System.ComponentModel;
-    using System.Runtime.InteropServices;
-    using adapters;
-    using filesystem;
-    using Environment = adapters.Environment;
-
     /// <summary>
     ///   OS Platform detection
     /// </summary>
@@ -65,9 +65,14 @@ namespace chocolatey.infrastructure.platforms
                         & FileSystem.DirectoryExists("/System")
                         & FileSystem.DirectoryExists("/Users")
                         & FileSystem.DirectoryExists("/Volumes"))
+                    {
                         return PlatformType.Mac;
+                    }
                     else
+                    {
                         return PlatformType.Linux;
+                    }
+
                 default:
                     return PlatformType.Windows;
             }
@@ -104,9 +109,10 @@ namespace chocolatey.infrastructure.platforms
             var name = "Windows";
             var isServer = false;
 
-            var osVersionInfo = new OSVERSIONINFOEX();
-
-            osVersionInfo.dwOSVersionInfoSize = Marshal.SizeOf(typeof (OSVERSIONINFOEX));
+            var osVersionInfo = new OSVERSIONINFOEX
+            {
+                dwOSVersionInfoSize = Marshal.SizeOf(typeof(OSVERSIONINFOEX))
+            };
             var success = GetVersionEx(ref osVersionInfo);
             if (success)
             {
@@ -116,7 +122,7 @@ namespace chocolatey.infrastructure.platforms
 
             //https://msdn.microsoft.com/en-us/library/windows/desktop/ms724832.aspx
             //switch doesn't like a double, but a string is fine?!
-            string majorMinor = version.Major + "." + version.Minor;
+            var majorMinor = version.Major + "." + version.Minor;
             switch (majorMinor)
             {
                 case "10.0":
@@ -196,7 +202,7 @@ namespace chocolatey.infrastructure.platforms
 
         // ReSharper restore InconsistentNaming
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IEnvironment> environment, Lazy<IFileSystem> file_system)
@@ -213,6 +219,6 @@ namespace chocolatey.infrastructure.platforms
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_name()
             => GetName();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

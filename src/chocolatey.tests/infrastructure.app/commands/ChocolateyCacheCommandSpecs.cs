@@ -1,18 +1,18 @@
-﻿namespace chocolatey.tests.infrastructure.app.commands
-{
-    using chocolatey.infrastructure.app.attributes;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.filesystem;
-    using Moq;
-    using System.Reflection;
-    using System.Linq;
-    using FluentAssertions;
-    using chocolatey.infrastructure.commandline;
-    using chocolatey.infrastructure.app.domain;
-    using FluentAssertions.Execution;
+﻿using chocolatey.infrastructure.app.attributes;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using Moq;
+using System.Reflection;
+using System.Linq;
+using FluentAssertions;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.domain;
+using FluentAssertions.Execution;
 
+namespace chocolatey.tests.infrastructure.app.commands
+{
     public class ChocolateyCacheCommandSpecs
     {
         [ConcernFor("cache")]
@@ -84,7 +84,7 @@
         {
             public override void Because()
             {
-                
+
             }
 
             public override void BeforeEachSpec()

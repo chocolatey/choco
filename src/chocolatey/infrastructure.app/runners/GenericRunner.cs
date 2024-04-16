@@ -14,29 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.app.events;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.registration;
+using chocolatey.infrastructure.tasks;
+using SimpleInjector;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.logging;
+using Console = System.Console;
+using Environment = System.Environment;
+
 namespace chocolatey.infrastructure.app.runners
 {
-    using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.app.services;
-    using events;
-    using filesystem;
-    using infrastructure.events;
-    using infrastructure.registration;
-    using infrastructure.tasks;
-    using SimpleInjector;
-    using adapters;
-    using attributes;
-    using commandline;
-    using configuration;
-    using domain;
-    using infrastructure.commands;
-    using infrastructure.configuration;
-    using logging;
-    using Console = System.Console;
-    using Environment = System.Environment;
-
     public sealed class GenericRunner
     {
         private ICommand FindCommand(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
@@ -57,7 +57,10 @@ namespace chocolatey.infrastructure.app.runners
  Try choco -? for command reference/help.".FormatWith(config.CommandName));
                 }
 
-                if (isConsole) Environment.ExitCode = 1;
+                if (isConsole)
+                {
+                    Environment.ExitCode = 1;
+                }
             }
             else
             {
@@ -132,9 +135,15 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             if (!config.Features.FailOnInvalidOrMissingLicense ||
                 config.CommandName.TrimSafe().IsEqualTo("feature") ||
                 config.CommandName.TrimSafe().IsEqualTo("features")
-            ) return;
+            )
+            {
+                return;
+            }
 
-            if (!config.Information.IsLicensedVersion) throw new ApplicationException("License is missing or invalid.");
+            if (!config.Information.IsLicensedVersion)
+            {
+                throw new ApplicationException("License is missing or invalid.");
+            }
         }
 
         public void Run(ChocolateyConfiguration config, Container container, bool isConsole, Action<ICommand> parseArgs)
@@ -286,10 +295,16 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
 
         public void WarnIfAdminAndNeedsElevation(ChocolateyConfiguration config)
         {
-            if (config.HelpRequested) return;
+            if (config.HelpRequested)
+            {
+                return;
+            }
 
             // skip when commands will set or for background mode
-            if (!config.Features.ShowNonElevatedWarnings) return;
+            if (!config.Features.ShowNonElevatedWarnings)
+            {
+                return;
+            }
 
             var shouldWarn = (!config.Information.IsProcessElevated && config.Information.IsUserAdministrator)
                           || (!config.Information.IsUserAdministrator && ApplicationParameters.InstallLocation.IsEqualTo(ApplicationParameters.CommonAppDataChocolatey));
@@ -332,7 +347,7 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void fail_when_license_is_missing_or_invalid_if_requested(ChocolateyConfiguration config)
             => FailOnMissingOrInvalidLicenseIfFeatureSet(config);
@@ -352,6 +367,6 @@ Chocolatey is not an official build (bypassed with --allow-unofficial).
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void warn_when_admin_needs_elevation(ChocolateyConfiguration config)
             => WarnIfAdminAndNeedsElevation(config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

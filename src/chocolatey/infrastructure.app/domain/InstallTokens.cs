@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-
     public static class InstallTokens
     {
         public const string InstallerLocation = "{{INSTALLER_LOCATION}}";
@@ -27,7 +27,7 @@ namespace chocolatey.infrastructure.app.domain
         public const string UninstallerLocation = "{{UNINSTALLER_LOCATION}}";
         public const string TempLocation = "{{TEMP_LOCATION}}";
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public const string INSTALLER_LOCATION = InstallerLocation;
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -40,6 +40,6 @@ namespace chocolatey.infrastructure.app.domain
         public const string UNINSTALLER_LOCATION = UninstallerLocation;
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public const string TEMP_LOCATION = TempLocation;
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

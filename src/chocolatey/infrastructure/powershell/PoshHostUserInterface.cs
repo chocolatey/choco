@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Management.Automation;
+using System.Management.Automation.Host;
+using System.Security;
+using System.Text;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.logging;
+using Console = chocolatey.infrastructure.adapters.Console;
+
 namespace chocolatey.infrastructure.powershell
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Globalization;
-    using System.Management.Automation;
-    using System.Management.Automation.Host;
-    using System.Security;
-    using System.Text;
-    using app.configuration;
-    using commandline;
-    using logging;
-    using Console = adapters.Console;
-
     public class PoshHostUserInterface : PSHostUserInterface
     {
         private readonly ChocolateyConfiguration _configuration;
@@ -134,7 +134,10 @@ namespace chocolatey.infrastructure.powershell
         private bool _hasLoggedStartProgress = false;
         public override void WriteProgress(long sourceId, ProgressRecord record)
         {
-            if (record.PercentComplete == -1) return;
+            if (record.PercentComplete == -1)
+            {
+                return;
+            }
 
             if (!_hasLoggedStartProgress)
             {
@@ -165,10 +168,13 @@ namespace chocolatey.infrastructure.powershell
             var results = new Dictionary<string, PSObject>();
             foreach (FieldDescription field in descriptions)
             {
-                if (string.IsNullOrWhiteSpace(field.Label)) this.Log().Warn(field.Name.EscapeCurlyBraces());
+                if (string.IsNullOrWhiteSpace(field.Label))
+                {
+                    this.Log().Warn(field.Name.EscapeCurlyBraces());
+                }
                 else
                 {
-                    string[] label = GetHotkeyAndLabel(field.Label);
+                    var label = GetHotkeyAndLabel(field.Label);
                     this.Log().Warn(label[1].EscapeCurlyBraces());
                 }
 
@@ -183,7 +189,10 @@ namespace chocolatey.infrastructure.powershell
                     selection = ReadLine();
                 }
 
-                if (selection == null) return null;
+                if (selection == null)
+                {
+                    return null;
+                }
 
                 results[field.Name] = PSObject.AsPSObject(selection);
             }
@@ -204,39 +213,52 @@ namespace chocolatey.infrastructure.powershell
         /// </returns>
         private static string[] GetHotkeyAndLabel(string input)
         {
-            var result = new[] { String.Empty, String.Empty };
+            var result = new[] { string.Empty, string.Empty };
             //Do not use StringSplitOptions.RemoveEmptyEntries, it causes issues here
-            string[] fragments = input.Split('&');
+            var fragments = input.Split('&');
             if (fragments.Length == 2)
             {
-                if (fragments[1].Length > 0) result[0] = fragments[1][0].ToStringSafe().ToUpper(CultureInfo.CurrentCulture);
+                if (fragments[1].Length > 0)
+                {
+                    result[0] = fragments[1][0].ToStringSafe().ToUpper(CultureInfo.CurrentCulture);
+                }
 
                 result[1] = (fragments[0] + fragments[1]).Trim();
             }
-            else result[1] = input;
+            else
+            {
+                result[1] = input;
+            }
 
             return result;
         }
 
         public override int PromptForChoice(string caption, string message, Collection<ChoiceDescription> choices, int defaultChoice)
         {
-            if (!string.IsNullOrWhiteSpace(caption)) this.Log().Warn(caption.EscapeCurlyBraces());
-            if (!string.IsNullOrWhiteSpace(message)) this.Log().Warn(ChocolateyLoggers.Important, message.EscapeCurlyBraces());
+            if (!string.IsNullOrWhiteSpace(caption))
+            {
+                this.Log().Warn(caption.EscapeCurlyBraces());
+            }
 
-            string[,] promptData = BuildHotkeysAndLabels(choices);
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                this.Log().Warn(ChocolateyLoggers.Important, message.EscapeCurlyBraces());
+            }
+
+            var promptData = BuildHotkeysAndLabels(choices);
 
             // Format the overall choice prompt string to display.
             var choicePrompt = new StringBuilder();
-            for (int element = 0; element < choices.Count; element++)
+            for (var element = 0; element < choices.Count; element++)
             {
-                choicePrompt.Append(String.Format(
+                choicePrompt.Append(string.Format(
                     CultureInfo.CurrentCulture,
                     "[{0}] {1} ",
                     promptData[0, element],
                     promptData[1, element]));
             }
 
-            choicePrompt.Append(String.Format(
+            choicePrompt.Append(string.Format(
                 CultureInfo.CurrentCulture,
                 "(default is \"{0}\")",
                 promptData[0, defaultChoice]));
@@ -244,13 +266,19 @@ namespace chocolatey.infrastructure.powershell
             while (true)
             {
                 this.Log().Warn(choicePrompt.ToString().EscapeCurlyBraces());
-                string selection = ReadLine().TrimSafe().ToUpper(CultureInfo.CurrentCulture);
+                var selection = ReadLine().TrimSafe().ToUpper(CultureInfo.CurrentCulture);
 
-                if (selection.Length == 0) return defaultChoice;
-
-                for (int i = 0; i < choices.Count; i++)
+                if (selection.Length == 0)
                 {
-                    if (promptData[0, i] == selection) return i;
+                    return defaultChoice;
+                }
+
+                for (var i = 0; i < choices.Count; i++)
+                {
+                    if (promptData[0, i] == selection)
+                    {
+                        return i;
+                    }
                 }
 
                 this.Log().Warn(ChocolateyLoggers.Important, "Invalid choice: " + selection.EscapeCurlyBraces());
@@ -261,9 +289,9 @@ namespace chocolatey.infrastructure.powershell
         {
             var choiceSelections = new string[2, choices.Count];
 
-            for (int i = 0; i < choices.Count; ++i)
+            for (var i = 0; i < choices.Count; ++i)
             {
-                string[] hotkeyAndLabel = GetHotkeyAndLabel(choices[i].Label);
+                var hotkeyAndLabel = GetHotkeyAndLabel(choices[i].Label);
                 choiceSelections[0, i] = hotkeyAndLabel[0];
                 choiceSelections[1, i] = hotkeyAndLabel[1];
             }
@@ -278,17 +306,30 @@ namespace chocolatey.infrastructure.powershell
 
         public override PSCredential PromptForCredential(string caption, string message, string userName, string targetName, PSCredentialTypes allowedCredentialTypes, PSCredentialUIOptions options)
         {
-            if (!string.IsNullOrWhiteSpace(caption)) this.Log().Warn(caption.EscapeCurlyBraces());
-            if (!string.IsNullOrWhiteSpace(message)) this.Log().Warn(ChocolateyLoggers.Important, message.EscapeCurlyBraces());
+            if (!string.IsNullOrWhiteSpace(caption))
+            {
+                this.Log().Warn(caption.EscapeCurlyBraces());
+            }
+
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                this.Log().Warn(ChocolateyLoggers.Important, message.EscapeCurlyBraces());
+            }
 
             if (string.IsNullOrWhiteSpace(userName))
             {
                 this.Log().Warn("Please provide username:");
-                string selection = ReadLine().TrimSafe().ToUpper(CultureInfo.CurrentCulture);
+                var selection = ReadLine().TrimSafe().ToUpper(CultureInfo.CurrentCulture);
 
-                if (selection.Length == 0) selection = targetName;
+                if (selection.Length == 0)
+                {
+                    selection = targetName;
+                }
 
-                if (!string.IsNullOrWhiteSpace(selection)) userName = selection;
+                if (!string.IsNullOrWhiteSpace(selection))
+                {
+                    userName = selection;
+                }
             }
 
             var password = string.Empty;

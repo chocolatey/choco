@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using chocolatey.infrastructure.services;
+
 namespace chocolatey.infrastructure.events
 {
-    using System;
-    using System.ComponentModel;
-    using services;
-
     public static class EventManager
     {
         private static Func<IEventSubscriptionManagerService> _messageSubscriptionManager = () => new EventSubscriptionManagerService();
@@ -76,7 +76,7 @@ namespace chocolatey.infrastructure.events
             return null;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void initialize_with(Func<IEventSubscriptionManagerService> messageSubscriptionManager)
             => InitializeWith(messageSubscriptionManager);
@@ -87,7 +87,7 @@ namespace chocolatey.infrastructure.events
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
-            => Subscribe(handleEvent,handleError, filter);
-#pragma warning restore IDE1006
+            => Subscribe(handleEvent, handleError, filter);
+#pragma warning restore IDE0022, IDE1006
     }
 }

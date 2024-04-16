@@ -13,12 +13,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using chocolatey.infrastructure.rules;
+using NuGet.Packaging;
+
 namespace chocolatey.infrastructure.app.rules
 {
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.rules;
-    using NuGet.Packaging;
-
     internal sealed class PackageTypesMetadataRule : FrameWorkReferencesMetadataRule
     {
         public override IEnumerable<RuleResult> Validate(NuspecReader reader)

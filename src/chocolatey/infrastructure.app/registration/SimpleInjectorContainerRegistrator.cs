@@ -14,26 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.services;
+using NuGet.Packaging;
+using SimpleInjector;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.services;
-    using infrastructure.commands;
-    using infrastructure.events;
-    using infrastructure.services;
-    using NuGet.Packaging;
-    using SimpleInjector;
-    using Assembly = adapters.Assembly;
-
     internal sealed class SimpleInjectorContainerRegistrator : IContainerRegistrator, ICloneable
     {
-        internal List<Func<Type, bool>> _validationHandlers = new List<Func<Type, bool>>();
+        internal List<Func<Type, bool>> ValidationHandlers = new List<Func<Type, bool>>();
 
         // We need to store the aliases for the commands to prevent them from
         // being overridden when the original class implementing these hasn't been removed.
@@ -76,7 +76,7 @@ namespace chocolatey.infrastructure.app.registration
             cloned._registeredCommands = _registeredCommands.DeepCopy();
             cloned._singletonServices = _singletonServices.DeepCopy();
             cloned._transientServices = _transientServices.DeepCopy();
-            cloned._validationHandlers = new List<Func<Type, bool>>();
+            cloned.ValidationHandlers = new List<Func<Type, bool>>();
 
             return cloned;
         }
@@ -221,7 +221,7 @@ namespace chocolatey.infrastructure.app.registration
 
         public void RegisterValidator(Func<Type, bool> validation_func)
         {
-            _validationHandlers.Add(validation_func);
+            ValidationHandlers.Add(validation_func);
         }
 
         public void RegisterSourceRunner<TService>() where TService : class
@@ -356,7 +356,7 @@ namespace chocolatey.infrastructure.app.registration
 
         private bool CanRegisterService(Type serviceType)
         {
-            foreach (var validator in _validationHandlers)
+            foreach (var validator in ValidationHandlers)
             {
                 if (!validator(serviceType))
                 {
@@ -544,7 +544,7 @@ namespace chocolatey.infrastructure.app.registration
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void register_assembly_commands(IAssembly assembly)
             => RegisterAssemblyCommands(assembly);
@@ -580,6 +580,6 @@ namespace chocolatey.infrastructure.app.registration
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void register_validator(Func<Type, bool> validation_func)
             => RegisterValidator(validation_func);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,33 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.cryptography;
+using chocolatey.infrastructure.extractors;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.licensing;
+using chocolatey.infrastructure.logging;
+using Microsoft.Win32;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.tolerance;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+using Container = SimpleInjector.Container;
+using Environment = chocolatey.infrastructure.adapters.Environment;
+
 namespace chocolatey.infrastructure.app.builders
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using adapters;
-    using chocolatey.infrastructure.app.commands;
-    using configuration;
-    using cryptography;
-    using extractors;
-    using filesystem;
-    using information;
-    using infrastructure.services;
-    using licensing;
-    using logging;
-    using Microsoft.Win32;
-    using nuget;
-    using platforms;
-    using services;
-    using tolerance;
-    using Assembly = adapters.Assembly;
-    using Container = SimpleInjector.Container;
-    using Environment = adapters.Environment;
-
     /// <summary>
     ///   Responsible for gathering all configuration related information and producing the ChocolateyConfig
     /// </summary>
@@ -77,14 +77,16 @@ namespace chocolatey.infrastructure.app.builders
         /// <param name="container">The container.</param>
         /// <param name="license">The license.</param>
         /// <param name="notifyWarnLoggingAction">Notify warn logging action</param>
+#pragma warning disable IDE0060 // Unused method parameter
         public static void SetupConfiguration(IList<string> args, ChocolateyConfiguration config, Container container, ChocolateyLicense license, Action<string> notifyWarnLoggingAction)
+#pragma warning restore IDE0060 // Unused method parameter
         {
             var fileSystem = container.GetInstance<IFileSystem>();
             var xmlService = container.GetInstance<IXmlService>();
             var configFileSettings = GetConfigFileSettings(fileSystem, xmlService);
             // must be done prior to setting the file configuration
             AddOrRemoveLicensedSource(license, configFileSettings);
-            SetFileConfiguration(config, configFileSettings, fileSystem, notifyWarnLoggingAction);
+            SetFileConfiguration(config, configFileSettings, fileSystem);
             ConfigurationOptions.ClearOptions();
             SetGlobalOptions(args, config, container);
             SetEnvironmentOptions(config);
@@ -153,7 +155,7 @@ namespace chocolatey.infrastructure.app.builders
             configFileSettings.Sources.RemoveWhere(s => s.Id.IsEqualTo(configSource.Id) && !NugetEncryptionUtility.DecryptString(s.Password).IsEqualTo(license.Id));
         }
 
-        private static void SetFileConfiguration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem, Action<string> notifyWarnLoggingAction)
+        private static void SetFileConfiguration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
             SetSourcesInPriorityOrder(config, configFileSettings);
             SetMachineSources(config, configFileSettings);
@@ -239,7 +241,10 @@ namespace chocolatey.infrastructure.app.builders
             }
 
             // if it is still empty, use temp in the Chocolatey install directory.
-            if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "temp");
+            if (string.IsNullOrWhiteSpace(config.CacheLocation))
+            {
+                config.CacheLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "temp");
+            }
 
             var commandExecutionTimeoutSeconds = 0;
             var commandExecutionTimeout = SetConfigItem(
@@ -408,7 +413,7 @@ namespace chocolatey.infrastructure.app.builders
                              "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds. Supply '0' to disable the timeout.".FormatWith(config.CommandExecutionTimeoutSeconds.ToStringSafe()),
                             option =>
                             {
-                                int timeout = 0;
+                                var timeout = 0;
                                 var timeoutString = option.UnquoteSafe();
                                 int.TryParse(timeoutString, out timeout);
                                 if (timeout > 0 || timeoutString.IsEqualTo("0"))
@@ -461,7 +466,7 @@ namespace chocolatey.infrastructure.app.builders
                                     config.CacheExpirationInMinutes = -1;
                                 }
                             });
-                        ;
+                    ;
                 },
                 (unparsedArgs) =>
                 {
@@ -531,27 +536,35 @@ namespace chocolatey.infrastructure.app.builders
 
                 if (licensedConfigBuilder == null)
                 {
-                    if (config.RegularOutput) "chocolatey".Log().Warn(ChocolateyLoggers.Important,
+                    if (config.RegularOutput)
+                    {
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important,
                         @"Unable to set licensed configuration. Please upgrade to a newer
  licensed version (choco upgrade chocolatey.extension).");
+                    }
+
                     return;
                 }
                 try
                 {
-                    object componentClass = Activator.CreateInstance(licensedConfigBuilder);
+                    var componentClass = Activator.CreateInstance(licensedConfigBuilder);
 
                     licensedConfigBuilder.InvokeMember(
                         SetConfigurationMethod,
                         BindingFlags.InvokeMethod,
                         null,
                         componentClass,
-                        new Object[] { config, configFileSettings }
+                        new object[] { config, configFileSettings }
                         );
                 }
                 catch (Exception ex)
                 {
                     var isDebug = ApplicationParameters.IsDebugModeCliPrimitive();
-                    if (config.Debug) isDebug = true;
+                    if (config.Debug)
+                    {
+                        isDebug = true;
+                    }
+
                     var message = isDebug ? ex.ToString() : ex.Message;
 
                     if (isDebug && ex.InnerException != null)
@@ -605,7 +618,7 @@ FIPS Mode detected - run 'choco feature enable -n {0}'
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IEnvironment> environment)
@@ -618,6 +631,6 @@ FIPS Mode detected - run 'choco feature enable -n {0}'
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void set_up_configuration(IList<string> args, ChocolateyConfiguration config, Container container, ChocolateyLicense license, Action<string> notifyWarnLoggingAction)
             => SetupConfiguration(args, config, container, license, notifyWarnLoggingAction);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

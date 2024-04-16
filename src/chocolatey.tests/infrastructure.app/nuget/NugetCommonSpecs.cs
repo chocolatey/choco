@@ -14,22 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.filesystem;
+using Moq;
+using NuGet.Common;
+using NuGet.Packaging;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.nuget
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.nuget;
-    using chocolatey.infrastructure.filesystem;
-    using Moq;
-    using NuGet.Common;
-    using NuGet.Packaging;
-    using NuGet.Protocol;
-    using NuGet.Protocol.Core.Types;
-    using FluentAssertions;
-
     public class NugetCommonSpecs
     {
         private class When_gets_remote_repository : TinySpec
@@ -174,8 +174,8 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _because();
 
                 // Change this when the NuGet version is updated.
-                string nugetClientVersion = "6.4.1";
-                string expectedUserAgentString = "{0}/{1} via NuGet Client/{2}".FormatWith(ApplicationParameters.UserAgent, _configuration.Information.ChocolateyProductVersion, nugetClientVersion);
+                var nugetClientVersion = "6.4.1";
+                var expectedUserAgentString = "{0}/{1} via NuGet Client/{2}".FormatWith(ApplicationParameters.UserAgent, _configuration.Information.ChocolateyProductVersion, nugetClientVersion);
                 UserAgent.UserAgentString.Should().StartWith(expectedUserAgentString);
             }
         }

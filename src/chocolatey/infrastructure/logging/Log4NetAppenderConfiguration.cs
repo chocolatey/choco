@@ -14,26 +14,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using log4net;
+using log4net.Appender;
+using log4net.Config;
+using log4net.Core;
+using log4net.Filter;
+using log4net.Layout;
+using log4net.Repository;
+using log4net.Repository.Hierarchy;
+using chocolatey.infrastructure.platforms;
+using Console = chocolatey.infrastructure.adapters.Console;
+
 namespace chocolatey.infrastructure.logging
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Linq;
-    using adapters;
-    using app;
-    using log4net;
-    using log4net.Appender;
-    using log4net.Config;
-    using log4net.Core;
-    using log4net.Filter;
-    using log4net.Layout;
-    using log4net.Repository;
-    using log4net.Repository.Hierarchy;
-    using platforms;
-    using Console = adapters.Console;
-
     public sealed class Log4NetAppenderConfiguration
     {
         private static readonly log4net.ILog _logger = LogManager.GetLogger(typeof(Log4NetAppenderConfiguration));
@@ -208,30 +208,33 @@ namespace chocolatey.infrastructure.logging
         /// <param name="excludeLoggerNames">Loggers, such as a trace logger, to exclude from file appender.</param>
         private static void SetFileAppender(string outputDirectory, params string[] excludeLoggerNames)
         {
-            if (excludeLoggerNames == null) excludeLoggerNames = new string[] {};
+            if (excludeLoggerNames == null)
+            {
+                excludeLoggerNames = new string[] { };
+            }
 
             if (!_alreadyConfiguredFileAppender)
             {
                 _alreadyConfiguredFileAppender = true;
 
                 var layout = new PatternLayout
-                    {
-                        ConversionPattern = "%date %property{pid} [%-5level] - %message%newline"
-                    };
+                {
+                    ConversionPattern = "%date %property{pid} [%-5level] - %message%newline"
+                };
                 layout.ActivateOptions();
 
                 var app = new RollingFileAppender
-                    {
-                        Name = "{0}.changes.log.appender".FormatWith(ApplicationParameters.Name),
-                        File = Path.Combine(Path.GetFullPath(outputDirectory), ApplicationParameters.LoggingFile),
-                        Layout = layout,
-                        AppendToFile = true,
-                        RollingStyle = RollingFileAppender.RollingMode.Size,
-                        MaxFileSize = 1024 * 1024 * 10,
-                        MaxSizeRollBackups = 50,
-                        LockingModel = new FileAppender.MinimalLock(),
-                        PreserveLogFileNameExtension = true,
-                    };
+                {
+                    Name = "{0}.changes.log.appender".FormatWith(ApplicationParameters.Name),
+                    File = Path.Combine(Path.GetFullPath(outputDirectory), ApplicationParameters.LoggingFile),
+                    Layout = layout,
+                    AppendToFile = true,
+                    RollingStyle = RollingFileAppender.RollingMode.Size,
+                    MaxFileSize = 1024 * 1024 * 10,
+                    MaxSizeRollBackups = 50,
+                    LockingModel = new FileAppender.MinimalLock(),
+                    PreserveLogFileNameExtension = true,
+                };
                 app.ActivateOptions();
 
                 var infoOnlyAppender = new RollingFileAppender
@@ -271,7 +274,10 @@ namespace chocolatey.infrastructure.logging
         /// <param name="excludeAppenderNames">Appenders, such as a verbose console appender, to exclude from debug.</param>
         public static void EnableDebugLoggingIf(bool enableDebug, params string[] excludeAppenderNames)
         {
-            if (excludeAppenderNames == null) excludeAppenderNames = new string[] { };
+            if (excludeAppenderNames == null)
+            {
+                excludeAppenderNames = new string[] { };
+            }
 
             if (enableDebug)
             {
@@ -350,7 +356,10 @@ namespace chocolatey.infrastructure.logging
                         appender.AddFilter(new log4net.Filter.LevelRangeFilter { LevelMin = minLevel, LevelMax = Level.Fatal });
                     }
 
-                    if (appender != null && appender.GetType() == typeof(RollingFileAppender)) fileAppenders.Add(appender);
+                    if (appender != null && appender.GetType() == typeof(RollingFileAppender))
+                    {
+                        fileAppenders.Add(appender);
+                    }
                 }
 
                 foreach (ILogger log in logRepository.GetCurrentLoggers().Where(l => l.Name.IsEqualTo("Trace")).OrEmpty())
@@ -384,11 +393,18 @@ namespace chocolatey.infrastructure.logging
 
         public static void SetupAdditionalLogFile(string logFileLocation)
         {
-            if (string.IsNullOrWhiteSpace(logFileLocation)) return;
+            if (string.IsNullOrWhiteSpace(logFileLocation))
+            {
+                return;
+            }
 
             var logDirectory = Path.GetDirectoryName(logFileLocation);
             var logFileName = Path.GetFileNameWithoutExtension(logFileLocation);
-            if (!string.IsNullOrWhiteSpace(logDirectory) && !Directory.Exists(logDirectory)) Directory.CreateDirectory(logDirectory);
+            if (!string.IsNullOrWhiteSpace(logDirectory) && !Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
+
             var layout = new PatternLayout
             {
                 ConversionPattern = "%date %property{pid} [%-5level] - %message%newline"
@@ -416,7 +432,7 @@ namespace chocolatey.infrastructure.logging
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void initialize_with(Lazy<IConsole> console)
             => InitializeWith(console);
@@ -440,6 +456,6 @@ namespace chocolatey.infrastructure.logging
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void configure_additional_log_file(string logFileLocation)
             => SetupAdditionalLogFile(logFileLocation);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

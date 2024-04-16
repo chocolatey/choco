@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.app.utility
 {
-    using System;
-
     //todo: #2560 maybe find a better name/location for this
 
     public static class ArgumentsUtility
@@ -50,10 +50,10 @@ namespace chocolatey.infrastructure.app.utility
             ;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool arguments_contain_sensitive_information(string commandArguments)
             => SensitiveArgumentsProvided(commandArguments);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

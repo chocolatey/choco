@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.Threading;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.synchronization
 {
-    using System;
-    using System.Security.AccessControl;
-    using System.Security.Principal;
-    using System.Threading;
-    using logging;
-    using platforms;
-
     /// <summary>
     ///   global mutex used for synchronizing multiple processes based on appguid
     /// </summary>
@@ -83,12 +83,18 @@ namespace chocolatey.infrastructure.synchronization
             {
                 using (new GlobalMutex(timeout))
                 {
-                    if (action != null) action.Invoke();
+                    if (action != null)
+                    {
+                        action.Invoke();
+                    }
                 }
             }
             else
             {
-                if (action != null) action.Invoke();
+                if (action != null)
+                {
+                    action.Invoke();
+                }
             }
         }
 
@@ -107,12 +113,18 @@ namespace chocolatey.infrastructure.synchronization
             {
                 using (new GlobalMutex(timeout))
                 {
-                    if (func != null) returnValue = func.Invoke();
+                    if (func != null)
+                    {
+                        returnValue = func.Invoke();
+                    }
                 }
             }
             else
             {
-                if (func != null) returnValue = func.Invoke();
+                if (func != null)
+                {
+                    returnValue = func.Invoke();
+                }
             }
 
             return returnValue;
@@ -130,7 +142,7 @@ namespace chocolatey.infrastructure.synchronization
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void enter(Action action, int timeout)
             => Enter(action, timeout);
@@ -138,6 +150,6 @@ namespace chocolatey.infrastructure.synchronization
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static T enter<T>(Func<T> func, int timeout)
             => Enter(func, timeout);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Linq;
+using System.Net;
+using System.Text.RegularExpressions;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.logging;
+using NuGet.Credentials;
+using System.Threading.Tasks;
+using NuGet.Configuration;
+using System.Threading;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.Linq;
-    using System.Net;
-    using System.Text.RegularExpressions;
-    using commandline;
-    using configuration;
-    using logging;
-    using NuGet.Credentials;
-    using System.Threading.Tasks;
-    using NuGet.Configuration;
-    using System.Threading;
-
     public sealed class ChocolateyNugetCredentialProvider : ICredentialProvider
     {
         private readonly ChocolateyConfiguration _config;
@@ -120,7 +120,7 @@ namespace chocolatey.infrastructure.app.nuget
                 // find the source that is the closest match
                 foreach (var candidateSource in candidateSources.OrEmpty())
                 {
-                    var candidateRegEx = new Regex(Regex.Escape(candidateSource.Key.TrimEnd('/')),RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+                    var candidateRegEx = new Regex(Regex.Escape(candidateSource.Key.TrimEnd('/')), RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
                     if (candidateRegEx.IsMatch(uri.OriginalString.TrimEnd('/')))
                     {
                         this.Log().Debug("Source selected will be '{0}'".FormatWith(candidateSource.Key.TrimEnd('/')));
@@ -159,8 +159,9 @@ namespace chocolatey.infrastructure.app.nuget
             return Task.FromResult(new CredentialResponse(new NetworkCredential(source.Username, NugetEncryptionUtility.DecryptString(source.EncryptedPassword))));
         }
 
-
+#pragma warning disable IDE0060 // unused method parameter
         public ICredentials GetUserCredentials(Uri uri, IWebProxy proxy, CredentialRequestType credentialType)
+#pragma warning restore IDE0060 // unused method parameter
         {
             if (!_config.Information.IsInteractive)
             {
@@ -169,13 +170,13 @@ namespace chocolatey.infrastructure.app.nuget
                 return CredentialCache.DefaultCredentials;
             }
 
-            string message = credentialType == CredentialRequestType.Proxy ?
+            var message = credentialType == CredentialRequestType.Proxy ?
                                  "Please provide proxy credentials:" :
                                  "Please provide credentials for: {0}".FormatWith(uri.OriginalString);
             this.Log().Info(ChocolateyLoggers.Important, message);
 
             Console.Write("User name: ");
-            string username = Console.ReadLine();
+            var username = Console.ReadLine();
             Console.Write("Password: ");
             var password = InteractivePrompt.GetPassword(_config.PromptForConfirmation);
 
@@ -186,18 +187,18 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             var credentials = new NetworkCredential
-                {
-                    UserName = username,
-                    Password = password
-                };
+            {
+                UserName = username,
+                Password = password
+            };
 
             return credentials;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ICredentials get_credentials_from_user(Uri uri, IWebProxy proxy, CredentialRequestType credentialType)
             => GetUserCredentials(uri, proxy, credentialType);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

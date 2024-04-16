@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.tolerance;
+
 namespace chocolatey.infrastructure.extractors
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using adapters;
-    using filesystem;
-    using tolerance;
-
     /// <summary>
     ///   Extracts resources from an assembly.
     /// </summary>
@@ -48,7 +48,7 @@ namespace chocolatey.infrastructure.extractors
                 var fileText = assembly.GetManifestString(manifestLocation);
                 if (string.IsNullOrWhiteSpace(fileText))
                 {
-                    string errorMessage = "Could not find a file in the manifest resource stream of '{0}' at '{1}'.".FormatWith(assembly.FullName, manifestLocation);
+                    var errorMessage = "Could not find a file in the manifest resource stream of '{0}' at '{1}'.".FormatWith(assembly.FullName, manifestLocation);
                     "chocolatey".Log().Error(() => errorMessage);
                     throw new FileNotFoundException(errorMessage);
                 }
@@ -78,7 +78,7 @@ namespace chocolatey.infrastructure.extractors
                         fileSystem.EnsureDirectoryExists(fileSystem.GetDirectoryName(filePath));
                         fileSystem.WriteFile(filePath, () => assembly.GetManifestStream(manifestLocation));
                     },
-                   errorMessage:"Unable to extract binary",
+                   errorMessage: "Unable to extract binary",
                    throwError: throwError,
                    logWarningInsteadOfError: false,
                    logDebugInsteadOfError: !throwError,
@@ -113,12 +113,16 @@ namespace chocolatey.infrastructure.extractors
                 //var fileLocation = fileSystem.combine_paths("", resourceString.ToString().Split('.')) + resourceName.Substring(fileExtensionLocation);
 
                 var filePath = fileSystem.CombinePaths(directoryPath, fileLocation);
-                if (logOutput) "chocolatey".Log().Debug("Unpacking {0} to '{1}'".FormatWith(fileLocation, filePath));
+                if (logOutput)
+                {
+                    "chocolatey".Log().Debug("Unpacking {0} to '{1}'".FormatWith(fileLocation, filePath));
+                }
+
                 ExtractBinaryFileFromAssembly(fileSystem, assembly, resourceName, filePath, overwriteExisting, throwError);
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void extract_text_file_from_assembly(IFileSystem fileSystem, IAssembly assembly, string manifestLocation, string filePath, bool overwriteExisting = false)
             => ExtractTextFileFromAssembly(fileSystem, assembly, manifestLocation, filePath, overwriteExisting);
@@ -130,6 +134,6 @@ namespace chocolatey.infrastructure.extractors
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void extract_all_resources_to_relative_directory(IFileSystem fileSystem, IAssembly assembly, string directoryPath, IList<string> relativeDirectories, string resourcesToInclude, bool overwriteExisting = false, bool logOutput = false, bool throwError = true)
             => ExtractAssemblyResourcesToRelativeDirectory(fileSystem, assembly, directoryPath, relativeDirectories, resourcesToInclude, overwriteExisting, logOutput, throwError);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

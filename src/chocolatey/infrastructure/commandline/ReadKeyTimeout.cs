@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+
 namespace chocolatey.infrastructure.commandline
 {
-    using System;
-    using System.Threading;
-
     /// <summary>
     ///   Because sometimes you to timeout a readkey instead of blocking infinitely.
     /// </summary>
@@ -69,7 +69,10 @@ namespace chocolatey.infrastructure.commandline
 
         public void Dispose()
         {
-            if (_isDisposing) return;
+            if (_isDisposing)
+            {
+                return;
+            }
 
             _isDisposing = true;
             _responseThread.Abort();
@@ -79,10 +82,10 @@ namespace chocolatey.infrastructure.commandline
             _foregroundResponseReset.Dispose();
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static ConsoleKeyInfo read_key(int timeoutMilliseconds)
             => ReadKey(timeoutMilliseconds);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

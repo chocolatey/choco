@@ -1,9 +1,9 @@
-﻿namespace chocolatey.tests.infrastructure.app.utility
-{
-    using chocolatey.infrastructure.app.utility;
-    using NUnit.Framework;
-    using FluentAssertions;
+﻿using chocolatey.infrastructure.app.utility;
+using NUnit.Framework;
+using FluentAssertions;
 
+namespace chocolatey.tests.infrastructure.app.utility
+{
     public class ArgumentsUtilitySpecs
     {
         public abstract class ArgumentsUtilitySpecsBase : TinySpec

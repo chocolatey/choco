@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.logging
 {
-    using System;
-
     /// <summary>
     ///   Custom interface for logging messages
     /// </summary>

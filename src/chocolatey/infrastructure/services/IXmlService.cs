@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.services
 {
-    using System;
-
     public interface IXmlService
     {
         /// <summary>
@@ -54,7 +54,7 @@ namespace chocolatey.infrastructure.services
         /// <param name="isSilent">Log messages?</param>
         void Serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         XmlType deserialize<XmlType>(string xmlFilePath);
 
@@ -66,6 +66,6 @@ namespace chocolatey.infrastructure.services
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

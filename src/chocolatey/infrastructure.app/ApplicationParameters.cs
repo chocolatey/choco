@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Security.Principal;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using Environment = System.Environment;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.information;
+
 namespace chocolatey.infrastructure.app
 {
-    using System;
-    using System.Security.Principal;
-    using adapters;
-    using filesystem;
-    using Environment = System.Environment;
-    using chocolatey.infrastructure.platforms;
-    using chocolatey.infrastructure.information;
-
     /// <summary>
     ///   Application constants and settings for the application
     /// </summary>
@@ -153,9 +153,9 @@ namespace chocolatey.infrastructure.app
         public static int DefaultWaitForExitInSeconds = 2700;
         public static int DefaultWebRequestTimeoutInSeconds = 30;
 
-        public static readonly string[] ConfigFileExtensions = new string[] {".autoconf",".config",".conf",".cfg",".jsc",".json",".jsonp",".ini",".xml",".yaml"};
+        public static readonly string[] ConfigFileExtensions = new string[] { ".autoconf", ".config", ".conf", ".cfg", ".jsc", ".json", ".jsonp", ".ini", ".xml", ".yaml" };
         public static readonly string ConfigFileTransformExtension = ".install.xdt";
-        public static readonly string[] ShimDirectorFileExtensions = new string[] {".gui",".ignore"};
+        public static readonly string[] ShimDirectorFileExtensions = new string[] { ".gui", ".ignore" };
 
         public static readonly string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
         public static readonly string HashProviderFileLocked = "UnableToDetectChanges_FileLocked";
@@ -251,10 +251,10 @@ namespace chocolatey.infrastructure.app
             return isDebug;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool is_debug_mode_cli_primitive()
             => IsDebugModeCliPrimitive();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

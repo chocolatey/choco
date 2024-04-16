@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using chocolatey.infrastructure.filesystem;
+using NuGet.Configuration;
+using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using NuGet.ProjectManagement;
+using NuGet.Versioning;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.IO;
-    using filesystem;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-    using NuGet.Packaging.Core;
-    using NuGet.ProjectManagement;
-    using NuGet.Versioning;
-
     public sealed class ChocolateyPackagePathResolver : PackagePathResolver
     {
         public string RootDirectory { get; set; }
@@ -38,16 +38,24 @@ namespace chocolatey.infrastructure.app.nuget
         }
 
         public override string GetInstallPath(PackageIdentity packageIdentity)
-            => GetInstallPath(packageIdentity.Id);
+        {
+            return GetInstallPath(packageIdentity.Id);
+        }
 
         public string GetInstallPath(string packageId)
-            => _filesystem.CombinePaths(RootDirectory, packageId);
+        {
+            return _filesystem.CombinePaths(RootDirectory, packageId);
+        }
 
         [Obsolete("This overload will be removed in a future version.")]
         public string GetInstallPath(string id, NuGetVersion version)
-            => GetInstallPath(id);
+        {
+            return GetInstallPath(id);
+        }
 
         public override string GetPackageFileName(PackageIdentity packageIdentity)
-            => packageIdentity.Id + NuGetConstants.PackageExtension;
+        {
+            return packageIdentity.Id + NuGetConstants.PackageExtension;
+        }
     }
 }

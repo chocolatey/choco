@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using SimpleInjector;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.validations;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.utility;
+using chocolatey.infrastructure.app.validations;
+
 namespace chocolatey.infrastructure.app.runners
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using SimpleInjector;
-    using configuration;
-    using infrastructure.validations;
-    using logging;
-    using utility;
-    using validations;
-
     /// <summary>
     ///   Console application responsible for running chocolatey
     /// </summary>
@@ -47,7 +47,7 @@ namespace chocolatey.infrastructure.app.runners
 
             IList<string> commandArgs = new List<string>();
             //shift the first arg off
-            int count = 0;
+            var count = 0;
             foreach (var arg in args)
             {
                 if (count == 0)
@@ -66,11 +66,15 @@ namespace chocolatey.infrastructure.app.runners
                         commandArgs,
                         config,
                         (optionSet) => command.ConfigureArgumentParser(optionSet, config),
-                        (unparsedArgs) => {
+                        (unparsedArgs) =>
+                        {
                             // if debug is bundled with local options, it may not get picked up when global
                             // options are parsed. Attempt to set it again once local options are set.
                             // This does mean some output from debug will be missed (but not much)
-                            if (config.Debug) Log4NetAppenderConfiguration.EnableDebugLoggingIf(config.Debug, "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Verbose.ToStringSafe()), "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Trace.ToStringSafe()));
+                            if (config.Debug)
+                            {
+                                Log4NetAppenderConfiguration.EnableDebugLoggingIf(config.Debug, "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Verbose.ToStringSafe()), "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Trace.ToStringSafe()));
+                            }
 
                             command.ParseAdditionalArguments(unparsedArgs, config);
 
@@ -88,7 +92,8 @@ namespace chocolatey.infrastructure.app.runners
                                 }
                             }
                         },
-                        () => {
+                        () =>
+                        {
                             this.Log().Debug(() => "Performing validation checks.");
                             command.Validate(config);
 
@@ -153,10 +158,10 @@ namespace chocolatey.infrastructure.app.runners
             return errors;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void run(string[] args, ChocolateyConfiguration config, Container container)
             => Run(args, config, container);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

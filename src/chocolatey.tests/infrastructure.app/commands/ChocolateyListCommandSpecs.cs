@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commandline;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commandline;
-    using Moq;
-    using FluentAssertions;
-
     public static class ChocolateyListCommandSpecs
     {
         [ConcernFor("list")]
@@ -139,7 +139,9 @@ namespace chocolatey.tests.infrastructure.app.commands
                 [NUnit.Framework.TestCase("--localonly")]
                 [NUnit.Framework.TestCase("-li")]
                 [NUnit.Framework.TestCase("-lai")]
+#pragma warning disable IDE0060 // Unused argument
                 public void Should_throw_on_unsupported_argument(string argument)
+#pragma warning restore IDE0060 // Unused argument
                 {
                     Configuration.RegularOutput = true;
                     var errored = false;

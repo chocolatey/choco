@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using System;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using configuration;
-    using System;
-
     /// <summary>
     ///   Test to see if there are any known situations that require
     ///   a System reboot.
@@ -28,9 +28,9 @@ namespace chocolatey.infrastructure.app.services
     {
         bool IsRebootPending(ChocolateyConfiguration config);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         bool is_pending_reboot(ChocolateyConfiguration config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

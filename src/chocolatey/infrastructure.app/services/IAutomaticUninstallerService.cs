@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.results;
+using System;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using configuration;
-    using domain;
-    using results;
-    using System;
-
     /// <summary>
     /// The automagic uninstaller service
     /// </summary>
@@ -42,12 +42,12 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="packageCacheLocation">The package cache location.</param>
         void Remove(RegistryApplicationKey key, ChocolateyConfiguration config, PackageResult packageResult, string packageCacheLocation);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void run(PackageResult packageResult, ChocolateyConfiguration config);
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void remove(RegistryApplicationKey key, ChocolateyConfiguration config, PackageResult packageResult, string packageCacheLocation);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

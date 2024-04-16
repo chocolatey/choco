@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.app.configuration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Text;
-    using domain;
-    using logging;
-    using platforms;
-
     /// <summary>
     ///   The chocolatey configuration.
     /// </summary>
@@ -108,7 +108,7 @@ namespace chocolatey.infrastructure.app.configuration
 
             // Runtime type lookup ensures this also fully works with derived classes (for example: licensed configuration)
             // without needing to re-implement this method / make it overridable.
-            var t = this.GetType();
+            var t = GetType();
 
             var backup = removeBackup ? _configurationBackups.Pop() : _configurationBackups.Peek();
 
@@ -494,7 +494,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </summary>
         public CacheCommandConfiguration CacheCommand { get; set; }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void start_backup()
             => CreateBackup();
@@ -502,7 +502,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void reset_config(bool removeBackup = false)
             => RevertChanges(removeBackup);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 
     [Serializable]

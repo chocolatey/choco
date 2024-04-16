@@ -14,33 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Management.Automation;
+using System.Management.Automation.Runspaces;
+using System.Reflection;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.cryptography;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.registration;
+using chocolatey.infrastructure.logging;
+using NuGet.Packaging;
+using NuGet.Protocol.Core.Types;
+using chocolatey.infrastructure.powershell;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.app.utility;
+using CryptoHashProvider = chocolatey.infrastructure.cryptography.CryptoHashProvider;
+using Environment = System.Environment;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Linq;
-    using System.Management.Automation;
-    using System.Management.Automation.Runspaces;
-    using System.Reflection;
-    using adapters;
-    using commandline;
-    using configuration;
-    using cryptography;
-    using domain;
-    using infrastructure.commands;
-    using infrastructure.registration;
-    using logging;
-    using NuGet.Packaging;
-    using NuGet.Protocol.Core.Types;
-    using powershell;
-    using results;
-    using utility;
-    using CryptoHashProvider = cryptography.CryptoHashProvider;
-    using Environment = System.Environment;
-    using IFileSystem = filesystem.IFileSystem;
-
     public class PowershellService : IPowershellService
     {
         private readonly IFileSystem _fileSystem;
@@ -88,13 +88,19 @@ namespace chocolatey.infrastructure.app.services
 
         private IEnumerable<string> GetHookScripts(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command, bool isPreHook)
         {
-            List<string> hookScriptPaths = new List<string>();
+            var hookScriptPaths = new List<string>();
 
             // If skipping hook scripts, return an empty list
-            if (configuration.SkipHookScripts) return hookScriptPaths;
+            if (configuration.SkipHookScripts)
+            {
+                return hookScriptPaths;
+            }
 
             // If hooks directory doesn't exist, return an empty list to prevent directory not exist warnings
-            if (!_fileSystem.DirectoryExists(ApplicationParameters.HooksLocation)) return hookScriptPaths;
+            if (!_fileSystem.DirectoryExists(ApplicationParameters.HooksLocation))
+            {
+                return hookScriptPaths;
+            }
 
             string filenameBase;
 
@@ -246,7 +252,7 @@ namespace chocolatey.infrastructure.app.services
             foreach (var hookScriptPath in hookPreScriptPathList.Concat(hookPostScriptPathList).OrEmpty())
             {
                 this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".FormatWith(chocoPowerShellScript));
-                string hookScriptContents = _fileSystem.ReadFile(hookScriptPath);
+                var hookScriptContents = _fileSystem.ReadFile(hookScriptPath);
                 this.Log().Debug(() => hookScriptContents.EscapeCurlyBraces());
             }
 
@@ -256,12 +262,12 @@ namespace chocolatey.infrastructure.app.services
 
                 var package = packageResult.SearchMetadata;
                 PreparePowerShellEnvironment(package, configuration, packageDirectory);
-                bool shouldRun = !configuration.PromptForConfirmation;
+                var shouldRun = !configuration.PromptForConfirmation;
 
                 if (!string.IsNullOrEmpty(chocoPowerShellScript))
                 {
                     this.Log().Debug(ChocolateyLoggers.Important, "Contents of '{0}':".FormatWith(chocoPowerShellScript));
-                    string chocoPowerShellScriptContents = _fileSystem.ReadFile(chocoPowerShellScript);
+                    var chocoPowerShellScriptContents = _fileSystem.ReadFile(chocoPowerShellScript);
                     // leave this way, doesn't take it through formatting.
                     this.Log().Debug(() => chocoPowerShellScriptContents.EscapeCurlyBraces());
 
@@ -294,7 +300,11 @@ namespace chocolatey.infrastructure.app.services
                             );
                         }
 
-                        if (selection.IsEqualTo("yes")) shouldRun = true;
+                        if (selection.IsEqualTo("yes"))
+                        {
+                            shouldRun = true;
+                        }
+
                         if (selection.IsEqualTo("all - yes to all"))
                         {
                             configuration.PromptForConfirmation = false;
@@ -404,7 +414,10 @@ namespace chocolatey.infrastructure.app.services
                 configuration.CommandExecutionTimeoutSeconds,
                 (s, e) =>
                 {
-                    if (string.IsNullOrWhiteSpace(e.Data)) return;
+                    if (string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        return;
+                    }
                     //inspect for different streams
                     if (e.Data.StartsWith("DEBUG:"))
                     {
@@ -425,7 +438,11 @@ namespace chocolatey.infrastructure.app.services
                 },
                 (s, e) =>
                 {
-                    if (string.IsNullOrWhiteSpace(e.Data)) return;
+                    if (string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        return;
+                    }
+
                     result.StandardErrorWritten = true;
                     this.Log().Error(() => " " + e.Data.EscapeCurlyBraces());
                 });
@@ -435,7 +452,10 @@ namespace chocolatey.infrastructure.app.services
 
         public void PreparePowerShellEnvironment(IPackageSearchMetadata package, ChocolateyConfiguration configuration, string packageDirectory)
         {
-            if (package == null) return;
+            if (package == null)
+            {
+                return;
+            }
 
             EnvironmentSettings.UpdateEnvironmentVariables();
             EnvironmentSettings.SetEnvironmentVariables(configuration);
@@ -561,8 +581,15 @@ namespace chocolatey.infrastructure.app.services
 
                 // we build against v1 - everything should update in a kosher manner to the newest, but it may not.
                 var assembly = TryLoadVersionedAssembly(requestedAssembly, new Version(5, 0, 0, 0)) ?? TryLoadVersionedAssembly(requestedAssembly, new Version(4, 0, 0, 0));
-                if (assembly == null) assembly = TryLoadVersionedAssembly(requestedAssembly, new Version(3, 0, 0, 0));
-                if (assembly == null) assembly = TryLoadVersionedAssembly(requestedAssembly, new Version(1, 0, 0, 0));
+                if (assembly == null)
+                {
+                    assembly = TryLoadVersionedAssembly(requestedAssembly, new Version(3, 0, 0, 0));
+                }
+
+                if (assembly == null)
+                {
+                    assembly = TryLoadVersionedAssembly(requestedAssembly, new Version(1, 0, 0, 0));
+                }
 
                 return assembly;
             };
@@ -572,7 +599,10 @@ namespace chocolatey.infrastructure.app.services
 
         private System.Reflection.Assembly TryLoadVersionedAssembly(AssemblyName requestedAssembly, Version version)
         {
-            if (requestedAssembly == null) return null;
+            if (requestedAssembly == null)
+            {
+                return null;
+            }
 
             requestedAssembly.Version = version;
 
@@ -587,7 +617,10 @@ namespace chocolatey.infrastructure.app.services
             }
             catch (Exception ex)
             {
-                if (requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase)) return null;
+                if (requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase))
+                {
+                    return null;
+                }
 
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Attempting to load assembly {0} failed:{1} {2}".FormatWith(requestedAssembly.Name, Environment.NewLine, ex.Message.EscapeCurlyBraces()));
 
@@ -611,7 +644,7 @@ namespace chocolatey.infrastructure.app.services
 
             var result = new PowerShellExecutionResults();
 
-            string commandToRun = WrapScriptWithModule(chocoPowerShellScript, hookPreScriptPathList, hookPostScriptPathList, config);
+            var commandToRun = WrapScriptWithModule(chocoPowerShellScript, hookPreScriptPathList, hookPostScriptPathList, config);
             var host = new PoshHost(config);
             this.Log().Debug(() => "Calling built-in PowerShell host with ['{0}']".FormatWith(commandToRun.EscapeCurlyBraces()));
 
@@ -639,7 +672,7 @@ namespace chocolatey.infrastructure.app.services
                     // Write-Output
                     pipeline.Output.DataReady += (sender, args) =>
                     {
-                        PipelineReader<PSObject> reader = sender as PipelineReader<PSObject>;
+                        var reader = sender as PipelineReader<PSObject>;
 
                         if (reader != null)
                         {
@@ -653,7 +686,7 @@ namespace chocolatey.infrastructure.app.services
                     // Write-Error
                     pipeline.Error.DataReady += (sender, args) =>
                     {
-                        PipelineReader<object> reader = sender as PipelineReader<object>;
+                        var reader = sender as PipelineReader<object>;
 
                         if (reader != null)
                         {
@@ -697,7 +730,10 @@ try {
 ";
                     pipeline.Commands.Add(new Command(outputRedirectionFixScript, isScript: true, useLocalScope: false));
 
-                    if (additionalActionsBeforeScript != null) additionalActionsBeforeScript.Invoke(pipeline);
+                    if (additionalActionsBeforeScript != null)
+                    {
+                        additionalActionsBeforeScript.Invoke(pipeline);
+                    }
 
                     pipeline.Commands.Add(new Command(commandToRun, isScript: true, useLocalScope: false));
 
@@ -717,7 +753,10 @@ try {
                             if (scriptStackTrace != null)
                             {
                                 var scriptError = scriptStackTrace.GetValue(record, null).ToStringSafe();
-                                if (!string.IsNullOrWhiteSpace(scriptError)) errorStackTrace = scriptError;
+                                if (!string.IsNullOrWhiteSpace(scriptError))
+                                {
+                                    errorStackTrace = scriptError;
+                                }
                             }
                         }
                         this.Log().Error("ERROR: {0}{1}".FormatWith(ex.Message.EscapeCurlyBraces(), !config.Debug ? string.Empty : "{0} {1}".FormatWith(Environment.NewLine, errorStackTrace.EscapeCurlyBraces())));
@@ -739,12 +778,20 @@ try {
                             case PipelineState.Failed:
                             case PipelineState.Stopping:
                             case PipelineState.Stopped:
-                                if (host.ExitCode == 0) host.SetShouldExit(1);
+                                if (host.ExitCode == 0)
+                                {
+                                    host.SetShouldExit(1);
+                                }
+
                                 host.HostException = pipeline.PipelineStateInfo.Reason;
                                 break;
 
                             case PipelineState.Completed:
-                                if (host.ExitCode == -1) host.SetShouldExit(0);
+                                if (host.ExitCode == -1)
+                                {
+                                    host.SetShouldExit(0);
+                                }
+
                                 break;
                         }
                     }
@@ -759,7 +806,7 @@ try {
             return result;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void noop_action(PackageResult packageResult, CommandNameType command)
             => DryRunAction(packageResult, command);
@@ -803,6 +850,6 @@ try {
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public PowerShellExecutionResults run_host(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList)
             => RunHost(config, chocoPowerShellScript, additionalActionsBeforeScript, hookPreScriptPathList, hookPostScriptPathList);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

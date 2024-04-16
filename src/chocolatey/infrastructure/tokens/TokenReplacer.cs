@@ -14,27 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text.RegularExpressions;
+
 namespace chocolatey.infrastructure.tokens
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Text.RegularExpressions;
-
     public sealed class TokenReplacer
     {
         public static string ReplaceTokens<TConfig>(TConfig configuration, string textToReplace, string tokenPrefix = "[[", string tokenSuffix = "]]")
         {
-            if (string.IsNullOrEmpty(textToReplace)) return string.Empty;
+            if (string.IsNullOrEmpty(textToReplace))
+            {
+                return string.Empty;
+            }
 
             IDictionary<string, string> dictionary = CreateDictionaryFromConfiguration(configuration);
-            if (dictionary.Count == 0) return textToReplace;
+            if (dictionary.Count == 0)
+            {
+                return textToReplace;
+            }
 
             var regex = new Regex("{0}(?<key>\\w+){1}".FormatWith(Regex.Escape(tokenPrefix), Regex.Escape(tokenSuffix)));
 
-            string output = regex.Replace(textToReplace, m =>
+            var output = regex.Replace(textToReplace, m =>
                 {
-                    string key = "";
+                    var key = "";
 
                     var originalKey = m.Groups["key"].Value;
                     key = originalKey.ToLowerSafe();
@@ -43,7 +49,7 @@ namespace chocolatey.infrastructure.tokens
                         return tokenPrefix + originalKey + tokenSuffix;
                     }
 
-                    string value = dictionary[key];
+                    var value = dictionary[key];
                     return value;
                 });
 
@@ -52,7 +58,10 @@ namespace chocolatey.infrastructure.tokens
 
         private static IDictionary<string, string> CreateDictionaryFromConfiguration<TConfig>(TConfig configuration)
         {
-            if (configuration is IDictionary<string, string>) return configuration as IDictionary<string, string>;
+            if (configuration is IDictionary<string, string>)
+            {
+                return configuration as IDictionary<string, string>;
+            }
 
             var propertyDictionary = new Dictionary<string, string>();
             foreach (PropertyInfo property in configuration.GetType().GetProperties())
@@ -74,7 +83,7 @@ namespace chocolatey.infrastructure.tokens
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string replace_tokens<TConfig>(TConfig configuration, string textToReplace, string tokenPrefix = "[[", string tokenSuffix = "]]")
             => ReplaceTokens(configuration, textToReplace, tokenPrefix, tokenSuffix);
@@ -82,6 +91,6 @@ namespace chocolatey.infrastructure.tokens
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IEnumerable<string> get_tokens(string textWithTokens, string tokenPrefix = "[[", string tokenSuffix = "]]")
             => GetTokens(textWithTokens, tokenPrefix, tokenSuffix);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

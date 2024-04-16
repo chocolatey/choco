@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.validations;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.validations
 {
-    using System;
-    using System.Collections.Generic;
-    using configuration;
-    using infrastructure.validations;
-    using services;
-
     /// <summary>
     ///   Performs validation against the current System State.  This
     ///   includes things like pending reboot requirement.  Any errors
@@ -62,7 +62,7 @@ namespace chocolatey.infrastructure.app.validations
 
             if (result)
             {
-                var commandsToErrorOn = new List<string> {"install", "uninstall", "upgrade"};
+                var commandsToErrorOn = new List<string> { "install", "uninstall", "upgrade" };
 
                 if (!commandsToErrorOn.Contains(config.CommandName.ToLowerInvariant()))
                 {
@@ -105,10 +105,10 @@ namespace chocolatey.infrastructure.app.validations
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ICollection<ValidationResult> validate(ChocolateyConfiguration config)
             => Validate(config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

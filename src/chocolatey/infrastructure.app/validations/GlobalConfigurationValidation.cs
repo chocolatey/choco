@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.validations;
+
 namespace chocolatey.infrastructure.app.validations
 {
-    using System;
-    using System.Collections.Generic;
-    using configuration;
-    using infrastructure.validations;
-
     /// <summary>
     ///   Performs top level validation checks against the current
     ///   Chocolatey Configuration object to ensure that everything is
@@ -71,7 +71,7 @@ namespace chocolatey.infrastructure.app.validations
                     ExitCode = 1
                 };
 
-                var commandsToErrorOn = new List<string> {"install", "uninstall", "upgrade"};
+                var commandsToErrorOn = new List<string> { "install", "uninstall", "upgrade" };
                 if (!commandsToErrorOn.Contains(config.CommandName.ToLowerInvariant()))
                 {
                     validationResult.Status = ValidationStatus.Warning;
@@ -84,10 +84,10 @@ namespace chocolatey.infrastructure.app.validations
             this.Log().Debug(" - Package Exit Code / Exit On Reboot = {0}".FormatWith(validationStatusResult.ToStringSafe()));
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ICollection<ValidationResult> validate(ChocolateyConfiguration config)
             => Validate(config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

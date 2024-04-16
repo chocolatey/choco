@@ -14,19 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+using chocolatey.infrastructure.adapters;
+
 namespace chocolatey.infrastructure.information
 {
-    using System;
-    using System.Diagnostics;
-    using adapters;
-
     public sealed class VersionInformation
     {
         public static string GetCurrentAssemblyVersion(IAssembly assembly = null)
         {
             string version = null;
-            if (assembly == null) assembly = Assembly.GetExecutingAssembly();
-            string location = assembly != null ? assembly.Location : string.Empty;
+            if (assembly == null)
+            {
+                assembly = Assembly.GetExecutingAssembly();
+            }
+
+            var location = assembly != null ? assembly.Location : string.Empty;
 
             if (!string.IsNullOrEmpty(location))
             {
@@ -35,7 +39,7 @@ namespace chocolatey.infrastructure.information
 
             if (string.IsNullOrEmpty(version))
             {
-                var attributes= assembly.UnderlyingType.GetCustomAttributesData();
+                var attributes = assembly.UnderlyingType.GetCustomAttributesData();
                 foreach (var attribute in attributes)
                 {
                     if (attribute.ToStringSafe().Contains("AssemblyFileVersion"))
@@ -52,8 +56,12 @@ namespace chocolatey.infrastructure.information
         public static string GetCurrentInformationalVersion(IAssembly assembly = null)
         {
             string version = null;
-            if (assembly == null) assembly = Assembly.GetExecutingAssembly();
-            string location = assembly != null ? assembly.Location : string.Empty;
+            if (assembly == null)
+            {
+                assembly = Assembly.GetExecutingAssembly();
+            }
+
+            var location = assembly != null ? assembly.Location : string.Empty;
 
             if (!string.IsNullOrEmpty(location))
             {
@@ -78,7 +86,10 @@ namespace chocolatey.infrastructure.information
 
         public static string GetMinimumChocolateyVersion(IAssembly assembly = null)
         {
-            if (assembly == null) assembly = Assembly.GetExecutingAssembly();
+            if (assembly == null)
+            {
+                assembly = Assembly.GetExecutingAssembly();
+            }
 
             var attributeData = assembly.UnderlyingType.GetCustomAttributesData();
             foreach (var attribute in attributeData)
@@ -95,7 +106,7 @@ namespace chocolatey.infrastructure.information
             return "1.0.0";
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_current_assembly_version(IAssembly assembly = null)
             => GetCurrentAssemblyVersion(assembly = null);
@@ -107,6 +118,6 @@ namespace chocolatey.infrastructure.information
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_minimum_chocolatey_version(IAssembly assembly = null)
             => GetMinimumChocolateyVersion(assembly);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

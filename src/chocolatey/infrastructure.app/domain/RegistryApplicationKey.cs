@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Xml.Serialization;
+using Microsoft.Win32;
+using chocolatey.infrastructure.xml;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-    using System.Xml.Serialization;
-    using Microsoft.Win32;
-    using xml;
-
     [Serializable]
     [XmlType("key")]
     public class RegistryApplicationKey : IEquatable<RegistryApplicationKey>
@@ -107,14 +107,20 @@ namespace chocolatey.infrastructure.app.domain
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(this, obj)) return true;
+            if (ReferenceEquals(this, obj))
+            {
+                return true;
+            }
 
             return Equals(obj as RegistryApplicationKey);
         }
 
         bool IEquatable<RegistryApplicationKey>.Equals(RegistryApplicationKey other)
         {
-            if (ReferenceEquals(other, null)) return false;
+            if (other is null)
+            {
+                return false;
+            }
 
             return DisplayName.ToStringSafe().IsEqualTo(other.DisplayName)
                    && DisplayVersion.IsEqualTo(other.DisplayVersion)
@@ -123,10 +129,10 @@ namespace chocolatey.infrastructure.app.domain
                 ;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public bool is_in_programs_and_features()
             => IsInProgramsAndFeatures();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

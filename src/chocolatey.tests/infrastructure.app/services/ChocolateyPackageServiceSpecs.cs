@@ -29,13 +29,12 @@ using Moq;
 using NUnit.Framework;
 using FluentAssertions;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using System.IO;
+using chocolatey.infrastructure.app.registration;
+using NuGet.Packaging;
 
 namespace chocolatey.tests.infrastructure.app.services
 {
-    using System.IO;
-    using chocolatey.infrastructure.app.registration;
-    using NuGet.Packaging;
-
     public class ChocolateyPackageServiceSpecs
     {
         public abstract class ChocolateyPackageServiceSpecsBase : TinySpec

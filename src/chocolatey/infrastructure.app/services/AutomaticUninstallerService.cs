@@ -14,24 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.domain.installers;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.app.utility;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using System.Threading;
-    using commandline;
-    using configuration;
-    using domain;
-    using domain.installers;
-    using filesystem;
-    using infrastructure.commands;
-    using logging;
-    using results;
-    using utility;
-
     public class AutomaticUninstallerService : IAutomaticUninstallerService
     {
         private readonly IChocolateyPackageInformationService _packageInfoService;
@@ -119,7 +119,10 @@ namespace chocolatey.infrastructure.app.services
                     userProvidedUninstallArguments = config.InstallArguments;
                     userOverrideUninstallArguments = config.OverrideArguments;
 
-                    if (!string.IsNullOrWhiteSpace(userProvidedUninstallArguments)) this.Log().Debug(ChocolateyLoggers.Verbose, " Using user passed {2}uninstaller args for {0}:'{1}'".FormatWith(package.Id, userProvidedUninstallArguments.EscapeCurlyBraces(), userOverrideUninstallArguments ? "overriding " : string.Empty));
+                    if (!string.IsNullOrWhiteSpace(userProvidedUninstallArguments))
+                    {
+                        this.Log().Debug(ChocolateyLoggers.Verbose, " Using user passed {2}uninstaller args for {0}:'{1}'".FormatWith(package.Id, userProvidedUninstallArguments.EscapeCurlyBraces(), userOverrideUninstallArguments ? "overriding " : string.Empty));
+                    }
                 }
             }
 
@@ -141,23 +144,23 @@ namespace chocolatey.infrastructure.app.services
             }
 
             // split on " /" and " -" for quite a bit more accuracy
-            IList<string> uninstallArgsSplit = key.UninstallString.ToStringSafe().Replace("&quot;","\"").Replace("&apos;","'").Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            IList<string> uninstallArgsSplit = key.UninstallString.ToStringSafe().Replace("&quot;", "\"").Replace("&apos;", "'").Split(new[] { " /", " -" }, StringSplitOptions.RemoveEmptyEntries).ToList();
             var uninstallExe = uninstallArgsSplit.DefaultIfEmpty(string.Empty).FirstOrDefault().TrimSafe();
             if (uninstallExe.Count(u => u == '"') > 2)
             {
-                uninstallExe = uninstallExe.Split(new []{" \""}, StringSplitOptions.RemoveEmptyEntries).First();
+                uninstallExe = uninstallExe.Split(new[] { " \"" }, StringSplitOptions.RemoveEmptyEntries).First();
             }
 
             if (uninstallExe.Count(u => u == ':') > 1)
             {
                 try
                 {
-                    var firstMatch = Regex.Match(uninstallExe, @"\s+\w\:",RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
+                    var firstMatch = Regex.Match(uninstallExe, @"\s+\w\:", RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
                     uninstallExe = uninstallExe.Substring(0, firstMatch.Index);
                 }
                 catch (Exception ex)
                 {
-                   this.Log().Debug("Error splitting the uninstall string:{0} {1}".FormatWith(Environment.NewLine,ex.ToStringSafe()));
+                    this.Log().Debug("Error splitting the uninstall string:{0} {1}".FormatWith(Environment.NewLine, ex.ToStringSafe()));
                 }
             }
             var uninstallArgs = key.UninstallString.ToStringSafe().Replace("&quot;", "\"").Replace("&apos;", "'").Replace(uninstallExe.ToStringSafe(), string.Empty).TrimSafe();
@@ -196,7 +199,7 @@ namespace chocolatey.infrastructure.app.services
             {
                 if (userOverrideUninstallArguments)
                 {
-                    this.Log().Debug(() => " Replacing original uninstall arguments of '{0}' with '{1}'".FormatWith(uninstallArgs.EscapeCurlyBraces(),userProvidedUninstallArguments.EscapeCurlyBraces()));
+                    this.Log().Debug(() => " Replacing original uninstall arguments of '{0}' with '{1}'".FormatWith(uninstallArgs.EscapeCurlyBraces(), userProvidedUninstallArguments.EscapeCurlyBraces()));
                     uninstallArgs = userProvidedUninstallArguments;
                 }
                 else
@@ -237,7 +240,10 @@ namespace chocolatey.infrastructure.app.services
                     shortPrompt: true,
                     timeoutInSeconds: timeout
                     );
-                if (selection.IsEqualTo("yes")) skipUninstaller = false;
+                if (selection.IsEqualTo("yes"))
+                {
+                    skipUninstaller = false;
+                }
 
                 if (skipUninstaller)
                 {
@@ -253,12 +259,20 @@ namespace chocolatey.infrastructure.app.services
                 config.CommandExecutionTimeoutSeconds,
                 (s, e) =>
                 {
-                    if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
+                    if (e == null || string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        return;
+                    }
+
                     this.Log().Info(() => " [AutoUninstaller] {0}".FormatWith(e.Data.EscapeCurlyBraces()));
                 },
                 (s, e) =>
                 {
-                    if (e == null || string.IsNullOrWhiteSpace(e.Data)) return;
+                    if (e == null || string.IsNullOrWhiteSpace(e.Data))
+                    {
+                        return;
+                    }
+
                     this.Log().Error(() => " [AutoUninstaller] {0}".FormatWith(e.Data.EscapeCurlyBraces()));
                 },
                 updateProcessPath: false);
@@ -266,7 +280,7 @@ namespace chocolatey.infrastructure.app.services
             if (!installer.ValidUninstallExitCodes.Contains(exitCode))
             {
                 Environment.ExitCode = exitCode;
-                string logMessage = " Auto uninstaller failed. Please remove machine installation manually.{0} Exit code was {1}".FormatWith(Environment.NewLine, exitCode);
+                var logMessage = " Auto uninstaller failed. Please remove machine installation manually.{0} Exit code was {1}".FormatWith(Environment.NewLine, exitCode);
                 this.Log().Error(() => logMessage.EscapeCurlyBraces());
                 packageResult.Messages.Add(new ResultMessage(config.Features.FailOnAutoUninstaller ? ResultType.Error : ResultType.Warn, logMessage));
             }
@@ -299,7 +313,7 @@ namespace chocolatey.infrastructure.app.services
             return installer;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void run(PackageResult packageResult, ChocolateyConfiguration config)
             => Run(packageResult, config);
@@ -311,6 +325,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual IInstaller get_installer_type(RegistryApplicationKey key, string uninstallExe, string uninstallArgs)
             => GetInstallerType(key, uninstallExe, uninstallArgs);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

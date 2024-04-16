@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Management.Automation.Host;
+using chocolatey.infrastructure.adapters;
+using Console = chocolatey.infrastructure.adapters.Console;
+
 namespace chocolatey.infrastructure.powershell
 {
-    using System;
-    using System.Management.Automation.Host;
-    using adapters;
-    using Console = adapters.Console;
-
     public class PoshHostRawUserInterface : PSHostRawUserInterface
     {
         private static readonly Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
@@ -67,7 +67,8 @@ namespace chocolatey.infrastructure.powershell
             get { return new Size(Console.LargestWindowWidth, Console.LargestWindowHeight); }
         }
 
-        public override Coordinates WindowPosition {
+        public override Coordinates WindowPosition
+        {
             get { return new Coordinates(Console.WindowLeft, Console.WindowTop); }
             set { Console.SetWindowPosition(value.X, value.Y); }
         }

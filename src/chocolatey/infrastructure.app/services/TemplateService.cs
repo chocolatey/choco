@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.templates;
+using chocolatey.infrastructure.tokens;
+using chocolatey.infrastructure.app.nuget;
+using NuGet.Common;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using configuration;
-    using infrastructure.services;
-    using logging;
-    using templates;
-    using tokens;
-    using nuget;
-    using NuGet.Common;
-    using IFileSystem = filesystem.IFileSystem;
-
     public class TemplateService : ITemplateService
     {
         private readonly UTF8Encoding _utf8WithoutBOM = new UTF8Encoding(false);
@@ -65,7 +65,10 @@ namespace chocolatey.infrastructure.app.services
         public void Generate(ChocolateyConfiguration configuration)
         {
             var logger = ChocolateyLoggers.Normal;
-            if (configuration.QuietOutput) logger = ChocolateyLoggers.LogFileOnly;
+            if (configuration.QuietOutput)
+            {
+                logger = ChocolateyLoggers.LogFileOnly;
+            }
 
             var packageLocation = _fileSystem.CombinePaths(configuration.OutputDirectory ?? _fileSystem.GetCurrentDirectory(), configuration.NewCommand.Name);
             if (_fileSystem.DirectoryExists(packageLocation) && !configuration.Force)
@@ -74,21 +77,31 @@ namespace chocolatey.infrastructure.app.services
                     "The location for the template already exists. You can:{0} 1. Remove '{1}'{0} 2. Use --force{0} 3. Specify a different name".FormatWith(Environment.NewLine, packageLocation));
             }
 
-            if (configuration.RegularOutput) this.Log().Info(logger, () => "Creating a new package specification at {0}".FormatWith(packageLocation));
+            if (configuration.RegularOutput)
+            {
+                this.Log().Info(logger, () => "Creating a new package specification at {0}".FormatWith(packageLocation));
+            }
+
             try
             {
                 _fileSystem.DeleteDirectoryChecked(packageLocation, recursive: true);
             }
             catch (Exception ex)
             {
-                if (configuration.RegularOutput) this.Log().Warn(() => "{0}".FormatWith(ex.Message));
+                if (configuration.RegularOutput)
+                {
+                    this.Log().Warn(() => "{0}".FormatWith(ex.Message));
+                }
             }
             _fileSystem.EnsureDirectoryExists(packageLocation);
             var packageToolsLocation = _fileSystem.CombinePaths(packageLocation, "tools");
             _fileSystem.EnsureDirectoryExists(packageToolsLocation);
 
             var tokens = new TemplateValues();
-            if (configuration.NewCommand.AutomaticPackage) tokens.SetAutomatic();
+            if (configuration.NewCommand.AutomaticPackage)
+            {
+                tokens.SetAutomatic();
+            }
 
             // now override those values
             foreach (var property in configuration.NewCommand.TemplateProperties)
@@ -100,7 +113,11 @@ namespace chocolatey.infrastructure.app.services
                 }
                 catch (Exception)
                 {
-                    if (configuration.RegularOutput) this.Log().Debug("Property {0} will be added to additional properties.".FormatWith(property.Key));
+                    if (configuration.RegularOutput)
+                    {
+                        this.Log().Debug("Property {0} will be added to additional properties.".FormatWith(property.Key));
+                    }
+
                     tokens.AdditionalProperties.Add(property.Key, property.Value);
                 }
             }
@@ -154,7 +171,10 @@ namespace chocolatey.infrastructure.app.services
 
                 var templatePath = _fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation, configuration.NewCommand.TemplateName);
                 var templateParameterCachePath = _fileSystem.CombinePaths(templatePath, _templateParameterCacheFilename);
-                if (!_fileSystem.DirectoryExists(templatePath)) throw new ApplicationException("Unable to find path to requested template '{0}'. Path should be '{1}'".FormatWith(configuration.NewCommand.TemplateName, templatePath));
+                if (!_fileSystem.DirectoryExists(templatePath))
+                {
+                    throw new ApplicationException("Unable to find path to requested template '{0}'. Path should be '{1}'".FormatWith(configuration.NewCommand.TemplateName, templatePath));
+                }
 
                 this.Log().Info(configuration.QuietOutput ? logger : ChocolateyLoggers.Important, "Generating package from custom template at '{0}'.".FormatWith(templatePath));
 
@@ -178,7 +198,7 @@ namespace chocolatey.infrastructure.app.services
                     else if (_templateBinaryExtensions.Contains(fileExtension))
                     {
                         this.Log().Debug(" Treating template file ('{0}') as binary instead of replacing templated values.".FormatWith(_fileSystem.GetFileName(file)));
-                        _fileSystem.CopyFile(file, packageFileLocation, overwriteExisting:true);
+                        _fileSystem.CopyFile(file, packageFileLocation, overwriteExisting: true);
                     }
                     else if (templateParameterCachePath.IsEqualTo(file))
                     {
@@ -201,7 +221,11 @@ namespace chocolatey.infrastructure.app.services
             template = TokenReplacer.ReplaceTokens(tokens, template);
             template = TokenReplacer.ReplaceTokens(tokens.AdditionalProperties, template);
 
-            if (configuration.RegularOutput) this.Log().Info(() => "Generating template to a file{0} at '{1}'".FormatWith(Environment.NewLine, fileLocation));
+            if (configuration.RegularOutput)
+            {
+                this.Log().Info(() => "Generating template to a file{0} at '{1}'".FormatWith(Environment.NewLine, fileLocation));
+            }
+
             this.Log().Debug(() => "{0}".FormatWith(template));
             _fileSystem.EnsureDirectoryExists(_fileSystem.GetDirectoryName(fileLocation));
             _fileSystem.WriteFile(fileLocation, template, encoding);
@@ -408,7 +432,7 @@ List of Parameters:
             return parametersList;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void generate_noop(ChocolateyConfiguration configuration)
             => GenerateDryRun(configuration);
@@ -444,6 +468,6 @@ List of Parameters:
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         protected HashSet<string> get_template_parameters_from_files(ChocolateyConfiguration configuration)
             => GetTemplateParametersFromFiles(configuration);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

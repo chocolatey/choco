@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-
     /// <summary>
     ///   Special source modifiers that use alternate sources for packages
     /// </summary>

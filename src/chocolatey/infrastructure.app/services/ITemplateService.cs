@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using System;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using configuration;
-    using System;
-
     public interface ITemplateService
     {
         void GenerateDryRun(ChocolateyConfiguration configuration);
@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.app.services
         void ListDryRun(ChocolateyConfiguration configuration);
         void List(ChocolateyConfiguration configuration);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void generate_noop(ChocolateyConfiguration configuration);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -35,6 +35,6 @@ namespace chocolatey.infrastructure.app.services
         void list_noop(ChocolateyConfiguration configuration);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void list(ChocolateyConfiguration configuration);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

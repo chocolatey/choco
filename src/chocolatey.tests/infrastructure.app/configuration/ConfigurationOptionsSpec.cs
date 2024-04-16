@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commandline;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.configuration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.commandline;
-    using Moq;
-    using FluentAssertions;
-
     public class ConfigurationOptionsSpec
     {
         public abstract class ConfigurationOptionsSpecBase : TinySpec

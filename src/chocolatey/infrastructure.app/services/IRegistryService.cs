@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.domain;
+using Microsoft.Win32;
+using Registry = chocolatey.infrastructure.app.domain.Registry;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using domain;
-    using Microsoft.Win32;
-    using Registry = domain.Registry;
-
     public interface IRegistryService
     {
         Registry GetInstallerKeys();
@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.app.services
         bool InstallerKeyExists(string keyPath);
         RegistryKey GetKey(RegistryHive hive, string subKeyPath);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         Registry get_installer_keys();
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -53,6 +53,6 @@ namespace chocolatey.infrastructure.app.services
         bool installer_value_exists(string keyPath, string value);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         RegistryKey get_key(RegistryHive hive, string subKeyPath);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.rules;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.rules;
+using chocolatey.infrastructure.services;
+using FluentAssertions;
+using NuGet.Packaging;
+
 namespace chocolatey.tests.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app.rules;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.rules;
-    using chocolatey.infrastructure.services;
-    using FluentAssertions;
-    using NuGet.Packaging;
-
     public class RulesServiceSpecs
     {
         [Categories.RuleEngine]

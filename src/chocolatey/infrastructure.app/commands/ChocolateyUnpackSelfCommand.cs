@@ -14,21 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.extractors;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+#if !NoResources
+using chocolatey.resources;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using adapters;
-    using attributes;
-    using commandline;
-    using configuration;
-    using extractors;
-    using filesystem;
-    using infrastructure.commands;
-    using logging;
-#if !NoResources
-    using resources;
 #endif
 
     [CommandFor("unpackself", "re-installs Chocolatey base files")]
@@ -37,7 +38,7 @@ namespace chocolatey.infrastructure.app.commands
         private readonly IFileSystem _fileSystem;
 
 #if !NoResources
-        private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => adapters.Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)));
+        private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => adapters.Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)));
 #else
         private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>();
 #endif
@@ -121,7 +122,7 @@ NOTE: This command should only be used when installing Chocolatey, not
             return true;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -149,6 +150,6 @@ NOTE: This command should only be used when installing Chocolatey, not
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual bool may_require_admin_access()
             => MayRequireAdminAccess();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

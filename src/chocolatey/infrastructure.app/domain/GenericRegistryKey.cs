@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using Microsoft.Win32;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System.Collections.Generic;
-    using Microsoft.Win32;
-
     public class GenericRegistryKey
     {
         public string Name { get; set; }

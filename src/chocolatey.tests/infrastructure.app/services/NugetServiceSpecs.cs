@@ -14,22 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.services;
+using Moq;
+using NuGet.Common;
+using NuGet.Packaging;
+using FluentAssertions;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.tests.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.services;
-    using Moq;
-    using NuGet.Common;
-    using NuGet.Packaging;
-    using FluentAssertions;
-    using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
-
     public class NugetServiceSpecs
     {
         public abstract class NugetServiceSpecsBase : TinySpec
@@ -67,8 +67,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
                 Package.Setup(x => x.Id).Returns("bob");
-                _packageInfo = new ChocolateyPackageInformation(Package.Object);
-                _packageInfo.FilesSnapshot = new PackageFiles();
+                _packageInfo = new ChocolateyPackageInformation(Package.Object)
+                {
+                    FilesSnapshot = new PackageFiles()
+                };
                 _packageFiles = new PackageFiles();
                 FileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
             }
@@ -127,10 +129,12 @@ namespace chocolatey.tests.infrastructure.app.services
                     FilePath
                 };
                 FileSystem.Setup(x => x.GetFiles(It.IsAny<string>(), It.IsAny<string>(), SearchOption.AllDirectories)).Returns(fileSystemFiles);
-                var updatedPackageFiles = new PackageFiles();
-                updatedPackageFiles.Files = new List<PackageFile>
+                var updatedPackageFiles = new PackageFiles
+                {
+                    Files = new List<PackageFile>
                 {
                     packageFileWithUpdatedChecksum
+                }
                 };
                 FilesService.Setup(x => x.CaptureSnapshot(It.IsAny<string>(), _config)).Returns(updatedPackageFiles);
 
@@ -151,8 +155,10 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
                 Package.Setup(x => x.Id).Returns("bob");
-                _packageInfo = new ChocolateyPackageInformation(Package.Object);
-                _packageInfo.FilesSnapshot = new PackageFiles();
+                _packageInfo = new ChocolateyPackageInformation(Package.Object)
+                {
+                    FilesSnapshot = new PackageFiles()
+                };
                 _packageFiles = new List<PackageFile>();
                 FileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(true);
             }
@@ -311,7 +317,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var infos = MockLogger.MessagesFor(tests.LogLevel.Info);
                 infos.Should().ContainSingle();
-                infos.Should().HaveElementAt(0,"Chocolatey would have searched for a nuspec file in \"c:\\projects\\chocolatey\" and attempted to compile it.");
+                infos.Should().HaveElementAt(0, "Chocolatey would have searched for a nuspec file in \"c:\\projects\\chocolatey\" and attempted to compile it.");
             }
 
             [Fact]
@@ -325,7 +331,7 @@ namespace chocolatey.tests.infrastructure.app.services
 
                 var infos = MockLogger.MessagesFor(tests.LogLevel.Info);
                 infos.Should().ContainSingle();
-                infos.Should().HaveElementAt(0,"Chocolatey would have searched for a nuspec file in \"c:\\packages\" and attempted to compile it.");
+                infos.Should().HaveElementAt(0, "Chocolatey would have searched for a nuspec file in \"c:\\packages\" and attempted to compile it.");
             }
         }
     }

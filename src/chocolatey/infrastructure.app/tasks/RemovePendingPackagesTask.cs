@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.app.events;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.tasks;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.tolerance;
+
 namespace chocolatey.infrastructure.app.tasks
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using events;
-    using filesystem;
-    using infrastructure.events;
-    using infrastructure.services;
-    using infrastructure.tasks;
-    using logging;
-    using tolerance;
-
     public class RemovePendingPackagesTask : ITask
     {
         private readonly IFileSystem _fileSystem;
@@ -53,7 +53,10 @@ namespace chocolatey.infrastructure.app.tasks
 
         public void Shutdown()
         {
-            if (_subscription != null) _subscription.Dispose();
+            if (_subscription != null)
+            {
+                _subscription.Dispose();
+            }
         }
 
         private void HandleMessage(PreRunMessage message)
@@ -100,7 +103,7 @@ namespace chocolatey.infrastructure.app.tasks
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void initialize()
             => Initialize();
@@ -108,6 +111,6 @@ namespace chocolatey.infrastructure.app.tasks
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void shutdown()
             => Shutdown();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Runtime;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey
 {
-    using System;
-    using System.Runtime;
-    using infrastructure.logging;
-
     /// <summary>
     ///   Extensions for ILog
     /// </summary>
@@ -31,15 +31,25 @@ namespace chocolatey
         public static bool LogTraceMessages = true;
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
+#pragma warning disable IDE0060 // Unused method parameter
         public static void Trace(this ILog logger, string message, params object[] formatting)
+#pragma warning restore IDE0060 // Unused method parameter
         {
-           if (LogTraceMessages) ChocolateyLoggers.Trace.ToStringSafe().Log().Debug(message, formatting);
+            if (LogTraceMessages)
+            {
+                ChocolateyLoggers.Trace.ToStringSafe().Log().Debug(message, formatting);
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
+#pragma warning disable IDE0060 // Unused method parameter
         public static void Trace(this ILog logger, Func<string> message)
+#pragma warning restore IDE0060 // Unused method parameter
         {
-            if (LogTraceMessages) ChocolateyLoggers.Trace.ToStringSafe().Log().Debug(message);
+            if (LogTraceMessages)
+            {
+                ChocolateyLoggers.Trace.ToStringSafe().Log().Debug(message);
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
@@ -52,7 +62,7 @@ namespace chocolatey
                     logger.Debug(message, formatting);
                     break;
                 case ChocolateyLoggers.Trace:
-                    Trace(logger,message,formatting);
+                    Trace(logger, message, formatting);
                     break;
                 default:
                     logType.ToStringSafe().Log().Debug(message, formatting);

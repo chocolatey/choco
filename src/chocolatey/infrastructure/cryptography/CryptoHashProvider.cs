@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.filesystem;
+using Environment = System.Environment;
+using HashAlgorithm = chocolatey.infrastructure.adapters.HashAlgorithm;
+
 namespace chocolatey.infrastructure.cryptography
 {
-    using System;
-    using System.IO;
-    using System.Runtime.InteropServices;
-    using System.Security.Cryptography;
-    using System.Text;
-    using adapters;
-    using app;
-    using filesystem;
-    using Environment = System.Environment;
-    using HashAlgorithm = adapters.HashAlgorithm;
-
     public class CryptoHashProvider : IHashProvider
     {
         private readonly IFileSystem _fileSystem;
@@ -86,7 +86,10 @@ namespace chocolatey.infrastructure.cryptography
 
         public string ComputeFileHash(string filePath)
         {
-            if (!_fileSystem.FileExists(filePath)) return string.Empty;
+            if (!_fileSystem.FileExists(filePath))
+            {
+                return string.Empty;
+            }
 
             try
             {
@@ -136,13 +139,16 @@ namespace chocolatey.infrastructure.cryptography
         public static string ComputeStringHash(string originalText, CryptoHashProviderType providerType)
         {
             IHashAlgorithm hashAlgorithm = GetHashAlgorithmStatic(providerType);
-            if (hashAlgorithm == null) return string.Empty;
+            if (hashAlgorithm == null)
+            {
+                return string.Empty;
+            }
 
-             var hash = hashAlgorithm.ComputeHash(Encoding.ASCII.GetBytes(originalText));
-             return BitConverter.ToString(hash).Replace("-", string.Empty);
+            var hash = hashAlgorithm.ComputeHash(Encoding.ASCII.GetBytes(originalText));
+            return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void set_hash_algorithm(CryptoHashProviderType algorithmType)
             => SetHashAlgorithm(algorithmType);
@@ -170,6 +176,6 @@ namespace chocolatey.infrastructure.cryptography
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string hash_value(string originalText, CryptoHashProviderType providerType)
             => ComputeStringHash(originalText, providerType);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

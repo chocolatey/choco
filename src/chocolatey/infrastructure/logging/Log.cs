@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.logging
 {
-    using System;
-
     /// <summary>
     ///   Logger type initialization
     /// </summary>
     public static class Log
     {
-        private static Type _logType = typeof (NullLog);
+        private static Type _logType = typeof(NullLog);
         private static ILog _logger;
 
         /// <summary>
@@ -33,8 +33,11 @@ namespace chocolatey.infrastructure.logging
         /// <param name="resetLoggers">Should other loggers be reset?</param>
         public static void InitializeWith<T>(bool resetLoggers = true) where T : ILog, new()
         {
-            _logType = typeof (T);
-            if (resetLoggers) LogExtensions.ResetLoggers();
+            _logType = typeof(T);
+            if (resetLoggers)
+            {
+                LogExtensions.ResetLoggers();
+            }
         }
 
         /// <summary>
@@ -47,7 +50,10 @@ namespace chocolatey.infrastructure.logging
         {
             _logType = loggerType.GetType();
             _logger = loggerType;
-            if (resetLoggers) LogExtensions.ResetLoggers();
+            if (resetLoggers)
+            {
+                LogExtensions.ResetLoggers();
+            }
         }
 
         /// <summary>

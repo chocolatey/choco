@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+
 namespace chocolatey.infrastructure.logging
 {
-    using System;
-    using System.Collections.Generic;
-
     public sealed class LogSinkLog : ILog, ILog<LogSinkLog>
     {
         private readonly IList<LogMessage> _messages = new List<LogMessage>();

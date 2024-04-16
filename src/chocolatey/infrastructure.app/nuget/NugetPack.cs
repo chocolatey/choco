@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using chocolatey.infrastructure.platforms;
+using NuGet.Common;
+using NuGet.Configuration;
+using NuGet.Packaging;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using IFileSystem = filesystem.IFileSystem;
-    using chocolatey.infrastructure.platforms;
-    using NuGet.Common;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-
     public sealed class NugetPack
     {
         public static bool BuildPackage(PackageBuilder builder, IFileSystem fileSystem, string outputPath)
@@ -33,7 +33,7 @@ namespace chocolatey.infrastructure.app.nuget
             ExcludeFiles(builder.Files);
 
             // Track if the package file was already present on disk
-            bool isExistingPackage = fileSystem.FileExists(outputPath);
+            var isExistingPackage = fileSystem.FileExists(outputPath);
             try
             {
                 using (Stream stream = fileSystem.CreateFile(outputPath))

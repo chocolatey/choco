@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.services;
+using Microsoft.Win32;
+using Moq;
+using NUnit.Framework;
+using FluentAssertions;
+using Registry = chocolatey.infrastructure.app.domain.Registry;
+
 namespace chocolatey.tests.infrastructure.app.services
 {
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.services;
-    using Microsoft.Win32;
-    using Moq;
-    using NUnit.Framework;
-    using FluentAssertions;
-    using Registry = chocolatey.infrastructure.app.domain.Registry;
-
     public class RegistryServiceSpecs
     {
         public abstract class RegistryServiceSpecsBase : TinySpec

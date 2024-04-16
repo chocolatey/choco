@@ -1,15 +1,15 @@
-﻿namespace chocolatey.tests.integration.infrastructure.app.services
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.services;
-    using Moq;
-    using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.services;
+using Moq;
+using FluentAssertions;
 
+namespace chocolatey.tests.integration.infrastructure.app.services
+{
     public class ChocolateyConfigSettingsServiceSpecs
     {
         public abstract class ChocolateyConfigSettingsServiceSpecsBase : TinySpec
@@ -167,8 +167,8 @@
 
                     Service.DisableFeature(config);
                 };
-                    action.Should().Throw<ApplicationException>()
-                        .WithMessage("Feature '{0}' is not supported.".FormatWith(FeatureName));
+                action.Should().Throw<ApplicationException>()
+                    .WithMessage("Feature '{0}' is not supported.".FormatWith(FeatureName));
             }
         }
 

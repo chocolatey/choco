@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.registration;
+
 namespace chocolatey.infrastructure.licensing
 {
-    using System;
-    using app;
-    using information;
-    using logging;
-    using registration;
-
     public static class License
     {
         public static ChocolateyLicense ValidateLicense()
@@ -88,10 +88,10 @@ Ensure that the chocolatey.licensed.dll exists at the following path:
             return license;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static ChocolateyLicense validate_license()
             => ValidateLicense();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }
