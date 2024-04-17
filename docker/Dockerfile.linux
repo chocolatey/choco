@@ -14,7 +14,7 @@ ENV GITHUB_BASE_REF=$github_base_ref
 ENV GITHUB_HEAD_REF=$github_head_ref
 ENV GITHUB_RUN_NUMBER=$github_run_number
 
-RUN echo deb http://deb.debian.org/debian buster-backports main | tee /etc/apt/sources.list.d/buster-backports.list; \
+RUN echo deb http://archive.debian.org/debian buster-backports main | tee /etc/apt/sources.list.d/buster-backports.list; \
     apt-get update && apt-get install -t buster-backports git -y
 
 RUN curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb; \
