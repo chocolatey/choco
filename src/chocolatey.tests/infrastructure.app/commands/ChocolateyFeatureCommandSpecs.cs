@@ -143,7 +143,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 errored.Should().BeTrue();
                 error.Should().NotBeNull();
                 error.Should().BeOfType<ApplicationException>();
-                error.Message.Should().Contain("A single features command must be listed");
+                error.Message.Should().Contain("A single feature command must be listed.");
             }
 
             [Fact]
