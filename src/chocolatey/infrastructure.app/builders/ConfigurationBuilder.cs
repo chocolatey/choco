@@ -278,10 +278,10 @@ namespace chocolatey.infrastructure.app.builders
             config.WebRequestTimeoutSeconds = webRequestTimeoutSeconds;
 
             config.Proxy.Location = SetConfigItem(ApplicationParameters.ConfigSettings.Proxy, configFileSettings, string.Empty, "Explicit proxy location.");
-            config.Proxy.User = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user.");
-            config.Proxy.EncryptedPassword = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted.");
-            config.Proxy.BypassList = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyBypassList, configFileSettings, string.Empty, "Optional proxy bypass list. Comma separated.");
-            config.Proxy.BypassOnLocal = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyBypassOnLocal, configFileSettings, "true", "Bypass proxy for local connections.").IsEqualTo(bool.TrueString);
+            config.Proxy.User = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user. Requires explicit proxy configured.");
+            config.Proxy.EncryptedPassword = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted. Requires explicit proxy and proxyUser configured.");
+            config.Proxy.BypassList = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyBypassList, configFileSettings, string.Empty, "Optional proxy bypass list. Comma separated. Requires explicit proxy configured.");
+            config.Proxy.BypassOnLocal = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyBypassOnLocal, configFileSettings, "true", "Bypass proxy for local connections. Requires explicit proxy configured.").IsEqualTo(bool.TrueString);
             config.UpgradeCommand.PackageNamesToSkip = SetConfigItem(ApplicationParameters.ConfigSettings.UpgradeAllExceptions, configFileSettings, string.Empty, "A comma-separated list of package names that should not be upgraded when running `choco upgrade all'. Defaults to empty.");
             config.DefaultTemplateName = SetConfigItem(ApplicationParameters.ConfigSettings.DefaultTemplateName, configFileSettings, string.Empty, "Default template name used when running 'choco new' command.");
             config.PushCommand.DefaultSource = SetConfigItem(ApplicationParameters.ConfigSettings.DefaultPushSource, configFileSettings, string.Empty, "Default source to push packages to when running 'choco push' command.");
@@ -443,7 +443,7 @@ namespace chocolatey.infrastructure.app.builders
                             "Proxy User Name - Explicit proxy user (optional). Requires explicit proxy (`--proxy` or config setting). Overrides the default proxy user of '{0}'.".FormatWith(config.Proxy.User),
                             option => config.Proxy.User = option.UnquoteSafe())
                         .Add("proxy-password=",
-                            "Proxy Password - Explicit proxy password (optional) to be used with username. Requires explicit proxy (`--proxy` or config setting) and user name.  Overrides the default proxy password (encrypted in settings if set).",
+                            "Proxy Password - Explicit proxy password (optional) to be used with user name. Encrypted. Requires explicit proxy (`--proxy` or config setting) and user name (`--proxy-user` or config setting).  Overrides the default proxy password.",
                             option => config.Proxy.EncryptedPassword = NugetEncryptionUtility.EncryptString(option.UnquoteSafe()))
                         .Add("proxy-bypass-list=",
                              "ProxyBypassList - Comma separated list of regex locations to bypass on proxy. Requires explicit proxy (`--proxy` or config setting). Overrides the default proxy bypass list of '{0}'.".FormatWith(config.Proxy.BypassList),
