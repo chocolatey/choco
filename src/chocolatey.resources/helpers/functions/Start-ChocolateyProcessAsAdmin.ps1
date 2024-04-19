@@ -127,9 +127,15 @@ Install-ChocolateyInstallPackage
         }
         $workingDirectory = $pwd.ProviderPath
     }
+
     $alreadyElevated = $false
     if (Test-ProcessAdminRights) {
         $alreadyElevated = $true
+    }
+
+    if ($elevated -and -not $alreadyElevated -and $env:ChocolateyAttemptedElevation) {
+        $env:ChocolateyAttemptedElevation = [string]::Empty
+        throw "Elevation attempt failed. Aborting..."
     }
 
     $dbMessagePrepend = "Elevating permissions and running"
@@ -257,31 +263,42 @@ $dbMessagePrepend [`"$exeToRun`" $wrappedStatements]. This may take a while, dep
         $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Minimized
     }
 
-    $process.Start() | Out-Null
-    if ($process.StartInfo.RedirectStandardOutput) {
-        $process.BeginOutputReadLine()
-    }
-    if ($process.StartInfo.RedirectStandardError) {
-        $process.BeginErrorReadLine()
-    }
-    $process.WaitForExit()
-
-    # For some reason this forces the jobs to finish and waits for
-    # them to do so. Without this it never finishes.
-    Unregister-Event -SourceIdentifier "LogOutput_ChocolateyProc"
-    Unregister-Event -SourceIdentifier "LogErrors_ChocolateyProc"
-
-    # sometimes the process hasn't fully exited yet.
-    for ($loopCount = 1; $loopCount -le 15; $loopCount++) {
-        if ($process.HasExited) {
-            break;
+    try {
+        if ($elevated -and -not $alreadyElevated) {
+            # Set this in case of recursive calls into Start-ChocolateyProcessAsAdmin
+            $env:ChocolateyAttemptedElevation = "true"
         }
-        Write-Debug "Waiting for process to exit - $loopCount/15 seconds";
-        Start-Sleep 1;
-    }
 
-    $exitCode = $process.ExitCode
-    $process.Dispose()
+        $process.Start() | Out-Null
+        if ($process.StartInfo.RedirectStandardOutput) {
+            $process.BeginOutputReadLine()
+        }
+        if ($process.StartInfo.RedirectStandardError) {
+            $process.BeginErrorReadLine()
+        }
+        $process.WaitForExit()
+
+        # For some reason this forces the jobs to finish and waits for
+        # them to do so. Without this it never finishes.
+        Unregister-Event -SourceIdentifier "LogOutput_ChocolateyProc"
+        Unregister-Event -SourceIdentifier "LogErrors_ChocolateyProc"
+
+        # sometimes the process hasn't fully exited yet.
+        for ($loopCount = 1; $loopCount -le 15; $loopCount++) {
+            if ($process.HasExited) {
+                break;
+            }
+            Write-Debug "Waiting for process to exit - $loopCount/15 seconds";
+            Start-Sleep 1;
+        }
+
+        $exitCode = $process.ExitCode
+        $process.Dispose()
+    }
+    finally {
+        # Unset the value so that any further invocations do not get confused.
+        $env:ChocolateyAttemptedElevation = [string]::Empty
+    }
 
     Write-Debug "Command [`"$exeToRun`" $wrappedStatements] exited with `'$exitCode`'."
 
