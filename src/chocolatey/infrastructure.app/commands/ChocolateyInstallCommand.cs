@@ -314,6 +314,11 @@ NOTE: Chocolatey Pro / Business builds on top of a great open source
     choco install <path/to/nuspec>
     choco install <path/to/nupkg>
 
+NOTE: `all` is a special package keyword that will allow you to install
+ all packages available on a source. This keyword is not available for
+ public repositories like the Chocolatey Community Repository, and is
+ intended to  be used with internal package sources only.
+
 NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
 

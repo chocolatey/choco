@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.XPath;
+using chocolatey.infrastructure.app;
 using chocolatey.infrastructure.app.commands;
 using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.app.services;
@@ -4593,6 +4594,53 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_not_have_warning_package_result()
             {
                 Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
+            }
+        }
+
+        public class When_installing_all_packages_from_ccr : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "all";
+                Configuration.Sources = ApplicationParameters.ChocolateyCommunityFeedSource;
+            }
+
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void Should_throw_an_error_that_it_is_not_allowed()
+            {
+                Action m = () => Service.Install(Configuration); ;
+
+                m.Should().Throw<ApplicationException>();
+            }
+        }
+
+        public class When_installing_all_packages_from_local_source : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "all";
+
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.1.0.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.1.0.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "upgradepackage*" + NuGetConstants.PackageExtension);
+            }
+
+            public override void Because()
+            {
+                Results = Service.Install(Configuration);
+            }
+
+            [Fact]
+            public void Should_install_all_packages()
+            {
+                Results.Should().HaveCount(6);
             }
         }
     }
