@@ -351,6 +351,11 @@ Exit codes that normally result from running this command.
 Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
+ - 2: nothing to do, no packages outdated (enhanced)
+
+NOTE: Starting in v2.3.0, if you have the feature '{2}'
+ turned on, then choco will provide enhanced exit codes that allow
+ better integration and scripting.
 
 Package Exit Codes:
  - 1641: success, reboot initiated
@@ -368,7 +373,7 @@ Reboot Exit Codes:
 In addition to the above exit codes, you may also see reboot exit codes
  when the feature '{1}' is turned on. It typically requires
  the feature '{0}' to also be turned on to work properly.
-".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
+".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected, ApplicationParameters.Features.UseEnhancedExitCodes));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"

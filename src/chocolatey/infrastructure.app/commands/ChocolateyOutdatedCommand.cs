@@ -130,7 +130,7 @@ Normal:
 Enhanced:
  - 0: no outdated packages
  - -1 or 1: an error has occurred
- - 2: outdated packages have been found
+ - 2: outdated packages have been found (enhanced)
 
 NOTE: If you have the feature '{0}' turned on,
  then choco will provide enhanced exit codes that allow
