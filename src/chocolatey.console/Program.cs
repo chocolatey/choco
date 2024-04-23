@@ -147,7 +147,7 @@ namespace chocolatey.console
                 Log4NetAppenderConfiguration.EnableVerboseLoggingIf(config.Verbose, config.Debug, verboseAppenderName);
                 Log4NetAppenderConfiguration.EnableTraceLoggingIf(config.Trace, traceAppenderName);
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".FormatWith(ApplicationParameters.Name, config.Information.PlatformType, config.Information.PlatformVersion.ToStringSafe()));
-                //"chocolatey".Log().Debug(() => "Command Line: {0}".format_with(Environment.CommandLine));
+                //"chocolatey".Log().Debug(() => "Command Line: {0}".FormatWith(Environment.CommandLine));
 
                 RemoveOldChocoExe(fileSystem);
 

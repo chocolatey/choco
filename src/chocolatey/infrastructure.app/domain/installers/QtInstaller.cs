@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             NoReboot = "";
             LogFile = "";
             //http://doc.qt.io/qtinstallerframework/ifw-globalconfig.html
-            //CustomInstallLocation = "targetdir={0}".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
+            //CustomInstallLocation = "targetdir={0}".FormatWith(InstallTokens.CUSTOM_INSTALL_LOCATION);
             CustomInstallLocation = "";
             Language = "";
             OtherInstallOptions = "";

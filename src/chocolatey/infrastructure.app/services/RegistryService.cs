@@ -98,7 +98,7 @@ namespace chocolatey.infrastructure.app.services
 
                 if (uninstallKey != null)
                 {
-                    //Console.WriteLine("Evaluating {0} of {1}".format_with(uninstallKey.View, uninstallKey.Name));
+                    //Console.WriteLine("Evaluating {0} of {1}".FormatWith(uninstallKey.View, uninstallKey.Name));
                     UpdateSnapshot(uninstallKey, snapshot);
                 }
                 registryKey.Close();
@@ -245,7 +245,7 @@ namespace chocolatey.infrastructure.app.services
                             Console.WriteLine("key - {0}|{1}={2}|Type detected={3}|install location={4}".FormatWith(key.Name, name, value.ToStringSafe(), appKey.InstallerType.ToStringSafe(), appKey.InstallLocation.ToStringSafe()));
                         }
 
-                        //Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".format_with(key.Name, name, kind, value.to_string()));
+                        //Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".FormatWith(key.Name, name, kind, value.to_string()));
                     }
                     //}
                 }
@@ -311,8 +311,8 @@ namespace chocolatey.infrastructure.app.services
                      //if (string.IsNullOrWhiteSpace(appKey.InstallLocation) && !appKey.Publisher.contains("Microsoft"))
                      //{
                      //    var msiComponentsKey = FaultTolerance.try_catch_with_logging_exception(
-                     //       () => msiRegistryKey.OpenSubKey("{0}\\Components".format_with(subKeyName), RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
-                     //       "Failed to open subkey named '{0}' for '{1}', likely due to permissions".format_with(subKeyName, msiRegistryKey.Name),
+                     //       () => msiRegistryKey.OpenSubKey("{0}\\Components".FormatWith(subKeyName), RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
+                     //       "Failed to open subkey named '{0}' for '{1}', likely due to permissions".FormatWith(subKeyName, msiRegistryKey.Name),
                      //       logWarningInsteadOfError: true);
                      //    if (msiComponentsKey == null) continue;
 
@@ -320,7 +320,7 @@ namespace chocolatey.infrastructure.app.services
                      //    {
                      //        var msiComponentKey = FaultTolerance.try_catch_with_logging_exception(
                      //           () => msiComponentsKey.OpenSubKey(msiComponentKeyName, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
-                     //           "Failed to open subkey named '{0}' for '{1}', likely due to permissions".format_with(subKeyName, msiRegistryKey.Name),
+                     //           "Failed to open subkey named '{0}' for '{1}', likely due to permissions".FormatWith(subKeyName, msiRegistryKey.Name),
                      //           logWarningInsteadOfError: true);
 
                      //        if (msiComponentKey.GetValueNames().Contains(userDataProductKeyId, StringComparer.OrdinalIgnoreCase))

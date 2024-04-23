@@ -769,7 +769,7 @@ namespace chocolatey.infrastructure.filesystem
             {
                 var destinationFile = file.Replace(sourceDirectoryPath, destinationDirectoryPath);
                 EnsureDirectoryExists(GetDirectoryName(destinationFile), ignoreError: true);
-                //this.Log().Debug(ChocolateyLoggers.Verbose, "Copying '{0}' {1} to '{2}'".format_with(file, Environment.NewLine, destinationFile));
+                //this.Log().Debug(ChocolateyLoggers.Verbose, "Copying '{0}' {1} to '{2}'".FormatWith(file, Environment.NewLine, destinationFile));
 
                 try
                 {

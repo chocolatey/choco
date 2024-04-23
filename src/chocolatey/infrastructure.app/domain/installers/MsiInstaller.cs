@@ -47,7 +47,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             OtherInstallOptions = "ALLUSERS=1 DISABLEDESKTOPSHORTCUT=1 ADDDESKTOPICON=0 ADDSTARTMENU=0";
             UninstallExecutable = "msiexec.exe";
             //todo: eventually will need this
-            //SilentUninstall = "/qn /x{0}".format_with(InstallTokens.UNINSTALLER_LOCATION);
+            //SilentUninstall = "/qn /x{0}".FormatWith(InstallTokens.UNINSTALLER_LOCATION);
             SilentUninstall = "/qn";
             OtherUninstallOptions = "";
             // https://msdn.microsoft.com/en-us/library/aa376931.aspx

@@ -657,7 +657,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             // use the config to reconstruct
 
             //bug:sources are unable to be used - it's late in the process when a package is known
-            //arguments.Append(" --source=\"'{0}'\"".format_with(config.Sources));
+            //arguments.Append(" --source=\"'{0}'\"".FormatWith(config.Sources));
 
             if (config.Prerelease)
             {
