@@ -834,17 +834,27 @@ function Install-DotNet48IfMissing {
 }
 
 function Invoke-Chocolatey-Initial {
+    if ($PSVersionTable.Major -le 3 -and $script:DotNetInstallRequiredReboot) {
+        Write-Debug "Skipping initialization due to known issues before rebooting."
+        return
+    }
+
     Write-Debug "Initializing Chocolatey files, etc by running Chocolatey CLI..."
 
     try {
         $chocoInstallationFolder = Get-ChocolateyInstallFolder
         $chocoExe = Join-Path -Path $chocoInstallationFolder -ChildPath "choco.exe"
-        $runResult = & $chocoExe -v
-        Write-Debug "Chocolatey CLI execution completed successfully."
+        $runResult = & $chocoExe -v *>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Debug "Chocolatey CLI execution completed successfully."
+        }
+        else {
+            throw
+        }
     }
     catch {
         Write-ChocolateyWarning "Unable to run Chocolatey CLI at this time:`n$($runResult)"
     }
 }
 
-Export-ModuleMember -Function Initialize-Chocolatey;
+Export-ModuleMember -Function Initialize-Chocolatey
