@@ -67,6 +67,14 @@ namespace chocolatey.tests
             {
                 MockLogger.Reset();
             }
+
+            // Chocolatey CLI by default will exit with Code 0, when everything work as expected, even if it doesn't
+            // set this explicitly.
+            // However, in some tests, we are testing for the setting of an explicit exit code, and when we do this,
+            // it can have an impact on other tests, since it may not have been reset.  Let's explicitly set it to
+            // 0 before running each test, so that everything starts off at the right place.
+            Environment.ExitCode = default;
+
             //Log.InitializeWith(MockLogger);
             NugetCommon.ClearRepositoriesCache();
             Context();
