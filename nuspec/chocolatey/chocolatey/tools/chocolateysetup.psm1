@@ -126,7 +126,7 @@ function Initialize-Chocolatey {
     $installModule = Join-Path $thisScriptFolder 'chocolateyInstall\helpers\chocolateyInstaller.psm1'
     Import-Module $installModule -Force
 
-  Install-DotNet48IfMissing
+    Install-DotNet48IfMissing
 
     if ($chocolateyPath -eq '') {
         $programData = [Environment]::GetFolderPath("CommonApplicationData")
@@ -167,7 +167,7 @@ The packages themselves go to `'$chocolateyLibPath`'
 A shim file for the command line goes to `'$chocolateyExePath`'
   and points to an executable in `'$yourPkgPath`'.
 
-Creating Chocolatey folders if they do not already exist.
+Creating Chocolatey CLI folders if they do not already exist.
 
 "@ | Write-Output
 
@@ -204,13 +204,20 @@ Creating Chocolatey folders if they do not already exist.
         $env:ChocolateyExitCode = 0
     }
 
-    @"
-Chocolatey (choco.exe) is now ready.
+    if ($script:DotNetInstallRequiredReboot) {
+        @"
+Chocolatey CLI (choco.exe) is nearly ready.
+You need to restart this machine prior to using choco.
+"@ | Write-Output
+    } else {
+        @"
+Chocolatey CLI (choco.exe) is now ready.
 You can call choco from anywhere, command line or powershell by typing choco.
 Run choco /? for a list of functions.
 You may need to shut down and restart powershell and/or consoles
  first prior to using choco.
 "@ | Write-Output
+    }
 
     if (-not $allowInsecureRootInstall) {
         Remove-OldChocolateyInstall $defaultChocolateyPathOld
@@ -812,9 +819,9 @@ function Install-DotNet48IfMissing {
         $s = [System.Diagnostics.Process]::Start($psi);
         $s.WaitForExit();
         if ($s.ExitCode -eq 1641 -or $s.ExitCode -eq 3010) {
-          throw ".NET Framework 4.8 was installed, but a reboot is required. `n Please reboot the system and try to install/upgrade Chocolatey again."
-        }
-        if ($s.ExitCode -ne 0) {
+          Write-Warning ".NET Framework 4.8 was installed, but a reboot is required before using Chocolatey CLI."
+          $script:DotNetInstallRequiredReboot = $true
+        } elseif ($s.ExitCode -ne 0) {
             if ($netFx48InstallTries -ge 2) {
                 Write-ChocolateyError ".NET Framework install failed with exit code `'$($s.ExitCode)`'. `n This will cause the rest of the install to fail."
                 throw "Error installing .NET Framework 4.8 (exit code $($s.ExitCode)). `n Please install the .NET Framework 4.8 manually and reboot the system `n and then try to install/upgrade Chocolatey again. `n Download at `'$NetFx48Url`'"
@@ -827,17 +834,27 @@ function Install-DotNet48IfMissing {
 }
 
 function Invoke-Chocolatey-Initial {
-    Write-Debug "Initializing Chocolatey files, etc by running Chocolatey..."
+    if ($PSVersionTable.Major -le 3 -and $script:DotNetInstallRequiredReboot) {
+        Write-Debug "Skipping initialization due to known issues before rebooting."
+        return
+    }
+
+    Write-Debug "Initializing Chocolatey files, etc by running Chocolatey CLI..."
 
     try {
         $chocoInstallationFolder = Get-ChocolateyInstallFolder
         $chocoExe = Join-Path -Path $chocoInstallationFolder -ChildPath "choco.exe"
-        & $chocoExe -v | Out-Null
-        Write-Debug "Chocolatey execution completed successfully."
+        $runResult = & $chocoExe -v *>&1
+        if ($LASTEXITCODE -eq 0) {
+            Write-Debug "Chocolatey CLI execution completed successfully."
+        }
+        else {
+            throw
+        }
     }
     catch {
-        Write-ChocolateyWarning "Unable to run Chocolatey at this time.  It is likely that .Net Framework installation requires a system reboot"
+        Write-ChocolateyWarning "Unable to run Chocolatey CLI at this time:`n$($runResult)"
     }
 }
 
-Export-ModuleMember -Function Initialize-Chocolatey;
+Export-ModuleMember -Function Initialize-Chocolatey
