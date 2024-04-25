@@ -1108,7 +1108,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var pkgInfo = _packageInfoService.Get(installedPackage.PackageMetadata);
                 var isPinned = pkgInfo != null && pkgInfo.IsPinned;
 
-                if (isPinned && config.OutdatedCommand.IgnorePinned)
+                if (isPinned && config.OutdatedCommand.IgnorePinned && !config.UpgradeCommand.IgnorePinned)
                 {
                     continue;
                 }
@@ -1246,15 +1246,31 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                     if (isPinned)
                     {
-                        var logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
-                        packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                        packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                        if (config.RegularOutput)
+                        if (!config.UpgradeCommand.IgnorePinned)
                         {
-                            this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                            var logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                            
+                            if (config.RegularOutput)
+                            {
+                                this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                            }
+                            
+                            continue;
                         }
+                        else
+                        {
+                            var logMessage = "{0} is pinned. Upgrading pinned package anyway as ignore pin is specified".FormatWith(packageName);
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
 
-                        continue;
+                            if (config.RegularOutput)
+                            {
+                                this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                            }
+                            
+                            config.PinPackage = true;
+                        }
                     }
 
                     if (performAction)
@@ -1262,7 +1278,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         localPackageListValid = false;
 
                         NugetCommon.GetPackageDependencies(availablePackage.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
-
 
                         packagesToUninstall.Add(installedPackage);
 
@@ -1275,7 +1290,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 packagesToUninstall.Add(allLocalPackages.FirstOrDefault(p => p.Identity.Equals(dependencyInfo)));
                             }
                         }
-
 
                         packagesToInstall.Add(availablePackage);
 
@@ -1326,7 +1340,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                         }
 
-                        var removedSources = RemovePinnedSourceDependencies(sourcePackageDependencyInfos, allLocalPackages);
+                        var removedSources = new HashSet<SourcePackageDependencyInfo>();
+                        
+                        if (!config.UpgradeCommand.IgnorePinned)
+                        {
+                            RemovePinnedSourceDependencies(sourcePackageDependencyInfos, allLocalPackages);
+                        }
 
                         if (version != null || removedSources.Count == 0)
                         {
