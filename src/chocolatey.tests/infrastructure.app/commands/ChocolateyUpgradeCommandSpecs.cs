@@ -236,6 +236,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 _optionSet.Contains("skiphooks").Should().BeTrue();
             }
+
+            [Fact]
+            public void Should_add_ignore_pinned_to_the_option_set()
+            {
+                _optionSet.Contains("ignore-pinned").Should().BeTrue();
+            }
         }
 
         public class When_handling_additional_argument_parsing : ChocolateyUpgradeCommandSpecsBase
