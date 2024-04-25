@@ -1279,7 +1279,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         NugetCommon.GetPackageDependencies(availablePackage.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
 
-
                         packagesToUninstall.Add(installedPackage);
 
                         if (config.ForceDependencies && installedPackage != null)
@@ -1291,7 +1290,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 packagesToUninstall.Add(allLocalPackages.FirstOrDefault(p => p.Identity.Equals(dependencyInfo)));
                             }
                         }
-
 
                         packagesToInstall.Add(availablePackage);
 
