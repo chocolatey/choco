@@ -158,6 +158,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 _optionSet.Contains("p").Should().BeTrue();
             }
+
+            [Fact]
+            public void Should_add_include_configured_sources_to_the_option_set()
+            {
+                _optionSet.Contains("include-configured-sources").Should().BeTrue();
+            }
         }
 
         [NUnit.Framework.TestFixture("search")]
