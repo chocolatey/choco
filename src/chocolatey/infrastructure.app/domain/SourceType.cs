@@ -19,7 +19,7 @@ using System;
 namespace chocolatey.infrastructure.app.domain
 {
     /// <summary>
-    ///   Special source modifiers that use alternate sources for packages
+    ///   Special source modifiers that use alternative sources for packages
     /// </summary>
     [Obsolete("This source type is no longer used, and only provided for backwards compatibility, instead use SourceTypes class instead.")]
     public enum SourceType
