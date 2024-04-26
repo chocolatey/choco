@@ -32,7 +32,7 @@ namespace chocolatey.infrastructure.app.commands
 {
 #endif
 
-    [CommandFor("unpackself", "re-installs Chocolatey base files")]
+    [CommandFor("unpackself", "[DEPRECATED] will be removed in v3.0.0 - re-installs Chocolatey base files")]
     public class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;
@@ -69,12 +69,17 @@ namespace chocolatey.infrastructure.app.commands
 
         public virtual void Validate(ChocolateyConfiguration configuration)
         {
+            this.Log().Warn(ChocolateyLoggers.Important, @"
+DEPRECATION NOTICE - choco unpackself command is deprecated and will be 
+ removed in version 3.0.0.");
         }
 
         public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
-            this.Log().Info(ChocolateyLoggers.Important, "UnpackSelf Command");
+            this.Log().Info(ChocolateyLoggers.Important, "[DEPRECATED] UnpackSelf Command");
             this.Log().Info(@"
+NOTE: Unpackself has been deprecated and will be removed in version 3.0.0. 
+
 This will unpack files needed by choco. It will overwrite existing
  files only if --force is specified.
 
