@@ -1,4 +1,4 @@
-#load nuget:?package=Chocolatey.Cake.Recipe&version=0.26.5
+#load nuget:?package=Chocolatey.Cake.Recipe&version=0.27.0
 
 ///////////////////////////////////////////////////////////////////////////////
 // TOOLS
