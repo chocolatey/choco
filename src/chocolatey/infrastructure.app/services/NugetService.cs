@@ -194,7 +194,7 @@ that uses these options.");
 
                 ChocolateyPackageMetadata packageLocalMetadata;
                 string packageInstallLocation = null;
-                string softwareInstallLocation = null;
+                string deploymentLocation = null;
                 if (package.PackagePath != null && !string.IsNullOrWhiteSpace(package.PackagePath))
                 {
                     packageLocalMetadata = new ChocolateyPackageMetadata(package.PackagePath, _fileSystem);
@@ -216,7 +216,7 @@ that uses these options.");
                         }
                     }
 
-                    softwareInstallLocation = packageInfo.SoftwareInstallLocation;
+                    deploymentLocation = packageInfo.DeploymentLocation;
                 }
 
                 if (!config.QuietOutput)
@@ -278,7 +278,7 @@ that uses these options.");
                                 package.Summary != null && !string.IsNullOrWhiteSpace(package.Summary.ToStringSafe()) ? "\r\n Summary: {0}".FormatWith(package.Summary.EscapeCurlyBraces().ToStringSafe()) : string.Empty,
                                 package.Description.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  "),
                                 !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty,
-                                !string.IsNullOrWhiteSpace(softwareInstallLocation) ? "{0} Software installed to: '{1}'".FormatWith(Environment.NewLine, softwareInstallLocation) : string.Empty
+                                !string.IsNullOrWhiteSpace(deploymentLocation) ? "{0} Deployed to: '{1}'".FormatWith(Environment.NewLine, deploymentLocation) : string.Empty
                             ));
                         }
                     }
