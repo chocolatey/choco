@@ -194,6 +194,7 @@ that uses these options.");
 
                 ChocolateyPackageMetadata packageLocalMetadata;
                 string packageInstallLocation = null;
+                string deploymentLocation = null;
                 if (package.PackagePath != null && !string.IsNullOrWhiteSpace(package.PackagePath))
                 {
                     packageLocalMetadata = new ChocolateyPackageMetadata(package.PackagePath, _fileSystem);
@@ -215,6 +216,7 @@ that uses these options.");
                         }
                     }
 
+                    deploymentLocation = packageInfo.DeploymentLocation;
                 }
 
                 if (!config.QuietOutput)
@@ -241,7 +243,7 @@ that uses these options.");
  Tags: {9}
  Software Site: {10}
  Software License: {11}{12}{13}{14}{15}{16}
- Description: {17}{18}
+ Description: {17}{18}{19}
 ".FormatWith(
                                 package.Title.EscapeCurlyBraces(),
                                 package.Published.GetValueOrDefault().UtcDateTime.ToShortDateString(),
@@ -275,7 +277,8 @@ that uses these options.");
                                 !string.IsNullOrWhiteSpace(package.BugTrackerUrl.ToStringSafe()) ? "{0} Issues: {1}".FormatWith(Environment.NewLine, package.BugTrackerUrl.ToStringSafe()) : string.Empty,
                                 package.Summary != null && !string.IsNullOrWhiteSpace(package.Summary.ToStringSafe()) ? "\r\n Summary: {0}".FormatWith(package.Summary.EscapeCurlyBraces().ToStringSafe()) : string.Empty,
                                 package.Description.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  "),
-                                !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty
+                                !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty,
+                                !string.IsNullOrWhiteSpace(deploymentLocation) ? "{0} Deployed to: '{1}'".FormatWith(Environment.NewLine, deploymentLocation) : string.Empty
                             ));
                         }
                     }
