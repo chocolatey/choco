@@ -371,21 +371,36 @@ namespace chocolatey.infrastructure.app.nuget
             ISet<PackageDependency> dependencyCache,
             ChocolateyConfiguration configuration)
         {
-            if (availablePackages.Contains(package))
+            foreach (var resource in resources)
             {
-                return;
-            }
+                var dependencyInfoResource = resource.DependencyInfoResource;
 
-            var dependencyInfoResources = resources.DependencyInfoResources();
+                if (dependencyInfoResource is null)
+                {
+                    // We can't lookup any dependencies using this resource.
+                    continue;
+                }
 
-            foreach (var dependencyInfoResource in dependencyInfoResources)
-            {
-                SourcePackageDependencyInfo dependencyInfo = null;
+                var dependencyInfo = availablePackages.FirstOrDefault(p => string.Equals(p.Id, package.Id, StringComparison.OrdinalIgnoreCase) && p.Version == package.Version && p.Source == resource.Source);
 
                 try
                 {
-                    dependencyInfo = await dependencyInfoResource.ResolvePackage(
-                        package, framework, cacheContext, logger, CancellationToken.None);
+                    if (dependencyInfo is null && !package.HasVersion)
+                    {
+                        var latestPackage = NugetList.FindPackage(package.Id, configuration, logger, cacheContext, new[] { resource });
+
+                        dependencyInfo = availablePackages.FirstOrDefault(p => string.Equals(p.Id, latestPackage.Identity.Id, StringComparison.OrdinalIgnoreCase) && p.Version == latestPackage.Identity.Version && p.Source == resource.Source);
+
+                        if (dependencyInfo is null)
+                        {
+                            dependencyInfo = await dependencyInfoResource.ResolvePackage(latestPackage.Identity, framework, cacheContext, logger, CancellationToken.None);
+                        }
+                    }
+                    else if (dependencyInfo is null)
+                    {
+                        dependencyInfo = await dependencyInfoResource.ResolvePackage(
+                            package, framework, cacheContext, logger, CancellationToken.None);
+                    }
                 }
                 catch (AggregateException ex) when (!(ex.InnerException is null))
                 {
@@ -402,18 +417,21 @@ namespace chocolatey.infrastructure.app.nuget
                 }
 
                 availablePackages.Add(dependencyInfo);
-                foreach (var dependency in dependencyInfo.Dependencies)
-                {
-                    if (dependencyCache.Contains(dependency))
-                    {
-                        continue;
-                    }
-
-                    dependencyCache.Add(dependency);
-                    await GetPackageDependencies(
-                        dependency.Id, framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration);
-                }
+                await HandleDependencies(framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration, dependencyInfo.Dependencies);
             }
+        }
+
+        [Obsolete("Use overload requiring a VersionRange being specified. Will be removed in v3.0.0")]
+        public static Task GetPackageDependencies(string packageId,
+            NuGetFramework framework,
+            SourceCacheContext cacheContext,
+            ILogger logger,
+            IEnumerable<NuGetEndpointResources> resources,
+            ISet<SourcePackageDependencyInfo> availablePackages,
+            ISet<PackageDependency> dependencyCache,
+            ChocolateyConfiguration configuration)
+        {
+            return GetPackageDependencies(packageId, framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration, VersionRange.All);
         }
 
         public static async Task GetPackageDependencies(string packageId,
@@ -423,8 +441,14 @@ namespace chocolatey.infrastructure.app.nuget
             IEnumerable<NuGetEndpointResources> resources,
             ISet<SourcePackageDependencyInfo> availablePackages,
             ISet<PackageDependency> dependencyCache,
-            ChocolateyConfiguration configuration)
+            ChocolateyConfiguration configuration,
+            VersionRange versionRange)
         {
+            if (versionRange is null)
+            {
+                throw new ArgumentNullException(nameof(versionRange));
+            }
+
             //if (availablePackages.Contains(packageID)) return;
 
             var dependencyInfoResources = resources.DependencyInfoResources();
@@ -452,20 +476,13 @@ namespace chocolatey.infrastructure.app.nuget
                     continue;
                 }
 
-                availablePackages.AddRange(dependencyInfos);
-                foreach (var dependency in dependencyInfos.SelectMany(p => p.Dependencies))
-                {
-                    if (dependencyCache.Contains(dependency))
-                    {
-                        continue;
-                    }
+                availablePackages.AddRange(dependencyInfos.Except(availablePackages));
+                // We call ToList here, otherwise we have the risk of the packages list being
+                // modified before we are done with the iteration
+                dependencyInfos = dependencyInfos.Where(di => versionRange.Satisfies(di.Version)).ToList();
 
-                    dependencyCache.Add(dependency);
 
-                    // Recursion is fun, kids
-                    await GetPackageDependencies(
-                        dependency.Id, framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration);
-                }
+                await HandleDependencies(framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration, dependencyInfos.SelectMany(di => di.Dependencies));
             }
         }
 
@@ -484,6 +501,36 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     parentPackages.Add(package);
                     await GetPackageParents(package.Id, parentPackages, locallyInstalledPackages);
+                }
+            }
+        }
+
+        private static async Task HandleDependencies(
+            NuGetFramework framework,
+            SourceCacheContext cacheContext,
+            ILogger logger,
+            IEnumerable<NuGetEndpointResources> resources,
+            ISet<SourcePackageDependencyInfo> availablePackages,
+            ISet<PackageDependency> dependencyCache, ChocolateyConfiguration configuration,
+            IEnumerable<PackageDependency> dependencies)
+        {
+            foreach (var dependency in dependencies)
+            {
+                if (dependencyCache.Contains(dependency))
+                {
+                    continue;
+                }
+
+                dependencyCache.Add(dependency);
+
+                if (dependency.VersionRange.HasLowerAndUpperBounds && dependency.VersionRange.MaxVersion == dependency.VersionRange.MinVersion)
+                {
+                    await GetPackageDependencies(new PackageIdentity(dependency.Id.ToLower(), dependency.VersionRange.MaxVersion), framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration);
+                }
+                else
+                {
+                    await GetPackageDependencies(
+                        dependency.Id.ToLower(), framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration, dependency.VersionRange);
                 }
             }
         }
