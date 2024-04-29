@@ -46,12 +46,45 @@ Get-Item -Path "$helpersPath\functions\*.ps1" |
         . $_.FullName
     }
 
+$currentAssemblies = [System.AppDomain]::CurrentDomain.GetAssemblies()
+
+# Import commands from Chocolatey.PowerShell.dll
+$chocolateyCmdlets = @{}
+
+$dllPath = "$helpersPath\Chocolatey.PowerShell.dll"
+if (Test-Path $dllPath) { 
+    # Try to import from already-loaded assembly, otherwise fallback to importing from dll
+    $cmdletsAssembly = $currentAssemblies |
+        Where-Object { $_.GetName().Name -eq 'Chocolatey.PowerShell' } |
+        Select-Object -First 1
+
+    if ($cmdletsAssembly) {
+        Import-Module $cmdletsAssembly.Location -Force
+    }
+    else {
+        Import-Module $dllPath
+    }
+
+    # Cache module commands for helping resolve lookups
+    $chocolateyCmdlets.Default = @( (Get-Module Chocolatey.PowerShell).ExportedCmdlets.Keys )
+
+    Write-Debug "Cmdlets exported from Chocolatey.PowerShell.dll"
+    $chocolateyCmdlets.Default | Write-Debug
+
+    # Set aliases for imported cmdlets
+    Set-Alias refreshenv Update-SessionEnvironment
+
+    # Check for & remove Chocolatey.PowerShell.dll.old left-over from an upgrade/reinstall
+    $dllOldPath = "$dllPath.old"
+    if (Test-Path $dllOldPath) {
+        Remove-Item -Path $dllOldPath -Force -ErrorAction SilentlyContinue
+    }
+}
+
 # Export built-in functions prior to loading extensions so that
 # extension-specific loading behavior can be used based on built-in
 # functions. This allows those overrides to be much more deterministic
 Export-ModuleMember -Function * -Alias * -Cmdlet *
-
-$currentAssemblies = [System.AppDomain]::CurrentDomain.GetAssemblies()
 
 # Load community extensions if they exist
 $extensionsPath = Join-Path $helpersPath -ChildPath '..\extensions'
@@ -68,13 +101,19 @@ if (Test-Path $extensionsPath) {
                 Select-Object -First 1
 
             if ($licensedAssembly) {
-                # It's already loaded, just import the existing assembly as a module for PowerShell to use
-                Import-Module $licensedAssembly
+                # Import-Module -Assembly doesn't work if the parent module is reimported, so force the import by path.
+                Import-Module $licensedAssembly.Location -Force
             }
             else {
                 # Fallback: load the extension DLL from the path directly.
                 Import-Module $licensedExtensionPath
             }
+
+            # Store commands from licensed module, stripping any 'Cmdlet' suffix from the command name
+            $chocolateyCmdlets.Licensed = @( (Get-Module chocolatey.licensed).ExportedCmdlets.Keys | ForEach-Object { $_ -replace "Cmdlet$" } )
+            
+            Write-Debug "Cmdlets exported from chocolatey.licensed"
+            $chocolateyCmdlets.Licensed | Write-Debug
         }
         catch {
             # Only write a warning if the Licensed extension failed to load in some way.
@@ -90,6 +129,46 @@ if (Test-Path $extensionsPath) {
             Import-Module $_
         }
 }
+
+# Exercise caution and test _thoroughly_ with AND without the licensed extension installed
+# when making any changes here. And make sure to update this comment if needed when any
+# changes are being made.
+#
+# This code overrides PowerShell's default command lookup semantics as follows:
+#
+# 1. If the command being looked up is available in chocolatey.licensed.dll as
+#    a cmdlet with OR without a "Cmdlet" suffix in its name, resolve to this command.
+#    (in other words, looking for `Get-ChocolateyThing` will _also_ accept something
+#    called `Get-ChocolateyThingCmdlet` if it's from the licensed extension)
+# 2. If nothing comes back from the licensed extension, then look through the cmdlets
+#    exported from the Chocolatey.PowerShell.dll module. If we find a match, make sure
+#    we resolve to this command from the Chocolatey.PowerShell.dll module.
+# 3. Finally, if neither of the above find the command being looked up, do nothing and allow
+#    PowerShell to use its default command lookup semantics.
+#
+# In effect we ensure that any command calls that match the name of one of our commands
+# will resolve to _our_ commands (preferring licensed cmdlets in the case of a name collision),
+# preventing packages from overriding them with their own commands and potentially breaking things.
+$ExecutionContext.InvokeCommand.PreCommandLookupAction = {
+    param($command, $eventArgs)
+
+    # Don't run this handler for stuff PowerShell is looking up internally
+    if ($eventArgs.CommandOrigin -eq 'Runspace') {
+        $resolvedCommand = if ($command -in $chocolateyCmdlets.Licensed) {
+            Get-Command "$command*" -Module 'chocolatey.licensed' -CommandType Cmdlet -ErrorAction Ignore |
+                Where-Object { $_.Name -match "^$command(Cmdlet)?$" } |
+                Select-Object -First 1
+        }
+        elseif ($command -in $chocolateyCmdlets.Default) {
+            Get-Command $command -Module "Chocolatey.PowerShell" -CommandType Cmdlet -ErrorAction Ignore
+        }
+
+        if ($resolvedCommand) {
+            $eventArgs.Command = $resolvedCommand
+            $eventArgs.StopSearch = $true
+        }
+    }
+}.GetNewClosure()
 
 # todo: explore removing this for a future version
 Export-ModuleMember -Function * -Alias * -Cmdlet *

@@ -20,10 +20,9 @@ if (Get-Module chocolateyProfile) {
 
 $thisDirectory = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
 
+Import-Module "$thisDirectory\Chocolatey.PowerShell.dll" -Cmdlet "Get-EnvironmentVariable", "Get-EnvironmentVariableNames", "Update-SessionEnvironment"
+
 . $thisDirectory\functions\Write-FunctionCallLogMessage.ps1
-. $thisDirectory\functions\Get-EnvironmentVariable.ps1
-. $thisDirectory\functions\Get-EnvironmentVariableNames.ps1
-. $thisDirectory\functions\Update-SessionEnvironment.ps1
 . $thisDirectory\ChocolateyTabExpansion.ps1
 
 Export-ModuleMember -Alias refreshenv -Function 'Update-SessionEnvironment', 'TabExpansion'

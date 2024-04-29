@@ -463,8 +463,21 @@ function Install-ChocolateyFiles {
             Get-ChildItem -Path "$_" | ForEach-Object {
                 #Write-Debug "Checking child path $_ ($($_.FullName))"
                 if (Test-Path $_.FullName) {
-                    Write-Debug "Removing $_ unless matches .log"
-                    Remove-Item $_.FullName -Exclude *.log -Recurse -Force -ErrorAction SilentlyContinue
+                    # If this is an upgrade, we can't *delete* Chocolatey.PowerShell.dll, as it will be currently loaded and thus locked.
+                    # Instead, rename it with a .old suffix. The code in the installer module will delete the .old file next time it runs.
+                    # This works similarly to how we move rather than overwriting choco.exe itself.
+                    if ($_.Name -ne "Chocolatey.PowerShell.dll") {
+                        Write-Debug "Removing $_ unless matches .log"
+                        Remove-Item $_.FullName -Exclude *.log -Recurse -Force -ErrorAction SilentlyContinue
+                    }
+                    else {
+                        $oldPath = "$($_.FullName).old"
+                        Write-Debug "Moving $_ to $oldPath"
+                        
+                        # Remove any still-existing Chocolatey.PowerShell.dll.old files before moving/renaming the current one.
+                        Get-Item -Path $oldPath -ErrorAction SilentlyContinue | Remove-Item -Force
+                        Move-Item $_.Fullname -Destination $oldPath
+                    }
                 }
             }
         }
