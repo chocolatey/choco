@@ -356,7 +356,7 @@ namespace chocolatey.infrastructure.app.nuget
             string packageName,
             ChocolateyConfiguration config,
             ILogger nugetLogger,
-            ChocolateySourceCacheContext cacheContext,
+            SourceCacheContext cacheContext,
             IEnumerable<NuGetEndpointResources> resources,
             NuGetVersion version = null)
         {
