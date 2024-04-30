@@ -1347,7 +1347,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         
                         if (!config.UpgradeCommand.IgnorePinned)
                         {
-                            RemovePinnedSourceDependencies(sourcePackageDependencyInfos, allLocalPackages);
+                            removedSources.AddRange(RemovePinnedSourceDependencies(sourcePackageDependencyInfos, allLocalPackages));
                         }
 
                         if (version != null || removedSources.Count == 0)
