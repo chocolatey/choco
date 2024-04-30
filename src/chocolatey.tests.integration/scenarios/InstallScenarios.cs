@@ -340,6 +340,8 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
             public void Should_contain_message_with_download_uri()
             {
                 var packagePath = "file:///{0}/{1}.{2}{3}".FormatWith(Configuration.Sources.Replace("\\","/"), Configuration.PackageNames,
