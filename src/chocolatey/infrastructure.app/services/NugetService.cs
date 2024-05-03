@@ -642,7 +642,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     continue;
                 }
 
+                var oldPrerelease = config.Prerelease;
+                config.Prerelease = config.Prerelease || availablePackage.Identity.Version.IsPrerelease;
                 NugetCommon.GetPackageDependencies(availablePackage.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, new HashSet<PackageDependency>(), config).GetAwaiter().GetResult();
+                config.Prerelease = oldPrerelease;
 
                 if (installedPackage != null && (installedPackage.PackageMetadata.Version == availablePackage.Identity.Version) && config.Force)
                 {
@@ -764,6 +767,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
 
                         foreach (var pkgMetadata in packagesToInstall)
+                        
                         {
                             var errorResult = packageResultsToReturn.GetOrAdd(pkgMetadata.Identity.Id, new PackageResult(pkgMetadata, pathResolver.GetInstallPath(pkgMetadata.Identity)));
                             errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -1281,7 +1285,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     {
                         localPackageListValid = false;
 
+                        var oldPrerelease = config.Prerelease;
+                        config.Prerelease = config.Prerelease || availablePackage.Identity.Version.IsPrerelease;
                         NugetCommon.GetPackageDependencies(availablePackage.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
+                        config.Prerelease = oldPrerelease;
 
                         packagesToUninstall.Add(installedPackage);
 
@@ -1323,7 +1330,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                 if (requestedPackageDependency != null)
                                 {
+                                    oldPrerelease = config.Prerelease;
+                                    config.Prerelease = config.Prerelease || availablePackage.Identity.Version.IsPrerelease;
                                     NugetCommon.GetPackageDependencies(requestedPackageDependency.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
+                                    config.Prerelease = oldPrerelease;
                                 }
                             }
 
@@ -1336,7 +1346,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                             if (availablePackageDependency != null)
                             {
+                                oldPrerelease = config.Prerelease;
+                                config.Prerelease = config.Prerelease || availablePackage.Identity.Version.IsPrerelease;
                                 NugetCommon.GetPackageDependencies(availablePackageDependency.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
+                                config.Prerelease = oldPrerelease;
                             }
                             else
                             {
@@ -1456,7 +1469,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     {
                                         foreach (var packageVersion in NugetList.FindAllPackageVersions(parentPackage.Id, config, _nugetLogger, sourceCacheContext, remoteEndpoints))
                                         {
+                                            oldPrerelease = config.Prerelease;
+                                            config.Prerelease = config.Prerelease || availablePackage.Identity.Version.IsPrerelease;
                                             NugetCommon.GetPackageDependencies(packageVersion.Identity, NuGetFramework.AnyFramework, sourceCacheContext, _nugetLogger, remoteEndpoints, sourcePackageDependencyInfos, sourceDependencyCache, config).GetAwaiter().GetResult();
+                                            config.Prerelease = oldPrerelease;
                                         }
                                     }
 
