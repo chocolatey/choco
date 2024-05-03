@@ -139,4 +139,8 @@ The Pester tests have been modelled in a way to be testable without installing C
 
 To run them locally on your system: Open an administrative PowerShell prompt to the root of the repository, and run `./Invoke-Tests.ps1`. This script will then "install" Chocolatey to a temporary test directory, run the tests, and when complete attempt to restore the system as close to when it started as possible. The script takes the following parameters: `TestPath` The location to use as the base for the Chocolatey Tests, defaults to `$env:TEMP\chocolateyTests`. `TestPackage` The path to the `.nupkg` package to run tests against, defaults to `$chocolateyRepository\code_drop\Packages\Chocolatey\chocolatey.<version>.nupkg`. `SkipPackaging` Optionally skip the packaging of the test packages.
 
-To use the `Vagrantfile` you need to change directory into the `tests` directory, then run `vagrant up`. The Vagrantfile has been tested with VirtualBox. The [box being used](https://app.vagrantup.com/StefanScherer/boxes/windows_2019) is currently only updated for vmware_desktop and virtualbox providers, but there is a dated hyperv one that should work.
+#### Using the provided Vagrantfile
+
+To use the `Vagrantfile` you need to change directory into the `tests` directory, then run `vagrant up`. The Vagrantfile has been tested with VirtualBox. The [box being used](https://app.vagrantup.com/StefanScherer/boxes/windows_2019) is currently only updated for vmware_desktop and virtualbox providers, but there is a dated hyperv one that may work.
+
+Once the Vagrant box is booted, you can re-run just the tests by running `vagrant provision default --provision-with test`. If you would like to clear the packages and run fresh tests, you can run `vagrant provision default --provision-with clear-packages,test`.
