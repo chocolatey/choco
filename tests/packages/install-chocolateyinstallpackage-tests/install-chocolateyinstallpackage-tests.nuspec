@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>install-chocolateyinstallpackage-tests</id>
+    <authors>Chocolatey Software</authors>
+    <version>1.0</version>
+    <title>Install-ChocolateyInstallPackage tests</title>
+    <summary>Package for the testing of Install-ChocolateyInstallPackage</summary>
+    <description>Package for the testing of Install-ChocolateyInstallPackage. Used by Pester to ensure extra spaces are not added to command lines.</description>
+  </metadata>
+  <files>
+    <file src="chocolateyInstall.ps1" target="tools/chocolateyInstall.ps1" />
+  </files>
+</package>
