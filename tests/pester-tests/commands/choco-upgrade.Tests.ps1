@@ -548,7 +548,7 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    Context 'Upgrading a package where parent only contain pre-releases' -Tag Testing {
+    Context 'Upgrading a package where parent only contain pre-releases' {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
