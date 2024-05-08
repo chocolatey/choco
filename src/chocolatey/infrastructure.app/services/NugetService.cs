@@ -221,7 +221,9 @@ that uses these options.");
                     deploymentLocation = packageInfo.DeploymentLocation;
                     if (!string.IsNullOrWhiteSpace(packageInfo.Arguments))
                     {
-                        packageArgumentsUnencrypted = "\n Remembered Package Arguments: " + (packageInfo.Arguments.ContainsSafe(" --") && packageInfo.Arguments.ToStringSafe().Length > 4 ? packageInfo.Arguments : NugetEncryptionUtility.DecryptString(packageInfo.Arguments));
+                        var decryptedArguments = ArgumentsUtility.DecryptPackageArgumentsFile(_fileSystem, packageInfo.Package.Id, packageInfo.Package.Version.ToNormalizedStringChecked());
+
+                        packageArgumentsUnencrypted = "\n Remembered Package Arguments: \n  {0}".FormatWith(string.Join(Environment.NewLine + "  ", decryptedArguments));
                     }
                 }
 
