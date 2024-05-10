@@ -78,5 +78,10 @@
     <Compile Include="Shared\EnvironmentVariables.cs" />
     <Compile Include="Win32\NativeMethods.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Chocolatey.PowerShell.dll-Help.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
