@@ -13,6 +13,7 @@ project {
     buildType(Chocolatey)
     buildType(ChocolateySchd)
     buildType(ChocolateyQA)
+    buildType(ChocolateySign)
     buildType(ChocolateyDockerWin)
     buildType(ChocolateyPosix)
 }
@@ -125,11 +126,6 @@ object ChocolateySchd : BuildType({
             }
         }
 
-        step {
-            name = "Include Signing Keys"
-            type = "PrepareSigningEnvironment"
-        }
-
         script {
             name = "Call Cake"
             scriptContent = """
@@ -195,11 +191,6 @@ object ChocolateyQA : BuildType({
             }
         }
 
-        step {
-            name = "Include Signing Keys"
-            type = "PrepareSigningEnvironment"
-        }
-
         script {
             name = "Call Cake"
             scriptContent = """
@@ -220,6 +211,76 @@ object ChocolateyQA : BuildType({
             """.trimIndent()
             triggerBuild = always()
 			withPendingChangesOnly = false
+        }
+    }
+
+    requirements {
+        doesNotExist("docker.server.version")
+    }
+})
+
+object ChocolateySign : BuildType({
+    id = AbsoluteId("ChocolateySign")
+    name = "Chocolatey CLI (Script Signing)"
+
+    artifactRules = """
+    """.trimIndent()
+
+    params {
+        param("env.vcsroot.branch", "%vcsroot.branch%")
+        param("env.Git_Branch", "%teamcity.build.vcs.branch.Chocolatey_ChocolateyVcsRoot%")
+        param("env.FORCE_OFFICIAL_AUTHENTICODE_SIGNATURE", "true")
+        param("teamcity.git.fetchAllHeads", "true")
+        password("env.GITHUB_PAT", "%system.GitHubPAT%", display = ParameterDisplay.HIDDEN, readOnly = true)
+    }
+
+    vcs {
+        root(DslContext.settingsRoot)
+
+        branchFilter = """
+            +:*
+        """.trimIndent()
+    }
+
+    steps {
+        powerShell {
+            name = "Prerequisites"
+            scriptMode = script {
+                content = """
+                    if ((Get-WindowsFeature -Name NET-Framework-Features).InstallState -ne 'Installed') {
+                        Install-WindowsFeature -Name NET-Framework-Features
+                    }
+
+                    choco install windows-sdk-7.1 netfx-4.0.3-devpack dotnet-6.0-runtime --confirm --no-progress
+                    exit ${'$'}LastExitCode
+                """.trimIndent()
+            }
+        }
+
+        step {
+            name = "Include Signing Keys"
+            type = "PrepareSigningEnvironment"
+        }
+
+        script {
+            name = "Call Cake"
+            scriptContent = """
+                build.official.bat --verbosity=diagnostic --target=Sign-PowerShellScripts --exclusive
+            """.trimIndent()
+        }
+    }
+
+    triggers {
+        vcs {
+            triggerRules = """
+                +:nuspec/**/*.ps1
+                +:nuspec/**/*.psm1
+                +:nuspec/**/*.psd1
+                +:src/chocolatey.resources/**/*.ps1
+                +:src/chocolatey.resources/**/*.psm1
+                +:src/chocolatey.resources/**/*.psd1
+            """.trimIndent()
+            branchFilter = "+:develop"
         }
     }
 
