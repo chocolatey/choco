@@ -1,4 +1,4 @@
-$thisScriptFolder = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
+﻿$thisScriptFolder = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
 $chocoInstallVariableName = "ChocolateyInstall"
 $sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
