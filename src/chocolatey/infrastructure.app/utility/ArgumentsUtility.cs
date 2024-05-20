@@ -68,7 +68,7 @@ namespace chocolatey.infrastructure.app.utility
                     arguments = fileSystem.ReadFile(argumentsFile);
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 "chocolatey".Log().Error("There was an error attempting to read the contents of the .arguments file for version '{0}' of package '{1}'.  See log file for more information.".FormatWith(version, id));
             }
