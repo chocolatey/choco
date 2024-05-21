@@ -14,9 +14,9 @@
     $action = $PSCmdlet.ParameterSetName
     $failures = $Name | ForEach-Object {
         $output = Invoke-Choco feature $action "--name=$_"
-        if ($output.ExitCode -ne 0) {
+        if ($output.ExitCode -notin @(0, 2)) {
             Write-Host "An error occurred setting ($action) feature: $_"
-            Write-Host ("Chocolatey output: {0}{1}{2}" -f $output.ExitCode, ([Environment]::NewLine), $output.String)
+            Write-Host ("Chocolatey ExitCode: {0}{1}Chocolatey Output:{1}{2}" -f $output.ExitCode, ([Environment]::NewLine), $output.String)
             $_
         }
     }
