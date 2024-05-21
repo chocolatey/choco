@@ -246,7 +246,7 @@ To upgrade a local, or remote file, you may use:
         }
 
         It 'Outputs software installation directory' {
-            $Output.Lines | Should -Contain "Software installed to '$env:ChocolateyInstall\lib\install-chocolateyzip\tools'" -Because $Output.String
+            $Output.Lines | Should -Contain "Deployed to '$env:ChocolateyInstall\lib\install-chocolateyzip\tools'" -Because $Output.String
         }
 
         It 'Should have cached installed directory in custom cache' {
