@@ -58,6 +58,7 @@ namespace chocolatey.infrastructure.app.configuration
             ExportCommand = new ExportCommandConfiguration();
             TemplateCommand = new TemplateCommandConfiguration();
             CacheCommand = new CacheCommandConfiguration();
+            RuleCommand = new RuleCommandConfiguration();
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -495,6 +496,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </summary>
         public CacheCommandConfiguration CacheCommand { get; set; }
 
+        /// <summary>
+        /// Gets or sets the configuration related specifically to the Rule command.
+        /// </summary>
+        public RuleCommandConfiguration RuleCommand { get; set; }
+
 #pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void start_backup()
@@ -748,5 +754,19 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   <c>true</c> if only expired cache items should be removed; otherwise, <c>false</c>.
         /// </value>
         public bool RemoveExpiredItemsOnly { get; set; }
+    }
+
+    [Serializable]
+    public sealed class RuleCommandConfiguration
+    {
+        /// <summary>
+        /// Gets or sets the name or identifier of a rule the user wants to use for the command.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sub command to execute.
+        /// </summary>
+        public string Command { get; set; }
     }
 }
