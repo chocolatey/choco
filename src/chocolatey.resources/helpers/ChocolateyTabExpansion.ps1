@@ -214,7 +214,7 @@ function ChocolateyTabExpansion($lastBlock) {
 
         # Handles feature first tab
         "^(feature)\s+(?<subcommand>[^-\s]*)$" {
-            @('list', 'disable', 'enable', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+            @('list', 'get', 'disable', 'enable', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
         # Handles config first tab
         "^(config)\s+(?<subcommand>[^-\s]*)$" {
