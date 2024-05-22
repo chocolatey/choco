@@ -35,7 +35,7 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
         Where-Object { $_ -like "$filter*" }
 }
 
-$script:chocoCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','pack','push','-h','--help','pin','source','config','feature','apikey','export','help','template','cache','--version')
+$script:chocoCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','pack','push','-h','--help','pin','source','config','feature','apikey','export','help','template','cache','--version','rule')
 
 # ensure these all have a space to start, or they will cause issues
 $allcommands = " --debug --verbose --trace --noop --help -? --online --accept-license --confirm --limit-output --no-progress --log-file='' --execution-timeout='' --cache-location='' --proxy='' --proxy-user='' --proxy-password='' --proxy-bypass-list='' --proxy-bypass-on-local --force --no-color --skip-compatibility-checks --ignore-http-cache"
@@ -59,6 +59,7 @@ $commandOptions = @{
     export    = "--include-version-numbers --output-file-path=''"
     template  = "--name=''"
     cache     = "--expired"
+    rule      = "--name=''"
 }
 
 $commandOptions['find'] = $commandOptions['search']
