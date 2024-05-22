@@ -80,6 +80,16 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
             $Completions[1] | Should -Be "info"
             $Completions[2] | Should -Be "-?"
             $Completions[3] | Should -Be "--name=''"
+
+        It "Should list completions for rule" {
+            $Command = "choco rule "
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "--name=''" -Because $becauseCompletions
+        }
+
         }
     }
 }
