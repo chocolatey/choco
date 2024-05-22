@@ -52,9 +52,13 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
             $Command = "choco pin "
             $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions[0] | Should -Be "list"
-            $Completions[1] | Should -Be "add"
-            $Completions[2] | Should -Be "remove"
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions[0] | Should -Be "list" -Because $becauseCompletions
+            $Completions[1] | Should -Be "add" -Because $becauseCompletions
+            $Completions[2] | Should -Be "remove" -Because $becauseCompletions
+            $Completions | Should -Contain "--name=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--version=''" -Because $becauseCompletions
         }
 
         It "Should correctly complete partial completions" -Skip:$ExportNotPresent {
@@ -68,18 +72,23 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
             $Command = "choco export "
             $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions[0] | Should -Be "--include-version-numbers"
-            $Completions[1] | Should -Be "--output-file-path=''"
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions[0] | Should -Be "--include-version-numbers" -Because $becauseCompletions
+            $Completions[1] | Should -Be "--output-file-path=''" -Because $becauseCompletions
         }
 
         It "Should list completions for Template" {
             $Command = "choco template "
             $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions[0] | Should -Be "list"
-            $Completions[1] | Should -Be "info"
-            $Completions[2] | Should -Be "-?"
-            $Completions[3] | Should -Be "--name=''"
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions[0] | Should -Be "list" -Because $becauseCompletions
+            $Completions[1] | Should -Be "info" -Because $becauseCompletions
+            $Completions[2] | Should -Be "-?" -Because $becauseCompletions
+            $Completions | Should -Contain "--name=''" -Because $becauseCompletions
+        }
 
         It "Should list completions for upgrade" {
             $Command = "choco upgrade "
