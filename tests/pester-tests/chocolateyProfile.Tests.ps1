@@ -81,6 +81,57 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
             $Completions[2] | Should -Be "-?"
             $Completions[3] | Should -Be "--name=''"
 
+        It "Should list completions for upgrade" {
+            $Command = "choco upgrade "
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "-y" -Because $becauseCompletions
+            $Completions | Should -Contain "-whatif" -Because $becauseCompletions
+            $Completions | Should -Contain "--pre" -Because $becauseCompletions
+            $Completions | Should -Contain "--version=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--except=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--params=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--install-arguments=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--override-arguments" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-dependencies" -Because $becauseCompletions
+            $Completions | Should -Contain "--source=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--source='windowsfeatures'" -Because $becauseCompletions
+            $Completions | Should -Contain "--user=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--password=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--prerelease" -Because $becauseCompletions
+            $Completions | Should -Contain "--forcex86" -Because $becauseCompletions
+            $Completions | Should -Contain "--not-silent" -Because $becauseCompletions
+            $Completions | Should -Contain "--package-parameters=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--exit-when-reboot-detected" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-detected-reboot" -Because $becauseCompletions
+            $Completions | Should -Contain "--allow-downgrade" -Because $becauseCompletions
+            $Completions | Should -Contain "--require-checksums" -Because $becauseCompletions
+            $Completions | Should -Contain "--use-package-exit-codes" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-package-exit-codes" -Because $becauseCompletions
+            $Completions | Should -Contain "--skip-automation-scripts" -Because $becauseCompletions
+            $Completions | Should -Contain "--fail-on-unfound" -Because $becauseCompletions
+            $Completions | Should -Contain "--fail-on-not-installed" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-checksums" -Because $becauseCompletions
+            $Completions | Should -Contain "--allow-empty-checksums" -Because $becauseCompletions
+            $Completions | Should -Contain "--allow-empty-checksums-secure" -Because $becauseCompletions
+            $Completions | Should -Contain "--download-checksum=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--download-checksum-type=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--download-checksum-x64=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--download-checksum-type-x64=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--exclude-prerelease" -Because $becauseCompletions
+            $Completions | Should -Contain "--stop-on-first-package-failure" -Because $becauseCompletions
+            $Completions | Should -Contain "--use-remembered-options" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-remembered-options" -Because $becauseCompletions
+            $Completions | Should -Contain "--skip-when-not-installed" -Because $becauseCompletions
+            $Completions | Should -Contain "--install-if-not-installed" -Because $becauseCompletions
+            $Completions | Should -Contain "--disable-package-repository-optimizations" -Because $becauseCompletions
+            $Completions | Should -Contain "--pin" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-pinned" -Because $becauseCompletions
+            $Completions | Should -Contain "--include-configured-sources" -Because $becauseCompletions
+        }
+
         It "Should list completions for rule" {
             $Command = "choco rule "
             $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
@@ -88,6 +139,111 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
             $becauseCompletions = ($Completions -Join ", ")
 
             $Completions | Should -Contain "--name=''" -Because $becauseCompletions
+        }
+
+        It "Should list completions for search" {
+            $Command = "choco search "
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "--id-only" -Because $becauseCompletions
+            $Completions | Should -Contain "--pre" -Because $becauseCompletions
+            $Completions | Should -Contain "--exact" -Because $becauseCompletions
+            $Completions | Should -Contain "--by-id-only" -Because $becauseCompletions
+            $Completions | Should -Contain "--id-starts-with" -Because $becauseCompletions
+            $Completions | Should -Contain "--detailed" -Because $becauseCompletions
+            $Completions | Should -Contain "--approved-only" -Because $becauseCompletions
+            $Completions | Should -Contain "--not-broken" -Because $becauseCompletions
+            $Completions | Should -Contain "--source=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--user=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--password=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--prerelease" -Because $becauseCompletions
+            $Completions | Should -Contain "--include-programs" -Because $becauseCompletions
+            $Completions | Should -Contain "--page=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--page-size=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--order-by-popularity" -Because $becauseCompletions
+            $Completions | Should -Contain "--download-cache-only" -Because $becauseCompletions
+            $Completions | Should -Contain "--disable-package-repository-optimizations" -Because $becauseCompletions
+            $Completions | Should -Contain "--include-configured-sources" -Because $becauseCompletions
+        }
+
+        It "Should list completions for info" {
+            $Command = "choco info "
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "--source=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--local-only" -Because $becauseCompletions
+            $Completions | Should -Contain "--version=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--prerelease" -Because $becauseCompletions
+            $Completions | Should -Contain "--user=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--password=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--cert=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--certpassword=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--disable-package-repository-optimizations" -Because $becauseCompletions
+            $Completions | Should -Contain "--include-configured-sources" -Because $becauseCompletions
+        }
+
+        It "Should list completions for install" {
+            $Command = "choco install "
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "-y" -Because $becauseCompletions
+            $Completions | Should -Contain "-whatif" -Because $becauseCompletions
+            $Completions | Should -Contain "--pre" -Because $becauseCompletions
+            $Completions | Should -Contain "--version=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--params=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--install-arguments=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--override-arguments" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-dependencies" -Because $becauseCompletions
+            $Completions | Should -Contain "--source=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--source='windowsfeatures'" -Because $becauseCompletions
+            $Completions | Should -Contain "--user=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--password=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--prerelease" -Because $becauseCompletions
+            $Completions | Should -Contain "--forcex86" -Because $becauseCompletions
+            $Completions | Should -Contain "--not-silent" -Because $becauseCompletions
+            $Completions | Should -Contain "--package-parameters=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--exit-when-reboot-detected" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-detected-reboot" -Because $becauseCompletions
+            $Completions | Should -Contain "--allow-downgrade" -Because $becauseCompletions
+            $Completions | Should -Contain "--force-dependencies" -Because $becauseCompletions
+            $Completions | Should -Contain "--require-checksums" -Because $becauseCompletions
+            $Completions | Should -Contain "--use-package-exit-codes" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-package-exit-codes" -Because $becauseCompletions
+            $Completions | Should -Contain "--skip-automation-scripts" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-checksums" -Because $becauseCompletions
+            $Completions | Should -Contain "--allow-empty-checksums" -Because $becauseCompletions
+            $Completions | Should -Contain "--allow-empty-checksums-secure" -Because $becauseCompletions
+            $Completions | Should -Contain "--download-checksum=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--download-checksum-type=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--download-checksum-x64=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--download-checksum-type-x64=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--stop-on-first-package-failure" -Because $becauseCompletions
+            $Completions | Should -Contain "--disable-package-repository-optimizations" -Because $becauseCompletions
+            $Completions | Should -Contain "--pin" -Because $becauseCompletions
+            $Completions | Should -Contain "--include-configured-sources" -Because $becauseCompletions
+        }
+
+        It "Should list completions for outdated" {
+            $Command = "choco outdated "
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "--source=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--user=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--password=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-pinned" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-unfound" -Because $becauseCompletions
+            $Completions | Should -Contain "--pre" -Because $becauseCompletions
+            $Completions | Should -Contain "--prerelease" -Because $becauseCompletions
+            $Completions | Should -Contain "--disable-package-repository-optimizations" -Because $becauseCompletions
+            $Completions | Should -Contain "--include-configured-sources" -Because $becauseCompletions
         }
 
         }
