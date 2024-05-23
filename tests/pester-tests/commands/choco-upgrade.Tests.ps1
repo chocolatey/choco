@@ -73,6 +73,77 @@
         }
     }
 
+    Context "Attempt to upgrade a package when there isn't an upgrade available" -Tag Internal {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateySource -Name hermes-setup
+            $null = Invoke-Choco install wget
+
+            $Output = Invoke-Choco upgrade wget
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Displays that upgrade was attempted but wasnt required' {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 0/1 packages." -Because $Output.String
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco upgrade wget
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It 'Displays that upgrade was attempted but wasnt required' {
+                $Output.Lines | Should -Contain "Chocolatey upgraded 0/1 packages." -Because $Output.String
+            }
+        }
+    }
+
+    Context "Attempt to run upgrade all when there isn't any upgrade available" -Tag Internal {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateySource -Name hermes-setup
+            $null = Invoke-Choco install wget
+            $null = Invoke-Choco install curl
+
+            $Output = Invoke-Choco upgrade all
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Displays that upgrade was attempted but wasnt required' {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 0/2 packages." -Because $Output.String
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco upgrade all
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It 'Displays that upgrade was attempted but wasnt required' {
+                $Output.Lines | Should -Contain "Chocolatey upgraded 0/2 packages." -Because $Output.String
+            }
+        }
+    }
+
     # We exclude this test when running CCM, as it will install and remove
     # the firefox package which is used through other tests that will be affected.
     Context "Upgrading packages while remembering arguments with multiple packages using arguments" -Tag CCMExcluded, Internal, VMOnly {
