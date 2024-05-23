@@ -117,14 +117,20 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     # This is skipped when not run in CI because it requires signed executables.
     Context "File signing (<_.FullName>)" -ForEach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0"))) {
         BeforeAll {
+            # Due to changes in the signing setup, the certificate used to sign PS1 files and the Chocolatey CLI executable MIGHT be different. This ensures that the both certificates are trusted.
             $FileUnderTest = $_
-            $SignerCert = (Get-AuthenticodeSignature (Get-ChocoPath)).SignerCertificate
+            $Ps1Cert = (Get-AuthenticodeSignature (Join-Path (Split-Path (Split-Path (Get-ChocoPath))) 'helpers/chocolateyScriptRunner.ps1')).SignerCertificate
+            $ExeCert = (Get-AuthenticodeSignature (Get-ChocoPath)).SignerCertificate
             $Cert = "$PWD\cert.cer"
-            # Write out the certificate
-            [IO.File]::WriteAllBytes($Cert, $SignerCert.export([security.cryptography.x509certificates.x509contenttype]::cert))
+            # Write out the exe certificate
+            [IO.File]::WriteAllBytes($Cert, $ExeCert.export([security.cryptography.x509certificates.x509contenttype]::cert))
             # Trust the certificate
             Import-Certificate -FilePath $Cert -CertStoreLocation 'Cert:\CurrentUser\TrustedPublisher\'
             Remove-Item -Path $Cert -Force -ErrorAction Ignore
+            # Write out the ps1 certificate
+            [IO.File]::WriteAllBytes($Cert, $Ps1Cert.export([security.cryptography.x509certificates.x509contenttype]::cert))
+            # Trust the certificate
+            Import-Certificate -FilePath $Cert -CertStoreLocation 'Cert:\CurrentUser\TrustedPublisher\'
         }
 
         AfterAll {
