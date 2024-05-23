@@ -12,6 +12,26 @@
         Remove-ChocolateyTestInstall
     }
 
+    Context "Should include remembered arguments (including redacted) when using option --local-only" {
+        BeforeAll {
+            Remove-NuGetPaths
+            Initialize-ChocolateyTestInstall -Source $PSScriptRoot\testpackages
+            Invoke-Choco install installpackage --package-parameters="bob" --user="bill" --password="secure-password" --confirm
+
+            $Output = Invoke-Choco info installpackage --local-only
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should contain a summary" {
+            $Output.Lines | Should -Contain "Remembered Package Arguments:" -Because $Output.String
+            $Output.Lines | Should -Contain "--package-parameters='bob'" -Because $Output.String
+            $Output.Lines | Should -Contain "--password=[REDACTED ARGUMENT]" -Because $Output.String
+        }
+    }
+
     Context "Listing package information when package can be found" {
         BeforeDiscovery {
             $infoItems = @(
@@ -187,11 +207,11 @@
         }
 
         It 'Outputs warning about unable to load service index' {
-            $Output.Lines | Should -Contain "Unable to load the service index for source $InvalidSource."
+            $Output.Lines | Should -Contain "Unable to load the service index for source $InvalidSource." -Because $Output.String
         }
 
         It 'Output information about the package' {
-            $Output.String | Should -Match "Title: Chocolatey "
+            $Output.String | Should -Match "Title: Chocolatey " -Because $Output.String
         }
     }
 
