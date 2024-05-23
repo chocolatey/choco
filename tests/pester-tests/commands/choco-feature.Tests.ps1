@@ -112,6 +112,76 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, FeatureCommand {
         }
     }
 
+    Context "Enabling a feature when it is already enabled" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            # Ensure that the feature is already enabled
+            $null = Invoke-Choco feature enable --name allowGlobalConfirmation
+
+            $Output = Invoke-Choco feature enable --name allowGlobalConfirmation
+        }
+
+        It "Exits with ExitCode 0" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Changes Nothing" {
+            $Output.Lines | Should -Contain "Nothing to change. Config already set."
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco feature enable --name allowGlobalConfirmation
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
+        }
+    }
+
+    Context "Disabling a feature when it is already disabled" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            # Ensure that the feature is already disabled
+            $null = Invoke-Choco feature disable --name allowGlobalConfirmation
+
+            $Output = Invoke-Choco feature disable --name allowGlobalConfirmation
+        }
+
+        It "Exits with ExitCode 0" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Changes Nothing" {
+            $Output.Lines | Should -Contain "Nothing to change. Config already set."
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco feature disable --name allowGlobalConfirmation
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
+        }
+    }
+
     Context "Disabling usePackageRepositoryOptimizations" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
