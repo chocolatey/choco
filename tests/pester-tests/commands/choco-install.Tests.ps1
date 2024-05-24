@@ -143,6 +143,76 @@
         }
     }
 
+    Context "Installing a Package (Happy Path) including configured sources" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "installpackage"
+
+            $Output = Invoke-Choco install $PackageUnderTest --include-configured-sources --debug --confirm
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Installed a package to the lib directory" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest" | Should -Exist
+        }
+
+        # We are skipping this for now, until we have stabilized the directory
+        # path reporting functionality. There are times that this test will
+        # fail due to Chocolatey not reporting the path.
+        # This failure seems to happen randomly, and is therefore not a
+        # reliable test we can make.
+        It "Outputs the installation directory (which should exist)" -Skip {
+            $directoryPath = "$env:ChocolateyInstall\lib\$PackageUnderTest"
+            $lineRegex = [regex]::Escape($directoryPath)
+
+            $foundPath = $Output.Lines -match $lineRegex
+            $foundPath | Should -Not -BeNullOrEmpty
+            $foundPath | Should -Exist
+        }
+
+        It "Installs the expected version of the package" {
+            "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+
+        It "Creates a Console Shim in the Bin Directory" {
+            "$env:ChocolateyInstall\bin\console.exe" | Should -Exist
+        }
+
+        It "Creates a Graphical Shim in the Bin Directory" {
+            "$env:ChocolateyInstall\bin\graphical.exe" | Should -Exist
+        }
+
+        It "Does not create a Shim for Ignored Executable in the Bin Directory" {
+            "$env:ChocolateyInstall\bin\not.installed.exe" | Should -Not -Exist
+        }
+
+        It "Does not create a Shim for Ignored Executable (with mismatched case) in the Bin Directory" {
+            "$env:ChocolateyInstall\bin\casemismatch.exe" | Should -Not -Exist
+        }
+
+        It "Does not create an extensions folder for the package" {
+            "$env:ChocolateyInstall\extensions\$PackageUnderTest" | Should -Not -Exist
+        }
+
+        It "Contains the output of the ChocolateyInstall.ps1 script" {
+            $Output.Lines | Should -Contain "Ya!"
+        }
+
+        It "Outputs a message showing that installation was successful" {
+            $Output.String | Should -Match "Chocolatey installed 1/1 packages\."
+        }
+
+        It "Should mention that configured sources have been included" {
+            $Output.Lines | Should -Contain "Including sources from chocolatey.config file." -Because $Output.String
+        }
+    }
+
     Context "Installing a Package with Packages.config" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot

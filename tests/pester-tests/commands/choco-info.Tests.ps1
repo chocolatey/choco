@@ -33,6 +33,24 @@
         }
     }
 
+    Context "Should include configured sources" {
+        BeforeAll {
+            Remove-NuGetPaths
+            Initialize-ChocolateyTestInstall -Source $PSScriptRoot\testpackages
+            Invoke-Choco install installpackage --confirm
+
+            $Output = Invoke-Choco info installpackage --include-configured-sources --debug
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should mention that configured sources have been included" {
+            $Output.Lines | Should -Contain "Including sources from chocolatey.config file." -Because $Output.String
+        }
+    }
+
     Context "Listing package information when package can be found" {
         BeforeDiscovery {
             $infoItems = @(
