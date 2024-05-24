@@ -152,3 +152,57 @@ References
 
  * [http://pivotallabs.com/git-rebase-onto/ (Archive)](https://web.archive.org/web/20150709101404/http://pivotallabs.com:80/git-rebase-onto/)
  * http://git-scm.com/book/ch3-6.html
+
+## Generating and Updating Cmdlet Documentation
+
+Documentation for the cmdlets in the Chocolatey.PowerShell project is maintained as `*.md` files in the [chocolatey/docs](https://github.com/chocolatey/docs) repository, under `input/en-us/create/cmdlets`.
+When making changes to a cmdlet or adding a new one, we need to ensure that those Markdown files get updated, and that those changes are propagated back to this repository in the [`Chocolatey.PowerShell.dll-help.xml`](./src/Chocolatey.PowerShell/Chocolatey.PowerShell.dll-Help.xml) file in the repository.
+
+Before working with this, be sure to clone the `chocolatey/docs` repository locally.
+If your local copy of the docs repository is not located at `../docs` relative to this folder, you will need to specify the `-DocsRepositoryPath` parameter whenever calling the `update-cmdlet-documentation.ps1` script.
+
+### Generating Documentation for a new Cmdlet
+
+Run the `update-cmdlet-documentation.ps1` script with the `-NewCommand` parameter, specifying the name of the cmdlet(s) that you've added:
+
+```powershell
+./update-cmdlet-documentation.ps1 -NewCommand Test-NewChocolateyCommand
+```
+
+Once this completes, you will get a warning that the documentation template needs to be filled out and the newly-generated documentation file will open in your default editor for `*.md` files.
+
+### Updating Documentation For an Existing Cmdlet
+
+Run the `update-cmdlet-documentation.ps1` script:
+
+```powershell
+./update-cmdlet-documentation.ps1
+```
+
+### Generating the `Chocolatey.PowerShell.dll-help.xml` External Help Documentation
+
+Once new files have been generated, in the `chocolatey/docs` repository, make any additional changes needed to the files.
+Note that these files will need to be compatible both with PlatyPS and the docs repository Markdown formatting.
+As such, for new files you will need to sure the additional frontmatter is added.
+A complete frontmatter block for these files looks like this:
+
+```md
+---
+Description: Information on Cmdlet-Name cmdlet
+external help file: Chocolatey.PowerShell.dll-Help.xml
+Module Name: Chocolatey.PowerShell
+online version: https://docs.chocolatey.org/en-us/create/functions/cmdlet-name
+Order: 70
+schema: 2.0.0
+Title: Cmdlet-Name
+xref: cmdlet-name
+---
+```
+
+Some files may also have a `RedirectFrom: [ ... ]` frontmatter entry.
+This is not required for new files, but existing files (or files added for a cmdlet that is a rewrite of a pre-existing command) should retain their existing redirects.
+
+Run the `update-cmdlet-documentation.ps1` script once more, and add the changes to the `Chocolatey.PowerShell.dll-help.xml` file to a commit.
+
+Finally, add the changes to a commit on a new branch in the `docs` repository and submit a PR for any changes there as well, alongside the PR to any changes made in this repository.
+If you are rewriting a cmdlet from a pre-existing script command, ensure you remove the old documentation file from `input/en-us/create/commands` as well, so that there are no duplicate xrefs.

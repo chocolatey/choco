@@ -61,6 +61,11 @@ namespace chocolatey.infrastructure.app
         public static readonly string LicensedAssemblyLocation = _fileSystem.FileExists(_fileSystem.CombinePaths(InstallLocation, "chocolatey.licensed.dll")) ? _fileSystem.CombinePaths(InstallLocation, "chocolatey.licensed.dll") : _fileSystem.CombinePaths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
 #endif
 
+        internal static readonly string ChocolateyPowerShellAssemblySimpleName = "Chocolatey.PowerShell";
+        internal static readonly string ChocolateyPowerShellAssemblyLocation = _fileSystem.FileExists(_fileSystem.CombinePaths(InstallLocation, "Chocolatey.PowerShell.dll"))
+            ? _fileSystem.CombinePaths(InstallLocation, "Chocolatey.PowerShell.dll")
+            : _fileSystem.CombinePaths(InstallLocation, "helpers", "Chocolatey.PowerShell.dll");
+
         public static readonly string CommonAppDataChocolatey = _fileSystem.CombinePaths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData), Name);
         public static readonly string LoggingLocation = _fileSystem.CombinePaths(InstallLocation, "logs");
         public static readonly string LoggingFile = @"chocolatey.log";
@@ -164,7 +169,6 @@ namespace chocolatey.infrastructure.app
         /// </summary>
         public static int DefaultWaitForExitInSeconds = 2700;
         public static int DefaultWebRequestTimeoutInSeconds = 30;
-
         public static readonly string[] ConfigFileExtensions = new string[] { ".autoconf", ".config", ".conf", ".cfg", ".jsc", ".json", ".jsonp", ".ini", ".xml", ".yaml" };
         public static readonly string ConfigFileTransformExtension = ".install.xdt";
         public static readonly string[] ShimDirectorFileExtensions = new string[] { ".gui", ".ignore" };

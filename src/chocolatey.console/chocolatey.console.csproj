@@ -224,6 +224,10 @@
       <Project>{5563DC61-35FD-4FAB-B331-9AE1FDB23F80}</Project>
       <Name>chocolatey</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Chocolatey.PowerShell\Chocolatey.PowerShell.csproj">
+      <Project>{88396c46-8089-4814-a7d1-e18777ff6083}</Project>
+      <Name>Chocolatey.PowerShell</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\docs\logo\chocolatey.ico">
@@ -238,4 +242,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <Target Name="AfterBuild" Condition="'$(Configuration)' == 'Debug'">
+    <ItemGroup>
+      <ChocolateyPowerShell Include="$(TargetDir)\Chocolatey.PowerShell.dll;$(TargetDir)\Chocolatey.PowerShell.pdb;$(TargetDir)\Chocolatey.PowerShell.dll-help.xml" />
+    </ItemGroup>
+    <Copy SourceFiles="@(ChocolateyPowerShell)" DestinationFolder="$(TargetDir)\helpers\" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

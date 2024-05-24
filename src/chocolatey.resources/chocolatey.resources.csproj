@@ -82,7 +82,6 @@
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyFileAssociation.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyInstallPackage.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyPackage.ps1" />
-    <EmbeddedResource Include="helpers\functions\Install-ChocolateyPath.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyPinnedTaskBarItem.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyPowershellCommand.ps1" />
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyShortcut.ps1" />
@@ -91,7 +90,6 @@
     <EmbeddedResource Include="helpers\functions\Start-ChocolateyProcessAsAdmin.ps1" />
     <EmbeddedResource Include="helpers\functions\Uninstall-ChocolateyPackage.ps1" />
     <EmbeddedResource Include="helpers\functions\UnInstall-ChocolateyZipPackage.ps1" />
-    <EmbeddedResource Include="helpers\functions\Update-SessionEnvironment.ps1" />
     <EmbeddedResource Include="redirects\choco.exe.ignore" />
     <EmbeddedResource Include="tools\checksum.exe.ignore" />
     <EmbeddedResource Include="tools\shimgen.exe.ignore" />
@@ -107,14 +105,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="redirects\RefreshEnv.cmd" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="helpers\functions\Get-EnvironmentVariable.ps1" />
-    <EmbeddedResource Include="helpers\functions\Get-EnvironmentVariableNames.ps1" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="helpers\functions\Set-EnvironmentVariable.ps1" />
-    <EmbeddedResource Include="helpers\functions\Test-ProcessAdminRights.ps1" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="helpers\functions\Install-BinFile.ps1" />

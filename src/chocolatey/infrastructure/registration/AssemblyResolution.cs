@@ -139,6 +139,13 @@ namespace chocolatey.infrastructure.registration
             {
                 try
                 {
+                    // If we're trying to load Chocolatey.PowerShell (e.g., as a dependency of the licensed extension,
+                    // we may need to alter the load file path.
+                    if (assemblySimpleName == ApplicationParameters.ChocolateyPowerShellAssemblySimpleName)
+                    {
+                        assemblyFileLocation = ApplicationParameters.ChocolateyPowerShellAssemblyLocation;
+                    }
+
                     IAssembly tempAssembly;
 #if FORCE_CHOCOLATEY_OFFICIAL_KEY
                     tempAssembly = Assembly.Load(FileSystem.ReadFileBytes(assemblyFileLocation));
@@ -371,7 +378,8 @@ namespace chocolatey.infrastructure.registration
             // There are things that are ILMerged into Chocolatey. Anything with
             // the right public key except extensions should use the choco/chocolatey assembly
             if (!requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase)
-                && !requestedAssembly.Name.IsEqualTo(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
+                && !requestedAssembly.Name.IsEqualTo(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
+                && !requestedAssembly.Name.IsEqualTo(ApplicationParameters.ChocolateyPowerShellAssemblySimpleName))
             {
                 return typeof(ConsoleApplication).Assembly;
             }
