@@ -73,6 +73,25 @@
         }
     }
 
+    Context "Should include configured sources" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateySource -Name hermes-setup
+            $null = Invoke-Choco install wget
+
+            $Output = Invoke-Choco upgrade wget --include-configured-sources --debug
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should mention that configured sources have been included" {
+            $Output.Lines | Should -Contain "Including sources from chocolatey.config file." -Because $Output.String
+        }
+    }
+
     Context "Attempt to upgrade a package when there isn't an upgrade available" -Tag Internal {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
