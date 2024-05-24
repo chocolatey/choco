@@ -118,7 +118,10 @@ namespace Chocolatey.PowerShell.Helpers
             {
                 using (var registryKey = GetEnvironmentKey(scope))
                 {
-                    return registryKey.GetValueNames();
+                    // .NET seems to cache the value names even if they're set to null (removed) at some point
+                    // so we need to only return the names of things that have non-null values.
+                    var names = registryKey.GetValueNames();
+                    return names.Where(n => !string.IsNullOrEmpty((string)registryKey.GetValue(n))).ToArray();
                 }
             }
             catch
@@ -219,7 +222,10 @@ namespace Chocolatey.PowerShell.Helpers
                 foreach (var name in GetVariableNames(scope))
                 {
                     var value = GetVariable(cmdlet, name, scope);
-                    SetVariable(cmdlet, name, EnvironmentVariableTarget.Process, value);
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        SetVariable(cmdlet, name, EnvironmentVariableTarget.Process, value);
+                    }
                 }
             }
 
