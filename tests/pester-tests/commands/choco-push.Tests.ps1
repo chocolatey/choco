@@ -40,8 +40,8 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $
 
         It "Should Report the actual cause of the error" {
             $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse" -Because $Output.String
-            $Output.Lines | Should -Contain "An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below..." -Because $Output.String
-            $Output.Lines | Should -Contain "Response status code does not indicate success: 409 (Conflict)." -Because $Output.String
+            $Output.Lines | Should -Contain "An error has occurred. This package version already exists on the repository and cannot be modified." -Because $Output.String
+            $Output.Lines | Should -Contain "Package versions that are approved, rejected, or exempted cannot be modified." -Because $Output.String
         }
     }
 
@@ -71,7 +71,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $
         It "Should Report the actual cause of the error" {
             $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse" -Because $Output.String
             $Output.Lines | Should -Contain "An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below..." -Because $Output.String
-            $Output.Lines | Should -Contain "Response status code does not indicate success: 409 (Conflict)." -Because $Output.String
+            $Output.Lines | Should -Contain "Response status code does not indicate success: 409 (This package had an issue pushing: A nuget package's Description property may not be more than 4000 characters long.)." -Because $Output.String
         }
     }
 
@@ -101,7 +101,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $
         It "Should Report the actual cause of the error" {
             $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse" -Because $Output.String
             $Output.Lines | Should -Contain "An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below..." -Because $Output.String
-            $Output.Lines | Should -Contain "Response status code does not indicate success: 409 (Conflict)." -Because $Output.String
+            $Output.Lines | Should -Contain "Response status code does not indicate success: 409 (This package had an issue pushing: A nuget package's Title property may not be more than 256 characters long.)." -Because $Output.String
         }
     }
 
