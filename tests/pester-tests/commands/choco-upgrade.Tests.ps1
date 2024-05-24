@@ -11,6 +11,36 @@
         Remove-ChocolateyTestInstall
     }
 
+    Context "Upgrade pinned package using (<Command>) option" -ForEach @(
+        @{ Command = '--ignore-pinned' ; Contains = $true }
+        @{ Command = '' ; Contains = $false }
+    ) {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Package = 'upgradepackage'
+
+            # This test relies on the correct usage of the --pin option on the install
+            # command, but this is tested elsewhere
+            $null = Invoke-Choco install $Package --pin --version 1.0.0 --confirm
+            $null = Invoke-Choco upgrade $Package $Command --confirm
+            $Output = Invoke-Choco pin list
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Output should include upgraded package, with new pin in place" {
+            if ($Contains) {
+                $Output.String | Should -Match "$Package|1.1.0"
+            }
+            else {
+                $Output.String | Should -Match "$Package|1.0.0"
+            }
+        }
+    }
+
     Context "Upgrade package with (<Command>) specified" -ForEach @(
         @{ Command = '--pin' ; Contains = $true }
         @{ Command = '' ; Contains = $false }
