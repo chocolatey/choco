@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using System;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.app.configuration;
-
     /// <summary>
     /// Placeholder for the future to prevent the need for a breaking release of Chocolatey Licensed Extension.
     /// </summary>
@@ -33,9 +33,9 @@ namespace chocolatey.infrastructure.app.registration
         /// <remarks>This is not used, and is only a placeholder for the future.</remarks>
         IDictionary<string, string> GetEnvironmentConfiguration(ChocolateyConfiguration config);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         IDictionary<string, string> get_environment_configuration(ChocolateyConfiguration config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.configuration;
+using NuGet.Packaging;
+using NuGet.Versioning;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.tolerance;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-    using configuration;
-    using domain;
-    using infrastructure.configuration;
-    using NuGet.Packaging;
-    using NuGet.Versioning;
-    using results;
-    using tolerance;
-    using IFileSystem = filesystem.IFileSystem;
-
     public class ChocolateyPackageInformationService : IChocolateyPackageInformationService
     {
         private readonly IFileSystem _fileSystem;
@@ -44,6 +44,7 @@ namespace chocolatey.infrastructure.app.services
         private const string ArgsFile = ".arguments";
         private const string ExtraFile = ".extra";
         private const string VersionOverrideFile = ".version";
+        private const string DeploymentLocationFile = ".deploymentLocation";
 
         // We need to store the package identifiers we have warned about
         // to prevent duplicated outputs.
@@ -100,7 +101,10 @@ A corrupt .registry file exists at {0}.
             {
                 if (_fileSystem.FileExists(_fileSystem.CombinePaths(pkgStorePath, RegistrySnapshotBadFile)))
                 {
-                    if (_config.RegularOutput) this.Log().Warn(deserializationErrorMessage);
+                    if (_config.RegularOutput)
+                    {
+                        this.Log().Warn(deserializationErrorMessage);
+                    }
                 }
                 else
                 {
@@ -109,16 +113,22 @@ A corrupt .registry file exists at {0}.
             }
             catch (Exception e)
             {
-                if (_config.RegularOutput) this.Log().Warn(@"A .registry file at '{0}'
+                if (_config.RegularOutput)
+                {
+                    this.Log().Warn(@"A .registry file at '{0}'
  has errored attempting to read it. This file will be renamed to
  '{1}' The error:
  {2}
  ".FormatWith(_fileSystem.CombinePaths(pkgStorePath, RegistrySnapshotFile), _fileSystem.CombinePaths(pkgStorePath, RegistrySnapshotBadFile), e.ToString()));
+                }
 
                 FaultTolerance.TryCatchWithLoggingException(
                     () =>
                     {
-                        if (_config.RegularOutput) this.Log().Warn(deserializationErrorMessage);
+                        if (_config.RegularOutput)
+                        {
+                            this.Log().Warn(deserializationErrorMessage);
+                        }
 
                         // rename the bad registry file so that it isn't processed again
                         _fileSystem.MoveFile(_fileSystem.CombinePaths(pkgStorePath, RegistrySnapshotFile), _fileSystem.CombinePaths(pkgStorePath, RegistrySnapshotBadFile));
@@ -138,15 +148,22 @@ A corrupt .registry file exists at {0}.
                     "Unable to read files snapshot file",
                     throwError: false,
                     logWarningInsteadOfError: true,
-                    isSilent:true
+                    isSilent: true
                  );
 
             packageInformation.HasSilentUninstall = _fileSystem.FileExists(_fileSystem.CombinePaths(pkgStorePath, SilentUninstallerFile));
             packageInformation.IsPinned = _fileSystem.FileExists(_fileSystem.CombinePaths(pkgStorePath, PinFile));
             var argsFile = _fileSystem.CombinePaths(pkgStorePath, ArgsFile);
-            if (_fileSystem.FileExists(argsFile)) packageInformation.Arguments = _fileSystem.ReadFile(argsFile);
+            if (_fileSystem.FileExists(argsFile))
+            {
+                packageInformation.Arguments = _fileSystem.ReadFile(argsFile);
+            }
+
             var extraInfoFile = _fileSystem.CombinePaths(pkgStorePath, ExtraFile);
-            if (_fileSystem.FileExists(extraInfoFile)) packageInformation.ExtraInformation = _fileSystem.ReadFile(extraInfoFile);
+            if (_fileSystem.FileExists(extraInfoFile))
+            {
+                packageInformation.ExtraInformation = _fileSystem.ReadFile(extraInfoFile);
+            }
 
             var versionOverrideFile = _fileSystem.CombinePaths(pkgStorePath, VersionOverrideFile);
             if (_fileSystem.FileExists(versionOverrideFile))
@@ -163,6 +180,20 @@ A corrupt .registry file exists at {0}.
                  );
             }
 
+            var locationFile = _fileSystem.CombinePaths(pkgStorePath, DeploymentLocationFile);
+            if (_fileSystem.FileExists(locationFile))
+            {
+                FaultTolerance.TryCatchWithLoggingException(
+                    () =>
+                    {
+                        packageInformation.DeploymentLocation = _fileSystem.ReadFile(locationFile);
+                    },
+                    "Unable to read deployment location file",
+                    throwError: false,
+                    logWarningInsteadOfError: true
+                );
+            }
+
             return packageInformation;
         }
 
@@ -173,7 +204,11 @@ A corrupt .registry file exists at {0}.
 
             if (packageInformation.Package == null)
             {
-                if (_config.RegularOutput) this.Log().Debug("No package information to save as package is null.");
+                if (_config.RegularOutput)
+                {
+                    this.Log().Debug("No package information to save as package is null.");
+                }
+
                 return;
             }
 
@@ -202,7 +237,11 @@ A corrupt .registry file exists at {0}.
             if (!string.IsNullOrWhiteSpace(packageInformation.Arguments))
             {
                 var argsFile = _fileSystem.CombinePaths(pkgStorePath, ArgsFile);
-                if (_fileSystem.FileExists(argsFile)) _fileSystem.DeleteFile(argsFile);
+                if (_fileSystem.FileExists(argsFile))
+                {
+                    _fileSystem.DeleteFile(argsFile);
+                }
+
                 _fileSystem.WriteFile(argsFile, packageInformation.Arguments);
             }
             else
@@ -213,7 +252,11 @@ A corrupt .registry file exists at {0}.
             if (!string.IsNullOrWhiteSpace(packageInformation.ExtraInformation))
             {
                 var extraFile = _fileSystem.CombinePaths(pkgStorePath, ExtraFile);
-                if (_fileSystem.FileExists(extraFile)) _fileSystem.DeleteFile(extraFile);
+                if (_fileSystem.FileExists(extraFile))
+                {
+                    _fileSystem.DeleteFile(extraFile);
+                }
+
                 _fileSystem.WriteFile(extraFile, packageInformation.ExtraInformation);
             }
             else
@@ -224,7 +267,11 @@ A corrupt .registry file exists at {0}.
             if (packageInformation.VersionOverride != null)
             {
                 var versionOverrideFile = _fileSystem.CombinePaths(pkgStorePath, VersionOverrideFile);
-                if (_fileSystem.FileExists(versionOverrideFile)) _fileSystem.DeleteFile(versionOverrideFile);
+                if (_fileSystem.FileExists(versionOverrideFile))
+                {
+                    _fileSystem.DeleteFile(versionOverrideFile);
+                }
+
                 _fileSystem.WriteFile(versionOverrideFile, packageInformation.VersionOverride.ToNormalizedStringChecked());
             }
             else
@@ -248,12 +295,31 @@ A corrupt .registry file exists at {0}.
             {
                 _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, PinFile));
             }
+
+            if (!string.IsNullOrWhiteSpace(packageInformation.DeploymentLocation))
+            {
+                var locationFile = _fileSystem.CombinePaths(pkgStorePath, DeploymentLocationFile);
+                if (_fileSystem.FileExists(locationFile))
+                {
+                    _fileSystem.DeleteFile(locationFile);
+                }
+                
+                _fileSystem.WriteFile(locationFile, packageInformation.DeploymentLocation);
+            }
+            else
+            {
+                _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, DeploymentLocationFile));
+            }
         }
 
         public void Remove(IPackageMetadata package)
         {
             var pkgStorePath = GetStorePath(_fileSystem, package.Id, package.Version);
-            if (_config.RegularOutput) this.Log().Info("Removing Package Information for {0}".FormatWith(pkgStorePath));
+            if (_config.RegularOutput)
+            {
+                this.Log().Info("Removing Package Information for {0}".FormatWith(pkgStorePath));
+            }
+
             _fileSystem.DeleteDirectoryChecked(pkgStorePath, recursive: true);
         }
 
@@ -306,7 +372,7 @@ A corrupt .registry file exists at {0}.
             return preferredStorePath;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ChocolateyPackageInformation get_package_information(IPackageMetadata package)
             => Get(package);
@@ -318,6 +384,6 @@ A corrupt .registry file exists at {0}.
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void remove_package_information(IPackageMetadata package)
             => Remove(package);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using chocolatey.infrastructure.logging;
+using Moq;
+
 namespace chocolatey.tests
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.logging;
-    using Moq;
-
     public enum LogLevel
     {
         Debug,
@@ -58,12 +58,15 @@ namespace chocolatey.tests
 
         public int ContainsMessageCount(string expectedMessage)
         {
-            int messageCount = 0;
+            var messageCount = 0;
             foreach (var messageLevel in Messages)
             {
                 foreach (var message in messageLevel.Value.OrEmpty())
                 {
-                    if (message.Contains(expectedMessage)) messageCount++;
+                    if (message.Contains(expectedMessage))
+                    {
+                        messageCount++;
+                    }
                 }
             }
 
@@ -72,10 +75,13 @@ namespace chocolatey.tests
 
         public int ContainsMessageCount(string expectedMessage, LogLevel level)
         {
-            int messageCount = 0;
+            var messageCount = 0;
             foreach (var message in MessagesFor(level).OrEmpty())
             {
-                if (message.Contains(expectedMessage)) messageCount++;
+                if (message.Contains(expectedMessage))
+                {
+                    messageCount++;
+                }
             }
 
             return messageCount;

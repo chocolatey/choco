@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using chocolatey.infrastructure.adapters;
+
 namespace chocolatey.infrastructure.information
 {
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.adapters;
-
     public class ExtensionInformation
     {
         public ExtensionInformation(IAssembly assembly)
@@ -36,8 +36,8 @@ namespace chocolatey.infrastructure.information
 
         public override bool Equals(object obj)
         {
-            ExtensionInformation information = obj as ExtensionInformation;
-            return !ReferenceEquals(information, null) &&
+            var information = obj as ExtensionInformation;
+            return information is object &&
                    Name == information.Name &&
                    Version == information.Version;
         }
@@ -47,7 +47,7 @@ namespace chocolatey.infrastructure.information
             // We do this in an uncheched statement so there won't be any arithmetic exceptions
             unchecked
             {
-                int hashCode = 14;
+                var hashCode = 14;
                 hashCode = (hashCode * 6)
                     + EqualityComparer<string>.Default.GetHashCode(Name)
                     + EqualityComparer<string>.Default.GetHashCode(Version);

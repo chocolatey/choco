@@ -29,8 +29,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     BeforeAll {
-        # TODO: Both this thumbprint and strong name key should be in an environment variable. Update when new kitchen-pester is available. - https://github.com/chocolatey/choco/issues/2692
-        $ChocolateyThumbprint = '83AC7D88C66CB8680BCE802E0F0F5C179722764B'
+        # TODO: This strong name key should be in an environment variable. Update when new kitchen-pester is available. - https://github.com/chocolatey/choco/issues/2692
         $ChocolateyStrongNameKey = '79d02ea9cad655eb'
         # These lines are part of testing the issue
         # https://github.com/chocolatey/choco/issues/2233
@@ -118,14 +117,20 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     # This is skipped when not run in CI because it requires signed executables.
     Context "File signing (<_.FullName>)" -ForEach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0"))) {
         BeforeAll {
+            # Due to changes in the signing setup, the certificate used to sign PS1 files and the Chocolatey CLI executable MIGHT be different. This ensures that the both certificates are trusted.
             $FileUnderTest = $_
-            $SignerCert = (Get-AuthenticodeSignature (Get-ChocoPath)).SignerCertificate
+            $Ps1Cert = (Get-AuthenticodeSignature (Join-Path (Split-Path (Split-Path (Get-ChocoPath))) 'helpers/chocolateyScriptRunner.ps1')).SignerCertificate
+            $ExeCert = (Get-AuthenticodeSignature (Get-ChocoPath)).SignerCertificate
             $Cert = "$PWD\cert.cer"
-            # Write out the certificate
-            [IO.File]::WriteAllBytes($Cert, $SignerCert.export([security.cryptography.x509certificates.x509contenttype]::cert))
+            # Write out the exe certificate
+            [IO.File]::WriteAllBytes($Cert, $ExeCert.export([security.cryptography.x509certificates.x509contenttype]::cert))
             # Trust the certificate
             Import-Certificate -FilePath $Cert -CertStoreLocation 'Cert:\CurrentUser\TrustedPublisher\'
             Remove-Item -Path $Cert -Force -ErrorAction Ignore
+            # Write out the ps1 certificate
+            [IO.File]::WriteAllBytes($Cert, $Ps1Cert.export([security.cryptography.x509certificates.x509contenttype]::cert))
+            # Trust the certificate
+            Import-Certificate -FilePath $Cert -CertStoreLocation 'Cert:\CurrentUser\TrustedPublisher\'
         }
 
         AfterAll {
@@ -134,8 +139,17 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
 
         It "Should be signed with our certificate" -Skip:($_.Name -like 'package*.exe') {
             $authenticodeSignature = Get-AuthenticodeSignature $FileUnderTest
-            $authenticodeSignature.Status | Should -Be 'Valid'
-            $authenticodeSignature.SignerCertificate.Thumbprint | Should -Be $ChocolateyThumbprint
+
+            # For non production builds, the official signing certificate is not in play, so need to
+            # alter the assestion slightly, to account for the fact that UnknownError, is making the
+            # underlying problem, i.e. "A certificate chain processed, but terminated in a root
+            # certificate which is not trusted by the trust provider"
+            if ($authenticodeSignature.SignerCertificate.Issuer -match 'Chocolatey Software, Inc') {
+                $authenticodeSignature.Status | Should -Be 'UnknownError'
+            }
+            elseif ($signature.SignerCertificate.Issuer -match 'DigiCert') {
+                $authenticodeSignature.Status | Should -Be 'Valid'
+            }
         }
 
         It "Should be strongly named with our strong name key" -Skip:($_ -notin $StrongNamingKeyFilesToCheck) {

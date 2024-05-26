@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.commandline;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.commandline
 {
-    using System;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.commandline;
-    using Moq;
-    using FluentAssertions;
-
     public class InteractivePromptSpecs
     {
         public abstract class InteractivePromptSpecsBase : TinySpec
@@ -62,7 +62,7 @@ namespace chocolatey.tests.infrastructure.commandline
             public void Should_error_when_the_choicelist_is_null()
             {
                 Choices = null;
-                bool errored = false;
+                var errored = false;
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
@@ -81,8 +81,8 @@ namespace chocolatey.tests.infrastructure.commandline
             public void Should_error_when_the_choicelist_is_empty()
             {
                 Choices = new List<string>();
-                bool errored = false;
-                string errorMessage = string.Empty;
+                var errored = false;
+                var errorMessage = string.Empty;
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
@@ -107,7 +107,7 @@ namespace chocolatey.tests.infrastructure.commandline
                     "bob"
                 };
                 PromptValue = null;
-                bool errored = false;
+                var errored = false;
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
@@ -130,8 +130,8 @@ namespace chocolatey.tests.infrastructure.commandline
                     "bob"
                 };
                 _defaultChoice = "maybe";
-                bool errored = false;
-                string errorMessage = string.Empty;
+                var errored = false;
+                var errorMessage = string.Empty;
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 string result = null;
                 try
@@ -257,7 +257,7 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void Should_error_when_no_answer_given()
             {
-                bool errored = false;
+                var errored = false;
 
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
@@ -291,7 +291,7 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void Should_error_when_any_choice_not_available_is_given()
             {
-                bool errored = false;
+                var errored = false;
 
                 Console.Setup(c => c.ReadLine()).Returns("3"); //Enter pressed
                 try
@@ -429,7 +429,7 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void Should_error_when_any_choice_not_available_is_given()
             {
-                bool errored = false;
+                var errored = false;
 
                 Console.Setup(c => c.ReadLine()).Returns("3"); //Enter pressed
                 try
@@ -459,7 +459,7 @@ namespace chocolatey.tests.infrastructure.commandline
             public void Should_error_when_the_choicelist_is_null()
             {
                 Choices = null;
-                bool errored = false;
+                var errored = false;
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
@@ -478,8 +478,8 @@ namespace chocolatey.tests.infrastructure.commandline
             public void Should_error_when_the_choicelist_is_empty()
             {
                 Choices = new List<string>();
-                bool errored = false;
-                string errorMessage = string.Empty;
+                var errored = false;
+                var errorMessage = string.Empty;
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
@@ -504,8 +504,8 @@ namespace chocolatey.tests.infrastructure.commandline
                     "bob"
                 };
                 PromptValue = null;
-                bool errored = false;
-                string errorMessage = string.Empty;
+                var errored = false;
+                var errorMessage = string.Empty;
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
@@ -530,8 +530,8 @@ namespace chocolatey.tests.infrastructure.commandline
                     "bob",
                     ""
                 };
-                bool errored = false;
-                string errorMessage = string.Empty;
+                var errored = false;
+                var errorMessage = string.Empty;
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
@@ -556,8 +556,8 @@ namespace chocolatey.tests.infrastructure.commandline
                     "sally",
                     "suzy"
                 };
-                bool errored = false;
-                string errorMessage = string.Empty;
+                var errored = false;
+                var errorMessage = string.Empty;
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
                 {
@@ -593,7 +593,7 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void Should_error_when_no_answer_given()
             {
-                bool errored = false;
+                var errored = false;
 
                 Console.Setup(c => c.ReadLine()).Returns(""); //Enter pressed
                 try
@@ -643,7 +643,7 @@ namespace chocolatey.tests.infrastructure.commandline
             [Fact]
             public void Should_error_when_any_choice_not_available_is_given()
             {
-                bool errored = false;
+                var errored = false;
 
                 Console.Setup(c => c.ReadLine()).Returns("yup"); //Enter pressed
                 try

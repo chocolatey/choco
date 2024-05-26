@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.platforms;
+using Moq;
+using FluentAssertions;
+using Environment = System.Environment;
+
 namespace chocolatey.tests.infrastructure.platforms
 {
-    using System;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.platforms;
-    using Moq;
-    using FluentAssertions;
-    using Environment = System.Environment;
-
     public class PlatformSpecs
     {
         public abstract class PlatformSpecsBase : TinySpec

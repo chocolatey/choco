@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Runtime.InteropServices;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.commandline
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using logging;
-    using platforms;
-
     /// <summary>
     ///   Detect abnormal exit signals and log them
     /// </summary>
@@ -48,7 +48,10 @@ namespace chocolatey.infrastructure.commandline
 
         public static void SetHandler()
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) return;
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                return;
+            }
 
             _handler += Handler;
             SetConsoleCtrlHandler(_handler, true);

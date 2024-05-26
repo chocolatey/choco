@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.commands
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using FluentAssertions;
-
     public class ChocolateyHelpCommandSpecs
     {
         [ConcernFor("help")]

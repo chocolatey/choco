@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
 namespace chocolatey
 {
-    using System;
-    using System.IO;
-    using System.Runtime.Serialization.Formatters.Binary;
-
     /// <summary>
     ///   Extensions for Object
     /// </summary>
@@ -32,7 +32,10 @@ namespace chocolatey
         /// <returns><see cref="string.Empty"/> if <paramref name="input"/> is null, otherwise <paramref name="input"/>.ToString()</returns>
         public static string ToStringSafe(this object input)
         {
-            if (input == null) return string.Empty;
+            if (input == null)
+            {
+                return string.Empty;
+            }
 
             return input.ToString();
         }
@@ -48,7 +51,7 @@ namespace chocolatey
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string to_string(this object input)
             => ToStringSafe(input);
@@ -56,6 +59,6 @@ namespace chocolatey
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static T deep_copy<T>(this T other)
             => DeepCopy(other);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

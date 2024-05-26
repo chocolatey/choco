@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.guards;
+using chocolatey.infrastructure.logging;
+using Console = chocolatey.infrastructure.adapters.Console;
+
 namespace chocolatey.infrastructure.commandline
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using adapters;
-    using guards;
-    using logging;
-    using Console = adapters.Console;
-
     public class InteractivePrompt
     {
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
@@ -43,7 +43,11 @@ namespace chocolatey.infrastructure.commandline
 
         public static string PromptForConfirmation(string prompt, IEnumerable<string> choices, string defaultChoice, bool requireAnswer, bool allowShortAnswer = true, bool shortPrompt = false, int repeat = 10, int timeoutInSeconds = 0)
         {
-            if (repeat < 0) throw new ApplicationException("Too many bad attempts. Stopping before application crash.");
+            if (repeat < 0)
+            {
+                throw new ApplicationException("Too many bad attempts. Stopping before application crash.");
+            }
+
             Ensure.That(() => prompt).NotNull();
             Ensure.That(() => choices).NotNull();
             Ensure
@@ -66,7 +70,7 @@ namespace chocolatey.infrastructure.commandline
                 Ensure
                     .That(() => choices)
                     .Meets(
-                        c => !c.Any(String.IsNullOrWhiteSpace),
+                        c => !c.Any(string.IsNullOrWhiteSpace),
                         (name, value) => { throw new ApplicationException("Some choices are empty. Please ensure you provide no empty choices."); });
 
                 Ensure
@@ -89,12 +93,12 @@ namespace chocolatey.infrastructure.commandline
 
             "chocolatey".Log().Info(shortPrompt ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, prompt);
 
-            int counter = 1;
+            var counter = 1;
             IDictionary<int, string> choiceDictionary = new Dictionary<int, string>();
             foreach (var choice in choices.OrEmpty())
             {
                 choiceDictionary.Add(counter, choice);
-                "chocolatey".Log().Info(shortPrompt ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Normal," {0}) {1}{2}".FormatWith(counter, choice.ToStringSafe(), choice.IsEqualTo(defaultChoice) ? " [Default - Press Enter]" : ""));
+                "chocolatey".Log().Info(shortPrompt ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Normal, " {0}) {1}{2}".FormatWith(counter, choice.ToStringSafe(), choice.IsEqualTo(defaultChoice) ? " [Default - Press Enter]" : ""));
                 if (shortPrompt)
                 {
                     var choicePrompt = choice.IsEqualTo(defaultChoice) ?
@@ -103,10 +107,14 @@ namespace chocolatey.infrastructure.commandline
                                 "[{0}]".FormatWith(choice.ToUpperInvariant())
                         :
                             shortPrompt ?
-                                "[{0}]{1}".FormatWith(choice.Substring(0,1).ToUpperInvariant(), choice.Substring(1, choice.Length - 1)) :
+                                "[{0}]{1}".FormatWith(choice.Substring(0, 1).ToUpperInvariant(), choice.Substring(1, choice.Length - 1)) :
                                 choice;
 
-                    if (counter != 1) Console.Write("/");
+                    if (counter != 1)
+                    {
+                        Console.Write("/");
+                    }
+
                     Console.Write(choicePrompt);
                 }
 
@@ -116,7 +124,10 @@ namespace chocolatey.infrastructure.commandline
             Console.Write(shortPrompt ? "): " : "> ");
 
             var selection = timeoutInSeconds == 0 ? Console.ReadLine() : Console.ReadLine(timeoutInSeconds * 1000);
-            if (shortPrompt) Console.WriteLine();
+            if (shortPrompt)
+            {
+                Console.WriteLine();
+            }
 
             if (string.IsNullOrWhiteSpace(selection) && !string.IsNullOrWhiteSpace(defaultChoice))
             {
@@ -124,7 +135,7 @@ namespace chocolatey.infrastructure.commandline
                 return defaultChoice;
             }
 
-            int selected = -1;
+            var selected = -1;
             if (!int.TryParse(selection, out selected) || selected <= 0 || selected > (counter - 1))
             {
                 // check to see if value was passed
@@ -178,7 +189,7 @@ namespace chocolatey.infrastructure.commandline
                     {
                         password = password.Substring(0, password.Length - 1);
                         // get the location of the cursor
-                        int pos = System.Console.CursorLeft;
+                        var pos = System.Console.CursorLeft;
                         // move the cursor to the left by one character
                         System.Console.SetCursorPosition(pos - 1, System.Console.CursorTop);
                         // replace it with space
@@ -189,14 +200,18 @@ namespace chocolatey.infrastructure.commandline
                     info = possibleNonInteractive ? Console.ReadKey(TimeoutInSeconds * 1000) : Console.ReadKey(true);
                 }
             }
-            for (int i = 0; i < password.Length; i++) Console.Write("*");
+            for (var i = 0; i < password.Length; i++)
+            {
+                Console.Write("*");
+            }
+
             System.Console.WriteLine("");
 
             return password;
         }
 
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IConsole> console)
@@ -209,6 +224,6 @@ namespace chocolatey.infrastructure.commandline
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_password(bool interactive)
             => GetPassword(interactive);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

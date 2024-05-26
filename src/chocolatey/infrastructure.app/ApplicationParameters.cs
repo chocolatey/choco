@@ -14,16 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Security.Principal;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using Environment = System.Environment;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.information;
+
 namespace chocolatey.infrastructure.app
 {
-    using System;
-    using System.Security.Principal;
-    using adapters;
-    using filesystem;
-    using Environment = System.Environment;
-    using chocolatey.infrastructure.platforms;
-    using chocolatey.infrastructure.information;
-
     /// <summary>
     ///   Application constants and settings for the application
     /// </summary>
@@ -59,6 +60,11 @@ namespace chocolatey.infrastructure.app
         // when being used as a reference, start by looking next to Chocolatey, then in a subfolder.
         public static readonly string LicensedAssemblyLocation = _fileSystem.FileExists(_fileSystem.CombinePaths(InstallLocation, "chocolatey.licensed.dll")) ? _fileSystem.CombinePaths(InstallLocation, "chocolatey.licensed.dll") : _fileSystem.CombinePaths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
 #endif
+
+        internal static readonly string ChocolateyPowerShellAssemblySimpleName = "Chocolatey.PowerShell";
+        internal static readonly string ChocolateyPowerShellAssemblyLocation = _fileSystem.FileExists(_fileSystem.CombinePaths(InstallLocation, "Chocolatey.PowerShell.dll"))
+            ? _fileSystem.CombinePaths(InstallLocation, "Chocolatey.PowerShell.dll")
+            : _fileSystem.CombinePaths(InstallLocation, "helpers", "Chocolatey.PowerShell.dll");
 
         public static readonly string CommonAppDataChocolatey = _fileSystem.CombinePaths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.CommonApplicationData), Name);
         public static readonly string LoggingLocation = _fileSystem.CombinePaths(InstallLocation, "logs");
@@ -101,6 +107,8 @@ namespace chocolatey.infrastructure.app
         public static readonly string ChocolateyCommunityFeedPushSource = "https://push.chocolatey.org/";
         public static readonly string ChocolateyCommunityGalleryUrl = "https://community.chocolatey.org/";
         public static readonly string ChocolateyCommunityFeedSource = "https://community.chocolatey.org/api/v2/";
+        public static readonly string NuGetPublicFeedSourceV2 = "https://www.nuget.org/api/v2/";
+        public static readonly string NuGetPublicFeedSourceV3 = "https://api.nuget.org/v3/index.json";
         public static readonly string ChocolateyLicensedFeedSource = "https://licensedpackages.chocolatey.org/api/v2/";
         public static readonly string ChocolateyLicensedFeedSourceName = "chocolatey.licensed";
         public static readonly string UserAgent = "Chocolatey Command Line";
@@ -110,6 +118,15 @@ namespace chocolatey.infrastructure.app
         public static readonly string PowerShellModulePathProcessDocuments = _fileSystem.CombinePaths(System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments), "WindowsPowerShell\\Modules");
         public static readonly string LocalSystemSidString = "S-1-5-18";
         public static readonly SecurityIdentifier LocalSystemSid = new SecurityIdentifier(LocalSystemSidString);
+        public static readonly List<string> PublicNuGetSources = new List<string>()
+        {
+            ChocolateyCommunityFeedSource,
+            ChocolateyCommunityFeedPushSource,
+            ChocolateyCommunityFeedPushSourceOld,
+            NuGetPublicFeedSourceV2,
+            NuGetPublicFeedSourceV3,
+            ChocolateyLicensedFeedSource,
+        };
 
         private static string GetHttpCacheLocation()
         {
@@ -152,10 +169,9 @@ namespace chocolatey.infrastructure.app
         /// </summary>
         public static int DefaultWaitForExitInSeconds = 2700;
         public static int DefaultWebRequestTimeoutInSeconds = 30;
-
-        public static readonly string[] ConfigFileExtensions = new string[] {".autoconf",".config",".conf",".cfg",".jsc",".json",".jsonp",".ini",".xml",".yaml"};
+        public static readonly string[] ConfigFileExtensions = new string[] { ".autoconf", ".config", ".conf", ".cfg", ".jsc", ".json", ".jsonp", ".ini", ".xml", ".yaml" };
         public static readonly string ConfigFileTransformExtension = ".install.xdt";
-        public static readonly string[] ShimDirectorFileExtensions = new string[] {".gui",".ignore"};
+        public static readonly string[] ShimDirectorFileExtensions = new string[] { ".gui", ".ignore" };
 
         public static readonly string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
         public static readonly string HashProviderFileLocked = "UnableToDetectChanges_FileLocked";
@@ -226,6 +242,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string LogValidationResultsOnWarnings = "logValidationResultsOnWarnings";
             public static readonly string UsePackageRepositoryOptimizations = "usePackageRepositoryOptimizations";
             public static readonly string DisableCompatibilityChecks = "disableCompatibilityChecks";
+            public static readonly string UsePackageHashValidation = "usePackageHashValidation";
         }
 
         public static class Messages
@@ -251,10 +268,10 @@ namespace chocolatey.infrastructure.app
             return isDebug;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool is_debug_mode_cli_primitive()
             => IsDebugModeCliPrimitive();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

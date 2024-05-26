@@ -1,9 +1,9 @@
-﻿namespace chocolatey.tests
-{
-    using System;
-    using System.IO;
-    using System.Net;
+﻿using System;
+using System.IO;
+using System.Net;
 
+namespace chocolatey.tests
+{
     public static class UNCHelper
     {
         public static string ConvertLocalFolderPathToIpBasedUncPath(string localFolderName)

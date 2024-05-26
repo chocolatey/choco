@@ -120,6 +120,9 @@ Submitting a ticket:
 ## Contributing
 If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md).
 
+This project uses an [.editorconfig](https://editorconfig.org) file in order to help maintain consistency of code.
+Errors and warnings produced by not following these defined conventions will in future be enforced at build time, so ensure your contributions adhere to the rules defined in it and produce no warnings or errors in Visual Studio.
+
 ## Committers
 Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/choco/blob/develop/COMMITTERS.md).
 
@@ -166,8 +169,7 @@ export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig:/Library/Frameworks/Mono.framewo
  * Set your permissions correctly:
 
 ```sh
-chmod +x build.sh
-chmod +x zip.sh
+chmod +x *.sh
 ```
 
 ##### Build Process:

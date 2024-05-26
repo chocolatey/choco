@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+using System.Net;
+using System.Reflection;
+using System.Threading;
+using log4net.Util;
+
 namespace chocolatey.infrastructure.logging
 {
-    using System;
-    using System.Diagnostics;
-    using System.Net;
-    using System.Reflection;
-    using System.Threading;
-    using log4net.Util;
-
     public class TraceLog : TraceListener
     {
         public TraceLog()
@@ -64,7 +64,7 @@ namespace chocolatey.infrastructure.logging
                 {
                     //// force initialization
                     HttpWebRequest.Create("http://localhost");
-                    Thread waitForInitializationThread = new Thread(() =>
+                    var waitForInitializationThread = new Thread(() =>
                     {
                         while (!(bool)isInitialized.GetValue(null))
                         {
@@ -83,7 +83,10 @@ namespace chocolatey.infrastructure.logging
             EnableTraceSource("s_CacheTraceSource", logging, this);  //System.Net.Cache
 
             var isEnabled = logging.GetField("s_LoggingEnabled", BindingFlags.NonPublic | BindingFlags.Static);
-            if (isEnabled !=null) isEnabled.SetValue(null, true);
+            if (isEnabled != null)
+            {
+                isEnabled.SetValue(null, true);
+            }
         }
 
         private static void EnableTraceSource(string fieldName, Type logging, TraceListener listener)

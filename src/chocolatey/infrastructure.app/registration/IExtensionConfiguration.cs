@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     /// <summary>
     /// Placeholder for the future to prevent the need to do a breaking release of
     /// Chocolatey Licensed Extension.
@@ -36,9 +36,9 @@ namespace chocolatey.infrastructure.app.registration
         /// <remarks>This is not used, and is only a placeholder for the future.</remarks>
         object CreateInitialExtensionConfiguration();
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         object create_initial_extension_configuration();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

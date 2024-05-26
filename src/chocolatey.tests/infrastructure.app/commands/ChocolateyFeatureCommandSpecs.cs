@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commandline;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commandline;
-    using Moq;
-    using FluentAssertions;
-
     public class ChocolateyFeatureCommandSpecs
     {
         [ConcernFor("feature")]
@@ -143,7 +143,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 errored.Should().BeTrue();
                 error.Should().NotBeNull();
                 error.Should().BeOfType<ApplicationException>();
-                error.Message.Should().Contain("A single features command must be listed");
+                error.Message.Should().Contain("A single feature command must be listed.");
             }
 
             [Fact]

@@ -1,4 +1,4 @@
-#load nuget:?package=Chocolatey.Cake.Recipe&version=0.25.0
+#load nuget:?package=Chocolatey.Cake.Recipe&version=0.28.4
 
 ///////////////////////////////////////////////////////////////////////////////
 // TOOLS
@@ -15,7 +15,8 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
     var targetPlatform = "v4,C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.8";
     var assembliesToILMerge = GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/*.{exe|dll}")
                             - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/choco.exe")
-                            - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/System.Management.Automation.dll");
+                            - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/System.Management.Automation.dll")
+                            - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/Chocolatey.PowerShell.dll");
 
     Information("The following assemblies have been selected to be ILMerged for choco.exe...");
     foreach (var assemblyToILMerge in assembliesToILMerge)
@@ -34,10 +35,11 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
         AssemblyPaths = assembliesToILMerge });
 
     assembliesToILMerge = GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/*.{exe|dll}")
-                            - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/choco.exe")
-                            - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.dll")
-                            - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/log4net.dll")
-                            - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/System.Management.Automation.dll");
+                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/choco.exe")
+                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.dll")
+                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/log4net.dll")
+                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/System.Management.Automation.dll")
+                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/Chocolatey.PowerShell.dll");
 
     Information("The following assemblies have been selected to be ILMerged for chocolatey.dll...");
     foreach (var assemblyToILMerge in assembliesToILMerge)
@@ -58,10 +60,11 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
     if (DirectoryExists(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/"))
     {
         var no7zAssembliesToILMerge = GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/*.{exe|dll}")
-                                - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/choco.exe")
-                                - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/System.Management.Automation.dll")
-                                - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/chocolatey.tests*.dll")
-                                - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/{Moq|nunit|Should|testcentric}*.dll");
+                                    - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/choco.exe")
+                                    - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/System.Management.Automation.dll")
+                                    - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/chocolatey.tests*.dll")
+                                    - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/{Moq|nunit|Should|testcentric}*.dll")
+                                    - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/Chocolatey.PowerShell.dll");
 
         Information("The following assemblies have been selected to be ILMerged for choco.exe No7zip Version...");
         foreach (var assemblyToILMerge in no7zAssembliesToILMerge)
@@ -83,15 +86,29 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
     return mergeConfigs;
 };
 
-Func<FilePathCollection> getScriptsToSign = () =>
+Func<FilePathCollection> getScriptsToVerify = () =>
 {
-    var scriptsToSign = GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/**/*.{ps1|psm1}") +
-                        GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/**/*.{ps1|psm1}");
+    var scriptsToVerify = GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/**/*.{ps1|psm1|psd1}") +
+                        GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/**/*.{ps1|psm1|psd1}");
 
     if (DirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip"))
     {
-        scriptsToSign += GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/**/*.{ps1|psm1}");
+        scriptsToVerify += GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/**/*.{ps1|psm1|psd1}");
     }
+
+    Information("The following PowerShell scripts have been selected to be verified...");
+    foreach (var scriptToVerify in scriptsToVerify)
+    {
+        Information(scriptToVerify.FullPath);
+    }
+
+    return scriptsToVerify;
+};
+
+Func<FilePathCollection> getScriptsToSign = () =>
+{
+    var scriptsToSign = GetFiles("./nuspec/**/*.{ps1|psm1|psd1}") +
+                        GetFiles("./src/chocolatey.resources/**/*.{ps1|psm1|psd1}");
 
     Information("The following PowerShell scripts have been selected to be signed...");
     foreach (var scriptToSign in scriptsToSign)
@@ -107,13 +124,15 @@ Func<FilePathCollection> getFilesToSign = () =>
     var filesToSign = GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/chocolatey.dll")
                     + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe")
                     + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/tools/{checksum|shimgen}.exe")
-                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/redirects/*.exe");
+                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/redirects/*.exe")
+                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll");
 
     if (DirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip"))
     {
         filesToSign += GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/tools/chocolateyInstall/choco.exe")
                     + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/tools/chocolateyInstall/tools/{checksum|shimgen}.exe")
-                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/tools/chocolateyInstall/redirects/*.exe");
+                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/tools/chocolateyInstall/redirects/*.exe")
+                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll");
     }
 
     Information("The following assemblies have been selected to be signed...");
@@ -144,7 +163,7 @@ Func<FilePathCollection> getMsisToSign = () =>
 
 Task("Prepare-Chocolatey-Packages")
     .IsDependeeOf("Create-Chocolatey-Packages")
-    .IsDependeeOf("Sign-PowerShellScripts")
+    .IsDependeeOf("Verify-PowerShellScripts")
     .IsDependeeOf("Sign-Assemblies")
     .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping because not running on Windows")
     .WithCriteria(() => BuildParameters.ShouldRunChocolatey, "Skipping because execution of Chocolatey has been disabled")
@@ -156,7 +175,11 @@ Task("Prepare-Chocolatey-Packages")
     // Run Chocolatey Unpackself
     CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco_merged/choco.exe", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe");
 
-    StartProcess(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe", new ProcessSettings{ Arguments = "unpackself -f -y --allow-unofficial-build" });
+    StartProcess(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe", new ProcessSettings{ Arguments = "unpackself -f -y --allow-unofficial-build --run-actual" });
+
+    // Copy Chocolatey.PowerShell.dll and its help.xml file
+    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/Chocolatey.PowerShell/Chocolatey.PowerShell.dll", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll");
+    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/Chocolatey.PowerShell/Chocolatey.PowerShell.dll-help.xml", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll-help.xml");
 
     // Tidy up logs and config folder which are not required
     var logsDirectory = BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/logs";
@@ -229,7 +252,7 @@ Task("Prepare-ChocolateyNo7zip-Package")
     .WithCriteria(() => BuildParameters.ShouldRunChocolatey, "Skipping because execution of Chocolatey has been disabled")
     .IsDependentOn("Build-ChocolateyNo7zip")
     .IsDependeeOf("Sign-Assemblies")
-    .IsDependeeOf("Sign-PowerShellScripts")
+    .IsDependeeOf("Verify-PowerShellScripts")
     .IsDependeeOf("Create-ChocolateyNo7zip-Package")
     .Does(() =>
 {
@@ -245,6 +268,10 @@ Task("Prepare-ChocolateyNo7zip-Package")
     CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip_merged/choco.exe", nuspecDirectory + "/tools/chocolateyInstall/choco.exe");
 
     StartProcess(nuspecDirectory + "/tools/chocolateyInstall/choco.exe", new ProcessSettings{ Arguments = "unpackself -f -y --allow-unofficial-build" });
+
+    // Copy Chocolatey.PowerShell.dll and help.xml file
+    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/Chocolatey.PowerShell/Chocolatey.PowerShell.dll", nuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll");
+    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/Chocolatey.PowerShell/Chocolatey.PowerShell.dll-help.xml", nuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll-help.xml");
 
     // Tidy up logs and config folder which are not required
     var logsDirectory = nuspecDirectory + "/tools/chocolateyInstall/logs";
@@ -298,7 +325,7 @@ Task("Create-ChocolateyNo7zip-Package")
 Task("Prepare-NuGet-Packages")
     .WithCriteria(() => BuildParameters.ShouldRunNuGet, "Skipping because execution of NuGet has been disabled")
     .IsDependeeOf("Create-NuGet-Packages")
-    .IsDependeeOf("Sign-PowerShellScripts")
+    .IsDependeeOf("Verify-PowerShellScripts")
     .IsDependeeOf("Sign-Assemblies")
     .Does(() =>
 {
@@ -383,6 +410,7 @@ BuildParameters.SetParameters(context: Context,
                             productCopyright: string.Format("Copyright © 2017 - {0} Chocolatey Software, Inc. Copyright © 2011 - 2017, RealDimensions Software, LLC - All Rights Reserved.", DateTime.Now.Year),
                             shouldStrongNameSignDependentAssemblies: false,
                             treatWarningsAsErrors: false,
+                            getScriptsToVerify: getScriptsToVerify,
                             getScriptsToSign: getScriptsToSign,
                             getFilesToSign: getFilesToSign,
                             getMsisToSign: getMsisToSign,

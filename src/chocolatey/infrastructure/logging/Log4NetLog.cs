@@ -15,16 +15,15 @@
 // limitations under the License.
 
 using log4net.Config;
+using System;
+using System.Runtime;
+using log4net;
+using log4net.Core;
 
 [assembly: XmlConfigurator(Watch = true)]
 
 namespace chocolatey.infrastructure.logging
 {
-    using System;
-    using System.Runtime;
-    using log4net;
-    using log4net.Core;
-
     /// <summary>
     ///   Log4net logger implementing special ILog class
     /// </summary>
@@ -43,37 +42,55 @@ namespace chocolatey.infrastructure.logging
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Debug(string message, params object[] formatting)
         {
-            if (_logger.IsDebugEnabled) Log(Level.Debug, DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsDebugEnabled)
+            {
+                Log(Level.Debug, DecorateMessageWithAuditInformation(message), formatting);
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Debug(Func<string> message)
         {
-            if (_logger.IsDebugEnabled) Log(Level.Debug, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            if (_logger.IsDebugEnabled)
+            {
+                Log(Level.Debug, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Info(string message, params object[] formatting)
         {
-            if (_logger.IsInfoEnabled) Log(Level.Info, DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsInfoEnabled)
+            {
+                Log(Level.Info, DecorateMessageWithAuditInformation(message), formatting);
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Info(Func<string> message)
         {
-            if (_logger.IsInfoEnabled) Log(Level.Info, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            if (_logger.IsInfoEnabled)
+            {
+                Log(Level.Info, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Warn(string message, params object[] formatting)
         {
-            if (_logger.IsWarnEnabled) Log(Level.Warn, DecorateMessageWithAuditInformation(message), formatting);
+            if (_logger.IsWarnEnabled)
+            {
+                Log(Level.Warn, DecorateMessageWithAuditInformation(message), formatting);
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
         public void Warn(Func<string> message)
         {
-            if (_logger.IsWarnEnabled) Log(Level.Warn, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            if (_logger.IsWarnEnabled)
+            {
+                Log(Level.Warn, DecorateMessageWithAuditInformation(message.Invoke()).EscapeCurlyBraces());
+            }
         }
 
         [TargetedPatchingOptOut("Performance critical to inline this type of method across NGen image boundaries")]
@@ -116,10 +133,10 @@ namespace chocolatey.infrastructure.logging
             _logger.Logger.Log(_declaringType, level, message.FormatWith(formatting), null);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public string decorate_message_with_audit_information(string message)
             => DecorateMessageWithAuditInformation(message);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

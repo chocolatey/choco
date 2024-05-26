@@ -1,25 +1,25 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.results;
+
+using NuGet;
+using NuGet.Configuration;
+
+using NUnit.Framework;
+
+using FluentAssertions;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.platforms;
-    using chocolatey.infrastructure.results;
-
-    using NuGet;
-    using NuGet.Configuration;
-
-    using NUnit.Framework;
-
-    using FluentAssertions;
-
     public class InfoScenarios
     {
         [ConcernFor("info")]
@@ -398,7 +398,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Results[0].Source.Should().Be(
                     ((Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://") + Path.Combine(Environment.CurrentDirectory, "PackageOutput"))
-                    .Replace("\\","/"));
+                    .Replace("\\", "/"));
             }
 
             [Fact]
@@ -422,7 +422,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_show_only_one_result()
             {
-                Results.Should().ContainSingle( "Expected 1 package to be returned!");
+                Results.Should().ContainSingle("Expected 1 package to be returned!");
             }
 
             [Fact]
@@ -478,7 +478,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_show_only_one_result()
             {
-                Results.Should().ContainSingle( "Expected 1 package to be returned!");
+                Results.Should().ContainSingle("Expected 1 package to be returned!");
             }
 
             [Fact]

@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml.XPath;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.results;
+using NuGet.Configuration;
+using NuGet.Packaging;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Xml.XPath;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.results;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class UpgradeScenarios
     {
         [ConcernFor("upgrade")]
@@ -263,6 +263,28 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_match_the_upgrade_version_of_one_dot_one_dot_zero()
             {
                 _packageResult.Version.Should().Be("1.1.0");
+            }
+
+            [Fact]
+            public void Should_contain_message_with_source()
+            {
+                var message = "Downloading package from source '{0}'".FormatWith(Configuration.Sources);
+
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToString()).WhoseValue.Should()
+                    .Contain(message);
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void Should_contain_message_with_download_uri()
+            {
+                var packagePath = "file:///{0}/{1}.{2}{3}".FormatWith(Configuration.Sources.Replace("\\", "/"), Configuration.PackageNames,
+                    "1.1.0", NuGetConstants.PackageExtension);
+                var message = "Package download location '{0}'".FormatWith(packagePath);
+
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToString()).WhoseValue.Should()
+                    .Contain(message);
             }
 
             [Fact]
@@ -3517,7 +3539,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_upgrade_packages_with_upgrades()
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
-                upgradePackageResult.Should().ContainSingle( "upgradepackage must be there once");
+                upgradePackageResult.Should().ContainSingle("upgradepackage must be there once");
                 upgradePackageResult.First().Value.Version.Should().Be("1.1.0");
             }
 
@@ -3525,7 +3547,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_skip_packages_without_upgrades()
             {
                 var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
-                installPackageResult.Should().ContainSingle( "installpackage must be there once");
+                installPackageResult.Should().ContainSingle("installpackage must be there once");
                 installPackageResult.First().Value.Version.Should().Be("1.0.0");
             }
         }
@@ -3556,7 +3578,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_upgrade_packages_with_upgrades()
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
-                upgradePackageResult.Should().ContainSingle( "upgradepackage must be there once");
+                upgradePackageResult.Should().ContainSingle("upgradepackage must be there once");
                 upgradePackageResult.First().Value.Version.Should().Be("1.1.1-beta2");
             }
 
@@ -3577,7 +3599,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_skip_packages_without_upgrades()
             {
                 var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
-                installPackageResult.Should().ContainSingle( "installpackage must be there once");
+                installPackageResult.Should().ContainSingle("installpackage must be there once");
                 installPackageResult.First().Value.Version.Should().Be("1.0.0");
             }
         }
@@ -3610,7 +3632,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_upgrade_packages_with_upgrades()
             {
                 var upgradePackageResult = Results.Where(x => x.Key == "upgradepackage").ToList();
-                upgradePackageResult.Should().ContainSingle( "upgradepackage must be there once");
+                upgradePackageResult.Should().ContainSingle("upgradepackage must be there once");
                 // available version will show as last stable
                 upgradePackageResult.First().Value.Version.Should().Be("1.1.0");
             }
@@ -3632,7 +3654,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_skip_packages_without_upgrades()
             {
                 var installPackageResult = Results.Where(x => x.Key == "installpackage").ToList();
-                installPackageResult.Should().ContainSingle( "installpackage must be there once");
+                installPackageResult.Should().ContainSingle("installpackage must be there once");
                 installPackageResult.First().Value.Version.Should().Be("1.0.0");
             }
         }
@@ -3659,7 +3681,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_have_a_single_package_result()
             {
-                Results.Should().ContainSingle( "The returned package results do not have a single value!");
+                Results.Should().ContainSingle("The returned package results do not have a single value!");
             }
 
             [Fact]
@@ -3974,7 +3996,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_install_hook_scripts_to_folder()
             {
                 var hookScripts = new List<string> { "pre-install-all.ps1", "post-install-all.ps1", "pre-upgrade-all.ps1", "post-upgrade-all.ps1", "pre-uninstall-all.ps1", "post-uninstall-all.ps1" };
-                foreach (string scriptName in hookScripts)
+                foreach (var scriptName in hookScripts)
                 {
                     var hookScriptPath = Path.Combine(Scenario.GetTopLevel(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), scriptName);
                     File.ReadAllText(hookScriptPath).Should().Contain("Write-Output");
@@ -4492,8 +4514,21 @@ namespace chocolatey.tests.integration.scenarios
         {
             private PackageResult _packageResult;
 
-            protected virtual string NonNormalizedVersion => "2.02.0.0";
-            protected virtual string NormalizedVersion => "2.2.0";
+            protected virtual string NonNormalizedVersion
+            {
+                get
+                {
+                    return "2.02.0.0";
+                }
+            }
+
+            protected virtual string NormalizedVersion
+            {
+                get
+                {
+                    return "2.2.0";
+                }
+            }
 
             public override void Context()
             {
@@ -4633,8 +4668,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_upgrading_an_existing_package_specifying_normalized_version : When_upgrading_an_existing_package_non_normalized_version
         {
-            protected override string NormalizedVersion => "2.2.0";
-            protected override string NonNormalizedVersion => "2.02.0.0";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "2.2.0";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "2.02.0.0";
+                }
+            }
 
             public override void Context()
             {
@@ -4645,8 +4693,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_upgrading_an_existing_package_specifying_non_normalized_version : When_upgrading_an_existing_package_non_normalized_version
         {
-            protected override string NormalizedVersion => "2.2.0";
-            protected override string NonNormalizedVersion => "2.02.0.0";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "2.2.0";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "2.02.0.0";
+                }
+            }
 
             public override void Context()
             {
@@ -4657,14 +4718,40 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_upgrading_an_existing_package_with_multiple_leading_zeros : When_upgrading_an_existing_package_non_normalized_version
         {
-            protected override string NormalizedVersion => "4.4.5.1";
-            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "4.4.5.1";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "0004.0004.00005.01";
+                }
+            }
         }
 
         public class When_upgrading_an_existing_package_with_multiple_leading_zeros_specifying_normalized_version : When_upgrading_an_existing_package_non_normalized_version
         {
-            protected override string NormalizedVersion => "4.4.5.1";
-            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "4.4.5.1";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "0004.0004.00005.01";
+                }
+            }
 
             public override void Context()
             {
@@ -4675,8 +4762,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_upgrading_an_existing_package_with_multiple_leading_zeros_specifying_non_normalized_version : When_upgrading_an_existing_package_non_normalized_version
         {
-            protected override string NormalizedVersion => "4.4.5.1";
-            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "4.4.5.1";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "0004.0004.00005.01";
+                }
+            }
 
             public override void Context()
             {

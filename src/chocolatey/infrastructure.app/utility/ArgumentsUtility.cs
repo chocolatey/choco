@@ -14,10 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.filesystem;
+
 namespace chocolatey.infrastructure.app.utility
 {
-    using System;
-
     //todo: #2560 maybe find a better name/location for this
 
     public static class ArgumentsUtility
@@ -50,10 +53,76 @@ namespace chocolatey.infrastructure.app.utility
             ;
         }
 
-#pragma warning disable IDE1006
+        public static IEnumerable<string> DecryptPackageArgumentsFile(IFileSystem fileSystem, string id, string version)
+        {
+            var argumentsPath = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, ".chocolatey", "{0}.{1}".FormatWith(id, version));
+            var argumentsFile = fileSystem.CombinePaths(argumentsPath, ".arguments");
+
+            var arguments = string.Empty;
+
+            // Get the arguments decrypted in here and return them
+            try
+            {
+                if (fileSystem.FileExists(argumentsFile))
+                {
+                    arguments = fileSystem.ReadFile(argumentsFile);
+                }
+            }
+            catch (Exception)
+            {
+                "chocolatey".Log().Error("There was an error attempting to read the contents of the .arguments file for version '{0}' of package '{1}'.  See log file for more information.".FormatWith(version, id));
+            }
+
+            if (string.IsNullOrEmpty(arguments))
+            {
+                "chocolatey".Log().Debug("Unable to locate .arguments file for version '{0}' of package '{1}'.".FormatWith(version, id));
+                yield break;
+            }
+
+            // The following code is borrowed from the Chocolatey codebase, should
+            // be extracted to a separate location in choco executable so we can re-use it.
+            var packageArgumentsUnencrypted = arguments.Contains(" --") && arguments.ToStringSafe().Length > 4
+                ? arguments
+                : NugetEncryptionUtility.DecryptString(arguments);
+
+            // Lets do a global check first to see if there are any sensitive arguments
+            // before we filter out the values used later.
+            var sensitiveArgs = SensitiveArgumentsProvided(packageArgumentsUnencrypted);
+
+            var packageArgumentsSplit =
+                packageArgumentsUnencrypted.Split(new[] { " --" }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var packageArgument in packageArgumentsSplit.OrEmpty())
+            {
+                var isSensitiveArgument = sensitiveArgs && SensitiveArgumentsProvided(string.Concat("--", packageArgument));
+
+                var packageArgumentSplit =
+                    packageArgument.Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
+
+                var optionName = packageArgumentSplit[0].ToStringSafe();
+                var optionValue = string.Empty;
+
+                if (packageArgumentSplit.Length == 2 && isSensitiveArgument)
+                {
+                    optionValue = "[REDACTED ARGUMENT]";
+                }
+                else if (packageArgumentSplit.Length == 2)
+                {
+                    optionValue = packageArgumentSplit[1].ToStringSafe().UnquoteSafe();
+                    if (optionValue.StartsWith("'"))
+                    {
+                        optionValue.UnquoteSafe();
+                    }
+                }
+
+                yield return "--{0}{1}".FormatWith(optionName, string.IsNullOrWhiteSpace(optionValue) ? string.Empty : "=" + optionValue);
+            }
+        }
+
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool arguments_contain_sensitive_information(string commandArguments)
             => SensitiveArgumentsProvided(commandArguments);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,35 +14,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.IO;
+using System.Linq;
+using System.Text;
+using chocolatey.infrastructure.app.registration;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.events;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.nuget;
+using NuGet.Configuration;
+using NuGet.Packaging;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.results;
+using SimpleInjector;
+using chocolatey.infrastructure.tolerance;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.ComponentModel.Design;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using chocolatey.infrastructure.app.registration;
-    using commandline;
-    using configuration;
-    using domain;
-    using events;
-    using infrastructure.commands;
-    using infrastructure.events;
-    using infrastructure.services;
-    using logging;
-    using nuget;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-    using NuGet.Protocol.Core.Types;
-    using NuGet.Versioning;
-    using platforms;
-    using results;
-    using SimpleInjector;
-    using tolerance;
-    using IFileSystem = filesystem.IFileSystem;
-
     public class ChocolateyPackageService : IChocolateyPackageService
     {
         private readonly INugetService _nugetService;
@@ -255,7 +255,10 @@ Did you know Pro / Business automatically syncs with Programs and
                 yield break;
             }
 
-            if (config.RegularOutput) this.Log().Debug(() => "Searching for package information");
+            if (config.RegularOutput)
+            {
+                this.Log().Debug(() => "Searching for package information");
+            }
 
             var packages = new List<PackageResult>();
 
@@ -326,7 +329,10 @@ Did you know Pro / Business automatically syncs with Programs and
                 if (config.RegularOutput)
                 {
                     this.Log().Info("{0}|{1}".FormatWith(key.DisplayName, key.DisplayVersion));
-                    if (config.Verbose) this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".FormatWith(key.InstallLocation.ToStringSafe().EscapeCurlyBraces(), Environment.NewLine, key.UninstallString.ToStringSafe().EscapeCurlyBraces()));
+                    if (config.Verbose)
+                    {
+                        this.Log().Info(" InstallLocation: {0}{1} Uninstall:{2}".FormatWith(key.InstallLocation.ToStringSafe().EscapeCurlyBraces(), Environment.NewLine, key.UninstallString.ToStringSafe().EscapeCurlyBraces()));
+                    }
                 }
                 count++;
 
@@ -432,7 +438,11 @@ Did you know Pro / Business automatically syncs with Programs and
                         // doesn't like to grab the max value.
                         var messageCount = _proBusinessMessages.Count;
                         var chosenMessage = new Random().Next(0, messageCount);
-                        if (chosenMessage >= messageCount) chosenMessage = messageCount - 1;
+                        if (chosenMessage >= messageCount)
+                        {
+                            chosenMessage = messageCount - 1;
+                        }
+
                         message = _proBusinessMessages[chosenMessage];
                     }
 
@@ -453,7 +463,7 @@ Did you know Pro / Business automatically syncs with Programs and
             var pkgInfo = GetPackageInformation(packageResult, config);
 
             // initialize this here so it can be used for the install location later
-            bool powerShellRan = false;
+            var powerShellRan = false;
 
             if (packageResult.Success && config.Information.PlatformType == PlatformType.Windows)
             {
@@ -466,7 +476,10 @@ Did you know Pro / Business automatically syncs with Programs and
                     if (powerShellRan)
                     {
                         // we don't care about the exit code
-                        if (config.Information.PlatformType == PlatformType.Windows) CommandExecutor.ExecuteStatic(_shutdownExe, "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.GetCurrentDirectory(), (s, e) => { }, (s, e) => { }, false, false);
+                        if (config.Information.PlatformType == PlatformType.Windows)
+                        {
+                            CommandExecutor.ExecuteStatic(_shutdownExe, "/a", config.CommandExecutionTimeoutSeconds, _fileSystem.GetCurrentDirectory(), (s, e) => { }, (s, e) => { }, false, false);
+                        }
                     }
 
                     var installersDifferences = _registryService.GetInstallerKeysChanged(installersBefore, _registryService.GetInstallerKeys());
@@ -501,11 +514,18 @@ Did you know Pro / Business automatically syncs with Programs and
                 var is32Bit = !config.Information.Is64BitProcess || config.ForceX86;
                 CreateExecutableIgnoreFiles(packageResult.InstallLocation, !is32Bit);
 
-                if (packageResult.Success) _shimgenService.Install(config, packageResult);
+                if (packageResult.Success)
+                {
+                    _shimgenService.Install(config, packageResult);
+                }
             }
             else
             {
-                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping PowerShell and shimgen portions of the install due to non-Windows.");
+                if (config.Information.PlatformType != PlatformType.Windows)
+                {
+                    this.Log().Info(ChocolateyLoggers.Important, () => " Skipping PowerShell and shimgen portions of the install due to non-Windows.");
+                }
+
                 if (packageResult.Success)
                 {
                     _configTransformService.Run(packageResult, config);
@@ -518,7 +538,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 HandleExtensionPackages(config, packageResult);
                 HandleTemplatePackages(config, packageResult);
                 HandleHookPackages(config, packageResult);
-                pkgInfo.Arguments = CaptureArguments(config, packageResult);
+                pkgInfo.Arguments = CaptureArguments(config);
                 pkgInfo.IsPinned = config.PinPackage;
             }
 
@@ -540,11 +560,16 @@ Did you know Pro / Business automatically syncs with Programs and
             if (pkgInfo.RegistrySnapshot != null && pkgInfo.RegistrySnapshot.RegistryKeys.Any(k => !string.IsNullOrWhiteSpace(k.InstallLocation)))
             {
                 var key = pkgInfo.RegistrySnapshot.RegistryKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k.InstallLocation));
-                if (key != null) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, key.InstallLocation, EnvironmentVariableTarget.Process);
+                if (key != null)
+                {
+                    Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, key.InstallLocation, EnvironmentVariableTarget.Process);
+                }
             }
 
+            pkgInfo.DeploymentLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation);
+
             UpdatePackageInformation(pkgInfo);
-            EnsureBadPackagesPathIsClean(config, packageResult);
+            EnsureBadPackagesPathIsClean(packageResult);
             EventManager.Publish(new HandlePackageResultCompletedMessage(packageResult, config, commandName));
 
             UnmarkPackagePending(packageResult, config);
@@ -578,11 +603,10 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
             this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".FormatWith(commandName.ToStringSafe(), packageResult.Name));
 
-            var installLocation = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation);
             var installerDetected = Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType);
-            if (!string.IsNullOrWhiteSpace(installLocation))
+            if (!string.IsNullOrWhiteSpace(pkgInfo.DeploymentLocation))
             {
-                this.Log().Info(ChocolateyLoggers.Important, "  Software installed to '{0}'".FormatWith(installLocation.EscapeCurlyBraces()));
+                this.Log().Info(ChocolateyLoggers.Important, "  Deployed to '{0}'".FormatWith(pkgInfo.DeploymentLocation.EscapeCurlyBraces()));
             }
             else if (!string.IsNullOrWhiteSpace(installerDetected))
             {
@@ -627,36 +651,83 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             _packageInfoService.Save(pkgInfo);
         }
 
-        private string CaptureArguments(ChocolateyConfiguration config, PackageResult packageResult)
+        private string CaptureArguments(ChocolateyConfiguration config)
         {
             var arguments = new StringBuilder();
 
             // use the config to reconstruct
 
             //bug:sources are unable to be used - it's late in the process when a package is known
-            //arguments.Append(" --source=\"'{0}'\"".format_with(config.Sources));
+            //arguments.Append(" --source=\"'{0}'\"".FormatWith(config.Sources));
 
-            if (config.Prerelease) arguments.Append(" --prerelease");
-            if (config.IgnoreDependencies) arguments.Append(" --ignore-dependencies");
-            if (config.ForceX86) arguments.Append(" --forcex86");
+            if (config.Prerelease)
+            {
+                arguments.Append(" --prerelease");
+            }
 
-            if (!string.IsNullOrWhiteSpace(config.InstallArguments)) arguments.Append(" --install-arguments=\"'{0}'\"".FormatWith(config.InstallArguments));
-            if (config.OverrideArguments) arguments.Append(" --override-arguments");
-            if (config.ApplyInstallArgumentsToDependencies) arguments.Append(" --apply-install-arguments-to-dependencies");
+            if (config.IgnoreDependencies)
+            {
+                arguments.Append(" --ignore-dependencies");
+            }
 
-            if (!string.IsNullOrWhiteSpace(config.PackageParameters)) arguments.Append(" --package-parameters=\"'{0}'\"".FormatWith(config.PackageParameters));
-            if (config.ApplyPackageParametersToDependencies) arguments.Append(" --apply-package-parameters-to-dependencies");
+            if (config.ForceX86)
+            {
+                arguments.Append(" --forcex86");
+            }
 
-            if (config.AllowDowngrade) arguments.Append(" --allow-downgrade");
+            if (!string.IsNullOrWhiteSpace(config.InstallArguments))
+            {
+                arguments.Append(" --install-arguments=\"'{0}'\"".FormatWith(config.InstallArguments));
+            }
+
+            if (config.OverrideArguments)
+            {
+                arguments.Append(" --override-arguments");
+            }
+
+            if (config.ApplyInstallArgumentsToDependencies)
+            {
+                arguments.Append(" --apply-install-arguments-to-dependencies");
+            }
+
+            if (!string.IsNullOrWhiteSpace(config.PackageParameters))
+            {
+                arguments.Append(" --package-parameters=\"'{0}'\"".FormatWith(config.PackageParameters));
+            }
+
+            if (config.ApplyPackageParametersToDependencies)
+            {
+                arguments.Append(" --apply-package-parameters-to-dependencies");
+            }
+
+            if (config.AllowDowngrade)
+            {
+                arguments.Append(" --allow-downgrade");
+            }
 
             // most times folks won't want to skip automation scripts on upgrade
             //if (config.SkipPackageInstallProvider) arguments.Append(" --skip-automation-scripts");
             //if (config.UpgradeCommand.FailOnUnfound) arguments.Append(" --fail-on-unfound");
 
-            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Username)) arguments.Append(" --user=\"'{0}'\"".FormatWith(config.SourceCommand.Username));
-            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Password)) arguments.Append(" --password=\"'{0}'\"".FormatWith(config.SourceCommand.Password));
-            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Certificate)) arguments.Append(" --cert=\"'{0}'\"".FormatWith(config.SourceCommand.Certificate));
-            if (!string.IsNullOrWhiteSpace(config.SourceCommand.CertificatePassword)) arguments.Append(" --certpassword=\"'{0}'\"".FormatWith(config.SourceCommand.CertificatePassword));
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Username))
+            {
+                arguments.Append(" --user=\"'{0}'\"".FormatWith(config.SourceCommand.Username));
+            }
+
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Password))
+            {
+                arguments.Append(" --password=\"'{0}'\"".FormatWith(config.SourceCommand.Password));
+            }
+
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.Certificate))
+            {
+                arguments.Append(" --cert=\"'{0}'\"".FormatWith(config.SourceCommand.Certificate));
+            }
+
+            if (!string.IsNullOrWhiteSpace(config.SourceCommand.CertificatePassword))
+            {
+                arguments.Append(" --certpassword=\"'{0}'\"".FormatWith(config.SourceCommand.CertificatePassword));
+            }
 
             // this should likely be limited
             //if (!config.Features.ChecksumFiles) arguments.Append(" --ignore-checksums");
@@ -670,9 +741,20 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
                 arguments.Append(" --execution-timeout=\"'{0}'\"".FormatWith(config.CommandExecutionTimeoutSeconds));
             }
 
-            if (!string.IsNullOrWhiteSpace(config.CacheLocation)) arguments.Append(" --cache-location=\"'{0}'\"".FormatWith(config.CacheLocation));
-            if (config.Features.FailOnStandardError) arguments.Append(" --fail-on-standard-error");
-            if (!config.Features.UsePowerShellHost) arguments.Append(" --use-system-powershell");
+            if (!string.IsNullOrWhiteSpace(config.CacheLocation))
+            {
+                arguments.Append(" --cache-location=\"'{0}'\"".FormatWith(config.CacheLocation));
+            }
+
+            if (config.Features.FailOnStandardError)
+            {
+                arguments.Append(" --fail-on-standard-error");
+            }
+
+            if (!config.Features.UsePowerShellHost)
+            {
+                arguments.Append(" --use-system-powershell");
+            }
 
             return NugetEncryptionUtility.EncryptString(arguments.ToStringSafe());
         }
@@ -731,8 +813,8 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             }
             finally
             {
-                var installFailures = ReportActionSummary(packageInstalls, "installed");
-                if (installFailures != 0 && Environment.ExitCode == 0)
+                var actionSummaryResult = ReportActionSummary(packageInstalls, "installed");
+                if (actionSummaryResult.Failures != 0 && Environment.ExitCode == 0)
                 {
                     Environment.ExitCode = 1;
                 }
@@ -758,9 +840,12 @@ Would have determined packages that are out of date based on what is
                 return;
             }
 
-            if (config.RegularOutput) this.Log().Info(ChocolateyLoggers.Important, @"Outdated Packages
+            if (config.RegularOutput)
+            {
+                this.Log().Info(ChocolateyLoggers.Important, @"Outdated Packages
  Output is package name | current version | available version | pinned?
 ");
+            }
 
             config.PackageNames = ApplicationParameters.AllPackages;
             config.UpgradeCommand.NotifyOnlyAvailableUpgrades = true;
@@ -847,32 +932,91 @@ Would have determined packages that are out of date based on what is
                     packageConfig.Version = pkgSettings.Version;
                     packageConfig.InstallArguments = string.IsNullOrWhiteSpace(pkgSettings.InstallArguments) ? packageConfig.InstallArguments : pkgSettings.InstallArguments;
                     packageConfig.PackageParameters = string.IsNullOrWhiteSpace(pkgSettings.PackageParameters) ? packageConfig.PackageParameters : pkgSettings.PackageParameters;
-                    if (pkgSettings.ForceX86) packageConfig.ForceX86 = true;
-                    if (pkgSettings.IgnoreDependencies) packageConfig.IgnoreDependencies = true;
-                    if (pkgSettings.ApplyInstallArgumentsToDependencies) packageConfig.ApplyInstallArgumentsToDependencies = true;
-                    if (pkgSettings.ApplyPackageParametersToDependencies) packageConfig.ApplyPackageParametersToDependencies = true;
+                    if (pkgSettings.ForceX86)
+                    {
+                        packageConfig.ForceX86 = true;
+                    }
+
+                    if (pkgSettings.IgnoreDependencies)
+                    {
+                        packageConfig.IgnoreDependencies = true;
+                    }
+
+                    if (pkgSettings.ApplyInstallArgumentsToDependencies)
+                    {
+                        packageConfig.ApplyInstallArgumentsToDependencies = true;
+                    }
+
+                    if (pkgSettings.ApplyPackageParametersToDependencies)
+                    {
+                        packageConfig.ApplyPackageParametersToDependencies = true;
+                    }
 
                     if (!string.IsNullOrWhiteSpace(pkgSettings.Source) && HasSourceType(pkgSettings.Source, alternativeSourceRunners))
                     {
                         packageConfig.SourceType = pkgSettings.Source;
                     }
 
-                    if (pkgSettings.PinPackage) packageConfig.PinPackage = true;
-                    if (pkgSettings.Force) packageConfig.Force = true;
+                    if (pkgSettings.PinPackage)
+                    {
+                        packageConfig.PinPackage = true;
+                    }
+
+                    if (pkgSettings.Force)
+                    {
+                        packageConfig.Force = true;
+                    }
+
                     packageConfig.CommandExecutionTimeoutSeconds = pkgSettings.ExecutionTimeout == -1 ? packageConfig.CommandExecutionTimeoutSeconds : pkgSettings.ExecutionTimeout;
-                    if (pkgSettings.Prerelease) packageConfig.Prerelease = true;
-                    if (pkgSettings.OverrideArguments) packageConfig.OverrideArguments = true;
-                    if (pkgSettings.NotSilent) packageConfig.NotSilent = true;
-                    if (pkgSettings.AllowDowngrade) packageConfig.AllowDowngrade = true;
-                    if (pkgSettings.ForceDependencies) packageConfig.ForceDependencies = true;
-                    if (pkgSettings.SkipAutomationScripts) packageConfig.SkipPackageInstallProvider = true;
+                    if (pkgSettings.Prerelease)
+                    {
+                        packageConfig.Prerelease = true;
+                    }
+
+                    if (pkgSettings.OverrideArguments)
+                    {
+                        packageConfig.OverrideArguments = true;
+                    }
+
+                    if (pkgSettings.NotSilent)
+                    {
+                        packageConfig.NotSilent = true;
+                    }
+
+                    if (pkgSettings.AllowDowngrade)
+                    {
+                        packageConfig.AllowDowngrade = true;
+                    }
+
+                    if (pkgSettings.ForceDependencies)
+                    {
+                        packageConfig.ForceDependencies = true;
+                    }
+
+                    if (pkgSettings.SkipAutomationScripts)
+                    {
+                        packageConfig.SkipPackageInstallProvider = true;
+                    }
+
                     packageConfig.SourceCommand.Username = string.IsNullOrWhiteSpace(pkgSettings.User) ? packageConfig.SourceCommand.Username : pkgSettings.User;
                     packageConfig.SourceCommand.Password = string.IsNullOrWhiteSpace(pkgSettings.Password) ? packageConfig.SourceCommand.Password : pkgSettings.Password;
                     packageConfig.SourceCommand.Certificate = string.IsNullOrWhiteSpace(pkgSettings.Cert) ? packageConfig.SourceCommand.Certificate : pkgSettings.Cert;
                     packageConfig.SourceCommand.CertificatePassword = string.IsNullOrWhiteSpace(pkgSettings.CertPassword) ? packageConfig.SourceCommand.CertificatePassword : pkgSettings.CertPassword;
-                    if (pkgSettings.IgnoreChecksums) packageConfig.Features.ChecksumFiles = false;
-                    if (pkgSettings.AllowEmptyChecksums) packageConfig.Features.AllowEmptyChecksums = true;
-                    if (pkgSettings.AllowEmptyChecksumsSecure) packageConfig.Features.AllowEmptyChecksumsSecure = true;
+                    if (pkgSettings.IgnoreChecksums)
+                    {
+                        packageConfig.Features.ChecksumFiles = false;
+                    }
+
+                    if (pkgSettings.AllowEmptyChecksums)
+                    {
+                        packageConfig.Features.AllowEmptyChecksums = true;
+                    }
+
+                    if (pkgSettings.AllowEmptyChecksumsSecure)
+                    {
+                        packageConfig.Features.AllowEmptyChecksumsSecure = true;
+                    }
+
                     if (pkgSettings.RequireChecksums)
                     {
                         packageConfig.Features.AllowEmptyChecksums = false;
@@ -882,23 +1026,66 @@ Would have determined packages that are out of date based on what is
                     packageConfig.DownloadChecksum64 = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksum64) ? packageConfig.DownloadChecksum64 : pkgSettings.DownloadChecksum64;
                     packageConfig.DownloadChecksumType = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksumType) ? packageConfig.DownloadChecksumType : pkgSettings.DownloadChecksumType;
                     packageConfig.DownloadChecksumType64 = string.IsNullOrWhiteSpace(pkgSettings.DownloadChecksumType64) ? packageConfig.DownloadChecksumType : pkgSettings.DownloadChecksumType64;
-                    if (pkgSettings.IgnorePackageExitCodes) packageConfig.Features.UsePackageExitCodes = false;
-                    if (pkgSettings.UsePackageExitCodes) packageConfig.Features.UsePackageExitCodes = true;
-                    if (pkgSettings.StopOnFirstFailure) packageConfig.Features.StopOnFirstPackageFailure = true;
-                    if (pkgSettings.ExitWhenRebootDetected) packageConfig.Features.ExitOnRebootDetected = true;
-                    if (pkgSettings.IgnoreDetectedReboot) packageConfig.Features.ExitOnRebootDetected = false;
-                    if (pkgSettings.DisableRepositoryOptimizations) packageConfig.Features.UsePackageRepositoryOptimizations = false;
-                    if (pkgSettings.AcceptLicense) packageConfig.AcceptLicense = true;
+                    if (pkgSettings.IgnorePackageExitCodes)
+                    {
+                        packageConfig.Features.UsePackageExitCodes = false;
+                    }
+
+                    if (pkgSettings.UsePackageExitCodes)
+                    {
+                        packageConfig.Features.UsePackageExitCodes = true;
+                    }
+
+                    if (pkgSettings.StopOnFirstFailure)
+                    {
+                        packageConfig.Features.StopOnFirstPackageFailure = true;
+                    }
+
+                    if (pkgSettings.ExitWhenRebootDetected)
+                    {
+                        packageConfig.Features.ExitOnRebootDetected = true;
+                    }
+
+                    if (pkgSettings.IgnoreDetectedReboot)
+                    {
+                        packageConfig.Features.ExitOnRebootDetected = false;
+                    }
+
+                    if (pkgSettings.DisableRepositoryOptimizations)
+                    {
+                        packageConfig.Features.UsePackageRepositoryOptimizations = false;
+                    }
+
+                    if (pkgSettings.AcceptLicense)
+                    {
+                        packageConfig.AcceptLicense = true;
+                    }
+
                     if (pkgSettings.Confirm)
                     {
                         packageConfig.PromptForConfirmation = false;
                         packageConfig.AcceptLicense = true;
                     }
-                    if (pkgSettings.LimitOutput) packageConfig.RegularOutput = false;
+                    if (pkgSettings.LimitOutput)
+                    {
+                        packageConfig.RegularOutput = false;
+                    }
+
                     packageConfig.CacheLocation = string.IsNullOrWhiteSpace(pkgSettings.CacheLocation) ? packageConfig.CacheLocation : pkgSettings.CacheLocation;
-                    if (pkgSettings.FailOnStderr) packageConfig.Features.FailOnStandardError = true;
-                    if (pkgSettings.UseSystemPowershell) packageConfig.Features.UsePowerShellHost = false;
-                    if (pkgSettings.NoProgress) packageConfig.Features.ShowDownloadProgress = false;
+                    if (pkgSettings.FailOnStderr)
+                    {
+                        packageConfig.Features.FailOnStandardError = true;
+                    }
+
+                    if (pkgSettings.UseSystemPowershell)
+                    {
+                        packageConfig.Features.UsePowerShellHost = false;
+                    }
+
+                    if (pkgSettings.NoProgress)
+                    {
+                        packageConfig.Features.ShowDownloadProgress = false;
+                    }
 
                     this.Log().Info(ChocolateyLoggers.Important, @"{0}".FormatWith(packageConfig.PackageNames));
                     packageConfigs.Add(packageConfig);
@@ -931,7 +1118,7 @@ Would have determined packages that are out of date based on what is
 
             if (config.RegularOutput)
             {
-                var noopFailures = ReportActionSummary(noopUpgrades, "can upgrade");
+                var actionSummaryResult = ReportActionSummary(noopUpgrades, "can upgrade");
             }
 
             RandomlyNotifyAboutLicensedFeatures(config);
@@ -991,10 +1178,15 @@ Would have determined packages that are out of date based on what is
             }
             finally
             {
-                var upgradeFailures = ReportActionSummary(packageUpgrades, "upgraded");
-                if (upgradeFailures != 0 && Environment.ExitCode == 0)
+                var actionSummaryResult = ReportActionSummary(packageUpgrades, "upgraded");
+                if (actionSummaryResult.Failures != 0 && Environment.ExitCode == 0)
                 {
                     Environment.ExitCode = 1;
+                }
+
+                if (config.Features.UseEnhancedExitCodes && (actionSummaryResult.Successes + actionSummaryResult.Failures == 0) && Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 2;
                 }
 
                 RandomlyNotifyAboutLicensedFeatures(config);
@@ -1011,7 +1203,10 @@ Would have determined packages that are out of date based on what is
             }
             else
             {
-                if (config.Information.PlatformType != PlatformType.Windows) this.Log().Info(ChocolateyLoggers.Important, () => " Skipping beforemodify PowerShell script due to non-Windows.");
+                if (config.Information.PlatformType != PlatformType.Windows)
+                {
+                    this.Log().Info(ChocolateyLoggers.Important, () => " Skipping beforemodify PowerShell script due to non-Windows.");
+                }
             }
         }
 
@@ -1085,13 +1280,13 @@ Would have determined packages that are out of date based on what is
             }
             finally
             {
-                var uninstallFailures = ReportActionSummary(packageUninstalls, "uninstalled");
-                if (uninstallFailures != 0 && Environment.ExitCode == 0)
+                var actionSummaryResult = ReportActionSummary(packageUninstalls, "uninstalled");
+                if (actionSummaryResult.Failures != 0 && Environment.ExitCode == 0)
                 {
                     Environment.ExitCode = 1;
                 }
 
-                if (uninstallFailures != 0)
+                if (actionSummaryResult.Failures != 0)
                 {
                     this.Log().Warn(@"
 If a package uninstall is failing and/or you've already uninstalled the
@@ -1239,7 +1434,7 @@ If a package is failing because it is a dependency of another package
             }
         }
 
-        private int ReportActionSummary(ConcurrentDictionary<string, PackageResult> packageResults, string actionName)
+        private (int Successes, int Failures, int Warnings, int RebootPackages) ReportActionSummary(ConcurrentDictionary<string, PackageResult> packageResults, string actionName)
         {
             var successes = packageResults.OrEmpty().Where(p => p.Value.Success && !p.Value.Inconclusive).OrderBy(p => p.Value.Name);
             var failures = packageResults.Count(p => !p.Value.Success);
@@ -1307,7 +1502,7 @@ The recent package changes indicate a reboot is necessary.
                 }
             }
 
-            return failures;
+            return (successes.Count(), failures, warnings, rebootPackages);
         }
 
         public virtual void HandlePackageUninstall(PackageResult packageResult, ChocolateyConfiguration config)
@@ -1369,9 +1564,12 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
         private void UninstallCleanup(ChocolateyConfiguration config, PackageResult packageResult)
         {
-            if (config.Features.RemovePackageInformationOnUninstall) _packageInfoService.Remove(packageResult.PackageMetadata);
+            if (config.Features.RemovePackageInformationOnUninstall)
+            {
+                _packageInfoService.Remove(packageResult.PackageMetadata);
+            }
 
-            EnsureBadPackagesPathIsClean(config, packageResult);
+            EnsureBadPackagesPathIsClean(packageResult);
             RemoveBackupIfExists(packageResult);
             HandleExtensionPackages(config, packageResult);
             HandleTemplatePackages(config, packageResult);
@@ -1381,7 +1579,10 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             {
                 var packageDirectory = packageResult.InstallLocation;
 
-                if (string.IsNullOrWhiteSpace(packageDirectory) || !_fileSystem.DirectoryExists(packageDirectory)) return;
+                if (string.IsNullOrWhiteSpace(packageDirectory) || !_fileSystem.DirectoryExists(packageDirectory))
+                {
+                    return;
+                }
 
                 if (packageDirectory.IsEqualTo(ApplicationParameters.InstallLocation) || packageDirectory.IsEqualTo(ApplicationParameters.PackagesLocation))
                 {
@@ -1404,8 +1605,15 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
         // This should probably be split into install(/upgrade)/uninstall methods with shared logic placed in helper method(s).
         private void HandleExtensionPackages(ChocolateyConfiguration config, PackageResult packageResult)
         {
-            if (packageResult == null) return;
-            if (!packageResult.Name.ToLowerSafe().EndsWith(".extension") && !packageResult.Name.ToLowerSafe().EndsWith(".extensions")) return;
+            if (packageResult == null)
+            {
+                return;
+            }
+
+            if (!packageResult.Name.ToLowerSafe().EndsWith(".extension") && !packageResult.Name.ToLowerSafe().EndsWith(".extensions"))
+            {
+                return;
+            }
 
             _fileSystem.EnsureDirectoryExists(ApplicationParameters.ExtensionsLocation);
             var extensionsFolderName = packageResult.Name.ToLowerSafe().Replace(".extensions", string.Empty).Replace(".extension", string.Empty);
@@ -1418,7 +1626,10 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
             if (!config.CommandName.IsEqualTo(CommandNameType.Uninstall.ToStringSafe()))
             {
-                if (packageResult.InstallLocation == null) return;
+                if (packageResult.InstallLocation == null)
+                {
+                    return;
+                }
 
                 _fileSystem.EnsureDirectoryExists(packageExtensionsInstallDirectory);
                 var extensionsFolder = _fileSystem.CombinePaths(packageResult.InstallLocation, "extensions");
@@ -1428,7 +1639,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
                     () => _fileSystem.CopyDirectory(extensionFolderToCopy, packageExtensionsInstallDirectory, overwriteExisting: true),
                     "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".FormatWith(Environment.NewLine, extensionFolderToCopy, packageExtensionsInstallDirectory));
 
-                string logMessage = " Installed/updated {0} extensions.".FormatWith(extensionsFolderName);
+                var logMessage = " Installed/updated {0} extensions.".FormatWith(extensionsFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
@@ -1436,7 +1647,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             }
             else
             {
-                string logMessage = " Uninstalled {0} extensions.".FormatWith(extensionsFolderName);
+                var logMessage = " Uninstalled {0} extensions.".FormatWith(extensionsFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }
@@ -1444,7 +1655,10 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
         private void RemoveExtensionFolder(string packageExtensionsDirectory)
         {
-            if (!_fileSystem.DirectoryExists(packageExtensionsDirectory)) return;
+            if (!_fileSystem.DirectoryExists(packageExtensionsDirectory))
+            {
+                return;
+            }
 
             // remove old dll files files
             foreach (var oldDllFile in _fileSystem.GetFiles(packageExtensionsDirectory, "*.dll.old", SearchOption.AllDirectories).OrEmpty())
@@ -1484,8 +1698,15 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
         // This should probably be split into install(/upgrade)/uninstall methods with shared logic placed in helper method(s).
         private void HandleTemplatePackages(ChocolateyConfiguration config, PackageResult packageResult)
         {
-            if (packageResult == null) return;
-            if (!packageResult.Name.ToLowerSafe().EndsWith(".template")) return;
+            if (packageResult == null)
+            {
+                return;
+            }
+
+            if (!packageResult.Name.ToLowerSafe().EndsWith(".template"))
+            {
+                return;
+            }
 
             _fileSystem.EnsureDirectoryExists(ApplicationParameters.TemplatesLocation);
             var templateFolderName = packageResult.Name.ToLowerSafe().Replace(".template", string.Empty);
@@ -1497,7 +1718,10 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
             if (!config.CommandName.IsEqualTo(CommandNameType.Uninstall.ToStringSafe()))
             {
-                if (packageResult.InstallLocation == null) return;
+                if (packageResult.InstallLocation == null)
+                {
+                    return;
+                }
 
                 _fileSystem.EnsureDirectoryExists(installTemplatePath);
                 var templatesPath = _fileSystem.CombinePaths(packageResult.InstallLocation, "templates");
@@ -1514,7 +1738,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
                     },
                     "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".FormatWith(Environment.NewLine, templatesFolderToCopy, installTemplatePath));
 
-                string logMessage = " Installed/updated {0} template.".FormatWith(templateFolderName);
+                var logMessage = " Installed/updated {0} template.".FormatWith(templateFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
@@ -1522,20 +1746,23 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             }
             else
             {
-                string logMessage = " Uninstalled {0} template.".FormatWith(templateFolderName);
+                var logMessage = " Uninstalled {0} template.".FormatWith(templateFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }
         }
 
-        private void EnsureBadPackagesPathIsClean(ChocolateyConfiguration config, PackageResult packageResult)
+        private void EnsureBadPackagesPathIsClean(PackageResult packageResult)
         {
-            if (packageResult.InstallLocation == null) return;
+            if (packageResult.InstallLocation == null)
+            {
+                return;
+            }
 
             FaultTolerance.TryCatchWithLoggingException(
                 () =>
                 {
-                    string badPackageInstallPath = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
+                    var badPackageInstallPath = packageResult.InstallLocation.Replace(ApplicationParameters.PackagesLocation, ApplicationParameters.PackageFailuresLocation);
                     if (_fileSystem.DirectoryExists(badPackageInstallPath))
                     {
                         _fileSystem.DeleteDirectory(badPackageInstallPath, recursive: true);
@@ -1546,7 +1773,10 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
         private void HandleFailedOperation(ChocolateyConfiguration config, PackageResult packageResult, bool movePackageToFailureLocation, bool attemptRollback)
         {
-            if (Environment.ExitCode == 0) Environment.ExitCode = 1;
+            if (Environment.ExitCode == 0)
+            {
+                Environment.ExitCode = 1;
+            }
 
             foreach (var message in packageResult.Messages.Where(m => m.MessageType == ResultType.Error))
             {
@@ -1570,9 +1800,15 @@ ATTENTION: You must take manual action to remove {1} from
                 }
                 else
                 {
-                    if (movePackageToFailureLocation) MovePackageToFailedPackagesLocation(packageResult);
+                    if (movePackageToFailureLocation)
+                    {
+                        MovePackageToFailedPackagesLocation(packageResult);
+                    }
 
-                    if (attemptRollback) RestorePreviousPackageVersion(config, packageResult);
+                    if (attemptRollback)
+                    {
+                        RestorePreviousPackageVersion(config, packageResult);
+                    }
                 }
             }
         }
@@ -1600,7 +1836,10 @@ ATTENTION: You must take manual action to remove {1} from
 
         private void RestorePreviousPackageVersion(ChocolateyConfiguration config, PackageResult packageResult)
         {
-            if (packageResult.InstallLocation == null) return;
+            if (packageResult.InstallLocation == null)
+            {
+                return;
+            }
 
             var normalizedVersion = new NuGetVersion(packageResult.Version).ToNormalizedStringChecked();
 
@@ -1625,8 +1864,15 @@ ATTENTION: You must take manual action to remove {1} from
 
             rollbackDirectory = _fileSystem.GetFullPath(rollbackDirectory);
 
-            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.DirectoryExists(rollbackDirectory)) return;
-            if (!rollbackDirectory.StartsWith(ApplicationParameters.PackageBackupLocation) || rollbackDirectory.IsEqualTo(ApplicationParameters.PackageBackupLocation)) return;
+            if (string.IsNullOrWhiteSpace(rollbackDirectory) || !_fileSystem.DirectoryExists(rollbackDirectory))
+            {
+                return;
+            }
+
+            if (!rollbackDirectory.StartsWith(ApplicationParameters.PackageBackupLocation) || rollbackDirectory.IsEqualTo(ApplicationParameters.PackageBackupLocation))
+            {
+                return;
+            }
 
             this.Log().Debug("Attempting rollback");
 
@@ -1651,12 +1897,15 @@ ATTENTION: You must take manual action to remove {1} from
                     allowShortAnswer: true,
                     shortPrompt: true
                     );
-                if (selection.IsEqualTo("no")) rollback = false;
+                if (selection.IsEqualTo("no"))
+                {
+                    rollback = false;
+                }
             }
 
             if (rollback)
             {
-             var destination = _fileSystem.CombinePaths(ApplicationParameters.PackagesLocation, packageResult.Identity.Id);
+                var destination = _fileSystem.CombinePaths(ApplicationParameters.PackagesLocation, packageResult.Identity.Id);
                 _filesService.MovePackageUsingBackupStrategy(rollbackDirectory, destination, restoreSource: false);
             }
 
@@ -1671,7 +1920,11 @@ ATTENTION: You must take manual action to remove {1} from
         public virtual void MarkPackagePending(PackageResult packageResult, ChocolateyConfiguration config)
         {
             var packageDirectory = packageResult.InstallLocation;
-            if (string.IsNullOrWhiteSpace(packageDirectory)) return;
+            if (string.IsNullOrWhiteSpace(packageDirectory))
+            {
+                return;
+            }
+
             if (packageDirectory.IsEqualTo(ApplicationParameters.InstallLocation) || packageDirectory.IsEqualTo(ApplicationParameters.PackagesLocation))
             {
                 packageResult.Messages.Add(
@@ -1695,7 +1948,11 @@ ATTENTION: You must take manual action to remove {1} from
         public virtual void UnmarkPackagePending(PackageResult packageResult, ChocolateyConfiguration config)
         {
             var packageDirectory = packageResult.InstallLocation;
-            if (string.IsNullOrWhiteSpace(packageDirectory)) return;
+            if (string.IsNullOrWhiteSpace(packageDirectory))
+            {
+                return;
+            }
+
             if (packageDirectory.IsEqualTo(ApplicationParameters.InstallLocation) || packageDirectory.IsEqualTo(ApplicationParameters.PackagesLocation))
             {
                 packageResult.Messages.Add(
@@ -1718,12 +1975,19 @@ ATTENTION: You must take manual action to remove {1} from
                 fileLock.Dispose();
             }
 
-            if (packageResult.Success && _fileSystem.FileExists(pendingFile)) _fileSystem.DeleteFile(pendingFile);
+            if (packageResult.Success && _fileSystem.FileExists(pendingFile))
+            {
+                _fileSystem.DeleteFile(pendingFile);
+            }
         }
 
         private IEnumerable<GenericRegistryValue> GetInitialEnvironment(ChocolateyConfiguration config, bool allowLogging = true)
         {
-            if (config.Information.PlatformType != PlatformType.Windows) return Enumerable.Empty<GenericRegistryValue>();
+            if (config.Information.PlatformType != PlatformType.Windows)
+            {
+                return Enumerable.Empty<GenericRegistryValue>();
+            }
+
             var environmentBefore = _registryService.GetEnvironmentValues();
 
             if (allowLogging && config.Features.LogEnvironmentValues)
@@ -1804,8 +2068,15 @@ ATTENTION: You must take manual action to remove {1} from
         // This should probably be split into install(/upgrade)/uninstall methods with shared logic placed in helper method(s).
         private void HandleHookPackages(ChocolateyConfiguration config, PackageResult packageResult)
         {
-            if (packageResult == null) return;
-            if (!packageResult.Name.ToLowerSafe().EndsWith(ApplicationParameters.HookPackageIdExtension)) return;
+            if (packageResult == null)
+            {
+                return;
+            }
+
+            if (!packageResult.Name.ToLowerSafe().EndsWith(ApplicationParameters.HookPackageIdExtension))
+            {
+                return;
+            }
 
             _fileSystem.EnsureDirectoryExists(ApplicationParameters.HooksLocation);
             var hookFolderName = packageResult.Name.ToLowerSafe().Replace(ApplicationParameters.HookPackageIdExtension, string.Empty);
@@ -1820,7 +2091,10 @@ ATTENTION: You must take manual action to remove {1} from
 
             if (!config.CommandName.IsEqualTo(CommandNameType.Uninstall.ToStringSafe()))
             {
-                if (packageResult.InstallLocation == null) return;
+                if (packageResult.InstallLocation == null)
+                {
+                    return;
+                }
 
                 _fileSystem.EnsureDirectoryExists(installHookPath);
                 var hookPath = _fileSystem.CombinePaths(packageResult.InstallLocation, "hook");
@@ -1833,7 +2107,7 @@ ATTENTION: You must take manual action to remove {1} from
                     },
                     "Attempted to copy{0} '{1}'{0} to '{2}'{0} but had an error".FormatWith(Environment.NewLine, hookFolderToCopy, installHookPath));
 
-                string logMessage = " Installed/updated {0} hook.".FormatWith(hookFolderName);
+                var logMessage = " Installed/updated {0} hook.".FormatWith(hookFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
@@ -1841,13 +2115,13 @@ ATTENTION: You must take manual action to remove {1} from
             }
             else
             {
-                string logMessage = " Uninstalled {0} hook.".FormatWith(hookFolderName);
+                var logMessage = " Uninstalled {0} hook.".FormatWith(hookFolderName);
                 this.Log().Warn(logMessage);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual int count_run(ChocolateyConfiguration config)
             => Count(config);
@@ -1935,6 +2209,6 @@ ATTENTION: You must take manual action to remove {1} from
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void remove_pending(PackageResult packageResult, ChocolateyConfiguration config)
             => UnmarkPackagePending(packageResult, config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

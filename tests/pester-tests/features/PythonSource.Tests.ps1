@@ -31,7 +31,7 @@ Describe "Python Source" -Tag Chocolatey, UpgradeCommand, PythonSource, ProxySki
         }
 
         It 'Outputs properly' {
-            $Output.Lines | Should -Not:($ExitCode -eq 0) -Contain 'The all keyword is not available for alternate sources'
+            $Output.Lines | Should -Not:($ExitCode -eq 0) -Contain "Alternative sources do not allow the use of the 'all' package name/keyword."
             $Output.Lines | Should  -Contain "Chocolatey upgraded $Count/$Count packages."
         }
     }

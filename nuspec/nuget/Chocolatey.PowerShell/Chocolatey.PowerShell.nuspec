@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata>
+    <id>Chocolatey.PowerShell</id>
+    <version>0.9.9</version>
+    <owners>Chocolatey Software, Inc</owners>
+    <title>Chocolatey CLI PowerShell Helpers</title>
+    <authors>Chocolatey Software, Inc</authors>
+    <projectUrl>https://github.com/chocolatey/choco</projectUrl>
+    <iconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</iconUrl>
+    <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <copyright>2024 Chocolatey Software, Inc</copyright>
+    <tags>chocolatey powershell</tags>
+    <summary>Chocolatey CLI's PowerShell helper commands</summary>
+    <description>
+Chocolatey is a package manager for Windows (like apt-get but for Windows).
+
+This is the Chocolatey PowerShell Library (API / DLL) package which contains the PowerShell helper commands used in Chocolatey CLI itself.
+
+### Information
+
+- [Chocolatey Website and Community Package Repository](https://community.chocolatey.org)
+- [Mailing List](http://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
+- [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [GitHub](https://github.com/chocolatey)
+- [Blog](https://blog.chocolatey.org/) / [Newsletter](https://chocolatey.us8.list-manage1.com/subscribe?u=86a6d80146a0da7f2223712e4&amp;id=73b018498d)
+- [Documentation](https://docs.chocolatey.org/en-us/) / [Support](https://chocolatey.org/support)
+</description>
+    <releaseNotes>
+See all - https://docs.chocolatey.org/en-us/choco/release-notes
+    </releaseNotes>
+  </metadata>
+</package>

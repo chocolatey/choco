@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Runtime.InteropServices;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.adapters
 {
-    using System;
-    using System.IO;
-    using System.Runtime.InteropServices;
-    using app;
-    using commandline;
-    using platforms;
-
     /// <summary>
     /// Adapter for System.Console
     /// </summary>
@@ -30,28 +30,40 @@ namespace chocolatey.infrastructure.adapters
     {
         public string ReadLine()
         {
-            if (!ApplicationParameters.AllowPrompts) return string.Empty;
+            if (!ApplicationParameters.AllowPrompts)
+            {
+                return string.Empty;
+            }
 
             return System.Console.ReadLine();
         }
 
         public string ReadLine(int timeoutMilliseconds)
         {
-            if (!ApplicationParameters.AllowPrompts) return string.Empty;
+            if (!ApplicationParameters.AllowPrompts)
+            {
+                return string.Empty;
+            }
 
             return ReadLineTimeout.Read(timeoutMilliseconds);
         }
 
         public System.ConsoleKeyInfo ReadKey(bool intercept)
         {
-            if (!ApplicationParameters.AllowPrompts) return new System.ConsoleKeyInfo('\0', ConsoleKey.Enter, false, false, false);
+            if (!ApplicationParameters.AllowPrompts)
+            {
+                return new System.ConsoleKeyInfo('\0', ConsoleKey.Enter, false, false, false);
+            }
 
             return System.Console.ReadKey(intercept);
         }
 
         public System.ConsoleKeyInfo ReadKey(int timeoutMilliseconds)
         {
-            if (!ApplicationParameters.AllowPrompts) return new System.ConsoleKeyInfo('\0', ConsoleKey.Enter, false, false, false);
+            if (!ApplicationParameters.AllowPrompts)
+            {
+                return new System.ConsoleKeyInfo('\0', ConsoleKey.Enter, false, false, false);
+            }
 
             return ReadKeyTimeout.ReadKey(timeoutMilliseconds);
         }
@@ -79,13 +91,19 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.BackgroundColor;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.BackgroundColor;
+                }
 
                 return System.ConsoleColor.Black;
             }
             set
             {
-                if (!IsOutputRedirected) System.Console.BackgroundColor = value;
+                if (!IsOutputRedirected)
+                {
+                    System.Console.BackgroundColor = value;
+                }
             }
         }
 
@@ -93,13 +111,19 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.ForegroundColor;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.ForegroundColor;
+                }
 
                 return System.ConsoleColor.Gray;
             }
             set
             {
-                if (!IsOutputRedirected) System.Console.ForegroundColor = value;
+                if (!IsOutputRedirected)
+                {
+                    System.Console.ForegroundColor = value;
+                }
             }
         }
 
@@ -107,13 +131,19 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.BufferWidth;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.BufferWidth;
+                }
 
                 return GetConsoleBuffer().dwSize.X; //the current console window width
             }
             set
             {
-                if (!IsOutputRedirected) System.Console.BufferWidth = value;
+                if (!IsOutputRedirected)
+                {
+                    System.Console.BufferWidth = value;
+                }
             }
         }
 
@@ -121,32 +151,47 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.BufferHeight;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.BufferHeight;
+                }
 
                 return GetConsoleBuffer().dwSize.Y; //the current console window height
             }
             set
             {
-                if (!IsOutputRedirected) System.Console.BufferHeight = value;
+                if (!IsOutputRedirected)
+                {
+                    System.Console.BufferHeight = value;
+                }
             }
         }
 
         public void SetBufferSize(int width, int height)
         {
-            if (!IsOutputRedirected) System.Console.SetBufferSize(width, height);
+            if (!IsOutputRedirected)
+            {
+                System.Console.SetBufferSize(width, height);
+            }
         }
 
         public string Title
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.Title;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.Title;
+                }
 
                 return string.Empty;
             }
             set
             {
-                if (!IsOutputRedirected) System.Console.Title = value;
+                if (!IsOutputRedirected)
+                {
+                    System.Console.Title = value;
+                }
             }
         }
 
@@ -154,7 +199,10 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.KeyAvailable;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.KeyAvailable;
+                }
 
                 return false;
             }
@@ -164,13 +212,19 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.CursorSize;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.CursorSize;
+                }
 
                 return GetConsoleBuffer().dwCursorPosition.Y;
             }
             set
             {
-                if (!IsOutputRedirected) System.Console.CursorSize = value;
+                if (!IsOutputRedirected)
+                {
+                    System.Console.CursorSize = value;
+                }
             }
         }
 
@@ -178,7 +232,10 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.LargestWindowWidth;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.LargestWindowWidth;
+                }
 
                 return GetConsoleBuffer().dwMaximumWindowSize.X; //the max console window width
             }
@@ -188,7 +245,10 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.LargestWindowHeight;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.LargestWindowHeight;
+                }
 
                 return GetConsoleBuffer().dwMaximumWindowSize.Y; //the max console window height
             }
@@ -198,13 +258,19 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.WindowWidth;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.WindowWidth;
+                }
 
                 return GetConsoleBuffer().dwSize.X; //the current console window width
             }
             set
             {
-                if (!IsOutputRedirected) System.Console.WindowWidth = value;
+                if (!IsOutputRedirected)
+                {
+                    System.Console.WindowWidth = value;
+                }
             }
         }
 
@@ -212,32 +278,47 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.WindowHeight;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.WindowHeight;
+                }
 
                 return GetConsoleBuffer().dwSize.Y; //the current console window height
             }
             set
             {
-                if (!IsOutputRedirected) System.Console.WindowHeight = value;
+                if (!IsOutputRedirected)
+                {
+                    System.Console.WindowHeight = value;
+                }
             }
         }
 
         public void SetWindowSize(int width, int height)
         {
-            if (!IsOutputRedirected) System.Console.SetWindowSize(width, height);
+            if (!IsOutputRedirected)
+            {
+                System.Console.SetWindowSize(width, height);
+            }
         }
 
         public int WindowLeft
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.WindowLeft;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.WindowLeft;
+                }
 
                 return GetConsoleBuffer().srWindow.Left;
             }
             set
             {
-                if (!IsOutputRedirected) System.Console.WindowLeft = value;
+                if (!IsOutputRedirected)
+                {
+                    System.Console.WindowLeft = value;
+                }
             }
         }
 
@@ -245,19 +326,28 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsOutputRedirected) return System.Console.WindowTop;
+                if (!IsOutputRedirected)
+                {
+                    return System.Console.WindowTop;
+                }
 
                 return GetConsoleBuffer().srWindow.Top;
             }
             set
             {
-                if (!IsOutputRedirected) System.Console.WindowTop = value;
+                if (!IsOutputRedirected)
+                {
+                    System.Console.WindowTop = value;
+                }
             }
         }
 
         public void SetWindowPosition(int width, int height)
         {
-            if (!IsOutputRedirected) System.Console.SetWindowPosition(width, height);
+            if (!IsOutputRedirected)
+            {
+                System.Console.SetWindowPosition(width, height);
+            }
         }
 
         /// <remarks>
@@ -267,7 +357,10 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsWindows()) return false;
+                if (!IsWindows())
+                {
+                    return false;
+                }
 
                 return FileType.Char != GetFileType(GetStdHandle(StdHandle.StdOut));
             }
@@ -280,7 +373,10 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsWindows()) return false;
+                if (!IsWindows())
+                {
+                    return false;
+                }
 
                 return FileType.Char != GetFileType(GetStdHandle(StdHandle.StdErr));
             }
@@ -293,7 +389,10 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                if (!IsWindows()) return false;
+                if (!IsWindows())
+                {
+                    return false;
+                }
 
                 return FileType.Char != GetFileType(GetStdHandle(StdHandle.StdIn));
             }
@@ -315,7 +414,10 @@ namespace chocolatey.infrastructure.adapters
                 wAttributes = 0,
             };
 
-            if (!IsWindows()) return defaultConsoleBuffer;
+            if (!IsWindows())
+            {
+                return defaultConsoleBuffer;
+            }
 
             CONSOLE_SCREEN_BUFFER_INFO csbi;
             if (GetConsoleScreenBufferInfo(GetStdHandle(StdHandle.StdOut), out csbi))
@@ -327,6 +429,7 @@ namespace chocolatey.infrastructure.adapters
             return defaultConsoleBuffer;
         }
 
+#pragma warning disable IDE1006 // naming conventions
         /// <summary>
         /// Contains information about a console screen buffer.
         /// </summary>
@@ -340,12 +443,13 @@ namespace chocolatey.infrastructure.adapters
             /// <summary> A CoOrd structure that contains the column and row coordinates of the cursor in the console screen buffer. </summary>
             internal COORD dwCursorPosition;
             /// <summary> The attributes of the characters written to a screen buffer by the WriteFile and WriteConsole functions, or echoed to a screen buffer by the ReadFile and ReadConsole functions. </summary>
-            internal System.Int16 wAttributes;
+            internal short wAttributes;
             /// <summary> A SmallRect structure that contains the console screen buffer coordinates of the upper-left and lower-right corners of the display window. </summary>
             internal SMALL_RECT srWindow;
             /// <summary> A CoOrd structure that contains the maximum size of the console window, in character columns and rows, given the current screen buffer size and font and the screen size. </summary>
             internal COORD dwMaximumWindowSize;
         }
+#pragma warning restore IDE1006 // naming conventions
 
         /// <summary>
         /// Defines the coordinates of a character cell in a console screen buffer.
@@ -357,9 +461,9 @@ namespace chocolatey.infrastructure.adapters
         private struct COORD
         {
             /// <summary> The horizontal coordinate or column value. </summary>
-            internal System.Int16 X;
+            internal short X;
             /// <summary> The vertical coordinate or row value. </summary>
-            internal System.Int16 Y;
+            internal short Y;
         }
 
         /// <summary>
@@ -371,13 +475,13 @@ namespace chocolatey.infrastructure.adapters
         private struct SMALL_RECT
         {
             /// <summary> The x-coordinate of the upper left corner of the rectangle. </summary>
-            internal System.Int16 Left;
+            internal short Left;
             /// <summary> The y-coordinate of the upper left corner of the rectangle. </summary>
-            internal System.Int16 Top;
+            internal short Top;
             /// <summary> The x-coordinate of the lower right corner of the rectangle. </summary>
-            internal System.Int16 Right;
+            internal short Right;
             /// <summary> The y-coordinate of the lower right corner of the rectangle. </summary>
-            internal System.Int16 Bottom;
+            internal short Bottom;
         }
 
         private enum StdHandle

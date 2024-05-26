@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Globalization;
+using System.Management.Automation.Host;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.powershell
 {
-    using System;
-    using System.Globalization;
-    using System.Management.Automation.Host;
-    using app;
-    using app.configuration;
-    using app.domain;
-    using app.services;
-
     public class PoshHost : PSHost
     {
         private readonly ChocolateyConfiguration _configuration;

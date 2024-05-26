@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey
 {
-    using System;
-
     /// <summary>
     ///   Extensions for Type
     /// </summary>
@@ -30,12 +30,15 @@ namespace chocolatey
         /// <returns>true if meets criteria for system type</returns>
         public static bool IsBuiltinType(this Type type)
         {
-            if (type == null) return false;
+            if (type == null)
+            {
+                return false;
+            }
 
             // if all else fails, check to see if the namespace is at system.
             return type.IsPrimitive
                    || type.IsValueType
-                   || (type == typeof (string))
+                   || (type == typeof(string))
                    || type.Namespace.Equals("System", StringComparison.Ordinal);
         }
 
@@ -46,14 +49,17 @@ namespace chocolatey
         /// <returns>true if enumerable</returns>
         public static bool IsCollectionType(this Type type)
         {
-            if (type == null) return false;
+            if (type == null)
+            {
+                return false;
+            }
 
             // Surely we can do a check around "is ICollection" / "is ICollection<>" here?
             return type.IsArray
                    || type.Namespace.Contains("System.Collections");
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool is_built_in_system_type(this Type type)
             => IsBuiltinType(type);
@@ -61,6 +67,6 @@ namespace chocolatey
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool is_collections_type(this Type type)
             => IsCollectionType(type);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

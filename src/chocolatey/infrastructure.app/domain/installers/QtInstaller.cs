@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+
 namespace chocolatey.infrastructure.app.domain.installers
 {
-    using System.Collections.Generic;
-
     /// <summary>
     ///   QT Installer Options
     /// </summary>
@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             NoReboot = "";
             LogFile = "";
             //http://doc.qt.io/qtinstallerframework/ifw-globalconfig.html
-            //CustomInstallLocation = "targetdir={0}".format_with(InstallTokens.CUSTOM_INSTALL_LOCATION);
+            //CustomInstallLocation = "targetdir={0}".FormatWith(InstallTokens.CUSTOM_INSTALL_LOCATION);
             CustomInstallLocation = "";
             Language = "";
             OtherInstallOptions = "";

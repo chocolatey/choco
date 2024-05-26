@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.utility;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.platforms;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.utility
 {
-    using chocolatey.infrastructure.app.utility;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.platforms;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class PackageUtilitySpecs
     {
         public abstract class PackageUtilitySpecsBase : TinySpec
@@ -52,7 +52,10 @@ namespace chocolatey.tests.infrastructure.app.utility
 
             public When_PackageUtility_is_checking_if_package_is_dependency(string packageName, string configNames, bool expectedResult)
             {
-                if (Platform.GetPlatform() != PlatformType.Windows) configNames = configNames.Replace("\\", "/");
+                if (Platform.GetPlatform() != PlatformType.Windows)
+                {
+                    configNames = configNames.Replace("\\", "/");
+                }
 
                 _packageName = packageName;
                 _config.PackageNames = configNames;

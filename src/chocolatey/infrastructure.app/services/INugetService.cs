@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using configuration;
-    using results;
-
     public interface INugetService : ISourceRunner
     {
         /// <summary>
@@ -67,7 +67,7 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="config">The configuration</param>
         IEnumerable<PackageResult> GetInstalledPackages(ChocolateyConfiguration config);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -82,6 +82,6 @@ namespace chocolatey.infrastructure.app.services
         void remove_rollback_directory_if_exists(string packageName);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

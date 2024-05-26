@@ -14,33 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.cryptography;
+using chocolatey.infrastructure.extractors;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.licensing;
+using chocolatey.infrastructure.logging;
+using Microsoft.Win32;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.tolerance;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+using Container = SimpleInjector.Container;
+using Environment = chocolatey.infrastructure.adapters.Environment;
+
 namespace chocolatey.infrastructure.app.builders
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using adapters;
-    using chocolatey.infrastructure.app.commands;
-    using configuration;
-    using cryptography;
-    using extractors;
-    using filesystem;
-    using information;
-    using infrastructure.services;
-    using licensing;
-    using logging;
-    using Microsoft.Win32;
-    using nuget;
-    using platforms;
-    using services;
-    using tolerance;
-    using Assembly = adapters.Assembly;
-    using Container = SimpleInjector.Container;
-    using Environment = adapters.Environment;
-
     /// <summary>
     ///   Responsible for gathering all configuration related information and producing the ChocolateyConfig
     /// </summary>
@@ -77,14 +77,16 @@ namespace chocolatey.infrastructure.app.builders
         /// <param name="container">The container.</param>
         /// <param name="license">The license.</param>
         /// <param name="notifyWarnLoggingAction">Notify warn logging action</param>
+#pragma warning disable IDE0060 // Unused method parameter
         public static void SetupConfiguration(IList<string> args, ChocolateyConfiguration config, Container container, ChocolateyLicense license, Action<string> notifyWarnLoggingAction)
+#pragma warning restore IDE0060 // Unused method parameter
         {
             var fileSystem = container.GetInstance<IFileSystem>();
             var xmlService = container.GetInstance<IXmlService>();
             var configFileSettings = GetConfigFileSettings(fileSystem, xmlService);
             // must be done prior to setting the file configuration
             AddOrRemoveLicensedSource(license, configFileSettings);
-            SetFileConfiguration(config, configFileSettings, fileSystem, notifyWarnLoggingAction);
+            SetFileConfiguration(config, configFileSettings, fileSystem);
             ConfigurationOptions.ClearOptions();
             SetGlobalOptions(args, config, container);
             SetEnvironmentOptions(config);
@@ -153,7 +155,7 @@ namespace chocolatey.infrastructure.app.builders
             configFileSettings.Sources.RemoveWhere(s => s.Id.IsEqualTo(configSource.Id) && !NugetEncryptionUtility.DecryptString(s.Password).IsEqualTo(license.Id));
         }
 
-        private static void SetFileConfiguration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem, Action<string> notifyWarnLoggingAction)
+        private static void SetFileConfiguration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
         {
             SetSourcesInPriorityOrder(config, configFileSettings);
             SetMachineSources(config, configFileSettings);
@@ -239,7 +241,10 @@ namespace chocolatey.infrastructure.app.builders
             }
 
             // if it is still empty, use temp in the Chocolatey install directory.
-            if (string.IsNullOrWhiteSpace(config.CacheLocation)) config.CacheLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "temp");
+            if (string.IsNullOrWhiteSpace(config.CacheLocation))
+            {
+                config.CacheLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "temp");
+            }
 
             var commandExecutionTimeoutSeconds = 0;
             var commandExecutionTimeout = SetConfigItem(
@@ -273,10 +278,10 @@ namespace chocolatey.infrastructure.app.builders
             config.WebRequestTimeoutSeconds = webRequestTimeoutSeconds;
 
             config.Proxy.Location = SetConfigItem(ApplicationParameters.ConfigSettings.Proxy, configFileSettings, string.Empty, "Explicit proxy location.");
-            config.Proxy.User = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user.");
-            config.Proxy.EncryptedPassword = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted.");
-            config.Proxy.BypassList = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyBypassList, configFileSettings, string.Empty, "Optional proxy bypass list. Comma separated.");
-            config.Proxy.BypassOnLocal = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyBypassOnLocal, configFileSettings, "true", "Bypass proxy for local connections.").IsEqualTo(bool.TrueString);
+            config.Proxy.User = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyUser, configFileSettings, string.Empty, "Optional proxy user. Requires explicit proxy configured.");
+            config.Proxy.EncryptedPassword = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyPassword, configFileSettings, string.Empty, "Optional proxy password. Encrypted. Requires explicit proxy and proxyUser configured.");
+            config.Proxy.BypassList = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyBypassList, configFileSettings, string.Empty, "Optional proxy bypass list. Comma separated. Requires explicit proxy configured.");
+            config.Proxy.BypassOnLocal = SetConfigItem(ApplicationParameters.ConfigSettings.ProxyBypassOnLocal, configFileSettings, "true", "Bypass proxy for local connections. Requires explicit proxy configured.").IsEqualTo(bool.TrueString);
             config.UpgradeCommand.PackageNamesToSkip = SetConfigItem(ApplicationParameters.ConfigSettings.UpgradeAllExceptions, configFileSettings, string.Empty, "A comma-separated list of package names that should not be upgraded when running `choco upgrade all'. Defaults to empty.");
             config.DefaultTemplateName = SetConfigItem(ApplicationParameters.ConfigSettings.DefaultTemplateName, configFileSettings, string.Empty, "Default template name used when running 'choco new' command.");
             config.PushCommand.DefaultSource = SetConfigItem(ApplicationParameters.ConfigSettings.DefaultPushSource, configFileSettings, string.Empty, "Default source to push packages to when running 'choco push' command.");
@@ -333,6 +338,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.LogWithoutColor = SetFeatureFlag(ApplicationParameters.Features.LogWithoutColor, configFileSettings, defaultEnabled: false, description: "Log without color - Do not show colorization in logging output.");
             config.Features.LogValidationResultsOnWarnings = SetFeatureFlag(ApplicationParameters.Features.LogValidationResultsOnWarnings, configFileSettings, defaultEnabled: true, description: "Log validation results on warnings - Should the validation results be logged if there are warnings?");
             config.Features.UsePackageRepositoryOptimizations = SetFeatureFlag(ApplicationParameters.Features.UsePackageRepositoryOptimizations, configFileSettings, defaultEnabled: true, description: "Use Package Repository Optimizations - Turn on optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should generally be left enabled, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in earlier versions of Chocolatey.");
+            config.Features.UsePackageHashValidation = SetFeatureFlag(ApplicationParameters.Features.UsePackageHashValidation, configFileSettings, defaultEnabled: false, description: "Use Package Hash Validation - Check the hash of the downloaded package file against the source provided hash. Only supports sources that provide SHA512 hashes. Disabled by default. Available in 2.3.0+");
             config.PromptForConfirmation = !SetFeatureFlag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
             config.DisableCompatibilityChecks = SetFeatureFlag(ApplicationParameters.Features.DisableCompatibilityChecks, configFileSettings, defaultEnabled: false, description: "Disable Compatibility Checks - Disable showing a warning when there is an incompatibility between Chocolatey CLI and Chocolatey Licensed Extension. Available in 1.1.0+");
         }
@@ -408,7 +414,7 @@ namespace chocolatey.infrastructure.app.builders
                              "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds. Supply '0' to disable the timeout.".FormatWith(config.CommandExecutionTimeoutSeconds.ToStringSafe()),
                             option =>
                             {
-                                int timeout = 0;
+                                var timeout = 0;
                                 var timeoutString = option.UnquoteSafe();
                                 int.TryParse(timeoutString, out timeout);
                                 if (timeout > 0 || timeoutString.IsEqualTo("0"))
@@ -438,7 +444,7 @@ namespace chocolatey.infrastructure.app.builders
                             "Proxy User Name - Explicit proxy user (optional). Requires explicit proxy (`--proxy` or config setting). Overrides the default proxy user of '{0}'.".FormatWith(config.Proxy.User),
                             option => config.Proxy.User = option.UnquoteSafe())
                         .Add("proxy-password=",
-                            "Proxy Password - Explicit proxy password (optional) to be used with username. Requires explicit proxy (`--proxy` or config setting) and user name.  Overrides the default proxy password (encrypted in settings if set).",
+                            "Proxy Password - Explicit proxy password (optional) to be used with user name. Encrypted. Requires explicit proxy (`--proxy` or config setting) and user name (`--proxy-user` or config setting).  Overrides the default proxy password.",
                             option => config.Proxy.EncryptedPassword = NugetEncryptionUtility.EncryptString(option.UnquoteSafe()))
                         .Add("proxy-bypass-list=",
                              "ProxyBypassList - Comma separated list of regex locations to bypass on proxy. Requires explicit proxy (`--proxy` or config setting). Overrides the default proxy bypass list of '{0}'.".FormatWith(config.Proxy.BypassList),
@@ -461,7 +467,7 @@ namespace chocolatey.infrastructure.app.builders
                                     config.CacheExpirationInMinutes = -1;
                                 }
                             });
-                        ;
+                    ;
                 },
                 (unparsedArgs) =>
                 {
@@ -531,27 +537,35 @@ namespace chocolatey.infrastructure.app.builders
 
                 if (licensedConfigBuilder == null)
                 {
-                    if (config.RegularOutput) "chocolatey".Log().Warn(ChocolateyLoggers.Important,
+                    if (config.RegularOutput)
+                    {
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important,
                         @"Unable to set licensed configuration. Please upgrade to a newer
  licensed version (choco upgrade chocolatey.extension).");
+                    }
+
                     return;
                 }
                 try
                 {
-                    object componentClass = Activator.CreateInstance(licensedConfigBuilder);
+                    var componentClass = Activator.CreateInstance(licensedConfigBuilder);
 
                     licensedConfigBuilder.InvokeMember(
                         SetConfigurationMethod,
                         BindingFlags.InvokeMethod,
                         null,
                         componentClass,
-                        new Object[] { config, configFileSettings }
+                        new object[] { config, configFileSettings }
                         );
                 }
                 catch (Exception ex)
                 {
                     var isDebug = ApplicationParameters.IsDebugModeCliPrimitive();
-                    if (config.Debug) isDebug = true;
+                    if (config.Debug)
+                    {
+                        isDebug = true;
+                    }
+
                     var message = isDebug ? ex.ToString() : ex.Message;
 
                     if (isDebug && ex.InnerException != null)
@@ -605,7 +619,7 @@ FIPS Mode detected - run 'choco feature enable -n {0}'
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IEnvironment> environment)
@@ -618,6 +632,6 @@ FIPS Mode detected - run 'choco feature enable -n {0}'
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void set_up_configuration(IList<string> args, ChocolateyConfiguration config, Container container, ChocolateyLicense license, Action<string> notifyWarnLoggingAction)
             => SetupConfiguration(args, config, container, license, notifyWarnLoggingAction);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

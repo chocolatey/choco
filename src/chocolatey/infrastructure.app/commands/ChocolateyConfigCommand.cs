@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using attributes;
-    using commandline;
-    using configuration;
-    using domain;
-    using infrastructure.commands;
-    using infrastructure.configuration;
-    using logging;
-    using services;
-
     [CommandFor("config", "Retrieve and configure config file settings")]
     public class ChocolateyConfigCommand : ICommand
     {
@@ -58,11 +58,15 @@ namespace chocolatey.infrastructure.app.commands
         {
             configuration.Input = string.Join(" ", unparsedArguments);
             var command = ConfigCommandType.Unknown;
-            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().ToStringSafe().Replace("-", string.Empty);
+            var unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault().ToStringSafe().Replace("-", string.Empty);
             Enum.TryParse(unparsedCommand, true, out command);
             if (command == ConfigCommandType.Unknown)
             {
-                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                if (!string.IsNullOrWhiteSpace(unparsedCommand))
+                {
+                    this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                }
+
                 command = ConfigCommandType.List;
             }
 
@@ -71,7 +75,10 @@ namespace chocolatey.infrastructure.app.commands
             if ((configuration.ConfigCommand.Command == ConfigCommandType.List
                  || !string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name)
                 )
-                && unparsedArguments.Count > 1) throw new ApplicationException("A single features command must be listed. Please see the help menu for those commands");
+                && unparsedArguments.Count > 1)
+            {
+                throw new ApplicationException("A single config command must be listed. Please see the help menu for those commands.");
+            }
 
             if (string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name) && unparsedArguments.Count >= 2)
             {
@@ -85,8 +92,15 @@ namespace chocolatey.infrastructure.app.commands
 
         public virtual void Validate(ChocolateyConfiguration configuration)
         {
-            if (configuration.ConfigCommand.Command != ConfigCommandType.List && string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name)) throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name by option or position.".FormatWith(configuration.ConfigCommand.Command.ToStringSafe().ToLower()));
-            if (configuration.ConfigCommand.Command == ConfigCommandType.Set && string.IsNullOrWhiteSpace(configuration.ConfigCommand.ConfigValue)) throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --value by option or position.".FormatWith(configuration.ConfigCommand.Command.ToStringSafe().ToLower()));
+            if (configuration.ConfigCommand.Command != ConfigCommandType.List && string.IsNullOrWhiteSpace(configuration.ConfigCommand.Name))
+            {
+                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --name by option or position.".FormatWith(configuration.ConfigCommand.Command.ToStringSafe().ToLower()));
+            }
+
+            if (configuration.ConfigCommand.Command == ConfigCommandType.Set && string.IsNullOrWhiteSpace(configuration.ConfigCommand.ConfigValue))
+            {
+                throw new ApplicationException("When specifying the subcommand '{0}', you must also specify --value by option or position.".FormatWith(configuration.ConfigCommand.Command.ToStringSafe().ToLower()));
+            }
         }
 
         public virtual void HelpMessage(ChocolateyConfiguration configuration)
@@ -124,12 +138,17 @@ Exit codes that normally result from running this command.
 Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
+ - 2: nothing to do, config already set/unset (enhanced)
+
+NOTE: Starting in v2.3.0, if you have the feature '{0}'
+ turned on, then choco will provide enhanced exit codes that allow
+ better integration and scripting.
 
 If you find other exit codes that we have not yet documented, please
  file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
-");
+".FormatWith(ApplicationParameters.Features.UseEnhancedExitCodes));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
@@ -167,12 +186,15 @@ Config shown in action: https://raw.githubusercontent.com/wiki/chocolatey/choco/
         public virtual bool MayRequireAdminAccess()
         {
             var config = Config.GetConfigurationSettings();
-            if (config == null) return true;
+            if (config == null)
+            {
+                return true;
+            }
 
             return config.ConfigCommand.Command != ConfigCommandType.List;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -200,6 +222,6 @@ Config shown in action: https://raw.githubusercontent.com/wiki/chocolatey/choco/
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual bool may_require_admin_access()
             => MayRequireAdminAccess();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

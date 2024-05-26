@@ -13,14 +13,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using chocolatey.infrastructure.logging;
+using NuGet.Protocol.Core.Types;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.logging;
-    using NuGet.Protocol.Core.Types;
-
     public sealed class NuGetEndpointResources
     {
         private static readonly ConcurrentDictionary<SourceRepository, NuGetEndpointResources> _cachedResources = new ConcurrentDictionary<SourceRepository, NuGetEndpointResources>();

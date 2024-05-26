@@ -14,27 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using Environment = System.Environment;
+
 namespace chocolatey.infrastructure.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.IO;
-    using adapters;
-    using filesystem;
-    using Environment = System.Environment;
-
     public sealed class PowershellExecutor
     {
-        private static bool _allowUseWindow = true;
-
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public static bool AllowUseWindow
-        {
-            get { return _allowUseWindow; }
-            set { _allowUseWindow = value; }
-        }
+        public static bool AllowUseWindow { get; set; } = true;
 
         private static readonly IList<string> _powershellLocations = new List<string>
             {
@@ -53,9 +47,12 @@ namespace chocolatey.infrastructure.commands
             Action<object, DataReceivedEventArgs> stdErrAction
             )
         {
-            if (string.IsNullOrWhiteSpace(_powershell)) _powershell = GetPowerShellLocation(fileSystem);
+            if (string.IsNullOrWhiteSpace(_powershell))
+            {
+                _powershell = GetPowerShellLocation(fileSystem);
+            }
             //-NoProfile -NoLogo -ExecutionPolicy unrestricted -Command "[System.Threading.Thread]::CurrentThread.CurrentCulture = ''; [System.Threading.Thread]::CurrentThread.CurrentUICulture = '';& '%DIR%chocolatey.ps1' %PS_ARGS%"
-            string arguments = "-NoProfile -NoLogo -ExecutionPolicy Bypass -Command \"{0}\"".FormatWith(command);
+            var arguments = "-NoProfile -NoLogo -ExecutionPolicy Bypass -Command \"{0}\"".FormatWith(command);
 
             return CommandExecutor.ExecuteStatic(
                 _powershell,
@@ -65,7 +62,7 @@ namespace chocolatey.infrastructure.commands
                 stdOutAction: stdOutAction,
                 stdErrAction: stdErrAction,
                 updateProcessPath: true,
-                allowUseWindow: _allowUseWindow
+                allowUseWindow: AllowUseWindow
                 );
         }
 
@@ -82,7 +79,7 @@ namespace chocolatey.infrastructure.commands
             throw new FileNotFoundException("Unable to find suitable location for PowerShell. Searched the following locations: '{0}'".FormatWith(string.Join("; ", _powershellLocations)));
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static int execute(
             string command,
@@ -95,6 +92,6 @@ namespace chocolatey.infrastructure.commands
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_powershell_location(IFileSystem fileSystem)
             => GetPowerShellLocation(fileSystem);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

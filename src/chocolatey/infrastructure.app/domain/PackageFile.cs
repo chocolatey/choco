@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Xml.Serialization;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-    using System.Xml.Serialization;
-
     /// <summary>
     ///   A package file in the snapshot.
     /// </summary>

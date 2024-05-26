@@ -14,30 +14,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.app.tasks;
+using chocolatey.infrastructure.app.validations;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.tasks;
+using chocolatey.infrastructure.validations;
+using CryptoHashProvider = chocolatey.infrastructure.cryptography.CryptoHashProvider;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using IHashProvider = chocolatey.infrastructure.cryptography.IHashProvider;
+using NuGet.Common;
+using NuGet.PackageManagement;
+using NuGet.Packaging;
+using chocolatey.infrastructure.rules;
+using chocolatey.infrastructure.app.rules;
+using System.Linq;
+using System;
+using System.Security.AccessControl;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.nuget;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.app.tasks;
-    using chocolatey.infrastructure.app.validations;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.configuration;
-    using chocolatey.infrastructure.services;
-    using chocolatey.infrastructure.tasks;
-    using chocolatey.infrastructure.validations;
-    using CryptoHashProvider = cryptography.CryptoHashProvider;
-    using IFileSystem = filesystem.IFileSystem;
-    using IHashProvider = cryptography.IHashProvider;
-    using NuGet.Common;
-    using NuGet.PackageManagement;
-    using NuGet.Packaging;
-    using chocolatey.infrastructure.rules;
-    using chocolatey.infrastructure.app.rules;
-    using System.Linq;
-    using System;
-    using System.Security.AccessControl;
-
     internal class ChocolateyRegistrationModule : IExtensionModule
     {
         public void RegisterDependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration)
@@ -96,10 +96,10 @@ namespace chocolatey.infrastructure.app.registration
             registrator.RegisterService<IMetadataRule>(availableRules);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void register_dependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration)
             => RegisterDependencies(registrator, configuration);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

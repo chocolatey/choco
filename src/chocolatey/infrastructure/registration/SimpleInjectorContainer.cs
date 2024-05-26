@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reflection;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.registration;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.licensing;
+using chocolatey.infrastructure.logging;
+using SimpleInjector;
+
 namespace chocolatey.infrastructure.registration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
-    using System.Reflection;
-    using app;
-    using app.registration;
-    using chocolatey.infrastructure.information;
-    using chocolatey.infrastructure.licensing;
-    using logging;
-    using SimpleInjector;
-
     /// <summary>
     ///   The inversion container
     /// </summary>
@@ -38,16 +38,11 @@ namespace chocolatey.infrastructure.registration
         private const string RegisterComponentsMethod = "RegisterComponents";
 
 #if DEBUG
-        private static bool _verifyContainer = true;
 #else
         private static bool _verifyContainer = false;
 #endif
 
-        public static bool VerifyContainer
-        {
-            get { return _verifyContainer; }
-            set { _verifyContainer = value; }
-        }
+        public static bool VerifyContainer { get; set; } = true;
 
         /// <summary>
         ///   Add a component registry class to the container.
@@ -85,7 +80,10 @@ namespace chocolatey.infrastructure.registration
                 LoadComponentRegistry(componentRegistry, container, extensions);
             }
 
-            if (_verifyContainer) container.Verify();
+            if (VerifyContainer)
+            {
+                container.Verify();
+            }
 
             return container;
         }
@@ -114,14 +112,14 @@ namespace chocolatey.infrastructure.registration
                 {
                     var registrations = container.GetCurrentRegistrations();
 
-                    object componentClass = Activator.CreateInstance(componentRegistry);
+                    var componentClass = Activator.CreateInstance(componentRegistry);
 
                     componentRegistry.InvokeMember(
                         RegisterComponentsMethod,
                         BindingFlags.InvokeMethod,
                         null,
                         componentClass,
-                        new Object[] { container }
+                        new object[] { container }
                         );
                 }
             }
@@ -146,10 +144,10 @@ namespace chocolatey.infrastructure.registration
         }
 
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void add_component_registry_class(Type componentType)
             => AddComponentRegistryClass(componentType);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

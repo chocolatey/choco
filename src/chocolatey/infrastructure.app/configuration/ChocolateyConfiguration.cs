@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.app.configuration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Text;
-    using domain;
-    using logging;
-    using platforms;
-
     /// <summary>
     ///   The chocolatey configuration.
     /// </summary>
@@ -58,6 +58,7 @@ namespace chocolatey.infrastructure.app.configuration
             ExportCommand = new ExportCommandConfiguration();
             TemplateCommand = new TemplateCommandConfiguration();
             CacheCommand = new CacheCommandConfiguration();
+            RuleCommand = new RuleCommandConfiguration();
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -108,7 +109,7 @@ namespace chocolatey.infrastructure.app.configuration
 
             // Runtime type lookup ensures this also fully works with derived classes (for example: licensed configuration)
             // without needing to re-implement this method / make it overridable.
-            var t = this.GetType();
+            var t = GetType();
 
             var backup = removeBackup ? _configurationBackups.Pop() : _configurationBackups.Peek();
 
@@ -262,6 +263,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string Sources { get; set; }
 
         public string SourceType { get; set; }
+        public bool IncludeConfiguredSources { get; set; }
 
         // top level commands
 
@@ -494,7 +496,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </summary>
         public CacheCommandConfiguration CacheCommand { get; set; }
 
-#pragma warning disable IDE1006
+        /// <summary>
+        /// Gets or sets the configuration related specifically to the Rule command.
+        /// </summary>
+        public RuleCommandConfiguration RuleCommand { get; set; }
+
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void start_backup()
             => CreateBackup();
@@ -502,7 +509,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void reset_config(bool removeBackup = false)
             => RevertChanges(removeBackup);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 
     [Serializable]
@@ -560,6 +567,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ExitOnRebootDetected { get; set; }
         public bool LogValidationResultsOnWarnings { get; set; }
         public bool UsePackageRepositoryOptimizations { get; set; }
+        public bool UsePackageHashValidation { get; set; }
     }
 
     //todo: #2565 retrofit other command configs this way
@@ -600,6 +608,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool NotifyOnlyAvailableUpgrades { get; set; }
         public string PackageNamesToSkip { get; set; }
         public bool ExcludePrerelease { get; set; }
+        public bool IgnorePinned { get; set; }
     }
 
     [Serializable]
@@ -745,5 +754,19 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         ///   <c>true</c> if only expired cache items should be removed; otherwise, <c>false</c>.
         /// </value>
         public bool RemoveExpiredItemsOnly { get; set; }
+    }
+
+    [Serializable]
+    public sealed class RuleCommandConfiguration
+    {
+        /// <summary>
+        /// Gets or sets the name or identifier of a rule the user wants to use for the command.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sub command to execute.
+        /// </summary>
+        public string Command { get; set; }
     }
 }

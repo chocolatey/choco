@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Microsoft.Web.XmlTransform;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.synchronization;
+using chocolatey.infrastructure.tolerance;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using Microsoft.Web.XmlTransform;
-    using configuration;
-    using filesystem;
-    using results;
-    using synchronization;
-    using tolerance;
-
     public class ConfigTransformService : IConfigTransformService
     {
         private readonly IFileSystem _fileSystem;
@@ -43,7 +43,11 @@ namespace chocolatey.infrastructure.app.services
             if (string.IsNullOrWhiteSpace(installDirectory) || installDirectory.IsEqualTo(ApplicationParameters.InstallLocation) || installDirectory.IsEqualTo(ApplicationParameters.PackagesLocation))
             {
                 var logMessage = "Install location is not specific enough, cannot capture files:{0} Erroneous install location captured as '{1}'".FormatWith(Environment.NewLine, installDirectory);
-                if (packageResult != null) packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                if (packageResult != null)
+                {
+                    packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                }
+
                 this.Log().Error(logMessage);
                 return;
             }
@@ -59,7 +63,7 @@ namespace chocolatey.infrastructure.app.services
                 var targetFilesTest = targetFiles as IList<string> ?? targetFiles.ToList();
                 if (!targetFilesTest.Any())
                 {
-                    targetFiles = new[] {transformFile.Replace(ApplicationParameters.ConfigFileTransformExtension, string.Empty)};
+                    targetFiles = new[] { transformFile.Replace(ApplicationParameters.ConfigFileTransformExtension, string.Empty) };
                     this.Log().Debug(() => "No matching files found for transform {0}.{1} Creating '{2}'".FormatWith(_fileSystem.GetFileName(transformFile), Environment.NewLine, targetFiles.FirstOrDefault()));
                 }
 
@@ -85,7 +89,7 @@ namespace chocolatey.infrastructure.app.services
                                     // backup and let the transform to its thing instead.
                                     if (_fileSystem.FileExists(backupTargetFile))
                                     {
-                                        this.Log().Debug(()=> "Restoring backup configuration file for '{0}'.".FormatWith(targetFile));
+                                        this.Log().Debug(() => "Restoring backup configuration file for '{0}'.".FormatWith(targetFile));
                                         _fileSystem.CopyFile(backupTargetFile, targetFile, overwriteExisting: true);
                                     }
                                 },
@@ -99,7 +103,7 @@ namespace chocolatey.infrastructure.app.services
 
                                 using (var transformation = new XmlTransformation(_fileSystem.ReadFile(transformFile), isTransformAFile: false, logger: null))
                                 {
-                                    using (var document = new XmlTransformableDocument {PreserveWhitespace = true})
+                                    using (var document = new XmlTransformableDocument { PreserveWhitespace = true })
                                     {
                                         using (var inputStream = _fileSystem.OpenFileReadonly(targetFile))
                                         {
@@ -112,7 +116,7 @@ namespace chocolatey.infrastructure.app.services
                                         this.Log().Debug(() => "Creating backup configuration file for '{0}'.".FormatWith(targetFile));
                                         _fileSystem.CopyFile(targetFile, backupTargetFile, overwriteExisting: true);
 
-                                        bool succeeded = transformation.Apply(document);
+                                        var succeeded = transformation.Apply(document);
                                         if (succeeded)
                                         {
                                             this.Log().Debug(() => "Transform applied successfully for '{0}'".FormatWith(targetFile));
@@ -193,10 +197,10 @@ namespace chocolatey.infrastructure.app.services
             return targetFile.Replace(installDirectory, backupDirectory);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void run(PackageResult packageResult, ChocolateyConfiguration config)
             => Run(packageResult, config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

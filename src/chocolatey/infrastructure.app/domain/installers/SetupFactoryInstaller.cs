@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+
 namespace chocolatey.infrastructure.app.domain.installers
 {
-    using System.Collections.Generic;
-
     /// <summary>
     ///   SetupFactory Options
     /// </summary>
@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             // todo: #2582 basically we need an environment variable for AppFolder
             CustomInstallLocation = "";
             Language = "";
-            //OtherInstallOptions = "\"/T:{0}\"".format_with(InstallTokens.TEMP_LOCATION);
+            //OtherInstallOptions = "\"/T:{0}\"".FormatWith(InstallTokens.TEMP_LOCATION);
             OtherInstallOptions = "";
             UninstallExecutable = "\"{0}\"".FormatWith(InstallTokens.UninstallerLocation);
             SilentUninstall = "/S";

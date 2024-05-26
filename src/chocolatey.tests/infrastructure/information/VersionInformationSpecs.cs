@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.information;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.information
 {
-    using System;
-    using chocolatey.infrastructure.information;
-    using FluentAssertions;
-
     public class VersionInformationSpecs
     {
         public abstract class VersionInformationSpecsBase : TinySpec

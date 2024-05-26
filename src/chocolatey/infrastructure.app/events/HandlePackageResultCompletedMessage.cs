@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.events
 {
-    using configuration;
-    using domain;
-    using infrastructure.events;
-    using results;
-
     public class HandlePackageResultCompletedMessage : IMessage
     {
         public PackageResult PackageResult { get; private set; }

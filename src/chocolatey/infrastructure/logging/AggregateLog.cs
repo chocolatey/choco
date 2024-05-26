@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+
 namespace chocolatey.infrastructure.logging
 {
-    using System;
-    using System.Collections.Generic;
-
     public sealed class AggregateLog : ILog, ILog<AggregateLog>
     {
         public IEnumerable<ILog> Loggers { get; private set; }

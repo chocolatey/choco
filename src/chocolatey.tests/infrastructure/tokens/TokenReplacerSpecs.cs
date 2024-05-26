@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.tokens;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.tokens
 {
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.tokens;
-    using FluentAssertions;
-
     public class TokenReplacerSpecs
     {
         public abstract class TokenReplacerSpecsBase : TinySpec

@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.platforms;
+using Moq;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.filesystem
 {
-    using System;
-    using System.IO;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.platforms;
-    using Moq;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class DotNetFileSystemSpecs
     {
         public abstract class DotNetFileSystemSpecsBase : TinySpec

@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commandline;
+using Moq;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commandline;
-    using Moq;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class ChocolateyPushCommandSpecs
     {
         [ConcernFor("push")]
@@ -135,7 +135,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_allow_a_path_to_the_nupkg_to_be_passed_in()
             {
                 Reset();
-                string nupkgPath = "./some/path/to.nupkg";
+                var nupkgPath = "./some/path/to.nupkg";
                 _unparsedArgs.Add(nupkgPath);
                 _because();
                 Configuration.Input.Should().Be(nupkgPath);

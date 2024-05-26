@@ -204,6 +204,7 @@
     <Compile Include="infrastructure.app\attributes\MultiServiceAttribute.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyCacheCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyRuleCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyTemplateCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyCommandBase.cs" />
     <Compile Include="infrastructure.app\domain\ApiKeyCommandType.cs" />
@@ -270,6 +271,7 @@
     <Compile Include="infrastructure.app\utility\ArgumentsUtility.cs" />
     <Compile Include="infrastructure.app\utility\PackageUtility.cs" />
     <Compile Include="infrastructure.app\validations\SystemStateValidation.cs" />
+    <Compile Include="infrastructure\cryptography\HashConverter.cs" />
     <Compile Include="infrastructure\filesystem\FileSystem.cs" />
     <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="infrastructure\information\ExtensionInformation.cs" />

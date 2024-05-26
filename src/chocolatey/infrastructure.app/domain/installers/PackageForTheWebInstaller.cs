@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+
 namespace chocolatey.infrastructure.app.domain.installers
 {
-    using System.Collections.Generic;
-
     /// <summary>
     ///   PackageForTheWeb Options
     /// </summary>

@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+
 namespace chocolatey.infrastructure.filesystem
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
-
     /// <summary>
     ///   File System Interface
     /// </summary>
@@ -465,7 +465,7 @@ namespace chocolatey.infrastructure.filesystem
         void EnsureFileAttributeRemoved(string path, FileAttributes attributes);
 
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         string combine_paths(string leftItem, params string[] rightItems);
 
@@ -624,6 +624,6 @@ namespace chocolatey.infrastructure.filesystem
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void ensure_file_attribute_removed(string path, FileAttributes attributes);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

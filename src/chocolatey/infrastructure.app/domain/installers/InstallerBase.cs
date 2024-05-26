@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Text;
+
 namespace chocolatey.infrastructure.app.domain.installers
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Text;
-
     public abstract class InstallerBase : IInstaller
     {
         public abstract InstallerType InstallerType { get; }
@@ -41,11 +41,20 @@ namespace chocolatey.infrastructure.app.domain.installers
         {
             var args = new StringBuilder();
             args.Append("{0} {1} {2}".FormatWith(SilentInstall, NoReboot, OtherInstallOptions).TrimSafe());
-            if (languageRequested) args.AppendFormat(" {0}", Language);
+            if (languageRequested)
+            {
+                args.AppendFormat(" {0}", Language);
+            }
             //MSI may have issues with 1622 - opening a log file location
-            if (logFile) args.AppendFormat(" {0}", LogFile);
+            if (logFile)
+            {
+                args.AppendFormat(" {0}", LogFile);
+            }
             // custom install location must be last for NSIS
-            if (customInstallLocation) args.AppendFormat(" {0}", CustomInstallLocation);
+            if (customInstallLocation)
+            {
+                args.AppendFormat(" {0}", CustomInstallLocation);
+            }
 
             return args.ToString();
         }
@@ -56,7 +65,7 @@ namespace chocolatey.infrastructure.app.domain.installers
             return "{0} {1} {2}".FormatWith(SilentUninstall, NoReboot, OtherUninstallOptions).TrimSafe();
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual string build_install_command_arguments(bool logFile, bool customInstallLocation, bool languageRequested)
             => BuildInstallCommandArguments(logFile, customInstallLocation, languageRequested);
@@ -64,7 +73,7 @@ namespace chocolatey.infrastructure.app.domain.installers
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual string build_uninstall_command_arguments()
             => BuildUninstallCommandArguments();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
 
     }
 }

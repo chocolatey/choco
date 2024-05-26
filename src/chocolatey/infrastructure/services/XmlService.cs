@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
+using chocolatey.infrastructure.cryptography;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.tolerance;
+using chocolatey.infrastructure.synchronization;
+
 namespace chocolatey.infrastructure.services
 {
-    using System;
-    using System.Diagnostics;
-    using System.IO;
-    using System.Text;
-    using System.Xml;
-    using System.Xml.Serialization;
-    using cryptography;
-    using filesystem;
-    using tolerance;
-    using synchronization;
-
     /// <summary>
     ///   XML interaction
     /// </summary>
@@ -149,7 +149,8 @@ namespace chocolatey.infrastructure.services
                         {
                             AutoFlush = true
                         }
-                        ){
+                        )
+                        {
                             xmlSerializer.Serialize(streamWriter, xmlType);
                             streamWriter.Flush();
 
@@ -197,7 +198,7 @@ namespace chocolatey.infrastructure.services
                 increaseRetryByMilliseconds: 200);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public XmlType deserialize<XmlType>(string xmlFilePath)
             => Deserialize<XmlType>(xmlFilePath);
@@ -213,6 +214,6 @@ namespace chocolatey.infrastructure.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent)
             => Serialize<XmlType>(xmlType, xmlFilePath, isSilent);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

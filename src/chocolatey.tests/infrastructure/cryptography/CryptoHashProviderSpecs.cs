@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.cryptography;
+using chocolatey.infrastructure.filesystem;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.cryptography
 {
-    using System;
-    using System.IO;
-    using System.Security.Cryptography;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.cryptography;
-    using chocolatey.infrastructure.filesystem;
-    using Moq;
-    using FluentAssertions;
-
     public class CryptoHashProviderSpecs
     {
         public abstract class CryptoHashProviderSpecsBase : TinySpec

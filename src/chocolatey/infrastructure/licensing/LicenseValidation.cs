@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.logging;
+using Rhino.Licensing;
+
 namespace chocolatey.infrastructure.licensing
 {
-    using System;
-    using System.IO;
-    using app;
-    using logging;
-    using Rhino.Licensing;
-
     public sealed class LicenseValidation
     {
         private const string PublicKey =
@@ -37,9 +37,12 @@ namespace chocolatey.infrastructure.licensing
 
             var regularLogOutput = ShouldLogErrorsToConsole();
 
-            string licenseFile = ApplicationParameters.LicenseFileLocation;
+            var licenseFile = ApplicationParameters.LicenseFileLocation;
             var userLicenseFile = ApplicationParameters.UserLicenseFileLocation;
-            if (File.Exists(userLicenseFile)) licenseFile = userLicenseFile;
+            if (File.Exists(userLicenseFile))
+            {
+                licenseFile = userLicenseFile;
+            }
 
             // no IFileSystem at this point
             if (!File.Exists(licenseFile))
@@ -55,7 +58,7 @@ namespace chocolatey.infrastructure.licensing
                     {
                         "chocolatey".Log().Error(regularLogOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, @"Files found in directory '{0}' but not a
  valid license file. License should be named '{1}'.".FormatWith(licenseDirectory, licenseFileName));
-                        "chocolatey".Log().Warn(ChocolateyLoggers.Important,@" Rename license file to '{0}' to allow commercial features.".FormatWith(licenseFileName));
+                        "chocolatey".Log().Warn(ChocolateyLoggers.Important, @" Rename license file to '{0}' to allow commercial features.".FormatWith(licenseFileName));
                     }
                 }
 
@@ -139,18 +142,24 @@ namespace chocolatey.infrastructure.licensing
         {
             var args = Environment.GetCommandLineArgs();
             // I think this check is incorrect??? if --version is supposed to return false, it can return true at this point?
-            if (args == null || args.Length < 2) return true;
+            if (args == null || args.Length < 2)
+            {
+                return true;
+            }
 
             var firstArg = args[1].ToStringSafe();
-            if (firstArg.IsEqualTo("-v") || firstArg.IsEqualTo("--version")) return false;
+            if (firstArg.IsEqualTo("-v") || firstArg.IsEqualTo("--version"))
+            {
+                return false;
+            }
 
             return true;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static ChocolateyLicense validate()
             => Validate();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey.infrastructure.commands
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using logging;
-
     /// <summary>
     /// Execute a method or function
     /// </summary>
@@ -62,7 +62,10 @@ namespace chocolatey.infrastructure.commands
         /// <returns>The results of the function if completes within timespan, otherwise returns the default value.</returns>
         public T Command<T>(Func<T> function, T timeoutDefaultValue)
         {
-            if (function == null) return timeoutDefaultValue;
+            if (function == null)
+            {
+                return timeoutDefaultValue;
+            }
 
             var cancelToken = new CancellationTokenSource();
             cancelToken.Token.ThrowIfCancellationRequested();
@@ -78,10 +81,13 @@ namespace chocolatey.infrastructure.commands
                 task.Wait(_timespan);
             }
 
-            if (task.IsCompleted) return task.Result;
+            if (task.IsCompleted)
+            {
+                return task.Result;
+            }
 
             cancelToken.Cancel();
-            this.Log().Warn(ChocolateyLoggers.Important,() => @"Chocolatey timed out waiting for the command to finish. The timeout
+            this.Log().Warn(ChocolateyLoggers.Important, () => @"Chocolatey timed out waiting for the command to finish. The timeout
  specified (or the default value) was '{0}' seconds. Perhaps try a
  higher `--execution-timeout`? See `choco -h` for details.".FormatWith(_timespan.TotalSeconds));
 
@@ -104,7 +110,10 @@ namespace chocolatey.infrastructure.commands
         /// <returns>True if it finishes executing, false otherwise.</returns>
         public bool Command(Action action)
         {
-            if (action == null) return false;
+            if (action == null)
+            {
+                return false;
+            }
 
             var completed = false;
 
@@ -135,7 +144,7 @@ namespace chocolatey.infrastructure.commands
             return completed;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static Execute with_timeout(int timeoutInSeconds)
             => WithTimeout(timeoutInSeconds);
@@ -151,6 +160,6 @@ namespace chocolatey.infrastructure.commands
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public bool command(Action action)
             => Command(action);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

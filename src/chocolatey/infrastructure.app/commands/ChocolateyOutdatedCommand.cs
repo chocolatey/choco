@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using attributes;
-    using commandline;
-    using configuration;
-    using infrastructure.commands;
-    using logging;
-    using services;
-
     [CommandFor("outdated", "retrieves information about packages that are outdated. Similar to upgrade all --noop")]
     public class ChocolateyOutdatedCommand : ICommand
     {
@@ -72,6 +72,9 @@ namespace chocolatey.infrastructure.app.commands
                             configuration.Features.UsePackageRepositoryOptimizations = false;
                         }
                     })
+                .Add("include-configured-sources",
+                    "Include Configured Sources - When using the '--source' option, this appends the sources that have been saved into the chocolatey.config file by 'source' command.  Available in 2.3.0+",
+                    option => configuration.IncludeConfiguredSources = option != null)
                 ;
         }
 
@@ -130,7 +133,7 @@ Normal:
 Enhanced:
  - 0: no outdated packages
  - -1 or 1: an error has occurred
- - 2: outdated packages have been found
+ - 2: outdated packages have been found (enhanced)
 
 NOTE: If you have the feature '{0}' turned on,
  then choco will provide enhanced exit codes that allow
@@ -166,7 +169,7 @@ choco outdated: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/g
             return false;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -194,6 +197,6 @@ choco outdated: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/g
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual bool may_require_admin_access()
             => MayRequireAdminAccess();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

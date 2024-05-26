@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commandline;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.commands
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commandline;
-    using Moq;
-    using FluentAssertions;
-
     public class ChocolateyOutdatedCommandSpecs
     {
         [ConcernFor("outdated")]
@@ -113,6 +113,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_add_ignore_pinned_to_the_option_set()
             {
                 _optionSet.Contains("ignore-pinned").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_include_configured_sources_to_the_option_set()
+            {
+                _optionSet.Contains("include-configured-sources").Should().BeTrue();
             }
         }
 

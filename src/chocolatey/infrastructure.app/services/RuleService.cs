@@ -13,19 +13,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using chocolatey.infrastructure.guards;
+using chocolatey.infrastructure.rules;
+using chocolatey.infrastructure.services;
+using NuGet.Configuration;
+using NuGet.Packaging;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using chocolatey.infrastructure.guards;
-    using chocolatey.infrastructure.rules;
-    using chocolatey.infrastructure.services;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-
     public class RuleService : IRuleService
     {
         private readonly IMetadataRule[] _rules;
@@ -94,11 +94,11 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public IEnumerable<RuleResult> validate_rules(string filePath)
             => ValidateRules(filePath);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
 
         private class RuleIdEqualityComparer : IEqualityComparer<ImmutableRule>
         {
