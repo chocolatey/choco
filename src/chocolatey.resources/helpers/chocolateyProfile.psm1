@@ -25,7 +25,9 @@ Import-Module "$thisDirectory\Chocolatey.PowerShell.dll" -Cmdlet "Get-Environmen
 . $thisDirectory\functions\Write-FunctionCallLogMessage.ps1
 . $thisDirectory\ChocolateyTabExpansion.ps1
 
-Export-ModuleMember -Alias refreshenv -Function 'Update-SessionEnvironment', 'TabExpansion'
+Set-Alias refreshenv Update-SessionEnvironment
+
+Export-ModuleMember -Alias refreshenv -Cmdlet 'Update-SessionEnvironment' -Function 'TabExpansion'
 
 # SIG # Begin signature block
 # MIInKwYJKoZIhvcNAQcCoIInHDCCJxgCAQExDzANBglghkgBZQMEAgEFADB5Bgor
