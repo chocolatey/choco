@@ -628,7 +628,7 @@ folder.");
                     latestPackageVersion = version;
                 }
 
-                var availablePackage = NugetList.FindPackage(packageName, config, _nugetLogger, sourceCacheContext, remoteEndpoints, latestPackageVersion);
+                var availablePackage = NugetList.FindPackage(packageName, config, _nugetLogger, (SourceCacheContext)sourceCacheContext, remoteEndpoints, latestPackageVersion);
 
                 if (availablePackage == null)
                 {
@@ -1149,7 +1149,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     // this is a prerelease - opt in for newer prereleases.
                     config.Prerelease = true;
                 }
-                var availablePackage = NugetList.FindPackage(packageName, config, _nugetLogger, sourceCacheContext, remoteEndpoints, version);
+                var availablePackage = NugetList.FindPackage(packageName, config, _nugetLogger, (SourceCacheContext)sourceCacheContext, remoteEndpoints, version);
 
                 config.Prerelease = originalPrerelease;
 
@@ -1334,7 +1334,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         {
                             if (version != null)
                             {
-                                var requestedPackageDependency = NugetList.FindPackage(parentPackage.Id, config, _nugetLogger, sourceCacheContext, remoteEndpoints, version);
+                                var requestedPackageDependency = NugetList.FindPackage(parentPackage.Id, config, _nugetLogger, (SourceCacheContext)sourceCacheContext, remoteEndpoints, version);
 
                                 if (requestedPackageDependency != null)
                                 {

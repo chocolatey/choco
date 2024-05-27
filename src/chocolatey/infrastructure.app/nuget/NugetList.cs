@@ -248,7 +248,7 @@ namespace chocolatey.infrastructure.app.nuget
                 }
                 else
                 {
-                    var exactPackage = FindPackage(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoryResources, version);
+                    var exactPackage = FindPackage(searchTermLower, configuration, nugetLogger, (SourceCacheContext)cacheContext, packageRepositoryResources, version);
 
                     if (exactPackage == null)
                     {
@@ -340,6 +340,28 @@ namespace chocolatey.infrastructure.app.nuget
                 metadataList.AddRange(resource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
             }
             return metadataList;
+        }
+
+        /// <summary>
+        ///   Searches for packages that are available based on name and other options
+        /// </summary>
+        /// <param name="packageName">Name of package to search for</param>
+        /// <param name="config">Chocolatey configuration used to help supply the search parameters</param>
+        /// <param name="nugetLogger">The nuget logger</param>
+        /// <param name="resources">The resources that should be queried</param>
+        /// <param name="version">Version to search for</param>
+        /// <param name="cacheContext">Settings for caching of results from sources</param>
+        /// <returns>One result or nothing</returns>
+        [Obsolete("Use the overload that uses the base source cache context instead.")]
+        public static IPackageSearchMetadata FindPackage(
+            string packageName,
+            ChocolateyConfiguration config,
+            ILogger nugetLogger,
+            ChocolateySourceCacheContext cacheContext,
+            IEnumerable<NuGetEndpointResources> resources,
+            NuGetVersion version)
+        {
+            return FindPackage(packageName, config, nugetLogger, (SourceCacheContext)cacheContext, resources, version);
         }
 
         /// <summary>
