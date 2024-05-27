@@ -6,7 +6,7 @@ Describe 'Set-EnvironmentVariable helper function tests' -Tags Cmdlets {
         Import-Module "$testLocation\helpers\chocolateyInstaller.psm1"
     }
 
-    Context 'Sets an environment variable value at the target scope' -ForEach @(
+    Context 'Sets an environment variable value at the target <Scope>' -ForEach @(
         @{ Scope = 'Process' }
         @{ Scope = 'User' }
         @{ Scope = 'Machine' }
@@ -24,9 +24,8 @@ Describe 'Set-EnvironmentVariable helper function tests' -Tags Cmdlets {
                 Set-EnvironmentVariable -Name $Name -Value $Value -Scope $Scope
                 [Environment]::GetEnvironmentVariable($Name, $Scope) | Should -BeExactly $Value
 
-                if ($Scope -ne 'Process') {
-                    [Environment]::GetEnvironmentVariable($Name) | Should -BeExactly $Value
-                }
+                # We are explicitly checking the Process variable here.
+                [Environment]::GetEnvironmentVariable($Name, 'Process') | Should -BeExactly $Value
             }
             
             AfterAll {

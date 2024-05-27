@@ -173,7 +173,7 @@
         }
 
         It 'Displays that upgrade was attempted but wasnt required' {
-            $Output.Lines | Should -Contain "Chocolatey upgraded 0/2 packages." -Because $Output.String
+            $Output.String | Should -MatchExactly "Chocolatey upgraded 0"
         }
 
         Context "when using enhanced exit codes" {
@@ -188,7 +188,7 @@
             }
 
             It 'Displays that upgrade was attempted but wasnt required' {
-                $Output.Lines | Should -Contain "Chocolatey upgraded 0/2 packages." -Because $Output.String
+                $Output.String | Should -MatchExactly "Chocolatey upgraded 0"
             }
         }
     }
