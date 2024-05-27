@@ -16,9 +16,13 @@
         @{ Scope = 'Machine' }
     ) {
         Context 'Path "<_>"' -ForEach @("C:\test", "C:\tools") {
+            AfterEach {
+                Uninstall-ChocolateyPath -Path $_ -Scope $Scope
+            }
+
             It 'stores the value in the desired PATH scope' {
                 Install-ChocolateyPath -Path $_ -Scope $Scope
-                [Environment]::GetEnvironmentVariable('PATH', $_, $Scope) -split [IO.Path]::PathSeparator | Should -Contain $_
+                [Environment]::GetEnvironmentVariable('PATH', $Scope) -split [IO.Path]::PathSeparator | Should -Contain $_
             }
         }
     }
