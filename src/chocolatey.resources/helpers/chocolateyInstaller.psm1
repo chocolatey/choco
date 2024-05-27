@@ -102,7 +102,11 @@ if (Test-Path $extensionsPath) {
 
             if ($licensedAssembly) {
                 # Import-Module -Assembly doesn't work if the parent module is reimported, so force the import by path.
-                Import-Module $licensedAssembly.Location -Force
+                if ($licensedAssembly.Location) {
+                    Import-Module $licensedAssembly.Location -Force
+                } else {
+                    Import-Module $licensedAssembly
+                }
             }
             else {
                 # Fallback: load the extension DLL from the path directly.
