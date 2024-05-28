@@ -20,10 +20,6 @@
             $Setup = Invoke-Choco install installpackage --package-parameters="bob" --password="secure-password" --confirm
             $Setup.ExitCode | Should -Be 0 -Because $Setup.String
 
-            # This is some troubleshooting code...
-            Write-Host $Setup.String
-            Invoke-Choco list | % String | Write-Host
-            # This is some troubleshooting code... It shouldn't be merged!!!
             $Output = Invoke-Choco info installpackage --local-only
         }
 
