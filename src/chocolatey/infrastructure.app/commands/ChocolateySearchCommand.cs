@@ -212,7 +212,6 @@ If you find other exit codes that we have not yet documented, please
 choco {0}: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_search.gif
 
 ".FormatWith(configuration.CommandName));
-            "chocolatey".Log().Info(ChocolateyLoggers.Important, "Alternative Sources");
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
