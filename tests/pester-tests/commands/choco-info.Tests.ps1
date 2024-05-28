@@ -17,7 +17,7 @@
             Remove-NuGetPaths
             Initialize-ChocolateyTestInstall -Source $PSScriptRoot\testpackages
 
-            $Setup = Invoke-Choco install installpackage --package-parameters="bob" --user="bill" --password="secure-password" --confirm
+            $Setup = Invoke-Choco install installpackage --package-parameters="bob" --password="secure-password" --confirm
             $Setup.ExitCode | Should -Be 0 -Because $Setup.String
 
             # This is some troubleshooting code...
