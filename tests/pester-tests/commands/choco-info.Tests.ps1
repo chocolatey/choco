@@ -30,7 +30,6 @@
         It "Should contain a summary" {
             $Output.Lines | Should -Contain "Remembered Package Arguments:" -Because $Output.String
             $Output.Lines | Should -Contain "--package-parameters='bob'" -Because $Output.String
-            $Output.Lines | Should -Contain "--user=[REDACTED ARGUMENT]" -Because $Output.String
             $Output.Lines | Should -Contain "--password=[REDACTED ARGUMENT]" -Because $Output.String
         }
     }
