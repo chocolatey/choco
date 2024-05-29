@@ -169,7 +169,7 @@ namespace Chocolatey.PowerShell.Helpers
 
                 if (string.IsNullOrEmpty(value))
                 {
-                    registryKey.DeleteValue(name);
+                    registryKey.DeleteValue(name, false);
                 }
                 else
                 {
