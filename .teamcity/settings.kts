@@ -86,7 +86,7 @@ object Chocolatey : BuildType({
 
     requirements {
         doesNotExist("docker.server.version")
-        doesNotContain("teamcity.agent.name", "docker")
+        doesNotContain("teamcity.agent.name", "Docker")
     }
 })
 
@@ -151,7 +151,7 @@ object ChocolateySchd : BuildType({
 
     requirements {
         doesNotExist("docker.server.version")
-        doesNotContain("teamcity.agent.name", "docker")
+        doesNotContain("teamcity.agent.name", "Docker")
     }
 })
 
@@ -218,7 +218,7 @@ object ChocolateyQA : BuildType({
 
     requirements {
         doesNotExist("docker.server.version")
-        doesNotContain("teamcity.agent.name", "docker")
+        doesNotContain("teamcity.agent.name", "Docker")
     }
 })
 
@@ -289,7 +289,7 @@ object ChocolateySign : BuildType({
 
     requirements {
         doesNotExist("docker.server.version")
-        doesNotContain("teamcity.agent.name", "docker")
+        doesNotContain("teamcity.agent.name", "Docker")
     }
 })
 
@@ -344,7 +344,7 @@ object ChocolateyDockerWin : BuildType({
     requirements {
         contains("docker.server.osType", "windows")
         exists("docker.server.version")
-        contains("teamcity.agent.name", "docker")
+        contains("teamcity.agent.name", "Docker")
     }
 })
 
@@ -457,6 +457,6 @@ object ChocolateyPosix : BuildType({
     requirements {
         contains("docker.server.osType", "linux")
         exists("docker.server.version")
-        contains("teamcity.agent.name", "docker")
+        contains("teamcity.agent.name", "Docker")
     }
 })
