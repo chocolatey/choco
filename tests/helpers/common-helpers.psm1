@@ -4,11 +4,6 @@ if (-not ("NuGet.Versioning.VersionRange" -as [Type])) {
     Add-Type -Path $PSScriptRoot\common\NuGet.Versioning.dll
 }
 
-if ([string]::IsNullOrEmpty($env:ChocolateyInstall)) {
-    $env:ChocolateyInstall = Join-Path $env:ProgramData 'Chocolatey'
-    Write-Warning "ChocolateyInstall Variable was not set. It has been set to $($env:ChocolateyInstall)."
-}
-
 # Common variables setup
 $script:snapshots = [System.Collections.Generic.Queue[hashtable]]::new()
 $script:snapshotStack = @()
