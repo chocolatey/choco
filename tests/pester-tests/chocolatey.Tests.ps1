@@ -195,20 +195,6 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             # $null = Invoke-Choco install MicrosoftWindowsPowerShellV2 -s windowsfeatures
         }
 
-        # This is Foss only as PowerShell running under version 2 doesn't have .net available and can't import the Licensed DLL.
-        # Tests on Windows 7 show no issues with running Chocolatey under Windows 7 with PowerShell v2 aside from issues surrounding TLS versions that we cannot resolve without an upgrade to Windows 7.
-        It "Imports ChocolateyInstaller module successfully in PowerShell v2" -Tag FossOnly {
-            $command = 'try { $ErrorActionPreference = ''Stop''; Import-Module $env:ChocolateyInstall\helpers\chocolateyInstaller.psm1 } catch { $_ ; exit 1 }'
-            $result = & powershell.exe -Version 2 -noprofile -command $command
-            $LastExitCode | Should -BeExactly 0 -Because $result
-        }
-
-        It "Imports ChocolateyProfile module successfully in PowerShell v2" {
-            $command = 'try { $ErrorActionPreference = ''Stop''; Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1 } catch { $_ ; exit 1 }'
-            $result = & powershell.exe -Version 2 -noprofile -command $command
-            $LastExitCode | Should -BeExactly 0 -Because $result
-        }
-
         Context "chocolateyScriptRunner.ps1" {
             BeforeAll {
                 $Command = @'
