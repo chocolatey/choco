@@ -20,16 +20,20 @@ Describe 'Set-EnvironmentVariable helper function tests' -Tags Cmdlets {
         }
 
         Describe 'Setting environment variable <Name>' -ForEach $variables {
-            It 'Sets the target environment variable in the proper scope, as well as current process scope' {
+            BeforeAll {
                 Set-EnvironmentVariable -Name $Name -Value $Value -Scope $Scope
-                [Environment]::GetEnvironmentVariable($Name, $Scope) | Should -BeExactly $Value
-
-                # We are explicitly checking the Process variable here.
-                [Environment]::GetEnvironmentVariable($Name, 'Process') | Should -BeExactly $Value
             }
             
             AfterAll {
                 Set-EnvironmentVariable -Name $Name -Value "" -Scope $Scope
+            }
+
+            It 'sets the target environment variable in the proper scope' {
+                [Environment]::GetEnvironmentVariable($Name, $Scope) | Should -BeExactly $Value
+            }
+
+            It 'propagates the change to the current process' {
+                Get-Content "Env:\$Name" | Should -BeExactly $Value
             }
         }
     }
