@@ -167,7 +167,14 @@ namespace Chocolatey.PowerShell.Helpers
 
                 cmdlet.WriteDebug($"Registry type for {name} is/will be {registryType}");
 
-                registryKey.SetValue(name, value, registryType);
+                if (string.IsNullOrEmpty(value))
+                {
+                    registryKey.DeleteValue(name);
+                }
+                else
+                {
+                    registryKey.SetValue(name, value, registryType);
+                }
             }
 
             try
@@ -197,7 +204,12 @@ namespace Chocolatey.PowerShell.Helpers
 
             // 2. Set a user environment variable making the system refresh
             var setxPath = string.Format(@"{0}\System32\setx.exe", GetVariable(cmdlet, EnvironmentVariables.SystemRoot, EnvironmentVariableTarget.Process));
-            var process = Process.Start(setxPath, $"{EnvironmentVariables.ChocolateyLastPathUpdate} \"{DateTime.Now.ToFileTime()}\"");
+            var processInfo = new ProcessStartInfo(setxPath, $"{EnvironmentVariables.ChocolateyLastPathUpdate} \"{DateTime.Now.ToFileTime()}\"")
+            {
+                CreateNoWindow = true,
+            };
+
+            var process = Process.Start(processInfo);
             process.WaitForExit();
         }
 
