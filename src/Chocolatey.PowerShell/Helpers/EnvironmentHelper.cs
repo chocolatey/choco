@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Management.Automation;
 using Chocolatey.PowerShell.Shared;
@@ -171,20 +172,7 @@ namespace Chocolatey.PowerShell.Helpers
 
             try
             {
-                // Trigger environment refresh in explorer.exe:
-                // 1. Notify all windows of environment block change
-                NativeMethods.SendMessageTimeout(
-                    hWnd: (IntPtr)NativeMethods.HWND_BROADCAST,
-                    Msg: NativeMethods.WM_SETTINGCHANGE,
-                    wParam: UIntPtr.Zero,
-                    lParam: "Environment",
-                    fuFlags: 2,
-                    uTimeout: 5000,
-                    out UIntPtr result);
-
-                // 2. Set a user environment variable making the system refresh
-                var setxPath = string.Format(@"{0}\System32\setx.exe", GetVariable(cmdlet, EnvironmentVariables.SystemRoot, EnvironmentVariableTarget.Process));
-                cmdlet.InvokeCommand.InvokeScript($"& \"{setxPath}\" {EnvironmentVariables.ChocolateyLastPathUpdate} \"{DateTime.Now.ToFileTime()}\"");
+                BroadcastEnvironmentChange(cmdlet);
             }
             catch (Exception error)
             {
@@ -192,6 +180,25 @@ namespace Chocolatey.PowerShell.Helpers
             }
 
             UpdateSession(cmdlet);
+        }
+
+        private static void BroadcastEnvironmentChange(PSCmdlet cmdlet)
+        {
+            // Trigger environment refresh in explorer.exe:
+            // 1. Notify all windows of environment block change
+            NativeMethods.SendMessageTimeout(
+                hWnd: (IntPtr)NativeMethods.HWND_BROADCAST,
+                Msg: NativeMethods.WM_SETTINGCHANGE,
+                wParam: UIntPtr.Zero,
+                lParam: "Environment",
+                fuFlags: 2,
+                uTimeout: 5000,
+                out UIntPtr result);
+
+            // 2. Set a user environment variable making the system refresh
+            var setxPath = string.Format(@"{0}\System32\setx.exe", GetVariable(cmdlet, EnvironmentVariables.SystemRoot, EnvironmentVariableTarget.Process));
+            var process = Process.Start(setxPath, $"{EnvironmentVariables.ChocolateyLastPathUpdate} \"{DateTime.Now.ToFileTime()}\"");
+            process.WaitForExit();
         }
 
         /// <summary>
@@ -204,7 +211,7 @@ namespace Chocolatey.PowerShell.Helpers
             var architecture = GetVariable(cmdlet, EnvironmentVariables.ProcessorArchitecture, EnvironmentVariableTarget.Process);
             var psModulePath = GetVariable(cmdlet, EnvironmentVariables.PSModulePath, EnvironmentVariableTarget.Process);
 
-            var scopeList = new List<EnvironmentVariableTarget>() { EnvironmentVariableTarget.Process, EnvironmentVariableTarget.Machine };
+            var scopeList = new List<EnvironmentVariableTarget>() { EnvironmentVariableTarget.Machine };
 
             var computerName = GetVariable(cmdlet, EnvironmentVariables.ComputerName, EnvironmentVariableTarget.Process);
 
@@ -219,7 +226,10 @@ namespace Chocolatey.PowerShell.Helpers
                 foreach (var name in GetVariableNames(scope))
                 {
                     var value = GetVariable(cmdlet, name, scope);
-                    SetVariable(cmdlet, name, EnvironmentVariableTarget.Process, value);
+                    if (!(value is null))
+                    {
+                        SetVariable(cmdlet, name, EnvironmentVariableTarget.Process, value);
+                    }
                 }
             }
 
