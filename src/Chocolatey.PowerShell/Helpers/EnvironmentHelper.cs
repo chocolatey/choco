@@ -166,7 +166,14 @@ namespace Chocolatey.PowerShell.Helpers
 
                 cmdlet.WriteDebug($"Registry type for {name} is/will be {registryType}");
 
-                registryKey.SetValue(name, value, registryType);
+                if (string.IsNullOrEmpty(value))
+                {
+                    registryKey.DeleteValue(name, throwOnMissingValue: false);
+                }
+                else
+                {
+                    registryKey.SetValue(name, value, registryType);
+                }
             }
 
             try
@@ -219,7 +226,10 @@ namespace Chocolatey.PowerShell.Helpers
                 foreach (var name in GetVariableNames(scope))
                 {
                     var value = GetVariable(cmdlet, name, scope);
-                    SetVariable(cmdlet, name, EnvironmentVariableTarget.Process, value);
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        SetVariable(cmdlet, name, EnvironmentVariableTarget.Process, value);
+                    }
                 }
             }
 

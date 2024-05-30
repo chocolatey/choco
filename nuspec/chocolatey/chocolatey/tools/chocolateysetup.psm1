@@ -858,7 +858,7 @@ function Invoke-Chocolatey-Initial {
     try {
         $chocoInstallationFolder = Get-ChocolateyInstallFolder
         $chocoExe = Join-Path -Path $chocoInstallationFolder -ChildPath "choco.exe"
-        $runResult = & $chocoExe -v *>&1
+        $runResult = & $chocoExe -v 2>&1
         if ($LASTEXITCODE -eq 0) {
             Write-Debug "Chocolatey CLI execution completed successfully."
         }

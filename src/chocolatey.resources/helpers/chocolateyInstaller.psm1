@@ -153,26 +153,31 @@ if (Test-Path $extensionsPath) {
 # In effect we ensure that any command calls that match the name of one of our commands
 # will resolve to _our_ commands (preferring licensed cmdlets in the case of a name collision),
 # preventing packages from overriding them with their own commands and potentially breaking things.
-$ExecutionContext.InvokeCommand.PreCommandLookupAction = {
-    param($command, $eventArgs)
+#
+# This functionality is only available in v3 and later, so using this in v2 will not
+# work; check for the property before trying to set it.
+if ($ExecutionContext.InvokeCommand.PreCommandLookupAction) {
+    $ExecutionContext.InvokeCommand.PreCommandLookupAction = {
+        param($command, $eventArgs)
 
-    # Don't run this handler for stuff PowerShell is looking up internally
-    if ($eventArgs.CommandOrigin -eq 'Runspace') {
-        $resolvedCommand = if ($command -in $chocolateyCmdlets.Licensed) {
-            Get-Command "$command*" -Module 'chocolatey.licensed' -CommandType Cmdlet -ErrorAction Ignore |
-                Where-Object { $_.Name -match "^$command(Cmdlet)?$" } |
-                Select-Object -First 1
-        }
-        elseif ($command -in $chocolateyCmdlets.Default) {
-            Get-Command $command -Module "Chocolatey.PowerShell" -CommandType Cmdlet -ErrorAction Ignore
-        }
+        # Don't run this handler for stuff PowerShell is looking up internally
+        if ($eventArgs.CommandOrigin -eq 'Runspace') {
+            $resolvedCommand = if ($chocolateyCmdlets.Licensed -contains $command) {
+                Get-Command "$command*" -Module 'chocolatey.licensed' -CommandType Cmdlet -ErrorAction SilentlyContinue |
+                    Where-Object { @($command, "$($command)Cmdlet") -contains $_.Name } |
+                    Select-Object -First 1
+            }
+            elseif ($chocolateyCmdlets.Default -contains $command) {
+                Get-Command $command -Module "Chocolatey.PowerShell" -CommandType Cmdlet -ErrorAction SilentlyContinue
+            }
 
-        if ($resolvedCommand) {
-            $eventArgs.Command = $resolvedCommand
-            $eventArgs.StopSearch = $true
+            if ($resolvedCommand) {
+                $eventArgs.Command = $resolvedCommand
+                $eventArgs.StopSearch = $true
+            }
         }
-    }
-}.GetNewClosure()
+    }.GetNewClosure()
+}
 
 # todo: explore removing this for a future version
 Export-ModuleMember -Function * -Alias * -Cmdlet *

@@ -64,6 +64,20 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
     }
 
+    Context "Should include configured sources" {
+        BeforeAll {
+            $Output = Invoke-Choco $_ upgradepackage --include-configured-sources --debug
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should mention that configured sources have been included" {
+            $Output.Lines | Should -Contain "Including sources from chocolatey.config file." -Because $Output.String
+        }
+    }
+
     Context "Searching for a particular package" {
         BeforeAll {
             $Output = Invoke-Choco $_ upgradepackage

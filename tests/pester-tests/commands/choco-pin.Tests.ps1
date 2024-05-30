@@ -112,6 +112,24 @@ Describe "choco pin" -Tag Chocolatey, PinCommand {
             $Output.Lines | Should -Contain "Nothing to change. Pin already set or removed."
             $CurrentPins | Should -Contain "upgradepackage|1.0.0$listSuffix"
         }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco pin add --name upgradepackage
+                $CurrentPins = Invoke-Choco pin list --LimitOutput | ForEach-Object Lines
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Pin already set or removed."
+                $CurrentPins | Should -Contain "upgradepackage|1.0.0$listSuffix"
+            }
+        }
     }
 
     Context "Setting a Pin for a non-installed Package" {

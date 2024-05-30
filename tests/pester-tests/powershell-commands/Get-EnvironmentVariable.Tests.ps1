@@ -21,9 +21,19 @@ Describe 'Get-EnvironmentVariable helper function tests' -Tags Cmdlets {
         }
     }
 
-    Context 'Can retrieve the PATH variable without expanding environment names for the <Scope> scope' {
-        It 'Retrieves the <Scope> PATH value with un-expanded environment names' {
-            Get-EnvironmentVariable -Name 'PATH' -Scope 'Machine' | Should -Match '%[^%;\]+%'
+    Context 'Can retrieve the PATH variable without expanding environment names for the Machine scope' {
+        BeforeAll {
+            Install-ChocolateyPath -Path "%systemroot%\test" -PathType Machine
+        }
+
+        AfterAll {
+            Uninstall-ChocolateyPath -Path "%systemroot%\test" -PathType Machine
+        }
+
+        It 'Retrieves the Machine PATH value with un-expanded environment names' {
+            # We expect there to be an entry similar to the following: "%SystemRoot%\system32", since this
+            # is there by default in a Windows install
+            Get-EnvironmentVariable -Name 'PATH' -Scope 'Machine' -PreserveVariables | Should -Match '%systemroot%\\test'
         }
     }
 }
