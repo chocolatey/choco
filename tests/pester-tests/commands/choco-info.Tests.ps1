@@ -14,10 +14,10 @@
 
     Context "Should include remembered arguments (including redacted) when using option --local-only" {
         BeforeAll {
-            Remove-NuGetPaths
             Initialize-ChocolateyTestInstall -Source $PSScriptRoot\testpackages
 
-            $Setup = Invoke-Choco install installpackage --package-parameters="bob" --user="bill" --password="secure-password" --confirm
+            $Setup = Invoke-Choco install installpackage --package-parameters="bob" --password="secure-password" --confirm
+
             $Setup.ExitCode | Should -Be 0 -Because $Setup.String
 
             $Output = Invoke-Choco info installpackage --local-only
@@ -36,7 +36,6 @@
 
     Context "Should include configured sources" {
         BeforeAll {
-            Remove-NuGetPaths
             Initialize-ChocolateyTestInstall -Source $PSScriptRoot\testpackages
             Invoke-Choco install installpackage --confirm
 

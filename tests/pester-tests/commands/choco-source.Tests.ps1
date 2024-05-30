@@ -566,6 +566,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SourceCommand {
 
             # Ensure source is enable
             Invoke-Choco $CurrentCommand add --name "already-enabled" --source "https://somewhere/out/there/"
+            Invoke-Choco $CurrentCommand enable --name "already-enabled"
 
             $Output = Invoke-Choco $CurrentCommand enable --name "already-enabled"
         }
