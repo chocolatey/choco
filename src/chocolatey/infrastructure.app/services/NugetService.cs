@@ -510,8 +510,6 @@ folder.");
             _fileSystem.EnsureDirectoryExists(ApplicationParameters.PackagesLocation);
             var packageResultsToReturn = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
-            SetRemotePackageNamesIfAllSpecified(config, () => { });
-
             NuGetVersion version = !string.IsNullOrWhiteSpace(config.Version) ? NuGetVersion.Parse(config.Version) : null;
             if (config.Force)
             {
@@ -520,6 +518,14 @@ folder.");
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
             var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
+
+            // The following method HAS to be called AFTER the call to GetRemoteRepositories.
+            // In that method, the Sources on the configuration object are expanded to be the full source URL's, rather than the named
+            // sources from the chocolatey.config file, i.e. https://community.chocolatey.org/api/v2/ rather than simply "chocolatey".
+            // This is important, since the full URL is what is used to ensure that a "choco install all" is not being attempted against
+            // one of the configured public sources in the following method.
+            SetRemotePackageNamesIfAllSpecified(config, () => { });
+
             var remoteEndpoints = NugetCommon.GetRepositoryResources(remoteRepositories, sourceCacheContext);
             var localRepositorySource = NugetCommon.GetLocalRepository();
             var pathResolver = NugetCommon.GetPathResolver(_fileSystem);
