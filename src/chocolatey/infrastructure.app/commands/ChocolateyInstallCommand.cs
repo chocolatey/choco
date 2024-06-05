@@ -279,10 +279,6 @@ Installs a package or a list of packages (sometimes specified as a
             "chocolatey".Log().Info(@"
     choco install <pkg|packages.config> [<pkg2> <pkgN>] [<options/switches>]
 
-NOTE: `all` is a special package keyword that will allow you to install
- all packages from a custom feed. Will not work with Chocolatey default
- feed. THIS IS NOT YET REIMPLEMENTED.
-
 NOTE: Any package name ending with .config is considered a
  'packages.config' file. Please see https://ch0.co/packages_config
 

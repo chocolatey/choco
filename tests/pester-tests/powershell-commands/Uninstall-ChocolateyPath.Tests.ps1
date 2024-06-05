@@ -18,7 +18,7 @@
 
             It 'removes a stored PATH value in the desired PATH scope' {
                 Uninstall-ChocolateyPath -Path $_ -Scope $Scope
-                [Environment]::GetEnvironmentVariable('PATH', $_, $Scope) -split [IO.Path]::PathSeparator | Should -Not -Contain $_
+                [Environment]::GetEnvironmentVariable('PATH', $Scope) -split [IO.Path]::PathSeparator | Should -Not -Contain $_
             }
         }
     }

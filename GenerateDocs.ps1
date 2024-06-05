@@ -25,6 +25,9 @@ $psModuleLocation = [System.IO.Path]::GetFullPath("$thisDirectory\src\chocolatey
 $docsFolder = [System.IO.Path]::GetFullPath("$thisDirectory\docs\generated")
 $mergedDirectory = [System.IO.Path]::GetFullPath("$thisDirectory\code_drop\temp\_PublishedApps\choco_merged")
 $chocoExe = "$mergedDirectory\choco.exe"
+
+Write-Host "Running choco.exe from $chocoExe" 
+
 $lineFeed = "`r`n"
 $sourceLocation = 'https://github.com/chocolatey/choco/blob/master/'
 $sourceCommands = $sourceLocation + 'src/chocolatey/infrastructure.app/commands'
@@ -599,6 +602,7 @@ The following are experimental or use not recommended:
     Generate-CommandReference 'Optimize' '90'
     Generate-CommandReference 'Outdated' '100'
     Generate-CommandReference 'Pin' '110'
+    Generate-CommandReference 'Rule' '115'
     Generate-CommandReference 'Search' '120'
     Generate-CommandReference 'SetApiKey' '130'
     Generate-CommandReference 'Source' '140'

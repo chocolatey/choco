@@ -175,6 +175,38 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
         }
     }
 
+    Context "Setting a configuration setting (cacheLocation) with same value that already exists" {
+        BeforeAll {
+            $null = Invoke-Choco config set cacheLocation "C:\temp\choco"
+
+            $Output = Invoke-Choco config set cacheLocation "C:\temp\choco"
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Changes Nothing" {
+            $Output.Lines | Should -Contain "Nothing to change. Config already set."
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco config set cacheLocation "C:\temp\choco"
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
+        }
+    }
+
     Context "Setting a configuration setting not available by default (newConfiguration)" {
         BeforeAll {
             $Output = Invoke-Choco config set --name newConfiguration --value some-value
@@ -261,6 +293,7 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
 
     Context "Unsetting a configuration that doesn't exist" {
         BeforeAll {
+            $null = Disable-ChocolateyFeature -Name "useEnhancedExitCodes"
             $Output = Invoke-Choco config unset not-existing
 
             [xml]$ConfigFileContent = Get-Content $env:ChocolateyInstall\config\chocolatey.config
@@ -275,13 +308,29 @@ Describe "choco config" -Tag Chocolatey, ConfigCommand {
             $Output.Lines | Should -Contain $expectedLicenseHeader
         }
 
-        It "Displays config value Added" {
+        It "Changes nothing" {
             $Output.Lines | Should -Contain "Nothing to change. Config already set."
         }
 
         It "No value is added to file" {
             $value = $configs.Where{ $_.key -eq "not-existing" }
             $value | Should -HaveCount 0
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco config unset not-existing
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
         }
     }
 

@@ -17,12 +17,13 @@
             Update-SessionEnvironment
             $env:Test | Should -BeExactly 'user-value'
             $env:Test2 | Should -BeExactly 'machine-value'
-            $env:Test3 | Should -BeNullOrEmpty -Because 'Process-only values should not be preserved'
+            $env:Test3 | Should -BeExactly 'process-value'
         }
 
         AfterAll {
             [Environment]::SetEnvironmentVariable("Test", [string]::Empty, "User")
             [Environment]::SetEnvironmentVariable("Test2", [string]::Empty, "Machine")
+            $env:Test3 = ''
         }
     }
 }

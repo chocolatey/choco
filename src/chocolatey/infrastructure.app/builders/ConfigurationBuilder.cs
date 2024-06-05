@@ -340,7 +340,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.UsePackageRepositoryOptimizations = SetFeatureFlag(ApplicationParameters.Features.UsePackageRepositoryOptimizations, configFileSettings, defaultEnabled: true, description: "Use Package Repository Optimizations - Turn on optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should generally be left enabled, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in earlier versions of Chocolatey.");
             config.Features.UsePackageHashValidation = SetFeatureFlag(ApplicationParameters.Features.UsePackageHashValidation, configFileSettings, defaultEnabled: false, description: "Use Package Hash Validation - Check the hash of the downloaded package file against the source provided hash. Only supports sources that provide SHA512 hashes. Disabled by default. Available in 2.3.0+");
             config.PromptForConfirmation = !SetFeatureFlag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
-            config.DisableCompatibilityChecks = SetFeatureFlag(ApplicationParameters.Features.DisableCompatibilityChecks, configFileSettings, defaultEnabled: false, description: "Disable Compatibility Checks - Disable showing a warning when there is an incompatibility between Chocolatey CLI and Chocolatey Licensed Extension. Available in 1.1.0+");
+            config.DisableCompatibilityChecks = SetFeatureFlag(ApplicationParameters.Features.DisableCompatibilityChecks, configFileSettings, defaultEnabled: false, description: "Disable Compatibility Checks - Disable showing a warning when there is an incompatibility between Chocolatey CLI and Chocolatey Licensed Extension.");
         }
 
         private static bool SetFeatureFlag(string featureName, ConfigFileSettings configFileSettings, bool defaultEnabled, string description)
@@ -456,7 +456,7 @@ namespace chocolatey.infrastructure.app.builders
                              "Log File to output to in addition to regular loggers.",
                              option => config.AdditionalLogFileLocation = option.UnquoteSafe())
                         .Add("skipcompatibilitychecks|skip-compatibility-checks",
-                            "SkipCompatibilityChecks - Prevent warnings being shown before and after command execution when a runtime compatibility problem is found between the version of Chocolatey and the Chocolatey Licensed Extension. Available in 1.1.0+",
+                            "SkipCompatibilityChecks - Prevent warnings being shown before and after command execution when a runtime compatibility problem is found between the version of Chocolatey and the Chocolatey Licensed Extension.",
                             option => config.DisableCompatibilityChecks = option != null)
                         .Add("ignore-http-cache",
                             "IgnoreHttpCache - Ignore any HTTP caches that have previously been created when querying sources, and create new caches. Available in 2.1.0+",

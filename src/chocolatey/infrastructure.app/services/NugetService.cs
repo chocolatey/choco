@@ -196,7 +196,6 @@ that uses these options.");
 
                 ChocolateyPackageMetadata packageLocalMetadata;
                 string packageInstallLocation = null;
-                string deploymentLocation = null;
                 if (package.PackagePath != null && !string.IsNullOrWhiteSpace(package.PackagePath))
                 {
                     packageLocalMetadata = new ChocolateyPackageMetadata(package.PackagePath, _fileSystem);
@@ -218,7 +217,6 @@ that uses these options.");
                         }
                     }
 
-                    deploymentLocation = packageInfo.DeploymentLocation;
                     if (!string.IsNullOrWhiteSpace(packageInfo.Arguments))
                     {
                         var decryptedArguments = ArgumentsUtility.DecryptPackageArgumentsFile(_fileSystem, packageInfo.Package.Id, packageInfo.Package.Version.ToNormalizedStringChecked());
@@ -251,7 +249,7 @@ that uses these options.");
  Tags: {9}
  Software Site: {10}
  Software License: {11}{12}{13}{14}{15}{16}
- Description: {17}{18}{19}{20}
+ Description: {17}{18}{19}
 ".FormatWith(
                                 package.Title.EscapeCurlyBraces(),
                                 package.Published.GetValueOrDefault().UtcDateTime.ToShortDateString(),
@@ -286,7 +284,6 @@ that uses these options.");
                                 package.Summary != null && !string.IsNullOrWhiteSpace(package.Summary.ToStringSafe()) ? "\r\n Summary: {0}".FormatWith(package.Summary.EscapeCurlyBraces().ToStringSafe()) : string.Empty,
                                 package.Description.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  "),
                                 !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty,
-                                !string.IsNullOrWhiteSpace(deploymentLocation) ? "{0} Deployed to: '{1}'".FormatWith(Environment.NewLine, deploymentLocation) : string.Empty,
                                 packageArgumentsUnencrypted != null ? packageArgumentsUnencrypted : string.Empty
                             ));
                         }
@@ -513,8 +510,6 @@ folder.");
             _fileSystem.EnsureDirectoryExists(ApplicationParameters.PackagesLocation);
             var packageResultsToReturn = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
-            SetRemotePackageNamesIfAllSpecified(config, () => { });
-
             NuGetVersion version = !string.IsNullOrWhiteSpace(config.Version) ? NuGetVersion.Parse(config.Version) : null;
             if (config.Force)
             {
@@ -523,6 +518,14 @@ folder.");
 
             var sourceCacheContext = new ChocolateySourceCacheContext(config);
             var remoteRepositories = NugetCommon.GetRemoteRepositories(config, _nugetLogger, _fileSystem);
+
+            // The following method HAS to be called AFTER the call to GetRemoteRepositories.
+            // In that method, the Sources on the configuration object are expanded to be the full source URL's, rather than the named
+            // sources from the chocolatey.config file, i.e. https://community.chocolatey.org/api/v2/ rather than simply "chocolatey".
+            // This is important, since the full URL is what is used to ensure that a "choco install all" is not being attempted against
+            // one of the configured public sources in the following method.
+            SetRemotePackageNamesIfAllSpecified(config, () => { });
+
             var remoteEndpoints = NugetCommon.GetRepositoryResources(remoteRepositories, sourceCacheContext);
             var localRepositorySource = NugetCommon.GetLocalRepository();
             var pathResolver = NugetCommon.GetPathResolver(_fileSystem);
@@ -628,7 +631,7 @@ folder.");
                     latestPackageVersion = version;
                 }
 
-                var availablePackage = NugetList.FindPackage(packageName, config, _nugetLogger, sourceCacheContext, remoteEndpoints, latestPackageVersion);
+                var availablePackage = NugetList.FindPackage(packageName, config, _nugetLogger, (SourceCacheContext)sourceCacheContext, remoteEndpoints, latestPackageVersion);
 
                 if (availablePackage == null)
                 {
@@ -1149,7 +1152,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     // this is a prerelease - opt in for newer prereleases.
                     config.Prerelease = true;
                 }
-                var availablePackage = NugetList.FindPackage(packageName, config, _nugetLogger, sourceCacheContext, remoteEndpoints, version);
+                var availablePackage = NugetList.FindPackage(packageName, config, _nugetLogger, (SourceCacheContext)sourceCacheContext, remoteEndpoints, version);
 
                 config.Prerelease = originalPrerelease;
 
@@ -1334,7 +1337,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         {
                             if (version != null)
                             {
-                                var requestedPackageDependency = NugetList.FindPackage(parentPackage.Id, config, _nugetLogger, sourceCacheContext, remoteEndpoints, version);
+                                var requestedPackageDependency = NugetList.FindPackage(parentPackage.Id, config, _nugetLogger, (SourceCacheContext)sourceCacheContext, remoteEndpoints, version);
 
                                 if (requestedPackageDependency != null)
                                 {

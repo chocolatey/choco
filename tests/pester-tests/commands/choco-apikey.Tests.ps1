@@ -371,6 +371,41 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
         }
     }
 
+    Context "Adding an apikey when it is already added" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            # Ensure that the apikey is indeed set
+            $null = Invoke-Choco apikey add --source "https://somewhere.out/there/" --api-key "123-4567-89"
+
+            $Output = Invoke-Choco apikey add --source "https://somewhere.out/there/" --api-key "123-4567-89"
+        }
+
+        It "Exits with ExitCode 0" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Changes Nothing" {
+            $Output.Lines | Should -Contain "Nothing to change. Config already set."
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco apikey add --source "https://somewhere.out/there/" --api-key "123-4567-89"
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths
 }

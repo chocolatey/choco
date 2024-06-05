@@ -102,7 +102,11 @@ if (Test-Path $extensionsPath) {
 
             if ($licensedAssembly) {
                 # Import-Module -Assembly doesn't work if the parent module is reimported, so force the import by path.
-                Import-Module $licensedAssembly.Location -Force
+                if ($licensedAssembly.Location) {
+                    Import-Module $licensedAssembly.Location -Force
+                } else {
+                    Import-Module $licensedAssembly
+                }
             }
             else {
                 # Fallback: load the extension DLL from the path directly.
@@ -149,26 +153,31 @@ if (Test-Path $extensionsPath) {
 # In effect we ensure that any command calls that match the name of one of our commands
 # will resolve to _our_ commands (preferring licensed cmdlets in the case of a name collision),
 # preventing packages from overriding them with their own commands and potentially breaking things.
-$ExecutionContext.InvokeCommand.PreCommandLookupAction = {
-    param($command, $eventArgs)
+#
+# This functionality is only available in v3 and later, so using this in v2 will not
+# work; check for the property before trying to set it.
+if ($ExecutionContext.InvokeCommand.PreCommandLookupAction) {
+    $ExecutionContext.InvokeCommand.PreCommandLookupAction = {
+        param($command, $eventArgs)
 
-    # Don't run this handler for stuff PowerShell is looking up internally
-    if ($eventArgs.CommandOrigin -eq 'Runspace') {
-        $resolvedCommand = if ($command -in $chocolateyCmdlets.Licensed) {
-            Get-Command "$command*" -Module 'chocolatey.licensed' -CommandType Cmdlet -ErrorAction Ignore |
-                Where-Object { $_.Name -match "^$command(Cmdlet)?$" } |
-                Select-Object -First 1
-        }
-        elseif ($command -in $chocolateyCmdlets.Default) {
-            Get-Command $command -Module "Chocolatey.PowerShell" -CommandType Cmdlet -ErrorAction Ignore
-        }
+        # Don't run this handler for stuff PowerShell is looking up internally
+        if ($eventArgs.CommandOrigin -eq 'Runspace') {
+            $resolvedCommand = if ($chocolateyCmdlets.Licensed -contains $command) {
+                Get-Command "$command*" -Module 'chocolatey.licensed' -CommandType Cmdlet -ErrorAction SilentlyContinue |
+                    Where-Object { @($command, "$($command)Cmdlet") -contains $_.Name } |
+                    Select-Object -First 1
+            }
+            elseif ($chocolateyCmdlets.Default -contains $command) {
+                Get-Command $command -Module "Chocolatey.PowerShell" -CommandType Cmdlet -ErrorAction SilentlyContinue
+            }
 
-        if ($resolvedCommand) {
-            $eventArgs.Command = $resolvedCommand
-            $eventArgs.StopSearch = $true
+            if ($resolvedCommand) {
+                $eventArgs.Command = $resolvedCommand
+                $eventArgs.StopSearch = $true
+            }
         }
-    }
-}.GetNewClosure()
+    }.GetNewClosure()
+}
 
 # todo: explore removing this for a future version
 Export-ModuleMember -Function * -Alias * -Cmdlet *
@@ -176,8 +185,8 @@ Export-ModuleMember -Function * -Alias * -Cmdlet *
 # SIG # Begin signature block
 # MIInKwYJKoZIhvcNAQcCoIInHDCCJxgCAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCCwc5bNHW/kpfcZ
-# 7+n0pl1aI7nawLR48Dvt/t2uNlf8MqCCIK4wggWNMIIEdaADAgECAhAOmxiO+dAt
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCDNL/wxXxTwoao9
+# +niutFOSQWJKM7QvRr2vKMT3E6T+AKCCIK4wggWNMIIEdaADAgECAhAOmxiO+dAt
 # 5+/bUOIIQBhaMA0GCSqGSIb3DQEBDAUAMGUxCzAJBgNVBAYTAlVTMRUwEwYDVQQK
 # EwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAiBgNV
 # BAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yMjA4MDEwMDAwMDBa
@@ -357,30 +366,30 @@ Export-ModuleMember -Function * -Alias * -Cmdlet *
 # IFNIQTM4NCAyMDIxIENBMQIQBNI793flHTneCMtwLiiYFTANBglghkgBZQMEAgEF
 # AKCBhDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgor
 # BgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMC8GCSqGSIb3
-# DQEJBDEiBCDZUPufdS+OwzLmUgo92cMpyJjXnaFsIC9gTR1nYqo6YTANBgkqhkiG
-# 9w0BAQEFAASCAYAaGhCrEt3ePvWYqbMREohQ4d1HO16LKq0hDHKwITSK78aBGrkS
-# 8uTvYq96TCZs/IXBlKqgPbGrJx9T2/tYrf7bI7WmH32oNaHwQi8ZuGNU619aAqh2
-# fv1c4AZZA0J574Kt7ornB9/WM0Q+ZwqEOKpJck/6J2kSbeORllyr4seGTUpHFrBV
-# wfSIGkAv42jV6rnhmeHT1KO6K181VU6/yTnwyCwdi59mZsd92JuBqdMdevJyK+jI
-# eUCRkDdbfCaoG4B08WukbLLZEXCsOCwP4pYO9k71eirpSi6x4s4Lcw8pDMYkjRpn
-# Xn4kEApJm4pJNckBdENdeR8jRY8eszUTWj+3I4WqPXy10XfVqdIf0P+q+SvHpavJ
-# nOZnmnHagJmT+uu2aHCeuKDAa4IXUZ+s6+LR9aPY7QiUQkmJ0PmNpMHcefCbU1W4
-# w6E3DWHpzrV1YFCnD4R3ZkdAtKX3Jk3LE1SVdnxFTN1RFrmbV8cGKEyu9GXXeN3N
-# HIor6od31ljL4oOhggMgMIIDHAYJKoZIhvcNAQkGMYIDDTCCAwkCAQEwdzBjMQsw
+# DQEJBDEiBCDfVFiQM7J1zBG3SMXd2WKkowiR9EYrXajSa8w0Af5C4jANBgkqhkiG
+# 9w0BAQEFAASCAYACrskGviu5NOPoHcqj9+yVEbLar5ZopNJX7Uc5eHIndy0yTxHH
+# VKwoS2xONgmSL+whd6B7RiiPsBSMzpegud/XJip1lfqQIFh5SlQpwSoEz+WDRiTx
+# vd0pToktDgn8Jyig7morW4HsRP0Pi77nNWnzF9aWaeIG4xEfGPA7gWnZBCzy07nn
+# KeDagmAS8Y1RrSLNAVgh8Ccj4L07cTqMD0NTIxvjfJdqOn0ku6logYXSdfcjBFaM
+# FRz7Z+FnSB2Ic/iC0RL6c+Ws8wADlZmfeHEHSz2GG7xOBodzlveriu6frN5AT8KD
+# 3QqF3OK2f4T55OKhtEuOXOGz17UADB3VvyCrqMCj8IngD69QEjl4GW+437Hssy/U
+# sd1XT7K8ZTR5F5dLexDvxJ1BBQ2wvSGStZXGwvzG2ckpAxVeDyZ/Cg+ghNEIzjGj
+# 72qiXLvgfDqdnXjb+QVHjCTt1lp3HcIQft2QSzcZqLxgrFrt78a88t24Qg9TKD+a
+# jovWMLzZuoZ4G+WhggMgMIIDHAYJKoZIhvcNAQkGMYIDDTCCAwkCAQEwdzBjMQsw
 # CQYDVQQGEwJVUzEXMBUGA1UEChMORGlnaUNlcnQsIEluYy4xOzA5BgNVBAMTMkRp
 # Z2lDZXJ0IFRydXN0ZWQgRzQgUlNBNDA5NiBTSEEyNTYgVGltZVN0YW1waW5nIENB
 # AhAFRK/zlJ0IOaa/2z9f5WEWMA0GCWCGSAFlAwQCAQUAoGkwGAYJKoZIhvcNAQkD
-# MQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNTI0MDcwNjM5WjAvBgkq
-# hkiG9w0BCQQxIgQgIytP//oW3+hGlSMsPaiwBgquBFI2lmpevay3LGNpyXwwDQYJ
-# KoZIhvcNAQEBBQAEggIAhogU3N2PYzBVQcqEyUJPWyop0lgf7Q3qANby72utOuEd
-# v6k4X96QV/V0WD9bu1CATZeyd3ddmqrLIS+tpaiF/h+Tiskzve0pR7c3sCSJ+4TD
-# LybmWMqhqRzwYd4AKpcI8GR//KNd8T+zq+9SQBlFcQb1Bwl9UDeW5pwPeYG9jZPr
-# p6Ifta9Ltidqwt1zNRGjQtM2Lk0j2KIhOanAC0naTDso7q1uXE56mHwVS3Rpnj5s
-# cdtxFBj8B5pXx0w/BICdJbYzsXkPbS8q0ZaQkvnk1mhUns/TjHvnByrEgGPZid0V
-# KmDNhfJq/9OBUU2w2NzGnF8Me1tXrQnXKTKHqRBB0nlA2TmyjEuhmNBPpq7kdrte
-# wgmsgXhoYstY30mbKvvWkv1y5wsCczgOBEg1ewAr2VACwyYVpCe/ht0WvJdoj2i4
-# dAVWvohJj2oLcJzuvVKp2Y70qjY5r8tzUIuCy7Y2TPu+JM3pu4XutsjOc9wnmSuU
-# aeid9dGd1t0xY1r/MzenKq6cs6F3IM43clHs3BcXZ+KehrHnKKBpdK8rIfcIPz8m
-# YZVnYSyFpRT4WMLNhY0zAvWRiMCW37Zl+nhF6O7g2S0Lby1M8gP49CYQZXP2JbPb
-# sJ4bDqEji2ilGD1Kfm29NE/mDm4k8WusQV0a6x38+8TX3CDq2e9t1Ta+7aKU1co=
+# MQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNTMwMTk1ODQyWjAvBgkq
+# hkiG9w0BCQQxIgQgMjUBf/vaW2Mel/F3o+3jwKil/Lk2VVlHp41MELm/sCMwDQYJ
+# KoZIhvcNAQEBBQAEggIAit02r1pWJk+QRmD+UlpZFCzRjuVlC40zBNjlkRd3SUPI
+# bDVRTWoTPbUmw6ExXn0AjFEgigxFk5MMZPyHaXL9rzAgjT2BtMwXvN76fxgp1dRR
+# Rntf4jaiMWLwfsy7bQfC0RyDg8h6Xjkhl9Do0VdCi4465x9Vdafsso7lCVOf6UK2
+# bkaqd/blX7G5PEghubKrPPagOEm0I4XY3r0UlMOB4gIuf2wzzI73HddmRaRdi/2T
+# tdgVqdoWLgAz5K1nIafqUMQjhxRCQ41slZ4AEwS6txbLot5i+PqJ2dEqlbqedfNA
+# R75eWdDWpSJzQE8Hcq6IZhvdya6OTPMn3DCODVAguYbZBq4S5Fayt+vR2K78Nmyz
+# JuU6hkOYw3x1PBL/an3rtvIOrk6J0jNiGVkCGPA6Gijm3uH5TbofaO8RdnG61TIO
+# x6g4USiJvOJY3SbEcSK1DsI91n2FF3vYotCZaGfuicbxhcvpIMdqtzbxiKIIsUda
+# 1oUOmQr2+3ehuGKftW+EGk83ZKObNF98RMSA/4YFO9e42FtB7P9+FSbJ1mXRUnFC
+# sftewOZA7haYCPiZV6Tt/kBJaG9Y2ROrq4rDrbMmKWl3WOWui/tyEwm12GcNLgpc
+# cRY1FUXMfOL1kM9fgLlUCKORaN9sB1kEKOGXGFGkpKyWQNGlpQn/EuKKqHEhwl4=
 # SIG # End signature block

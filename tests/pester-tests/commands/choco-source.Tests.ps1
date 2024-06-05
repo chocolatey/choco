@@ -67,6 +67,45 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SourceCommand {
         }
     }
 
+    Context "Add source that already exists" {
+        BeforeAll {
+            $null = Disable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+            # Ensure source is already added
+            Invoke-Choco $CurrentCommand add --name "already-exists" --source "https://somewhere/out/there/"
+
+            $Output = Invoke-Choco $CurrentCommand add --name "already-exists" --source "https://somewhere/out/there/"
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Displays chocolatey name with version" {
+            $Output.Lines | Should -Contain $expectedHeader
+        }
+
+        It "Displays no change made" {
+            $Output.Lines | Should -Contain "Nothing to change. Config already set."
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco $CurrentCommand add --name "already-exists" --source "https://somewhere/out/there/"
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
+        }
+    }
+
     Context "Add single unauthenticated source with priority" {
         BeforeAll {
             $Output = Invoke-Choco $CurrentCommand add --name "dummy-long" --source "https://priority.test.com/api" --priority 1
@@ -304,6 +343,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SourceCommand {
 
     Context "Removing missing source" {
         BeforeAll {
+            $null = Disable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
             # Make sure the source is removed
             Invoke-Choco $CurrentCommand remove --name "not-existing"
 
@@ -320,6 +361,22 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SourceCommand {
 
         It "Displays message about no change made" {
             $Output.Lines | Should -Contain "Nothing to change. Config already set."
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco $CurrentCommand remove --name "not-existing"
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
         }
     }
 
@@ -387,6 +444,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SourceCommand {
 
     Context "Disabling missing source" {
         BeforeAll {
+            $null = Disable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
             # Ensure source is not available
             Invoke-Choco $CurrentCommand remove --name "not-existing"
 
@@ -404,10 +463,68 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SourceCommand {
         It "Displays no change made" {
             $Output.Lines | Should -Contain "Nothing to change. Config already set."
         }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco $CurrentCommand disable --name "not-existing"
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
+        }
+    }
+
+    Context "Disabling source that is already disabled" {
+        BeforeAll {
+            $null = Disable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+            # Ensure source is not available
+            Invoke-Choco $CurrentCommand add --name "already-disabled" --source "https://somewhere/out/there/"
+            Invoke-Choco $CurrentCommand disable --name "already-disabled"
+
+            $Output = Invoke-Choco $CurrentCommand disable --name "already-disabled"
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Displays chocolatey name with version" {
+            $Output.Lines | Should -Contain $expectedHeader
+        }
+
+        It "Displays no change made" {
+            $Output.Lines | Should -Contain "Nothing to change. Config already set."
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco $CurrentCommand disable --name "already-disabled"
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
+        }
     }
 
     Context "Enabling missing source" {
         BeforeAll {
+            $null = Disable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
             # Ensure source is not available
             Invoke-Choco $CurrentCommand remove --name "not-existing"
 
@@ -424,6 +541,62 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SourceCommand {
 
         It "Displays no change made" {
             $Output.Lines | Should -Contain "Nothing to change. Config already set."
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco $CurrentCommand enable --name "not-existing"
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
+        }
+    }
+
+    Context "Enabling source that is already enabled" {
+        BeforeAll {
+            $null = Disable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+            # Ensure source is enable
+            Invoke-Choco $CurrentCommand add --name "already-enabled" --source "https://somewhere/out/there/"
+            Invoke-Choco $CurrentCommand enable --name "already-enabled"
+
+            $Output = Invoke-Choco $CurrentCommand enable --name "already-enabled"
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Displays chocolatey name with version" {
+            $Output.Lines | Should -Contain $expectedHeader
+        }
+
+        It "Displays no change made" {
+            $Output.Lines | Should -Contain "Nothing to change. Config already set."
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco $CurrentCommand enable --name "already-enabled"
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It "Changes Nothing" {
+                $Output.Lines | Should -Contain "Nothing to change. Config already set."
+            }
         }
     }
 
