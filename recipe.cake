@@ -329,14 +329,14 @@ Task("Prepare-NuGet-Packages")
     .IsDependeeOf("Sign-Assemblies")
     .Does(() =>
 {
-    CleanDirectory(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib");
-    EnsureDirectoryExists(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/net48");
+    CleanDirectory(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib");
+    EnsureDirectoryExists(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/net48");
 
     // Copy legal documents
-    CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.md", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/CREDITS.txt");
+    CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.md", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/CREDITS.txt");
 
-    CopyFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey_merged/*", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/net48");
-    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.xml", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/net48/chocolatey.xml");
+    CopyFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey_merged/*", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/net48");
+    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.xml", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/net48/chocolatey.xml");
 });
 
 Task("Prepare-MSI")
