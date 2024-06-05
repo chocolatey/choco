@@ -14,22 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Microsoft.Win32;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using Microsoft.Win32;
-    using configuration;
-    using domain;
-    using filesystem;
-    using infrastructure.commands;
-    using logging;
-    using results;
-    using platforms;
-
     /// <summary>
     ///   Alternative Source for Cygwin
     /// </summary>
@@ -140,7 +140,10 @@ namespace chocolatey.infrastructure.app.services
 
         public void EnsureSourceAppInstalled(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                throw new NotImplementedException("This source is not supported on non-Windows systems");
+            }
 
             var runnerConfig = new ChocolateyConfiguration
             {
@@ -180,7 +183,10 @@ namespace chocolatey.infrastructure.app.services
             }
 
             var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
-            if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
+            if (string.IsNullOrWhiteSpace(binRoot))
+            {
+                binRoot = "c:\\tools";
+            }
 
             return _fileSystem.CombinePaths(binRoot, "cygwin");
         }
@@ -212,6 +218,11 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
         {
+            if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
+            {
+                throw new NotImplementedException("Alternative sources do not allow the use of the 'all' package name/keyword.");
+            }
+
             var args = BuildArgs(config, _installArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
 
@@ -227,7 +238,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                             if (_installedRegex.IsMatch(logMessage))
@@ -241,7 +256,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
                         },
                     updateProcessPath: false,
@@ -275,7 +294,7 @@ namespace chocolatey.infrastructure.app.services
             return string.Empty;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public const string CYGWIN_PACKAGE = CygwinPackage;
 
@@ -300,6 +319,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
             => Install(config, continueAction, beforeModifyAction);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

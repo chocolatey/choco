@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using NuGet.Packaging;
+using NuGet.Versioning;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-    using NuGet.Packaging;
-    using NuGet.Versioning;
-    using results;
-
     public sealed class ChocolateyPackageInformation
     {
         public ChocolateyPackageInformation(IPackageMetadata package)
@@ -36,5 +36,6 @@ namespace chocolatey.infrastructure.app.domain
         public bool HasSilentUninstall { get; set; }
         public bool IsPinned { get; set; }
         public string ExtraInformation { get; set; }
+        public string DeploymentLocation { get; set; }
     }
 }

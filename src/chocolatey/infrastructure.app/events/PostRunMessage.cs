@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.events;
+
 namespace chocolatey.infrastructure.app.events
 {
-    using configuration;
-    using infrastructure.commands;
-    using infrastructure.events;
-
     public class PostRunMessage : IMessage
     {
         public ChocolateyConfiguration Configuration { get; private set; }
 
         public PostRunMessage(ChocolateyConfiguration configuration)
         {
-            this.Configuration = configuration;
+            Configuration = configuration;
         }
     }
 
@@ -39,7 +39,7 @@ namespace chocolatey.infrastructure.app.events
         public PostRunMessage(TCommand command, ChocolateyConfiguration configuration, object[] state)
         {
             Command = command;
-            this.Configuration = configuration;
+            Configuration = configuration;
             State = state;
         }
     }

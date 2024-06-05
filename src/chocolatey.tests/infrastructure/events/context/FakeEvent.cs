@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.events;
+
 namespace chocolatey.tests.infrastructure.events.context
 {
-    using chocolatey.infrastructure.events;
-
     public class FakeEvent : IMessage
     {
         public FakeEvent(string name, double digits)

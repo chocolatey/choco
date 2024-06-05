@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.adapters;
+using System;
+using DateTime = System.DateTime;
+
 namespace chocolatey.infrastructure.licensing
 {
-    using adapters;
-    using System;
-    using DateTime = System.DateTime;
-
     public sealed class ChocolateyLicense
     {
         public string Id { get; set; }
@@ -42,10 +42,10 @@ namespace chocolatey.infrastructure.licensing
                 ;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public bool is_licensed_version()
             => IsLicensedVersion();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

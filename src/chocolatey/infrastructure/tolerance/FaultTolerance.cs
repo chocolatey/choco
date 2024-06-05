@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey.infrastructure.tolerance
 {
-    using System;
-    using System.Threading;
-    using configuration;
-    using logging;
-
     /// <summary>
     /// Provides methods that are able to tolerate faults and recover
     /// </summary>
@@ -51,7 +51,10 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="isSilent">Log messages?</param>
         public static void Retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
-            if (action == null) return;
+            if (action == null)
+            {
+                return;
+            }
 
             var success = Retry(
                 numberOfTries,
@@ -78,15 +81,26 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="isSilent">Log messages?</param>
         public static T Retry<T>(int numberOfTries, Func<T> function, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
         {
-            if (function == null) return default(T);
-            if (numberOfTries == 0) throw new ApplicationException("You must specify a number of tries greater than zero.");
+            if (function == null)
+            {
+                return default(T);
+            }
+
+            if (numberOfTries == 0)
+            {
+                throw new ApplicationException("You must specify a number of tries greater than zero.");
+            }
+
             var returnValue = default(T);
 
             var debugging = InDebugMode();
             var logLocation = ChocolateyLoggers.Normal;
-            if (isSilent) logLocation = ChocolateyLoggers.LogFileOnly;
+            if (isSilent)
+            {
+                logLocation = ChocolateyLoggers.LogFileOnly;
+            }
 
-            for (int i = 1; i <= numberOfTries; i++)
+            for (var i = 1; i <= numberOfTries; i++)
             {
                 try
                 {
@@ -101,7 +115,7 @@ namespace chocolatey.infrastructure.tolerance
                         throw;
                     }
 
-                    int retryWait = waitDurationMilliseconds + (i*increaseRetryByMilliseconds);
+                    var retryWait = waitDurationMilliseconds + (i * increaseRetryByMilliseconds);
 
                     var exceptionMessage = debugging ? ex.ToString() : ex.Message;
 
@@ -129,7 +143,10 @@ namespace chocolatey.infrastructure.tolerance
         /// <param name="isSilent">Log messages?</param>
         public static void TryCatchWithLoggingException(Action action, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
         {
-            if (action == null) return;
+            if (action == null)
+            {
+                return;
+            }
 
             var success = TryCatchWithLoggingException(
                 () =>
@@ -158,11 +175,18 @@ namespace chocolatey.infrastructure.tolerance
         /// <returns>The return value from the function</returns>
         public static T TryCatchWithLoggingException<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
         {
-            if (function == null) return default(T);
+            if (function == null)
+            {
+                return default(T);
+            }
+
             var returnValue = default(T);
 
             var logLocation = ChocolateyLoggers.Normal;
-            if (isSilent) logLocation = ChocolateyLoggers.LogFileOnly;
+            if (isSilent)
+            {
+                logLocation = ChocolateyLoggers.LogFileOnly;
+            }
 
             try
             {
@@ -194,7 +218,7 @@ namespace chocolatey.infrastructure.tolerance
             return returnValue;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void retry(int numberOfTries, Action action, int waitDurationMilliseconds = 100, int increaseRetryByMilliseconds = 0, bool isSilent = false)
             => Retry(numberOfTries, action, waitDurationMilliseconds, increaseRetryByMilliseconds, isSilent);
@@ -210,6 +234,6 @@ namespace chocolatey.infrastructure.tolerance
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static T try_catch_with_logging_exception<T>(Func<T> function, string errorMessage, bool throwError = false, bool logWarningInsteadOfError = false, bool logDebugInsteadOfError = false, bool isSilent = false)
             => TryCatchWithLoggingException(function, errorMessage, throwError, logWarningInsteadOfError, logDebugInsteadOfError, isSilent);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

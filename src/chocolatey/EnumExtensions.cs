@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
+
 namespace chocolatey
 {
-    using System;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Reflection;
-
     /// <summary>
     ///   Extensions for Enum
     /// </summary>
@@ -32,14 +32,14 @@ namespace chocolatey
         /// <param name="enumeration">The enumeration item.</param>
         public static string DescriptionOrValue(this Enum enumeration)
         {
-            string description = enumeration.ToString();
+            var description = enumeration.ToString();
 
             Type type = enumeration.GetType();
             MemberInfo[] memberInfo = type.GetMember(description);
 
             if (memberInfo != null && memberInfo.Length > 0)
             {
-                var attrib = memberInfo[0].GetCustomAttributes(typeof (DescriptionAttribute), false).Cast<DescriptionAttribute>().SingleOrDefault();
+                var attrib = memberInfo[0].GetCustomAttributes(typeof(DescriptionAttribute), false).Cast<DescriptionAttribute>().SingleOrDefault();
 
                 if (attrib != null)
                 {
@@ -53,20 +53,20 @@ namespace chocolatey
         public static TEnum ParseEnumDescription<TEnum>(this string description)
             where TEnum : struct, Enum
         {
-            Type type = typeof (TEnum);
+            Type type = typeof(TEnum);
             foreach (var fieldInfo in type.GetFields())
             {
-                var attr = fieldInfo.GetCustomAttributes(typeof (DescriptionAttribute), false).Cast<DescriptionAttribute>().SingleOrDefault();
+                var attr = fieldInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).Cast<DescriptionAttribute>().SingleOrDefault();
                 if (attr != null && attr.Description.Equals(description, StringComparison.Ordinal))
                 {
-                    return (TEnum) fieldInfo.GetValue(null);
+                    return (TEnum)fieldInfo.GetValue(null);
                 }
             }
 
             return default(TEnum);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_description_or_value(this Enum enumeration)
             => DescriptionOrValue(enumeration);
@@ -75,6 +75,6 @@ namespace chocolatey
         public static TEnum parse_enum_from_description<TEnum>(this string description)
             where TEnum : struct, Enum
             => ParseEnumDescription<TEnum>(description);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

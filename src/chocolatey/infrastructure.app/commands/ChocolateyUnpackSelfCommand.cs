@@ -14,30 +14,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.extractors;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+#if !NoResources
+using chocolatey.resources;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using adapters;
-    using attributes;
-    using commandline;
-    using configuration;
-    using extractors;
-    using filesystem;
-    using infrastructure.commands;
-    using logging;
-#if !NoResources
-    using resources;
 #endif
 
-    [CommandFor("unpackself", "re-installs Chocolatey base files")]
+    [CommandFor("unpackself", "[DEPRECATED] will be removed in v3.0.0 - re-installs Chocolatey base files")]
     public class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;
 
 #if !NoResources
-        private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => adapters.Assembly.GetAssembly(typeof (ChocolateyResourcesAssembly)));
+        private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => adapters.Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)));
 #else
         private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>();
 #endif
@@ -68,12 +69,17 @@ namespace chocolatey.infrastructure.app.commands
 
         public virtual void Validate(ChocolateyConfiguration configuration)
         {
+            this.Log().Warn(ChocolateyLoggers.Important, @"
+DEPRECATION NOTICE - choco unpackself command is deprecated and will be 
+ removed in version 3.0.0.");
         }
 
         public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
-            this.Log().Info(ChocolateyLoggers.Important, "UnpackSelf Command");
+            this.Log().Info(ChocolateyLoggers.Important, "[DEPRECATED] UnpackSelf Command");
             this.Log().Info(@"
+NOTE: Unpackself has been deprecated and will be removed in version 3.0.0. 
+
 This will unpack files needed by choco. It will overwrite existing
  files only if --force is specified.
 
@@ -121,7 +127,7 @@ NOTE: This command should only be used when installing Chocolatey, not
             return true;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -149,6 +155,6 @@ NOTE: This command should only be used when installing Chocolatey, not
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual bool may_require_admin_access()
             => MayRequireAdminAccess();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

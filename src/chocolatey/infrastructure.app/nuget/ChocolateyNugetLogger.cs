@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
+using chocolatey.infrastructure.logging;
+using NuGet.Common;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.IO;
-    using System.Text;
-    using System.Threading.Tasks;
-    using logging;
-    using NuGet.Common;
-
     public sealed class ChocolateyNugetLogger : ILogger
     {
         public void LogDebug(string message)

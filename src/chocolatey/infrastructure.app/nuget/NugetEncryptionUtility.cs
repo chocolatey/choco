@@ -14,14 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.cryptography;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.ComponentModel;
-    using System.Text;
-    using adapters;
-    using cryptography;
-
     public static class NugetEncryptionUtility
     {
         private static Lazy<IEncryptionUtility> _encryptionUtility = new Lazy<IEncryptionUtility>(() => new DefaultEncryptionUtility());
@@ -52,11 +52,11 @@ namespace chocolatey.infrastructure.app.nuget
             return EncryptionUtility.GenerateUniqueToken(caseInsensitiveKey);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IEncryptionUtility> encryptionUtility)
             => InitializeWith(encryptionUtility);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

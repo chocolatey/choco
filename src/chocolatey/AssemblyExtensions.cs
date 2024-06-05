@@ -14,17 +14,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using chocolatey.infrastructure.app.registration;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.adapters;
+
 namespace chocolatey
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using chocolatey.infrastructure.app.registration;
-    using chocolatey.infrastructure.logging;
-    using infrastructure.adapters;
-
     /// <summary>
     ///   Extensions for Assembly
     /// </summary>
@@ -38,7 +38,7 @@ namespace chocolatey
         /// <returns></returns>
         public static string GetManifestString(this IAssembly assembly, string manifestResourceStreamLocation)
         {
-            string manifestFileText = "";
+            var manifestFileText = "";
 
             using (Stream manifestFileStream = assembly.GetManifestResourceStream(manifestResourceStreamLocation))
             {
@@ -75,18 +75,27 @@ namespace chocolatey
         /// <remarks>Borrowed heavily from http://dhvik.blogspot.com/2009/05/assemblynamegetpublickeytoken-tostring.html </remarks>
         public static string GetPublicKeyToken(this IAssembly assembly)
         {
-            if (assembly == null) return string.Empty;
+            if (assembly == null)
+            {
+                return string.Empty;
+            }
 
             return assembly.GetName().GetPublicKeyTokenString();
         }
 
         public static string GetPublicKeyTokenString(this AssemblyName assemblyName)
         {
-            if (assemblyName == null) return string.Empty;
+            if (assemblyName == null)
+            {
+                return string.Empty;
+            }
 
-            byte[] publicKeyToken = assemblyName.GetPublicKeyToken();
+            var publicKeyToken = assemblyName.GetPublicKeyToken();
 
-            if (publicKeyToken == null || publicKeyToken.Length == 0) return string.Empty;
+            if (publicKeyToken == null || publicKeyToken.Length == 0)
+            {
+                return string.Empty;
+            }
 
             return publicKeyToken.Select(x => x.ToString("x2")).Aggregate((x, y) => x + y);
         }
@@ -139,7 +148,7 @@ namespace chocolatey
             return result;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_manifest_string(this IAssembly assembly, string manifestResourceStreamLocation)
             => GetManifestString(assembly, manifestResourceStreamLocation);
@@ -163,6 +172,6 @@ namespace chocolatey
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IEnumerable<IExtensionModule> get_extension_modules(this IAssembly assembly)
             => GetExtensionModules(assembly);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

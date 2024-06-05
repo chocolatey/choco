@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using System;
-    using System.Collections.Generic;
-
     public interface IContainerResolver
     {
         TService Resolve<TService>()
@@ -27,7 +27,7 @@ namespace chocolatey.infrastructure.app.registration
         IEnumerable<TService> ResolveAll<TService>()
             where TService : class;
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         TService resolve<TService>()
             where TService : class;
@@ -35,6 +35,6 @@ namespace chocolatey.infrastructure.app.registration
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         IEnumerable<TService> resolve_all<TService>()
             where TService : class;
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

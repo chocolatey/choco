@@ -17,10 +17,12 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.registration;
 using chocolatey.infrastructure.app.services;
 using chocolatey.infrastructure.filesystem;
 using chocolatey.infrastructure.results;
@@ -28,14 +30,12 @@ using chocolatey.infrastructure.services;
 using Moq;
 using NUnit.Framework;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using NuGet.Packaging;
 
 namespace chocolatey.tests.infrastructure.app.services
 {
-    using System.IO;
-    using chocolatey.infrastructure.app.registration;
-    using NuGet.Packaging;
-
     public class ChocolateyPackageServiceSpecs
     {
         public abstract class ChocolateyPackageServiceSpecsBase : TinySpec
@@ -396,7 +396,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 Action = () => Service.Upgrade(Configuration);
                 Configuration.CommandName = "upgrade";
             }
-        }
+        }   
 
         public class When_ChocolateyPackageService_tries_to_upgrade_noop_nupkg_file : When_ChocolateyPackageService_tries_to_install_nupkg_file
         {
@@ -405,6 +405,82 @@ namespace chocolatey.tests.infrastructure.app.services
                 base.Context();
                 Action = () => Service.UpgradeDryRun(Configuration);
                 Configuration.CommandName = "upgrade";
+            }
+        }
+
+        public class When_ChocolateyPackageService_tries_to_upgrade_a_package_that_doesnt_need_upgraded : ChocolateyPackageServiceSpecsBase
+        {
+            private ConcurrentDictionary<string, PackageResult> _result;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = "alreadyupgraded";
+                Configuration.Sources = @"c:\packages";
+                Configuration.Features.UseEnhancedExitCodes = false;
+
+                var package = new Mock<IPackageMetadata>();
+                var expectedResult = new ConcurrentDictionary<string, PackageResult>();
+                var packageResult = new PackageResult(package.Object, @"c:\programdata\chocolatey\lib\alreadyupgraded", null);
+                var logMessage = "alreadyupgraded v1.2.3 is the latest version available based on your source(s).";
+                packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                expectedResult.TryAdd("alreadyupgraded", packageResult);
+
+                NugetService.Setup(n => n.Upgrade(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()))
+                    .Returns(expectedResult);
+            }
+
+            public override void Because()
+            {
+                _result = Service.Upgrade(Configuration);
+            }
+
+            [Fact]
+            public void Should_Return_0_Exit_Code()
+            {
+                using(new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().Contain(m => m.Contains("Chocolatey upgraded 0/1 packages."));
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+        }
+
+        public class When_ChocolateyPackageService_tries_to_upgrade_a_package_that_doesnt_need_upgraded_using_enhanced_exitcodes : ChocolateyPackageServiceSpecsBase
+        {
+            private ConcurrentDictionary<string, PackageResult> _result;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = "alreadyupgraded";
+                Configuration.Sources = @"c:\packages";
+                Configuration.Features.UseEnhancedExitCodes = true;
+
+                var package = new Mock<IPackageMetadata>();
+                var expectedResult = new ConcurrentDictionary<string, PackageResult>();
+                var packageResult = new PackageResult(package.Object, @"c:\programdata\chocolatey\lib\alreadyupgraded", null);
+                var logMessage = "alreadyupgraded v1.2.3 is the latest version available based on your source(s).";
+                packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+                expectedResult.TryAdd("alreadyupgraded", packageResult);
+
+                NugetService.Setup(n => n.Upgrade(It.IsAny<ChocolateyConfiguration>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>(), It.IsAny<Action<PackageResult, ChocolateyConfiguration>>()))
+                    .Returns(expectedResult);
+            }
+
+            public override void Because()
+            {
+                _result = Service.Upgrade(Configuration);
+            }
+
+            [Fact]
+            public void Should_Return_0_Exit_Code()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().Contain(m => m.Contains("Chocolatey upgraded 0/1 packages."));
+                    Environment.ExitCode.Should().Be(2);
+                }
             }
         }
     }

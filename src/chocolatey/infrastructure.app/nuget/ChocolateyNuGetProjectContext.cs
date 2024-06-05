@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using chocolatey.infrastructure.app.configuration;
+using NuGet.Common;
+using NuGet.Packaging;
+using NuGet.ProjectManagement;
+using chocolatey.infrastructure.logging;
+using NuGet.Configuration;
+using NuGet.Packaging.Signing;
 
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System.Xml.Linq;
-    using configuration;
-    using NuGet.Common;
-    using NuGet.Packaging;
-    using NuGet.ProjectManagement;
-    using logging;
-    using NuGet.Configuration;
-    using NuGet.Packaging.Signing;
-
     public class ChocolateyNuGetProjectContext : INuGetProjectContext
     {
         private readonly ILogger _logger;
@@ -24,7 +23,7 @@ namespace chocolatey.infrastructure.app.nuget
             //TODO, set client policy correctly here with settings, fix in chocolatey implementation of ISettings for this purpose
             var chocolateyNugetSettings = new ChocolateyNuGetSettings(config);
             var clientPolicyContext = ClientPolicyContext.GetClientPolicy(chocolateyNugetSettings, logger);
-            _extractionContext = new PackageExtractionContext(
+            PackageExtractionContext = new PackageExtractionContext(
                 PackageSaveMode.Nupkg | PackageSaveMode.Nuspec | PackageSaveMode.Files,
                 XmlDocFileSaveMode.None,
                 clientPolicyContext,
@@ -32,8 +31,6 @@ namespace chocolatey.infrastructure.app.nuget
                 );
             _logger = logger;
         }
-
-        private PackageExtractionContext _extractionContext;
 
         public void Log(MessageLevel level, string message, params object[] args)
         {
@@ -75,20 +72,24 @@ namespace chocolatey.infrastructure.app.nuget
             return FileConflictAction.OverwriteAll;
         }
 
-        public PackageExtractionContext PackageExtractionContext
+        public PackageExtractionContext PackageExtractionContext { get; set; }
+
+        public ISourceControlManagerProvider SourceControlManagerProvider
         {
             get
             {
-                return _extractionContext;
-            }
-            set
-            {
-                _extractionContext = value;
+                return null;
             }
         }
 
-        public ISourceControlManagerProvider SourceControlManagerProvider => null;
-        public ExecutionContext ExecutionContext => null;
+        public ExecutionContext ExecutionContext
+        {
+            get
+            {
+                return null;
+            }
+        }
+
         public XDocument OriginalPackagesConfig { get; set; }
         public NuGetActionType ActionType { get; set; }
         public Guid OperationId { get; set; }

@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace chocolatey.infrastructure.results
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     /// <summary>
     ///   Outcome from some work performed
     /// </summary>
@@ -46,9 +46,9 @@ namespace chocolatey.infrastructure.results
             get { return LazyMessages.Value; }
         }
 
-#pragma warning disable IDE1006 // Naming Styles
+#pragma warning disable IDE0022, IDE1006 // Naming Styles
         [Obsolete("This field is deprecated and will be removed in v3. Use LazyMessages or Messages instead.")]
         protected readonly Lazy<List<ResultMessage>> _messages;
-#pragma warning restore IDE1006 // Naming Styles
+#pragma warning restore IDE0022, IDE1006 // Naming Styles
     }
 }

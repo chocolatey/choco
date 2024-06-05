@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
+using System.Security.Principal;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.nuget;
+using Environment = chocolatey.infrastructure.adapters.Environment;
+
 namespace chocolatey.infrastructure.app.configuration
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Linq;
-    using System.Reflection;
-    using System.Security.Principal;
-    using System.Text;
-    using adapters;
-    using logging;
-    using nuget;
-    using Environment = adapters.Environment;
-
     public static class EnvironmentSettings
     {
         private const string SetEnvironmentMethod = "SetEnvironment";
@@ -45,7 +45,9 @@ namespace chocolatey.infrastructure.app.configuration
             get { return _environmentInitializer.Value; }
         }
 
+#pragma warning disable IDE0060 // Unused method parameter
         public static void ResetEnvironmentVariables(ChocolateyConfiguration config)
+#pragma warning restore IDE0060 // Unused method parameter
         {
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, null);
             Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType, null);
@@ -86,11 +88,30 @@ namespace chocolatey.infrastructure.app.configuration
             Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
             Environment.SetEnvironmentVariable("TMP", config.CacheLocation);
 
-            if (config.Debug) Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
-            if (config.Verbose) Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
-            if (!config.Features.ChecksumFiles) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyIgnoreChecksums, "true");
-            if (config.Features.AllowEmptyChecksums) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksums, "true");
-            if (config.Features.AllowEmptyChecksumsSecure) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, "true");
+            if (config.Debug)
+            {
+                Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
+            }
+
+            if (config.Verbose)
+            {
+                Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
+            }
+
+            if (!config.Features.ChecksumFiles)
+            {
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyIgnoreChecksums, "true");
+            }
+
+            if (config.Features.AllowEmptyChecksums)
+            {
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksums, "true");
+            }
+
+            if (config.Features.AllowEmptyChecksumsSecure)
+            {
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, "true");
+            }
 
             Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.ToStringSafe() + "000");
 
@@ -123,12 +144,27 @@ namespace chocolatey.infrastructure.app.configuration
 
                 }
 
-                if (config.Proxy.BypassOnLocal) Environment.SetEnvironmentVariable("chocolateyProxyBypassOnLocal", "true");
+                if (config.Proxy.BypassOnLocal)
+                {
+                    Environment.SetEnvironmentVariable("chocolateyProxyBypassOnLocal", "true");
+                }
             }
 
-            if (config.Features.UsePowerShellHost) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, "true");
-            if (config.Force) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, "true");
-            if (config.Features.ExitOnRebootDetected) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyExitOnRebootDetected, "true");
+            if (config.Features.UsePowerShellHost)
+            {
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, "true");
+            }
+
+            if (config.Force)
+            {
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, "true");
+            }
+
+            if (config.Features.ExitOnRebootDetected)
+            {
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyExitOnRebootDetected, "true");
+            }
+
             SetLicensedEnvironment(config);
         }
 
@@ -149,27 +185,35 @@ namespace chocolatey.infrastructure.app.configuration
 
                 if (licensedEnvironmentSettings == null)
                 {
-                    if (config.RegularOutput) "chocolatey".Log().Warn(
+                    if (config.RegularOutput)
+                    {
+                        "chocolatey".Log().Warn(
                         ChocolateyLoggers.Important, @"Unable to set licensed environment settings. Please upgrade to a newer
  licensed version (choco upgrade chocolatey.extension).");
+                    }
+
                     return;
                 }
                 try
                 {
-                    object componentClass = Activator.CreateInstance(licensedEnvironmentSettings);
+                    var componentClass = Activator.CreateInstance(licensedEnvironmentSettings);
 
                     licensedEnvironmentSettings.InvokeMember(
                         SetEnvironmentMethod,
                         BindingFlags.InvokeMethod,
                         null,
                         componentClass,
-                        new Object[] { config }
+                        new object[] { config }
                         );
                 }
                 catch (Exception ex)
                 {
                     var isDebug = ApplicationParameters.IsDebugModeCliPrimitive();
-                    if (config.Debug) isDebug = true;
+                    if (config.Debug)
+                    {
+                        isDebug = true;
+                    }
+
                     var message = isDebug ? ex.ToString() : ex.Message;
 
                     if (isDebug && ex.InnerException != null)
@@ -234,11 +278,21 @@ namespace chocolatey.infrastructure.app.configuration
                 "chocolatey".Log().Debug("Unable to determine current user to determine if LocalSystem account (to skip user env vars).{0} Reported error: {1}".FormatWith(Environment.NewLine, ex.Message));
             }
 
-            if (setUserEnvironmentVariables) RefreshEnvironmentVariables(userVariables);
+            if (setUserEnvironmentVariables)
+            {
+                RefreshEnvironmentVariables(userVariables);
+            }
 
             // restore process overridden variables
-            if (originalEnvironmentVariables.Contains(ApplicationParameters.Environment.Username)) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.Username, userName);
-            if (originalEnvironmentVariables.Contains(ApplicationParameters.Environment.ProcessorArchitecture)) Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ProcessorArchitecture, architecture);
+            if (originalEnvironmentVariables.Contains(ApplicationParameters.Environment.Username))
+            {
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.Username, userName);
+            }
+
+            if (originalEnvironmentVariables.Contains(ApplicationParameters.Environment.ProcessorArchitecture))
+            {
+                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ProcessorArchitecture, architecture);
+            }
 
             // combine environment values that append together
             var updatedPath = "{0};{1};".FormatWith(
@@ -257,7 +311,7 @@ namespace chocolatey.infrastructure.app.configuration
             // add back in process items
             updatedPath += GetProcessOnlyItems(updatedPath, originalPath);
             updatedPathExt += GetProcessOnlyItems(updatedPathExt, originalPathExt);
-            updatedPsModulePath = "{0};{1}".FormatWith(GetProcessOnlyItems(updatedPsModulePath, originalPsModulePath),updatedPsModulePath);
+            updatedPsModulePath = "{0};{1}".FormatWith(GetProcessOnlyItems(updatedPsModulePath, originalPsModulePath), updatedPsModulePath);
 
             if (!updatedPsModulePath.ContainsSafe(ApplicationParameters.PowerShellModulePathProcessProgramFiles))
             {
@@ -281,7 +335,10 @@ namespace chocolatey.infrastructure.app.configuration
 
         private static IDictionary ConvertToCaseInsensitiveDictionary(IDictionary originalDictionary)
         {
-            if (originalDictionary == null) return new Hashtable(new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase);
+            if (originalDictionary == null)
+            {
+                return new Hashtable(new Dictionary<string, string>(), StringComparer.OrdinalIgnoreCase);
+            }
 
             return new Hashtable(originalDictionary, StringComparer.OrdinalIgnoreCase);
         }
@@ -302,7 +359,7 @@ namespace chocolatey.infrastructure.app.configuration
                 StringSplitOptions.RemoveEmptyEntries
                 );
 
-            foreach (string originalValue in originalValues.OrEmpty())
+            foreach (var originalValue in originalValues.OrEmpty())
             {
                 if (!items.Contains(originalValue, StringComparer.InvariantCultureIgnoreCase))
                 {
@@ -313,7 +370,7 @@ namespace chocolatey.infrastructure.app.configuration
             return additionalItems.ToStringSafe();
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IEnvironment> environment)
@@ -330,6 +387,6 @@ namespace chocolatey.infrastructure.app.configuration
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void update_environment_variables()
             => UpdateEnvironmentVariables();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

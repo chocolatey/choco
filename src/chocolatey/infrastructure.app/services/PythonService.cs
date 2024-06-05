@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Microsoft.Win32;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using Microsoft.Win32;
-    using configuration;
-    using domain;
-    using filesystem;
-    using infrastructure.commands;
-    using logging;
-    using results;
-    using platforms;
-
     /// <summary>
     ///   Alternative Source for Installing Python packages
     /// </summary>
@@ -172,7 +172,10 @@ namespace chocolatey.infrastructure.app.services
 
         public void EnsureSourceAppInstalled(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                throw new NotImplementedException("This source is not supported on non-Windows systems");
+            }
 
             //ensure at least python 2.7.9 is installed
             var python = _fileSystem.GetExecutablePath("python");
@@ -212,7 +215,10 @@ namespace chocolatey.infrastructure.app.services
 
         private void EnsureExecutablePathSet()
         {
-            if (!string.IsNullOrWhiteSpace(_exePath)) return;
+            if (!string.IsNullOrWhiteSpace(_exePath))
+            {
+                return;
+            }
 
             var python = _fileSystem.GetExecutablePath("python");
 
@@ -245,7 +251,10 @@ namespace chocolatey.infrastructure.app.services
             if (string.IsNullOrWhiteSpace(topLevelPath))
             {
                 var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
-                if (string.IsNullOrWhiteSpace(binRoot)) binRoot = "c:\\tools";
+                if (string.IsNullOrWhiteSpace(binRoot))
+                {
+                    binRoot = "c:\\tools";
+                }
 
                 topLevelPath = _fileSystem.CombinePaths(binRoot, "python");
             }
@@ -256,7 +265,10 @@ namespace chocolatey.infrastructure.app.services
                 _exePath = pipPath;
             }
 
-            if (string.IsNullOrWhiteSpace(_exePath)) throw new FileNotFoundException("Unable to find pip");
+            if (string.IsNullOrWhiteSpace(_exePath))
+            {
+                throw new FileNotFoundException("Unable to find pip");
+            }
         }
 
         private string BuildArguments(ChocolateyConfiguration config, IDictionary<string, ExternalCommandArgument> argsDictionary)
@@ -302,7 +314,11 @@ namespace chocolatey.infrastructure.app.services
                 stdOutAction: (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         if (!config.QuietOutput)
                         {
                             this.Log().Info(logMessage.EscapeCurlyBraces());
@@ -314,7 +330,11 @@ namespace chocolatey.infrastructure.app.services
                     },
                 stdErrAction: (s, e) =>
                     {
-                        if (string.IsNullOrWhiteSpace(e.Data)) return;
+                        if (string.IsNullOrWhiteSpace(e.Data))
+                        {
+                            return;
+                        }
+
                         this.Log().Error(() => "{0}".FormatWith(e.Data.EscapeCurlyBraces()));
                     },
                 updateProcessPath: false,
@@ -338,6 +358,11 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
         {
+            if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
+            {
+                throw new NotImplementedException("Alternative sources do not allow the use of the 'all' package name/keyword.");
+            }
+
             EnsureExecutablePathSet();
             var args = BuildArguments(config, _installArguments);
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
@@ -359,7 +384,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -379,7 +408,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -413,7 +446,7 @@ namespace chocolatey.infrastructure.app.services
         {
             if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
             {
-                throw new NotImplementedException("The all keyword is not available for alternate sources");
+                throw new NotImplementedException("Alternative sources do not allow the use of the 'all' package name/keyword.");
             }
 
             EnsureExecutablePathSet();
@@ -438,7 +471,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -458,7 +495,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -505,7 +546,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -525,7 +570,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                         if (_errorRegex.IsMatch(logMessage) || _errorNotFoundRegex.IsMatch(logMessage))
@@ -565,7 +614,7 @@ namespace chocolatey.infrastructure.app.services
             return string.Empty;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public const string PYTHON_PACKAGE = PythonPackage;
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -628,6 +677,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null)
             => Uninstall(config, continueAction, beforeUninstallAction);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

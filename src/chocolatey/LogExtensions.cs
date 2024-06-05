@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey
 {
-    using System;
-    using System.Collections.Concurrent;
-    using infrastructure.logging;
-
     /// <summary>
     ///   Extensions to help make logging awesome
     /// </summary>
@@ -55,9 +55,11 @@ namespace chocolatey
         /// <typeparam name="T"></typeparam>
         /// <param name="type">The type to get the logger for.</param>
         /// <returns>Instance of a logger for the object.</returns>
+#pragma warning disable IDE0060 // Unused method parameter
         public static ILog Log<T>(this T type)
+#pragma warning restore IDE0060 // Unused method parameter
         {
-            string objectName = typeof (T).FullName;
+            var objectName = typeof(T).FullName;
             return Log(objectName);
         }
 

@@ -14,18 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Runtime.InteropServices;
+using System.Security.Principal;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.information
 {
-    using System;
-    using System.Runtime.InteropServices;
-    using System.Security.Principal;
-    using platforms;
-
     public sealed class ProcessInformation
     {
         public static bool UserIsAdministrator()
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) return false;
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                return false;
+            }
 
             var isAdmin = false;
 
@@ -38,7 +41,10 @@ namespace chocolatey.infrastructure.information
 
                     // Any version of Windows less than 6 does not have UAC
                     // so bail with the answer from the above check
-                    if (Platform.GetVersion().Major < 6) return isAdmin;
+                    if (Platform.GetVersion().Major < 6)
+                    {
+                        return isAdmin;
+                    }
 
                     if (!isAdmin)
                     {
@@ -63,7 +69,7 @@ namespace chocolatey.infrastructure.information
                         "chocolatey".Log().Debug(@"User may be subject to UAC, checking for a split token (not 100%
  effective).");
 
-                        int tokenInfLength = Marshal.SizeOf(typeof(int));
+                        var tokenInfLength = Marshal.SizeOf(typeof(int));
                         IntPtr tokenInformation = Marshal.AllocHGlobal(tokenInfLength);
 
                         try
@@ -74,7 +80,10 @@ namespace chocolatey.infrastructure.information
                             if (!successfulCall)
                             {
                                 "chocolatey".Log().Warn("Error during native GetTokenInformation call - {0}".FormatWith(Marshal.GetLastWin32Error()));
-                                if (tokenInformation != IntPtr.Zero) Marshal.FreeHGlobal(tokenInformation);
+                                if (tokenInformation != IntPtr.Zero)
+                                {
+                                    Marshal.FreeHGlobal(tokenInformation);
+                                }
                             }
 
                             var elevationType = (TokenElevationType)Marshal.ReadInt32(tokenInformation);
@@ -91,7 +100,10 @@ namespace chocolatey.infrastructure.information
                         }
                         finally
                         {
-                            if (tokenInformation != IntPtr.Zero) Marshal.FreeHGlobal(tokenInformation);
+                            if (tokenInformation != IntPtr.Zero)
+                            {
+                                Marshal.FreeHGlobal(tokenInformation);
+                            }
                         }
                     }
                 }
@@ -102,7 +114,10 @@ namespace chocolatey.infrastructure.information
 
         public static bool IsElevated()
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) return false;
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                return false;
+            }
 
             using (var identity = WindowsIdentity.GetCurrent(TokenAccessLevels.Query | TokenAccessLevels.Duplicate))
             {
@@ -128,7 +143,10 @@ namespace chocolatey.infrastructure.information
 
         public static bool UserIsSystem()
         {
-             if (Platform.GetPlatform() != PlatformType.Windows) return false;
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                return false;
+            }
 
             var isSystem = false;
 
@@ -183,7 +201,7 @@ namespace chocolatey.infrastructure.information
         /// Passed to <see cref="GetTokenInformation"/> to specify what
         /// information about the token to return.
         /// </summary>
-        enum TokenInformationType
+        private enum TokenInformationType
         {
             TokenUser = 1,
             TokenGroups,
@@ -219,14 +237,14 @@ namespace chocolatey.infrastructure.information
         /// <summary>
         /// The elevation type for a user token.
         /// </summary>
-        enum TokenElevationType
+        private enum TokenElevationType
         {
             TokenElevationTypeDefault = 1,
             TokenElevationTypeFull,
             TokenElevationTypeLimited
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool user_is_administrator()
             => UserIsAdministrator();
@@ -246,6 +264,6 @@ namespace chocolatey.infrastructure.information
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool user_is_system()
             => UserIsSystem();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

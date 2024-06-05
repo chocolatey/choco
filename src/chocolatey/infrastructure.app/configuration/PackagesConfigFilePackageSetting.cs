@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Xml.Serialization;
+
 namespace chocolatey.infrastructure.app.configuration
 {
-    using System;
-    using System.Xml.Serialization;
-
     /// <summary>
     ///   XML packages.config file package element
     /// </summary>
@@ -58,7 +58,7 @@ namespace chocolatey.infrastructure.app.configuration
 
         [XmlAttribute(AttributeName = "pinPackage")]
         public bool PinPackage { get; set; }
-        
+
         [System.ComponentModel.DefaultValue(-1)]
         [XmlAttribute(AttributeName = "executionTimeout")]
         public int ExecutionTimeout { get; set; }

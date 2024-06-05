@@ -13,12 +13,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.app.utility
 {
-    using System;
-    using configuration;
-    using platforms;
-
     public class PackageUtility
     {
         /// <summary>
@@ -30,8 +30,15 @@ namespace chocolatey.infrastructure.app.utility
         /// <returns>true if the package is a dependency, false if the package is the one specified or a virtual/semi-virtual</returns>
         public static bool PackageIdHasDependencySuffix(ChocolateyConfiguration config, string packageName)
         {
-            if (string.IsNullOrWhiteSpace(config.PackageNames)) return true;
-            if (string.IsNullOrWhiteSpace(packageName)) return true;
+            if (string.IsNullOrWhiteSpace(config.PackageNames))
+            {
+                return true;
+            }
+
+            if (string.IsNullOrWhiteSpace(packageName))
+            {
+                return true;
+            }
 
             foreach (var package in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
             {
@@ -52,10 +59,10 @@ namespace chocolatey.infrastructure.app.utility
             return true;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static bool package_is_a_dependency(ChocolateyConfiguration config, string packageName)
             => PackageIdHasDependencySuffix(config, packageName);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

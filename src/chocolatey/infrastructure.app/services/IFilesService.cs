@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using configuration;
-    using domain;
-    using results;
-
     /// <summary>
     /// The files service for capturing and handling file snapshots.
     /// </summary>
@@ -79,7 +79,7 @@ namespace chocolatey.infrastructure.app.services
 
         bool MovePackageUsingBackupStrategy(string sourceFolder, string destinationFolder, bool restoreSource);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         PackageFiles read_from_file(string filepath);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -94,6 +94,6 @@ namespace chocolatey.infrastructure.app.services
         PackageFiles capture_package_files(string directory, ChocolateyConfiguration config);
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         PackageFile get_package_file(string file);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -11,6 +11,36 @@
         Remove-ChocolateyTestInstall
     }
 
+    Context "Upgrade pinned package using (<Command>) option" -ForEach @(
+        @{ Command = '--ignore-pinned' ; Contains = $true }
+        @{ Command = '' ; Contains = $false }
+    ) {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Package = 'upgradepackage'
+
+            # This test relies on the correct usage of the --pin option on the install
+            # command, but this is tested elsewhere
+            $null = Invoke-Choco install $Package --pin --version 1.0.0 --confirm
+            $null = Invoke-Choco upgrade $Package $Command --confirm
+            $Output = Invoke-Choco pin list
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Output should include upgraded package, with new pin in place" {
+            if ($Contains) {
+                $Output.String | Should -Match "$Package|1.1.0"
+            }
+            else {
+                $Output.String | Should -Match "$Package|1.0.0"
+            }
+        }
+    }
+
     Context "Upgrade package with (<Command>) specified" -ForEach @(
         @{ Command = '--pin' ; Contains = $true }
         @{ Command = '' ; Contains = $false }
@@ -70,6 +100,96 @@
             $line | Should -Match "installArguments:? ''"
             $line | Should -Match "packageParameters:? ''"
             $line | Should -Not -Match "-forceX86"
+        }
+    }
+
+    Context "Should include configured sources" {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateySource -Name hermes-setup
+            $null = Invoke-Choco install wget
+
+            $Output = Invoke-Choco upgrade wget --include-configured-sources --debug
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should mention that configured sources have been included" {
+            $Output.Lines | Should -Contain "Including sources from chocolatey.config file." -Because $Output.String
+        }
+    }
+
+    Context "Attempt to upgrade a package when there isn't an upgrade available" -Tag Internal {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateySource -Name hermes-setup
+            $null = Invoke-Choco install wget
+
+            $Output = Invoke-Choco upgrade wget
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Displays that upgrade was attempted but wasnt required' {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 0/1 packages." -Because $Output.String
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco upgrade wget
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It 'Displays that upgrade was attempted but wasnt required' {
+                $Output.Lines | Should -Contain "Chocolatey upgraded 0/1 packages." -Because $Output.String
+            }
+        }
+    }
+
+    Context "Attempt to run upgrade all when there isn't any upgrade available" -Tag Internal {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateySource -Name hermes-setup
+            $null = Invoke-Choco install wget
+            $null = Invoke-Choco install curl
+
+            $Output = Invoke-Choco upgrade all
+        }
+
+        It 'Exits with Success (0)' {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It 'Displays that upgrade was attempted but wasnt required' {
+            $Output.String | Should -MatchExactly "Chocolatey upgraded 0"
+        }
+
+        Context "when using enhanced exit codes" {
+            BeforeAll {
+                $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
+
+                $Output = Invoke-Choco upgrade all
+            }
+
+            It "Exits with ExitCode 2" {
+                $Output.ExitCode | Should -Be 2 -Because $Output.String
+            }
+
+            It 'Displays that upgrade was attempted but wasnt required' {
+                $Output.String | Should -MatchExactly "Chocolatey upgraded 0"
+            }
         }
     }
 
@@ -246,7 +366,7 @@ To upgrade a local, or remote file, you may use:
         }
 
         It 'Outputs software installation directory' {
-            $Output.Lines | Should -Contain "Software installed to '$env:ChocolateyInstall\lib\install-chocolateyzip\tools'" -Because $Output.String
+            $Output.Lines | Should -Contain "Deployed to '$env:ChocolateyInstall\lib\install-chocolateyzip\tools'" -Because $Output.String
         }
 
         It 'Should have cached installed directory in custom cache' {
@@ -548,7 +668,7 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    Context 'Upgrading a package where parent only contain pre-releases' -Tag Testing {
+    Context 'Upgrading a package where parent only contain pre-releases' {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 

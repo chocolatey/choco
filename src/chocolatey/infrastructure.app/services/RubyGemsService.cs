@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using configuration;
-    using domain;
-    using infrastructure.commands;
-    using logging;
-    using results;
-    using platforms;
-
     public sealed class RubyGemsService : IBootstrappableSourceRunner, IListSourceRunner, IInstallSourceRunner
     {
         private readonly ICommandExecutor _commandExecutor;
@@ -116,7 +116,10 @@ namespace chocolatey.infrastructure.app.services
 
         public void EnsureSourceAppInstalled(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
         {
-            if (Platform.GetPlatform() != PlatformType.Windows) throw new NotImplementedException("This source is not supported on non-Windows systems");
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                throw new NotImplementedException("This source is not supported on non-Windows systems");
+            }
 
             var runnerConfig = new ChocolateyConfiguration
             {
@@ -165,7 +168,11 @@ namespace chocolatey.infrastructure.app.services
                 stdOutAction: (s, e) =>
                     {
                         var logMessage = e.Data;
-                        if (string.IsNullOrWhiteSpace(logMessage)) return;
+                        if (string.IsNullOrWhiteSpace(logMessage))
+                        {
+                            return;
+                        }
+
                         if (!config.QuietOutput)
                         {
                             this.Log().Info(logMessage.EscapeCurlyBraces());
@@ -177,7 +184,11 @@ namespace chocolatey.infrastructure.app.services
                     },
                 stdErrAction: (s, e) =>
                     {
-                        if (string.IsNullOrWhiteSpace(e.Data)) return;
+                        if (string.IsNullOrWhiteSpace(e.Data))
+                        {
+                            return;
+                        }
+
                         this.Log().Error(() => "{0}".FormatWith(e.Data.EscapeCurlyBraces()));
                     },
                 updateProcessPath: false
@@ -200,6 +211,11 @@ namespace chocolatey.infrastructure.app.services
 
         public ConcurrentDictionary<string, PackageResult> Install(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
         {
+            if (config.PackageNames.IsEqualTo(ApplicationParameters.AllPackages))
+            {
+                throw new NotImplementedException("Alternative sources do not allow the use of the 'all' package name/keyword.");
+            }
+
             var packageResults = new ConcurrentDictionary<string, PackageResult>(StringComparer.InvariantCultureIgnoreCase);
             var args = ExternalCommandArgsBuilder.BuildArguments(config, _installArguments);
 
@@ -213,7 +229,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Info(() => " [{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                             if (_installingRegex.IsMatch(logMessage))
@@ -238,7 +258,11 @@ namespace chocolatey.infrastructure.app.services
                     (s, e) =>
                         {
                             var logMessage = e.Data;
-                            if (string.IsNullOrWhiteSpace(logMessage)) return;
+                            if (string.IsNullOrWhiteSpace(logMessage))
+                            {
+                                return;
+                            }
+
                             this.Log().Error("[{0}] {1}".FormatWith(AppName, logMessage.EscapeCurlyBraces()));
 
                             var packageName = GetValueFromOutput(logMessage, _packageNameErrorRegex, PackageNameGroup);
@@ -279,7 +303,7 @@ namespace chocolatey.infrastructure.app.services
             return string.Empty;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public const string RUBY_PORTABLE_PACKAGE = "ruby.portable";
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -322,6 +346,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
             => Install(config, continueAction, beforeModifyAction);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using SimpleInjector;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using System;
-    using System.Collections.Generic;
-    using SimpleInjector;
-
     internal class SimpleInjectorContainerResolver : IContainerResolver
     {
         private readonly Container _container;
@@ -41,7 +41,7 @@ namespace chocolatey.infrastructure.app.registration
             return _container.GetAllInstances<TService>();
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public TService resolve<TService>()
             where TService : class
@@ -51,6 +51,6 @@ namespace chocolatey.infrastructure.app.registration
         public IEnumerable<TService> resolve_all<TService>()
             where TService : class
             => ResolveAll<TService>();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+
 namespace chocolatey.infrastructure.xml
 {
-    using System.Xml;
-    using System.Xml.Schema;
-    using System.Xml.Serialization;
-
     /// <summary>
     ///   Xml CData autoconversion
     /// </summary>
@@ -49,7 +49,10 @@ namespace chocolatey.infrastructure.xml
         /// <returns></returns>
         public static implicit operator string(XmlCData cdata)
         {
-            if (cdata != null) return cdata._value.ToStringSafe();
+            if (cdata != null)
+            {
+                return cdata._value.ToStringSafe();
+            }
 
             return string.Empty;
         }

@@ -14,27 +14,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Configuration;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using ConfigurationBuilder = chocolatey.infrastructure.app.builders.ConfigurationBuilder;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.licensing;
+using Moq;
+using NUnit.Framework;
+using Container = SimpleInjector.Container;
+using License = System.ComponentModel.License;
+using chocolatey.infrastructure.registration;
+using Microsoft.Win32;
+using chocolatey.tests.integration.scenarios;
+using FluentAssertions;
+
 namespace chocolatey.tests.integration.infrastructure.app.builders
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Configuration;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.app;
-    using ConfigurationBuilder = chocolatey.infrastructure.app.builders.ConfigurationBuilder;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.licensing;
-    using Moq;
-    using NUnit.Framework;
-    using Container = SimpleInjector.Container;
-    using License = System.ComponentModel.License;
-    using chocolatey.infrastructure.registration;
-    using Microsoft.Win32;
-    using scenarios;
-    using FluentAssertions;
-
     public class ConfigurationBuilderSpecs
     {
         private const string IgnoreSystemProxyReason = "System Proxy not mockable";
@@ -104,7 +104,7 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
         [TestFixture(false, false, false, true, TestName = "Argument Set")]
         public class WhenProxyConfigurationTests : ProxyConfigurationBase
         {
-            public WhenProxyConfigurationTests(bool system, bool environment, bool config, bool argument) : base(system, environment, config, argument) {}
+            public WhenProxyConfigurationTests(bool system, bool environment, bool config, bool argument) : base(system, environment, config, argument) { }
             public override void Context()
             {
                 base.Context();

@@ -51,7 +51,7 @@ namespace chocolatey.infrastructure.cryptography
         /// <returns>A computed hash of the array, based on the contents.</returns>
         string ComputeByteArrayHash(byte[] buffer);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void set_hash_algorithm(CryptoHashProviderType algorithmType);
 
@@ -63,6 +63,6 @@ namespace chocolatey.infrastructure.cryptography
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         string hash_byte_array(byte[] buffer);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

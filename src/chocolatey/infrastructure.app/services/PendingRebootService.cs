@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using Microsoft.Win32;
+using chocolatey.infrastructure.platforms;
+using System;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using configuration;
-    using Microsoft.Win32;
-    using platforms;
-    using System;
-
     /// <summary>
     ///   Service to check for System level pending reboot request
     /// </summary>
@@ -69,7 +69,7 @@ namespace chocolatey.infrastructure.app.services
             var activeName = GetRegistryKeyString(path.FormatWith("ActiveComputerName"), "ComputerName");
             var pendingName = GetRegistryKeyString(path.FormatWith("ComputerName"), "ComputerName");
 
-            bool result = !string.IsNullOrWhiteSpace(activeName) &&
+            var result = !string.IsNullOrWhiteSpace(activeName) &&
                           !string.IsNullOrWhiteSpace(pendingName) &&
                           activeName != pendingName;
 
@@ -225,10 +225,10 @@ namespace chocolatey.infrastructure.app.services
             return versionNumber.Build >= 6001;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public bool is_pending_reboot(ChocolateyConfiguration config)
             => IsRebootPending(config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

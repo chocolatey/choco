@@ -13,20 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commandline;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.logging;
-    using chocolatey.infrastructure.results;
-
     [CommandFor("list", "lists local packages")]
     public class ChocolateyListCommand : IListCommand<PackageResult>
     {
@@ -95,7 +95,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Prerelease - Include Prereleases? Defaults to false.",
                      option => configuration.Prerelease = option != null)
                 .Add("i|includeprograms|include-programs",
-                     "IncludePrograms - Filters out apps Chocolatey has listed as packages and includes those in the list. Defaults to false.",
+                     "IncludePrograms - Includes software from Programs and Features not being managed by Chocolatey CLI.",
                      option => configuration.ListCommand.IncludeRegistryPrograms = option != null)
                 .Add("version=",
                      "Version - Specific version of a package to return.",
@@ -151,8 +151,8 @@ namespace chocolatey.infrastructure.app.commands
 
             foreach (var argument in unparsedArguments)
             {
-                bool isUnsupportedArgument = _unsupportedArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
-                bool isUnsupportedRegistryProgramsArgument = _unsupportedIncludeRegistryProgramsArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
+                var isUnsupportedArgument = _unsupportedArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
+                var isUnsupportedRegistryProgramsArgument = _unsupportedIncludeRegistryProgramsArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
 
                 if (isUnsupportedArgument || isUnsupportedRegistryProgramsArgument)
                 {
@@ -252,7 +252,7 @@ If you find other exit codes that we have not yet documented, please
         {
             // Would have liked to have done this in the Validate method, but can't, since the SourceType
             // hasn't yet been set, since the sources have not yet been parsed.
-            if (config.ListCommand.ExplicitSource && config.SourceType ==  SourceTypes.Normal)
+            if (config.ListCommand.ExplicitSource && config.SourceType == SourceTypes.Normal)
             {
                 throw new ApplicationException("When using the '--source' option with the 'choco list' command, only a named alternative source can be provided.");
             }
@@ -269,7 +269,7 @@ If you find other exit codes that we have not yet documented, please
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -305,6 +305,6 @@ If you find other exit codes that we have not yet documented, please
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual IEnumerable<PackageResult> list(ChocolateyConfiguration config)
             => List(config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

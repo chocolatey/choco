@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Xml.Serialization;
+
 namespace chocolatey.infrastructure.app.configuration
 {
-    using System;
-    using System.Xml.Serialization;
-
     /// <summary>
     ///   XML config file config element
     /// </summary>
@@ -43,7 +43,7 @@ namespace chocolatey.infrastructure.app.configuration
                 return false;
             }
 
-            var item = (ConfigFileConfigSetting) obj;
+            var item = (ConfigFileConfigSetting)obj;
 
             return (Key == item.Key)
                    && (Value == item.Value)

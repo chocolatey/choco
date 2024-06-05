@@ -1,4 +1,4 @@
-﻿#Requires -Module @{ ModuleName = 'pester'; ModuleVersion = '5.3.1' }
+#Requires -Module @{ ModuleName = 'pester'; ModuleVersion = '5.3.1' }
 #Requires -RunAsAdministrator
 <#
     .SYNOPSIS
@@ -22,7 +22,11 @@ param(
 
     # Indicate to skip packaging all of the tests packages. Useful for running tests after you've performed the tests previously.
     [switch]
-    $SkipPackaging
+    $SkipPackaging,
+
+    # Specific tag(s) of tests to run
+    [string[]]
+    $Tag
 )
 $packageRegex = 'chocolatey\.\d.*\.nupkg'
 
@@ -50,7 +54,7 @@ else {
 if (-not (Test-Path "$TestPath/packages") -or -not $SkipPackaging) {
     $null = New-Item -Path "$TestPath/packages" -ItemType Directory -Force
     # Get and pack packages
-    $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages -Recurse -Include *.nuspec
+    $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages -Recurse -Include *.nuspec | Where-Object FullName -notmatch 'bin'
     Get-ChildItem -Path $PSScriptRoot/tests/packages -Recurse -Include *.nupkg | Copy-Item -Destination "$TestPath/packages"
 
     foreach ($file in $nuspecs) {
@@ -124,11 +128,15 @@ try {
         }
     }
 
+    if ($Tag) {
+        $PesterConfiguration.Filter.Tag = $Tag
+    }
+
     Invoke-Pester -Configuration $PesterConfiguration
 }
 finally {
     # For some reason we need to import this again... I'm not 100% sure on why...
-    Import-Module $TestPath/Chocolatey/tools/ChocolateyInstall/helpers/chocolateyInstaller.psm1
+    Import-Module $TestPath/Chocolatey/tools/ChocolateyInstall/helpers/chocolateyInstaller.psm1 -Force
     # Put back Path and Chocolatey
     Set-EnvironmentVariable -Name 'PATH' -Scope 'User' -Value $environmentVariables.UserPath
     Set-EnvironmentVariable -Name 'ChocolateyInstall' -Scope 'User' -Value $environmentVariables.UserChocolateyInstall

@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using attributes;
-    using commandline;
-    using configuration;
-    using logging;
-    using services;
-
     [CommandFor("info", "retrieves package information. Shorthand for choco search pkgname --exact --verbose")]
     public class ChocolateyInfoCommand : ChocolateySearchCommand
     {
@@ -74,6 +74,9 @@ namespace chocolatey.infrastructure.app.commands
                             configuration.Features.UsePackageRepositoryOptimizations = false;
                         }
                     })
+                .Add("include-configured-sources",
+                    "Include Configured Sources - When using the '--source' option, this appends the sources that have been saved into the chocolatey.config file by 'source' command.  Available in 2.3.0+",
+                    option => configuration.IncludeConfiguredSources = option != null)
                 ;
         }
 

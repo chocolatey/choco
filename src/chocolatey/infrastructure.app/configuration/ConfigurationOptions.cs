@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.commandline;
+using Console = chocolatey.infrastructure.adapters.Console;
+
 namespace chocolatey.infrastructure.app.configuration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Text.RegularExpressions;
-    using adapters;
-    using commandline;
-    using Console = adapters.Console;
-
     public static class ConfigurationOptions
     {
         private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.app.configuration
 
         public static void ClearOptions()
         {
-            _optionSet.Clear();
+            OptionSet.Clear();
         }
 
         private static IConsole Console
@@ -46,12 +46,7 @@ namespace chocolatey.infrastructure.app.configuration
             get { return _console.Value; }
         }
 
-        private static readonly OptionSet _optionSet = new OptionSet();
-
-        public static OptionSet OptionSet
-        {
-            get { return _optionSet; }
-        }
+        public static OptionSet OptionSet { get; } = new OptionSet();
 
         /// <summary>
         ///   Parses arguments and updates the configuration
@@ -72,9 +67,9 @@ namespace chocolatey.infrastructure.app.configuration
             IList<string> unparsedArguments = new List<string>();
 
             // add help only once
-            if (_optionSet.Count == 0)
+            if (OptionSet.Count == 0)
             {
-                _optionSet
+                OptionSet
                     .Add("?|help|h",
                         "Prints out the help menu.",
                         option => configuration.HelpRequested = option != null)
@@ -85,16 +80,16 @@ namespace chocolatey.infrastructure.app.configuration
 
             if (setOptions != null)
             {
-                setOptions(_optionSet);
+                setOptions(OptionSet);
             }
 
             try
             {
-                unparsedArguments = _optionSet.Parse(args);
+                unparsedArguments = OptionSet.Parse(args);
             }
             catch (OptionException)
             {
-                ShowHelp(_optionSet, helpMessage);
+                ShowHelp(OptionSet, helpMessage);
                 configuration.UnsuccessfulParsing = true;
             }
 
@@ -146,7 +141,7 @@ namespace chocolatey.infrastructure.app.configuration
                     return;
                 }
 
-                ShowHelp(_optionSet, helpMessage);
+                ShowHelp(OptionSet, helpMessage);
             }
             else
             {
@@ -178,7 +173,7 @@ namespace chocolatey.infrastructure.app.configuration
             optionSet.WriteOptionDescriptions(Console.Out);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IConsole> console)
@@ -196,6 +191,6 @@ namespace chocolatey.infrastructure.app.configuration
                                                                     Action validateConfiguration,
                                                                     Action helpMessage)
             => ParseArgumentsAndUpdateConfiguration(args, configuration, setOptions, afterParse, validateConfiguration, helpMessage);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

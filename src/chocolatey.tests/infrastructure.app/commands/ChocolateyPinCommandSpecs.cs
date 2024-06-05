@@ -14,28 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.results;
+using Moq;
+using NuGet.Common;
+using NuGet.Packaging;
+using NuGet.Versioning;
+
+using NUnit.Framework;
+
+using FluentAssertions;
+using FluentAssertions.Execution;
+
 namespace chocolatey.tests.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commandline;
-    using chocolatey.infrastructure.results;
-    using Moq;
-    using NuGet.Common;
-    using NuGet.Packaging;
-    using NuGet.Versioning;
-
-    using NUnit.Framework;
-
-    using FluentAssertions;
-
     public class ChocolateyPinCommandSpecs
     {
         [ConcernFor("pin")]
@@ -535,6 +536,140 @@ namespace chocolatey.tests.infrastructure.app.commands
                 PackageInfoService.Verify(s =>
                     s.Save(It.Is<ChocolateyPackageInformation>(n =>
                         n.Package.Id.Equals("mingw"))), Times.Once);
+            }
+        }
+
+        public class When_adding_a_pin_on_an_already_pinned_package : ChocolateyPinCommandSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Sources = ApplicationParameters.PackagesLocation;
+                Configuration.ListCommand.LocalOnly = true;
+                Configuration.AllVersions = true;
+
+                var packageResults = new[]
+                {
+                    new PackageResult(PinnedPackage.Object, null)
+                };
+                NugetService.Setup(n => n.List(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
+            }
+
+            public new void Reset()
+            {
+                Context();
+                base.Reset();
+            }
+
+            public override void AfterEachSpec()
+            {
+                base.AfterEachSpec();
+                MockLogger.Messages.Clear();
+            }
+
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void Should_Return_0_ExitCode_When_Pinning_An_Already_Pinned_Package()
+            {
+                Reset();
+                Configuration.Features.UseEnhancedExitCodes = false;
+                Configuration.PinCommand.Name = "pinned";
+                Configuration.PinCommand.Command = PinCommandType.Add;
+
+                Command.SetPin(Configuration);
+
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Pin already set or removed.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+
+            [Fact]
+            public void Should_Return_2_ExitCode_When_Pinning_An_Already_Pinned_Package_With_UseEnhancedExitCodes_Enabled()
+            {
+                Reset();
+                Configuration.Features.UseEnhancedExitCodes = true;
+                Configuration.PinCommand.Name = "pinned";
+                Configuration.PinCommand.Command = PinCommandType.Add;
+
+                Command.SetPin(Configuration);
+
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Pin already set or removed.");
+                    Environment.ExitCode.Should().Be(2);
+                }
+            }
+        }
+
+        public class When_removing_a_pin_on_a_package_with_no_pin : ChocolateyPinCommandSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Sources = ApplicationParameters.PackagesLocation;
+                Configuration.ListCommand.LocalOnly = true;
+                Configuration.AllVersions = true;
+
+                var packageResults = new[]
+                {
+                    new PackageResult(Package.Object, null)
+                };
+                NugetService.Setup(n => n.List(It.IsAny<ChocolateyConfiguration>())).Returns(packageResults);
+            }
+
+            public new void Reset()
+            {
+                Context();
+                base.Reset();
+            }
+
+            public override void AfterEachSpec()
+            {
+                base.AfterEachSpec();
+                MockLogger.Messages.Clear();
+            }
+
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void Should_Return_0_ExitCode_When_Pinning_An_Already_Pinned_Package()
+            {
+                Reset();
+                Configuration.Features.UseEnhancedExitCodes = false;
+                Configuration.PinCommand.Name = "regular";
+                Configuration.PinCommand.Command = PinCommandType.Remove;
+
+                Command.SetPin(Configuration);
+
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Pin already set or removed.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+
+            [Fact]
+            public void Should_Return_2_ExitCode_When_Pinning_An_Already_Pinned_Package_With_UseEnhancedExitCodes_Enabled()
+            {
+                Reset();
+                Configuration.Features.UseEnhancedExitCodes = true;
+                Configuration.PinCommand.Name = "regular";
+                Configuration.PinCommand.Command = PinCommandType.Remove;
+
+                Command.SetPin(Configuration);
+
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Pin already set or removed.");
+                    Environment.ExitCode.Should().Be(2);
+                }
             }
         }
     }

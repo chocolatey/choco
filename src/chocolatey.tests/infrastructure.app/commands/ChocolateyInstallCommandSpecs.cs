@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commandline;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commandline;
-    using Moq;
-    using FluentAssertions;
-
     public class ChocolateyInstallCommandSpecs
     {
         [ConcernFor("install")]
@@ -253,6 +253,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_add_short_version_of_skip_hooks_to_the_option_set()
             {
                 _optionSet.Contains("skiphooks").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_include_configured_sources_to_the_option_set()
+            {
+                _optionSet.Contains("include-configured-sources").Should().BeTrue();
             }
         }
 

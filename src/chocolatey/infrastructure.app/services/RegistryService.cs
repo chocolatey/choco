@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Security.AccessControl;
+using System.Security.Principal;
+using System.Text;
+using System.Text.RegularExpressions;
+using Microsoft.Win32;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.tolerance;
+using Registry = chocolatey.infrastructure.app.domain.Registry;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using System.Linq;
-    using System.Security.AccessControl;
-    using System.Security.Principal;
-    using System.Text;
-    using System.Text.RegularExpressions;
-    using Microsoft.Win32;
-    using domain;
-    using filesystem;
-    using infrastructure.services;
-    using tolerance;
-    using Registry = domain.Registry;
-
     /// <summary>
     ///   Allows comparing registry
     /// </summary>
@@ -64,14 +64,20 @@ namespace chocolatey.infrastructure.app.services
         private void AddKey(IList<RegistryKey> keys, RegistryHive hive, RegistryView view)
         {
             var key = OpenKey(hive, view);
-            if (key != null) keys.Add(key);
+            if (key != null)
+            {
+                keys.Add(key);
+            }
         }
 
         public Registry GetInstallerKeys()
         {
             var snapshot = new Registry();
             var windowsIdentity = WindowsIdentity.GetCurrent();
-            if (windowsIdentity != null) snapshot.User = windowsIdentity.User.ToStringSafe();
+            if (windowsIdentity != null)
+            {
+                snapshot.User = windowsIdentity.User.ToStringSafe();
+            }
 
             IList<RegistryKey> keys = new List<RegistryKey>();
             if (Environment.Is64BitOperatingSystem)
@@ -92,7 +98,7 @@ namespace chocolatey.infrastructure.app.services
 
                 if (uninstallKey != null)
                 {
-                    //Console.WriteLine("Evaluating {0} of {1}".format_with(uninstallKey.View, uninstallKey.Name));
+                    //Console.WriteLine("Evaluating {0} of {1}".FormatWith(uninstallKey.View, uninstallKey.Name));
                     UpdateSnapshot(uninstallKey, snapshot);
                 }
                 registryKey.Close();
@@ -120,7 +126,10 @@ namespace chocolatey.infrastructure.app.services
         /// <param name="snapshot">The snapshot.</param>
         public void UpdateSnapshot(RegistryKey key, Registry snapshot)
         {
-            if (key == null) return;
+            if (key == null)
+            {
+                return;
+            }
 
             FaultTolerance.TryCatchWithLoggingException(
                 () =>
@@ -137,12 +146,12 @@ namespace chocolatey.infrastructure.app.services
                 logWarningInsteadOfError: true);
 
             var appKey = new RegistryApplicationKey
-                {
-                    KeyPath = key.Name,
-                    RegistryView = key.View,
-                    DefaultValue = key.AsXmlSafeString(""),
-                    DisplayName = key.AsXmlSafeString("DisplayName")
-                };
+            {
+                KeyPath = key.Name,
+                RegistryView = key.View,
+                DefaultValue = key.AsXmlSafeString(""),
+                DisplayName = key.AsXmlSafeString("DisplayName")
+            };
 
             if (string.IsNullOrWhiteSpace(appKey.DisplayName))
             {
@@ -227,17 +236,17 @@ namespace chocolatey.infrastructure.app.services
                 {
                     //if (appKey.is_in_programs_and_features() && appKey.InstallerType == InstallerType.Unknown)
                     //{
-                        foreach (var name in key.GetValueNames())
+                    foreach (var name in key.GetValueNames())
+                    {
+                        //var kind = key.GetValueKind(name);
+                        var value = key.AsXmlSafeString(name);
+                        if (name.IsEqualTo("QuietUninstallString") || name.IsEqualTo("UninstallString"))
                         {
-                            //var kind = key.GetValueKind(name);
-                            var value = key.AsXmlSafeString(name);
-                            if (name.IsEqualTo("QuietUninstallString") || name.IsEqualTo("UninstallString"))
-                            {
-                                Console.WriteLine("key - {0}|{1}={2}|Type detected={3}|install location={4}".FormatWith(key.Name, name, value.ToStringSafe(), appKey.InstallerType.ToStringSafe(),appKey.InstallLocation.ToStringSafe()));
-                            }
-
-                            //Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".format_with(key.Name, name, kind, value.to_string()));
+                            Console.WriteLine("key - {0}|{1}={2}|Type detected={3}|install location={4}".FormatWith(key.Name, name, value.ToStringSafe(), appKey.InstallerType.ToStringSafe(), appKey.InstallLocation.ToStringSafe()));
                         }
+
+                        //Console.WriteLine("key - {0}, name - {1}, kind - {2}, value - {3}".FormatWith(key.Name, name, kind, value.to_string()));
+                    }
                     //}
                 }
 
@@ -251,7 +260,10 @@ namespace chocolatey.infrastructure.app.services
         private void GetMsiInformation(RegistryApplicationKey appKey, RegistryKey key)
         {
             var userDataProductKeyId = GetMsiUserDataKey(key.Name);
-            if (string.IsNullOrWhiteSpace(userDataProductKeyId)) return;
+            if (string.IsNullOrWhiteSpace(userDataProductKeyId))
+            {
+                return;
+            }
 
             var hklm = OpenKey(RegistryHive.LocalMachine, RegistryView.Default);
             if (Environment.Is64BitOperatingSystem)
@@ -263,7 +275,10 @@ namespace chocolatey.infrastructure.app.services
              () =>
              {
                  var msiRegistryKey = hklm.OpenSubKey(UninstallerMsiMachineKeyName, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey);
-                 if (msiRegistryKey == null) return;
+                 if (msiRegistryKey == null)
+                 {
+                     return;
+                 }
 
                  foreach (var subKeyName in msiRegistryKey.GetSubKeyNames())
                  {
@@ -271,7 +286,10 @@ namespace chocolatey.infrastructure.app.services
                          () => msiRegistryKey.OpenSubKey("{0}\\Products\\{1}\\InstallProperties".FormatWith(subKeyName, userDataProductKeyId), RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
                          "Failed to open subkey named '{0}' for '{1}', likely due to permissions".FormatWith(subKeyName, msiRegistryKey.Name),
                          logWarningInsteadOfError: true);
-                     if (msiProductKey == null) continue;
+                     if (msiProductKey == null)
+                     {
+                         continue;
+                     }
 
                      appKey.InstallLocation = SetIfEmpty(appKey.InstallLocation, msiProductKey.AsXmlSafeString("InstallLocation"));
                      // informational
@@ -293,8 +311,8 @@ namespace chocolatey.infrastructure.app.services
                      //if (string.IsNullOrWhiteSpace(appKey.InstallLocation) && !appKey.Publisher.contains("Microsoft"))
                      //{
                      //    var msiComponentsKey = FaultTolerance.try_catch_with_logging_exception(
-                     //       () => msiRegistryKey.OpenSubKey("{0}\\Components".format_with(subKeyName), RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
-                     //       "Failed to open subkey named '{0}' for '{1}', likely due to permissions".format_with(subKeyName, msiRegistryKey.Name),
+                     //       () => msiRegistryKey.OpenSubKey("{0}\\Components".FormatWith(subKeyName), RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
+                     //       "Failed to open subkey named '{0}' for '{1}', likely due to permissions".FormatWith(subKeyName, msiRegistryKey.Name),
                      //       logWarningInsteadOfError: true);
                      //    if (msiComponentsKey == null) continue;
 
@@ -302,7 +320,7 @@ namespace chocolatey.infrastructure.app.services
                      //    {
                      //        var msiComponentKey = FaultTolerance.try_catch_with_logging_exception(
                      //           () => msiComponentsKey.OpenSubKey(msiComponentKeyName, RegistryKeyPermissionCheck.ReadSubTree, RegistryRights.ReadKey),
-                     //           "Failed to open subkey named '{0}' for '{1}', likely due to permissions".format_with(subKeyName, msiRegistryKey.Name),
+                     //           "Failed to open subkey named '{0}' for '{1}', likely due to permissions".FormatWith(subKeyName, msiRegistryKey.Name),
                      //           logWarningInsteadOfError: true);
 
                      //        if (msiComponentKey.GetValueNames().Contains(userDataProductKeyId, StringComparer.OrdinalIgnoreCase))
@@ -322,7 +340,10 @@ namespace chocolatey.infrastructure.app.services
 
         private string SetIfEmpty(string current, string proposed)
         {
-            if (string.IsNullOrWhiteSpace(current)) return proposed;
+            if (string.IsNullOrWhiteSpace(current))
+            {
+                return proposed;
+            }
 
             return current;
         }
@@ -335,9 +356,12 @@ namespace chocolatey.infrastructure.app.services
         {
             _userDataKey.Clear();
             var match = _guidRegex.Match(name);
-            if (!match.Success) return string.Empty;
+            if (!match.Success)
+            {
+                return string.Empty;
+            }
 
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 var fullGroup = match.Groups["ReverseFull{0}".FormatWith(i + 1)];
                 if (fullGroup != null)
@@ -345,13 +369,13 @@ namespace chocolatey.infrastructure.app.services
                     _userDataKey.Append(fullGroup.Value.ToCharArray().Reverse().ToArray());
                 }
             }
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
             {
                 var pairsGroup = match.Groups["ReversePairs{0}".FormatWith(i + 1)];
                 if (pairsGroup != null)
                 {
                     var pairValue = pairsGroup.Value;
-                    for (int j = 0; j < pairValue.Length - 1; j++)
+                    for (var j = 0; j < pairValue.Length - 1; j++)
                     {
                         _userDataKey.Append("{1}{0}".FormatWith(pairValue[j], pairValue[j + 1]));
                         j++;
@@ -508,7 +532,10 @@ namespace chocolatey.infrastructure.app.services
                             "Could not get registry value '{0}' from key '{1}'".FormatWith(registryValue, key.Name),
                             logWarningInsteadOfError: true);
 
-                        if (value != null) break;
+                        if (value != null)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -516,7 +543,7 @@ namespace chocolatey.infrastructure.app.services
             return value;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public Registry get_installer_keys()
             => GetInstallerKeys();
@@ -560,6 +587,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static GenericRegistryValue get_value(RegistryHiveType hive, string subKeyPath, string registryValue)
             => GetRegistryValue(hive, subKeyPath, registryValue);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

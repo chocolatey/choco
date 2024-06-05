@@ -14,22 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.cryptography;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.services;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.cryptography;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.results;
-    using chocolatey.infrastructure.services;
-    using Moq;
-    using FluentAssertions;
-
     public class FilesServiceSpecs
     {
         public abstract class FilesServiceSpecsBase : TinySpec

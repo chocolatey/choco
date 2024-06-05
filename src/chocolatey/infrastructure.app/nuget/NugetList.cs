@@ -14,22 +14,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using chocolatey.infrastructure.tolerance;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using NuGet.Common;
+using NuGet.Packaging;
+using NuGet.Packaging.Core;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
+
 namespace chocolatey.infrastructure.app.nuget
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using chocolatey.infrastructure.tolerance;
-    using configuration;
-    using filesystem;
-    using NuGet.Common;
-    using NuGet.Packaging;
-    using NuGet.Packaging.Core;
-    using NuGet.Protocol.Core.Types;
-    using NuGet.Versioning;
-
     public static class NugetList
     {
         public static int LastPackageLimitUsed { get; private set; }
@@ -50,13 +50,15 @@ namespace chocolatey.infrastructure.app.nuget
         public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem, ChocolateySourceCacheContext cacheContext)
         {
             var packageRepositoriesResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem, cacheContext);
-            string searchTermLower = configuration.Input.ToLowerSafe();
+            var searchTermLower = configuration.Input.ToLowerSafe();
 
-            SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
-            searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
-            searchFilter.OrderBy = SearchOrderBy.DownloadCount;
+            var searchFilter = new SearchFilter(configuration.Prerelease)
+            {
+                IncludeDelisted = configuration.ListCommand.LocalOnly,
+                OrderBy = SearchOrderBy.DownloadCount
+            };
 
-            int totalCount = 0;
+            var totalCount = 0;
             foreach (var searchResource in packageRepositoriesResources.SearchResources())
             {
                 totalCount += searchResource.SearchCountAsync(searchTermLower, searchFilter, nugetLogger, CancellationToken.None).GetAwaiter().GetResult();
@@ -72,11 +74,13 @@ namespace chocolatey.infrastructure.app.nuget
 
             var cacheContext = new ChocolateySourceCacheContext(configuration);
             var packageRepositoryResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem, cacheContext);
-            string searchTermLower = configuration.Input.ToLowerSafe();
+            var searchTermLower = configuration.Input.ToLowerSafe();
 
-            SearchFilter searchFilter = new SearchFilter(configuration.Prerelease);
-            searchFilter.IncludeDelisted = configuration.ListCommand.LocalOnly;
-            searchFilter.OrderBy = SearchOrderBy.Id;
+            var searchFilter = new SearchFilter(configuration.Prerelease)
+            {
+                IncludeDelisted = configuration.ListCommand.LocalOnly,
+                OrderBy = SearchOrderBy.Id
+            };
 
             if (configuration.ListCommand.OrderByPopularity)
             {
@@ -244,9 +248,12 @@ namespace chocolatey.infrastructure.app.nuget
                 }
                 else
                 {
-                    var exactPackage = FindPackage(searchTermLower, configuration, nugetLogger, cacheContext, packageRepositoryResources, version);
+                    var exactPackage = FindPackage(searchTermLower, configuration, nugetLogger, (SourceCacheContext)cacheContext, packageRepositoryResources, version);
 
-                    if (exactPackage == null) return new List<IPackageSearchMetadata>().AsQueryable();
+                    if (exactPackage == null)
+                    {
+                        return new List<IPackageSearchMetadata>().AsQueryable();
+                    }
 
                     return new List<IPackageSearchMetadata>()
                     {
@@ -345,11 +352,33 @@ namespace chocolatey.infrastructure.app.nuget
         /// <param name="version">Version to search for</param>
         /// <param name="cacheContext">Settings for caching of results from sources</param>
         /// <returns>One result or nothing</returns>
+        [Obsolete("Use the overload that uses the base source cache context instead.")]
         public static IPackageSearchMetadata FindPackage(
             string packageName,
             ChocolateyConfiguration config,
             ILogger nugetLogger,
             ChocolateySourceCacheContext cacheContext,
+            IEnumerable<NuGetEndpointResources> resources,
+            NuGetVersion version)
+        {
+            return FindPackage(packageName, config, nugetLogger, (SourceCacheContext)cacheContext, resources, version);
+        }
+
+        /// <summary>
+        ///   Searches for packages that are available based on name and other options
+        /// </summary>
+        /// <param name="packageName">Name of package to search for</param>
+        /// <param name="config">Chocolatey configuration used to help supply the search parameters</param>
+        /// <param name="nugetLogger">The nuget logger</param>
+        /// <param name="resources">The resources that should be queried</param>
+        /// <param name="version">Version to search for</param>
+        /// <param name="cacheContext">Settings for caching of results from sources</param>
+        /// <returns>One result or nothing</returns>
+        public static IPackageSearchMetadata FindPackage(
+            string packageName,
+            ChocolateyConfiguration config,
+            ILogger nugetLogger,
+            SourceCacheContext cacheContext,
             IEnumerable<NuGetEndpointResources> resources,
             NuGetVersion version = null)
         {
@@ -405,14 +434,14 @@ namespace chocolatey.infrastructure.app.nuget
             return packagesList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static ISet<IPackageSearchMetadata> find_all_package_versions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
             => FindAllPackageVersions(packageName, config, nugetLogger, cacheContext, resources);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 
-    public class ComparePackageSearchMetadataIdOnly: IEqualityComparer<IPackageSearchMetadata>
+    public class ComparePackageSearchMetadataIdOnly : IEqualityComparer<IPackageSearchMetadata>
     {
         public bool Equals(IPackageSearchMetadata x, IPackageSearchMetadata y)
         {
@@ -421,7 +450,7 @@ namespace chocolatey.infrastructure.app.nuget
                 return true;
             }
 
-            if (ReferenceEquals(x, null) || ReferenceEquals(y, null))
+            if (x is null || y is null)
             {
                 return false;
             }
@@ -430,7 +459,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public int GetHashCode(IPackageSearchMetadata obj)
         {
-            if (ReferenceEquals(obj, null))
+            if (obj is null)
             {
                 return 0;
             }
@@ -447,7 +476,7 @@ namespace chocolatey.infrastructure.app.nuget
                 return true;
             }
 
-            if (ReferenceEquals(x, null) || ReferenceEquals(y, null))
+            if (x is null || y is null)
             {
                 return false;
             }
@@ -457,7 +486,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public int GetHashCode(IPackageSearchMetadata obj)
         {
-            if (ReferenceEquals(obj, null))
+            if (obj is null)
             {
                 return 0;
             }

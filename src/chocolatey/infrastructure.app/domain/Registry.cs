@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Serialization;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml.Serialization;
-
     /// <summary>
     ///   The installer registry as a snapshot
     /// </summary>

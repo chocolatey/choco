@@ -13,15 +13,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using chocolatey.infrastructure.rules;
+using NuGet.Packaging;
+
 namespace chocolatey.infrastructure.app.rules
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Xml.Linq;
-    using chocolatey.infrastructure.rules;
-    using NuGet.Packaging;
-
     public abstract class MetadataRuleBase : IMetadataRule
     {
         private IDictionary<string, ImmutableRule> _cachedRules;
@@ -82,7 +82,7 @@ namespace chocolatey.infrastructure.app.rules
 
         protected abstract IEnumerable<ImmutableRule> GetRules();
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual IEnumerable<RuleResult> validate(NuspecReader reader)
             => Validate(reader);
@@ -94,6 +94,6 @@ namespace chocolatey.infrastructure.app.rules
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         protected static string get_element_value(NuspecReader reader, string name)
             => GetElementValue(reader, name);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

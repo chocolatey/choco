@@ -1,15 +1,17 @@
-﻿namespace chocolatey.tests.integration.infrastructure.app.services
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.services;
-    using Moq;
-    using FluentAssertions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.nuget;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.services;
+using FluentAssertions;
+using FluentAssertions.Execution;
+using Moq;
 
+namespace chocolatey.tests.integration.infrastructure.app.services
+{
     public class ChocolateyConfigSettingsServiceSpecs
     {
         public abstract class ChocolateyConfigSettingsServiceSpecsBase : TinySpec
@@ -167,8 +169,8 @@
 
                     Service.DisableFeature(config);
                 };
-                    action.Should().Throw<ApplicationException>()
-                        .WithMessage("Feature '{0}' is not supported.".FormatWith(FeatureName));
+                action.Should().Throw<ApplicationException>()
+                    .WithMessage("Feature '{0}' is not supported.".FormatWith(FeatureName));
             }
         }
 
@@ -570,6 +572,906 @@
                 var infoMessages = MockLogger.Messages["Info"];
                 infoMessages.Should().ContainSingle();
                 infoMessages[0].Should().Contain("Enabled");
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_AddSource_When_Source_Already_Exists : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    Sources = "https://test.org/api/v2",
+                    SourceCommand = new SourcesCommandConfiguration()
+                    {
+                        Name = "testSource",
+                        Command = chocolatey.infrastructure.app.domain.SourceCommandType.Add
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = false
+                    }
+                };
+
+                Service.AddSource(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Sources = new HashSet<ConfigFileSourceSetting>
+                        {
+                            new ConfigFileSourceSetting()
+                            {
+                                Id = "testSource",
+                                Value = "https://test.org/api/v2"
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_0()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_AddSource_When_Source_Already_Exists_With_Enhanced_Exit_Codes : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    Sources = "https://test.org/api/v2",
+                    SourceCommand = new SourcesCommandConfiguration()
+                    {
+                        Name = "testSource",
+                        Command = chocolatey.infrastructure.app.domain.SourceCommandType.Add
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = true
+                    }
+                };
+
+                Service.AddSource(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Sources = new HashSet<ConfigFileSourceSetting>
+                        {
+                            new ConfigFileSourceSetting()
+                            {
+                                Id = "testSource",
+                                Value = "https://test.org/api/v2"
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_2()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(2);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_RemoveSource_When_Source_Doesnt_Exist : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    Sources = "https://test.org/api/v2",
+                    SourceCommand = new SourcesCommandConfiguration()
+                    {
+                        Name = "testSource",
+                        Command = chocolatey.infrastructure.app.domain.SourceCommandType.Remove
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = false
+                    }
+                };
+
+                Service.RemoveSource(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Sources = new HashSet<ConfigFileSourceSetting>()
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_0()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_RemoveSource_When_Source_Doesnt_Exist_With_Enhanced_Exit_Codes : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    Sources = "https://test.org/api/v2",
+                    SourceCommand = new SourcesCommandConfiguration()
+                    {
+                        Name = "testSource",
+                        Command = chocolatey.infrastructure.app.domain.SourceCommandType.Remove
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = true
+                    }
+                };
+
+                Service.RemoveSource(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Sources = new HashSet<ConfigFileSourceSetting>()
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_2()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(2);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_DisableSource_When_Source_Doesnt_Exist : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    Sources = "https://test.org/api/v2",
+                    SourceCommand = new SourcesCommandConfiguration()
+                    {
+                        Name = "testSource",
+                        Command = chocolatey.infrastructure.app.domain.SourceCommandType.Disable
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = false
+                    }
+                };
+
+                Service.DisableSource(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Sources = new HashSet<ConfigFileSourceSetting>()
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_0()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_DisableSource_When_Source_Doesnt_Exist_With_Enhanced_Exit_Codes : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    Sources = "https://test.org/api/v2",
+                    SourceCommand = new SourcesCommandConfiguration()
+                    {
+                        Name = "testSource",
+                        Command = chocolatey.infrastructure.app.domain.SourceCommandType.Disable
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = true
+                    }
+                };
+
+                Service.DisableSource(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Sources = new HashSet<ConfigFileSourceSetting>()
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_2()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(2);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_EnableSource_When_Source_Doesnt_Exist : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    Sources = "https://test.org/api/v2",
+                    SourceCommand = new SourcesCommandConfiguration()
+                    {
+                        Name = "testSource",
+                        Command = chocolatey.infrastructure.app.domain.SourceCommandType.Enable
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = false
+                    }
+                };
+
+                Service.EnableSource(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Sources = new HashSet<ConfigFileSourceSetting>()
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_0()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_EnableSource_When_Source_Doesnt_Exist_With_Enhanced_Exit_Codes : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    Sources = "https://test.org/api/v2",
+                    SourceCommand = new SourcesCommandConfiguration()
+                    {
+                        Name = "testSource",
+                        Command = chocolatey.infrastructure.app.domain.SourceCommandType.Enable
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = true
+                    }
+                };
+
+                Service.EnableSource(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Sources = new HashSet<ConfigFileSourceSetting>()
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_2()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(2);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_DisableFeature_When_Feature_Already_Disabled : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    FeatureCommand = new FeatureCommandConfiguration()
+                    {
+                        Name = ApplicationParameters.Features.ChecksumFiles,
+                        Command = chocolatey.infrastructure.app.domain.FeatureCommandType.Disable
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = false
+                    }
+                };
+
+                Service.DisableFeature(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Features = new HashSet<ConfigFileFeatureSetting>
+                        {
+                            new ConfigFileFeatureSetting
+                            {
+                                Name = ApplicationParameters.Features.ChecksumFiles,
+                                Enabled = false,
+                                SetExplicitly = true
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_0()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_DisableFeature_When_Feature_Already_Disabled_With_Enhanced_Exit_Codes : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    FeatureCommand = new FeatureCommandConfiguration()
+                    {
+                        Name = ApplicationParameters.Features.ChecksumFiles,
+                        Command = chocolatey.infrastructure.app.domain.FeatureCommandType.Disable
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = true
+                    }
+                };
+
+                Service.DisableFeature(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Features = new HashSet<ConfigFileFeatureSetting>
+                        {
+                            new ConfigFileFeatureSetting
+                            {
+                                Name = ApplicationParameters.Features.ChecksumFiles,
+                                Enabled = false,
+                                SetExplicitly = true
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_2()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(2);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_EnableFeature_When_Feature_Already_Enabled: ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    FeatureCommand = new FeatureCommandConfiguration()
+                    {
+                        Name = ApplicationParameters.Features.ChecksumFiles,
+                        Command = chocolatey.infrastructure.app.domain.FeatureCommandType.Enable
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = false
+                    }
+                };
+
+                Service.EnableFeature(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Features = new HashSet<ConfigFileFeatureSetting>
+                        {
+                            new ConfigFileFeatureSetting
+                            {
+                                Name = ApplicationParameters.Features.ChecksumFiles,
+                                Enabled = true,
+                                SetExplicitly = true
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_0()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_EnableFeature_When_Feature_Already_Enabled_With_Enhanced_Exit_Codes : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    FeatureCommand = new FeatureCommandConfiguration()
+                    {
+                        Name = ApplicationParameters.Features.ChecksumFiles,
+                        Command = chocolatey.infrastructure.app.domain.FeatureCommandType.Enable
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = true
+                    }
+                };
+
+                Service.EnableFeature(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        Features = new HashSet<ConfigFileFeatureSetting>
+                        {
+                            new ConfigFileFeatureSetting
+                            {
+                                Name = ApplicationParameters.Features.ChecksumFiles,
+                                Enabled = true,
+                                SetExplicitly = true
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_2()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(2);
+                }
+            }
+        }
+
+        [WindowsOnly]
+        public class When_ChocolateyConfigSettingsService_SetApiKey_When_ApiKey_Already_Exists : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    Sources = "https://test.org/api/v2",
+                    ApiKeyCommand = new ApiKeyCommandConfiguration()
+                    {
+                        Key = "bob",
+                        Command = chocolatey.infrastructure.app.domain.ApiKeyCommandType.Add
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = false
+                    }
+                };
+
+                Service.SetApiKey(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        ApiKeys = new HashSet<ConfigFileApiKeySetting>
+                        {
+                            new ConfigFileApiKeySetting
+                            {
+                                Key = NugetEncryptionUtility.EncryptString("bob"),
+                                Source = "https://test.org/api/v2"
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_0()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+        }
+
+        [WindowsOnly]
+        public class When_ChocolateyConfigSettingsService_SetApiKey_When_ApiKey_Already_Exists_With_Enhanced_Exit_Codes : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    Sources = "https://test.org/api/v2",
+                    ApiKeyCommand = new ApiKeyCommandConfiguration()
+                    {
+                        Key = "bob",
+                        Command = chocolatey.infrastructure.app.domain.ApiKeyCommandType.Add
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = true
+                    }
+                };
+
+                Service.SetApiKey(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        ApiKeys = new HashSet<ConfigFileApiKeySetting>
+                        {
+                            new ConfigFileApiKeySetting
+                            {
+                                Key = NugetEncryptionUtility.EncryptString("bob"),
+                                Source = "https://test.org/api/v2"
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_2()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(2);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_SetConfig_When_Config_Already_Set : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    ConfigCommand = new ConfigCommandConfiguration()
+                    {
+                        Name = ApplicationParameters.ConfigSettings.CacheLocation,
+                        Command = chocolatey.infrastructure.app.domain.ConfigCommandType.Set,
+                        ConfigValue = @"C:\temp"
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = false
+                    }
+                };
+
+                Service.SetConfig(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        ConfigSettings = new HashSet<ConfigFileConfigSetting>()
+                        {
+                            new ConfigFileConfigSetting()
+                            {
+                                Key = ApplicationParameters.ConfigSettings.CacheLocation,
+                                Value = @"C:\temp"
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_0()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_SetConfig_When_Config_Already_Set_Enhanced_Exit_Codes : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    ConfigCommand = new ConfigCommandConfiguration()
+                    {
+                        Name = ApplicationParameters.ConfigSettings.CacheLocation,
+                        Command = chocolatey.infrastructure.app.domain.ConfigCommandType.Set,
+                        ConfigValue = @"C:\temp"
+
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = true
+                    }
+                };
+
+                Service.SetConfig(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        ConfigSettings = new HashSet<ConfigFileConfigSetting>()
+                        {
+                            new ConfigFileConfigSetting()
+                            {
+                                Key = ApplicationParameters.ConfigSettings.CacheLocation,
+                                Value = @"C:\temp"
+                            }
+                        }
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_2()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(2);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_UnSetConfig_When_Config_Already_UnSet : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    ConfigCommand = new ConfigCommandConfiguration()
+                    {
+                        Name = ApplicationParameters.ConfigSettings.CacheLocation,
+                        Command = chocolatey.infrastructure.app.domain.ConfigCommandType.Unset
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = false
+                    }
+                };
+
+                Service.UnsetConfig(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        ConfigSettings = new HashSet<ConfigFileConfigSetting>()
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_0()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(0);
+                }
+            }
+        }
+
+        public class When_ChocolateyConfigSettingsService_UnSetConfig_When_Config_Already_UnSet_Enhanced_Exit_Codes : ChocolateyConfigSettingsServiceSpecsBase
+        {
+            public override void Because()
+            {
+                var config = new ChocolateyConfiguration()
+                {
+                    RegularOutput = true,
+                    ConfigCommand = new ConfigCommandConfiguration()
+                    {
+                        Name = ApplicationParameters.ConfigSettings.CacheLocation,
+                        Command = chocolatey.infrastructure.app.domain.ConfigCommandType.Unset
+
+                    },
+                    Features = new FeaturesConfiguration()
+                    {
+                        UseEnhancedExitCodes = true
+                    }
+                };
+
+                Service.UnsetConfig(config);
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                XmlService.Setup(x => x.Deserialize<ConfigFileSettings>(ApplicationParameters.GlobalConfigFileLocation))
+                    .Returns(new ConfigFileSettings
+                    {
+                        ConfigSettings = new HashSet<ConfigFileConfigSetting>()
+                    });
+
+                Service = new ChocolateyConfigSettingsService(XmlService.Object);
+            }
+
+            [Fact]
+            public void Should_return_exit_code_2()
+            {
+                using (new AssertionScope())
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().ContainSingle().And.Contain("Nothing to change. Config already set.");
+                    Environment.ExitCode.Should().Be(2);
+                }
             }
         }
     }

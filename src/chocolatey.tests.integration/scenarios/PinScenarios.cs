@@ -14,25 +14,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.results;
+
+using NUnit.Framework;
+
+using NuGet.Configuration;
+using FluentAssertions;
+using Moq;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.domain;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.results;
-
-    using NUnit.Framework;
-
-    using NuGet.Configuration;
-    using FluentAssertions;
-    using Moq;
-
     public class PinScenarios
     {
         [ConcernFor("pin")]

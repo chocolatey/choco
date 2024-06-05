@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using attributes;
-    using commandline;
-    using configuration;
-    using infrastructure.commands;
-    using logging;
-    using services;
-
     [CommandFor("upgrade", "upgrades packages from various sources")]
     public class ChocolateyUpgradeCommand : ChocolateyCommandBase, ICommand
     {
@@ -115,19 +115,28 @@ namespace chocolatey.infrastructure.app.commands
                       "IgnoreChecksums - Ignore checksums provided by the package. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.ChecksumFiles, configuration.Features.ChecksumFiles.ToStringSafe()),
                       option =>
                       {
-                          if (option != null) configuration.Features.ChecksumFiles = false;
+                          if (option != null)
+                          {
+                              configuration.Features.ChecksumFiles = false;
+                          }
                       })
                 .Add("allowemptychecksum|allowemptychecksums|allow-empty-checksums",
                       "Allow Empty Checksums - Allow packages to have empty/missing checksums for downloaded resources from non-secure locations (HTTP, FTP). Use this switch is not recommended if using sources that download resources from the internet. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.ToStringSafe()),
                       option =>
                       {
-                          if (option != null) configuration.Features.AllowEmptyChecksums = true;
+                          if (option != null)
+                          {
+                              configuration.Features.AllowEmptyChecksums = true;
+                          }
                       })
                  .Add("allowemptychecksumsecure|allowemptychecksumssecure|allow-empty-checksums-secure",
                       "Allow Empty Checksums Secure - Allow packages to have empty checksums for downloaded resources from secure locations (HTTPS). Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.AllowEmptyChecksumsSecure, configuration.Features.AllowEmptyChecksumsSecure.ToStringSafe()),
                       option =>
                       {
-                          if (option != null) configuration.Features.AllowEmptyChecksumsSecure = true;
+                          if (option != null)
+                          {
+                              configuration.Features.AllowEmptyChecksumsSecure = true;
+                          }
                       })
                 .Add("requirechecksum|requirechecksums|require-checksums",
                       "Require Checksums - Requires packages to have checksums for downloaded resources (both non-secure and secure). Overrides the default feature '{0}' set to '{1}' and '{2}' set to '{3}'.".FormatWith(ApplicationParameters.Features.AllowEmptyChecksums, configuration.Features.AllowEmptyChecksums.ToStringSafe(), ApplicationParameters.Features.AllowEmptyChecksumsSecure, configuration.Features.AllowEmptyChecksumsSecure.ToStringSafe()),
@@ -194,13 +203,19 @@ namespace chocolatey.infrastructure.app.commands
                      "Use Remembered Options for Upgrade - use the arguments and options used during install for upgrade. Does not override arguments being passed at runtime. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configuration.Features.UseRememberedArgumentsForUpgrades.ToStringSafe()),
                      option =>
                      {
-                         if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = true;
+                         if (option != null)
+                         {
+                             configuration.Features.UseRememberedArgumentsForUpgrades = true;
+                         }
                      })
                 .Add("ignorerememberedargs|ignorerememberedarguments|ignorerememberedoptions|ignore-remembered-args|ignore-remembered-arguments|ignore-remembered-options",
                      "Ignore Remembered Options for Upgrade - ignore the arguments and options used during install for upgrade. Overrides the default feature '{0}' set to '{1}'.".FormatWith(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configuration.Features.UseRememberedArgumentsForUpgrades.ToStringSafe()),
                      option =>
                      {
-                         if (option != null) configuration.Features.UseRememberedArgumentsForUpgrades = false;
+                         if (option != null)
+                         {
+                             configuration.Features.UseRememberedArgumentsForUpgrades = false;
+                         }
                      })
                 .Add("exitwhenrebootdetected|exit-when-reboot-detected",
                      "Exit When Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}. Overrides the default feature '{3}' set to '{4}'.".FormatWith
@@ -234,6 +249,14 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("skiphooks|skip-hooks",
                     "Skip hooks - Do not run hook scripts. Available in 1.2.0+",
                     option => configuration.SkipHookScripts = option != null
+                    )
+                .Add("ignore-pinned",
+                    "Ignore Pinned - Ignores any pins and upgrades the package(s) anyway. Available in 2.3.0+",
+                    option => configuration.UpgradeCommand.IgnorePinned = option != null
+                    )
+                .Add("include-configured-sources",
+                    "Include Configured Sources - When using the '--source' option, this appends the sources that have been saved into the chocolatey.config file by 'source' command.  Available in 2.3.0+",
+                    option => configuration.IncludeConfiguredSources = option != null
                     )
                 ;
         }
@@ -336,6 +359,11 @@ Exit codes that normally result from running this command.
 Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
+ - 2: nothing to do, no packages outdated (enhanced)
+
+NOTE: Starting in v2.3.0, if you have the feature '{2}'
+ turned on, then choco will provide enhanced exit codes that allow
+ better integration and scripting.
 
 Package Exit Codes:
  - 1641: success, reboot initiated
@@ -353,7 +381,7 @@ Reboot Exit Codes:
 In addition to the above exit codes, you may also see reboot exit codes
  when the feature '{1}' is turned on. It typically requires
  the feature '{0}' to also be turned on to work properly.
-".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected));
+".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.Features.ExitOnRebootDetected, ApplicationParameters.Features.UseEnhancedExitCodes));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "See It In Action");
             "chocolatey".Log().Info(@"
@@ -386,7 +414,7 @@ NOTE: Options and switches apply to all items passed, so if you are
             return true;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -414,6 +442,6 @@ NOTE: Options and switches apply to all items passed, so if you are
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual bool may_require_admin_access()
             => MayRequireAdminAccess();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

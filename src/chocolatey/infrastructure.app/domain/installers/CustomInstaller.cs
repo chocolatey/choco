@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+
 namespace chocolatey.infrastructure.app.domain.installers
 {
-    using System;
-    using System.Collections.Generic;
-
     public class CustomInstaller : InstallerBase
     {
         public CustomInstaller()
@@ -44,8 +44,15 @@ namespace chocolatey.infrastructure.app.domain.installers
 
         public override string BuildInstallCommandArguments(bool logFile, bool customInstallLocation, bool languageRequested)
         {
-            if (customInstallLocation) this.Log().Warn("CustomInstaller doesn't support custom install locations.");
-            if (languageRequested) this.Log().Warn("CustomInstaller doesn't support custom language options.");
+            if (customInstallLocation)
+            {
+                this.Log().Warn("CustomInstaller doesn't support custom install locations.");
+            }
+
+            if (languageRequested)
+            {
+                this.Log().Warn("CustomInstaller doesn't support custom language options.");
+            }
 
             return string.Empty;
         }

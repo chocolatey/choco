@@ -13,18 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Threading.Tasks;
+using chocolatey.infrastructure.app.nuget;
+using NuGet.Common;
+using NUnit.Framework;
+using FluentAssertions;
+
+using LogLevel = chocolatey.tests.LogLevel;
+using NuGetLogLevel = NuGet.Common.LogLevel;
+
 namespace chocolatey.tests.infrastructure.app.nuget
 {
-    using System;
-    using System.Threading.Tasks;
-    using chocolatey.infrastructure.app.nuget;
-    using NuGet.Common;
-    using NUnit.Framework;
-    using FluentAssertions;
-
-    using LogLevel = chocolatey.tests.LogLevel;
-    using NuGetLogLevel = NuGet.Common.LogLevel;
-
     public class ChocolateyNugetLoggerSpecs
     {
         [Categories.Logging]

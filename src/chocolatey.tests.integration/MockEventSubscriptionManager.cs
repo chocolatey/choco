@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Reactive.Subjects;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.services;
+using Moq;
+
 namespace chocolatey.tests.integration
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.Reactive.Subjects;
-    using chocolatey.infrastructure.events;
-    using chocolatey.infrastructure.services;
-    using Moq;
-
     public class MockEventSubscriptionManager : Mock<IEventSubscriptionManagerService>, IEventSubscriptionManagerService
     {
         private readonly Lazy<ConcurrentDictionary<Type, IList<object>>> _messages = new Lazy<ConcurrentDictionary<Type, IList<object>>>();
@@ -45,7 +45,7 @@ namespace chocolatey.tests.integration
             return new Subject<Event>();
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void publish<Event>(Event eventMessage) where Event : class, IMessage
             => Publish(eventMessage);
@@ -53,6 +53,6 @@ namespace chocolatey.tests.integration
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
             => Subscribe(handleEvent, handleError, filter);
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
     }
 }

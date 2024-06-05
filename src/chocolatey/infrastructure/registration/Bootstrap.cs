@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.app;
+using log4net;
+using chocolatey.infrastructure.logging;
+using ILog = log4net.ILog;
+
 namespace chocolatey.infrastructure.registration
 {
-    using System;
-    using app;
-    using log4net;
-    using logging;
-    using ILog = log4net.ILog;
-
     /// <summary>
     ///   Application bootstrapping - sets up logging and errors for the app domain
     /// </summary>
     public sealed class Bootstrap
     {
-        private static readonly ILog _logger = LogManager.GetLogger(typeof (Bootstrap));
+        private static readonly ILog _logger = LogManager.GetLogger(typeof(Bootstrap));
 
         /// <summary>
         ///   Initializes this instance.
@@ -55,10 +55,10 @@ namespace chocolatey.infrastructure.registration
         /// </param>
 // ReSharper disable InconsistentNaming
         private static void DomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
-// ReSharper restore InconsistentNaming
+        // ReSharper restore InconsistentNaming
         {
             var ex = e.ExceptionObject as Exception;
-            string exceptionMessage = string.Empty;
+            var exceptionMessage = string.Empty;
             if (ex != null)
             {
                 exceptionMessage = ex.ToString();
@@ -79,7 +79,7 @@ namespace chocolatey.infrastructure.registration
         {
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void initialize()
             => Initialize();
@@ -91,6 +91,6 @@ namespace chocolatey.infrastructure.registration
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void shutdown()
             => Shutdown();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

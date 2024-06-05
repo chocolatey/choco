@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Text;
+
 namespace chocolatey.infrastructure.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Reflection;
-    using System.Text;
-
     /// <summary>
     ///   Responsible for setting up arguments for an external command to be executed
     /// </summary>
@@ -62,7 +62,10 @@ namespace chocolatey.infrastructure.commands
                     }
                 }
             }
-            if (arguments.Length == 0) return string.Empty;
+            if (arguments.Length == 0)
+            {
+                return string.Empty;
+            }
 
             return arguments.Remove(arguments.Length - 1, 1).ToString();
         }
@@ -72,7 +75,10 @@ namespace chocolatey.infrastructure.commands
             foreach (var prop in properties.OrEmpty())
             {
                 //todo: #2587 need a better way of handling
-                if (prop.Name == "MachineSources") continue;
+                if (prop.Name == "MachineSources")
+                {
+                    continue;
+                }
 
                 if (prop.PropertyType.IsBuiltinType())
                 {
@@ -86,12 +92,12 @@ namespace chocolatey.infrastructure.commands
                         var arg = configToArgNames[propName];
                         var propType = prop.PropertyType;
                         var propValue = prop.GetValue(obj, null).ToStringSafe().QuoteIfContainsSpaces();
-                        if (propType == typeof (Boolean) && propValue.IsEqualTo(bool.FalseString))
+                        if (propType == typeof(bool) && propValue.IsEqualTo(bool.FalseString))
                         {
                             continue;
                         }
 
-                        if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof (Boolean))
+                        if (string.IsNullOrWhiteSpace(arg.ArgumentValue) && propType != typeof(bool))
                         {
                             if (string.IsNullOrWhiteSpace(propValue))
                             {
@@ -126,7 +132,7 @@ namespace chocolatey.infrastructure.commands
             return argument.ArgumentValue;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string build_arguments(object properties, IDictionary<string, ExternalCommandArgument> configToArgNames)
             => BuildArguments(properties, configToArgNames);
@@ -138,6 +144,6 @@ namespace chocolatey.infrastructure.commands
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         private static string quote_arg_value_if_required(ExternalCommandArgument argument)
             => QuoteArgumentValueIfRequired(argument);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

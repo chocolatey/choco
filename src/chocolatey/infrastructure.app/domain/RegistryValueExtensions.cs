@@ -14,17 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Security;
+using Microsoft.Win32;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-    using System.Security;
-    using Microsoft.Win32;
-
     public static class RegistryValueExtensions
     {
         public static string AsXmlSafeString(this RegistryKey key, string name)
         {
-            if (key == null) return string.Empty;
+            if (key == null)
+            {
+                return string.Empty;
+            }
 
             // Since it is possible that registry keys contain characters that are not valid
             // in XML files, ensure that all content is escaped, prior to serialization
@@ -35,10 +38,10 @@ namespace chocolatey.infrastructure.app.domain
                                   .Replace("\0", string.Empty);
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static string get_value_as_string(this RegistryKey key, string name)
             => AsXmlSafeString(key, name);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

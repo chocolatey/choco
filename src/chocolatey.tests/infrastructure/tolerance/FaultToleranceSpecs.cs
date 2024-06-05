@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.tolerance;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.tolerance
 {
-    using System;
-    using chocolatey.infrastructure.tolerance;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class FaultToleranceSpecs
     {
         public abstract class FaultToleranceSpecsBase : TinySpec

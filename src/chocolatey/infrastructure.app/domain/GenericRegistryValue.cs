@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-
     public class GenericRegistryValue : IEquatable<GenericRegistryValue>
     {
         public string ParentKeyName { get; set; }
@@ -40,7 +40,10 @@ namespace chocolatey.infrastructure.app.domain
 
         bool IEquatable<GenericRegistryValue>.Equals(GenericRegistryValue other)
         {
-            if (other == null) return false;
+            if (other == null)
+            {
+                return false;
+            }
 
             return ParentKeyName.IsEqualTo(other.ParentKeyName)
                    && Name.IsEqualTo(other.Name)

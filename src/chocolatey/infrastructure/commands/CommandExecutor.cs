@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.platforms;
+using Process = chocolatey.infrastructure.adapters.Process;
+
 namespace chocolatey.infrastructure.commands
 {
-    using System;
-    using System.ComponentModel;
-    using System.Diagnostics;
-    using System.IO;
-    using adapters;
-    using filesystem;
-    using logging;
-    using platforms;
-    using Process = adapters.Process;
-
     public sealed class CommandExecutor : ICommandExecutor
     {
         public CommandExecutor(IFileSystem fileSystem)
@@ -97,7 +97,7 @@ namespace chocolatey.infrastructure.commands
                           stdErrAction,
                           updateProcessPath,
                           allowUseWindow,
-                          waitForExit:true
+                          waitForExit: true
                );
         }
 
@@ -157,7 +157,7 @@ namespace chocolatey.infrastructure.commands
                                   bool waitForExit
             )
         {
-            int exitCode = -1;
+            var exitCode = -1;
             if (updateProcessPath)
             {
                 process = FileSystem.GetFullPath(process);
@@ -177,14 +177,14 @@ namespace chocolatey.infrastructure.commands
             "chocolatey".Log().Debug(() => "Calling command ['\"{0}\" {1}']".FormatWith(process.EscapeCurlyBraces(), arguments.EscapeCurlyBraces()));
 
             var psi = new ProcessStartInfo(process.UnquoteSafe(), arguments)
-                {
-                    UseShellExecute = false,
-                    WorkingDirectory = workingDirectory,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = !allowUseWindow,
-                    WindowStyle = ProcessWindowStyle.Minimized,
-                };
+            {
+                UseShellExecute = false,
+                WorkingDirectory = workingDirectory,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = !allowUseWindow,
+                WindowStyle = ProcessWindowStyle.Minimized,
+            };
 
             using (var p = _initializeProcess())
             {
@@ -245,16 +245,22 @@ namespace chocolatey.infrastructure.commands
 
         private static void LogOutput(object sender, DataReceivedEventArgs e)
         {
-            if (e != null) "chocolatey".Log().Info(e.Data.EscapeCurlyBraces());
+            if (e != null)
+            {
+                "chocolatey".Log().Info(e.Data.EscapeCurlyBraces());
+            }
         }
 
         private static void LogError(object sender, DataReceivedEventArgs e)
         {
-            if (e != null) "chocolatey".Log().Error(e.Data.EscapeCurlyBraces());
+            if (e != null)
+            {
+                "chocolatey".Log().Error(e.Data.EscapeCurlyBraces());
+            }
         }
 
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public static void initialize_with(Lazy<IFileSystem> file_system, Func<IProcess> process_initializer)
@@ -331,6 +337,6 @@ namespace chocolatey.infrastructure.commands
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         private static void log_error(object sender, DataReceivedEventArgs e)
             => LogError(sender, e);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

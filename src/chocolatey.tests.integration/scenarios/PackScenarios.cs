@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+using System.Xml;
+
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+
+using NuGet.Packaging;
+
+using NUnit.Framework;
+
+using FluentAssertions;
+using FluentAssertions.Execution;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System;
-    using System.IO;
-    using System.Xml;
-
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-
-    using NuGet.Packaging;
-
-    using NUnit.Framework;
-
-    using FluentAssertions;
-    using FluentAssertions.Execution;
-
     public class PackScenarios
     {
         [ConcernFor("pack")]
@@ -122,7 +122,13 @@ namespace chocolatey.tests.integration.scenarios
 
             protected abstract string ExpectedNuspecVersion { get; }
 
-            protected virtual string ExpectedPathVersion => ExpectedNuspecVersion;
+            protected virtual string ExpectedPathVersion
+            {
+                get
+                {
+                    return ExpectedNuspecVersion;
+                }
+            }
 
             protected virtual string ExpectedSubDirectory { get; } = string.Empty;
 
@@ -198,7 +204,13 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_packing_without_specifying_an_output_directory : ScenariosBase
         {
-            protected override string ExpectedNuspecVersion => "0.1.0";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "0.1.0";
+                }
+            }
 
             public override void Because()
             {
@@ -209,8 +221,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_packing_with_an_output_directory : ScenariosBase
         {
-            protected override string ExpectedNuspecVersion => "0.1.0";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "0.1.0";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -222,9 +247,29 @@ namespace chocolatey.tests.integration.scenarios
         [Categories.LegacySemVer]
         public class When_packing_with_only_major_minor_version : ScenariosBase
         {
-            protected override string PackagePath => Path.Combine("PackageOutput", "test-package.0.3.0.nupkg");
-            protected override string ExpectedNuspecVersion => "0.3.0";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string PackagePath
+            {
+                get
+                {
+                    return Path.Combine("PackageOutput", "test-package.0.3.0.nupkg");
+                }
+            }
+
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "0.3.0";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -241,8 +286,21 @@ namespace chocolatey.tests.integration.scenarios
         [Categories.LegacySemVer]
         public class When_packing_with_full_4_part_versioning_scheme : ScenariosBase
         {
-            protected override string ExpectedNuspecVersion => "0.5.0.5";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "0.5.0.5";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -259,9 +317,29 @@ namespace chocolatey.tests.integration.scenarios
         [Categories.SemVer20]
         public class When_packaging_with_build_metadata : ScenariosBase
         {
-            protected override string ExpectedNuspecVersion => "0.1.0+build.543";
-            protected override string ExpectedPathVersion => "0.1.0";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "0.1.0+build.543";
+                }
+            }
+
+            protected override string ExpectedPathVersion
+            {
+                get
+                {
+                    return "0.1.0";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -278,9 +356,29 @@ namespace chocolatey.tests.integration.scenarios
         [Categories.SemVer20]
         public class When_packaging_with_semver_20_pre_release_tag : ScenariosBase
         {
-            protected override string ExpectedNuspecVersion => "0.1.0-rc.5+build.999";
-            protected override string ExpectedPathVersion => "0.1.0-rc.5";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "0.1.0-rc.5+build.999";
+                }
+            }
+
+            protected override string ExpectedPathVersion
+            {
+                get
+                {
+                    return "0.1.0-rc.5";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -297,8 +395,21 @@ namespace chocolatey.tests.integration.scenarios
         [Categories.LegacySemVer]
         public class When_packaging_with_legacy_pre_release_tag : ScenariosBase
         {
-            protected override string ExpectedNuspecVersion => "0.1.0-rc-5";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "0.1.0-rc-5";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -316,8 +427,21 @@ namespace chocolatey.tests.integration.scenarios
         public class When_packaging_with_four_part_version_with_trailing_zero : ScenariosBase
         {
             private string _originalVersion = "0.1.0.0";
-            protected override string ExpectedNuspecVersion => "0.1.0";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "0.1.0";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -335,8 +459,21 @@ namespace chocolatey.tests.integration.scenarios
         public class When_packaging_with_leading_zeros_four_part : ScenariosBase
         {
             private string _originalVersion = "01.02.03.04";
-            protected override string ExpectedNuspecVersion => "1.2.3.4";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "1.2.3.4";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -354,8 +491,21 @@ namespace chocolatey.tests.integration.scenarios
         public class When_packaging_with_leading_zeros_three_part : ScenariosBase
         {
             private string _originalVersion = "01.02.04";
-            protected override string ExpectedNuspecVersion => "1.2.4";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "1.2.4";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -373,8 +523,21 @@ namespace chocolatey.tests.integration.scenarios
         public class When_packaging_with_leading_zeros_two_part : ScenariosBase
         {
             private string _originalVersion = "01.02";
-            protected override string ExpectedNuspecVersion => "1.2.0";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "1.2.0";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -392,8 +555,21 @@ namespace chocolatey.tests.integration.scenarios
         public class When_packaging_with_multiple_leading_zeros : ScenariosBase
         {
             private string _originalVersion = "0001.0002.0003";
-            protected override string ExpectedNuspecVersion => "1.2.3";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "1.2.3";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             public override void Because()
             {
@@ -409,7 +585,13 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_packing_with_properties : ScenariosBase
         {
-            protected override string ExpectedNuspecVersion => "0.1.0";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "0.1.0";
+                }
+            }
 
             public override void Context()
             {
@@ -510,8 +692,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_packing_with_min_client_version : ScenariosBase
         {
-            protected override string ExpectedNuspecVersion => "0.1.0";
-            protected override string ExpectedSubDirectory => "PackageOutput";
+            protected override string ExpectedNuspecVersion
+            {
+                get
+                {
+                    return "0.1.0";
+                }
+            }
+
+            protected override string ExpectedSubDirectory
+            {
+                get
+                {
+                    return "PackageOutput";
+                }
+            }
 
             // This high version is to ensure that pack does not throw, even if the min client version is well
             // above both the Chocolatey and NuGet assembly versions.
@@ -947,7 +1142,7 @@ namespace chocolatey.tests.integration.scenarios
   </files>
 </package>";
 
-    private const string NuspecContentWithFormatableMinClientVersion = @"<?xml version=""1.0"" encoding=""utf-8""?>
+        private const string NuspecContentWithFormatableMinClientVersion = @"<?xml version=""1.0"" encoding=""utf-8""?>
 <package xmlns=""http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd"">
   <metadata minClientVersion=""{0}"">
     <id>test-package</id>

@@ -13,19 +13,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.rules;
+
 namespace chocolatey.infrastructure.services
 {
-    using System;
-    using System.Collections.Generic;
-    using chocolatey.infrastructure.rules;
-
     public interface IRuleService
     {
+        IReadOnlyList<ImmutableRule> GetAllAvailableRules();
         IEnumerable<RuleResult> ValidateRules(string filePath);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         IEnumerable<RuleResult> validate_rules(string filePath);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

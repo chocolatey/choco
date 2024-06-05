@@ -14,18 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using System;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using chocolatey.infrastructure.app.configuration;
-    using System;
-
     public interface IExtensionModule
     {
         void RegisterDependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void register_dependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.filesystem;
+using Moq;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.commands
 {
-    using System;
-    using chocolatey.infrastructure.adapters;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.filesystem;
-    using Moq;
-    using FluentAssertions;
-
     public class CommandExecutorSpecs
     {
         public abstract class CommandExecutorSpecsBase : TinySpec

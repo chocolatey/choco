@@ -14,23 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.IO;
+using System.Linq;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.results;
+using NuGet.Configuration;
+using NUnit.Framework;
+using FluentAssertions;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.IO;
-    using System.Linq;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.results;
-    using NuGet.Configuration;
-    using NUnit.Framework;
-    using FluentAssertions;
-    using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
-
     public class UninstallScenarios
     {
         [ConcernFor("uninstall")]

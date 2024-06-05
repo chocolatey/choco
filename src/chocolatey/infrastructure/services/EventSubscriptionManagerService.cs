@@ -14,15 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using chocolatey.infrastructure.events;
+using chocolatey.infrastructure.guards;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey.infrastructure.services
 {
-    using System;
-    using System.Reactive.Linq;
-    using System.Reactive.Subjects;
-    using events;
-    using guards;
-    using logging;
-
     /// <summary>
     ///   Implementation of IEventSubscriptionManagerService
     /// </summary>
@@ -37,15 +37,22 @@ namespace chocolatey.infrastructure.services
         {
             Ensure.That(() => eventMessage).NotNull();
 
-            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Sending message '{0}' out if there are subscribers...".FormatWith(typeof (Event).Name));
+            this.Log().Debug(ChocolateyLoggers.Verbose, () => "Sending message '{0}' out if there are subscribers...".FormatWith(typeof(Event).Name));
 
             _subject.OnNext(eventMessage);
         }
 
         public IDisposable Subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
         {
-            if (filter == null) filter = (message) => true;
-            if (handleError == null) handleError = (ex) => { };
+            if (filter == null)
+            {
+                filter = (message) => true;
+            }
+
+            if (handleError == null)
+            {
+                handleError = (ex) => { };
+            }
 
             var subscription = _subject.OfType<Event>().AsObservable()
                                        .Where(filter)
@@ -54,7 +61,7 @@ namespace chocolatey.infrastructure.services
             return subscription;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void publish<Event>(Event eventMessage) where Event : class, IMessage
             => Publish(eventMessage);
@@ -62,6 +69,6 @@ namespace chocolatey.infrastructure.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
             => Subscribe(handleEvent, handleError, filter);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

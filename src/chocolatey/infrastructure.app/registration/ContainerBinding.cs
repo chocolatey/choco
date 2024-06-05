@@ -14,29 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using chocolatey.infrastructure.app.builders;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.licensing;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.services;
+using chocolatey.infrastructure.configuration;
+using SimpleInjector;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+using chocolatey.infrastructure.app.nuget;
+using NuGet.Common;
+using NuGet.Versioning;
+using CryptoHashProvider = chocolatey.infrastructure.cryptography.CryptoHashProvider;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using IHashProvider = chocolatey.infrastructure.cryptography.IHashProvider;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using chocolatey.infrastructure.app.builders;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.filesystem;
-    using chocolatey.infrastructure.information;
-    using chocolatey.infrastructure.licensing;
-    using chocolatey.infrastructure.logging;
-    using chocolatey.infrastructure.services;
-    using infrastructure.configuration;
-    using SimpleInjector;
-    using Assembly = adapters.Assembly;
-    using nuget;
-    using NuGet.Common;
-    using NuGet.Versioning;
-    using CryptoHashProvider = cryptography.CryptoHashProvider;
-    using IFileSystem = filesystem.IFileSystem;
-    using IHashProvider = cryptography.IHashProvider;
-
     // ReSharper disable InconsistentNaming
 
     /// <summary>
@@ -150,7 +150,7 @@ choco feature enable --name=""disableCompatibilityChecks""",
                         }
 
                         this.Log().Debug("Calling registration module '{0}' in extension '{1}'!", registration.GetType().Name, assemblyName);
-                        clonedRegistrator._validationHandlers.Clear();
+                        clonedRegistrator.ValidationHandlers.Clear();
                         clonedRegistrator.RegisterValidator((instanceType) => ValidateMinimumChocolateyVersion(instanceType, chocoVersion));
                         registration.RegisterDependencies(clonedRegistrator, configuration.DeepCopy());
                         hasRegisteredDependencies = !clonedRegistrator.RegistrationFailed;

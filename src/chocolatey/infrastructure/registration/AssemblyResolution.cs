@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Concurrent;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.runners;
+using chocolatey.infrastructure.filesystem;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+
 namespace chocolatey.infrastructure.registration
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using System.Threading;
-    using adapters;
-    using chocolatey.infrastructure.app;
-    using chocolatey.infrastructure.app.runners;
-    using filesystem;
-    using Assembly = adapters.Assembly;
-
     public class AssemblyResolution
     {
         private const int LockResolutionTimeoutSeconds = 5;
@@ -43,7 +43,8 @@ namespace chocolatey.infrastructure.registration
         /// <param name="assemblyFileLocation">The assembly file location. Typically the path to the DLL on disk.</param>
         /// <returns>An assembly</returns>
         /// <exception cref="Exception">Unable to enter synchronized code to determine assembly loading</exception>
-        public static IAssembly ResolveOrLoadAssembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation) {
+        public static IAssembly ResolveOrLoadAssembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation)
+        {
             return ResolveOrLoadAssembly(assemblySimpleName, publicKeyToken, assemblyFileLocation, false);
         }
 
@@ -138,6 +139,13 @@ namespace chocolatey.infrastructure.registration
             {
                 try
                 {
+                    // If we're trying to load Chocolatey.PowerShell (e.g., as a dependency of the licensed extension,
+                    // we may need to alter the load file path.
+                    if (assemblySimpleName == ApplicationParameters.ChocolateyPowerShellAssemblySimpleName)
+                    {
+                        assemblyFileLocation = ApplicationParameters.ChocolateyPowerShellAssemblyLocation;
+                    }
+
                     IAssembly tempAssembly;
 #if FORCE_CHOCOLATEY_OFFICIAL_KEY
                     tempAssembly = Assembly.Load(FileSystem.ReadFileBytes(assemblyFileLocation));
@@ -338,7 +346,7 @@ namespace chocolatey.infrastructure.registration
 
             if (Directory.Exists(ApplicationParameters.ExtensionsLocation))
             {
-                bool extensionsFound = false;
+                var extensionsFound = false;
                 foreach (var extensionDll in Directory.EnumerateFiles(ApplicationParameters.ExtensionsLocation, requestedAssembly.Name + ".dll", SearchOption.AllDirectories))
                 {
                     extensionsFound = true;
@@ -370,7 +378,8 @@ namespace chocolatey.infrastructure.registration
             // There are things that are ILMerged into Chocolatey. Anything with
             // the right public key except extensions should use the choco/chocolatey assembly
             if (!requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase)
-                && !requestedAssembly.Name.IsEqualTo(ApplicationParameters.LicensedChocolateyAssemblySimpleName))
+                && !requestedAssembly.Name.IsEqualTo(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
+                && !requestedAssembly.Name.IsEqualTo(ApplicationParameters.ChocolateyPowerShellAssemblySimpleName))
             {
                 return typeof(ConsoleApplication).Assembly;
             }
@@ -378,7 +387,7 @@ namespace chocolatey.infrastructure.registration
             return null;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IAssembly resolve_or_load_assembly(string assemblySimpleName, string publicKeyToken, string assemblyFileLocation)
             => ResolveOrLoadAssembly(assemblySimpleName, publicKeyToken, assemblyFileLocation);
@@ -402,6 +411,6 @@ namespace chocolatey.infrastructure.registration
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static System.Reflection.Assembly resolve_extension_or_merged_assembly(object sender, ResolveEventArgs args)
             => ResolveExtensionOrMergedAssembly(sender, args);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

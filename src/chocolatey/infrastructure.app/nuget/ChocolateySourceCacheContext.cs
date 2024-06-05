@@ -1,11 +1,11 @@
-﻿namespace chocolatey.infrastructure.app.nuget
-{
-    using System;
-    using System.Threading;
-    using Alphaleonis.Win32.Filesystem;
-    using chocolatey.infrastructure.app.configuration;
-    using NuGet.Protocol.Core.Types;
+﻿using System;
+using System.Threading;
+using Alphaleonis.Win32.Filesystem;
+using chocolatey.infrastructure.app.configuration;
+using NuGet.Protocol.Core.Types;
 
+namespace chocolatey.infrastructure.app.nuget
+{
     public class ChocolateySourceCacheContext : SourceCacheContext
     {
         /// <summary>
@@ -47,7 +47,10 @@
                 return _generatedChocolateyTempFolder;
             }
 
-            set => Interlocked.CompareExchange(ref _generatedChocolateyTempFolder, value, comparand: null);
+            set
+            {
+                Interlocked.CompareExchange(ref _generatedChocolateyTempFolder, value, comparand: null);
+            }
         }
 
         /// <summary>

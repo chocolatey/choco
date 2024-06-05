@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Text.RegularExpressions;
+
 namespace chocolatey.infrastructure.services
 {
-    using System;
-    using System.Text.RegularExpressions;
-
     /// <summary>
     ///   Regular expressions helper
     /// </summary>
@@ -33,9 +33,9 @@ namespace chocolatey.infrastructure.services
         /// <returns></returns>
         string Replace(string input, string pattern, MatchEvaluator matchEvaluator);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         string replace(string input, string pattern, MatchEvaluator matchEvaluator);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

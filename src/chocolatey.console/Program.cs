@@ -14,39 +14,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace chocolatey.console
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Reflection;
-    using Microsoft.Win32;
-    using chocolatey.infrastructure.information;
-    using infrastructure.app;
-    using infrastructure.app.builders;
-    using infrastructure.app.configuration;
-    using infrastructure.app.runners;
-    using infrastructure.commandline;
-    using infrastructure.extractors;
-    using infrastructure.licensing;
-    using infrastructure.logging;
-    using infrastructure.platforms;
-    using infrastructure.registration;
-    using infrastructure.tolerance;
-    using SimpleInjector;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using Microsoft.Win32;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.builders;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.runners;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.extractors;
+using chocolatey.infrastructure.licensing;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.platforms;
+using chocolatey.infrastructure.registration;
+using chocolatey.infrastructure.tolerance;
+using SimpleInjector;
 
 #if !NoResources
 
-    using resources;
+using chocolatey.resources;
 
 #endif
 
-    using Assembly = infrastructure.adapters.Assembly;
-    using Console = System.Console;
-    using Environment = System.Environment;
-    using IFileSystem = infrastructure.filesystem.IFileSystem;
+using Assembly = chocolatey.infrastructure.adapters.Assembly;
+using Console = System.Console;
+using Environment = System.Environment;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
+namespace chocolatey.console
+{
     public sealed class Program
     {
         private static void Main(string[] args)
@@ -58,9 +58,12 @@ namespace chocolatey.console
             {
                 AddAssemblyResolver();
 
-                string loggingLocation = ApplicationParameters.LoggingLocation;
+                var loggingLocation = ApplicationParameters.LoggingLocation;
                 //no file system at this point
-                if (!Directory.Exists(loggingLocation)) Directory.CreateDirectory(loggingLocation);
+                if (!Directory.Exists(loggingLocation))
+                {
+                    Directory.CreateDirectory(loggingLocation);
+                }
 
                 Log4NetAppenderConfiguration.Configure(loggingLocation, excludeLoggerNames: ChocolateyLoggers.Trace.ToStringSafe());
                 Bootstrap.Initialize();
@@ -107,7 +110,7 @@ namespace chocolatey.console
 
                 ReportVersionAndExitIfRequested(args, config);
 
-                TrapExitScenarios(config);
+                TrapExitScenarios();
 
                 if (config.RegularOutput)
                 {
@@ -144,7 +147,7 @@ namespace chocolatey.console
                 Log4NetAppenderConfiguration.EnableVerboseLoggingIf(config.Verbose, config.Debug, verboseAppenderName);
                 Log4NetAppenderConfiguration.EnableTraceLoggingIf(config.Trace, traceAppenderName);
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".FormatWith(ApplicationParameters.Name, config.Information.PlatformType, config.Information.PlatformVersion.ToStringSafe()));
-                //"chocolatey".Log().Debug(() => "Command Line: {0}".format_with(Environment.CommandLine));
+                //"chocolatey".Log().Debug(() => "Command Line: {0}".FormatWith(Environment.CommandLine));
 
                 RemoveOldChocoExe(fileSystem);
 
@@ -178,7 +181,10 @@ namespace chocolatey.console
                     "chocolatey".Log().Error(ChocolateyLoggers.LogFileOnly, () => "More Details: {0}".FormatWith(ex.ToString()));
                 }
 
-                if (Environment.ExitCode == 0) Environment.ExitCode = 1;
+                if (Environment.ExitCode == 0)
+                {
+                    Environment.ExitCode = 1;
+                }
             }
             finally
             {
@@ -191,7 +197,12 @@ namespace chocolatey.console
 #if DEBUG
                 "chocolatey".Log().Info(() => "Exiting with {0}".FormatWith(Environment.ExitCode));
 #endif
-                PauseIfDebug();
+                // Chocolatey Agent runs Chocolatey CLI with --run-actual. If that's the case we don't want to pause on debug.
+                if (!args.Any(a => a.IsEqualTo("--run-actual")))
+                {
+                    PauseIfDebug();
+                }
+
                 Bootstrap.Shutdown();
                 Environment.Exit(Environment.ExitCode);
             }
@@ -223,7 +234,10 @@ namespace chocolatey.console
 
         private static void ReportVersionAndExitIfRequested(string[] args, ChocolateyConfiguration config)
         {
-            if (args == null || args.Length == 0) return;
+            if (args == null || args.Length == 0)
+            {
+                return;
+            }
 
             var firstArg = args.FirstOrDefault();
             if (firstArg.IsEqualTo("-v") || firstArg.IsEqualTo("--version"))
@@ -235,7 +249,7 @@ namespace chocolatey.console
             }
         }
 
-        private static void TrapExitScenarios(ChocolateyConfiguration config)
+        private static void TrapExitScenarios()
         {
             ExitScenarioHandler.SetHandler();
         }

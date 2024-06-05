@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.configuration;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.configuration
 {
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.configuration;
-    using FluentAssertions;
-
     public class ConfigSpecs
     {
         public abstract class ConfigSpecsBase : TinySpec

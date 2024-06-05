@@ -13,18 +13,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.logging;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using chocolatey.infrastructure.app.attributes;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.logging;
-
     /// <summary>
     /// A base class for any Chocolatey commands which need to utilise shared logic.
     /// </summary>
@@ -101,7 +101,7 @@ NOTE: See scripting in the command reference (`choco -?`) for how to
 
             var normalExitCodes = GetNormalExitCodes(configuration).ToArray();
             var enhancedExitCodes = GetEnhancedExitCodes(configuration).ToArray();
-            var additionalExitCodeDescription = GetAdditionalExitCodeDescription(configuration);
+            var additionalExitCodeDescription = GetAdditionalExitCodeDescription();
 
             if (normalExitCodes.Length > 0 || enhancedExitCodes.Length > 0 || !string.IsNullOrEmpty(additionalExitCodeDescription))
             {
@@ -139,7 +139,7 @@ If you find other exit codes that we have not yet documented, please
                 this.Log().Info(string.Empty);
             }
 
-            var additionalHelpContent = GetAdditionalHelpContent(configuration);
+            var additionalHelpContent = GetAdditionalHelpContent();
 
             if (!string.IsNullOrEmpty(additionalHelpContent))
             {
@@ -149,7 +149,7 @@ If you find other exit codes that we have not yet documented, please
 
             this.Log().Info(ChocolateyLoggers.Important, "Options and Switches");
 
-            var optionsAndSwitchesContent = GetOptionsAndSwitchesDescription(configuration);
+            var optionsAndSwitchesContent = GetOptionsAndSwitchesDescription();
 
             if (!string.IsNullOrEmpty(optionsAndSwitchesContent))
             {
@@ -239,17 +239,17 @@ If you find other exit codes that we have not yet documented, please
             }
         }
 
-        private string GetAdditionalExitCodeDescription(ChocolateyConfiguration configuration)
+        private string GetAdditionalExitCodeDescription()
         {
             return string.Empty;
         }
 
-        private string GetAdditionalHelpContent(ChocolateyConfiguration configuration)
+        private string GetAdditionalHelpContent()
         {
             return string.Empty;
         }
 
-        private string GetOptionsAndSwitchesDescription(ChocolateyConfiguration configuration)
+        private string GetOptionsAndSwitchesDescription()
         {
             return string.Empty;
         }

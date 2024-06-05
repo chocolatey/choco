@@ -14,28 +14,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Xml.XPath;
+using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.commands;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.results;
+using NuGet.Configuration;
+using NuGet.Packaging;
+using NUnit.Framework;
+using FluentAssertions;
+using FluentAssertions.Execution;
+using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+
 namespace chocolatey.tests.integration.scenarios
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Concurrent;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Xml.XPath;
-    using chocolatey.infrastructure.app.commands;
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.services;
-    using chocolatey.infrastructure.commands;
-    using chocolatey.infrastructure.results;
-    using NuGet.Configuration;
-    using NuGet.Packaging;
-    using NUnit.Framework;
-    using FluentAssertions;
-    using FluentAssertions.Execution;
-    using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
-
     public class InstallScenarios
     {
         [ConcernFor("install")]
@@ -149,7 +150,13 @@ namespace chocolatey.tests.integration.scenarios
         {
             private PackageResult _packageResult;
 
-            protected virtual string TestSemVersion => "1.0.0";
+            protected virtual string TestSemVersion
+            {
+                get
+                {
+                    return "1.0.0";
+                }
+            }
 
             public override void Context()
             {
@@ -324,6 +331,28 @@ namespace chocolatey.tests.integration.scenarios
             }
 
             [Fact]
+            public void Should_contain_message_with_source()
+            {
+                var message = "Downloading package from source '{0}'".FormatWith(Configuration.Sources);
+
+                MockLogger.Messages.Should().ContainKey(LogLevel.Info.ToString()).WhoseValue.Should()
+                    .Contain(message);
+            }
+
+            [Fact]
+            [WindowsOnly]
+            [Platform(Exclude = "Mono")]
+            public void Should_contain_message_with_download_uri()
+            {
+                var packagePath = "file:///{0}/{1}.{2}{3}".FormatWith(Configuration.Sources.Replace("\\","/"), Configuration.PackageNames,
+                    TestVersion(), NuGetConstants.PackageExtension);
+               var message = "Package download location '{0}'".FormatWith(packagePath);
+
+                MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToString()).WhoseValue.Should()
+                    .Contain(message);
+            }
+
+            [Fact]
             [WindowsOnly]
             [Platform(Exclude = "Mono")]
             public void Should_have_executed_chocolateyInstall_script()
@@ -351,13 +380,25 @@ namespace chocolatey.tests.integration.scenarios
         [Categories.SemVer20]
         public class When_installing_a_package_with_semver_2_0_meta_data : When_installing_a_package_happy_path
         {
-            protected override string TestSemVersion => "0.9.9+build.543";
+            protected override string TestSemVersion
+            {
+                get
+                {
+                    return "0.9.9+build.543";
+                }
+            }
         }
 
         [Categories.SemVer20]
         public class When_installing_a_package_with_semver_2_0_pre_release_tag : When_installing_a_package_happy_path
         {
-            protected override string TestSemVersion => "1.0.0-alpha.34";
+            protected override string TestSemVersion
+            {
+                get
+                {
+                    return "1.0.0-alpha.34";
+                }
+            }
         }
 
         public class When_installing_packages_with_packages_config : ScenariosBase
@@ -383,7 +424,10 @@ namespace chocolatey.tests.integration.scenarios
             {
                 foreach (var packageResult in Results)
                 {
-                    if (packageResult.Value.Name.IsEqualTo("missingpackage")) continue;
+                    if (packageResult.Value.Name.IsEqualTo("missingpackage"))
+                    {
+                        continue;
+                    }
 
                     DirectoryAssert.Exists(packageResult.Value.InstallLocation);
                 }
@@ -3010,7 +3054,7 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_install_hook_scripts_to_folder()
             {
                 var hookScripts = new List<string> { "pre-install-all.ps1", "post-install-all.ps1", "pre-upgrade-all.ps1", "post-upgrade-all.ps1", "pre-uninstall-all.ps1", "post-uninstall-all.ps1" };
-                foreach (string scriptName in hookScripts)
+                foreach (var scriptName in hookScripts)
                 {
                     var hookScriptPath = Path.Combine(Scenario.GetTopLevel(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty), scriptName);
                     File.ReadAllText(hookScriptPath).Should().Contain("Write-Output");
@@ -4166,8 +4210,21 @@ namespace chocolatey.tests.integration.scenarios
         {
             private PackageResult _packageResult;
 
-            protected virtual string NonNormalizedVersion => "2.02.0.0";
-            protected virtual string NormalizedVersion => "2.2.0";
+            protected virtual string NonNormalizedVersion
+            {
+                get
+                {
+                    return "2.02.0.0";
+                }
+            }
+
+            protected virtual string NormalizedVersion
+            {
+                get
+                {
+                    return "2.2.0";
+                }
+            }
 
             public override void Context()
             {
@@ -4351,8 +4408,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_installing_a_package_specifying_normalized_version : When_installing_a_package_with_non_normalized_version
         {
-            protected override string NormalizedVersion => "2.2.0";
-            protected override string NonNormalizedVersion => "2.02.0.0";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "2.2.0";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "2.02.0.0";
+                }
+            }
 
             public override void Context()
             {
@@ -4363,8 +4433,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_installing_a_package_specifying_non_normalized_version : When_installing_a_package_with_non_normalized_version
         {
-            protected override string NormalizedVersion => "2.2.0";
-            protected override string NonNormalizedVersion => "2.02.0.0";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "2.2.0";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "2.02.0.0";
+                }
+            }
 
             public override void Context()
             {
@@ -4375,14 +4458,40 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_installing_a_package_with_multiple_leading_zeros : When_installing_a_package_with_non_normalized_version
         {
-            protected override string NormalizedVersion => "4.4.5.1";
-            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "4.4.5.1";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "0004.0004.00005.01";
+                }
+            }
         }
 
         public class When_installing_a_package_with_multiple_leading_zeros_specifying_normalized_version : When_installing_a_package_with_non_normalized_version
         {
-            protected override string NormalizedVersion => "4.4.5.1"  ;
-            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "4.4.5.1";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "0004.0004.00005.01";
+                }
+            }
 
             public override void Context()
             {
@@ -4393,8 +4502,21 @@ namespace chocolatey.tests.integration.scenarios
 
         public class When_installing_a_package_with_multiple_leading_zeros_specifying_non_normalized_version : When_installing_a_package_with_non_normalized_version
         {
-            protected override string NormalizedVersion => "4.4.5.1";
-            protected override string NonNormalizedVersion => "0004.0004.00005.01";
+            protected override string NormalizedVersion
+            {
+                get
+                {
+                    return "4.4.5.1";
+                }
+            }
+
+            protected override string NonNormalizedVersion
+            {
+                get
+                {
+                    return "0004.0004.00005.01";
+                }
+            }
 
             public override void Context()
             {
@@ -4494,6 +4616,53 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_not_have_warning_package_result()
             {
                 Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
+            }
+        }
+
+        public class When_installing_all_packages_from_ccr : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "all";
+                Configuration.Sources = ApplicationParameters.ChocolateyCommunityFeedSource;
+            }
+
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void Should_throw_an_error_that_it_is_not_allowed()
+            {
+                Action m = () => Service.Install(Configuration); ;
+
+                m.Should().Throw<ApplicationException>();
+            }
+        }
+
+        public class When_installing_all_packages_from_local_source : ScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = Configuration.Input = "all";
+
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.1.0.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.1.0.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "upgradepackage*" + NuGetConstants.PackageExtension);
+            }
+
+            public override void Because()
+            {
+                Results = Service.Install(Configuration);
+            }
+
+            [Fact]
+            public void Should_install_all_packages()
+            {
+                Results.Should().HaveCount(6);
             }
         }
     }

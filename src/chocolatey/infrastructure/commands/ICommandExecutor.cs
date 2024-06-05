@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Diagnostics;
+
 namespace chocolatey.infrastructure.commands
 {
-    using System;
-    using System.Diagnostics;
-
     public interface ICommandExecutor
     {
         int Execute(string process, string arguments, int waitForExitInSeconds);
@@ -56,7 +56,7 @@ namespace chocolatey.infrastructure.commands
             bool waitForExit
             );
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         int execute(string process, string arguments, int waitForExitInSeconds);
 
@@ -96,6 +96,6 @@ namespace chocolatey.infrastructure.commands
             bool allowUseWindow,
             bool waitForExit
             );
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

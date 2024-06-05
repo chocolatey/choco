@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+
 namespace chocolatey.infrastructure.adapters
 {
-    using System;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Reflection;
-
     // ReSharper disable InconsistentNaming
 
     public interface IAssembly
@@ -80,11 +80,11 @@ namespace chocolatey.infrastructure.adapters
 
         AssemblyName GetName();
 
-        Type GetType(String name);
+        Type GetType(string name);
 
-        Type GetType(String name, bool throwOnError);
+        Type GetType(string name, bool throwOnError);
 
-        Type GetType(String name, bool throwOnError, bool ignoreCase);
+        Type GetType(string name, bool throwOnError, bool ignoreCase);
 
         Type[] GetTypes();
 

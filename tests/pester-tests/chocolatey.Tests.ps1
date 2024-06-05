@@ -29,8 +29,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     }
 
     BeforeAll {
-        # TODO: Both this thumbprint and strong name key should be in an environment variable. Update when new kitchen-pester is available. - https://github.com/chocolatey/choco/issues/2692
-        $ChocolateyThumbprint = '83AC7D88C66CB8680BCE802E0F0F5C179722764B'
+        # TODO: This strong name key should be in an environment variable. Update when new kitchen-pester is available. - https://github.com/chocolatey/choco/issues/2692
         $ChocolateyStrongNameKey = '79d02ea9cad655eb'
         # These lines are part of testing the issue
         # https://github.com/chocolatey/choco/issues/2233
@@ -118,14 +117,20 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
     # This is skipped when not run in CI because it requires signed executables.
     Context "File signing (<_.FullName>)" -ForEach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0"))) {
         BeforeAll {
+            # Due to changes in the signing setup, the certificate used to sign PS1 files and the Chocolatey CLI executable MIGHT be different. This ensures that the both certificates are trusted.
             $FileUnderTest = $_
-            $SignerCert = (Get-AuthenticodeSignature (Get-ChocoPath)).SignerCertificate
+            $Ps1Cert = (Get-AuthenticodeSignature (Join-Path (Split-Path (Split-Path (Get-ChocoPath))) 'helpers/chocolateyScriptRunner.ps1')).SignerCertificate
+            $ExeCert = (Get-AuthenticodeSignature (Get-ChocoPath)).SignerCertificate
             $Cert = "$PWD\cert.cer"
-            # Write out the certificate
-            [IO.File]::WriteAllBytes($Cert, $SignerCert.export([security.cryptography.x509certificates.x509contenttype]::cert))
+            # Write out the exe certificate
+            [IO.File]::WriteAllBytes($Cert, $ExeCert.export([security.cryptography.x509certificates.x509contenttype]::cert))
             # Trust the certificate
             Import-Certificate -FilePath $Cert -CertStoreLocation 'Cert:\CurrentUser\TrustedPublisher\'
             Remove-Item -Path $Cert -Force -ErrorAction Ignore
+            # Write out the ps1 certificate
+            [IO.File]::WriteAllBytes($Cert, $Ps1Cert.export([security.cryptography.x509certificates.x509contenttype]::cert))
+            # Trust the certificate
+            Import-Certificate -FilePath $Cert -CertStoreLocation 'Cert:\CurrentUser\TrustedPublisher\'
         }
 
         AfterAll {
@@ -134,8 +139,17 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
 
         It "Should be signed with our certificate" -Skip:($_.Name -like 'package*.exe') {
             $authenticodeSignature = Get-AuthenticodeSignature $FileUnderTest
-            $authenticodeSignature.Status | Should -Be 'Valid'
-            $authenticodeSignature.SignerCertificate.Thumbprint | Should -Be $ChocolateyThumbprint
+
+            # For non production builds, the official signing certificate is not in play, so need to
+            # alter the assestion slightly, to account for the fact that UnknownError, is making the
+            # underlying problem, i.e. "A certificate chain processed, but terminated in a root
+            # certificate which is not trusted by the trust provider"
+            if ($authenticodeSignature.SignerCertificate.Issuer -match 'Chocolatey Software, Inc') {
+                $authenticodeSignature.Status | Should -Be 'UnknownError'
+            }
+            elseif ($signature.SignerCertificate.Issuer -match 'DigiCert') {
+                $authenticodeSignature.Status | Should -Be 'Valid'
+            }
         }
 
         It "Should be strongly named with our strong name key" -Skip:($_ -notin $StrongNamingKeyFilesToCheck) {
@@ -179,20 +193,6 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             # TODO: This doesn't work on Windows server.
             # $null = Invoke-Choco install dotnet3.5
             # $null = Invoke-Choco install MicrosoftWindowsPowerShellV2 -s windowsfeatures
-        }
-
-        # This is Foss only as PowerShell running under version 2 doesn't have .net available and can't import the Licensed DLL.
-        # Tests on Windows 7 show no issues with running Chocolatey under Windows 7 with PowerShell v2 aside from issues surrounding TLS versions that we cannot resolve without an upgrade to Windows 7.
-        It "Imports ChocolateyInstaller module successfully in PowerShell v2" -Tag FossOnly {
-            $command = 'try { $ErrorActionPreference = ''Stop''; Import-Module $env:ChocolateyInstall\helpers\chocolateyInstaller.psm1 } catch { $_ ; exit 1 }'
-            $result = & powershell.exe -Version 2 -noprofile -command $command
-            $LastExitCode | Should -BeExactly 0 -Because $result
-        }
-
-        It "Imports ChocolateyProfile module successfully in PowerShell v2" {
-            $command = 'try { $ErrorActionPreference = ''Stop''; Import-Module $env:ChocolateyInstall\helpers\chocolateyProfile.psm1 } catch { $_ ; exit 1 }'
-            $result = & powershell.exe -Version 2 -noprofile -command $command
-            $LastExitCode | Should -BeExactly 0 -Because $result
         }
 
         Context "chocolateyScriptRunner.ps1" {

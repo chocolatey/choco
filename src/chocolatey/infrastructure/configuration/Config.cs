@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.ComponentModel;
+using chocolatey.infrastructure.app.configuration;
+
 namespace chocolatey.infrastructure.configuration
 {
-    using System;
-    using System.ComponentModel;
-    using app.configuration;
-
     /// <summary>
     ///   Configuration initialization
     /// </summary>
@@ -53,7 +53,7 @@ namespace chocolatey.infrastructure.configuration
             return _configuration;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static void initialize_with(ChocolateyConfiguration configuration)
             => InitializeWith(configuration);
@@ -61,6 +61,6 @@ namespace chocolatey.infrastructure.configuration
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static ChocolateyConfiguration get_configuration_settings()
             => GetConfigurationSettings();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

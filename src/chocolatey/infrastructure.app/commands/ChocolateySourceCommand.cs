@@ -14,21 +14,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.results;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using attributes;
-    using chocolatey.infrastructure.results;
-    using commandline;
-    using configuration;
-    using domain;
-    using infrastructure.commands;
-    using infrastructure.configuration;
-    using logging;
-    using services;
-
     [CommandFor("source", "view and configure default sources")]
     [CommandFor("sources", "view and configure default sources (alias for source)")]
     public class ChocolateySourceCommand : IListCommand<ChocolateySource>
@@ -70,10 +70,10 @@ namespace chocolatey.infrastructure.app.commands
                      "Bypass Proxy - Should this source explicitly bypass any explicitly or system configured proxies? Defaults to false.",
                      option => configuration.SourceCommand.BypassProxy = option != null)
                  .Add("allowselfservice|allow-self-service",
-                     "Allow Self-Service - Should this source be allowed to be used with self-service? Requires business edition (v1.10.0+) with feature 'useBackgroundServiceWithSelfServiceSourcesOnly' turned on. Defaults to false.",
+                     "Allow Self-Service - Should this source be allowed to be used with self-service? Requires business edition with feature 'useBackgroundServiceWithSelfServiceSourcesOnly' turned on. Defaults to false.",
                      option => configuration.SourceCommand.AllowSelfService = option != null)
                  .Add("adminonly|admin-only",
-                     "Visible to Administrators Only - Should this source be visible to non-administrators? Requires business edition (v1.12.2+). Defaults to false.",
+                     "Visible to Administrators Only - Should this source be visible to non-administrators? Requires business edition. Defaults to false.",
                      option => configuration.SourceCommand.VisibleToAdminsOnly = option != null)
                 ;
         }
@@ -88,11 +88,15 @@ namespace chocolatey.infrastructure.app.commands
             }
 
             var command = SourceCommandType.Unknown;
-            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
+            var unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
             Enum.TryParse(unparsedCommand, true, out command);
             if (command == SourceCommandType.Unknown)
             {
-                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                if (!string.IsNullOrWhiteSpace(unparsedCommand))
+                {
+                    this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                }
+
                 command = SourceCommandType.List;
             }
 
@@ -160,12 +164,17 @@ Exit codes that normally result from running this command.
 Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
+ - 2: nothing to do (enhanced)
+
+NOTE: Starting in v2.3.0, if you have the feature '{0}'
+ turned on, then choco will provide enhanced exit codes that allow
+ better integration and scripting.
 
 If you find other exit codes that we have not yet documented, please
  file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
-");
+".FormatWith(ApplicationParameters.Features.UseEnhancedExitCodes));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
@@ -210,12 +219,15 @@ If you find other exit codes that we have not yet documented, please
         public virtual bool MayRequireAdminAccess()
         {
             var config = Config.GetConfigurationSettings();
-            if (config == null) return true;
+            if (config == null)
+            {
+                return true;
+            }
 
             return config.SourceCommand.Command != SourceCommandType.List;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -251,6 +263,6 @@ If you find other exit codes that we have not yet documented, please
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual IEnumerable<ChocolateySource> list(ChocolateyConfiguration config)
             => List(config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

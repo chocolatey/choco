@@ -13,10 +13,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+using System;
+
 namespace chocolatey.infrastructure.app.registration
 {
-    using System;
-
     public interface IContainerRegistrator
     {
         bool RegistrationFailed { get; }
@@ -42,7 +42,7 @@ namespace chocolatey.infrastructure.app.registration
         void RegisterInstance<TService, TImplementation>(Func<IContainerResolver, TImplementation> instance)
             where TImplementation : class, TService;
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void register_validator(Func<Type, bool> validation_func);
 
@@ -64,6 +64,6 @@ namespace chocolatey.infrastructure.app.registration
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         void register_instance<TService, TImplementation>(Func<IContainerResolver, TImplementation> instance)
             where TImplementation : class, TService;
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

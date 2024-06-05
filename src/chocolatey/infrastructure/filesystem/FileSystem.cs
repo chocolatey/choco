@@ -14,19 +14,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.IO;
+
 namespace chocolatey.infrastructure.filesystem
 {
-    using System;
-    using System.IO;
-
     public static class FileSystem
     {
         public static byte[] ReadFileBytes(string filePath)
         {
             byte[] fileBytes = null;
-            using (FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var fs = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
-                using (BinaryReader binaryReader = new BinaryReader(fs))
+                using (var binaryReader = new BinaryReader(fs))
                 {
                     fileBytes = binaryReader.ReadBytes((int)fs.Length);
                 }
@@ -35,10 +35,10 @@ namespace chocolatey.infrastructure.filesystem
             return fileBytes;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static byte[] read_binary_file_into_byte_array(string filePath)
             => ReadFileBytes(filePath);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

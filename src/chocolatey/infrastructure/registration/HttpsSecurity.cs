@@ -1,12 +1,12 @@
-﻿namespace chocolatey.infrastructure.registration
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Net;
-    using System.Text;
-    using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading.Tasks;
 
+namespace chocolatey.infrastructure.registration
+{
     public static class HttpsSecurity
     {
         /// <summary>

@@ -14,16 +14,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.results;
+
 namespace chocolatey.infrastructure.app.services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using configuration;
-    using filesystem;
-    using infrastructure.commands;
-    using results;
-
     public class ShimGenerationService : IShimGenerationService
     {
         private readonly IFileSystem _fileSystem;
@@ -48,28 +48,28 @@ namespace chocolatey.infrastructure.app.services
         private void SetupShimgenArgsDictionary()
         {
             _shimGenArguments.Add("_file_path_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--path=",
-                    ArgumentValue = PathToken,
-                    QuoteValue = true,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--path=",
+                ArgumentValue = PathToken,
+                QuoteValue = true,
+                Required = true
+            });
 
             _shimGenArguments.Add("_output_directory_", new ExternalCommandArgument
-                {
-                    ArgumentOption = "--output=",
-                    ArgumentValue = OutputToken,
-                    QuoteValue = true,
-                    Required = true
-                });
+            {
+                ArgumentOption = "--output=",
+                ArgumentValue = OutputToken,
+                QuoteValue = true,
+                Required = true
+            });
 
             _shimGenArguments.Add("_icon_path_", new ExternalCommandArgument
-                {
-                    ArgumentOption = " --iconpath=",
-                    ArgumentValue = IconPathToken,
-                    QuoteValue = true,
-                    Required = true
-                });
+            {
+                ArgumentOption = " --iconpath=",
+                ArgumentValue = IconPathToken,
+                QuoteValue = true,
+                Required = true
+            });
 
             //_shimGenArguments.Add("_gui_", new ExternalCommandArgument { ArgumentOption = "--gui", Required = false });
         }
@@ -89,10 +89,14 @@ namespace chocolatey.infrastructure.app.services
 
             //gather all .exes in the folder
             var exeFiles = _fileSystem.GetFiles(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
-            foreach (string file in exeFiles.OrEmpty())
+            foreach (var file in exeFiles.OrEmpty())
             {
-                if (_fileSystem.FileExists(file + ".ignore")) continue;
-                bool isGui = _fileSystem.FileExists(file + ".gui");
+                if (_fileSystem.FileExists(file + ".ignore"))
+                {
+                    continue;
+                }
+
+                var isGui = _fileSystem.FileExists(file + ".gui");
                 //todo: #2586 v2 be able to determine gui automatically
 
                 var args = ExternalCommandArgsBuilder.BuildArguments(configuration, _shimGenArguments);
@@ -107,12 +111,20 @@ namespace chocolatey.infrastructure.app.services
                     _shimGenExePath, argsForPackage, configuration.CommandExecutionTimeoutSeconds,
                     (s, e) =>
                         {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            if (string.IsNullOrWhiteSpace(e.Data))
+                            {
+                                return;
+                            }
+
                             this.Log().Debug(() => " [ShimGen] {0}".FormatWith(e.Data.EscapeCurlyBraces()));
                         },
                     (s, e) =>
                         {
-                            if (string.IsNullOrWhiteSpace(e.Data)) return;
+                            if (string.IsNullOrWhiteSpace(e.Data))
+                            {
+                                return;
+                            }
+
                             this.Log().Error(() => " [ShimGen] {0}".FormatWith(e.Data.EscapeCurlyBraces()));
                         },
                     updateProcessPath: true
@@ -134,9 +146,12 @@ namespace chocolatey.infrastructure.app.services
         {
             //gather all .exes in the folder
             var exeFiles = _fileSystem.GetFiles(packageResult.InstallLocation, pattern: "*.exe", option: SearchOption.AllDirectories);
-            foreach (string file in exeFiles.OrEmpty())
+            foreach (var file in exeFiles.OrEmpty())
             {
-                if (_fileSystem.FileExists(file + ".ignore")) continue;
+                if (_fileSystem.FileExists(file + ".ignore"))
+                {
+                    continue;
+                }
 
                 var shimLocation = _fileSystem.CombinePaths(ApplicationParameters.ShimsLocation, _fileSystem.GetFileName(file));
                 this.Log().Debug(() => "Removing shim for {0} at '{1}".FormatWith(_fileSystem.GetFileName(file), shimLocation));
@@ -144,7 +159,7 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void install(ChocolateyConfiguration configuration, PackageResult packageResult)
             => Install(configuration, packageResult);
@@ -152,6 +167,6 @@ namespace chocolatey.infrastructure.app.services
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public void uninstall(ChocolateyConfiguration configuration, PackageResult packageResult)
             => Uninstall(configuration, packageResult);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

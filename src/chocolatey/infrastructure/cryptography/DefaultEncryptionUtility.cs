@@ -14,21 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Security.Cryptography;
+using System.Text;
+using chocolatey.infrastructure.adapters;
+using chocolatey.infrastructure.platforms;
+
 namespace chocolatey.infrastructure.cryptography
 {
-    using System;
-    using System.Security.Cryptography;
-    using System.Text;
-    using adapters;
-    using platforms;
-
     public class DefaultEncryptionUtility : IEncryptionUtility
     {
         private readonly byte[] _entropyBytes = Encoding.UTF8.GetBytes("Chocolatey");
 
         public string EncryptString(string cleartextValue)
         {
-            if (string.IsNullOrWhiteSpace(cleartextValue)) return null;
+            if (string.IsNullOrWhiteSpace(cleartextValue))
+            {
+                return null;
+            }
 
             var decryptedByteArray = Encoding.UTF8.GetBytes(cleartextValue);
             byte[] encryptedByteArray;
@@ -92,7 +95,7 @@ Anything encrypted as CurrentUser can only be decrypted by your current user.");
             return Convert.ToBase64String(hashProvider.CalculateHash(pathBytes)).ToUpperInvariant();
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public string encrypt_string(string cleartextValue)
             => EncryptString(cleartextValue);
@@ -104,6 +107,6 @@ Anything encrypted as CurrentUser can only be decrypted by your current user.");
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public string generate_unique_token(string caseInsensitiveKey)
             => GenerateUniqueToken(caseInsensitiveKey);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

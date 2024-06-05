@@ -14,10 +14,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+
 namespace chocolatey.infrastructure.app.domain
 {
-    using System;
-
     public enum ConfigCommandType
     {
         Unknown,
@@ -26,7 +26,7 @@ namespace chocolatey.infrastructure.app.domain
         Set,
         Unset,
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         unknown = Unknown,
         [Obsolete("This overload is deprecated and will be removed in v3.")]
@@ -37,6 +37,6 @@ namespace chocolatey.infrastructure.app.domain
         set = Set,
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         unset = Unset,
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -23,6 +23,20 @@ Describe "choco outdated" -Tag Chocolatey, OutdatedCommand {
         Remove-ChocolateyTestInstall
     }
 
+    Context "Should include configured sources" {
+        BeforeAll {
+            $Output = Invoke-Choco outdated --include-configured-sources --debug
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should mention that configured sources have been included" {
+            $Output.Lines | Should -Contain "Including sources from chocolatey.config file." -Because $Output.String
+        }
+    }
+
     Context "outdated ignore-pinned uses correct enhanced exit codes" -ForEach @(
         @{ Argument = '' ; ExitCode = 2 }
         @{ Argument = '--ignore-pinned' ; ExitCode = 0 }

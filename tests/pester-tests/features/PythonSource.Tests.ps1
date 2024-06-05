@@ -27,12 +27,29 @@ Describe "Python Source" -Tag Chocolatey, UpgradeCommand, PythonSource, ProxySki
         }
 
         It 'Exits with correct exit code (<ExitCode>)' {
-            $Output.ExitCode | Should -Be $ExitCode
+            $Output.ExitCode | Should -Be $ExitCode -Because $Output.String
         }
 
         It 'Outputs properly' {
-            $Output.Lines | Should -Not:($ExitCode -eq 0) -Contain 'The all keyword is not available for alternate sources'
-            $Output.Lines | Should  -Contain "Chocolatey upgraded $Count/$Count packages."
+            $Output.Lines | Should -Not:($ExitCode -eq 0) -Contain "Alternative sources do not allow the use of the 'all' package name/keyword." -Because $Output.String
+            $Output.Lines | Should  -Contain "Chocolatey upgraded $Count/$Count packages." -Because $Output.String
+        }
+    }
+
+    Context "install all" {
+        BeforeAll {
+            # For some reason under kitchen-pester we don't have pip on the path. This might be due to our snapshotting...
+            Import-Module $env:ChocolateyInstall/helpers/ChocolateyProfile.psm1
+            Update-SessionEnvironment
+            $Output = Invoke-Choco install all --source=python
+        }
+
+        It 'Exits with exit code (1)' {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It 'Outputs exception' {
+            $Output.Lines | Should -Contain "Alternative sources do not allow the use of the 'all' package name/keyword." -Because $Output.String
         }
     }
 }

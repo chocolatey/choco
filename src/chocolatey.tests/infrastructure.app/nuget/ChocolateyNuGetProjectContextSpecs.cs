@@ -13,16 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.nuget;
+using Moq;
+using NuGet.Common;
+using NuGet.ProjectManagement;
+using NUnit.Framework;
+using FluentAssertions;
+
 namespace chocolatey.tests.infrastructure.app.nuget
 {
-    using chocolatey.infrastructure.app.configuration;
-    using chocolatey.infrastructure.app.nuget;
-    using Moq;
-    using NuGet.Common;
-    using NuGet.ProjectManagement;
-    using NUnit.Framework;
-    using FluentAssertions;
-
     public class ChocolateyNuGetProjectContextSpecs
     {
         public abstract class ChocolateyNuGetProjectContextSpecsBase : TinySpec
@@ -84,8 +84,8 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 //Logger.VerifyNoOtherCalls();
             }
 
-            [TestCase(LogLevel.Debug)]
-            public void Should_log_to_child_logger_and_pass_along_original_message(LogLevel logLevel)
+            [TestCase(NuGet.Common.LogLevel.Debug)]
+            public void Should_log_to_child_logger_and_pass_along_original_message(NuGet.Common.LogLevel logLevel)
             {
                 var logMessage = new LogMessage(logLevel, "My awesome message");
 
@@ -122,7 +122,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             [Fact]
             public void Should_report_errors_with_message_to_child_logger()
             {
-                var logMessage = new LogMessage(LogLevel.Debug, "Some message");
+                var logMessage = new LogMessage(NuGet.Common.LogLevel.Debug, "Some message");
 
                 Service.ReportError(logMessage);
 

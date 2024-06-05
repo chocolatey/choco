@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace chocolatey
 {
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-
     /// <summary>
     ///   Extensions for IEnumerable
     /// </summary>
@@ -66,8 +66,8 @@ namespace chocolatey
         /// </summary>
         public static IEnumerable<T> LastDistinct<T>(this IEnumerable<T> source, IEqualityComparer<T> equalityComparer, IComparer<T> comparer)
         {
-            bool first = true;
-            bool maxElementHasValue = false;
+            var first = true;
+            var maxElementHasValue = false;
             var previousElement = default(T);
             var maxElement = default(T);
 
@@ -118,11 +118,11 @@ namespace chocolatey
             unchecked
             {
                 return source.Aggregate(seed, (current, item) =>
-                    (current*modifier) + item.GetHashCode());
+                    (current * modifier) + item.GetHashCode());
             }
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static IEnumerable<T> or_empty_list_if_null<T>(this IEnumerable<T> source)
             => OrEmpty(source);
@@ -142,6 +142,6 @@ namespace chocolatey
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public static int get_sequence_hash_code<T>(this IEnumerable<T> source)
             => SequenceHashCode<T>(source);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

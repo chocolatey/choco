@@ -14,13 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.attributes;
+
 namespace chocolatey.infrastructure.validations
 {
-    using System;
-    using System.Collections.Generic;
-    using app.configuration;
-    using chocolatey.infrastructure.app.attributes;
-
     /// <summary>
     ///   Interface for all validations
     /// </summary>
@@ -34,9 +34,9 @@ namespace chocolatey.infrastructure.validations
         /// <returns>The validation results</returns>
         ICollection<ValidationResult> Validate(ChocolateyConfiguration config);
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         ICollection<ValidationResult> validate(ChocolateyConfiguration config);
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }

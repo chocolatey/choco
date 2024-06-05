@@ -3,6 +3,8 @@
 
 Vagrant.configure("2") do |config|
   config.vm.box = "StefanScherer/windows_2022"
+  # Set Hostname to prevent error messages. https://github.com/hashicorp/vagrant/issues/12644
+  config.vm.hostname = 'chocolatey-tests'
   config.vm.boot_timeout = 600
 
   # windows
@@ -54,7 +56,7 @@ Vagrant.configure("2") do |config|
     $null = robocopy c:/chocoRoot c:/code/choco /e /copy:dt /purge
     Push-Location c:/code/choco
     Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Files have been copied, beginning build process."
-    $CakeOutput = ./build.bat 2>&1
+    $CakeOutput = ./build.bat --verbosity=diagnostic --target=CI --testExecutionType=none --shouldRunalyze=false --shouldRunNuGet=false 2>&1
 
     if ($LastExitCode -ne 0) {
         Set-Content c:/vagrant/buildOutput.log -Value $CakeOutput
@@ -64,12 +66,22 @@ Vagrant.configure("2") do |config|
 
     Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Build complete."
   SHELL
+  config.vm.provision "shell", name: "clear-packages", inline: <<-SHELL
+    Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Clearing the packages directory"
+    Remove-Item "$env:TEMP/chocolateyTests/packages" -Recurse -Force -ErrorAction SilentlyContinue
+  SHELL
   config.vm.provision "shell", name: "test", inline: <<-SHELL
+    # Copy changed files.
+    $null = robocopy c:/chocoRoot c:/code/choco /e /copy:dt
+    # Purge any tests files that have been removed.
+    $null = robocopy c:/chocoRoot/tests c:/code/choco/tests /e /copy:dt /purge
     Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Starting Test Execution"
     Push-Location c:/code/choco
     # $env:TEST_KITCHEN = 1
     $env:VM_RUNNING = 1
-    ./Invoke-Tests.ps1
+    # The Invoke-Tests file will build the packages if the directory does not exist.
+    # This will allow to rerun tests without packaging each time.
+    ./Invoke-Tests.ps1 -SkipPackaging
     Copy-Item $env:ALLUSERSPROFILE/chocolatey/logs/testInvocations.log C:/vagrant
   SHELL
 end

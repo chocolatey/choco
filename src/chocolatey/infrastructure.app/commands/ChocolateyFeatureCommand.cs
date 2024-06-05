@@ -14,20 +14,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using chocolatey.infrastructure.app.attributes;
+using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.app.domain;
+using chocolatey.infrastructure.commands;
+using chocolatey.infrastructure.configuration;
+using chocolatey.infrastructure.logging;
+using chocolatey.infrastructure.app.services;
+
 namespace chocolatey.infrastructure.app.commands
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using attributes;
-    using commandline;
-    using configuration;
-    using domain;
-    using infrastructure.commands;
-    using infrastructure.configuration;
-    using logging;
-    using services;
-
     [CommandFor("feature", "view and configure choco features")]
     [CommandFor("features", "view and configure choco features (alias for feature)")]
     public class ChocolateyFeatureCommand : ICommand
@@ -55,11 +55,15 @@ namespace chocolatey.infrastructure.app.commands
             configuration.Input = string.Join(" ", unparsedArguments);
 
             var command = FeatureCommandType.Unknown;
-            string unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
+            var unparsedCommand = unparsedArguments.DefaultIfEmpty(string.Empty).FirstOrDefault();
             Enum.TryParse(unparsedCommand, true, out command);
             if (command == FeatureCommandType.Unknown)
             {
-                if (!string.IsNullOrWhiteSpace(unparsedCommand)) this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                if (!string.IsNullOrWhiteSpace(unparsedCommand))
+                {
+                    this.Log().Warn("Unknown command {0}. Setting to list.".FormatWith(unparsedCommand));
+                }
+
                 command = FeatureCommandType.List;
             }
 
@@ -70,7 +74,7 @@ namespace chocolatey.infrastructure.app.commands
                 )
                 && unparsedArguments.Count > 1)
             {
-                throw new ApplicationException("A single features command must be listed. Please see the help menu for those commands");
+                throw new ApplicationException("A single feature command must be listed. Please see the help menu for those commands.");
             }
 
             if (string.IsNullOrWhiteSpace(configuration.FeatureCommand.Name) && unparsedArguments.Count >= 2)
@@ -120,12 +124,17 @@ Exit codes that normally result from running this command.
 Normal:
  - 0: operation was successful, no issues detected
  - -1 or 1: an error has occurred
+ - 2: nothing to do, feature already set (enhanced)
+
+NOTE: Starting in v2.3.0, if you have the feature '{0}'
+ turned on, then choco will provide enhanced exit codes that allow
+ better integration and scripting.
 
 If you find other exit codes that we have not yet documented, please
  file a ticket so we can document it at
  https://github.com/chocolatey/choco/issues/new/choose.
 
-");
+".FormatWith(ApplicationParameters.Features.UseEnhancedExitCodes));
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, "Options and Switches");
         }
@@ -157,12 +166,15 @@ If you find other exit codes that we have not yet documented, please
         public virtual bool MayRequireAdminAccess()
         {
             var config = Config.GetConfigurationSettings();
-            if (config == null) return true;
+            if (config == null)
+            {
+                return true;
+            }
 
             return config.FeatureCommand.Command != FeatureCommandType.List;
         }
 
-#pragma warning disable IDE1006
+#pragma warning disable IDE0022, IDE1006
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
             => ConfigureArgumentParser(optionSet, configuration);
@@ -190,6 +202,6 @@ If you find other exit codes that we have not yet documented, please
         [Obsolete("This overload is deprecated and will be removed in v3.")]
         public virtual bool may_require_admin_access()
             => MayRequireAdminAccess();
-#pragma warning restore IDE1006
+#pragma warning restore IDE0022, IDE1006
     }
 }
