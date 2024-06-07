@@ -31,16 +31,26 @@ if (-not (Get-Module -ListAvailable PlatyPS)) {
     Install-Module PlatyPS -Scope CurrentUser
 }
 
-$documentationPath = Join-Path $DocsRepositoryPath -ChildPath "input/en-us/create/cmdlets"
+$documentationPath = Join-Path $DocsRepositoryPath -ChildPath "src\content\docs\en-us\create\cmdlets"
 if (-not (Test-Path $DocsRepositoryPath)) {
     throw "PowerShell commands docs folder was not found at '$documentationPath'. Please clone the chocolatey/docs repository locally first, and/or provide the path to the repo root as -DocsRepositoryPath to this script."
 }
 
-$dllPath = "$PSScriptRoot/code_drop/temp/_PublishedLibs/Chocolatey.PowerShell_signed/Chocolatey.PowerShell.dll"
+$dllPath = "$PSScriptRoot/code_drop/temp/_PublishedLibs/Chocolatey.PowerShell/Chocolatey.PowerShell.dll"
 
 if (-not (Test-Path $dllPath)) {
     throw "Please run this repository's build.ps1 file before trying to build markdown help for this module."
 }
+
+# Rename .mdx to .md and transform anything platyps doesn't like and can't handle
+$renamedFiles = Get-ChildItem -Path $documentationPath -Filter '*.md*' |
+    Where-Object Name -notlike "index.*" |
+    Rename-Item -NewName { $_.BaseName + ".md" } -PassThru |
+    ForEach-Object {
+        $content = Get-Content -Path $_.FullName
+        $content = $content -replace '<Xref title="(?<label>[^"]+)" value="(?<xref>[^"]+)" classes="(?<classes>[^"]+)" />', '[${label}](${xref},${classes})'
+        $content | Set-Content -Path $_.FullName
+    }
 
 # Import the module .dll to generate / update help from.
 Import-Module $dllPath
@@ -70,7 +80,32 @@ if ($incompleteFiles) {
     Write-Warning "Run this script again once these files have been updated in order to generate the XML help documentation for the module."
 }
 else {
-    New-ExternalHelp -Path $documentationPath -OutputPath "$PSScriptRoot/src/Chocolatey.PowerShell"
+    New-ExternalHelp -Path $documentationPath -OutputPath "$PSScriptRoot/src/Chocolatey.PowerShell" -Force
+
+    $newOrUpdatedFiles = $newOrUpdatedFiles |
+        Rename-Item -NewName { $_.BaseName + ".mdx" } -PassThru |
+        ForEach-Object {
+            $content = Get-Content -Path $_.FullName
+            $content = $content -replace '\[(?<name>[^\]]+)\]\((?<xref>[^,]+),(?<classes>[^)]+)\)', '<Xref title="${name}" value="${xref}" classes="${classes}" />'
+
+            $frontMatterBounds = 0
+            $content = $content | ForEach-Object {
+                $_
+
+                if ($_ -eq '---') {
+                    $frontMatterBounds++
+
+                    if ($frontMatterBounds -eq 2) {
+                        "import Xref from '@components/Xref.astro';"
+                    }
+                }
+            }
+
+            $content | Set-Content -Path $_.FullName
+
+            $_
+        }
+
 }
 
 # Output the new/updated files so calling user knows what files the script has touched.
