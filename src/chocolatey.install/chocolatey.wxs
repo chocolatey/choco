@@ -50,21 +50,12 @@
           </Component>
         </Directory>
       </Directory>
-      <Directory Id="TOOLSDIR" Name="Tools">
-        <Component Id="ToolsFolder" Guid="{D8FFAB60-BD14-4DF3-81D2-1510FD1BB257}" Win64="no">
-          <CreateFolder />
-          <Environment Id="ChocolateyToolsLocationEnvVar" Action="create" Name="ChocolateyToolsLocation" Permanent="no" System="yes" Value="[TOOLSDIR]" />
-        </Component>
-      </Directory>
     </Directory>
 
     <!-- Feature Listing for Chocolatey -->
     <Feature Id="Complete" Title="Chocolatey" Description="$(var.ProductSummary)" Display="expand" Level="1" Absent="disallow">
       <Feature Id="Choco" Title="Choco.exe" Description="!(loc.ChocoExeDescription)" Absent="disallow" Display="hidden" Level="1">
         <ComponentRef Id="ChocolateyInstallers" />
-      </Feature>
-      <Feature Id="Tools" Title="Tools Folder Location" Description="!(loc.ToolsFolderDescription)" Level="1" ConfigurableDirectory="TOOLSDIR">
-        <ComponentRef Id="ToolsFolder" />
       </Feature>
     </Feature>
 
