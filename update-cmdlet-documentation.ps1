@@ -48,7 +48,33 @@ $renamedFiles = Get-ChildItem -Path $documentationPath -Filter '*.md*' |
     Rename-Item -NewName { $_.BaseName + ".md" } -PassThru |
     ForEach-Object {
         $content = Get-Content -Path $_.FullName
-        $content = $content -replace '<Xref title="(?<label>[^"]+)" value="(?<xref>[^"]+)" classes="(?<classes>[^"]+)" />', '[${label}](${xref},${classes})'
+        $content = $content | ForEach-Object {
+            # replace xref with markdown-ish link so platyPS can process things
+            if ($_ -match '<Xref[^>]+?>') {
+                $xml = [xml]$_
+                $label = $xml.Xref.title
+                $xref = $xml.Xref.value
+                $anchor = $xml.Xref.anchor
+                $classes = $xml.Xref.classes
+
+                if ($anchor -and $classes) {
+                    "[${label}](xref:${xref}#${anchor},${classes})"
+                }
+                elseif ($classes) {
+                    "[${label}](xref:${xref},${classes})"     
+                }
+                elseif ($anchor) {
+                    "[${label}](xref:${xref}#${anchor})"                    
+                }
+                else {
+                    "[${label}](xref:${xref})"      
+                }
+
+            }
+            else {
+                $_
+            }
+        }
         $content | Set-Content -Path $_.FullName
     }
 
@@ -81,15 +107,41 @@ if ($incompleteFiles) {
 }
 else {
     New-ExternalHelp -Path $documentationPath -OutputPath "$PSScriptRoot/src/Chocolatey.PowerShell" -Force
+}
 
-    $newOrUpdatedFiles = $newOrUpdatedFiles |
-        Rename-Item -NewName { $_.BaseName + ".mdx" } -PassThru |
-        ForEach-Object {
-            $content = Get-Content -Path $_.FullName
-            $content = $content -replace '\[(?<name>[^\]]+)\]\((?<xref>[^,]+),(?<classes>[^)]+)\)', '<Xref title="${name}" value="${xref}" classes="${classes}" />'
+$newOrUpdatedFiles = $newOrUpdatedFiles |
+    Rename-Item -NewName { $_.BaseName + ".mdx" } -PassThru |
+    ForEach-Object {
+        $content = Get-Content -Path $_.FullName
+        
+        $frontMatterBounds = 0
+        $content = $content | ForEach-Object {
+            if ($_ -match '\[(?<name>[^\]]+)\]\(xref:(?<xref>[^#,]+)(#(?<anchor>[^,]+))?,(?<classes>[^)]+)\)') {
+                # replace any lines that are an xref link with the html/xml format that astro uses <Xref ... />
+                $xml = [xml]::new()
+                $node = $xml.CreateElement('Xref')
+                $title = $xml.CreateAttribute('title')
+                $title.Value = $matches['name']
+                $null = $node.Attributes.Append($title)
 
-            $frontMatterBounds = 0
-            $content = $content | ForEach-Object {
+                $target = $xml.CreateAttribute('value')
+                $target.Value = $matches['xref']
+                $null = $node.Attributes.Append($target)
+
+                if ($matches['anchor']) {
+                    $anchor = $xml.CreateAttribute('anchor')
+                    $anchor.Value = $matches['anchor']
+                    $null = $node.Attributes.Append($anchor)
+                }
+
+                $classes = $xml.CreateAttribute('classes')
+                $classes.Value = $matches['classes']
+                $null = $node.Attributes.Append($classes)
+
+                $node.OuterXml
+            }
+            else {
+                # after the second --- where we exit the frontmatter, add the xref import to the document
                 $_
 
                 if ($_ -eq '---') {
@@ -100,13 +152,12 @@ else {
                     }
                 }
             }
-
-            $content | Set-Content -Path $_.FullName
-
-            $_
         }
 
-}
+        $content | Set-Content -Path $_.FullName
+
+        $_
+    }
 
 # Output the new/updated files so calling user knows what files the script has touched.
 $newOrUpdatedFiles
