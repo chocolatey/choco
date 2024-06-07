@@ -32,8 +32,8 @@
     <SetProperty Id="InstallChocolatey"
       Before="InstallChocolatey"
       Sequence="execute"
-      Value="&quot;[SystemFolder]\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -Command &quot;$env:ChocolateyInstall='[INSTALLDIR]'; &amp; '[#ChocolateyInstall]' -ChocolateyDownloadUrl '[#ChocolateyNupkg]' -UseNativeUnzip&quot;" />
-    <CustomAction Id="InstallChocolatey" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="yes" />
+      Value="&quot;[SystemFolder]\WindowsPowerShell\v1.0\powershell.exe&quot; -NoProfile -ExecutionPolicy Bypass -Command &quot;&amp; '[#ChocolateyInstall]' -ChocolateyDownloadUrl '[#ChocolateyNupkg]' -UseNativeUnzip&quot;" />
+    <CustomAction Id="InstallChocolatey" BinaryKey="WixCA" DllEntry="WixQuietExec" Execute="deferred" Return="check" Impersonate="no" />
 
     <!-- Custom Additions to the InstallExecuteSequence (e.g. the actions above) -->
     <InstallExecuteSequence>
@@ -42,14 +42,6 @@
 
     <!-- Installation Layout - primarily 'temporary' install files, unlike most MSI installers, as we run the standard install script -->
     <Directory Id="TARGETDIR" Name="SourceDir">
-      <Directory Id="CommonAppDataFolder" Name="ProgramData">
-        <Directory Id="INSTALLDIR" Name="chocolatey">
-          <Component Id="ChocolateyInstallDirectory" Guid="{9E538CD6-6F07-43E5-B8E2-ED31995F3D1C}" Win64="no">
-            <CreateFolder />
-            <Environment Id="ChocolateyInstallEnvVar" Action="set" Name="ChocolateyInstall" Permanent="no" System="yes" Value="[INSTALLDIR]" />
-          </Component>
-        </Directory>
-      </Directory>
       <Directory Id="TempFolder" Name="TempFolder">
         <Directory Id="InstallersDirectory" Name="chocolatey$(var.ProductVersion)">
           <Component Id="ChocolateyInstallers" Guid="{E5AD31D5-FEE3-4445-97F9-DAFEAA359CCD}" Win64="no">
@@ -67,9 +59,8 @@
     </Directory>
 
     <!-- Feature Listing for Chocolatey -->
-    <Feature Id="Complete" Title="Chocolatey" Description="$(var.ProductSummary)" Display="expand" Level="1" Absent="disallow" ConfigurableDirectory="INSTALLDIR">
+    <Feature Id="Complete" Title="Chocolatey" Description="$(var.ProductSummary)" Display="expand" Level="1" Absent="disallow">
       <Feature Id="Choco" Title="Choco.exe" Description="!(loc.ChocoExeDescription)" Absent="disallow" Display="hidden" Level="1">
-        <ComponentRef Id="ChocolateyInstallDirectory" />
         <ComponentRef Id="ChocolateyInstallers" />
       </Feature>
       <Feature Id="Tools" Title="Tools Folder Location" Description="!(loc.ToolsFolderDescription)" Level="1" ConfigurableDirectory="TOOLSDIR">
