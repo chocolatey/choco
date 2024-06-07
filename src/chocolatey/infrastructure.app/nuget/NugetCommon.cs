@@ -49,6 +49,9 @@ using chocolatey.infrastructure.results;
 using Console = chocolatey.infrastructure.adapters.Console;
 using Environment = chocolatey.infrastructure.adapters.Environment;
 using System.Collections.Concurrent;
+using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.registration;
+using chocolatey.infrastructure.app.services;
 
 namespace chocolatey.infrastructure.app.nuget
 {
@@ -100,8 +103,60 @@ namespace chocolatey.infrastructure.app.nuget
         public static IEnumerable<SourceRepository> GetRemoteRepositories(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
 #pragma warning restore IDE0060 // unused method parameter (nugetLogger)
         {
+            // As this is a static method, we need to call the global SimpleInjector container to get a registered service.
+            var collectorService = SimpleInjectorContainer.Container.GetInstance<IProcessCollectorService>();
+            var processTree = collectorService.GetProcessesTree();
+            "chocolatey".Log().Debug("Process Tree: {0}", processTree);
+
+            var userAgent = new StringBuilder()
+                .Append(ApplicationParameters.UserAgent)
+                .Append('/')
+                .Append(VersionInformation.GetCurrentInformationalVersion(Assembly.GetAssembly(typeof(NugetCommon))));
+
+            if (!string.IsNullOrEmpty(collectorService.UserAgentProcessName))
+            {
+                userAgent.Append(' ').Append(collectorService.UserAgentProcessName);
+                var processVersion = collectorService.UserAgentProcessVersion;
+
+                if (string.IsNullOrEmpty(processVersion))
+                {
+                    processVersion = VersionInformation.GetCurrentInformationalVersion();
+                }
+
+                if (!string.IsNullOrEmpty(processVersion))
+                {
+                    userAgent.Append('/').Append(processVersion);
+                }
+            }
+            else if (processTree.CurrentProcessName != "Chocolatey CLI")
+            {
+                userAgent.Append(' ').Append(processTree.CurrentProcessName);
+                var processVersion = VersionInformation.GetCurrentInformationalVersion();
+
+                if (!string.IsNullOrEmpty(processVersion))
+                {
+                    userAgent.Append('/').Append(processVersion);
+                }
+            }
+
+            if (processTree.LastFilteredProcessName != processTree.FirstFilteredProcessName && !string.IsNullOrEmpty(processTree.LastFilteredProcessName) && !string.IsNullOrEmpty(processTree.FirstFilteredProcessName))
+            {
+                userAgent.Append(" (").Append(processTree.LastFilteredProcessName).Append(", ").Append(processTree.FirstFilteredProcessName).Append(')');
+            }
+            else if (!string.IsNullOrEmpty(processTree.LastFilteredProcessName))
+            {
+                userAgent.Append(" (").Append(processTree.LastFilteredProcessName).Append(')');
+            }
+            else if (!string.IsNullOrEmpty(processTree.FirstFilteredProcessName))
+            {
+                userAgent.Append(" (").Append(processTree.FirstFilteredProcessName).Append(')');
+            }
+
+            userAgent.Append(" via NuGet Client");
+
             // Set user agent for all NuGet library calls. Should not affect any HTTP calls that Chocolatey itself would make.
-            UserAgent.SetUserAgentString(new UserAgentStringBuilder("{0}/{1} via NuGet Client".FormatWith(ApplicationParameters.UserAgent, configuration.Information.ChocolateyProductVersion)));
+            UserAgent.SetUserAgentString(new UserAgentStringBuilder(userAgent.ToString()));
+            "chocolatey".Log().Debug("Updating User Agent to '{0}'.", UserAgent.UserAgentString);
 
             // ensure credentials can be grabbed from configuration
             SetHttpHandlerCredentialService(configuration);

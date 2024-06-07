@@ -8,6 +8,11 @@ namespace chocolatey.infrastructure.information
     [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
     public class ProcessTree
     {
+        // IGNORED USER AGENT PROCESSES
+        // Our Pester tests may need their own exclusion list in the verification
+        // updated when this list changes. Search the repo for the above string
+        // in caps if you have trouble finding the corresponding list in tests
+        // (should be in UserAgent.Tests.ps1).
         private static readonly string[] _filteredParents = new[]
         {
             "explorer",
@@ -67,8 +72,11 @@ namespace chocolatey.infrastructure.information
                 case "choco":
                     return "Chocolatey CLI";
 
-                case "ChocolateyGui":
+                case "chocolateygui":
                     return "Chocolatey GUI";
+
+                case "chocolatey-agent":
+                    return "Chocolatey Agent";
 
                 default:
                     return value;

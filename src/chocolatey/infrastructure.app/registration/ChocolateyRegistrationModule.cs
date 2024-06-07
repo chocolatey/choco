@@ -94,6 +94,7 @@ namespace chocolatey.infrastructure.app.registration
                 .ToArray();
 
             registrator.RegisterService<IMetadataRule>(availableRules);
+            registrator.RegisterService<IProcessCollectorService, ProcessCollectorService>();
         }
 
 #pragma warning disable IDE0022, IDE1006

@@ -33,6 +33,9 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using FluentAssertions;
+using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.registration;
+using System.Diagnostics;
 
 namespace chocolatey.tests.infrastructure.app.nuget
 {
@@ -175,14 +178,17 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 Context();
                 var source = "https://community.chocolatey.org/api/v2/";
                 _configuration.Sources = source;
-                _configuration.Information.ChocolateyProductVersion = "vNext";
 
                 _because();
 
                 // Change this when the NuGet version is updated.
-                var nugetClientVersion = "6.4.1";
-                var expectedUserAgentString = "{0}/{1} via NuGet Client/{2}".FormatWith(ApplicationParameters.UserAgent, _configuration.Information.ChocolateyProductVersion, nugetClientVersion);
-                UserAgent.UserAgentString.Should().StartWith(expectedUserAgentString);
+                const string nugetClientVersion = "6.4.1";
+                var currentProcess = Process.GetCurrentProcess();
+                var expectedUserAgentRegexString = @"^{0}\/[\d\.]+(-[A-za-z\d\.-]+)? {1}\/[\d\.]+(-[A-Za-z\d\.-]+)? (\([A-za-z\d\.-]+(, [A-Za-z\d\.-]+)?\) )?via NuGet Client\/{2}".FormatWith(
+                    ApplicationParameters.UserAgent,
+                    currentProcess.ProcessName,
+                    Regex.Escape(nugetClientVersion));
+                UserAgent.UserAgentString.Should().MatchRegex(expectedUserAgentRegexString);
             }
         }
 
