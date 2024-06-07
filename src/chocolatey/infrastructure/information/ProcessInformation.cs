@@ -15,6 +15,9 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using chocolatey.infrastructure.platforms;
@@ -158,6 +161,52 @@ namespace chocolatey.infrastructure.information
             return isSystem;
         }
 
+        public static ProcessTree GetProcessTree(Process process = null)
+        {
+            if (process == null)
+            {
+                process = Process.GetCurrentProcess();
+            }
+
+            var tree = new ProcessTree(process.ProcessName);
+
+            Process nextProcess = null;
+
+            while (true)
+            {
+                try
+                {
+                    var parentProcess = ParentProcessUtilities.GetParentProcess(nextProcess ?? process);
+
+                    if (parentProcess == null)
+                    {
+                        break;
+                    }
+
+                    nextProcess = parentProcess;
+                    tree.Processes.AddLast(nextProcess.ProcessName);
+                }
+                catch (Win32Exception ex)
+                {
+                    // Native error code 5 is access denied.
+                    // This usually happens if the parent executable
+                    // is running as a different user, in which case
+                    // we are not able to get the necessary handle for
+                    // the process.
+                    if (ex.NativeErrorCode != 5)
+                    {
+                        throw;
+                    }
+                    else
+                    {
+                        "chocolatey".Log().Warn(logging.ChocolateyLoggers.LogFileOnly, "Unable to get parent process for '{0}'. Ignoring...", process.ProcessName);
+                    }
+                }
+            }
+
+            return tree;
+        }
+
         /*
          https://msdn.microsoft.com/en-us/library/windows/desktop/aa376402.aspx
          BOOL WINAPI ConvertStringSidToSid(
@@ -242,6 +291,53 @@ namespace chocolatey.infrastructure.information
             TokenElevationTypeDefault = 1,
             TokenElevationTypeFull,
             TokenElevationTypeLimited
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct ParentProcessUtilities
+        {
+            internal IntPtr Reserved1;
+            internal IntPtr PebBaseAddress;
+            internal IntPtr Reserved2_0;
+            internal IntPtr Reselved2_1;
+            internal IntPtr UniqueProcessId;
+            internal IntPtr InheritedFromUniqueProcessId;
+
+            [DllImport("ntdll.dll")]
+            private static extern int NtQueryInformationProcess(IntPtr processHandle, int processInformationClass, ref ParentProcessUtilities processInformaiton, int processInformationLength, out int returnLength);
+
+            public static Process GetParentProcess(Process process)
+            {
+                try
+                {
+                    return GetParentProcess(process.Handle);
+                }
+                catch (Win32Exception)
+                {
+                    return null;
+                }
+            }
+
+            public static Process GetParentProcess(IntPtr handle)
+            {
+                try
+                {
+                    var processUtilities = new ParentProcessUtilities();
+
+                    var status = NtQueryInformationProcess(handle, 0, ref processUtilities, Marshal.SizeOf(processUtilities), out _);
+
+                    if (status != 0)
+                    {
+                        return null;
+                    }
+
+                    return Process.GetProcessById(processUtilities.InheritedFromUniqueProcessId.ToInt32());
+                }
+                catch (ArgumentException)
+                {
+                    return null;
+                }
+            }
         }
 
 #pragma warning disable IDE0022, IDE1006

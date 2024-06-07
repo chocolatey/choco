@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using chocolatey.benchmark.helpers;
+using chocolatey.infrastructure.information;
 
 namespace chocolatey.benchmark
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using chocolatey.infrastructure.information;
 
 namespace chocolatey.benchmark.helpers
 {
@@ -8,11 +9,20 @@ namespace chocolatey.benchmark.helpers
     {
         private static readonly string[] _filteredParents = new[]
         {
-                "explorer",
-                "powershell",
-                "pwsh",
-                "cmd",
-                "bash"
+            "explorer",
+            "powershell",
+            "pwsh",
+            "cmd",
+            "bash",
+            // The name used to launch windows services
+            // in the operating system.
+            "services",
+            // Known Terminal Emulators
+            "Tabby",
+            "WindowsTerminal",
+            "FireCMD",
+            "ConEmu64",
+            "ConEmuC64"
         };
 
         public static ProcessTree GetProcessTree(Process process = null)
@@ -81,29 +91,6 @@ namespace chocolatey.benchmark.helpers
             }
 
             return nextProcess?.ProcessName;
-
-            //var processName = FindIndexedProcessName(process.Id);
-
-            //if (string.IsNullOrEmpty(processName))
-            //{
-            //    return null;
-            //}
-
-            //var parentProcess = FindPidFromIndexedProcessName(processName);
-
-            //if (parentProcess == null)
-            //{
-            //    return null;
-            //}
-
-            //var topLevelProcess = GetParent(parentProcess);
-
-            //if (topLevelProcess == null)
-            //{
-            //    return parentProcess.ProcessName;
-            //}
-
-            //return topLevelProcess;
         }
 
         public static string GetParentFiltered(Process process = null)
@@ -142,37 +129,7 @@ namespace chocolatey.benchmark.helpers
                 }
             }
 
-            return nextProcess?.ProcessName;
-
-            //var processName = FindIndexedProcessName(process.Id);
-
-            //if (string.IsNullOrEmpty(processName))
-            //{
-            //    return null;
-            //}
-
-            //var parentProcess = FindPidFromIndexedProcessName(processName);
-
-            //if (parentProcess == null)
-            //{
-            //    return null;
-            //}
-
-            //var topLevelProcess = GetParent(parentProcess);
-
-            //if (topLevelProcess == null || IsIgnoredParent(topLevelProcess))
-            //{
-            //    if (IsIgnoredParent(parentProcess.ProcessName))
-            //    {
-            //        return null;
-            //    }
-            //    else
-            //    {
-            //        return parentProcess.ProcessName;
-            //    }
-            //}
-
-            //return topLevelProcess;
+            return selectedProcess?.ProcessName;
         }
 
         private static bool IsIgnoredParent(string processName)

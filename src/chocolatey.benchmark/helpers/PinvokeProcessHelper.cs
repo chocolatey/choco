@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.Security.Permissions;
 using System.Security;
+using chocolatey.infrastructure.information;
 
 namespace chocolatey.benchmark.helpers
 {
@@ -14,10 +15,20 @@ namespace chocolatey.benchmark.helpers
     {
         private static readonly string[] _filteredParents = new[]
         {
-                "explorer",
-                "powershell",
-                "pwsh",
-                "cmd"
+            "explorer",
+            "powershell",
+            "pwsh",
+            "cmd",
+            "bash",
+            // The name used to launch windows services
+            // in the operating system.
+            "services",
+            // Known Terminal Emulators
+            "Tabby",
+            "WindowsTerminal",
+            "FireCMD",
+            "ConEmu64",
+            "ConEmuC64"
         };
 
         public static ProcessTree GetDocumentedProcessTree(Process process = null)
@@ -79,22 +90,6 @@ namespace chocolatey.benchmark.helpers
             }
 
             return nextProcess?.ProcessName;
-
-            //var parentProcess = ParentDocumentedHelper.ParentProcess(process);
-
-            //if (parentProcess == null)
-            //{
-            //    return null;
-            //}
-
-            //var topLevelProcess = GetDocumentedParent(parentProcess);
-
-            //if (topLevelProcess == null)
-            //{
-            //    return parentProcess.ProcessName;
-            //}
-
-            //return topLevelProcess;
         }
 
         public static string GetDocumentedParentFiltered(Process process = null)
@@ -129,30 +124,7 @@ namespace chocolatey.benchmark.helpers
                 }
             }
 
-            return nextProcess?.ProcessName;
-
-            var parentProcess = ParentDocumentedHelper.ParentProcess(process);
-
-            if (parentProcess == null)
-            {
-                return null;
-            }
-
-            //var topLevelProcess = GetDocumentedParentFiltered(parentProcess);
-
-            //if (topLevelProcess == null || IsIgnoredParent(topLevelProcess))
-            //{
-            //    if (IsIgnoredParent(parentProcess.ProcessName))
-            //    {
-            //        return null;
-            //    }
-            //    else
-            //    {
-            //        return parentProcess.ProcessName;
-            //    }
-            //}
-
-            //return topLevelProcess;
+            return selectedProcess?.ProcessName;
         }
 
         public static ProcessTree GetUndocumentedProcessTree(Process process = null)
@@ -209,22 +181,6 @@ namespace chocolatey.benchmark.helpers
             }
 
             return nextProcess?.ProcessName;
-
-            //var parentProcess = ParentProcessUtilities.GetParentProcess(process);
-
-            //if (parentProcess == null)
-            //{
-            //    return null;
-            //}
-
-            //var topLevelProcess = GetUndocumentedParent(parentProcess);
-
-            //if (topLevelProcess == null)
-            //{
-            //    return parentProcess.ProcessName;
-            //}
-
-            //return topLevelProcess;
         }
 
         public static string GetUndocumentedParentFiltered(Process process = null)
@@ -260,29 +216,6 @@ namespace chocolatey.benchmark.helpers
             }
 
             return selectedProcess?.ProcessName;
-
-            //var parentProcess = ParentProcessUtilities.GetParentProcess(process);
-
-            //if (parentProcess == null)
-            //{
-            //    return null;
-            //}
-
-            //var topLevelProcess = GetUndocumentedParentFiltered(parentProcess);
-
-            //if (topLevelProcess == null || IsIgnoredParent(topLevelProcess))
-            //{
-            //    if (IsIgnoredParent(parentProcess.ProcessName))
-            //    {
-            //        return null;
-            //    }
-            //    else
-            //    {
-            //        return parentProcess.ProcessName;
-            //    }
-            //}
-
-            //return topLevelProcess;
         }
 
         private static bool IsIgnoredParent(string processName)

@@ -3,23 +3,32 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace chocolatey.benchmark.helpers
+namespace chocolatey.infrastructure.information
 {
     [DebuggerDisplay("{" + nameof(GetDebuggerDisplay) + "(),nq}")]
-    public sealed class ProcessTree
+    public class ProcessTree
     {
         private static readonly string[] _filteredParents = new[]
         {
-                "explorer",
-                "powershell",
-                "pwsh",
-                "cmd",
-                "bash"
+            "explorer",
+            "powershell",
+            "pwsh",
+            "cmd",
+            "bash",
+            // The name used to launch windows services
+            // in the operating system.
+            "services",
+            // Known Terminal Emulators
+            "Tabby",
+            "WindowsTerminal",
+            "FireCMD",
+            "ConEmu64",
+            "ConEmuC64"
         };
 
         public ProcessTree(string currentProcessName)
         {
-            CurrentProcessName = currentProcessName;
+            CurrentProcessName = ToFriendlyName(currentProcessName);
         }
 
         public string CurrentProcessName { get; }
@@ -51,6 +60,21 @@ namespace chocolatey.benchmark.helpers
             return _filteredParents.Contains(value, StringComparer.OrdinalIgnoreCase);
         }
 
+        protected virtual string ToFriendlyName(string value)
+        {
+            switch (value.ToLowerInvariant())
+            {
+                case "choco":
+                    return "Chocolatey CLI";
+
+                case "ChocolateyGui":
+                    return "Chocolatey GUI";
+
+                default:
+                    return value;
+            }
+        }
+
         private string GetFirstProcess(bool includeIgnored)
         {
             if (Processes.Count == 0)
@@ -67,9 +91,9 @@ namespace chocolatey.benchmark.helpers
 
             while (currentNode != null)
             {
-                if (!IsIgnoredProcess(currentNode.Value))
+                if (!IsIgnoredProcess(currentNode.Value) && currentNode.Value != CurrentProcessName)
                 {
-                    return currentNode.Value;
+                    return ToFriendlyName(currentNode.Value);
                 }
 
                 currentNode = currentNode.Next;
@@ -94,9 +118,9 @@ namespace chocolatey.benchmark.helpers
 
             while (currentNode != null)
             {
-                if (!IsIgnoredProcess(currentNode.Value))
+                if (!IsIgnoredProcess(currentNode.Value) && currentNode.Value != CurrentProcessName)
                 {
-                    return currentNode.Value;
+                    return ToFriendlyName(currentNode.Value);
                 }
 
                 currentNode = currentNode.Previous;
@@ -113,7 +137,7 @@ namespace chocolatey.benchmark.helpers
             }
             else
             {
-                return CurrentProcessName + " =>" + string.Join(" => ", Processes);
+                return CurrentProcessName + " => " + string.Join(" => ", Processes.Select(ToFriendlyName));
             }
         }
 
