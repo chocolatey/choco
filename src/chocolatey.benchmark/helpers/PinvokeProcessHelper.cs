@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.Security.Permissions;
 using System.Security;
+using chocolatey.infrastructure.information;
 
 namespace chocolatey.benchmark.helpers
 {
@@ -14,10 +15,20 @@ namespace chocolatey.benchmark.helpers
     {
         private static readonly string[] _filteredParents = new[]
         {
-                "explorer",
-                "powershell",
-                "pwsh",
-                "cmd"
+            "explorer",
+            "powershell",
+            "pwsh",
+            "cmd",
+            "bash",
+            // The name used to launch windows services
+            // in the operating system.
+            "services",
+            // Known Terminal Emulators
+            "Tabby",
+            "WindowsTerminal",
+            "FireCMD",
+            "ConEmu64",
+            "ConEmuC64"
         };
 
         public static ProcessTree GetDocumentedProcessTree(Process process = null)
@@ -129,7 +140,7 @@ namespace chocolatey.benchmark.helpers
                 }
             }
 
-            return nextProcess?.ProcessName;
+            return selectedProcess?.ProcessName;
 
             var parentProcess = ParentDocumentedHelper.ParentProcess(process);
 

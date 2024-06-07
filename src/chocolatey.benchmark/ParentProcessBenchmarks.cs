@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Attributes;
 using chocolatey.benchmark.helpers;
+using chocolatey.infrastructure.information;
 
 namespace chocolatey.benchmark
 {
@@ -58,6 +59,11 @@ namespace chocolatey.benchmark
         public string GetParentProcessUndocumentedPinvoke()
         {
             return PinvokeProcessHelper.GetUndocumentedParent();
+        }
+        [Benchmark, MethodImpl(MethodImplOptions.NoInlining)]
+        public ProcessTree GetParentProcessTreeImplemented()
+        {
+            return ProcessInformation.GetProcessTree();
         }
     }
 }

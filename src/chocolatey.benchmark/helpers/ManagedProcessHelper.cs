@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using chocolatey.infrastructure.information;
 
 namespace chocolatey.benchmark.helpers
 {
@@ -8,11 +9,20 @@ namespace chocolatey.benchmark.helpers
     {
         private static readonly string[] _filteredParents = new[]
         {
-                "explorer",
-                "powershell",
-                "pwsh",
-                "cmd",
-                "bash"
+            "explorer",
+            "powershell",
+            "pwsh",
+            "cmd",
+            "bash",
+            // The name used to launch windows services
+            // in the operating system.
+            "services",
+            // Known Terminal Emulators
+            "Tabby",
+            "WindowsTerminal",
+            "FireCMD",
+            "ConEmu64",
+            "ConEmuC64"
         };
 
         public static ProcessTree GetProcessTree(Process process = null)
@@ -142,7 +152,7 @@ namespace chocolatey.benchmark.helpers
                 }
             }
 
-            return nextProcess?.ProcessName;
+            return selectedProcess?.ProcessName;
 
             //var processName = FindIndexedProcessName(process.Id);
 

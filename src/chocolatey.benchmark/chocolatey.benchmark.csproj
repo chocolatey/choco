@@ -237,7 +237,6 @@
     <Compile Include="BenchmarkConfig.cs" />
     <Compile Include="helpers\ManagedProcessHelper.cs" />
     <Compile Include="helpers\PinvokeProcessHelper.cs" />
-    <Compile Include="helpers\ProcessTree.cs" />
     <Compile Include="ParentProcessBenchmarks.cs" />
     <Compile Include="ProcessTreeBenchmark.cs" />
     <Compile Include="Program.cs" />
@@ -250,6 +249,12 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.4\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.3.3.4\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\chocolatey\chocolatey.csproj">
+      <Project>{5563dc61-35fd-4fab-b331-9ae1fdb23f80}</Project>
+      <Name>chocolatey</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
