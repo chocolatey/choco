@@ -189,27 +189,40 @@ Install-ChocolateyPackage
         throw "Checksum type '$checksumType' is unsupported. This type may be supported in a newer version of Chocolatey."
     }
 
-    $checksumExe = Join-Path "$helpersPath" '..\tools\checksum.exe'
-    if (!([System.IO.File]::Exists($checksumExe))) {
-        Update-SessionEnvironment
-        $checksumExe = Join-Path "$env:ChocolateyInstall" 'tools\checksum.exe'
+    # Use Get-FileHash if available (added in Windows PowerShell 4.0)
+    if ($PSVersionTable.PSVersion.Major -ge 4) {
+        Write-Debug "Using Get-FileHash as it is available"
+
+        $hash = (Get-FileHash -Path $file -Algorithm $checksumType).Hash
+
+        if ($hash -eq $checksum) {
+            $exitCode = 0
+        } else {
+            $exitCode = 1
+        }
+    } else {
+        $checksumExe = Join-Path "$helpersPath" '..\tools\checksum.exe'
+        if (!([System.IO.File]::Exists($checksumExe))) {
+            Update-SessionEnvironment
+            $checksumExe = Join-Path "$env:ChocolateyInstall" 'tools\checksum.exe'
+        }
+        Write-Debug "checksum.exe found at `'$checksumExe`'"
+
+        $params = "-c=`"$checksum`" -t=`"$checksumType`" -f=`"$file`""
+
+        Write-Debug "Executing command ['$checksumExe' $params]"
+        $process = New-Object System.Diagnostics.Process
+        $process.StartInfo = New-Object System.Diagnostics.ProcessStartInfo($checksumExe, $params)
+        $process.StartInfo.UseShellExecute = $false
+        $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+
+        $process.Start() | Out-Null
+        $process.WaitForExit()
+        $exitCode = $process.ExitCode
+        $process.Dispose()
+
+        Write-Debug "Command [`'$checksumExe`' $params] exited with `'$exitCode`'."
     }
-    Write-Debug "checksum.exe found at `'$checksumExe`'"
-
-    $params = "-c=`"$checksum`" -t=`"$checksumType`" -f=`"$file`""
-
-    Write-Debug "Executing command ['$checksumExe' $params]"
-    $process = New-Object System.Diagnostics.Process
-    $process.StartInfo = New-Object System.Diagnostics.ProcessStartInfo($checksumExe, $params)
-    $process.StartInfo.UseShellExecute = $false
-    $process.StartInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
-
-    $process.Start() | Out-Null
-    $process.WaitForExit()
-    $exitCode = $process.ExitCode
-    $process.Dispose()
-
-    Write-Debug "Command [`'$checksumExe`' $params] exited with `'$exitCode`'."
 
     if ($exitCode -ne 0) {
         throw "Checksum for '$file' did not meet '$checksum' for checksum type '$checksumType'. Consider passing the actual checksums through with `--checksum --checksum64` once you validate the checksums are appropriate. A less secure option is to pass `--ignore-checksums` if necessary."
