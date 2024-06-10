@@ -1,4 +1,4 @@
-#load nuget:?package=Chocolatey.Cake.Recipe&version=0.22.0
+#load nuget:?package=Chocolatey.Cake.Recipe&version=0.28.4
 
 ///////////////////////////////////////////////////////////////////////////////
 // TOOLS
@@ -87,15 +87,30 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
     return mergeConfigs;
 };
 
-Func<FilePathCollection> getScriptsToSign = () =>
+Func<FilePathCollection> getScriptsToVerify = () =>
 {
-    var scriptsToSign = GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/**/*.{ps1|psm1}") +
-                        GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/**/*.{ps1|psm1}");
+    var scriptsToVerify = GetFiles("./src/chocolatey.resources/**/*.{ps1|psm1|psd1}") +
+                        GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/**/*.{ps1|psm1|psd1}") +
+                        GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/**/*.{ps1|psm1|psd1}");
 
     if (DirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip"))
     {
-        scriptsToSign += GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/**/*.{ps1|psm1}");
+        scriptsToVerify += GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/**/*.{ps1|psm1|psd1}");
     }
+
+    Information("The following PowerShell scripts have been selected to be verified...");
+    foreach (var scriptToVerify in scriptsToVerify)
+    {
+        Information(scriptToVerify.FullPath);
+    }
+
+    return scriptsToVerify;
+};
+
+Func<FilePathCollection> getScriptsToSign = () =>
+{
+    var scriptsToSign = GetFiles("./nuspec/**/*.{ps1|psm1|psd1}") +
+                        GetFiles("./src/chocolatey.resources/**/*.{ps1|psm1|psd1}");
 
     Information("The following PowerShell scripts have been selected to be signed...");
     foreach (var scriptToSign in scriptsToSign)
@@ -135,7 +150,7 @@ Func<FilePathCollection> getFilesToSign = () =>
 
 Task("Prepare-Chocolatey-Packages")
     .IsDependeeOf("Create-Chocolatey-Packages")
-    .IsDependeeOf("Sign-PowerShellScripts")
+    .IsDependeeOf("Verify-PowerShellScripts")
     .IsDependeeOf("Sign-Assemblies")
     .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping because not running on Windows")
     .WithCriteria(() => BuildParameters.ShouldRunChocolatey, "Skipping because execution of Chocolatey has been disabled")
@@ -220,7 +235,7 @@ Task("Prepare-ChocolateyNo7zip-Package")
     .WithCriteria(() => BuildParameters.ShouldRunChocolatey, "Skipping because execution of Chocolatey has been disabled")
     .IsDependentOn("Build-ChocolateyNo7zip")
     .IsDependeeOf("Sign-Assemblies")
-    .IsDependeeOf("Sign-PowerShellScripts")
+    .IsDependeeOf("Verify-PowerShellScripts")
     .IsDependeeOf("Create-ChocolateyNo7zip-Package")
     .Does(() =>
 {
@@ -289,7 +304,7 @@ Task("Create-ChocolateyNo7zip-Package")
 Task("Prepare-NuGet-Packages")
     .WithCriteria(() => BuildParameters.ShouldRunNuGet, "Skipping because execution of NuGet has been disabled")
     .IsDependeeOf("Create-NuGet-Packages")
-    .IsDependeeOf("Sign-PowerShellScripts")
+    .IsDependeeOf("Verify-PowerShellScripts")
     .IsDependeeOf("Sign-Assemblies")
     .Does(() =>
 {
@@ -321,11 +336,14 @@ BuildParameters.SetParameters(context: Context,
                             productCopyright: string.Format("Copyright © 2017 - {0} Chocolatey Software, Inc. Copyright © 2011 - 2017, RealDimensions Software, LLC - All Rights Reserved.", DateTime.Now.Year),
                             shouldStrongNameSignDependentAssemblies: false,
                             treatWarningsAsErrors: false,
+                            getScriptsToVerify: getScriptsToVerify,
                             getScriptsToSign: getScriptsToSign,
                             getFilesToSign: getFilesToSign,
                             getILMergeConfigs: getILMergeConfigs,
                             preferDotNetGlobalToolUsage: !IsRunningOnWindows(),
+                            shouldAuthenticodeSignMsis: true,
                             shouldRunNuGet: IsRunningOnWindows(),
+                            shouldAuthenticodeSignPowerShellScripts: IsRunningOnWindows(),
                             shouldPublishAwsLambdas: false,
                             chocolateyNupkgGlobbingPattern: "/**/chocolatey[!-no7zip]*.nupkg");
 
