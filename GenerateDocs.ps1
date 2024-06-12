@@ -34,22 +34,20 @@ $sourceCommands = $sourceLocation + 'src/chocolatey/infrastructure.app/commands'
 $sourceFunctions = $sourceLocation + 'src/chocolatey.resources/helpers/functions'
 $global:powerShellReferenceTOC = @'
 ---
-Order: 40
+order: 40
 xref: powershell-reference
-Title: PowerShell Reference
-Description: PowerShell Functions aka Helpers Reference
-RedirectFrom:
-  - docs/helpers-reference
-  - docs/HelpersReference
+title: PowerShell Reference
+description: PowerShell Functions aka Helpers Reference
 ---
+import Xref from '@components/Xref.astro';
 
 # PowerShell Functions aka Helpers Reference
 
-<!-- This documentation file is automatically generated from the files at $sourceFunctions using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+{/* This documentation file is automatically generated from the files at $sourceFunctions using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). */}
 
 ## Summary
 
-In your Chocolatey packaging, you have the ability to use these functions (and others with Chocolatey's [PowerShell Extensions](xref:extensions)) to work with all aspects of software management. Keep in mind Chocolatey's automation scripts are just PowerShell, so you can do manage anything you want.
+In your Chocolatey packaging, you have the ability to use these functions (and others with Chocolatey's <Xref title="PowerShell Extensions" value="extensions" />) to work with all aspects of software management. Keep in mind Chocolatey's automation scripts are just PowerShell, so you can do manage anything you want.
 
 > :choco-info: **NOTE**
 >
@@ -57,12 +55,12 @@ In your Chocolatey packaging, you have the ability to use these functions (and o
 
 ## Main Functions
 
-These functions call other functions and many times may be the only thing you need in your [chocolateyInstall.ps1 file](xref:chocolatey-install-ps1).
+These functions call other functions and many times may be the only thing you need in your <Xref title="chocolateyInstall.ps1 file" value="chocolatey-install-ps1" />.
 
-* [Install-ChocolateyPackage](xref:install-chocolateypackage)
-* [Install-ChocolateyZipPackage](xref:install-chocolateyzippackage)
-* [Install-ChocolateyPowershellCommand](xref:install-chocolateypowershellcommand)
-* [Install-ChocolateyVsixPackage](xref:install-chocolateyvsixpackage)
+* <Xref title="Install-ChocolateyPackage" value="install-chocolateypackage" />
+* <Xref title="Install-ChocolateyZipPackage" value="install-chocolateyzippackage" />
+* <Xref title="Install-ChocolateyPowershellCommand" value="install-chocolateypowershellcommand" />
+* <Xref title="Install-ChocolateyVsixPackage" value="install-chocolateyvsixpackage" />
 
 ## More Functions
 
@@ -70,13 +68,13 @@ These functions call other functions and many times may be the only thing you ne
 
 When creating packages that need to run one of the following commands below, one should add the tag `admin` to the nuspec.
 
-* [Install-ChocolateyPackage](xref:install-chocolateypackage)
-* [Start-ChocolateyProcessAsAdmin](xref:start-chocolateyprocessasadmin)
-* [Install-ChocolateyInstallPackage](xref:install-chocolateyinstallpackage)
-* [Install-ChocolateyPath](xref:install-chocolateypath) - when specifying machine path
-* [Install-ChocolateyEnvironmentVariable](xref:install-chocolateyenvironmentvariable) - when specifying machine path
-* [Install-ChocolateyExplorerMenuItem](xref:install-chocolateyexplorermenuitem)
-* [Install-ChocolateyFileAssociation](xref:install-chocolateyfileassociation)
+* <Xref title="Install-ChocolateyPackage" value="install-chocolateypackage" />
+* <Xref title="Start-ChocolateyProcessAsAdmin" value="start-chocolateyprocessasadmin" />
+* <Xref title="Install-ChocolateyInstallPackage" value="install-chocolateyinstallpackage" />
+* <Xref title="Install-ChocolateyPath" value="install-chocolateypath" /> - when specifying machine path
+* <Xref title="Install-ChocolateyEnvironmentVariable" value="install-chocolateyenvironmentvariable" /> - when specifying machine path
+* <Xref title="Install-ChocolateyExplorerMenuItem" value="install-chocolateyexplorermenuitem" />
+* <Xref title="Install-ChocolateyFileAssociation" value="install-chocolateyfileassociation" />
 
 ### Non-Administrator Safe Functions
 
@@ -84,17 +82,17 @@ When you have a need to run Chocolatey without Administrative access required (n
 
 These are the functions from above as one list.
 
-* [Install-ChocolateyZipPackage](xref:install-chocolateyzippackage)
-* [Install-ChocolateyPowershellCommand](xref:install-chocolateypowershellcommand)
-* [Get-ChocolateyPath](xref:get-chocolateypath)
-* [Get-ChocolateyWebFile](xref:get-chocolateywebfile)
-* [Get-ChocolateyUnzip](xref:get-chocolateyunzip)
-* [Install-ChocolateyPath](xref:install-chocolateypath) - when specifying user path
-* [Install-ChocolateyEnvironmentVariable](xref:install-chocolateyenvironmentvariable) - when specifying user path
-* [Install-ChocolateyPinnedTaskBarItem](xref:install-chocolateypinnedtaskbaritem)
-* [Install-ChocolateyShortcut](xref:install-chocolateyshortcut)
-* [Update-SessionEnvironment](xref:update-sessionenvironment)
-* [Get-PackageParameters](xref:get-packageparameters)
+* <Xref title="Install-ChocolateyZipPackage" value="install-chocolateyzippackage" />
+* <Xref title="Install-ChocolateyPowershellCommand" value="install-chocolateypowershellcommand" />
+* <Xref title="Get-ChocolateyPath" value="get-chocolateypath" />
+* <Xref title="Get-ChocolateyWebFile" value="get-chocolateywebfile" />
+* <Xref title="Get-ChocolateyUnzip" value="get-chocolateyunzip" />
+* <Xref title="Install-ChocolateyPath" value="install-chocolateypath" /> - when specifying user path
+* <Xref title="Install-ChocolateyEnvironmentVariable" value="install-chocolateyenvironmentvariable" /> - when specifying user path
+* <Xref title="Install-ChocolateyPinnedTaskBarItem" value="install-chocolateypinnedtaskbaritem" />
+* <Xref title="Install-ChocolateyShortcut" value="install-chocolateyshortcut" />
+* <Xref title="Update-SessionEnvironment" value="update-sessionenvironment" />
+* <Xref title="Get-PackageParameters" value="get-packageparameters" />
 
 ## Complete List (alphabetical order)
 
@@ -145,9 +143,9 @@ function Replace-CommonItems($text) {
     $text = $text -replace '(Pro[fessional]\s?/\s?Business)', '[$1](https://chocolatey.org/compare)'
     $text = $text -replace '([Ll]icensed editions)', '[$1](https://chocolatey.org/compare)'
     $text = $text -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'
-    $text = $text -replace '\(https://docs.chocolatey.org/en-us/create/automatic-packages\)', '(xref:automatic-packaging)'
-    $text = $text -replace 'Learn more about using this at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument', '[Learn more](xref:parse-package-parameters)'
-    $text = $text -replace 'at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument#step-3---use-core-community-extension', 'in [the docs](xref:parse-package-parameters#step-3-use-core-community-extension)'
+    $text = $text -replace '\[automatic packaging\]\(https://docs.chocolatey.org/en-us/create/automatic-packages\)', '<Xref title="automatic packaging" value="automatic-packaging" />'
+    $text = $text -replace 'Learn more about using this at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument', '<Xref title="Learn more" value="parse-package-parameters" />'
+    $text = $text -replace 'at https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument#step-3---use-core-community-extension', 'in <Xref title="the docs" value="parse-package-parameters" anchor="step-3-use-core-community-extension" />'
     $text = $text -replace 'https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument', 'https://docs.chocolatey.org/en-us/guides/create/parse-packageparameters-argument'
     $text = $text -replace '\[community feed\)\]\(https://community.chocolatey.org/packages\)', '[community feed](https://community.chocolatey.org/packages))'
 
@@ -207,7 +205,7 @@ function Convert-Parameter($objItem, $commandName) {
     $aliases = [string]((Get-Command -Name $commandName).parameters."$($objItem.Name)".Aliases -join ', ')
     $required = [string]($objItem.required)
     $position = [string]($objItem.position)
-    $defValue = [string]($objItem.defaultValue)
+    $defValue = [string]($objItem.defaultValue -replace '@{Headers = @{}', '`@{Headers = @{}`' )
     $acceptPipeline = [string]($objItem.pipelineInput)
 
     $padding = ($aliases.Length, $required.Length, $position.Length, $defValue.Length, $acceptPipeline.Length | Measure-Object -Maximum).Maximum
@@ -245,11 +243,11 @@ function Convert-CommandText {
     $commandText = $commandText -replace '^(Windows Features|Ruby|Cygwin|Python)\s*$', '### $1'
     $commandText = $commandText -replace '(?<!\s)NOTE:', '> :choco-info: **NOTE**'
     $commandText = $commandText -replace '(?<!\s)WARNING:', '> :choco-warning: **WARNING**'
-    $commandText = $commandText -replace '\*> :choco-(info|warning): \*\*(INFO|WARNING)\*\*\*', '> :choco-$1: **$2**'
-    $commandText = $commandText -replace 'the command reference', '[how to pass arguments](xref:choco-commands#how-to-pass-options-switches)'
+    $commandText = $commandText -replace '\*> :choco-(info|warning): \*\*(INFO|WARNING|NOTE)\*\*\*', '> :choco-$1: **$2**'
+    $commandText = $commandText -replace 'the command reference', '<Xref title="how to pass arguments" value="choco-commands" anchor="how-to-pass-options-switches" />'
     $commandText = $commandText -replace '(community feed[s]?|community repository)', '[$1](https://community.chocolatey.org/packages)'
     #$commandText = $commandText -replace '\`(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[[`$1`|Commands$1]]'
-    $commandText = $commandText -replace '\`([choco\s]*)(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '[`$1$2`](xref:choco-command-$2)'
+    $commandText = $commandText -replace '\`([choco\s]*)(apikey|install|upgrade|uninstall|list|search|info|outdated|pin)\`', '<Xref title="`$1$2`" value="choco-command-$2" />'
     $commandText = $commandText -replace '^(.+):\s(.+.gif)$', '![$1]($2)'
     $commandText = $commandText -replace '^(\s+)\<\?xml', "~~~xml$lineFeed`$1<?xml"
     $commandText = $commandText -replace '^(\s+)</packages>', "`$1</packages>$lineFeed~~~"
@@ -257,21 +255,21 @@ function Convert-CommandText {
     $commandText = $commandText -replace '(Pro[fessional]\s?/\s?Business)', '[$1](https://chocolatey.org/compare)'
     $commandText = $commandText -replace '([Ll]icensed editions)', '[$1](https://chocolatey.org/compare)'
     $commandText = $commandText -replace '([Ll]icensed versions)', '[$1](https://chocolatey.org/compare)'
-    $commandText = $commandText -replace 'https://raw.githubusercontent.com/wiki/chocolatey/choco/images', '/assets/images'
+    $commandText = $commandText -replace 'https://raw.githubusercontent.com/wiki/chocolatey/choco/images', '/images'
     $commandText = $commandText -replace 'https://chocolatey.org/docs/features-automatically-recompile-packages', 'https://docs.chocolatey.org/en-us/guides/create/recompile-packages'
     $commandText = $commandText -replace 'https://chocolatey.org/docs/features-private-cdn', 'https://docs.chocolatey.org/en-us/features/private-cdn'
     $commandText = $commandText -replace 'https://chocolatey.org/docs/features-virus-check', 'https://docs.chocolatey.org/en-us/features/virus-check'
     $commandText = $commandText -replace 'https://chocolatey.org/docs/features-synchronize', 'https://docs.chocolatey.org/en-us/features/package-synchronization'
     $commandText = $commandText -replace 'explicity', 'explicit'
     $commandText = $commandText -replace 'https://chocolatey.org/docs/features-create-packages-from-installers', 'https://docs.chocolatey.org/en-us/features/package-builder'
-    $commandText = $commandText -replace 'See https://chocolatey.org/docs/features-create-packages-from-installers', 'See more information about [Package Builder features](xref:package-builder)'
-    $commandText = $commandText -replace 'See https://docs.chocolatey.org/en-us/features/package-builder', 'See more information about [Package Builder features](xref:package-builder)'
+    $commandText = $commandText -replace 'See https://chocolatey.org/docs/features-create-packages-from-installers', 'See more information about <Xref title="Package Builder features" value="package-builder" />'
+    $commandText = $commandText -replace 'See https://docs.chocolatey.org/en-us/features/package-builder', 'See more information about <Xref title="Package Builder features" value="package-builder" />'
     $commandText = $commandText -replace 'https://chocolatey.org/docs/features-install-directory-override', 'https://docs.chocolatey.org/en-us/features/install-directory-override'
     $commandText = $commandText -replace 'y.org/docs/features-package-reducer', 'y.org/docs/en-us/features/package-reducer'
     $commandText = $commandText -replace 'https://chocolatey.org/docs/features-package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
     $commandText = $commandText -replace 'https://chocolatey.org/docs/en-us/features/package-reducer', 'https://docs.chocolatey.org/en-us/features/package-reducer'
     $commandText = $commandText -replace '\[community feed\)\]\(https://community.chocolatey.org/packages\)', '[community feed](https://community.chocolatey.org/packages))'
-    $commandText = $commandText -replace '> :choco-(info|warning): \*\*(INFO|WARNING)\*\*\s', '> :choco-$1: **$2**
+    $commandText = $commandText -replace '> :choco-(info|warning): \*\*(INFO|WARNING|NOTE)\*\*\s', '> :choco-$1: **$2**
 >
 > '
 
@@ -286,7 +284,7 @@ function Convert-CommandText {
  try to install version 1.0.0 of every package passed. So please split
  out multiple package calls when wanting to pass specific options.
 
-Includes [default options/switches](xref:choco-commands#default-options-and-switches) (included below for completeness).
+Includes <Xref title="default options/switches" value="choco-commands" anchor="default-options-and-switches" /> (included below for completeness).
 
 ~~~
 '@
@@ -318,32 +316,30 @@ function Convert-CommandReferenceSpecific($commandText) {
             param($m)
             $commandName = $m.Groups[1].Value
             $commandNameUpper = $($commandName.Substring(0, 1).ToUpper() + $commandName.Substring(1))
-            " * [$commandName](xref:choco-command-$($commandName)) -"
+            " * <Xref title='$commandName' value='choco-command-$commandName' /> -"
         }
     )
     #$commandText = $commandText -replace '\s?\s?\*\s(\w+)\s\-', ' * [[$1|Commands$1]] -'
-    $commandText = $commandText.Replace("## Default Options and Switches", "## See Help Menu In Action$lineFeed$lineFeed![choco help in action](/assets/images/gifs/choco_help.gif)$lineFeed$lineFeed## Default Options and Switches")
+    $commandText = $commandText.Replace("## Default Options and Switches", "## See Help Menu In Action$lineFeed$lineFeed![choco help in action](/images/gifs/choco_help.gif)$lineFeed$lineFeed## Default Options and Switches")
 
     Write-Output $commandText
 }
 
 function Generate-TopLevelCommandReference {
     Write-Host "Generating Top Level Command Reference"
-    $fileName = "$docsFolder\choco\commands\index.md"
+    $fileName = "$docsFolder\choco\commands\index.mdx"
     $commandOutput = @("---")
-    $commandOutput += @("Order: 40")
+    $commandOutput += @("order: 40")
     $commandOutput += @("xref: choco-commands")
-    $commandOutput += @("Title: Commands")
-    $commandOutput += @("Description: Full list of all available Chocolatey commands")
-    $commandOutput += @("RedirectFrom:")
-    $commandOutput += @("  - docs/commandsreference")
-    $commandOutput += @("  - docs/commands-reference")
-    $commandOutput += @("---$lineFeed")
+    $commandOutput += @("title: Commands")
+    $commandOutput += @("description: Full list of all available Chocolatey commands")
+    $commandOutput += @("---")
+    $commandOutput += @("import Xref from '@components/Xref.astro';$lineFeed")
     $commandOutput += @("# Command Reference$lineFeed")
-    $commandOutput += @("<!-- This file is automatically generated based on output from the files at $sourceCommands using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). --> $lineFeed")
+    $commandOutput += @("{/* This file is automatically generated based on output from the files at $sourceCommands using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). */} $lineFeed")
     $commandOutput += $(& $chocoExe -? -r)
     $commandOutput += @("$lineFeed~~~$lineFeed")
-    $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco -h``. $lineFeed")
+    $commandOutput += @("$lineFeed$lineFeed> :choco-info: **NOTE**$lineFeed>$lineFeed> This documentation has been automatically generated from ``choco -h``. $lineFeed")
 
     $commandOutput |
         ForEach-Object { Convert-CommandText($_) } |
@@ -356,51 +352,50 @@ function Move-GeneratedFiles {
         New-Item -ItemType Directory -Path "$docsFolder\create\commands" -ErrorAction Continue | Out-Null
     }
 
-    Move-Item -Path "$docsFolder\choco\commands\apikey.md" -Destination "$docsFolder\create\commands\api-key.md"
-    Move-Item -Path "$docsFolder\choco\commands\new.md" -Destination "$docsFolder\create\commands\new.md"
-    Move-Item -Path "$docsFolder\choco\commands\pack.md" -Destination "$docsFolder\create\commands\pack.md"
-    Move-Item -Path "$docsFolder\choco\commands\push.md" -Destination "$docsFolder\create\commands\push.md"
-    Move-Item -Path "$docsFolder\choco\commands\template.md" -Destination "$docsFolder\create\commands\template.md"
-    Move-Item -Path "$docsFolder\choco\commands\templates.md" -Destination "$docsFolder\create\commands\templates.md"
-    Move-Item -Path "$docsFolder\choco\commands\convert.md" -Destination "$docsFolder\create\commands\convert.md"
+    Move-Item -Path "$docsFolder\choco\commands\apikey.mdx" -Destination "$docsFolder\create\commands\api-key.mdx"
+    Move-Item -Path "$docsFolder\choco\commands\new.mdx" -Destination "$docsFolder\create\commands\new.mdx"
+    Move-Item -Path "$docsFolder\choco\commands\pack.mdx" -Destination "$docsFolder\create\commands\pack.mdx"
+    Move-Item -Path "$docsFolder\choco\commands\push.mdx" -Destination "$docsFolder\create\commands\push.mdx"
+    Move-Item -Path "$docsFolder\choco\commands\template.mdx" -Destination "$docsFolder\create\commands\template.mdx"
+    Move-Item -Path "$docsFolder\choco\commands\templates.mdx" -Destination "$docsFolder\create\commands\templates.mdx"
+    Move-Item -Path "$docsFolder\choco\commands\convert.mdx" -Destination "$docsFolder\create\commands\convert.mdx"
 }
 
 function Generate-CommandReference($commandName, $order) {
     if (-not(Test-Path "$docsFolder\choco\commands")) {
         New-Item -ItemType Directory -Path "$docsFolder\choco\commands" -ErrorAction Continue | Out-Null
     }
-    $fileName = Join-Path "$docsFolder\choco\commands" "$($commandName.ToLower()).md"
+    $fileName = Join-Path "$docsFolder\choco\commands" "$($commandName.ToLower()).mdx"
     $commandNameLower = $commandName.ToLower()
 
     Write-Host "Generating $fileName ..."
     $commandOutput += @("---")
-    $commandOutput += @("Order: $order")
+    $commandOutput += @("order: $order")
     $commandOutput += @("xref: choco-command-$commandNameLower")
-    $commandOutput += @("Title: $commandName")
-    $commandOutput += @("Description: $commandName Command (choco $commandNameLower)")
-    $commandOutput += @("RedirectFrom:")
-    $commandOutput += @("  - docs/commands$commandNameLower")
-    $commandOutput += @("  - docs/commands-$commandNameLower")
+    $commandOutput += @("title: $commandName")
+    $commandOutput += @("description: $commandName Command (choco $commandNameLower)")
 
     if ($commandName -eq 'Features') {
-        $commandOutput += @("ShowInNavbar: false")
         $commandOutput += @("ShowInSidebar: false")
     }
 
     if ($commandName -eq 'Templates') {
-        $commandOutput += @("ShowInNavbar: false")
         $commandOutput += @("ShowInSidebar: false")
     }
 
-    $commandOutput += @("---$lineFeed")
-    $commandOutput += @("<!-- This file is automatically generated based on output from $($sourceCommands)/Chocolatey$($commandName)Command.cs using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). If the file is not found, it is not part of the open source edition of Chocolatey or the name of the file is different. --> $lineFeed")
+    $commandOutput += @("---")
+    $commandOutput += @("import Xref from '@components/Xref.astro';$lineFeed")
+    $commandOutput += @("{/* This file is automatically generated based on output from $($sourceCommands)/Chocolatey$($commandName)Command.cs using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). If the file is not found, it is not part of the open source edition of Chocolatey or the name of the file is different. */} $lineFeed")
 
     $commandOutput += $(& $chocoExe $commandName.ToLower() -h -r)
-    $commandOutput += @("$lineFeed~~~$lineFeed$lineFeed[Command Reference](xref:choco-commands)")
+    $commandOutput += @("$lineFeed~~~$lineFeed$lineFeed<Xref title='Command Reference' value='choco-commands' classes='mb-3 d-block' />")
     $commandOutput += @("$lineFeed$lineFeed*NOTE:* This documentation has been automatically generated from ``choco $($commandName.ToLower()) -h``. $lineFeed")
-    $commandOutput |
+    $fileContent = $commandOutput |
         ForEach-Object { Convert-CommandText $_ $commandName.ToLower() } |
-        Out-File $fileName -Encoding UTF8 -Force
+        Out-String
+    # Surround indented blocks with code blocks (intended for Usage and Examples sections), ignoring sections we are putting in code blocks in other ways
+    $fileContent = $fileContent -replace '(\r?\n( {4}[^ <-].+\r?\n?)+)',"`r`n~~~`$0~~~`r`n`r`n"
+    $fileContent | Out-File $fileName -Encoding UTF8 -Force
 }
 
 try {
@@ -426,8 +421,8 @@ try {
     $helperOrder = 10;
     Get-Command -Module $psModuleName -CommandType Function | ForEach-Object -Process { Get-Help $_ -Full } | ForEach-Object -Process { `
             $commandName = $_.Name
-        $fileName = Join-Path "$docsFolder\create\functions" "$($_.Name.ToLower()).md"
-        $global:powerShellReferenceTOC += "$lineFeed * [$commandName](xref:$([System.IO.Path]::GetFileNameWithoutExtension($fileName)))"
+        $fileName = Join-Path "$docsFolder\create\functions" "$($_.Name.ToLower()).mdx"
+        $global:powerShellReferenceTOC += "$lineFeed * <Xref title='$commandName' value='$([System.IO.Path]::GetFileNameWithoutExtension($fileName))' />"
         $hasCmdletBinding = (Get-Command -Name $commandName).CmdLetBinding
 
         Write-Host "Generating $fileName ..."
@@ -446,18 +441,16 @@ try {
 
         @"
 ---
-Order: $($helperOrder)
+order: $($helperOrder)
 xref: $($_.Name.ToLower())
-Title: $($_.Name)
-Description: Information on $($_.Name) function
-RedirectFrom:
-  - docs/helpers-$($FormattedName)
-  - docs/helpers$($NameNoHyphen.ToLower())
+title: $($_.Name)
+description: Information on $($_.Name) function
 ---
+import Xref from '@components/Xref.astro';
 
 # $($_.Name)
 
-<!-- This documentation is automatically generated from $sourceFunctions/$($_.Name)`.ps1 using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). -->
+{/* This documentation is automatically generated from $sourceFunctions/$($_.Name)`.ps1 using $($sourceLocation)GenerateDocs.ps1. Contributions are welcome at the original location(s). */}
 
 $(Replace-CommonItems $_.Synopsis)
 
@@ -481,9 +474,9 @@ $( if ($_.ReturnValues -ne $null -and $_.ReturnValues.Length -gt 0 -and -not $_.
 ## Parameters
 $( if ($_.parameters.parameter.count -gt 0) { $_.parameters.parameter | ForEach-Object { Convert-Parameter $_ $commandName }}) $( if ($hasCmdletBinding) { "$lineFeed### &lt;CommonParameters&gt;$lineFeed$($lineFeed)This cmdlet supports the common parameters: -Verbose, -Debug, -ErrorAction, -ErrorVariable, -OutBuffer, and -OutVariable. For more information, see ``about_CommonParameters`` http://go.microsoft.com/fwlink/p/?LinkID=113216 ." } )
 
-$( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$lineFeed"; $_.relatedLinks.navigationLink | Where-Object { $_.linkText -ne $null} | ForEach-Object { Write-Output "* [$($_.LinkText)](xref:$($_.LinkText.ToLower()))$lineFeed" }})
+$( if ($_.relatedLinks -ne $null) {Write-Output "$lineFeed## Links$lineFeed$lineFeed"; $_.relatedLinks.navigationLink | Where-Object { $_.linkText -ne $null} | ForEach-Object { Write-Output "* <Xref title='$($_.LinkText)' value='$($_.LinkText.ToLower())' />$lineFeed" }})
 
-[Function Reference](xref:powershell-reference)
+<Xref title="Function Reference" value="powershell-reference" />
 
 > :choco-info: **NOTE**
 >
@@ -495,17 +488,17 @@ View the source for [$($_.Name)]($sourceFunctions/$($_.Name)`.ps1)
     }
 
     Write-Host "Generating Top Level PowerShell Reference"
-    $fileName = Join-Path "$docsFolder\create\functions" 'index.md'
+    $fileName = Join-Path "$docsFolder\create\functions" 'index.mdx'
 
     $global:powerShellReferenceTOC += @'
 
 
 ## Chocolatey for Business Functions
 
- * [Install-ChocolateyWindowsService](xref:install-chocolateywindowsservice)
- * [Start-ChocolateyWindowsService](xref:start-chocolateywindowsservice)
- * [Stop-ChocolateyWindowsService](xref:stop-chocolateywindowsservice)
- * [Uninstall-ChocolateyWindowsService](xref:uninstall-chocolateywindowsservice)
+* <Xref title="Install-ChocolateyWindowsService" value="install-chocolateywindowsservice" />
+* <Xref title="Start-ChocolateyWindowsService" value="start-chocolateywindowsservice" />
+* <Xref title="Stop-ChocolateyWindowsService" value="stop-chocolateywindowsservice" />
+* <Xref title="Uninstall-ChocolateyWindowsService" value="uninstall-chocolateywindowsservice" />
 
 ## Variables
 
@@ -515,24 +508,24 @@ There are also a number of environment variables providing access to some values
 
 Chocolatey makes a number of environment variables available (You can access any of these with $env:TheVariableNameBelow):
 
- * TEMP/TMP - Overridden to the CacheLocation, but may be the same as the original TEMP folder
- * ChocolateyInstall - Top level folder where Chocolatey is installed
- * ChocolateyPackageName - The name of the package, equivalent to the `<id />` field in the nuspec
- * ChocolateyPackageTitle - The title of the package, equivalent to the `<title />` field in the nuspec
- * ChocolateyPackageVersion - The version of the package, equivalent to the `<version />` field in the nuspec
+* TEMP/TMP - Overridden to the CacheLocation, but may be the same as the original TEMP folder
+* ChocolateyInstall - Top level folder where Chocolatey is installed
+* ChocolateyPackageName - The name of the package, equivalent to the `<id />` field in the nuspec
+* ChocolateyPackageTitle - The title of the package, equivalent to the `<title />` field in the nuspec
+* ChocolateyPackageVersion - The version of the package, equivalent to the `<version />` field in the nuspec
 
 #### Advanced Environment Variables
 
 The following are more advanced settings:
 
- * ChocolateyPackageParameters - Parameters to use with packaging, not the same as install arguments (which are passed directly to the native installer). Based on `--package-parameters`.
- * CHOCOLATEY_VERSION - The version of Choco you normally see. Use if you are 'lighting' things up based on choco version, otherwise take a dependency on the specific version you need.
- * ChocolateyForceX86 = If available and set to 'true', then user has requested 32bit version. Automatically handled in built in Choco functions.
- * OS_PLATFORM - Like Windows, macOS, Linux.
- * OS_VERSION - The version of OS, like 6.1 something something for Windows.
- * OS_NAME - The reported name of the OS.
- * IS_PROCESSELEVATED = Is the process elevated?
- * ChocolateyPackageInstallLocation - Install location of the software that the package installs. Displayed at the end of the package install.
+* ChocolateyPackageParameters - Parameters to use with packaging, not the same as install arguments (which are passed directly to the native installer). Based on `--package-parameters`.
+* CHOCOLATEY_VERSION - The version of Choco you normally see. Use if you are 'lighting' things up based on choco version, otherwise take a dependency on the specific version you need.
+* ChocolateyForceX86 = If available and set to 'true', then user has requested 32bit version. Automatically handled in built in Choco functions.
+* OS_PLATFORM - Like Windows, macOS, Linux.
+* OS_VERSION - The version of OS, like 6.1 something something for Windows.
+* OS_NAME - The reported name of the OS.
+* IS_PROCESSELEVATED = Is the process elevated?
+* ChocolateyPackageInstallLocation - Install location of the software that the package installs. Displayed at the end of the package install.
 
 #### Set By Options and Configuration
 
