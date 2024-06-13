@@ -167,6 +167,7 @@ Task("Prepare-Chocolatey-Packages")
     .IsDependeeOf("Create-Chocolatey-Packages")
     .IsDependeeOf("Verify-PowerShellScripts")
     .IsDependeeOf("Sign-Assemblies")
+    .IsDependentOn("Copy-Nuspec-Folders")
     .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping because not running on Windows")
     .WithCriteria(() => BuildParameters.ShouldRunChocolatey, "Skipping because execution of Chocolatey has been disabled")
     .Does(() =>
