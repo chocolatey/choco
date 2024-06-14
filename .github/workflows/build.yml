@@ -50,7 +50,7 @@ jobs:
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Build with .Net Framework
       shell: powershell
-      run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=unit --shouldRunOpenCover=false
+      run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=unit --shouldRunOpenCover=false --shouldBuildMsi=true
     - name: Upload Windows build results
       uses: actions/upload-artifact@v3
       # Always upload build results
