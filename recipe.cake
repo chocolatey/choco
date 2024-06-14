@@ -88,7 +88,8 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
 
 Func<FilePathCollection> getScriptsToVerify = () =>
 {
-    var scriptsToVerify = GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/**/*.{ps1|psm1|psd1}") +
+    var scriptsToVerify = GetFiles("./src/chocolatey.resources/**/*.{ps1|psm1|psd1}") +
+                        GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/**/*.{ps1|psm1|psd1}") +
                         GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/**/*.{ps1|psm1|psd1}");
 
     if (DirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip"))
