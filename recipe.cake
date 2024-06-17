@@ -1,4 +1,5 @@
 #load nuget:?package=Chocolatey.Cake.Recipe&version=0.28.4
+#tool nuget:?package=WiX&version=3.11.2
 
 ///////////////////////////////////////////////////////////////////////////////
 // TOOLS
