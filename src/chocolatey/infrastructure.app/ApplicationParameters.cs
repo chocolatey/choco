@@ -234,6 +234,7 @@ namespace chocolatey.infrastructure.app
             public static readonly string ShowDownloadProgress = "showDownloadProgress";
             public static readonly string StopOnFirstPackageFailure = "stopOnFirstPackageFailure";
             public static readonly string UseRememberedArgumentsForUpgrades = "useRememberedArgumentsForUpgrades";
+            public static readonly string UseRememberedArgumentsForUninstalls = "useRememberedArgumentsForUninstalls";
             public static readonly string IgnoreUnfoundPackagesOnUpgradeOutdated = "ignoreUnfoundPackagesOnUpgradeOutdated";
             public static readonly string SkipPackageUpgradesWhenNotInstalled = "skipPackageUpgradesWhenNotInstalled";
             public static readonly string RemovePackageInformationOnUninstall = "removePackageInformationOnUninstall";
