@@ -22,6 +22,8 @@ object Chocolatey : BuildType({
     id = AbsoluteId("Chocolatey")
     name = "Chocolatey CLI (Built with Unit Tests)"
 
+    templates(AbsoluteId("SlackNotificationTemplate"))
+
     artifactRules = """
     """.trimIndent()
 
@@ -94,6 +96,8 @@ object ChocolateySchd : BuildType({
     id = AbsoluteId("ChocolateySchd")
     name = "Chocolatey CLI (Scheduled Integration Testing)"
 
+    templates(AbsoluteId("SlackNotificationTemplate"))
+
     artifactRules = """
     """.trimIndent()
 
@@ -158,6 +162,8 @@ object ChocolateySchd : BuildType({
 object ChocolateyQA : BuildType({
     id = AbsoluteId("ChocolateyQA")
     name = "Chocolatey CLI (SonarQube)"
+
+    templates(AbsoluteId("SlackNotificationTemplate"))
 
     artifactRules = """
     """.trimIndent()
@@ -225,6 +231,8 @@ object ChocolateyQA : BuildType({
 object ChocolateySign : BuildType({
     id = AbsoluteId("ChocolateySign")
     name = "Chocolatey CLI (Script Signing)"
+
+    templates(AbsoluteId("SlackNotificationTemplate"))
 
     artifactRules = """
     """.trimIndent()
@@ -297,6 +305,8 @@ object ChocolateyDockerWin : BuildType({
     id = AbsoluteId("ChocolateyDockerWin")
     name = "Docker (Windows)"
 
+    templates(AbsoluteId("SlackNotificationTemplate"))
+
     params {
         // TeamCity has suggested "${Chocolatey.depParamRefs.buildNumber}"
         param("env.CHOCOLATEY_VERSION", "%dep.Chocolatey.build.number%")
@@ -351,6 +361,8 @@ object ChocolateyDockerWin : BuildType({
 object ChocolateyPosix : BuildType({
     id = AbsoluteId("ChocolateyPosix")
     name = "Docker (Linux)"
+
+    templates(AbsoluteId("SlackNotificationTemplate"))
 
     params {
         param("env.CAKE_NUGET_SOURCE", "") // The Cake version we use has issues with authing to our private source on Linux
