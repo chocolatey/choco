@@ -1185,7 +1185,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         else
                         {
                             //last one is whether this package is pinned or not
-                            this.Log().Info("{0}|{1}|{1}|{2}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -1206,7 +1206,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                         else
                         {
-                            this.Log().Info("{0}|{1}|{1}|{2}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -1232,7 +1232,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                             else
                             {
-                                this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe()));
+                                OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe());
                             }
                         }
 
@@ -1259,7 +1259,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                         else
                         {
-                            this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToStringSafe(), isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 

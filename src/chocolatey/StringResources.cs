@@ -56,5 +56,15 @@ namespace chocolatey
             [Browsable(false)]
             internal const string PackageNuspecVersion = "packageNuspecVersion";
         }
+
+        public static class OptionDescriptions
+        {
+            public const string DISPLAY_HEADERS = "Display headers - Display headers when limit-output is used. Requires 2.3.0";
+        }
+
+        public static class Options
+        {
+            public const string DISPLAY_HEADERS = "headers"; // TODO: This option name needs to be decided and agreed upon.
+        }
     }
 }

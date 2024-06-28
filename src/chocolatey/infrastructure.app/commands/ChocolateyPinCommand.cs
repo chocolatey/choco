@@ -178,6 +178,11 @@ If you find other exit codes that we have not yet documented, please
             config.QuietOutput = quiet;
             config.Input = input;
 
+            if (!config.RegularOutput && config.DisplayHeaders)
+            {
+                OutputHelpers.LimitedOutput("PackageId","Version");
+            }
+
             foreach (var pkg in packages.OrEmpty())
             {
                 var pkgInfo = _packageInfoService.Get(pkg.PackageMetadata);
