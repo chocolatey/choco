@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel;
 using System.Xml.Serialization;
 
 namespace chocolatey.infrastructure.app.configuration
@@ -44,45 +45,129 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "applyPackageParametersToDependencies")]
         public bool ApplyPackageParametersToDependencies { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool ApplyPackageParametersToDependenciesSpecified
+        {
+            get { return ApplyPackageParametersToDependencies; }
+        }
+
         [XmlAttribute(AttributeName = "applyInstallArgumentsToDependencies")]
         public bool ApplyInstallArgumentsToDependencies { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool ApplyInstallArgumentsToDependenciesSpecified
+        {
+            get { return ApplyInstallArgumentsToDependencies; }
+        }
 
         [XmlAttribute(AttributeName = "forceX86")]
         public bool ForceX86 { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool ForceX86Specified
+        {
+            get { return ForceX86; }
+        }
+
         [XmlAttribute(AttributeName = "ignoreDependencies")]
         public bool IgnoreDependencies { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool IgnoreDependenciesSpecified
+        {
+            get { return IgnoreDependencies; }
+        }
 
         [XmlAttribute(AttributeName = "disabled")]
         public bool Disabled { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool DisabledSpecified
+        {
+            get { return Disabled; }
+        }
+
         [XmlAttribute(AttributeName = "pinPackage")]
         public bool PinPackage { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool PinPackageSpecified
+        {
+            get { return PinPackage; }
+        }
 
         [System.ComponentModel.DefaultValue(-1)]
         [XmlAttribute(AttributeName = "executionTimeout")]
         public int ExecutionTimeout { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool ExecutionTimeoutSpecified
+        {
+            get { return ExecutionTimeout != 0; }
+        }
+
         [XmlAttribute(AttributeName = "force")]
         public bool Force { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool ForceSpecified
+        {
+            get { return Force; }
+        }
 
         [XmlAttribute(AttributeName = "prerelease")]
         public bool Prerelease { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool PrereleaseSpecified
+        {
+            get { return Prerelease; }
+        }
+
         [XmlAttribute(AttributeName = "overrideArguments")]
         public bool OverrideArguments { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool OverrideArgumentsSpecified
+        {
+            get { return OverrideArguments; }
+        }
 
         [XmlAttribute(AttributeName = "notSilent")]
         public bool NotSilent { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool NotSilentSpecified
+        {
+            get { return NotSilent; }
+        }
+
         [XmlAttribute(AttributeName = "allowDowngrade")]
         public bool AllowDowngrade { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool AllowDowngradeSpecified
+        {
+            get { return AllowDowngrade; }
+        }
 
         [XmlAttribute(AttributeName = "forceDependencies")]
         public bool ForceDependencies { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool ForceDependenciesSpecified
+        {
+            get { return ForceDependencies; }
+        }
+
         [XmlAttribute(AttributeName = "skipAutomationScripts")]
         public bool SkipAutomationScripts { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool SkipAutomationScriptsSpecified
+        {
+            get { return SkipAutomationScripts; }
+        }
 
         [XmlAttribute(AttributeName = "user")]
         public string User { get; set; }
@@ -99,14 +184,38 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "ignoreChecksums")]
         public bool IgnoreChecksums { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool IgnoreChecksumsSpecified
+        {
+            get { return IgnoreChecksums; }
+        }
+
         [XmlAttribute(AttributeName = "allowEmptyChecksums")]
         public bool AllowEmptyChecksums { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool AllowEmptyChecksumsSpecified
+        {
+            get { return AllowEmptyChecksums; }
+        }
 
         [XmlAttribute(AttributeName = "allowEmptyChecksumsSecure")]
         public bool AllowEmptyChecksumsSecure { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool AllowEmptyChecksumsSecureSpecified
+        {
+            get { return AllowEmptyChecksumsSecure; }
+        }
+
         [XmlAttribute(AttributeName = "requireChecksums")]
         public bool RequireChecksums { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool RequireChecksumsSpecified
+        {
+            get { return RequireChecksums; }
+        }
 
         [XmlAttribute(AttributeName = "downloadChecksum")]
         public string DownloadChecksum { get; set; }
@@ -123,29 +232,83 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "ignorePackageExitCodes")]
         public bool IgnorePackageExitCodes { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool IgnorePackageExitCodesSpecified
+        {
+            get { return IgnorePackageExitCodes; }
+        }
+
         [XmlAttribute(AttributeName = "usePackageExitCodes")]
         public bool UsePackageExitCodes { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool UsePackageExitCodesSpecified
+        {
+            get { return UsePackageExitCodes; }
+        }
 
         [XmlAttribute(AttributeName = "stopOnFirstFailure")]
         public bool StopOnFirstFailure { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool StopOnFirstFailureSpecified
+        {
+            get { return StopOnFirstFailure; }
+        }
+
         [XmlAttribute(AttributeName = "exitWhenRebootDetected")]
         public bool ExitWhenRebootDetected { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool ExitWhenRebootDetectedSpecified
+        {
+            get { return ExitWhenRebootDetected; }
+        }
 
         [XmlAttribute(AttributeName = "ignoreDetectedReboot")]
         public bool IgnoreDetectedReboot { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool IgnoreDetectedRebootSpecified
+        {
+            get { return IgnoreDetectedReboot; }
+        }
+
         [XmlAttribute(AttributeName = "disableRepositoryOptimizations")]
         public bool DisableRepositoryOptimizations { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool DisableRepositoryOptimizationsSpecified
+        {
+            get { return DisableRepositoryOptimizations; }
+        }
 
         [XmlAttribute(AttributeName = "acceptLicense")]
         public bool AcceptLicense { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool AcceptLicenseSpecified
+        {
+            get { return AcceptLicense; }
+        }
+
         [XmlAttribute(AttributeName = "confirm")]
         public bool Confirm { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool ConfirmSpecified
+        {
+            get { return Confirm; }
+        }
+
         [XmlAttribute(AttributeName = "limitOutput")]
         public bool LimitOutput { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool LimitOutputSpecified
+        {
+            get { return LimitOutput; }
+        }
 
         [XmlAttribute(AttributeName = "cacheLocation")]
         public string CacheLocation { get; set; }
@@ -153,10 +316,28 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "failOnStderr")]
         public bool FailOnStderr { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool FailOnStderrSpecified
+        {
+            get { return FailOnStderr; }
+        }
+
         [XmlAttribute(AttributeName = "useSystemPowershell")]
         public bool UseSystemPowershell { get; set; }
 
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool UseSystemPowershellSpecified
+        {
+            get { return UseSystemPowershell; }
+        }
+
         [XmlAttribute(AttributeName = "noProgress")]
         public bool NoProgress { get; set; }
+
+        [XmlIgnore, EditorBrowsable(EditorBrowsableState.Never)]
+        public bool NoProgressSpecified
+        {
+            get { return NoProgress; }
+        }
     }
 }
