@@ -24,6 +24,8 @@
 
 ## Committers & Contributors
 
+testing...
+
 Chocolatey has been the thoughts, ideas, and work of a large community. While [Rob](https://github.com/ferventcoder) heads up direction and plays a primary role in development, there are several people that have really been a part of making Chocolatey what it is today.
 
 ### Committers
