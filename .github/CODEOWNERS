@@ -1,0 +1,4 @@
+packages.config                      @chocolatey/chocolatey-credits-reviewers
+CREDITS.md                           @chocolatey/chocolatey-credits-reviewers
+/src/chocolatey.resources/tools/     @chocolatey/chocolatey-credits-reviewers
+/lib/                                @chocolatey/chocolatey-credits-reviewers
