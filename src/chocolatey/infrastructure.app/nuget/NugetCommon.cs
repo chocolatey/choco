@@ -451,16 +451,27 @@ namespace chocolatey.infrastructure.app.nuget
 
             //if (availablePackages.Contains(packageID)) return;
 
-            var dependencyInfoResources = resources.DependencyInfoResources();
-
-            foreach (var dependencyInfoResource in dependencyInfoResources)
+            foreach (var resource in resources)
             {
-                IEnumerable<SourcePackageDependencyInfo> dependencyInfos = Array.Empty<SourcePackageDependencyInfo>();
+                var dependencyInfoResource = resource.DependencyInfoResource;
+
+                if (dependencyInfoResource is null)
+                {
+                    // We can't lookup any dependencies using this resource.
+                    continue;
+                }
+
+                // check if we already have packages matching the constraints in the list
+                IEnumerable<SourcePackageDependencyInfo> dependencyInfos = availablePackages.Where(
+                    p => string.Equals(p.Id, packageId, StringComparison.OrdinalIgnoreCase) && p.HasVersion && versionRange.Satisfies(p.Version) && p.Source == resource.Source).ToList();
 
                 try
                 {
-                    dependencyInfos = await dependencyInfoResource.ResolvePackages(
-                        packageId, configuration.Prerelease, framework, cacheContext, logger, CancellationToken.None);
+                    if (!dependencyInfos.Any())
+                    {
+                        dependencyInfos = await dependencyInfoResource.ResolvePackages(
+                            packageId, configuration.Prerelease, framework, cacheContext, logger, CancellationToken.None);
+                    }
                 }
                 catch (AggregateException ex) when (!(ex.InnerException is null))
                 {
