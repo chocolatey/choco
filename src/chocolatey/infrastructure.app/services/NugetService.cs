@@ -809,6 +809,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     var packageToUninstall = packagesToUninstall.FirstOrDefault(p => p.PackageMetadata.Id.Equals(packageDependencyInfo.Id, StringComparison.OrdinalIgnoreCase));
                     if (packageToUninstall != null)
                     {
+                        // Are we attempting a downgrade? We need to ensure it's allowed...
+                        if (!config.AllowDowngrade && packageToUninstall.Identity.HasVersion && packageDependencyInfo.HasVersion && packageDependencyInfo.Version < packageToUninstall.Identity.Version)
+                        {
+                            var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(packageToUninstall.Name, packageToUninstall.Version, Environment.NewLine);
+                            var nullResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
+                            nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                            continue;
+                        }
+
                         shouldAddForcedResultMessage = true;
                         BackupAndRunBeforeModify(packageToUninstall, config, beforeModifyAction);
                         packageToUninstall.InstallLocation = pathResolver.GetInstallPath(packageToUninstall.Identity);
@@ -1576,6 +1586,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             {
                                 if (packageToUninstall != null)
                                 {
+                                    // Are we attempting a downgrade? We need to ensure it's allowed...
+                                    if (!config.AllowDowngrade && packageToUninstall.Identity.HasVersion && packageDependencyInfo.HasVersion && packageDependencyInfo.Version < packageToUninstall.Identity.Version)
+                                    {
+                                        var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(packageToUninstall.Name, packageToUninstall.Version, Environment.NewLine);
+                                        var nullResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
+                                        nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                                        this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                                        continue;
+                                    }
+
                                     var oldPkgInfo = _packageInfoService.Get(packageToUninstall.PackageMetadata);
 
                                     BackupAndRunBeforeModify(packageToUninstall, oldPkgInfo, config, beforeUpgradeAction);
