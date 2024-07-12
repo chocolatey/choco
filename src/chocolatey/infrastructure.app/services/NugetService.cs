@@ -619,7 +619,7 @@ folder.");
 
                 if (installedPackage != null && version != null && version < installedPackage.PackageMetadata.Version && !config.AllowDowngrade)
                 {
-                    var logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to install older versions.".FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
+                    var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
                     var nullResult = packageResultsToReturn.GetOrAdd(packageName, installedPackage);
                     nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
@@ -1138,7 +1138,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (version != null && version < installedPackage.PackageMetadata.Version && !config.AllowDowngrade)
                 {
-                    var logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to upgrade to older versions.".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, Environment.NewLine);
+                    var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, Environment.NewLine);
                     var nullResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
                     nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
