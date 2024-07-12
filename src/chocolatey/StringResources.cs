@@ -56,5 +56,12 @@ namespace chocolatey
             [Browsable(false)]
             internal const string PackageNuspecVersion = "packageNuspecVersion";
         }
+
+        public static class ErrorMessages
+        {
+            [EditorBrowsable(EditorBrowsableState.Never)]
+            [Browsable(false)]
+            internal const string UnableToDowngrade = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to install older versions.";
+        }
     }
 }
