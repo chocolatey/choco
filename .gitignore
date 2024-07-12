@@ -6,6 +6,7 @@ code_drop
 obj
 src/packages
 /.vscode/**
+!.vscode/extensions.json
 !/.vscode/settings.json
 .vs
 
