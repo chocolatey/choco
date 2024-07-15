@@ -793,6 +793,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 foreach (SourcePackageDependencyInfo packageDependencyInfo in resolvedPackages)
                 {
+                    if (packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id == r.Value.Identity.Id)))
+                    {
+                        var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id);
+                        var x = new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToStringSafe(), string.Empty);
+                        var nullResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, x);
+                        nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                        this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                        continue;
+                    }
+
                     var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                     if (packageRemoteMetadata is null)
@@ -1567,6 +1577,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 existingPackage.Messages.Add(message);
 
                                 break;
+                            }
+
+                            if (packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id == r.Value.Identity.Id)))
+                            {
+                                var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id, packageDependencyInfo.Version);
+                                var x = new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToStringSafe(), string.Empty);
+                                var nullResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, x);
+                                nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                                this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                                continue;
                             }
 
                             var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
