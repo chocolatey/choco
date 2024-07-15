@@ -1,4 +1,4 @@
-﻿Describe "choco install" -Tag Chocolatey, InstallCommand {
+Describe "choco install" -Tag Chocolatey, InstallCommand {
     BeforeDiscovery {
         $isLicensed30OrMissingVersion = Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-beta' -AllowMissingPackage
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
@@ -2067,6 +2067,54 @@ To install a local, or remote file, you may use:
             # 30 seconds was chosen for this timeout because the benchmark of Chocolatey was that this would take about 15 seconds.
             # Prior to the change that this is testing, this execution would be measured in minutes with the fastest being 7 minutes.
             $Output.Duration | Should -BeLessOrEqual '00:00:30' -Because $Output.String
+        }
+    }
+
+    Context 'Installing a package should not downgrade an existing package dependency.' -Tag Downgrade {
+        BeforeAll {
+            $DependentPackage = @{
+                Name = 'isexactversiondependency'
+                Version = '2.0.0'
+            }
+
+            Restore-ChocolateyInstallSnapshot
+
+            $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
+            $Output = Invoke-Choco install toplevelhasexactversiondependency
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It "Reports that it cannot downgrade isexactversiondependency" {
+            $Output.Lines | Should -Contain 'A newer version of isexactversiondependency (v2.0.0) is already installed.' -Because $Output.String
+            $Output.Lines | Should -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+            $Output.Lines | Should -Contain 'Chocolatey installed 0/3 packages. 3 packages failed.' -Because $Output.String
+        }
+    }
+
+    Context 'Installing a package should downgrade an existing package dependency when <_> is used.' -ForEach @('--force', '--allow-downgrade') -Tag Downgrade {
+        BeforeAll {
+            $DependentPackage = @{
+                Name = 'isexactversiondependency'
+                Version = '2.0.0'
+            }
+
+            Restore-ChocolateyInstallSnapshot
+
+            $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
+            $Output = Invoke-Choco install toplevelhasexactversiondependency $_
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Does not report that it cannot downgrade isexactversiondependency" {
+            $Output.Lines | Should -Not -Contain 'A newer version of isexactversiondependency (v2.0.0) is already installed.' -Because $Output.String
+            $Output.Lines | Should -Not -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+            $Output.Lines | Should -Contain 'Chocolatey installed 3/3 packages.' -Because $Output.String
         }
     }
 
