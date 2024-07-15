@@ -578,6 +578,12 @@ folder.");
 
             foreach (var packageName in packageNames.OrEmpty())
             {
+                if (packageResultsToReturn.ContainsKey(packageName))
+                {
+                    // We have already processed this package (likely during dependency resolution of another package).
+                    continue;
+                }
+                
                 // We need to ensure we are using a clean configuration file
                 // before we start reading it.
                 config.RevertChanges();
@@ -793,6 +799,23 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 foreach (SourcePackageDependencyInfo packageDependencyInfo in resolvedPackages)
                 {
+                    // Don't attempt to action this package if dependencies failed.
+                    if (packageDependencyInfo != null && packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id == r.Value.Identity.Id)))
+                    {
+                        var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id);
+                        var x = new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToStringSafe(), string.Empty);
+                        var nullResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, x);
+                        nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                        this.Log().Error(ChocolateyLoggers.Important, logMessage);
+
+                        if (config.Features.StopOnFirstPackageFailure)
+                        {
+                            throw new ApplicationException("Stopping further execution as {0} has failed install.".FormatWith(packageDependencyInfo.Id));
+                        }
+
+                        continue;
+                    }
+
                     var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                     if (packageRemoteMetadata is null)
@@ -816,6 +839,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             var nullResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
                             nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                            
+                            if (config.Features.StopOnFirstPackageFailure)
+                            {
+                                throw new ApplicationException("Stopping further execution as {0} has failed install.".FormatWith(packageToUninstall.Identity.Id));
+                            }
+
                             continue;
                         }
 
@@ -1061,6 +1090,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             foreach (var packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
             {
+                if (packageResultsToReturn.ContainsKey(packageName))
+                {
+                    // We have already processed this package (likely during dependency resolution of another package).
+                    continue;
+                }
+
                 // We need to ensure we are using a clean configuration file
                 // before we start reading it.
                 config.RevertChanges();
@@ -1569,6 +1604,23 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 break;
                             }
 
+                            // Don't attempt to action this package if dependencies failed.
+                            if (packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id == r.Value.Identity.Id)))
+                            {
+                                var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id, packageDependencyInfo.Version);
+                                var x = new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToStringSafe(), string.Empty);
+                                var nullResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, x);
+                                nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                                this.Log().Error(ChocolateyLoggers.Important, logMessage);
+
+                                if (config.Features.StopOnFirstPackageFailure)
+                                {
+                                    throw new ApplicationException("Stopping further execution as {0} has failed.".FormatWith(packageDependencyInfo.Id));
+                                }
+
+                                continue;
+                            }
+
                             var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                             if (packageRemoteMetadata is null)
@@ -1593,8 +1645,24 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                         var nullResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
                                         nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                                        
+                                        if (config.Features.StopOnFirstPackageFailure)
+                                        {
+                                            throw new ApplicationException("Stopping further execution as {0} has failed.".FormatWith(packageDependencyInfo.Id));
+                                        }
+
                                         continue;
                                     }
+
+                                    // Package was previously marked inconclusive (not upgraded). We need remove the message since we are now upgrading it.
+                                    // Packages that are inconclusive but successfull are not labeled as successful at the end of the run.
+                                    var checkResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
+
+                                    while (checkResult.Inconclusive)
+                                    {
+                                        checkResult.Messages.Remove(checkResult.Messages.FirstOrDefault((m) => m.MessageType == ResultType.Inconclusive));
+                                    }
+
 
                                     var oldPkgInfo = _packageInfoService.Get(packageToUninstall.PackageMetadata);
 
