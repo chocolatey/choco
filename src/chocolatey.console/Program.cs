@@ -44,6 +44,7 @@ using Assembly = chocolatey.infrastructure.adapters.Assembly;
 using Console = System.Console;
 using Environment = System.Environment;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using System.Diagnostics;
 
 namespace chocolatey.console
 {
@@ -270,6 +271,7 @@ namespace chocolatey.console
                 );
         }
 
+        [Conditional("DEBUG")]
         private static void PauseIfDebug()
         {
 #if DEBUG
