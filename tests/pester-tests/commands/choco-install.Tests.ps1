@@ -2046,6 +2046,54 @@ To install a local, or remote file, you may use:
         }
     }
 
+    Context 'Installing a package should not downgrade an existing package dependency.' -Tag Downgrade {
+        BeforeAll {
+            $DependentPackage = @{
+                Name = 'isexactversiondependency'
+                Version = '2.0.0'
+            }
+
+            Restore-ChocolateyInstallSnapshot
+
+            $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
+            $Output = Invoke-Choco install toplevelhasexactversiondependency
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It "Reports that it cannot downgrade isexactversiondependency" {
+            $Output.Lines | Should -Contain 'A newer version of isexactversiondependency (v2.0.0) is already installed.' -Because $Output.String
+            $Output.Lines | Should -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+            $Output.Lines | Should -Contain 'Chocolatey installed 0/3 packages. 3 packages failed.' -Because $Output.String
+        }
+    }
+
+    Context 'Installing a package should downgrade an existing package dependency when <_> is used.' -ForEach @('--force', '--allow-downgrade') -Tag Downgrade {
+        BeforeAll {
+            $DependentPackage = @{
+                Name = 'isexactversiondependency'
+                Version = '2.0.0'
+            }
+
+            Restore-ChocolateyInstallSnapshot
+
+            $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
+            $Output = Invoke-Choco install toplevelhasexactversiondependency $_
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Does not report that it cannot downgrade isexactversiondependency" {
+            $Output.Lines | Should -Not -Contain 'A newer version of isexactversiondependency (v2.0.0) is already installed.' -Because $Output.String
+            $Output.Lines | Should -Not -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+            $Output.Lines | Should -Contain 'Chocolatey installed 3/3 packages.' -Because $Output.String
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths
