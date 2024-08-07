@@ -1327,17 +1327,17 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     null));
 
                         // For an initial attempt at finding a package resolution solution, check for all parent packages (i.e. locally installed packages
-                        // that take a dependency on the package that is currently being upgraded) and find the depdendencies associated with these packages.
-                        // NOTE: All the latest availble package version, as well as the specifically requested package version (if applicable) will be
+                        // that take a dependency on the package that is currently being upgraded) and find the dependencies associated with these packages.
+                        // NOTE: All the latest available package version, as well as the specifically requested package version (if applicable) will be
                         // searched for.  If this don't provide enough information to obtain a solution, then a follow up query in the catch block for this
                         // section of the code will be completed.
                         var parentInfos = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
                         NugetCommon.GetPackageParents(availablePackage.Identity.Id, parentInfos, localPackagesDependencyInfos).GetAwaiter().GetResult();
                         foreach (var parentPackage in parentInfos)
                         {
-                            if (version != null)
+                            if (parentPackage.HasVersion)
                             {
-                                var requestedPackageDependency = NugetList.FindPackage(parentPackage.Id, config, _nugetLogger, (SourceCacheContext)sourceCacheContext, remoteEndpoints, version);
+                                var requestedPackageDependency = NugetList.FindPackage(parentPackage.Id, config, _nugetLogger, (SourceCacheContext)sourceCacheContext, remoteEndpoints, parentPackage.Version);
 
                                 if (requestedPackageDependency != null)
                                 {

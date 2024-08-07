@@ -695,6 +695,47 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
+    # This test is taken from UpgradeScenarios.cs from the integration test suite:
+    # When_upgrading_a_dependency_with_parent_being_pinned_and_depends_on_a_range_less_than_upgrade_version
+    # Further details about this test can be found there.
+    Context 'Upgrading a dependency with pinned parent and depends on a range less than upgrade version' {
+        BeforeAll {
+            $DependentPackageName = 'isdependency'
+            Restore-ChocolateyInstallSnapshot
+            $Setup = @(
+                Invoke-Choco install $DependentPackageName --version 1.0.0 --confirm
+                Invoke-Choco install hasdependency --pin --version 1.0.0 --confirm
+            )
+            $Output = Invoke-Choco upgrade $DependentPackageName --confirm
+            $Packages = (Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should report upgraded successfully" {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 1/1 packages." -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should report package conflicts" {
+            $message = "[NuGet] One or more unresolved package dependency constraints detected in the Chocolatey lib folder. All dependency constraints must be resolved to add or update packages. If these packages are being updated this message may be ignored, if not the following error(s) may be blocking the current package operation: 'hasdependency 1.0.0 constraint: isdependency (>= 1.0.0 && < 2.0.0)'"
+            $Output.Lines | Should -Contain $message -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should upgrade the dependent package to the highest version in the range" {
+            ($Packages | Where-Object Name -eq $DependentPackageName).Version | Should -Be '1.1.0' -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should not upgrade the exact version dependency package" {
+            ($Packages | Where-Object Name -eq 'isexactversiondependency').Version | Should -Be '1.0.0' -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+    }
+
     # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

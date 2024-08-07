@@ -17,15 +17,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Threading;
+using Chocolatey.NuGet.Frameworks;
 using chocolatey.infrastructure.app;
 using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.app.nuget;
 using chocolatey.infrastructure.filesystem;
 using Moq;
 using NuGet.Common;
+using NuGet.Configuration;
 using NuGet.Packaging;
+using NuGet.Packaging.Core;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 using FluentAssertions;
 
 namespace chocolatey.tests.infrastructure.app.nuget
@@ -177,6 +183,87 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 var nugetClientVersion = "6.4.1";
                 var expectedUserAgentString = "{0}/{1} via NuGet Client/{2}".FormatWith(ApplicationParameters.UserAgent, _configuration.Information.ChocolateyProductVersion, nugetClientVersion);
                 UserAgent.UserAgentString.Should().StartWith(expectedUserAgentString);
+            }
+        }
+
+        private class When_gets_package_dependencies : TinySpec
+        {
+            private Func<Task> _because;
+            private readonly Mock<SourceCacheContext> _sourceCacheContext = new Mock<SourceCacheContext>();
+            private readonly Mock<ILogger> _nugetLogger = new Mock<ILogger>();
+            private readonly List<NuGetEndpointResources> _nuGetEndpointResources = new List<NuGetEndpointResources>();
+            private readonly HashSet<SourcePackageDependencyInfo> _sourcePackageDependencyInfos = new HashSet<SourcePackageDependencyInfo>();
+            private readonly HashSet<PackageDependency> _packageDependencies = new HashSet<PackageDependency>();
+            private readonly Mock<SourceRepository> _sourceRepository = new Mock<SourceRepository>();
+            private readonly Mock<DependencyInfoResource> _dependencyInfoResource = new Mock<DependencyInfoResource>();
+            private PackageSource _packageSource;
+            private ChocolateyConfiguration _configuration;
+
+            public override void Context()
+            {
+                _configuration = new ChocolateyConfiguration();
+                _sourceCacheContext.ResetCalls();
+                _nugetLogger.ResetCalls();
+                _sourceRepository.ResetCalls();
+                _nuGetEndpointResources.Clear();
+                _sourcePackageDependencyInfos.Clear();
+                _packageDependencies.Clear();
+                _sourceRepository.Setup(r => r.GetResource<DependencyInfoResource>(It.IsAny<SourceCacheContext>())).Returns(_dependencyInfoResource.Object);
+                _packageSource = new PackageSource("C:\\packages");
+                _sourceRepository.SetupGet(r => r.PackageSource).Returns(_packageSource);
+
+                var chocolateySourceCacheContext = new ChocolateySourceCacheContext(_configuration);
+                _nuGetEndpointResources.Add(NuGetEndpointResources.GetResourcesBySource(_sourceRepository.Object, chocolateySourceCacheContext));
+            }
+
+            public override void Because()
+            {
+                _because = () => NugetCommon.GetPackageDependencies(new PackageIdentity("a", new NuGetVersion(1, 0, 1000)), NuGetFramework.AnyFramework,
+                    _sourceCacheContext.Object, _nugetLogger.Object, _nuGetEndpointResources, _sourcePackageDependencyInfos, _packageDependencies, _configuration);
+            }
+
+            [Fact]
+            public async Task Should_request_dependencies_once()
+            {
+                Context();
+
+                var adeps = new[] { new PackageDependency("b", new VersionRange(new NuGetVersion(1, 0, 1000), true, new NuGetVersion(2, 0, 0), false)), new PackageDependency("c", new VersionRange(new NuGetVersion(1, 0, 1), true, new NuGetVersion(2, 0, 0), false)) };
+                var adepInfo = new SourcePackageDependencyInfo("a", new NuGetVersion(1, 0, 1000), adeps, true, _sourceRepository.Object);
+                _dependencyInfoResource.Setup(r => r.ResolvePackage(It.Is<PackageIdentity>(pid => pid.Id == "a" && pid.Version == new NuGetVersion(1, 0, 1000)), It.IsAny<NuGetFramework>(), It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(adepInfo);
+                var bdeps = new[] { new PackageDependency("d", new VersionRange(new NuGetVersion(1, 0, 1000), true, new NuGetVersion(2, 0, 0), false)) };
+                var bdepInfo = new[] { new SourcePackageDependencyInfo("b", new NuGetVersion(1, 0, 1000), bdeps, true, _sourceRepository.Object) };
+                _dependencyInfoResource.Setup(r => r.ResolvePackages("b", false, NuGetFramework.AnyFramework, It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(bdepInfo);
+                var cdeps = new[] { new PackageDependency("d", new VersionRange(new NuGetVersion(1, 0, 1), true, new NuGetVersion(2, 0, 0), false)) };
+                var cdepInfo = new[] { new SourcePackageDependencyInfo("c", new NuGetVersion(1, 0, 1), cdeps, true, _sourceRepository.Object) };
+                _dependencyInfoResource.Setup(r => r.ResolvePackages("c", false, NuGetFramework.AnyFramework, It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(cdepInfo);
+                var ddepInfo = GetDependencies("d", "e", "1.0.0", 1001, "2.0.0");
+                _dependencyInfoResource.Setup(r => r.ResolvePackages("d", false, NuGetFramework.AnyFramework, It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(ddepInfo);
+                var edepInfo = GetDependencies("e", null, "1.0.0", 1001, null);
+                _dependencyInfoResource.Setup(r => r.ResolvePackages("e", false, NuGetFramework.AnyFramework, It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>())).ReturnsAsync(edepInfo);
+
+                await _because();
+
+                _dependencyInfoResource.Verify(r => r.ResolvePackage(It.Is<PackageIdentity>(pid => pid.Id == "a" && pid.Version == new NuGetVersion(1, 0, 1000)), It.IsAny<NuGetFramework>(), It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>()), Times.Once());
+                _dependencyInfoResource.Verify(r => r.ResolvePackages("b", false, NuGetFramework.AnyFramework, It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>()), Times.Once());
+                _dependencyInfoResource.Verify(r => r.ResolvePackages("c", false, NuGetFramework.AnyFramework, It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>()), Times.Once());
+                _dependencyInfoResource.Verify(r => r.ResolvePackages("d", false, NuGetFramework.AnyFramework, It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>()), Times.Once());
+                _dependencyInfoResource.Verify(r => r.ResolvePackages("e", false, NuGetFramework.AnyFramework, It.IsAny<SourceCacheContext>(), It.IsAny<ILogger>(), It.IsAny<CancellationToken>()), Times.Once());
+            }
+
+            private IEnumerable<SourcePackageDependencyInfo> GetDependencies(string packageId, string dependencyId, string lowerRangeStart, int count, string upperRange)
+            {
+                var dependencyInfo = new List<SourcePackageDependencyInfo>();
+                var startVersion = NuGetVersion.Parse(lowerRangeStart);
+                var upperVersion = !string.IsNullOrEmpty(upperRange) ? NuGetVersion.Parse(upperRange) : null;
+                for (var i = startVersion.Patch; i < startVersion.Patch + count; i++)
+                {
+                    var packageDependency = !string.IsNullOrEmpty(dependencyId)
+                        ? new[] { new PackageDependency(dependencyId, new VersionRange(new NuGetVersion(startVersion.Major, startVersion.Minor, i), true, upperVersion, false)) }
+                        : Array.Empty<PackageDependency>();
+                    dependencyInfo.Add(new SourcePackageDependencyInfo(packageId, new NuGetVersion(startVersion.Major, startVersion.Minor, i), packageDependency, true, _sourceRepository.Object));
+                }
+
+                return dependencyInfo;
             }
         }
     }

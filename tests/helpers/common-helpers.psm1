@@ -18,6 +18,10 @@ $script:LicenseType = $null
 $script:chocolateyTestLocation = $null
 $script:originalChocolateyInstall = $env:ChocolateyInstall
 
+# Set the Progress Preference to SilentlyContinue. We do not need progress bars in our tests.
+# And they are known to greatly hinder performance on Windows PowerShell.
+$global:ProgressPreference = 'SilentlyContinue'
+
 Get-ChildItem -Path $PSScriptRoot\common -Filter *.ps1 -Recurse | ForEach-Object { . $_.FullName }
 
 # Prepare information that will be useful for troubleshooting.

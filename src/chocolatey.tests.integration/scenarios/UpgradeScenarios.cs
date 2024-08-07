@@ -2946,6 +2946,10 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        /// <summary>
+        /// This test suite tests upgrading isdependency from 1.0.0 while hasdependency is pinned to a version that does not allow
+        /// for isdependency to upgrade to the latest available in the source.
+        /// </summary>
         public class When_upgrading_a_dependency_with_parent_being_pinned_and_depends_on_a_range_less_than_upgrade_version : ScenariosBase
         {
             public override void Context()
