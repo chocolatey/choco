@@ -132,13 +132,22 @@ There is a `build.bat`/`build.sh` file that creates a necessary generated file n
 #### Windows
 Prerequisites:
 
- * .NET Framework 4.8+
- * Visual Studio 2019+
- * ReSharper is immensely helpful (and there is a `.sln.DotSettings` file to help with code conventions).
+The following are a minimum set of requirements to successfully complete the build process:
+
+ * .NET Framework 4.8
+ * .NET Framework 4.8 Dev Pack
+ * Visual Studio 2019 or Visual Studio 2019 Build Tools
+ * .NET SDK (i.e. ability to install .NET Global tools using `dotnet tool install`)
+
+There is a `setup.ps1` file at the root of this repository, which can be used to install all of the above.
 
 Build Process:
 
  * Run `build.bat`.
+
+> [!IMPORTANT]
+> It is assumed that Chocolatey CLI is installed on the machine where you are running the build, as this is required to generate the final Chocolatey package.
+> If required, you can skip the creation of the Chocolatey packages using the `--shouldRunChocolatey` option, i.e. `.\build.bat --shouldRunChocolatey=false`
 
 Running the build on Windows should produce an artifact that is tested and ready to be used.
 
