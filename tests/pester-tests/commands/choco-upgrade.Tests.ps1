@@ -695,6 +695,104 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
+    Context 'Upgrading a package (<PackageName>) with <Argument> should downgrade (<AllowsDowngrade>) an existing package dependency.' -ForEach @(
+        @{
+            Argument = '--force'
+            AllowsDowngrade = $true
+            ExpectedExit = 0
+            PackageName = 'upgradedowngradesdependency'
+        }
+        @{
+            Argument = '--allow-downgrade'
+            AllowsDowngrade = $true
+            ExpectedExit = 0
+            PackageName = 'upgradedowngradesdependency'
+        }
+        @{
+            Argument = ''
+            AllowsDowngrade = $false
+            ExpectedExit = 1
+            PackageName = 'upgradedowngradesdependency'
+        }
+        @{
+            Argument = '--force'
+            AllowsDowngrade = $true
+            ExpectedExit = 0
+            PackageName = 'all'
+        }
+        @{
+            Argument = '--allow-downgrade'
+            AllowsDowngrade = $true
+            ExpectedExit = 0
+            PackageName = 'all'
+        }
+        @{
+            Argument = ''
+            AllowsDowngrade = $false
+            ExpectedExit = 1
+            PackageName = 'all'
+        }
+    ) -Tag Downgrade1 {
+        BeforeAll {
+            $DependentPackage = @{
+                Name = 'isdependency'
+                Version = '2.1.0'
+            }
+
+            $PackageUnderTest = 'upgradedowngradesdependency'
+
+            Restore-ChocolateyInstallSnapshot
+
+            $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
+            $Setup2 = Invoke-Choco install $PackageUnderTest --version 1.0.0 --confirm
+            $Output = Invoke-Choco upgrade $PackageName --confirm --except="'chocolatey'" $Argument
+        }
+
+        It "Exits with expected result (<ExpectedExit>)" {
+            $Output.ExitCode | Should -Be $ExpectedExit -Because $Output.String
+        }
+
+        It "Reports correctly about downgrading isdependency" {
+            if ($AllowsDowngrade) {
+                $Output.Lines | Should -Not -Contain 'A newer version of isdependency (v2.1.0) is already installed.' -Because $Output.String
+                $Output.Lines | Should -Not -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+                $Output.Lines | Should -Contain 'Chocolatey upgraded 2/2 packages.' -Because $Output.String
+            }
+            else {
+                $Output.Lines | Should -Contain 'A newer version of isdependency (v2.1.0) is already installed.' -Because $Output.String
+                $Output.Lines | Should -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+                $Output.Lines | Should -Contain 'Chocolatey upgraded 0/2 packages. 2 packages failed.' -Because $Output.String
+            }
+        }
+    }
+
+    Context 'Upgrading a package should downgrade an existing package dependency when <_> is used.' -ForEach @('--force', '--allow-downgrade') -Tag Downgrade {
+        BeforeAll {
+            $DependentPackage = @{
+                Name = 'isdependency'
+                Version = '2.0.0'
+            }
+
+            $PackageUnderTest = 'upgradedowngradesdependency'
+
+            Restore-ChocolateyInstallSnapshot
+
+            $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
+            $Setup2 = Invoke-Choco install $PackageUnderTest --version 1.0.0 --confirm
+            $Output = Invoke-Choco upgrade $PackageUnderTest --confirm $_
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Does not report that it cannot downgrade isdependency" {
+            $Output.Lines | Should -Not -Contain 'A newer version of isdependency (v2.0.0) is already installed.' -Because $Output.String
+            $Output.Lines | Should -Not -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+            $Output.Lines | Should -Contain 'Chocolatey upgraded 2/2 packages.' -Because $Output.String
+        }
+    }
+
     # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

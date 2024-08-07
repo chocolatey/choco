@@ -81,7 +81,7 @@ Vagrant.configure("2") do |config|
     $env:VM_RUNNING = 1
     # The Invoke-Tests file will build the packages if the directory does not exist.
     # This will allow to rerun tests without packaging each time.
-    ./Invoke-Tests.ps1 -SkipPackaging
+    ./Invoke-Tests.ps1 -SkipPackaging -Tag Downgrade1
     Copy-Item $env:ALLUSERSPROFILE/chocolatey/logs/testInvocations.log C:/vagrant
   SHELL
 end
