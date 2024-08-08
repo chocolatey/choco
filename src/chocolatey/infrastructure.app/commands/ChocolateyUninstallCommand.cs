@@ -146,6 +146,18 @@ namespace chocolatey.infrastructure.app.commands
                     "Skip hooks - Do not run hook scripts. Available in 1.2.0+",
                     option => configuration.SkipHookScripts = option != null
                     )
+                .Add("userememberedargs|userememberedarguments|userememberedoptions|use-remembered-args|use-remembered-arguments|use-remembered-options",
+                    "Use Remembered Options for Uninstall - use the arguments and options used during install/upgrade for uninstall. Does not override arguments being passed at runtime. Overrides the default feature '{0}' set to '{1}'. Available in 2.4.0+.".FormatWith(ApplicationParameters.Features.UseRememberedArgumentsForUninstalls, configuration.Features.UseRememberedArgumentsForUninstalls.ToString()),
+                    option =>
+                    {
+                        if (option != null) configuration.Features.UseRememberedArgumentsForUninstalls = true;
+                    })
+                .Add("ignorerememberedargs|ignorerememberedarguments|ignorerememberedoptions|ignore-remembered-args|ignore-remembered-arguments|ignore-remembered-options",
+                    "Ignore Remembered Options for Uninstall - ignore the arguments and options used during install for Uninstall. Overrides the default feature '{0}' set to '{1}'. Available in 2.4.0+.".FormatWith(ApplicationParameters.Features.UseRememberedArgumentsForUninstalls, configuration.Features.UseRememberedArgumentsForUninstalls.ToString()),
+                    option =>
+                    {
+                        if (option != null) configuration.Features.UseRememberedArgumentsForUninstalls = false;
+                    })
                 ;
         }
 
