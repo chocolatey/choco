@@ -476,6 +476,7 @@
     <Compile Include="LogExtensions.cs" />
     <Compile Include="NuGetVersionExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
+    <Compile Include="OutputHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuleResultExtensions.cs" />
     <Compile Include="StringExtensions.cs" />

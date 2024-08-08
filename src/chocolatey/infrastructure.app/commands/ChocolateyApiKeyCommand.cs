@@ -197,6 +197,11 @@ If you find other exit codes that we have not yet documented, please
                     _configSettingsService.SetApiKey(configuration);
                     break;
                 default:
+                    if (!configuration.RegularOutput && configuration.DisplayHeaders)
+                    {
+                        OutputHelpers.LimitedOutput("Source","Key");
+                    }
+
                     _configSettingsService.GetApiKey(configuration, (key) =>
                     {
                         var authenticatedString = string.IsNullOrWhiteSpace(key.Key) ? string.Empty : "(Authenticated)";
@@ -207,7 +212,7 @@ If you find other exit codes that we have not yet documented, please
                         }
                         else
                         {
-                            this.Log().Info(() => "{0}|{1}".FormatWith(key.Source, authenticatedString));
+                            OutputHelpers.LimitedOutput( key.Source, authenticatedString);
                         }
                     });
                     break;
