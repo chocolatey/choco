@@ -1071,6 +1071,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             foreach (var packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
             {
+                if (packageResultsToReturn.ContainsKey(packageName))
+                {
+                    // We have already processed this package (likely during dependency resolution of another package).
+                    continue;
+                }
+
                 // We need to ensure we are using a clean configuration file
                 // before we start reading it.
                 config.RevertChanges();
@@ -1615,6 +1621,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
                                         continue;
                                     }
+
+                                    // Package was previously marked inconclusive (not upgraded). We need remove the message since we are now upgrading it.
+                                    // Packages that are inconclusive but successfull are not labeled as successful at the end of the run.
+                                    var checkResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
+
+                                    while (checkResult.Inconclusive)
+                                    {
+                                        checkResult.Messages.Remove(checkResult.Messages.FirstOrDefault((m) => m.MessageType == ResultType.Inconclusive));
+                                    }
+
 
                                     var oldPkgInfo = _packageInfoService.Get(packageToUninstall.PackageMetadata);
 
