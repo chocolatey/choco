@@ -69,6 +69,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell", name: "clear-packages", inline: <<-SHELL
     Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Clearing the packages directory"
     Remove-Item "$env:TEMP/chocolateyTests/packages" -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item "$env:TEMP/chocolateyTests/all-packages" -Recurse -Force -ErrorAction SilentlyContinue
   SHELL
   config.vm.provision "shell", name: "test", inline: <<-SHELL
     # Copy changed files.
