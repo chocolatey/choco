@@ -736,6 +736,102 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
+    Context 'Upgrading a package (<PackageName>) with <Argument> should downgrade (<AllowsDowngrade>) an existing package dependency.' -Tag Downgrade -ForEach @(
+        @{
+            Argument = '--force'
+            AllowsDowngrade = $true
+            ExpectedExit = 0
+            PackageName = 'upgradedowngradesdependency'
+            BasePackage = 'upgradedowngradesdependency'
+        }
+        @{
+            Argument = '--allow-downgrade'
+            AllowsDowngrade = $true
+            ExpectedExit = 0
+            PackageName = 'upgradedowngradesdependency'
+            BasePackage = 'upgradedowngradesdependency'
+        }
+        @{
+            Argument = ''
+            AllowsDowngrade = $false
+            ExpectedExit = 1
+            PackageName = 'upgradedowngradesdependency'
+            BasePackage = 'upgradedowngradesdependency'
+        }
+        @{
+            Argument = '--force'
+            AllowsDowngrade = $true
+            ExpectedExit = 0
+            PackageName = 'all'
+            BasePackage = 'upgradedowngradesdependency'
+        }
+        @{
+            Argument = '--allow-downgrade'
+            AllowsDowngrade = $true
+            ExpectedExit = 0
+            PackageName = 'all'
+            BasePackage = 'upgradedowngradesdependency'
+        }
+        @{
+            Argument = ''
+            AllowsDowngrade = $false
+            ExpectedExit = 1
+            PackageName = 'all'
+            BasePackage = 'upgradedowngradesdependency'
+        }
+        @{
+            Argument = '--force'
+            AllowsDowngrade = $true
+            ExpectedExit = 0
+            PackageName = 'all'
+            BasePackage = 'downgradesdependency'
+        }
+        @{
+            Argument = '--allow-downgrade'
+            AllowsDowngrade = $true
+            ExpectedExit = 0
+            PackageName = 'all'
+            BasePackage = 'downgradesdependency'
+        }
+        @{
+            Argument = ''
+            AllowsDowngrade = $false
+            ExpectedExit = 1
+            PackageName = 'all'
+            BasePackage = 'downgradesdependency'
+        }
+    ) {
+        BeforeAll {
+            $DependentPackage = @{
+                Name = 'isdependency'
+                Version = '2.1.0'
+            }
+
+            Restore-ChocolateyInstallSnapshot
+
+            $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
+            $Setup2 = Invoke-Choco install $BasePackage --version 1.0.0 --confirm
+            $Output = Invoke-Choco upgrade $PackageName --confirm --except="'chocolatey'" $Argument
+        }
+
+        It "Exits with expected result (<ExpectedExit>)" {
+            $Output.ExitCode | Should -Be $ExpectedExit -Because $Output.String
+        }
+
+        It "Reports correctly about downgrading isdependency" {
+            if ($AllowsDowngrade) {
+                $Output.Lines | Should -Not -Contain 'A newer version of isdependency (v2.1.0) is already installed.' -Because $Output.String
+                $Output.Lines | Should -Not -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+                $Output.String | Should -MatchExactly 'Chocolatey upgraded 2/\d+ packages.'
+            }
+            else {
+                $Output.Lines | Should -Contain 'A newer version of isdependency (v2.1.0) is already installed.' -Because $Output.String
+                $Output.Lines | Should -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+                $Output.String | Should -MatchExactly 'Chocolatey upgraded 0/\d+ packages. 2 packages failed.'
+            }
+        }
+    }
+
     # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

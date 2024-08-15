@@ -1,4 +1,4 @@
-Describe "choco install" -Tag Chocolatey, InstallCommand {
+﻿Describe "choco install" -Tag Chocolatey, InstallCommand {
     BeforeDiscovery {
         $isLicensed30OrMissingVersion = Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-beta' -AllowMissingPackage
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
@@ -217,7 +217,8 @@ Describe "choco install" -Tag Chocolatey, InstallCommand {
         It "Should mention that package hash verification was skipped since local folder source is being used" {
             if ((Test-HasNuGetV3Source) -or (-not $env:TEST_KITCHEN)) {
                 $Output.Lines | Should -Contain "Source does not provide a package hash, skipping package hash validation." -Because $Output.String
-            } else {
+            }
+            else {
                 $Output.Lines | Should -Contain "Package hash matches expected hash." -Because $Output.String
             }
         }
@@ -1690,7 +1691,7 @@ To install a local, or remote file, you may use:
 
             $PackageUnderTest = "installpackage", "packagewithscript"
 
-            $Output = "a`n"*2 | Invoke-Choco install @PackageUnderTest
+            $Output = "a`n" * 2 | Invoke-Choco install @PackageUnderTest
         }
 
         It "Installs successfully and exits with success (0)" {
@@ -1740,7 +1741,8 @@ To install a local, or remote file, you may use:
         It 'Outputs download completed' {
             $testMessage = if ($features.License) {
                 "Download of 'cmake-3.21.2-windows-x86_64.zip' (36.01 MB) completed."
-            } else {
+            }
+            else {
                 "Download of cmake-3.21.2-windows-x86_64.zip (36.01 MB) completed."
             }
             $Output.Lines | Should -Contain $testMessage -Because $Output.String
@@ -1749,7 +1751,8 @@ To install a local, or remote file, you may use:
         It 'Outputs extracting correct archive' {
             $testMessage = if ($features.License) {
                 "Extracting cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
-            } else {
+            }
+            else {
                 "Extracting $($paths.CachePathLong)\install-chocolateyzip\3.21.2\cmake-3.21.2-windows-x86_64.zip to $env:ChocolateyInstall\lib\install-chocolateyzip\tools..."
             }
             $Output.Lines | Should -Contain $testMessage -Because $Output.String
@@ -1925,8 +1928,8 @@ To install a local, or remote file, you may use:
     }
 
     Context "Installing a package with a non-normalized version number" -ForEach @(
-        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1' ; NuspecVersion = '01.0.0.0'}
-        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0' ; NuspecVersion = '01.0.0.0'}
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1' ; NuspecVersion = '01.0.0.0' }
+        @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0' ; NuspecVersion = '01.0.0.0' }
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0.0' ; NuspecVersion = '01.0.0.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '4.0.1' ; NuspecVersion = '004.0.01.0' }
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' ; NuspecVersion = '01.0.0.0' }
@@ -2027,21 +2030,21 @@ To install a local, or remote file, you may use:
         }
 
         It 'Outputs <Name> as <Value>' -ForEach @(@{
-            Name = 'chocolateyPackageVersion'
-            Value= '0.9.0'
-        }
-        @{
-            Name = 'packageVersion'
-            Value= '0.9.0'
-        }
-        @{
-            Name = 'chocolateyPackageNuspecVersion'
-            Value= '0.9'
-        }
-        @{
-            Name = 'packageNuspecVersion'
-            Value= '0.9'
-        }) {
+                Name  = 'chocolateyPackageVersion'
+                Value = '0.9.0'
+            }
+            @{
+                Name  = 'packageVersion'
+                Value = '0.9.0'
+            }
+            @{
+                Name  = 'chocolateyPackageNuspecVersion'
+                Value = '0.9'
+            }
+            @{
+                Name  = 'packageNuspecVersion'
+                Value = '0.9'
+            }) {
             $Output.Lines | Should -Contain "$Name=$Value"
         }
     }
@@ -2070,51 +2073,200 @@ To install a local, or remote file, you may use:
         }
     }
 
-    Context 'Installing a package should not downgrade an existing package dependency.' -Tag Downgrade {
+    Context 'Installing a package with argument (<Argument>) should (<AllowsDowngrade>) downgrade an existing package dependency.' -Tag Downgrade -ForEach @(
+        @{
+            Argument        = '--force'
+            AllowsDowngrade = $true
+            ExpectedExit    = 0
+        }
+        @{
+            Argument        = '--allow-downgrade'
+            AllowsDowngrade = $true
+            ExpectedExit    = 0
+        }
+        @{
+            Argument        = ''
+            AllowsDowngrade = $false
+            ExpectedExit    = 1
+        }
+    ) {
         BeforeAll {
             $DependentPackage = @{
-                Name = 'isexactversiondependency'
-                Version = '2.0.0'
+                Name    = 'isdependency'
+                Version = '2.1.0'
             }
 
             Restore-ChocolateyInstallSnapshot
 
             $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
-            $Output = Invoke-Choco install toplevelhasexactversiondependency
+            $Output = Invoke-Choco install downgradesdependency --confirm $Argument
+            $Packages = Get-ChocolateyInstalledPackages
         }
 
-        It "Exits with Failure (1)" {
-            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        It "Exits correctly (<ExpectedExit>)" {
+            $Output.ExitCode | Should -Be $ExpectedExit -Because $Output.String
         }
 
-        It "Reports that it cannot downgrade isexactversiondependency" {
-            $Output.Lines | Should -Contain 'A newer version of isexactversiondependency (v2.0.0) is already installed.' -Because $Output.String
-            $Output.Lines | Should -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
-            $Output.Lines | Should -Contain 'Chocolatey installed 0/3 packages. 3 packages failed.' -Because $Output.String
+        It "Reports that it can (<AllowsDowngrade>) downgrade isdependency" {
+            if ($AllowsDowngrade) {
+                $Output.Lines | Should -Contain 'Chocolatey installed 2/2 packages.' -Because $Output.String
+            }
+            else {
+                $Output.Lines | Should -Contain 'Chocolatey installed 0/2 packages. 2 packages failed.' -Because $Output.String
+            }
+
+            $Output.Lines | Should -Contain -Not:($AllowsDowngrade) "A newer version of $($DependentPackage.Name) (v$($DependentPackage.Version)) is already installed." -Because $Output.String
+            $Output.Lines | Should -Contain -Not:($AllowsDowngrade) 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+        }
+
+        It "Should have the expected packages" {
+            if ($AllowsDowngrade) {
+                $Packages | where { $_.Name -eq $DependentPackage.Name -and $_.Version -eq '1.0.0' } | Should -Not -BeNullOrEmpty -Because "Packages: $Packages $($Output.String)"
+            }
+            else {
+                $Packages | where { $_.Name -eq $DependentPackage.Name -and $_.Version -eq $DependentPackage.Version } | Should -Not -BeNullOrEmpty -Because "Packages: $Packages $($Output.String)"
+            }
         }
     }
 
-    Context 'Installing a package should downgrade an existing package dependency when <_> is used.' -ForEach @('--force', '--allow-downgrade') -Tag Downgrade {
+    Context 'Installing a package with argument (<Argument>) should (<AllowsDowngrade>) downgrade an existing package dependency.' -Tag Downgrade, StopOnFirstPackageFailure -ForEach @(
+        @{
+            Argument        = '--force'
+            AllowsDowngrade = $true
+            ExpectedExit    = 0
+        }
+        @{
+            Argument        = '--allow-downgrade'
+            AllowsDowngrade = $true
+            ExpectedExit    = 0
+        }
+        @{
+            Argument        = ''
+            AllowsDowngrade = $false
+            ExpectedExit    = 1
+        }
+    ) {
         BeforeAll {
             $DependentPackage = @{
-                Name = 'isexactversiondependency'
-                Version = '2.0.0'
+                Name    = 'isdependency'
+                Version = '2.1.0'
             }
 
             Restore-ChocolateyInstallSnapshot
 
             $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
-            $Output = Invoke-Choco install toplevelhasexactversiondependency $_
+            $null = Enable-ChocolateyFeature -Name StopOnFirstPackageFailure
+            $Output = Invoke-Choco install downgradesdependency installpackage --confirm $Argument
+            $Packages = Get-ChocolateyInstalledPackages
         }
 
-        It "Exits with Success (0)" {
-            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        It "Exits correctly (<ExpectedExit>)" {
+            $Output.ExitCode | Should -Be $ExpectedExit -Because $Output.String
         }
 
-        It "Does not report that it cannot downgrade isexactversiondependency" {
-            $Output.Lines | Should -Not -Contain 'A newer version of isexactversiondependency (v2.0.0) is already installed.' -Because $Output.String
-            $Output.Lines | Should -Not -Contain 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
-            $Output.Lines | Should -Contain 'Chocolatey installed 3/3 packages.' -Because $Output.String
+        It "Reports that it can (<AllowsDowngrade>) downgrade isdependency" {
+            $Output.Lines | Should -Contain -Not:($AllowsDowngrade) "A newer version of $($DependentPackage.Name) (v$($DependentPackage.Version)) is already installed." -Because $Output.String
+            $Output.Lines | Should -Contain -Not:($AllowsDowngrade) 'Use --allow-downgrade or --force to attempt to install older versions.' -Because $Output.String
+        }
+
+        It "Should have the expected packages" {
+            if ($AllowsDowngrade) {
+                $Packages | where { $_.Name -eq $DependentPackage.Name -and $_.Version -eq '1.0.0' } | Should -Not -BeNullOrEmpty -Because "Packages: $Packages $($Output.String)"
+            }
+            else {
+                $Packages | where { $_.Name -eq $DependentPackage.Name -and $_.Version -eq $DependentPackage.Version } | Should -Not -BeNullOrEmpty -Because "Packages: $Packages $($Output.String)"
+            }
+        }
+    }
+
+    Context 'Installing a package (<PackageName>) with a failing nested dependency should not install the package with failing dependencies' -ForEach @(
+        @{
+            PackageName = 'dependencyfailure;downgradesdependency;failingdependency;hasdependency;hasfailingnesteddependency;hasnesteddependency;isdependency;isexactversiondependency'.Split(';')
+        }
+        @{
+            PackageName = @('packages.config')
+        }
+        @{
+            PackageName = @('all')
+        }
+    ) {
+        BeforeAll {
+
+            Restore-ChocolateyInstallSnapshot -SetWorkingDirectory
+
+            Copy-Item "$PSScriptRoot/failingnested.packages.config" './packages.config'
+            Disable-ChocolateySource -All
+            Enable-ChocolateySource -Name 'hermes-all'
+
+            $Output = Invoke-Choco install @PackageName --confirm
+            $Packages = Get-ChocolateyInstalledPackages
+        }
+
+        It "Exits correctly (15608)" {
+            # failingdependency exits with 15608, so Chocolatey exits with that.
+            $Output.ExitCode | Should -Be 15608 -Because $Output.String
+        }
+
+        It "Should have the expected packages" {
+            $ExpectedPackages = @(
+                "downgradesdependency"
+                "isdependency"
+                "isexactversiondependency"
+            )
+            $UnexpectedPackages = @(
+                'dependencyfailure'
+                "dependencyfailure"
+                'hasfailingnesteddependency'
+            )
+
+            foreach ($package in $ExpectedPackages) {
+                $Packages.Name | Should -Contain $package -Because "Package: $package $($Output.String)"
+            }
+
+            foreach ($package in $UnexpectedPackages) {
+                $Packages.Name | Should -Not -Contain $package -Because "Package: $package $($Output.String)"
+            }
+        }
+    }
+
+    Context 'Installing a package (<PackageName>) with a failing nested dependency should not install the package with failing dependencies' -ForEach @( @{ PackageName = 'hasfailingnesteddependency;hasnesteddependency' } ) {
+        BeforeAll {
+
+            Restore-ChocolateyInstallSnapshot -SetWorkingDirectory
+
+            Disable-ChocolateySource -All
+            Enable-ChocolateySource -Name 'hermes-all'
+
+            $Output = Invoke-Choco install $PackageName --confirm
+            $Packages = Get-ChocolateyInstalledPackages
+        }
+
+        It "Exits correctly (15608)" {
+            # failingdependency exits with 15608, so Chocolatey exits with that.
+            $Output.ExitCode | Should -Be 15608 -Because $Output.String
+        }
+
+        It "Should have the expected packages" {
+            $ExpectedPackages = @(
+                "downgradesdependency"
+                "hasnesteddependency"
+                "isdependency"
+                "hasdependency"
+            )
+            $UnexpectedPackages = @(
+                "dependencyfailure"
+                "isexactversiondependency"
+                'dependencyfailure'
+                'hasfailingnesteddependency'
+            )
+
+            foreach ($package in $ExpectedPackages) {
+                $Packages.Name | Should -Contain $package -Because "Package: $package $($Output.String)"
+            }
+
+            foreach ($package in $UnexpectedPackages) {
+                $Packages.Name | Should -Not -Contain $package -Because "Package: $package $($Output.String)"
+            }
         }
     }
 
