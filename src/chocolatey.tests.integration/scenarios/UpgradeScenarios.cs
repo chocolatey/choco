@@ -4973,8 +4973,12 @@ namespace chocolatey.tests.integration.scenarios
             {
                 base.Context();
 
+                // Start WireMockServer using a random port
+                _wireMockServer = WireMockServer.Start();
+
                 // Force outgoing Chocolatey CLI HTTP requests to go to WireMock.NET Server
-                Configuration.Sources = "http://localhost:24626/api/v2/";
+                Configuration.Sources = $"{_wireMockServer.Url}/api/v2/";
+
                 // Set configuration to prevent re-use of cached HTTP Requests
                 Configuration.CacheExpirationInMinutes = -1;
 
