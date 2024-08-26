@@ -67,6 +67,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [WindowsOnly]
         public class When_listing_pins_with_no_pins : ScenariosBase
         {
             public override void Context()
@@ -96,6 +97,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [WindowsOnly]
         public class When_listing_pins_with_an_existing_pin : ScenariosBase
         {
             public override void Context()
@@ -130,6 +132,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [WindowsOnly]
         public class When_listing_pins_with_existing_pins : ScenariosBase
         {
             public override void Context()
