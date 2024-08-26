@@ -605,6 +605,7 @@ folder.");
                 if (installedPackage != null && (version == null || version == installedPackage.PackageMetadata.Version) && !config.Force)
                 {
                     var logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
+                    // We need a temporary PackageResult so that we can add to the Messages collection.
                     var nullResult = packageResultsToReturn.GetOrAdd(packageName, installedPackage);
                     nullResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                     nullResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
@@ -626,8 +627,8 @@ folder.");
                 if (installedPackage != null && version != null && version < installedPackage.PackageMetadata.Version && !config.AllowDowngrade)
                 {
                     var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
-                    var nullResult = packageResultsToReturn.GetOrAdd(packageName, installedPackage);
-                    nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    packageResultsToReturn.GetOrAdd(packageName, installedPackage)
+                        .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
@@ -803,9 +804,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     if (packageDependencyInfo != null && packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id == r.Value.Identity.Id)))
                     {
                         var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id);
-                        var x = new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToStringSafe(), string.Empty);
-                        var nullResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, x);
-                        nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                        packageResultsToReturn
+                            .GetOrAdd(
+                                packageDependencyInfo.Id,
+                                new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToStringSafe(), string.Empty)
+                            )
+                            .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
 
                         if (config.Features.StopOnFirstPackageFailure)
@@ -836,8 +840,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         if (!config.AllowDowngrade && packageToUninstall.Identity.HasVersion && packageDependencyInfo.HasVersion && packageDependencyInfo.Version < packageToUninstall.Identity.Version)
                         {
                             var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(packageToUninstall.Name, packageToUninstall.Version, Environment.NewLine);
-                            var nullResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
-                            nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall)
+                                .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
                             
                             if (config.Features.StopOnFirstPackageFailure)
@@ -1184,8 +1188,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 if (version != null && version < installedPackage.PackageMetadata.Version && !config.AllowDowngrade)
                 {
                     var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, Environment.NewLine);
-                    var nullResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
-                    nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    packageResultsToReturn.GetOrAdd(packageName, new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)))
+                        .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
@@ -1608,9 +1612,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             if (packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id == r.Value.Identity.Id)))
                             {
                                 var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id, packageDependencyInfo.Version);
-                                var x = new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToStringSafe(), string.Empty);
-                                var nullResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, x);
-                                nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                                packageResultsToReturn.GetOrAdd(
+                                        packageDependencyInfo.Id, 
+                                        new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToStringSafe(), string.Empty)
+                                    )
+                                    .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                                 this.Log().Error(ChocolateyLoggers.Important, logMessage);
 
                                 if (config.Features.StopOnFirstPackageFailure)
@@ -1642,8 +1648,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     if (!config.AllowDowngrade && packageToUninstall.Identity.HasVersion && packageDependencyInfo.HasVersion && packageDependencyInfo.Version < packageToUninstall.Identity.Version)
                                     {
                                         var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(packageToUninstall.Name, packageToUninstall.Version, Environment.NewLine);
-                                        var nullResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
-                                        nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                                        packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall)
+                                            .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
                                         
                                         if (config.Features.StopOnFirstPackageFailure)
@@ -1655,7 +1661,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     }
 
                                     // Package was previously marked inconclusive (not upgraded). We need remove the message since we are now upgrading it.
-                                    // Packages that are inconclusive but successfull are not labeled as successful at the end of the run.
+                                    // Packages that are inconclusive but successful are not labeled as successful at the end of the run.
                                     var checkResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
 
                                     while (checkResult.Inconclusive)
