@@ -4982,8 +4982,6 @@ namespace chocolatey.tests.integration.scenarios
                 // Set configuration to prevent re-use of cached HTTP Requests
                 Configuration.CacheExpirationInMinutes = -1;
 
-                _wireMockServer = WireMockServer.Start(24626);
-
                 _wireMockServer.Given(
                     Request.Create().WithPath("/api/v2/").UsingGet()
                 )
@@ -4993,14 +4991,14 @@ namespace chocolatey.tests.integration.scenarios
                         .WithHeader("Content-Type", "application/xml;charset=utf-8")
                         .WithHeader("DataServiceVersion", "1.0;")
                         .WithBody(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-<service xml:base=""http://localhost:24626/api/v2/"" xmlns:atom=""http://www.w3.org/2005/Atom"" xmlns:app=""http://www.w3.org/2007/app"" xmlns=""http://www.w3.org/2007/app"">
+<service xml:base=""{0}/api/v2/"" xmlns:atom=""http://www.w3.org/2005/Atom"" xmlns:app=""http://www.w3.org/2007/app"" xmlns=""http://www.w3.org/2007/app"">
 <workspace>
 <atom:title>Default</atom:title>
 <collection href=""Packages"">
 <atom:title>Packages</atom:title>
 </collection>
 </workspace>
-</service>")
+</service>".FormatWith(_wireMockServer.Url))
                 );
 
                 _wireMockServer.Given(
@@ -5108,13 +5106,13 @@ namespace chocolatey.tests.integration.scenarios
                     .WithHeader("Content-Type", "application/atom+xml;charset=utf-8")
                     .WithHeader("DataServiceVersion", "2.0;")
                     .WithBody(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
-<feed xml:base=""http://localhost:24626/api/v2/"" xmlns:d=""http://schemas.microsoft.com/ado/2007/08/dataservices"" xmlns:m=""http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"" xmlns=""http://www.w3.org/2005/Atom"">
+<feed xml:base=""{0}/api/v2/"" xmlns:d=""http://schemas.microsoft.com/ado/2007/08/dataservices"" xmlns:m=""http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"" xmlns=""http://www.w3.org/2005/Atom"">
   <title type=""text"">Packages</title>
-  <id>http://localhost:24626/api/v2/Packages</id>
+  <id>{0}/api/v2/Packages</id>
   <updated>2024-08-13T21:56:43Z</updated>
   <link rel=""self"" title=""Packages"" href=""Packages"" />
   <entry>
-    <id>http://localhost:24626/api/v2/Packages(Id='upgradepackage',Version='2.0.0')</id>
+    <id>{0}/api/v2/Packages(Id='upgradepackage',Version='2.0.0')</id>
     <title type=""text"">upgradepackage</title>
     <summary type=""text"">A package used to test upgrading of packages.</summary>
     <updated>2024-08-08T05:11:50Z</updated>
@@ -5124,7 +5122,7 @@ namespace chocolatey.tests.integration.scenarios
     <link rel=""edit-media"" title=""V2FeedPackage"" href=""Packages(Id='upgradepackage',Version='2.0.0')/$value"" />
     <link rel=""edit"" title=""V2FeedPackage"" href=""Packages(Id='upgradepackage',Version='2.0.0')"" />
     <category term=""CCR.Website.V2FeedPackage"" scheme=""http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"" />
-    <content type=""application/zip"" src=""http://localhost:24626/api/v2/package/upgradepackage/2.0.0"" />
+    <content type=""application/zip"" src=""{0}/api/v2/package/upgradepackage/2.0.0"" />
     <m:properties xmlns:m=""http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"" xmlns:d=""http://schemas.microsoft.com/ado/2007/08/dataservices"">
       <d:Version>2.0.0</d:Version>
       <d:Title>Upgrade Package</d:Title>
@@ -5135,8 +5133,8 @@ namespace chocolatey.tests.integration.scenarios
       <d:Dependencies></d:Dependencies>
       <d:DownloadCount m:type=""Edm.Int32"">289183</d:DownloadCount>
       <d:VersionDownloadCount m:type=""Edm.Int32"">63</d:VersionDownloadCount>
-      <d:GalleryDetailsUrl>http://localhost:24626/packages/upgradepackage/2.0.0</d:GalleryDetailsUrl>
-      <d:ReportAbuseUrl>http://localhost:24626/package/ReportAbuse/upgradepackage/2.0.0</d:ReportAbuseUrl>
+      <d:GalleryDetailsUrl>{0}/packages/upgradepackage/2.0.0</d:GalleryDetailsUrl>
+      <d:ReportAbuseUrl>{0}/package/ReportAbuse/upgradepackage/2.0.0</d:ReportAbuseUrl>
       <d:IconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</d:IconUrl>
       <d:IsLatestVersion m:type=""Edm.Boolean"">true</d:IsLatestVersion>
       <d:IsAbsoluteLatestVersion m:type=""Edm.Boolean"">false</d:IsAbsoluteLatestVersion>
@@ -5176,7 +5174,7 @@ namespace chocolatey.tests.integration.scenarios
       <d:PackageScanFlagResult>None</d:PackageScanFlagResult>
     </m:properties>
   </entry>
-</feed>")
+</feed>".FormatWith(_wireMockServer.Url))
                 );
 
                 _wireMockServer.Given(
@@ -5191,7 +5189,7 @@ namespace chocolatey.tests.integration.scenarios
                     .WithHeader("DataServiceVersion", "2.0;")
                     .WithBody(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
 <entry>
-  <id>http://localhost:24626/api/v2/Packages(Id='upgradepackage',Version='2.0.0')</id>
+  <id>{0}}/api/v2/Packages(Id='upgradepackage',Version='2.0.0')</id>
   <title type=""text"">upgradepackage</title>
   <summary type=""text"">A package used to test upgrading of packages.</summary>
   <updated>2024-08-08T05:11:50Z</updated>
@@ -5201,7 +5199,7 @@ namespace chocolatey.tests.integration.scenarios
   <link rel=""edit-media"" title=""V2FeedPackage"" href=""Packages(Id='upgradepackage',Version='2.0.0')/$value"" />
   <link rel=""edit"" title=""V2FeedPackage"" href=""Packages(Id='upgradepackage',Version='2.0.0')"" />
   <category term=""CCR.Website.V2FeedPackage"" scheme=""http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"" />
-  <content type=""application/zip"" src=""http://localhost:24626/api/v2/package/upgradepackage/2.0.0"" />
+  <content type=""application/zip"" src=""{0}/api/v2/package/upgradepackage/2.0.0"" />
   <m:properties xmlns:m=""http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"" xmlns:d=""http://schemas.microsoft.com/ado/2007/08/dataservices"">
     <d:Version>2.0.0</d:Version>
     <d:Title>Upgrade Package</d:Title>
@@ -5212,8 +5210,8 @@ namespace chocolatey.tests.integration.scenarios
     <d:Dependencies></d:Dependencies>
     <d:DownloadCount m:type=""Edm.Int32"">289183</d:DownloadCount>
     <d:VersionDownloadCount m:type=""Edm.Int32"">63</d:VersionDownloadCount>
-    <d:GalleryDetailsUrl>http://localhost:24626/packages/upgradepackage/2.0.0</d:GalleryDetailsUrl>
-    <d:ReportAbuseUrl>http://localhost:24626/package/ReportAbuse/upgradepackage/2.0.0</d:ReportAbuseUrl>
+    <d:GalleryDetailsUrl>{0}/packages/upgradepackage/2.0.0</d:GalleryDetailsUrl>
+    <d:ReportAbuseUrl>{0}/package/ReportAbuse/upgradepackage/2.0.0</d:ReportAbuseUrl>
     <d:IconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</d:IconUrl>
     <d:IsLatestVersion m:type=""Edm.Boolean"">true</d:IsLatestVersion>
     <d:IsAbsoluteLatestVersion m:type=""Edm.Boolean"">false</d:IsAbsoluteLatestVersion>
@@ -5252,7 +5250,7 @@ namespace chocolatey.tests.integration.scenarios
     <d:PackageScanResultDate m:type=""Edm.DateTime"">2024-08-07T03:58:15.683</d:PackageScanResultDate>
     <d:PackageScanFlagResult>None</d:PackageScanFlagResult>
   </m:properties>
-</entry>")
+</entry>".FormatWith(_wireMockServer.Url))
                 );
 
                 _wireMockServer.Given(
@@ -5352,13 +5350,13 @@ namespace chocolatey.tests.integration.scenarios
                     r.Value.Messages.Should().Contain(m =>
                         m.MessageType == ResultType.Error &&
                         m.Message.Contains(@"upgradepackage not upgraded. An error occurred during installation:
- Error downloading 'upgradepackage.2.0.0' from 'http://localhost:24626/api/v2/package/upgradepackage/2.0.0'.")));
+ Error downloading 'upgradepackage.2.0.0' from '{0}/api/v2/package/upgradepackage/2.0.0'.".FormatWith(_wireMockServer.Url))));
             }
 
             [Fact]
             public void Should_have_requested_download_of_package()
             {
-                _wireMockServer.Should().HaveReceivedACall().AtUrl("http://localhost:24626/api/v2/package/upgradepackage/2.0.0");
+                _wireMockServer.Should().HaveReceivedACall().AtUrl("{0}/api/v2/package/upgradepackage/2.0.0".FormatWith(_wireMockServer.Url));
             }
         }
     }
