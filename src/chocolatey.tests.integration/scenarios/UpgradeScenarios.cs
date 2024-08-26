@@ -4982,6 +4982,16 @@ namespace chocolatey.tests.integration.scenarios
                 // Set configuration to prevent re-use of cached HTTP Requests
                 Configuration.CacheExpirationInMinutes = -1;
 
+                // The WireMock.Net Server is setup to reply to requests made when _NOT_
+                // using repository optimizations, so let's make sure that we are using
+                // that configuration explicitly.  It was found that when running all
+                // the integration tests together, this value could be set to true
+                // elsewhere, which then causes tests here to fail. This is far from ideal,
+                // and the Configuration should have been reset when starting this scenario
+                // but for now, let's explicitly set to false, as this is what we know
+                // the WireMock.Net server will respond with.
+                Configuration.Features.UsePackageRepositoryOptimizations = false;
+
                 _wireMockServer.Given(
                     Request.Create().WithPath("/api/v2/").UsingGet()
                 )
