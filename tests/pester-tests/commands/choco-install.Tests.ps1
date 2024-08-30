@@ -2129,7 +2129,7 @@ To install a local, or remote file, you may use:
         }
     }
 
-    Context 'Installing a package with argument (<Argument>) should (<AllowsDowngrade>) downgrade an existing package dependency.' -Tag Downgrade, StopOnFirstPackageFailure -ForEach @(
+    Context 'Installing a package with argument (<Argument>) and StopOnFirstPackageFailure enabled should (<AllowsDowngrade>) downgrade an existing package dependency and correctly handle installpackage.' -Tag Downgrade, StopOnFirstPackageFailure -ForEach @(
         @{
             Argument        = '--force'
             AllowsDowngrade = $true
