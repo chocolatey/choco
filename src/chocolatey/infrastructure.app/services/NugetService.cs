@@ -801,13 +801,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 foreach (SourcePackageDependencyInfo packageDependencyInfo in resolvedPackages)
                 {
                     // Don't attempt to action this package if dependencies failed.
-                    if (packageDependencyInfo != null && packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id == r.Value.Identity.Id)))
+                    if (packageDependencyInfo != null && packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id.Equals(r.Value.Identity.Id, StringComparison.OrdinalIgnoreCase))))
                     {
                         var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id);
                         packageResultsToReturn
                             .GetOrAdd(
                                 packageDependencyInfo.Id,
-                                new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToStringSafe(), string.Empty)
+                                new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToFullStringChecked(), string.Empty)
                             )
                             .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
@@ -1609,12 +1609,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
 
                             // Don't attempt to action this package if dependencies failed.
-                            if (packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id == r.Value.Identity.Id)))
+                            if (packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id.Equals(r.Value.Identity.Id, StringComparison.OrdinalIgnoreCase))))
                             {
                                 var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id, packageDependencyInfo.Version);
                                 packageResultsToReturn.GetOrAdd(
                                         packageDependencyInfo.Id, 
-                                        new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToStringSafe(), string.Empty)
+                                        new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToFullStringChecked(), string.Empty)
                                     )
                                     .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                                 this.Log().Error(ChocolateyLoggers.Important, logMessage);
