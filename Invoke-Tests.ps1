@@ -57,10 +57,30 @@ if (-not (Test-Path "$TestPath/packages") -or -not $SkipPackaging) {
     $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages -Recurse -Include *.nuspec | Where-Object FullName -NotMatch 'bin'
     Get-ChildItem -Path $PSScriptRoot/tests/packages -Recurse -Include *.nupkg | Copy-Item -Destination "$TestPath/packages"
 
-    foreach ($file in $nuspecs) {
-        Write-Host "Packaging $file"
+    $packFailures = foreach ($file in $nuspecs) {
         # Include allow-unofficial in case an unofficial Chocolatey has been installed globally for testing
-        $null = choco pack $file.FullName --out "$TestPath/packages" --allow-unofficial
+        $packOutput = choco pack $file.FullName --out "$TestPath/packages" --allow-unofficial
+        if ($LASTEXITCODE -ne 0) {
+            [pscustomobject]@{
+                Package = $file.FullName
+                ExitCode = $LASTEXITCODE
+                Output = $packOutput
+            }
+            Write-Warning "Failed to pack $file"
+        }
+        else {
+            Write-Host "Packaged $file"
+        }
+    }
+
+    if ($null -ne $packFailures) {
+        foreach ($failure in $packFailures) {
+            Write-Warning "$($failure.Package) failed to pack with exit code: $($failure.ExitCode)"
+            $failure.Output | Write-Warning
+        }
+        # If you want to stop things, change this to a throw.
+        # This is not currently throwing as there are two packages that are supposed to fail.
+        Write-Error "$($packFailures.Count) packages failed to pack."
     }
 }
 
