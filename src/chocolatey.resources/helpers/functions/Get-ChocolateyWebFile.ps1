@@ -385,9 +385,29 @@ Get-FtpFile
         if ($url.StartsWith('file:')) {
             $url = ([uri] $url).LocalPath
         }
-        Write-Host "Copying $packageName
+        $fiCached = New-Object System.IO.FileInfo($fileFullPath)
+        if ($fiCached.Exists -and -not ($forceDownload)) {
+            if ($checksum -ne $null -and $checksum -ne '') {
+                try {
+                    Write-Host "File appears to be copied already. Verifying with package checksum to determine if it needs to be recopied."
+                    Get-ChecksumValid -file $fileFullPath -checkSum $checksum -checksumType $checksumType -originalUrl $url -ErrorAction "Stop"
+                    $needsCopy = $false
+                }
+                catch {
+                    Write-Debug "Existing file failed checksum. Will be recopied from url."
+                }
+            }
+        }
+
+        if ($needsCopy) {
+            Write-Host "Copying $packageName
   from `'$url`'"
-        Copy-Item $url -Destination $fileFullPath -Force
+            Copy-Item $url -Destination $fileFullPath -Force
+        }
+        else {
+            Write-Debug "$($packageName)'s requested file has already been copied. Using cached copy at
+ '$fileFullPath'."
+        }
         $urlIsRemote = $false
     }
 
