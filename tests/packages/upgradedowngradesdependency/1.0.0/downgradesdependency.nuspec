@@ -4,8 +4,8 @@
         <id>downgradesdependency</id>
         <version>1.0.0</version>
         <title>Has out of range Dependency</title>
-        <authors>__REPLACE_AUTHORS_OF_SOFTWARE__</authors>
-        <owners>__REPLACE_YOUR_NAME__</owners>
+        <authors>Chocolatey Software</authors>
+        <owners>chocolatey</owners>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>
           These packages can be used to test the installation or upgrading of packages that require an existing package to downgrade.
