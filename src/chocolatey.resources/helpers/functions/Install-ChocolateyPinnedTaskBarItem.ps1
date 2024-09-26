@@ -21,7 +21,7 @@ Creates an item in the task bar linking to the provided path.
 
 .NOTES
 Does not work with SYSTEM, but does not error. It warns with the error
-message.
+message. This command is deprecated and will be removed in version 3.0.0.
 
 .INPUTS
 None
@@ -53,6 +53,7 @@ Install-ChocolateyExplorerMenuItem
     )
 
     Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
+    Write-Warning "Install-ChocolateyPinnedTaskBarItem has been deprecated in v2.4.0 and will be removed in v3.0.0."
 
     try {
         if (Test-Path($targetFilePath)) {
