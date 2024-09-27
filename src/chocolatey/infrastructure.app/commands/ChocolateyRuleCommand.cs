@@ -113,6 +113,13 @@ namespace chocolatey.infrastructure.app.commands
             {
                 this.Log().Info(ChocolateyLoggers.Important, "Implemented Package Rules");
             }
+            else
+            {
+                if (config.DisplayHeaders)
+                {
+                    OutputHelpers.LimitedOutput("Severity","Id","Summary","HelpUrl");
+                }
+            }
 
             OutputRules("Error/Required", config, implementedRules.Where(r => r.Severity == RuleType.Error).ToList());
             OutputRules("Warning/Guideline", config, implementedRules.Where(r => r.Severity == RuleType.Warning).ToList());
@@ -193,7 +200,7 @@ namespace chocolatey.infrastructure.app.commands
                 }
                 else
                 {
-                    this.Log().Info("{0}|{1}|{2}|{3}", rule.Severity, rule.Id, rule.Summary, rule.HelpUrl);
+                    OutputHelpers.LimitedOutput(rule.Severity.ToString(), rule.Id, rule.Summary, rule.HelpUrl);
                 }
             }
         }
