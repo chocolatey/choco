@@ -578,6 +578,12 @@ folder.");
 
             foreach (var packageName in packageNames.OrEmpty())
             {
+                if (packageResultsToReturn.ContainsKey(packageName))
+                {
+                    // We have already processed this package (likely during dependency resolution of another package).
+                    continue;
+                }
+                
                 // We need to ensure we are using a clean configuration file
                 // before we start reading it.
                 config.RevertChanges();
@@ -599,6 +605,7 @@ folder.");
                 if (installedPackage != null && (version == null || version == installedPackage.PackageMetadata.Version) && !config.Force)
                 {
                     var logMessage = "{0} v{1} already installed.{2} Use --force to reinstall, specify a version to install, or try upgrade.".FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
+                    // We need a temporary PackageResult so that we can add to the Messages collection.
                     var nullResult = packageResultsToReturn.GetOrAdd(packageName, installedPackage);
                     nullResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                     nullResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
@@ -619,9 +626,9 @@ folder.");
 
                 if (installedPackage != null && version != null && version < installedPackage.PackageMetadata.Version && !config.AllowDowngrade)
                 {
-                    var logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to install older versions.".FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
-                    var nullResult = packageResultsToReturn.GetOrAdd(packageName, installedPackage);
-                    nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(installedPackage.Name, installedPackage.Version, Environment.NewLine);
+                    packageResultsToReturn.GetOrAdd(packageName, installedPackage)
+                        .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
@@ -793,6 +800,26 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 foreach (SourcePackageDependencyInfo packageDependencyInfo in resolvedPackages)
                 {
+                    // Don't attempt to action this package if dependencies failed.
+                    if (packageDependencyInfo != null && packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id.Equals(r.Value.Identity.Id, StringComparison.OrdinalIgnoreCase))))
+                    {
+                        var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id);
+                        packageResultsToReturn
+                            .GetOrAdd(
+                                packageDependencyInfo.Id,
+                                new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToFullStringChecked(), string.Empty)
+                            )
+                            .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                        this.Log().Error(ChocolateyLoggers.Important, logMessage);
+
+                        if (config.Features.StopOnFirstPackageFailure)
+                        {
+                            throw new ApplicationException("Stopping further execution as {0} has failed install.".FormatWith(packageDependencyInfo.Id));
+                        }
+
+                        continue;
+                    }
+
                     var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                     if (packageRemoteMetadata is null)
@@ -809,6 +836,22 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     var packageToUninstall = packagesToUninstall.FirstOrDefault(p => p.PackageMetadata.Id.Equals(packageDependencyInfo.Id, StringComparison.OrdinalIgnoreCase));
                     if (packageToUninstall != null)
                     {
+                        // Are we attempting a downgrade? We need to ensure it's allowed...
+                        if (!config.AllowDowngrade && packageToUninstall.Identity.HasVersion && packageDependencyInfo.HasVersion && packageDependencyInfo.Version < packageToUninstall.Identity.Version)
+                        {
+                            var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(packageToUninstall.Name, packageToUninstall.Version, Environment.NewLine);
+                            packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall)
+                                .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                            this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                            
+                            if (config.Features.StopOnFirstPackageFailure)
+                            {
+                                throw new ApplicationException("Stopping further execution as {0} has failed install.".FormatWith(packageToUninstall.Identity.Id));
+                            }
+
+                            continue;
+                        }
+
                         shouldAddForcedResultMessage = true;
                         BackupAndRunBeforeModify(packageToUninstall, config, beforeModifyAction);
                         packageToUninstall.InstallLocation = pathResolver.GetInstallPath(packageToUninstall.Identity);
@@ -1051,6 +1094,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             foreach (var packageName in config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty())
             {
+                if (packageResultsToReturn.ContainsKey(packageName))
+                {
+                    // We have already processed this package (likely during dependency resolution of another package).
+                    continue;
+                }
+
                 // We need to ensure we are using a clean configuration file
                 // before we start reading it.
                 config.RevertChanges();
@@ -1138,9 +1187,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (version != null && version < installedPackage.PackageMetadata.Version && !config.AllowDowngrade)
                 {
-                    var logMessage = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to upgrade to older versions.".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, Environment.NewLine);
-                    var nullResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
-                    nullResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                    var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, Environment.NewLine);
+                    packageResultsToReturn.GetOrAdd(packageName, new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)))
+                        .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
                     continue;
                 }
@@ -1559,6 +1608,25 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 break;
                             }
 
+                            // Don't attempt to action this package if dependencies failed.
+                            if (packageResultsToReturn.Any(r => r.Value.Success != true && packageDependencyInfo.Dependencies.Any(d => d.Id.Equals(r.Value.Identity.Id, StringComparison.OrdinalIgnoreCase))))
+                            {
+                                var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id, packageDependencyInfo.Version);
+                                packageResultsToReturn.GetOrAdd(
+                                        packageDependencyInfo.Id, 
+                                        new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToFullStringChecked(), string.Empty)
+                                    )
+                                    .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                                this.Log().Error(ChocolateyLoggers.Important, logMessage);
+
+                                if (config.Features.StopOnFirstPackageFailure)
+                                {
+                                    throw new ApplicationException("Stopping further execution as {0} has failed.".FormatWith(packageDependencyInfo.Id));
+                                }
+
+                                continue;
+                            }
+
                             var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                             if (packageRemoteMetadata is null)
@@ -1576,6 +1644,32 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             {
                                 if (packageToUninstall != null)
                                 {
+                                    // Are we attempting a downgrade? We need to ensure it's allowed...
+                                    if (!config.AllowDowngrade && packageToUninstall.Identity.HasVersion && packageDependencyInfo.HasVersion && packageDependencyInfo.Version < packageToUninstall.Identity.Version)
+                                    {
+                                        var logMessage = StringResources.ErrorMessages.UnableToDowngrade.FormatWith(packageToUninstall.Name, packageToUninstall.Version, Environment.NewLine);
+                                        packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall)
+                                            .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+                                        this.Log().Error(ChocolateyLoggers.Important, logMessage);
+                                        
+                                        if (config.Features.StopOnFirstPackageFailure)
+                                        {
+                                            throw new ApplicationException("Stopping further execution as {0} has failed.".FormatWith(packageDependencyInfo.Id));
+                                        }
+
+                                        continue;
+                                    }
+
+                                    // Package was previously marked inconclusive (not upgraded). We need remove the message since we are now upgrading it.
+                                    // Packages that are inconclusive but successful are not labeled as successful at the end of the run.
+                                    var checkResult = packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall);
+
+                                    while (checkResult.Inconclusive)
+                                    {
+                                        checkResult.Messages.Remove(checkResult.Messages.FirstOrDefault((m) => m.MessageType == ResultType.Inconclusive));
+                                    }
+
+
                                     var oldPkgInfo = _packageInfoService.Get(packageToUninstall.PackageMetadata);
 
                                     BackupAndRunBeforeModify(packageToUninstall, oldPkgInfo, config, beforeUpgradeAction);
