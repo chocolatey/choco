@@ -134,6 +134,8 @@ if (Test-Path $extensionsPath) {
         }
 }
 
+Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
+
 # Exercise caution and test _thoroughly_ with AND without the licensed extension installed
 # when making any changes here. And make sure to update this comment if needed when any
 # changes are being made.
