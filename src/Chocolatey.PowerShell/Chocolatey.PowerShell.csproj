@@ -61,6 +61,10 @@
     <Compile Include="..\chocolatey\StringResources.cs">
       <Link>Shared\StringResources.cs</Link>
     </Compile>
+    <Compile Include="Commands\AssertValidChecksumCommand.cs" />
+    <Compile Include="Shared\ChecksumExeNotFoundException.cs" />
+    <Compile Include="Shared\ChecksumVerificationFailedException.cs" />
+    <Compile Include="Shared\ChecksumMissingException.cs" />
     <Compile Include="Commands\GetEnvironmentVariableCommand.cs" />
     <Compile Include="Commands\GetEnvironmentVariableNamesCommand.cs" />
     <Compile Include="Commands\InstallChocolateyPathCommand.cs" />
@@ -68,6 +72,7 @@
     <Compile Include="Commands\TestProcessAdminRightsCommand.cs" />
     <Compile Include="Commands\UninstallChocolateyPathCommand.cs" />
     <Compile Include="Commands\UpdateSessionEnvironmentCommand.cs" />
+    <Compile Include="Helpers\ChecksumValidator.cs" />
     <Compile Include="Helpers\Elevation.cs" />
     <Compile Include="Helpers\EnvironmentHelper.cs" />
     <Compile Include="Helpers\Paths.cs" />
@@ -77,6 +82,7 @@
     <Compile Include="..\SolutionVersion.cs">
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
+    <Compile Include="Shared\ChecksumType.cs" />
     <Compile Include="Shared\ChocolateyCmdlet.cs" />
     <Compile Include="Shared\EnvironmentNames.cs" />
     <Compile Include="Shared\EnvironmentVariables.cs" />
