@@ -28,6 +28,18 @@ namespace Chocolatey.PowerShell.Shared
     public abstract class ChocolateyCmdlet : PSCmdlet
     {
         /// <summary>
+        /// The canonical error ID for the command to assist with traceability.
+        /// For more specific error IDs where needed, use <c>"{ErrorId}.EventName"</c>.
+        /// </summary>
+        protected string ErrorId
+        {
+            get
+            {
+                return GetType().Name + "Error";
+            }
+        }
+
+        /// <summary>
         /// For compatibility reasons, we always add the -IgnoredArguments parameter, so that newly added parameters
         /// won't break things too much if a package is run with an older version of Chocolatey.
         /// </summary>
