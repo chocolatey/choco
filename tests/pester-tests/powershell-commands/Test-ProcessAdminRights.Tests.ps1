@@ -1,4 +1,4 @@
-﻿Describe 'Test-ProcessAdminRights helper function tests' -Tags Cmdlets {
+﻿Describe 'Test-ProcessAdminRights helper function tests' -Tags Cmdlets, TestProcessAdminRights {
     BeforeAll {
         Initialize-ChocolateyTestInstall
 
