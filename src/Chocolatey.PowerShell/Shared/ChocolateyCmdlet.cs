@@ -14,7 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Management.Automation;
 using System.Text;
 using Chocolatey.PowerShell.Helpers;
@@ -27,6 +29,16 @@ namespace Chocolatey.PowerShell.Shared
     /// </summary>
     public abstract class ChocolateyCmdlet : PSCmdlet
     {
+        // Place deprecated command names and their corresponding replacement in this dictionary to have those commands
+        // warn users about the deprecation when they are called by those names.
+        private readonly Dictionary<string, string> _deprecatedCommandNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            // Use the following format to provide a deprecation notice. If the new command name is an empty string,
+            // the warning will inform the user it is to be removed instead of renamed.
+            //
+            // { "Deprecated-CommandName", "New-CommandName" },
+        };
+
         /// <summary>
         /// The canonical error ID for the command to assist with traceability.
         /// For more specific error IDs where needed, use <c>"{ErrorId}.EventName"</c>.
@@ -54,8 +66,20 @@ namespace Chocolatey.PowerShell.Shared
         /// </summary>
         protected virtual bool Logging { get; } = true;
 
+        private void WriteWarningForDeprecatedCommands()
+        {
+            if (_deprecatedCommandNames.TryGetValue(MyInvocation.InvocationName, out var replacement))
+            {
+                var message = string.IsNullOrEmpty(replacement)
+                    ? $"The command '{MyInvocation.InvocationName}' is deprecated and will be removed in a future version"
+                    : $"The '{MyInvocation.InvocationName}' alias is deprecated and will be removed in a future version. Use '{replacement}' to ensure compatibility with future versions of Chocolatey.";
+                WriteWarning(message);
+            }
+        }
+
         protected sealed override void BeginProcessing()
         {
+            WriteWarningForDeprecatedCommands();
             WriteCmdletCallDebugMessage();
             Begin();
         }
