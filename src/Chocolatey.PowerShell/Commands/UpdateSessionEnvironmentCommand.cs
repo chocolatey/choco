@@ -20,7 +20,7 @@ using Chocolatey.PowerShell.Shared;
 
 namespace Chocolatey.PowerShell.Commands
 {
-    [Cmdlet(VerbsData.Update, "SessionEnvironment")]
+    [Cmdlet(VerbsData.Update, "SessionEnvironment", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.Low)]
     [OutputType(typeof(void))]
     public sealed class UpdateSessionEnvironmentCommand : ChocolateyCmdlet
     {

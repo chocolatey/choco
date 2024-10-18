@@ -21,7 +21,7 @@ using Chocolatey.PowerShell.Shared;
 
 namespace Chocolatey.PowerShell.Commands
 {
-    [Cmdlet(VerbsCommon.Set, "EnvironmentVariable")]
+    [Cmdlet(VerbsCommon.Set, "EnvironmentVariable", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.Medium)]
     [OutputType(typeof(void))]
     public sealed class SetEnvironmentVariableCommand : ChocolateyCmdlet
     {
