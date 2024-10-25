@@ -173,11 +173,21 @@ Task("Prepare-Chocolatey-Packages")
 {
     // Copy legal documents
     CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.md", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/CREDITS.txt");
+    CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco/LICENSE.txt", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/LICENSE.txt");
 
-    // Run Chocolatey Unpackself
+    // Copy choco.exe.manifest
+    CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco/choco.exe.manifest", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe.manifest");
+
+    // Copy external file resources
+    EnsureDirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers");
+    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/helpers/**/*"), BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers", true);
+    EnsureDirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/redirects");
+    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/redirects/**/*"), BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/redirects", true);
+    EnsureDirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/tools");
+    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/tools/**/*"), BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/tools", true);
+
+    // Copy merged choco.exe
     CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco_merged/choco.exe", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe");
-
-    StartProcess(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe", new ProcessSettings{ Arguments = "unpackself -f -y --allow-unofficial-build --run-actual" });
 
     // Copy Chocolatey.PowerShell.dll and its help.xml file
     CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/Chocolatey.PowerShell/Chocolatey.PowerShell.dll", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll");
@@ -265,11 +275,21 @@ Task("Prepare-ChocolateyNo7zip-Package")
 
     // Copy legal documents
     CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.md", nuspecDirectory + "/tools/chocolateyInstall/CREDITS.txt");
+    CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/LICENSE.txt", nuspecDirectory + "/tools/chocolateyInstall/LICENSE.txt");
 
-    // Run Chocolatey Unpackself
+    // Copy choco.exe.manifest
+    CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/choco.exe.manifest", nuspecDirectory + "/tools/chocolateyInstall/choco.exe.manifest");
+
+    // Copy external file resources
+    EnsureDirectoryExists(nuspecDirectory + "/tools/chocolateyInstall/helpers");
+    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/helpers/**/*"), nuspecDirectory + "/tools/chocolateyInstall/helpers", true);
+    EnsureDirectoryExists(nuspecDirectory + "/tools/chocolateyInstall/redirects");
+    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/redirects/**/*"), nuspecDirectory + "/tools/chocolateyInstall/redirects", true);
+    EnsureDirectoryExists(nuspecDirectory + "/tools/chocolateyInstall/tools");
+    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/tools/**/*"), nuspecDirectory + "/tools/chocolateyInstall/tools", true);
+
+    // Copy merged choco.exe
     CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip_merged/choco.exe", nuspecDirectory + "/tools/chocolateyInstall/choco.exe");
-
-    StartProcess(nuspecDirectory + "/tools/chocolateyInstall/choco.exe", new ProcessSettings{ Arguments = "unpackself -f -y --allow-unofficial-build" });
 
     // Copy Chocolatey.PowerShell.dll and help.xml file
     CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/Chocolatey.PowerShell/Chocolatey.PowerShell.dll", nuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll");

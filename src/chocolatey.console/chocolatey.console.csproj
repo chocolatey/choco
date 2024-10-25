@@ -209,6 +209,7 @@
   <ItemGroup>
     <EmbeddedResource Include="choco.exe.manifest">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <None Include="packages.config" />
   </ItemGroup>
