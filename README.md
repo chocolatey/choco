@@ -27,7 +27,10 @@ You can just call me choco.
     - [Windows](#windows)
     - [Other Platforms](#other-platforms)
       - [Prerequisites:](#prerequisites)
+      - [Before building:](#before-building)
       - [Build Process:](#build-process)
+  - [Testing](#testing)
+  - [Installing on Other Platforms:](#installing-on-other-platforms)
 - [Credits](#credits)
 
 <!-- /TOC -->
@@ -199,6 +202,15 @@ chmod +x *.sh
  * Run `./build.sh`.
 
 Running the build on Mono produces an artifact similar to Windows but may have more rough edges. You may get a failure or two in the build script that can be safely ignored.
+
+### Testing
+
+The Chocolatey CLI codebase contains a number of different tests, including unit, integration, and end-to-end tests.
+These are all documented in the [TESTING.md](https://github.com/chocolatey/choco/blob/develop/TESTING.md) file.
+
+The unit and integration tests are NUnit tests, which can be executed directly within Visual Studio, or as part of the [build process](https://github.com/chocolatey/choco/blob/develop/TESTING.md#running-tests).
+
+The end-to-end tests use Pester as the test framework. Since these tests have the potential to actually make changes to your system, we recommend using the [provided Vagrant file to run these tests in a dedicated virtual machine](https://github.com/chocolatey/choco/blob/develop/TESTING.md#pester-tests).
 
 ### Installing on Other Platforms:
 

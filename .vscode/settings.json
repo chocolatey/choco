@@ -1,5 +1,6 @@
 {
     "[powershell]": {
         "files.encoding": "utf8bom",
-    }
+    },
+    "markdown.extension.toc.levels": "2..6"
 }
