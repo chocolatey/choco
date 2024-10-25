@@ -27,7 +27,10 @@ You can just call me choco.
     - [Windows](#windows)
     - [Other Platforms](#other-platforms)
       - [Prerequisites:](#prerequisites)
+      - [Before building:](#before-building)
       - [Build Process:](#build-process)
+  - [Testing](#testing)
+  - [Installing on Other Platforms:](#installing-on-other-platforms)
 - [Credits](#credits)
 
 <!-- /TOC -->
@@ -39,6 +42,7 @@ You can just call me choco.
 | [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/develop?logo=github)](https://github.com/chocolatey/choco/actions/workflows/build.yml)  |
 
 ## Chat Room
+
 Come join in the conversation about Chocolatey in our Community Chat Room.
 
 [![Discord](https://img.shields.io/discord/778552361454141460?logo=Discord)](https://ch0.co/community)
@@ -46,9 +50,11 @@ Come join in the conversation about Chocolatey in our Community Chat Room.
 Please make sure you've read over and agree with the [etiquette regarding communication](#etiquette-regarding-communication).
 
 ## Support Chocolatey!
+
  * Purchase [Chocolatey Pro / Chocolatey for Business](https://chocolatey.org/pricing#compare)
 
 ## See Chocolatey In Action
+
 Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update environment variables without restarting your shell):
 
 ![install](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/choco_install.gif "Wat? Tab completion and updating environment variables!")
@@ -58,11 +64,13 @@ Chocolatey FOSS install showing tab completion and `refreshenv` (a way to update
 ![install w/pro](https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/chocopro_install_stopped.gif "Chocolatey Pro availability now! A great option for individuals looking for that community PLUS option.")
 
 ## Etiquette Regarding Communication
+
 If you are an open source user requesting support, please remember that most folks in the Chocolatey community are volunteers that have lives outside of open source and are not paid to ensure things work for you, so please be considerate of others' time when you are asking for things. Many of us have families that also need time as well and only have so much time to give on a daily basis. A little consideration and patience can go a long way. After all, you are using a pretty good tool without cost. It may not be perfect (yet), and we know that.
 
 If you are using a [commercial edition of Chocolatey](https://chocolatey.org/compare#compare), you have different terms! Please see [support](https://chocolatey.org/support).
 
 ## Information
+
  * [Chocolatey Website and Community Package Repository](https://community.chocolatey.org)
  * [Mailing List](https://groups.google.com/group/chocolatey) / [Release Announcements Only Mailing List](https://groups.google.com/group/chocolatey-announce) / [Build Status Mailing List](http://groups.google.com/group/chocolatey-build-status)
  * [Twitter](https://twitter.com/chocolateynuget) / [Facebook](https://www.facebook.com/ChocolateySoftware) / [GitHub](https://github.com/chocolatey)
@@ -70,6 +78,7 @@ If you are using a [commercial edition of Chocolatey](https://chocolatey.org/com
  * [Documentation](https://docs.chocolatey.org/en-us/) / [Support](https://chocolatey.org/support)
 
 ### Documentation
+
 Please see the [docs](https://docs.chocolatey.org/en-us/)
 
 Give `choco.exe -?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
@@ -82,9 +91,11 @@ Give `choco.exe -?` a shot (or `choco.exe -h`). For specific commands, add the c
   - See our documentation on the [support lifecycle and supported operating systems](https://docs.chocolatey.org/en-us/information/support-lifecycle) for additional information
 
 ### License / Credits
+
 Apache 2.0 - see [LICENSE](https://github.com/chocolatey/choco/blob/master/LICENSE) and [NOTICE](https://github.com/chocolatey/choco/blob/master/NOTICE) files.
 
 ## Submitting Issues
+
 ![submitting issues](https://cloud.githubusercontent.com/assets/63502/12534554/6ea7cc04-c224-11e5-82ad-3805d0b5c724.png)
 
  * If you are having issue with a package, please see [Request Package Fixes or Updates / Become a maintainer of an existing package](https://docs.chocolatey.org/en-us/community-repository/users/package-triage-process).
@@ -118,31 +129,45 @@ Submitting a ticket:
  * Include screenshots and/or animated gifs whenever possible, they help show us exactly what the problem is.
 
 ## Contributing
+
 If you would like to contribute code or help squash a bug or two, that's awesome. Please familiarize yourself with [CONTRIBUTING](https://github.com/chocolatey/choco/blob/develop/CONTRIBUTING.md).
 
 This project uses an [.editorconfig](https://editorconfig.org) file in order to help maintain consistency of code.
 Errors and warnings produced by not following these defined conventions will in future be enforced at build time, so ensure your contributions adhere to the rules defined in it and produce no warnings or errors in Visual Studio.
 
 ## Committers
+
 Committers, you should be very familiar with [COMMITTERS](https://github.com/chocolatey/choco/blob/develop/COMMITTERS.md).
 
 ### Compiling / Building Source
+
 There is a `build.bat`/`build.sh` file that creates a necessary generated file named `SolutionVersion.cs`. It must be run at least once before Visual Studio will build.
 
 #### Windows
+
 Prerequisites:
 
- * .NET Framework 4.8+
- * Visual Studio 2019+
- * ReSharper is immensely helpful (and there is a `.sln.DotSettings` file to help with code conventions).
+The following are a minimum set of requirements to successfully complete the build process:
+
+ * .NET Framework 4.8
+ * .NET Framework 4.8 Dev Pack
+ * Visual Studio 2019 or Visual Studio 2019 Build Tools
+ * .NET SDK (i.e. ability to install .NET Global tools using `dotnet tool install`)
+
+There is a `setup.ps1` file at the root of this repository, which can be used to install all of the above.
 
 Build Process:
 
  * Run `build.bat`.
 
+> [!IMPORTANT]
+> It is assumed that Chocolatey CLI is installed on the machine where you are running the build, as this is required to generate the final Chocolatey package.
+> If required, you can skip the creation of the Chocolatey packages using the `--shouldRunChocolatey` option, i.e. `.\build.bat --shouldRunChocolatey=false`
+
 Running the build on Windows should produce an artifact that is tested and ready to be used.
 
 #### Other Platforms
+
 ##### Prerequisites:
 
  * Install and configure Mono. Mono 6.6 or newer should work, see `docker/Dockerfile.linux` for the currently recommended version of Mono.
@@ -178,6 +203,15 @@ chmod +x *.sh
 
 Running the build on Mono produces an artifact similar to Windows but may have more rough edges. You may get a failure or two in the build script that can be safely ignored.
 
+### Testing
+
+The Chocolatey CLI codebase contains a number of different tests, including unit, integration, and end-to-end tests.
+These are all documented in the [TESTING.md](https://github.com/chocolatey/choco/blob/develop/TESTING.md) file.
+
+The unit and integration tests are NUnit tests, which can be executed directly within Visual Studio, or as part of the [build process](https://github.com/chocolatey/choco/blob/develop/TESTING.md#running-tests).
+
+The end-to-end tests use Pester as the test framework. Since these tests have the potential to actually make changes to your system, we recommend using the [provided Vagrant file to run these tests in a dedicated virtual machine](https://github.com/chocolatey/choco/blob/develop/TESTING.md#pester-tests).
+
 ### Installing on Other Platforms:
 
  1. Get a copy of the source code and build.
@@ -186,4 +220,5 @@ Running the build on Mono produces an artifact similar to Windows but may have m
  1. Copy `./docker/choco_wrapper` to a directory on the `$PATH`, rename to `choco`, and if the install directory is something else than `/opt/chocolatey`, then edit it to point to the correct path.
 
 ## Credits
+
 Chocolatey is brought to you by quite a few people and frameworks. See [CREDITS](https://github.com/chocolatey/choco/blob/master/docs/legal/CREDITS.md) (just LEGAL/Credits.md in the zip folder).
