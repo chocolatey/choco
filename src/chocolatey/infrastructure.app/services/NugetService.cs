@@ -189,6 +189,8 @@ that uses these options.");
                 this.Log().Debug(ChocolateyLoggers.Verbose, () => "--- Start of List ---");
             }
 
+            var decryptionFailures = new List<ChocolateyPackageInformation>();
+
             foreach (var pkg in NugetList.GetPackages(config, _nugetLogger, _fileSystem))
             {
                 var package = pkg; // for lamda access
@@ -217,9 +219,24 @@ that uses these options.");
                         }
                     }
 
-                    if (!string.IsNullOrWhiteSpace(packageInfo.Arguments))
+                    // The main scenario where we desire the decrypted arguments during a list sequence is to display them when verbose output is selected.
+                    // This is done by default on the `info` command, and by request on the `list` command. As such, we are going to validate it's that scenario
+                    // to avoid needlessly decrypting the arguments file.
+                    var shouldDecryptArguments = (
+                            config.CommandName.Equals("info", StringComparison.InvariantCultureIgnoreCase) ||
+                            config.CommandName.Equals("list", StringComparison.InvariantCultureIgnoreCase)
+                        ) &&
+                        config.Verbose &&
+                        !string.IsNullOrWhiteSpace(packageInfo.Arguments);
+
+                    if (shouldDecryptArguments)
                     {
-                        var decryptedArguments = ArgumentsUtility.DecryptPackageArgumentsFile(_fileSystem, packageInfo.Package.Id, packageInfo.Package.Version.ToNormalizedStringChecked());
+                        var decryptedArguments = ArgumentsUtility.DecryptPackageArgumentsFile(_fileSystem, packageInfo.Package.Id, packageInfo.Package.Version.ToNormalizedStringChecked()).ToList();
+
+                        if (decryptedArguments.Count <= 0)
+                        {
+                            decryptionFailures.Add(packageInfo);
+                        }
 
                         packageArgumentsUnencrypted = "\n Remembered Package Arguments: \n  {0}".FormatWith(string.Join(Environment.NewLine + "  ", decryptedArguments));
                     }
@@ -334,6 +351,23 @@ that uses these options.");
                 else if (NugetList.LowerThresholdHit)
                 {
                     this.Log().Warn(logType, "Over {0:N0} packages, or package versions, was found per source, but there may be more packages available that were filtered out. Please refine your search, or specify a page number to retrieve more results.".FormatWith(NugetList.LastPackageLimitUsed * 0.9));
+                }
+            }
+
+            if (decryptionFailures.Count > 0)
+            {
+                var failedPackages = string.Join(", ", decryptionFailures.Select(f => "{0} - {1}".FormatWith(f.Package.Id, f.Package.Version)));
+                var failureMessage = "There were some failures decrypting package arguments.";
+                var failedPackagesMessage = "Failed packages: {0}".FormatWith(failedPackages);
+                if (config.RegularOutput)
+                {
+                    this.Log().Warn(failureMessage);
+                    this.Log().Warn(failedPackagesMessage);
+                }
+                else
+                {
+                    this.Log().Debug(failureMessage);
+                    this.Log().Debug(failedPackagesMessage);
                 }
             }
         }
@@ -1915,36 +1949,17 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 return config;
             }
 
-            var packageArgumentsUnencrypted = packageInfo.Arguments.ContainsSafe(" --") && packageInfo.Arguments.ToStringSafe().Length > 4 ? packageInfo.Arguments : NugetEncryptionUtility.DecryptString(packageInfo.Arguments);
+            var packageArguments = ArgumentsUtility.DecryptPackageArgumentsFile(
+                _fileSystem, 
+                packageInfo.Package.Id,
+                packageInfo.Package.Version.ToNormalizedStringChecked(),
+                redactSensitiveArguments: false,
+                throwOnFailure: true).ToList();
+            var packageArgumentsUnencrypted = string.Join(" ", packageArguments);
 
-            var sensitiveArgs = true;
             if (!ArgumentsUtility.SensitiveArgumentsProvided(packageArgumentsUnencrypted))
             {
-                sensitiveArgs = false;
                 this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding remembered arguments for upgrade: {1}".FormatWith(packageInfo.Package.Id, packageArgumentsUnencrypted.EscapeCurlyBraces()));
-            }
-
-            var packageArgumentsSplit = packageArgumentsUnencrypted.Split(new[] { " --" }, StringSplitOptions.RemoveEmptyEntries);
-            var packageArguments = new List<string>();
-            foreach (var packageArgument in packageArgumentsSplit.OrEmpty())
-            {
-                var packageArgumentSplit = packageArgument.Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
-                var optionName = packageArgumentSplit[0].ToStringSafe();
-                var optionValue = string.Empty;
-                if (packageArgumentSplit.Length == 2)
-                {
-                    optionValue = packageArgumentSplit[1].ToStringSafe().UnquoteSafe();
-                    if (optionValue.StartsWith("'"))
-                    {
-                        optionValue.UnquoteSafe();
-                    }
-                }
-
-                if (sensitiveArgs)
-                {
-                    this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding '{1}' to upgrade arguments. Values not shown due to detected sensitive arguments".FormatWith(packageInfo.Package.Id, optionName.EscapeCurlyBraces()));
-                }
-                packageArguments.Add("--{0}{1}".FormatWith(optionName, string.IsNullOrWhiteSpace(optionValue) ? string.Empty : "=" + optionValue));
             }
 
             var originalConfig = config.DeepCopy();
