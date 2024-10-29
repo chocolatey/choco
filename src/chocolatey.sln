@@ -302,11 +302,8 @@ Global
 		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.ReleaseOfficial|x86.ActiveCfg = Release|Any CPU
 		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.ReleaseOfficial|x86.Build.0 = Release|Any CPU
 		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.ReleaseOfficialNo7zip|Any CPU.ActiveCfg = Release|Any CPU
-		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.ReleaseOfficialNo7zip|Any CPU.Build.0 = Release|Any CPU
 		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.ReleaseOfficialNo7zip|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.ReleaseOfficialNo7zip|Mixed Platforms.Build.0 = Release|Any CPU
 		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.ReleaseOfficialNo7zip|x86.ActiveCfg = Release|Any CPU
-		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.ReleaseOfficialNo7zip|x86.Build.0 = Release|Any CPU
 		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.WIX|Any CPU.ActiveCfg = Debug|Any CPU
 		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.WIX|Any CPU.Build.0 = Debug|Any CPU
 		{2B98BB42-A7AE-4EF6-B0B8-AA7BFC1E1180}.WIX|Mixed Platforms.ActiveCfg = Debug|Any CPU

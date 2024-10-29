@@ -16,6 +16,7 @@ namespace chocolatey.infrastructure.information
         private static readonly string[] _filteredParents = new[]
         {
             "explorer",
+            "winlogon",
             "powershell",
             "pwsh",
             "cmd",
@@ -28,7 +29,9 @@ namespace chocolatey.infrastructure.information
             "WindowsTerminal",
             "FireCMD",
             "ConEmu64",
-            "ConEmuC64"
+            "ConEmuC64",
+            // Nested processes / invoked by the shim choco.exe
+            "Chocolatey CLI"
         };
 
         public ProcessTree(string currentProcessName)
