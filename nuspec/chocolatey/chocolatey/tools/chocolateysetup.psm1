@@ -1,8 +1,7 @@
 $thisScriptFolder = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
 $chocoInstallVariableName = "ChocolateyInstall"
-$sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
-$defaultChocolateyPathOld = "$sysDrive\Chocolatey"
+$insecureRootInstallPath = "$env:SystemDrive\Chocolatey"
 
 $originalForegroundColor = $host.ui.RawUI.ForegroundColor
 
@@ -135,14 +134,15 @@ function Initialize-Chocolatey {
     }
 
     # variable to allow insecure directory:
-    $allowInsecureRootInstall = $false
-    if ($env:ChocolateyAllowInsecureRootDirectory -eq 'true') {
-        $allowInsecureRootInstall = $true
-    }
+    $allowInsecureRootInstall = $env:ChocolateyAllowInsecureRootDirectory -eq 'true'
 
     # if we have an already environment variable path, use it.
     $alreadyInitializedNugetPath = Get-ChocolateyInstallFolder
-    if ($alreadyInitializedNugetPath -and $alreadyInitializedNugetPath -ne $chocolateyPath -and ($allowInsecureRootInstall -or $alreadyInitializedNugetPath -ne $defaultChocolateyPathOld)) {
+    
+    $useCustomInstallPath = $alreadyInitializedNugetPath -and
+        $alreadyInitializedNugetPath -ne $chocolateyPath -and
+        ($allowInsecureRootInstall -or $alreadyInitializedNugetPath -ne $insecureRootInstallPath)
+    if ($useCustomInstallPath) {
         $chocolateyPath = $alreadyInitializedNugetPath
     }
     else {
@@ -194,11 +194,6 @@ Creating Chocolatey CLI folders if they do not already exist.
     $realModule = Join-Path $chocolateyPath "helpers\chocolateyInstaller.psm1"
     Import-Module "$realModule" -Force
 
-    if (-not $allowInsecureRootInstall -and (Test-Path($defaultChocolateyPathOld))) {
-        Upgrade-OldChocolateyInstall $defaultChocolateyPathOld $chocolateyPath
-        Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
-    }
-
     Add-ChocolateyProfile
     Invoke-Chocolatey-Initial
     if ($env:ChocolateyExitCode -eq $null -or $env:ChocolateyExitCode -eq '') {
@@ -218,10 +213,6 @@ Run choco /? for a list of functions.
 You may need to shut down and restart powershell and/or consoles
  first prior to using choco.
 "@ | Write-Output
-    }
-
-    if (-not $allowInsecureRootInstall) {
-        Remove-OldChocolateyInstall $defaultChocolateyPathOld
     }
 
     Remove-UnsupportedShimFiles -Paths $chocolateyExePath
@@ -366,87 +357,6 @@ function Ensure-Permissions {
         Write-ChocolateyWarning "Not able to set permissions for $folder."
     }
     $ErrorActionPreference = $currentEA
-}
-
-function Upgrade-OldChocolateyInstall {
-    param(
-        [string]$chocolateyPathOld = "$sysDrive\Chocolatey",
-        [string]$chocolateyPath = "$($env:ALLUSERSPROFILE)\chocolatey"
-    )
-
-    Write-Debug "Upgrade-OldChocolateyInstall"
-
-    if (Test-Path $chocolateyPathOld) {
-        Write-Output "Attempting to upgrade `'$chocolateyPathOld`' to `'$chocolateyPath`'."
-        Write-ChocolateyWarning "Copying the contents of `'$chocolateyPathOld`' to `'$chocolateyPath`'. `n This step may fail if you have anything in this folder running or locked."
-        Write-Output 'If it fails, just manually copy the rest of the items out and then delete the folder.'
-        Write-ChocolateyWarning "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!"
-        #-ForegroundColor Magenta -BackgroundColor Black
-
-        $chocolateyExePathOld = Join-Path $chocolateyPathOld 'bin'
-        'Machine', 'User' |
-            ForEach-Object {
-                $path = Get-EnvironmentVariable -Name 'PATH' -Scope $_
-                $updatedPath = [System.Text.RegularExpressions.Regex]::Replace($path, [System.Text.RegularExpressions.Regex]::Escape($chocolateyExePathOld) + '(?>;)?', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-                if ($updatedPath -ne $path) {
-                    Write-Output "Updating `'$_`' PATH to reflect removal of '$chocolateyPathOld'."
-                    try {
-                        Set-EnvironmentVariable -Name 'Path' -Value $updatedPath -Scope $_ -ErrorAction Stop
-                    }
-                    catch {
-                        Write-ChocolateyWarning "Was not able to remove the old environment variable from PATH. You will need to do this manually"
-                    }
-                }
-            }
-
-        Copy-Item "$chocolateyPathOld\lib\*" "$chocolateyPath\lib" -Force -Recurse
-
-        $from = "$chocolateyPathOld\bin"
-        $to = "$chocolateyPath\bin"
-        # TODO: This exclusion list needs to be updated once shims are removed
-        $exclude = @("choco.exe", "RefreshEnv.cmd")
-        Get-ChildItem -Path $from -Recurse -Exclude $exclude |
-            ForEach-Object {
-                Write-Debug "Copying $_ `n to $to"
-                if ($_.PSIsContainer) {
-                    Copy-Item $_ -Destination (Join-Path $to $_.Parent.FullName.Substring($from.length)) -Force -ErrorAction SilentlyContinue
-                }
-                else {
-                    $fileToMove = (Join-Path $to $_.FullName.Substring($from.length))
-                    try {
-                        Copy-Item $_ -Destination $fileToMove -Exclude $exclude -Force -ErrorAction Stop
-                    }
-                    catch {
-                        Write-ChocolateyWarning "Was not able to move `'$fileToMove`'. You may need to reinstall the shim"
-                    }
-                }
-            }
-    }
-}
-
-function Remove-OldChocolateyInstall {
-    param(
-        [string]$chocolateyPathOld = "$sysDrive\Chocolatey"
-    )
-    Write-Debug "Remove-OldChocolateyInstall"
-
-    if (Test-Path $chocolateyPathOld) {
-        Write-ChocolateyWarning "This action will result in Log Errors, you can safely ignore those. `n You may need to finish removing '$chocolateyPathOld' manually."
-        try {
-            Get-ChildItem -Path "$chocolateyPathOld" | ForEach-Object {
-                if (Test-Path $_.FullName) {
-                    Write-Debug "Removing $_ unless matches .log"
-                    Remove-Item $_.FullName -Exclude *.log -Recurse -Force -ErrorAction SilentlyContinue
-                }
-            }
-
-            Write-Output "Attempting to remove `'$chocolateyPathOld`'. This may fail if something in the folder is being used or locked."
-            Remove-Item "$($chocolateyPathOld)" -Force -Recurse -ErrorAction Stop
-        }
-        catch {
-            Write-ChocolateyWarning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
-        }
-    }
 }
 
 function Install-ChocolateyFiles {
