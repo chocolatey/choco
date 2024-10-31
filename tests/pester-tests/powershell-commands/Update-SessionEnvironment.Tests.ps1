@@ -1,4 +1,4 @@
-﻿Describe 'Update-SessionEnvironment helper function tests' -Tag Cmdlets {
+﻿Describe 'Update-SessionEnvironment helper function tests' -Tag Cmdlets, UpdateSessionEnvironment {
     BeforeAll {
         Initialize-ChocolateyTestInstall
 

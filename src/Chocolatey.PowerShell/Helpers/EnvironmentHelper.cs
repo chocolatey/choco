@@ -30,6 +30,16 @@ namespace Chocolatey.PowerShell.Helpers
         private const string UserEnvironmentRegistryKeyName = "Environment";
 
         /// <summary>
+        /// Get an environment variable from the current process scope by name.
+        /// </summary>
+        /// <param name="name">The name of the variable to retrieve.</param>
+        /// <returns>The value of the environment variable.</returns>
+        public static string GetVariable(string name)
+        {
+            return Environment.GetEnvironmentVariable(name);
+        }
+
+        /// <summary>
         /// Gets the value of the environment variable with the target <paramref name="name"/>, expanding environment names that may be present in the value.
         /// </summary>
         /// <param name="cmdlet">The cmdlet running the method.</param>
@@ -53,7 +63,7 @@ namespace Chocolatey.PowerShell.Helpers
         {
             if (scope == EnvironmentVariableTarget.Process)
             {
-                return Environment.GetEnvironmentVariable(name, scope);
+                return GetVariable(name);
             }
 
             var value = string.Empty;
@@ -129,6 +139,16 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
+        /// Sets the value of an environment variable for the current process only.
+        /// </summary>
+        /// <param name="name">The name of the environment variable to set.</param>
+        /// <param name="value">The value to set the environment variable to.</param>
+        public static void SetVariable(string name, string value)
+        {
+            Environment.SetEnvironmentVariable(name, value);
+        }
+
+        /// <summary>
         /// Sets the value of an environment variable at the target <paramref name="scope"/>, and updates the current session environment.
         /// </summary>
         /// <param name="cmdlet">The cmdlet calling the method.</param>
@@ -139,7 +159,7 @@ namespace Chocolatey.PowerShell.Helpers
         {
             if (scope == EnvironmentVariableTarget.Process)
             {
-                Environment.SetEnvironmentVariable(name, value);
+                SetVariable(name, value);
                 return;
             }
 

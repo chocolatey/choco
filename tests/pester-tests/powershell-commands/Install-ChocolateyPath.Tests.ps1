@@ -1,4 +1,4 @@
-﻿Describe 'Install-ChocolateyPath helper function tests' -Tags Cmdlets {
+﻿Describe 'Install-ChocolateyPath helper function tests' -Tags Cmdlets, InstallChocolateyPath {
     BeforeAll {
         Initialize-ChocolateyTestInstall
 
@@ -55,7 +55,7 @@
     }
 }
 
-Describe 'Install-ChocolateyPath end-to-end tests with add-path package modifying <Scope> PATH' -Tags Cmdlet -ForEach @(
+Describe 'Install-ChocolateyPath end-to-end tests with add-path package modifying <Scope> PATH' -Tags Cmdlet, InstallChocolateyPath -ForEach @(
     @{ Scope = 'User' }
     @{ Scope = 'Machine' }
 ) {

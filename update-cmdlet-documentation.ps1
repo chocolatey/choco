@@ -1,4 +1,6 @@
-﻿<#
+﻿# PowerShell Core generates additional documentation that may not be correct for running under Windows PowerShell.
+#Requires -PSEdition Desktop
+<#
 .SYNOPSIS
 Generates Markdown documentation for the Chocolatey.PowerShell portion of Chocolatey's installer module commands.
 
@@ -85,12 +87,12 @@ if (-not (Get-Module Chocolatey.PowerShell)) {
     throw "The Chocolatey.PowerShell module was not able to be loaded, exiting documentation generation."
 }
 
-$newOrUpdatedFiles = [System.Collections.Generic.HashSet[System.IO.FileSystemInfo]] @(
+$newOrUpdatedFiles = @(
     if ($NewCommand) {
-        New-MarkdownHelp -Command $NewCommand -OutputFolder "$PSScriptRoot\docs" -ExcludeDontShow
+        New-MarkdownHelp -Command $NewCommand -OutputFolder $documentationPath -ExcludeDontShow
     }
 
-    Update-MarkdownHelp -Path $documentationPath -ExcludeDontShow
+    Update-MarkdownHelp -Path $documentationPath -ExcludeDontShow | Where-Object BaseName -ne $NewCommand
 )
 
 $incompleteFiles = $newOrUpdatedFiles | Select-String '\{\{[^}]+}}' | Select-Object -ExpandProperty Path
@@ -116,7 +118,7 @@ $newOrUpdatedFiles = $newOrUpdatedFiles |
         
         $frontMatterBounds = 0
         $content = $content | ForEach-Object {
-            if ($_ -match '\[(?<name>[^\]]+)\]\(xref:(?<xref>[^#,]+)(#(?<anchor>[^,]+))?,(?<classes>[^)]+)\)') {
+            if ($_ -match '\[(?<name>[^\]]+)\]\(xref:(?<xref>[^#,]+)(#(?<anchor>[^,]+))?(?:,(?<classes>[^)]+))?\)') {
                 # replace any lines that are an xref link with the html/xml format that astro uses <Xref ... />
                 $xml = [xml]::new()
                 $node = $xml.CreateElement('Xref')
@@ -134,9 +136,11 @@ $newOrUpdatedFiles = $newOrUpdatedFiles |
                     $null = $node.Attributes.Append($anchor)
                 }
 
-                $classes = $xml.CreateAttribute('classes')
-                $classes.Value = $matches['classes']
-                $null = $node.Attributes.Append($classes)
+                if ($matches['classes']) {
+                    $classes = $xml.CreateAttribute('classes')
+                    $classes.Value = $matches['classes']
+                    $null = $node.Attributes.Append($classes)
+                }
 
                 $node.OuterXml
             }

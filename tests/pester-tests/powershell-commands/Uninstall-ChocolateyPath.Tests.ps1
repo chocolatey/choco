@@ -1,4 +1,4 @@
-﻿Describe 'Uninstall-ChocolateyPath helper function tests' -Tags Cmdlets {
+﻿Describe 'Uninstall-ChocolateyPath helper function tests' -Tags Cmdlets, UninstallChocolateyPath {
     BeforeAll {
         Initialize-ChocolateyTestInstall
 
@@ -40,7 +40,7 @@
     }
 }
 
-Describe 'Uninstall-ChocolateyPath end-to-end tests with add-path package' -Tags Cmdlet -ForEach @(
+Describe 'Uninstall-ChocolateyPath end-to-end tests with add-path package' -Tags Cmdlet, UninstallChocolateyPath -ForEach @(
     @{ Scope = 'User' }
     @{ Scope = 'Machine' }
 ) {

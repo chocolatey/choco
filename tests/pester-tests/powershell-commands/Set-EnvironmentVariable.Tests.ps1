@@ -1,4 +1,4 @@
-Describe 'Set-EnvironmentVariable helper function tests' -Tags Cmdlets {
+Describe 'Set-EnvironmentVariable helper function tests' -Tags Cmdlets, SetEnvironmentVariable {
     BeforeAll {
         Initialize-ChocolateyTestInstall
 
