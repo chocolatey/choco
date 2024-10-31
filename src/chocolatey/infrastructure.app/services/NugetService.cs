@@ -329,11 +329,11 @@ that uses these options.");
 
                 if (NugetList.ThresholdHit)
                 {
-                    this.Log().Warn(logType, "The threshold of {0:N0} packages per source has been met. Please refine your search, or specify a page to find any more results.".FormatWith(NugetList.LastPackageLimitUsed));
+                    this.Log().Warn(logType, "The threshold of {0:N0} packages, or package versions, per source has been met. Please refine your search, or specify a page number to retrieve more results.".FormatWith(NugetList.LastPackageLimitUsed));
                 }
                 else if (NugetList.LowerThresholdHit)
                 {
-                    this.Log().Warn(logType, "Over {0:N0} packages was found per source, there may be more packages available that was filtered out. Please refine your search, or specify a page to check for more packages.".FormatWith(NugetList.LastPackageLimitUsed * 0.9));
+                    this.Log().Warn(logType, "Over {0:N0} packages, or package versions, was found per source, but there may be more packages available that were filtered out. Please refine your search, or specify a page number to retrieve more results.".FormatWith(NugetList.LastPackageLimitUsed * 0.9));
                 }
             }
         }
