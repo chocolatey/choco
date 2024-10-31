@@ -8,6 +8,7 @@ using Microsoft.Win32.SafeHandles;
 using System.Security.Permissions;
 using System.Security;
 using chocolatey.infrastructure.information;
+using chocolatey.infrastructure.platforms;
 
 namespace chocolatey.benchmark.helpers
 {
@@ -40,7 +41,7 @@ namespace chocolatey.benchmark.helpers
 
             var tree = new ProcessTree(process.ProcessName);
 
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (Platform.GetPlatform() != PlatformType.Windows)
             {
                 return tree;
             }
@@ -65,7 +66,7 @@ namespace chocolatey.benchmark.helpers
 
         public static string GetDocumentedParent(Process process = null)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (Platform.GetPlatform() != PlatformType.Windows)
             {
                 return null;
             }
@@ -94,7 +95,7 @@ namespace chocolatey.benchmark.helpers
 
         public static string GetDocumentedParentFiltered(Process process = null)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (Platform.GetPlatform() != PlatformType.Windows)
             {
                 return null;
             }
@@ -156,7 +157,7 @@ namespace chocolatey.benchmark.helpers
 
         public static string GetUndocumentedParent(Process process = null)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (Platform.GetPlatform() != PlatformType.Windows)
             {
                 return null;
             }
@@ -185,7 +186,7 @@ namespace chocolatey.benchmark.helpers
 
         public static string GetUndocumentedParentFiltered(Process process = null)
         {
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            if (Platform.GetPlatform() != PlatformType.Windows)
             {
                 return null;
             }
