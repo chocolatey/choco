@@ -15,6 +15,7 @@ namespace chocolatey.infrastructure.information
         // (should be in UserAgent.Tests.ps1).
         private static readonly string[] _filteredParents = new[]
         {
+            // Windows processes and shells
             "explorer",
             "winlogon",
             "powershell",
@@ -24,14 +25,23 @@ namespace chocolatey.infrastructure.information
             // The name used to launch windows services
             // in the operating system.
             "services",
+            "svchost",
+            // Nested processes / invoked by the shim choco.exe
+            "Chocolatey CLI",
             // Known Terminal Emulators
-            "Tabby",
-            "WindowsTerminal",
-            "FireCMD",
+            "alacritty",
+            "code",
             "ConEmu64",
             "ConEmuC64",
-            // Nested processes / invoked by the shim choco.exe
-            "Chocolatey CLI"
+            "conhost",
+            "c3270",
+            "FireCMD",
+            "Hyper",
+            "SecureCRT",
+            "Tabby",
+            "wezterm",
+            "wezterm-gui",
+            "WindowsTerminal",
         };
 
         public ProcessTree(string currentProcessName)
