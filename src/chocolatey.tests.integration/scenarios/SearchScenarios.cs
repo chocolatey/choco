@@ -601,7 +601,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.Messages.Should()
                     .ContainKey(LogLevel.Warn.ToString())
-                    .WhoseValue.Should().ContainSingle(m => m == "The threshold of 2 packages per source has been met. Please refine your search, or specify a page to find any more results.");
+                    .WhoseValue.Should().ContainSingle(m => m == "The threshold of 2 packages, or package versions, per source has been met. Please refine your search, or specify a page number to retrieve more results.");
             }
 
             [Fact]
