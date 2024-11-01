@@ -264,8 +264,8 @@ if ($PowerTab_RegisterTabExpansion) {
     return
 }
 
-# PowerShell up to v7.3.x: use a custom TabExpansion function.
-if ($PSVersionTable.PSVersion.Major -lt 7 -or ($PSVersionTable.PSVersion.Major -eq 7 -and $PSVersionTable.PSVersion.Minor -lt 4)) { 
+# PowerShell up to v5.x: use a custom TabExpansion function.
+if ($PSVersionTable.PSVersion.Major -lt 5) { 
     if (Test-Path Function:\TabExpansion) {
         Rename-Item Function:\TabExpansion TabExpansionBackup
     }
@@ -288,7 +288,8 @@ if ($PSVersionTable.PSVersion.Major -lt 7 -or ($PSVersionTable.PSVersion.Major -
             }
         }
     }
-} else { # PowerShell v7.4+: use the Register-ArgumentCompleter cmdlet (PowerShell no longer calls TabExpansion)
+}
+else { # PowerShell v5+: use the Register-ArgumentCompleter cmdlet (PowerShell no longer calls TabExpansion after 7.4, but this available from 5.x)
     function script:Get-AliasNames($exe) {
         @($exe) + @(Get-Alias | Where-Object { $_.Definition -eq $exe } | Select-Object -Exp Name)
     }
