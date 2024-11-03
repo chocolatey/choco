@@ -182,6 +182,78 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 _optionSet.Contains("skiphooks").Should().BeTrue();
             }
+
+            [Fact]
+            public void Should_add_short_version_of_userememberedargs_to_the_option_set()
+            {
+                _optionSet.Contains("userememberedargs").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_short_version_of_userememberedarguments_to_the_option_set()
+            {
+                _optionSet.Contains("userememberedarguments").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_short_version_of_userememberedoptions_to_the_option_set()
+            {
+                _optionSet.Contains("userememberedoptions").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_userememberedargs_to_the_option_set()
+            {
+                _optionSet.Contains("use-remembered-args").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_userememberedarguments_to_the_option_set()
+            {
+                _optionSet.Contains("use-remembered-arguments").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_userememberedoptions_to_the_option_set()
+            {
+                _optionSet.Contains("use-remembered-options").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_short_version_of_ignorerememberedargs_to_the_option_set()
+            {
+                _optionSet.Contains("ignorerememberedargs").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_short_version_of_ignorerememberedarguments_to_the_option_set()
+            {
+                _optionSet.Contains("ignorerememberedarguments").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_short_version_of_ignorerememberedoptions_to_the_option_set()
+            {
+                _optionSet.Contains("ignorerememberedoptions").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_ignorerememberedargs_to_the_option_set()
+            {
+                _optionSet.Contains("ignore-remembered-args").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_ignorerememberedarguments_to_the_option_set()
+            {
+                _optionSet.Contains("ignore-remembered-arguments").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_ignorerememberedoptions_to_the_option_set()
+            {
+                _optionSet.Contains("ignore-remembered-options").Should().BeTrue();
+            }
         }
 
         public class When_handling_additional_argument_parsing : ChocolateyUninstallCommandSpecsBase

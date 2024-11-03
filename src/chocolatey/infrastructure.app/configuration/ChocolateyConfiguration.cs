@@ -252,8 +252,10 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         // configuration set variables
         public string CacheLocation { get; set; }
+        public bool CacheLocationArgumentWasPassed { get; set; }
 
         public int CommandExecutionTimeoutSeconds { get; set; }
+        public bool CommandExecutionTimeoutSecondsArgumentWasPassed { get; set; }
         public int WebRequestTimeoutSeconds { get; set; }
         public string DefaultTemplateName { get; set; }
 
@@ -561,6 +563,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ShowDownloadProgress { get; set; }
         public bool StopOnFirstPackageFailure { get; set; }
         public bool UseRememberedArgumentsForUpgrades { get; set; }
+        public bool UseRememberedArgumentsForUninstalls { get; set; }
         public bool IgnoreUnfoundPackagesOnUpgradeOutdated { get; set; }
         public bool SkipPackageUpgradesWhenNotInstalled { get; set; }
         public bool RemovePackageInformationOnUninstall { get; set; }

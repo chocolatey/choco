@@ -332,6 +332,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.ShowDownloadProgress = SetFeatureFlag(ApplicationParameters.Features.ShowDownloadProgress, configFileSettings, defaultEnabled: true, description: "Show Download Progress - Show download progress percentages in the CLI.");
             config.Features.StopOnFirstPackageFailure = SetFeatureFlag(ApplicationParameters.Features.StopOnFirstPackageFailure, configFileSettings, defaultEnabled: false, description: "Stop On First Package Failure - Stop running install, upgrade or uninstall on first package failure instead of continuing with others. As this will affect upgrade all, it is normally recommended to leave this off.");
             config.Features.UseRememberedArgumentsForUpgrades = SetFeatureFlag(ApplicationParameters.Features.UseRememberedArgumentsForUpgrades, configFileSettings, defaultEnabled: false, description: "Use Remembered Arguments For Upgrades - When running upgrades, use arguments for upgrade that were used for installation ('remembered'). This is helpful when running upgrade for all packages. This is considered in preview and will be flipped to on by default in a future release.");
+            config.Features.UseRememberedArgumentsForUninstalls = SetFeatureFlag(ApplicationParameters.Features.UseRememberedArgumentsForUninstalls, configFileSettings, defaultEnabled: false, description: "Use Remembered Arguments For Uninstalls - When running uninstalls, use arguments for uninstall that were used for installation or upgrade ('remembered'). Does not include --install-args. Available in 2.4.0+. This is considered in preview and will be flipped to on by default in a future release.");
             config.Features.IgnoreUnfoundPackagesOnUpgradeOutdated = SetFeatureFlag(ApplicationParameters.Features.IgnoreUnfoundPackagesOnUpgradeOutdated, configFileSettings, defaultEnabled: false, description: "Ignore Unfound Packages On Upgrade Outdated - When checking outdated or upgrades, if a package is not found against sources specified, don't report the package at all.");
             config.Features.SkipPackageUpgradesWhenNotInstalled = SetFeatureFlag(ApplicationParameters.Features.SkipPackageUpgradesWhenNotInstalled, configFileSettings, defaultEnabled: false, description: "Skip Packages Not Installed During Upgrade - if a package is not installed, do not install it during the upgrade process.");
             config.Features.RemovePackageInformationOnUninstall = SetFeatureFlag(ApplicationParameters.Features.RemovePackageInformationOnUninstall, configFileSettings, defaultEnabled: false, description: "Remove Stored Package Information On Uninstall - When a package is uninstalled, should the stored package information also be removed? ");
@@ -420,11 +421,16 @@ namespace chocolatey.infrastructure.app.builders
                                 if (timeout > 0 || timeoutString.IsEqualTo("0"))
                                 {
                                     config.CommandExecutionTimeoutSeconds = timeout;
+                                    config.CommandExecutionTimeoutSecondsArgumentWasPassed = true;
                                 }
                             })
                         .Add("c=|cache=|cachelocation=|cache-location=",
                              "CacheLocation - Location for download cache, defaults to %TEMP% or value in chocolatey.config file.",
-                             option => config.CacheLocation = option.UnquoteSafe())
+                             option =>
+                             {
+                                 config.CacheLocation = option.UnquoteSafe();
+                                 config.CacheLocationArgumentWasPassed = true;
+                             })
                         .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
                              "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
                              option => config.AllowUnofficialBuild = option != null)

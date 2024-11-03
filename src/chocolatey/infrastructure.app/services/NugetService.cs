@@ -536,7 +536,7 @@ folder.");
             if (packageNames.Count == 1)
             {
                 var packageName = packageNames.DefaultIfEmpty(string.Empty).FirstOrDefault();
-                if (packageName.EndsWith(NuGetConstants.PackageExtension) || packageName.EndsWith(PackagingConstants.ManifestExtension))
+                if (packageName.EndsWith(NuGetConstants.PackageExtension, StringComparison.OrdinalIgnoreCase) || packageName.EndsWith(PackagingConstants.ManifestExtension, StringComparison.OrdinalIgnoreCase))
                 {
                     this.Log().Warn(ChocolateyLoggers.Important, "DEPRECATION WARNING");
                     this.Log().Warn(InstallWithFilePathDeprecationMessage);
@@ -546,7 +546,7 @@ folder.");
 
                     config.Sources = _fileSystem.GetDirectoryName(_fileSystem.GetFullPath(packageName));
 
-                    if (packageName.EndsWith(PackagingConstants.ManifestExtension))
+                    if (packageName.EndsWith(PackagingConstants.ManifestExtension, StringComparison.OrdinalIgnoreCase))
                     {
                         packageNames.Add(_fileSystem.GetFilenameWithoutExtension(packageName));
 
@@ -596,7 +596,7 @@ folder.");
 
                 var installedPackage = allLocalPackages.FirstOrDefault(p => p.Name.IsEqualTo(packageName));
 
-                if (Platform.GetPlatform() != PlatformType.Windows && !packageName.EndsWith(".template"))
+                if (Platform.GetPlatform() != PlatformType.Windows && !packageName.EndsWith(".template", StringComparison.OrdinalIgnoreCase))
                 {
                     var logMessage = "{0} is not a supported package on non-Windows systems.{1}Only template packages are currently supported.".FormatWith(packageName, Environment.NewLine);
                     this.Log().Warn(ChocolateyLoggers.Important, logMessage);
@@ -1181,7 +1181,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     continue;
                 }
 
-                SetConfigFromRememberedArguments(config, pkgInfo);
+                config = GetPackageConfigFromRememberedArguments(config, pkgInfo);
                 var pathResolver = NugetCommon.GetPathResolver(_fileSystem);
                 var nugetProject = new FolderNuGetProject(ApplicationParameters.PackagesLocation, pathResolver, NuGetFramework.AnyFramework);
 
@@ -1319,12 +1319,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             var logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
                             packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                             packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                            
+
                             if (config.RegularOutput)
                             {
                                 this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                             }
-                            
+
                             continue;
                         }
                         else
@@ -1336,7 +1336,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             {
                                 this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                             }
-                            
+
                             config.PinPackage = true;
                         }
                     }
@@ -1418,7 +1418,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
 
                         var removedSources = new HashSet<SourcePackageDependencyInfo>();
-                        
+
                         if (!config.UpgradeCommand.IgnorePinned)
                         {
                             removedSources.AddRange(RemovePinnedSourceDependencies(sourcePackageDependencyInfos, allLocalPackages));
@@ -1902,15 +1902,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             return outdatedPackages;
         }
 
-        /// <summary>
-        /// Sets the configuration for the package upgrade
-        /// </summary>
-        /// <param name="config">The configuration.</param>
-        /// <param name="packageInfo">The package information.</param>
-        /// <returns>The original unmodified configuration, so it can be reset after upgrade</returns>
-        protected virtual ChocolateyConfiguration SetConfigFromRememberedArguments(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
+        [Obsolete("This method is deprecated and will be removed in v3.")]
+        protected virtual ChocolateyConfiguration SetConfigFromRememberedArguments(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo, CommandNameType commandType = CommandNameType.Upgrade)
         {
-            if (!config.Features.UseRememberedArgumentsForUpgrades || string.IsNullOrWhiteSpace(packageInfo.Arguments))
+            if ((commandType == CommandNameType.Upgrade && !config.Features.UseRememberedArgumentsForUpgrades) ||
+                (commandType == CommandNameType.Uninstall && !config.Features.UseRememberedArgumentsForUninstalls) || string.IsNullOrWhiteSpace(packageInfo.Arguments))
             {
                 return config;
             }
@@ -1921,7 +1917,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             if (!ArgumentsUtility.SensitiveArgumentsProvided(packageArgumentsUnencrypted))
             {
                 sensitiveArgs = false;
-                this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding remembered arguments for upgrade: {1}".FormatWith(packageInfo.Package.Id, packageArgumentsUnencrypted.EscapeCurlyBraces()));
+                this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding remembered arguments: {1}".FormatWith(packageInfo.Package.Id, packageArgumentsUnencrypted.EscapeCurlyBraces()));
             }
 
             var packageArgumentsSplit = packageArgumentsUnencrypted.Split(new[] { " --" }, StringSplitOptions.RemoveEmptyEntries);
@@ -1942,7 +1938,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (sensitiveArgs)
                 {
-                    this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding '{1}' to upgrade arguments. Values not shown due to detected sensitive arguments".FormatWith(packageInfo.Package.Id, optionName.EscapeCurlyBraces()));
+                    this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding '{1}' to arguments. Values not shown due to detected sensitive arguments".FormatWith(packageInfo.Package.Id, optionName.EscapeCurlyBraces()));
                 }
                 packageArguments.Add("--{0}{1}".FormatWith(optionName, string.IsNullOrWhiteSpace(optionValue) ? string.Empty : "=" + optionValue));
             }
@@ -1952,6 +1948,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             ConfigurationOptions.OptionSet.Parse(packageArguments);
 
             // there may be overrides from the user running upgrade
+            if (!string.IsNullOrWhiteSpace(originalConfig.PackageParameters))
+            {
+                config.PackageParameters = originalConfig.PackageParameters;
+            }
+
+            if (!string.IsNullOrWhiteSpace(originalConfig.InstallArguments))
+            {
+                config.InstallArguments = originalConfig.InstallArguments;
+            }
+
             if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Username))
             {
                 config.SourceCommand.Username = originalConfig.SourceCommand.Username;
@@ -1972,7 +1978,186 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
             }
 
+            if (originalConfig.CacheLocationArgumentWasPassed && !string.IsNullOrWhiteSpace(originalConfig.CacheLocation))
+            {
+                config.CacheLocation = originalConfig.CacheLocation;
+            }
+
+            if (originalConfig.CommandExecutionTimeoutSecondsArgumentWasPassed)
+            {
+                config.CommandExecutionTimeoutSeconds = originalConfig.CommandExecutionTimeoutSeconds;
+            }
+
             return originalConfig;
+        }
+
+        /// <summary>
+        /// Gets the configuration from remembered arguments
+        /// </summary>
+        /// <param name="config">The original configuration.</param>
+        /// <param name="packageInfo">The package information.</param>
+        /// <param name="commandType">The command type</param>
+        /// <returns>The modified configuration, so it can be used</returns>
+        public virtual ChocolateyConfiguration GetPackageConfigFromRememberedArguments(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo, CommandNameType commandType = CommandNameType.Upgrade)
+        {
+            if ((commandType == CommandNameType.Upgrade && !config.Features.UseRememberedArgumentsForUpgrades) ||
+                (commandType == CommandNameType.Uninstall && !config.Features.UseRememberedArgumentsForUninstalls) || string.IsNullOrWhiteSpace(packageInfo.Arguments))
+            {
+                return config;
+            }
+
+            var packageArgumentsUnencrypted = packageInfo.Arguments.ContainsSafe(" --") && packageInfo.Arguments.ToStringSafe().Length > 4 ? packageInfo.Arguments : NugetEncryptionUtility.DecryptString(packageInfo.Arguments);
+
+            var sensitiveArgs = ArgumentsUtility.SensitiveArgumentsProvided(packageArgumentsUnencrypted);
+
+            var packageArgumentsSplit = packageArgumentsUnencrypted.Split(new[] { " --" }, StringSplitOptions.RemoveEmptyEntries);
+            var packageArguments = new List<string>();
+            foreach (var packageArgument in packageArgumentsSplit.OrEmpty())
+            {
+                var packageArgumentSplit = packageArgument.Split(new[] { '=' }, 2, StringSplitOptions.RemoveEmptyEntries);
+                var optionName = packageArgumentSplit[0].ToStringSafe();
+                var optionValue = string.Empty;
+                if (packageArgumentSplit.Length == 2)
+                {
+                    optionValue = packageArgumentSplit[1].ToStringSafe().UnquoteSafe();
+                    if (optionValue.StartsWith("'"))
+                    {
+                        optionValue.UnquoteSafe();
+                    }
+                }
+
+                //Don't add install arguments during uninstall. We don't want a argument for the installer to be passed to the uninstaller.
+                if (string.Equals(optionName, "install-arguments", StringComparison.OrdinalIgnoreCase) &&
+                    commandType == CommandNameType.Uninstall)
+                {
+                    continue;
+                }
+
+                if (string.Equals(optionName, "override-argument", StringComparison.OrdinalIgnoreCase) &&
+                    commandType == CommandNameType.Uninstall)
+                {
+                    continue;
+                }
+
+                if (sensitiveArgs)
+                {
+                    this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding '{1}' to arguments. Values not shown due to detected sensitive arguments".FormatWith(packageInfo.Package.Id, optionName.EscapeCurlyBraces()));
+                }
+                else
+                {
+                    this.Log().Debug(ChocolateyLoggers.Verbose, "{0} - Adding '{1}' to arguments with a value of '{2}'".FormatWith(packageInfo.Package.Id, optionName.EscapeCurlyBraces(), optionValue.EscapeCurlyBraces()));
+                }
+                packageArguments.Add("--{0}{1}".FormatWith(optionName, string.IsNullOrWhiteSpace(optionValue) ? string.Empty : "=" + optionValue));
+            }
+
+            var originalConfig = config.DeepCopy();
+            var rememberedOptionSet = new OptionSet();
+
+            rememberedOptionSet
+                .Add("pre|prerelease",
+                    "Prerelease - Include Prereleases? Defaults to false.",
+                    option => config.Prerelease = option != null)
+                .Add("i|ignoredependencies|ignore-dependencies",
+                    "IgnoreDependencies - Ignore dependencies when installing package(s). Defaults to false.",
+                    option => config.IgnoreDependencies = option != null)
+                .Add("x86|forcex86",
+                    "ForceX86 - Force x86 (32bit) installation on 64 bit systems. Defaults to false.",
+                    option => config.ForceX86 = option != null)
+                .Add("ia=|installargs=|install-args=|installarguments=|install-arguments=",
+                    "InstallArguments - Install Arguments to pass to the native installer in the package. Defaults to unspecified.",
+                    option => config.InstallArguments = option.UnquoteSafe())
+                .Add("o|override|overrideargs|overridearguments|override-arguments",
+                    "OverrideArguments - Should install arguments be used exclusively without appending to current package passed arguments? Defaults to false.",
+                    option => config.OverrideArguments = option != null)
+                .Add("argsglobal|args-global|installargsglobal|install-args-global|applyargstodependencies|apply-args-to-dependencies|apply-install-arguments-to-dependencies",
+                    "Apply Install Arguments To Dependencies  - Should install arguments be applied to dependent packages? Defaults to false.",
+                    option => config.ApplyInstallArgumentsToDependencies = option != null)
+                .Add("params=|parameters=|pkgparameters=|packageparameters=|package-parameters=",
+                    "PackageParameters - Parameters to pass to the package. Defaults to unspecified.",
+                    option => config.PackageParameters = option.UnquoteSafe())
+                .Add("paramsglobal|params-global|packageparametersglobal|package-parameters-global|applyparamstodependencies|apply-params-to-dependencies|apply-package-parameters-to-dependencies",
+                    "Apply Package Parameters To Dependencies  - Should package parameters be applied to dependent packages? Defaults to false.",
+                    option => config.ApplyPackageParametersToDependencies = option != null)
+                .Add("allowdowngrade|allow-downgrade",
+                    "AllowDowngrade - Should an attempt at downgrading be allowed? Defaults to false.",
+                    option => config.AllowDowngrade = option != null)
+                .Add("u=|user=",
+                    "User - used with authenticated feeds. Defaults to empty.",
+                    option => config.SourceCommand.Username = option.UnquoteSafe())
+                .Add("p=|password=",
+                    "Password - the user's password to the source. Defaults to empty.",
+                    option => config.SourceCommand.Password = option.UnquoteSafe())
+                .Add("cert=",
+                    "Client certificate - PFX pathname for an x509 authenticated feeds. Defaults to empty. Available in 0.9.10+.",
+                    option => config.SourceCommand.Certificate = option.UnquoteSafe())
+                .Add("cp=|certpassword=",
+                    "Certificate Password - the client certificate's password to the source. Defaults to empty. Available in 0.9.10+.",
+                    option => config.SourceCommand.CertificatePassword = option.UnquoteSafe())
+                .Add("timeout=|execution-timeout=",
+                    "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds. '0' for infinite starting in 0.10.4.".FormatWith(config.CommandExecutionTimeoutSeconds.ToString()),
+                    option =>
+                    {
+                        var timeout = 0;
+                        var timeoutString = option.UnquoteSafe();
+                        int.TryParse(timeoutString, out timeout);
+                        if (timeout > 0 || timeoutString.IsEqualTo("0"))
+                        {
+                            config.CommandExecutionTimeoutSeconds = timeout;
+                        }
+                    })
+                .Add("c=|cache=|cachelocation=|cache-location=",
+                    "CacheLocation - Location for download cache, defaults to %TEMP% or value in chocolatey.config file.",
+                    option => config.CacheLocation = option.UnquoteSafe())
+                .Add("use-system-powershell",
+                    "UseSystemPowerShell - Execute PowerShell using an external process instead of the built-in PowerShell host. Should only be used when internal host is failing. Available in 0.9.10+.",
+                    option => config.Features.UsePowerShellHost = option != null);
+
+            rememberedOptionSet.Parse(packageArguments);
+
+            // there may be overrides from the user running upgrade
+            if (!string.IsNullOrWhiteSpace(originalConfig.PackageParameters))
+            {
+                config.PackageParameters = originalConfig.PackageParameters;
+            }
+
+            if (!string.IsNullOrWhiteSpace(originalConfig.InstallArguments))
+            {
+                config.InstallArguments = originalConfig.InstallArguments;
+            }
+
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Username))
+            {
+                config.SourceCommand.Username = originalConfig.SourceCommand.Username;
+            }
+
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Password))
+            {
+                config.SourceCommand.Password = originalConfig.SourceCommand.Password;
+            }
+
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.Certificate))
+            {
+                config.SourceCommand.Certificate = originalConfig.SourceCommand.Certificate;
+            }
+
+            if (!string.IsNullOrWhiteSpace(originalConfig.SourceCommand.CertificatePassword))
+            {
+                config.SourceCommand.CertificatePassword = originalConfig.SourceCommand.CertificatePassword;
+            }
+
+            if (originalConfig.CacheLocationArgumentWasPassed && !string.IsNullOrWhiteSpace(originalConfig.CacheLocation))
+            {
+                config.CacheLocation = originalConfig.CacheLocation;
+            }
+
+            if (originalConfig.CommandExecutionTimeoutSecondsArgumentWasPassed)
+            {
+                config.CommandExecutionTimeoutSeconds = originalConfig.CommandExecutionTimeoutSeconds;
+            }
+
+            // We can't override switches because we don't know here if they were set on the command line
+
+            return config;
         }
 
         private bool HasMissingDependency(PackageResult package, List<PackageResult> allLocalPackages)
@@ -2546,6 +2731,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                     continue;
                 }
+
+                config = GetPackageConfigFromRememberedArguments(config, pkgInfo);
 
                 if (performAction)
                 {
