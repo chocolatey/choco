@@ -17,7 +17,7 @@ namespace chocolatey.infrastructure.app.services
         /// <remarks>
         /// This method is not overridable on purpose, as once a tree is created it should not be changed.
         /// </remarks>
-        public ProcessTree GetProcessesTree()
+        public ProcessTree GetProcessTree()
         {
             if (_processTree is null)
             {

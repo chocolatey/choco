@@ -105,7 +105,7 @@ namespace chocolatey.infrastructure.app.nuget
         {
             // As this is a static method, we need to call the global SimpleInjector container to get a registered service.
             var collectorService = SimpleInjectorContainer.Container.GetInstance<IProcessCollectorService>();
-            var processTree = collectorService.GetProcessesTree();
+            var processTree = collectorService.GetProcessTree();
             "chocolatey".Log().Debug("Process Tree: {0}", processTree);
 
             var userAgent = new StringBuilder()

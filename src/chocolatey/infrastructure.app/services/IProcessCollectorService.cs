@@ -40,6 +40,6 @@ namespace chocolatey.infrastructure.app.services
         /// <returns>
         /// The found process tree, returning null from this will throw an exception in Chocolatey CLI.
         /// </returns>
-        ProcessTree GetProcessesTree();
+        ProcessTree GetProcessTree();
     }
 }

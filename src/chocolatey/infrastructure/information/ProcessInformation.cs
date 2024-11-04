@@ -399,7 +399,13 @@ namespace chocolatey.infrastructure.information
                 {
                     var processUtilities = new ParentProcessHelperInternal();
 
-                    var status = NtQueryInformationProcess(handle, 0, ref processUtilities, Marshal.SizeOf(processUtilities), out _);
+                    // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryinformationprocess#process_basic_information
+                    // Retrieves a pointer to a PEB structure that can be used to determine whether the specified process is being debugged,
+                    // and a unique value used by the system to identify the specified process. 
+                    // It also includes the `InheritedFromUniqueProcessId` value which we can use to look up the parent process directly.
+                    const int processBasicInformation = 0;
+
+                    var status = NtQueryInformationProcess(handle, processBasicInformation, ref processUtilities, Marshal.SizeOf(processUtilities), out _);
 
                     if (status != 0)
                     {
