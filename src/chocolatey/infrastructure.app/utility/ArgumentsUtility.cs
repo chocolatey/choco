@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.app.utility
 
         public static IEnumerable<string> DecryptPackageArgumentsFile(IFileSystem fileSystem, string id, string version)
         {
-            return DecryptPackageArgumentsFile(fileSystem, id, version, true, false);
+            return DecryptPackageArgumentsFile(fileSystem, id, version, redactSensitiveArguments: true, throwOnFailure: false);
         }
 
         public static IEnumerable<string> DecryptPackageArgumentsFile(
@@ -93,8 +93,6 @@ namespace chocolatey.infrastructure.app.utility
 
             try
             {
-                // The following code is borrowed from the Chocolatey codebase, should
-                // be extracted to a separate location in choco executable so we can re-use it.
                 packageArgumentsUnencrypted = arguments.Contains(" --") && arguments.ToStringSafe().Length > 4
                     ? arguments
                     : NugetEncryptionUtility.DecryptString(arguments);
@@ -103,8 +101,8 @@ namespace chocolatey.infrastructure.app.utility
             catch (Exception ex)
             {
                 var firstMessage = "There was an error attempting to decrypt the contents of the .arguments file for version '{0}' of package '{1}'.  See log file for more information.".FormatWith(version, id);
-                var secondMessage = "We failed to decrypt {0}. Error from decryption: {1}".FormatWith(argumentsFile, ex.Message);
-                
+                var secondMessage = "We failed to decrypt '{0}'. Error from decryption:{1}  '{2}'".FormatWith(argumentsFile, Environment.NewLine, ex.Message.Trim());
+
                 if (throwOnFailure)
                 {
                     "chocolatey".Log().Error(firstMessage);

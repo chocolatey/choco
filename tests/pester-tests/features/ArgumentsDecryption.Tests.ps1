@@ -77,12 +77,13 @@
         @{
             ErrorType = 'Base64 invalid'
             DecryptionError = 'The input is not a valid Base-64 string as it contains a non-base 64 character, more than two padding characters, or an illegal character among the padding characters.'
+            # `!` is an invalid Base64 character: https://en.wikipedia.org/wiki/Base64#Base64_table_from_RFC_4648
             FileContents = 'InvalidBase64!'
         }
         @{
             ErrorType = 'Invalid decryption'
             DecryptionError = 'Key not valid for use in specified state.'
-            # The contents of this was taken from a throw away VM.
+            # The contents of this was taken from a throw away VM. As such, DPAPI will not be able to decrypt it, and will error.
             FileContents = 'AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAn1/taDnOFUqGb17fBymxHQQAAAACAAAAAAAQZgAAAAEAACAAAAAU8gmqznJYKdkuj8bgk8sgg6Le3sbGoGkZOV3YtRFfwwAAAAAOgAAAAAIAACAAAAD1I9LYxrEhx9m71eF3VqyAike+XJTePhDAcrOilAFjQlAAAAA8lfiMR5Ns/AntLdVR3eBQSduCnipRCbdu/er/+YABMTzJDMGqnXuIsKwWoNIhrB14Yit4jVPipt3a/Nx18xx+YsnUewI4P6GlDL5do1y8mkAAAABMxvyPgCtN36BwAOXvJghIh9Hs8jUZOJtQIlWci8BnJkBmaaoSZ6pTGULk4TbFXMf/FK1NPo2mPM0YVL8QgJyK'
         }
     ) {
@@ -110,7 +111,8 @@
 
         It 'Outputs expected messages' {
             $shouldContain = -not ($CommandDescription -eq 'verbose' -or $CommandDescription -eq 'remember')
-            $Output.Lines | Should -Not:$shouldContain -Contain "We failed to decrypt $($env:ChocolateyInstall)\.chocolatey\upgradepackage.1.0.0\.arguments. Error from decryption: $DecryptionError" -Because $Output.String
+            $Output.Lines | Should -Not:$shouldContain -Contain "We failed to decrypt '$($env:ChocolateyInstall)\.chocolatey\upgradepackage.1.0.0\.arguments'. Error from decryption:" -Because $Output.String
+            $Output.Lines | Should -Not:$shouldContain -Contain "'$DecryptionError'" -Because $Output.String
         }
     }
 }

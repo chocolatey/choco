@@ -223,8 +223,8 @@ that uses these options.");
                     // This is done by default on the `info` command, and by request on the `list` command. As such, we are going to validate it's that scenario
                     // to avoid needlessly decrypting the arguments file.
                     var shouldDecryptArguments = (
-                            config.CommandName.Equals("info", StringComparison.InvariantCultureIgnoreCase) ||
-                            config.CommandName.Equals("list", StringComparison.InvariantCultureIgnoreCase)
+                            config.CommandName.Equals("info", StringComparison.OrdinalIgnoreCase) ||
+                            config.CommandName.Equals("list", StringComparison.OrdinalIgnoreCase)
                         ) &&
                         config.Verbose &&
                         !string.IsNullOrWhiteSpace(packageInfo.Arguments);
