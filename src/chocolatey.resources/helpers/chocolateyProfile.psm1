@@ -27,7 +27,10 @@ Import-Module "$thisDirectory\Chocolatey.PowerShell.dll" -Cmdlet "Get-Environmen
 
 Set-Alias refreshenv Update-SessionEnvironment
 
-Export-ModuleMember -Alias refreshenv -Cmdlet 'Update-SessionEnvironment' -Function 'TabExpansion'
+Export-ModuleMember -Alias refreshenv -Cmdlet 'Update-SessionEnvironment'
+if ($PSVersionTable.PSVersion.Major -lt 5) { 
+    Export-ModuleMember -Function 'TabExpansion' # Legacy TabExpansion function is only used up to PowerShell v5.x
+}
 
 # SIG # Begin signature block
 # MIInKwYJKoZIhvcNAQcCoIInHDCCJxgCAQExDzANBglghkgBZQMEAgEFADB5Bgor
