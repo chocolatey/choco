@@ -139,7 +139,11 @@ namespace Chocolatey.PowerShell.Helpers
         {
             if (scope == EnvironmentVariableTarget.Process)
             {
-                Environment.SetEnvironmentVariable(name, value);
+                if (cmdlet.ShouldProcess(name, "Set Process environment variable"))
+                {
+                    Environment.SetEnvironmentVariable(name, value);
+                }
+
                 return;
             }
 
@@ -166,32 +170,38 @@ namespace Chocolatey.PowerShell.Helpers
 
                 cmdlet.WriteDebug($"Registry type for {name} is/will be {registryType}");
 
-                if (string.IsNullOrEmpty(value))
+                if (cmdlet.ShouldProcess(name, $"Set {scope} environment variable"))
                 {
-                    registryKey.DeleteValue(name, throwOnMissingValue: false);
-                }
-                else
-                {
-                    registryKey.SetValue(name, value, registryType);
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        registryKey.DeleteValue(name, throwOnMissingValue: false);
+                    }
+                    else
+                    {
+                        registryKey.SetValue(name, value, registryType);
+                    }
                 }
             }
 
             try
             {
-                // Trigger environment refresh in explorer.exe:
-                // 1. Notify all windows of environment block change
-                NativeMethods.SendMessageTimeout(
-                    hWnd: (IntPtr)NativeMethods.HWND_BROADCAST,
-                    Msg: NativeMethods.WM_SETTINGCHANGE,
-                    wParam: UIntPtr.Zero,
-                    lParam: "Environment",
-                    fuFlags: 2,
-                    uTimeout: 5000,
-                    out UIntPtr result);
+                if (cmdlet.ShouldProcess("Environment variables", "Notify system of changes"))
+                {
+                    // Trigger environment refresh in explorer.exe:
+                    // 1. Notify all windows of environment block change
+                    NativeMethods.SendMessageTimeout(
+                        hWnd: (IntPtr)NativeMethods.HWND_BROADCAST,
+                        Msg: NativeMethods.WM_SETTINGCHANGE,
+                        wParam: UIntPtr.Zero,
+                        lParam: "Environment",
+                        fuFlags: 2,
+                        uTimeout: 5000,
+                        out UIntPtr result);
 
-                // 2. Set a user environment variable making the system refresh
-                var setxPath = string.Format(@"{0}\System32\setx.exe", GetVariable(cmdlet, EnvironmentVariables.SystemRoot, EnvironmentVariableTarget.Process));
-                cmdlet.InvokeCommand.InvokeScript($"& \"{setxPath}\" {EnvironmentVariables.ChocolateyLastPathUpdate} \"{DateTime.Now.ToFileTime()}\"");
+                    // 2. Set a user environment variable making the system refresh
+                    var setxPath = string.Format(@"{0}\System32\setx.exe", GetVariable(cmdlet, EnvironmentVariables.SystemRoot, EnvironmentVariableTarget.Process));
+                    cmdlet.InvokeCommand.InvokeScript($"& \"{setxPath}\" {EnvironmentVariables.ChocolateyLastPathUpdate} \"{DateTime.Now.ToFileTime()}\"");
+                }
             }
             catch (Exception error)
             {
@@ -221,37 +231,40 @@ namespace Chocolatey.PowerShell.Helpers
                 scopeList.Add(EnvironmentVariableTarget.User);
             }
 
-            foreach (var scope in scopeList)
+            if (cmdlet.ShouldProcess("Current process", "Refresh all environment variables"))
             {
-                foreach (var name in GetVariableNames(scope))
+                foreach (var scope in scopeList)
                 {
-                    var value = GetVariable(cmdlet, name, scope);
-                    if (!string.IsNullOrEmpty(value))
+                    foreach (var name in GetVariableNames(scope))
                     {
-                        SetVariable(cmdlet, name, EnvironmentVariableTarget.Process, value);
+                        var value = GetVariable(cmdlet, name, scope);
+                        if (!string.IsNullOrEmpty(value))
+                        {
+                            SetVariable(cmdlet, name, EnvironmentVariableTarget.Process, value);
+                        }
                     }
                 }
-            }
 
-            // Update PATH, combining both scopes' values.
-            var paths = new string[2];
-            paths[0] = GetVariable(cmdlet, EnvironmentVariables.Path, EnvironmentVariableTarget.Machine);
-            paths[1] = GetVariable(cmdlet, EnvironmentVariables.Path, EnvironmentVariableTarget.User);
+                // Update PATH, combining both scopes' values.
+                var paths = new string[2];
+                paths[0] = GetVariable(cmdlet, EnvironmentVariables.Path, EnvironmentVariableTarget.Machine);
+                paths[1] = GetVariable(cmdlet, EnvironmentVariables.Path, EnvironmentVariableTarget.User);
 
-            SetVariable(cmdlet, EnvironmentVariables.Path, EnvironmentVariableTarget.Process, string.Join(";", paths));
+                SetVariable(cmdlet, EnvironmentVariables.Path, EnvironmentVariableTarget.Process, string.Join(";", paths));
 
-            // Preserve PSModulePath as it's almost always updated by process, preserve it
-            SetVariable(cmdlet, EnvironmentVariables.PSModulePath, EnvironmentVariableTarget.Process, psModulePath);
+                // Preserve PSModulePath as it's almost always updated by process, preserve it
+                SetVariable(cmdlet, EnvironmentVariables.PSModulePath, EnvironmentVariableTarget.Process, psModulePath);
 
-            // Preserve user and architecture
-            if (!string.IsNullOrEmpty(userName))
-            {
-                SetVariable(cmdlet, EnvironmentVariables.Username, EnvironmentVariableTarget.Process, userName);
-            }
+                // Preserve user and architecture
+                if (!string.IsNullOrEmpty(userName))
+                {
+                    SetVariable(cmdlet, EnvironmentVariables.Username, EnvironmentVariableTarget.Process, userName);
+                }
 
-            if (!string.IsNullOrEmpty(architecture))
-            {
-                SetVariable(cmdlet, EnvironmentVariables.ProcessorArchitecture, EnvironmentVariableTarget.Process, architecture);
+                if (!string.IsNullOrEmpty(architecture))
+                {
+                    SetVariable(cmdlet, EnvironmentVariables.ProcessorArchitecture, EnvironmentVariableTarget.Process, architecture);
+                }
             }
         }
     }

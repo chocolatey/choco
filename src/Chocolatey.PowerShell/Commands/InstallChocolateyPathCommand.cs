@@ -21,7 +21,7 @@ using Chocolatey.PowerShell.Shared;
 
 namespace Chocolatey.PowerShell.Commands
 {
-    [Cmdlet(VerbsLifecycle.Install, "ChocolateyPath")]
+    [Cmdlet(VerbsLifecycle.Install, "ChocolateyPath", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.Medium)]
     [OutputType(typeof(void))]
     public class InstallChocolateyPathCommand : ChocolateyCmdlet
     {
