@@ -1,11 +1,11 @@
 ﻿Import-Module helpers/common-helpers
 
 Describe 'Ensuring correct version of <Name> is installed' -Tag BundledApplications -ForEach @(
-    @{ Name = 'shimgen' ; Version = '2.0.0' ; ChocolateyVersion = '2.0.0-alpha' ; IsSigned = $true }
-    @{ Name = 'checksum' ; Version = '0.3.1' ; ChocolateyVersion = '2.0.0-alpha' ; IsSigned = $true }
-    @{ Name = '7z' ; Version = '23.01' ; ChocolateyVersion = '2.2.1-alpha' ; IsSigned = $false }
-) -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0")) {
-    Context '<Name> is correctly installed' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan $ChocolateyVersion)) {
+    @{ Name = 'shimgen' ; Version = '2.0.0' ; IsSigned = $true }
+    @{ Name = 'checksum' ; Version = '0.3.1' ; IsSigned = $true }
+    @{ Name = '7z' ; Version = '24.08' ; IsSigned = $false }
+) {
+    Context '<Name> is correctly installed' {
         BeforeAll {
             # Because we're not modifying the install in any way, there is no need to Initialize-ChocolateyTestInstall
             $ToolPath = "$env:ChocolateyInstall/tools/$Name.exe"

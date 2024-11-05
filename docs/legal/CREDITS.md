@@ -6,7 +6,7 @@
   - [Contributors](#contributors)
 - [Third Party Licenses - Development](#third-party-licenses---development)
 - [Third Party Licenses - Runtime](#third-party-licenses---runtime)
-  - [7-Zip @ 23.01](#7-zip--2301)
+  - [7-Zip @ 24.08](#7-zip--2408)
   - [AlphaFS @ 2.1.3](#alphafs--213)
   - [Checksum @ 0.3.1](#checksum--031)
   - [log4net @ 2.0.12](#log4net--2012)
@@ -73,7 +73,7 @@ We would like to credit other super sweet tools/frameworks that aid in the devel
 Chocolatey CLI (choco) uses a number of 3rd-party components.
 Their details are below.
 
-### 7-Zip @ 23.01
+### 7-Zip @ 24.08
 
 Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives.
 [License terms](http://www.7-zip.org/license.txt):
