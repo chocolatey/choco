@@ -16,9 +16,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Win32;
 using chocolatey.infrastructure.information;
 using chocolatey.infrastructure.app;
@@ -44,7 +44,6 @@ using Assembly = chocolatey.infrastructure.adapters.Assembly;
 using Console = System.Console;
 using Environment = System.Environment;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
-using System.Diagnostics;
 
 namespace chocolatey.console
 {

@@ -16,26 +16,24 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using System.Threading;
-using Chocolatey.NuGet.Frameworks;
+using System.Threading.Tasks;
 using chocolatey.infrastructure.app;
 using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.app.nuget;
 using chocolatey.infrastructure.filesystem;
+using Chocolatey.NuGet.Frameworks;
+using FluentAssertions;
 using Moq;
 using NuGet.Common;
 using NuGet.Configuration;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
-using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
-using FluentAssertions;
-using chocolatey.infrastructure.app.services;
-using chocolatey.infrastructure.registration;
-using System.Diagnostics;
 
 namespace chocolatey.tests.infrastructure.app.nuget
 {
