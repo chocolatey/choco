@@ -811,7 +811,8 @@ To upgrade a local, or remote file, you may use:
 
             $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
             $Setup2 = Invoke-Choco install $BasePackage --version 1.0.0 --confirm
-            $Output = Invoke-Choco upgrade $PackageName --confirm --except="'chocolatey'" $Argument
+            # We need to exclude packages that are in Test Kitchen but not the other environments.
+            $Output = Invoke-Choco upgrade $PackageName --confirm --except="chocolatey,chocolatey.extension,chocolatey-agent,pester,chocolatey-license-business" $Argument
         }
 
         It "Exits with expected result (<ExpectedExit>)" {
