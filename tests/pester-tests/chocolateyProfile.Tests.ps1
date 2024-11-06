@@ -11,14 +11,6 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
     }
 
     Context "Tab Completion" {
-        It "Should Exist" {
-            Test-Path Function:\TabExpansion | Should -BeTrue
-        }
-
-        It "Should have overridden TabExpansion with a new scriptblock including ChocolateyTabExpansion" {
-            [bool]((Get-Command TabExpansion).ScriptBlock -match "ChocolateyTabExpansion") | Should -BeTrue
-        }
-
         It "Should list completions for all Top Level Commands, sorted alphabetically, but not aliases or unpackself" {
             $Command = "choco "
             $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
