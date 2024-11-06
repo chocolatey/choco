@@ -222,7 +222,8 @@ that uses these options.");
                     // The main scenario where we desire the decrypted arguments during a list sequence is to display them when verbose output is selected.
                     // This is done by default on the `info` command, and by request on the `list` command. As such, we are going to validate it's that scenario
                     // to avoid needlessly decrypting the arguments file.
-                    var shouldDecryptArguments = (
+                    var shouldDecryptArguments = !string.IsNullOrWhiteSpace(config.CommandName) &&
+                        (
                             config.CommandName.Equals("info", StringComparison.OrdinalIgnoreCase) ||
                             config.CommandName.Equals("list", StringComparison.OrdinalIgnoreCase)
                         ) &&
