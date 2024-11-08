@@ -116,7 +116,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_contain_any_version_number()
             {
-                MockLogger.ContainsMessage(".0").Should().BeFalse();
+                MockLogger.ContainsMessage(".0", LogLevel.Info).Should().BeFalse();
             }
         }
 
@@ -196,7 +196,7 @@ namespace chocolatey.tests.integration.scenarios
             [Fact]
             public void Should_not_contain_any_version_number()
             {
-                MockLogger.ContainsMessage(".0").Should().BeFalse();
+                MockLogger.ContainsMessage(".0", LogLevel.Info).Should().BeFalse();
             }
 
             [Fact]
