@@ -15,28 +15,27 @@
         @{ Scope = 'User' }
         @{ Scope = 'Machine' }
     ) {
-        Context 'Path "<_>"' -ForEach @("C:\test", "C:\tools") {
-            BeforeAll {    
-                $Preamble = [scriptblock]::Create("Import-Module '$testLocation\helpers\chocolateyInstaller.psm1'")
-            }
+        BeforeAll {
+            $Preamble = [scriptblock]::Create("Import-Module '$testLocation\helpers\chocolateyInstaller.psm1' -Global")
+        }
 
-            It 'stores the value in the desired PATH scope' {
-                $Command = [scriptblock]::Create("Install-ChocolateyPath -Path '$_' -Scope $Scope -WhatIf")
-                
-                $results = @( Get-WhatIfResult -Preamble $Preamble -Command $Command )
-                $results[0] | Should -BeExactly "What if: Performing the operation ""Set $Scope environment variable"" on target ""PATH""."
+        It 'stores the value <_> in the desired PATH scope' -TestCases @("C:\test", "C:\tools") {
+            $Command = [scriptblock]::Create("Install-ChocolateyPath -Path '$_' -Scope $Scope -WhatIf")
+            
+            $results = Get-WhatIfResult -Preamble $Preamble -Command $Command
+            $results.WhatIf[0] | Should -BeExactly "What if: Performing the operation ""Set $Scope environment variable"" on target ""PATH""." -Because $results.Output
 
-                if ($Scope -ne 'Process') {
-                    $results[1] | Should -BeExactly 'What if: Performing the operation "Notify system of changes" on target "Environment variables".'
-                    $results[2] | Should -BeExactly 'What if: Performing the operation "Refresh all environment variables" on target "Current process".'
-                }
+            if ($Scope -ne 'Process') {
+                $results.WhatIf[1] | Should -BeExactly 'What if: Performing the operation "Notify system of changes" on target "Environment variables".' -Because $results.Output
+                $results.WhatIf[2] | Should -BeExactly 'What if: Performing the operation "Refresh all environment variables" on target "Current process".' -Because $results.Output
             }
+        }
 
-            It 'skips adding the value if it is already present' {
-                $targetPathEntry = [Environment]::GetEnvironmentVariable('PATH', $Scope) -split ';' | Select-Object -First 1
-                $Command = [scriptblock]::Create("Install-ChocolateyPath -Path '$targetPathEntry' -Scope $Scope -WhatIf")
-                Get-WhatIfResult -Preamble $Preamble -Command $Command | Should -BeNullOrEmpty -Because 'we should skip adding values that already exist'
-            }
+        It 'skips adding the value if it is already present' {
+            $targetPathEntry = [Environment]::GetEnvironmentVariable('PATH', $Scope) -split ';' | Select-Object -Last 1
+            $Command = [scriptblock]::Create("Install-ChocolateyPath -Path '$targetPathEntry' -Scope $Scope -WhatIf")
+            $result = Get-WhatIfResult -Preamble $Preamble -Command $Command
+            $result.WhatIf | Should -BeNullOrEmpty -Because "we should skip adding values that already exist. Output:`n$($result.Output)"
         }
     }
 

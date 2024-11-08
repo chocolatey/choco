@@ -16,12 +16,12 @@ Describe 'Set-EnvironmentVariable helper function tests' -Tags SetEnvironmentVar
             $Preamble = [scriptblock]::Create("Import-Module '$testLocation\helpers\chocolateyInstaller.psm1'")
             $Command = [scriptblock]::Create("Set-EnvironmentVariable -Name $testVariableName -Value 'TEST' -Scope $Scope -WhatIf")
             
-            $results = @( Get-WhatIfResult -Preamble $Preamble -Command $Command )
-            $results[0] | Should -BeExactly "What if: Performing the operation ""Set $Scope environment variable"" on target ""testVariable""."
+            $results = Get-WhatIfResult -Preamble $Preamble -Command $Command
+            $results.WhatIf[0] | Should -BeExactly "What if: Performing the operation ""Set $Scope environment variable"" on target ""testVariable""." -Because $results.Output
 
             if ($Scope -ne 'Process') {
-                $results[1] | Should -BeExactly 'What if: Performing the operation "Notify system of changes" on target "Environment variables".'
-                $results[2] | Should -BeExactly 'What if: Performing the operation "Refresh all environment variables" on target "Current process".'
+                $results.WhatIf[1] | Should -BeExactly 'What if: Performing the operation "Notify system of changes" on target "Environment variables".' -Because $results.Output
+                $results.WhatIf[2] | Should -BeExactly 'What if: Performing the operation "Refresh all environment variables" on target "Current process".' -Because $results.Output
             }
         }
     }

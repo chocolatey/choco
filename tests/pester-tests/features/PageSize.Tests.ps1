@@ -34,6 +34,8 @@
         }
     ) {
         BeforeAll {
+            Disable-ChocolateySource
+            Enable-ChocolateySource -Name hermes
             $Output = Invoke-Choco $Command --page-size $ProvidedSize
         }
 
@@ -55,8 +57,6 @@
                 }
             }
             foreach ($message in $ExpectedMessage) {
-                # The output here may contain duplicated line for the warning about non-30 page size.
-                # We have been unable to reproduce this output in any scenario other than in these tests.
                 $Output.Lines | Should -Contain $message -Because $Output.String
             }
         }

@@ -24,6 +24,10 @@
 & {{ {1} }}
 '@ -f $Preamble, $Command
 
-    powershell -NoProfile -NonInteractive -Command $commandString |
-        Where-Object { $_ -like "What if:*" }
+    $results = @(powershell -NoProfile -NonInteractive -Command $commandString)
+
+    [pscustomobject]@{
+        Output = $results
+        WhatIf = @($results | Where-Object { $_ -like "What if:*" })
+    }
 }

@@ -12,7 +12,7 @@
             $Command = [scriptblock]::Create("Update-SessionEnvironment -WhatIf")
             
             $results = Get-WhatIfResult -Preamble $Preamble -Command $Command
-            $results | Should -BeExactly 'What if: Performing the operation "refresh all environment variables" on target "current process".'
+            $results.WhatIf | Should -BeExactly 'What if: Performing the operation "Refresh all environment variables" on target "Current process".'
         }
     }
 
