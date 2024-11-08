@@ -46,7 +46,7 @@ Describe "Chocolatey User Agent" -Tag Chocolatey, UserAgent {
     }
 
     It 'Logs the full process tree to debug' {
-        $logLine = $Output.Lines | Where-Object { $_ -match '^Process Tree' }
+        $logLine = $Output.Lines | Where-Object { $_ -match '^Process Tree' } | Select-Object -Last 1
 
         $logLine | Should -Not -BeNullOrEmpty -Because 'choco.exe should log the process tree to debug'
         
@@ -60,7 +60,7 @@ Describe "Chocolatey User Agent" -Tag Chocolatey, UserAgent {
     }
 
     It 'Logs the final user agent to debug' {
-        $logLine = $Output.Lines | Where-Object { $_ -match '^Updating User Agent' }
+        $logLine = $Output.Lines | Where-Object { $_ -match '^Updating User Agent' } | Select-Object -Last 1
         
         $logLine | Should -Not -BeNullOrEmpty -Because "choco.exe should log the user agent string to debug`n$($Output.Lines)"
 
