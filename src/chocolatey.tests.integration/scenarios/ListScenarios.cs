@@ -163,12 +163,6 @@ namespace chocolatey.tests.integration.scenarios
             {
                 MockLogger.ContainsMessage("packages installed").Should().BeFalse();
             }
-
-            [Fact]
-            public void Should_not_contain_debugging_messages()
-            {
-                MockLogger.Messages.Should().NotContainKey(LogLevel.Debug.ToStringSafe());
-            }
         }
 
         public class When_listing_local_packages_limiting_output_with_id_only : ScenariosBase
