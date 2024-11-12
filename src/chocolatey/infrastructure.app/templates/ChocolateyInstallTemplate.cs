@@ -134,7 +134,7 @@ Install-ChocolateyPackage @packageArgs # https://docs.chocolatey.org/en-us/creat
 ## Add specific files as shortcuts to the desktop
 ## - https://docs.chocolatey.org/en-us/create/functions/install-chocolateyshortcut
 #$target = Join-Path $toolsDir ""$($packageName).exe""
-# Install-ChocolateyShortcut -shortcutFilePath ""<path>"" -targetPath ""<path>"" [-workDirectory ""C:\"" -arguments ""C:\test.txt"" -iconLocation ""C:\test.ico"" -description ""This is the description""]
+# Install-ChocolateyShortcut -shortcutFilePath ""<path>"" -targetPath ""<path>"" [-workingDirectory ""C:\"" -arguments ""C:\test.txt"" -iconLocation ""C:\test.ico"" -description ""This is the description""]
 
 ## Outputs the bitness of the OS (either ""32"" or ""64"")
 ## - https://docs.chocolatey.org/en-us/create/functions/get-osarchitecturewidth

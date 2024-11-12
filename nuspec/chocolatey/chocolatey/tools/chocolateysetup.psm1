@@ -1,8 +1,7 @@
 $thisScriptFolder = (Split-Path -Parent $MyInvocation.MyCommand.Definition)
 $chocoInstallVariableName = "ChocolateyInstall"
-$sysDrive = $env:SystemDrive
 $tempDir = $env:TEMP
-$defaultChocolateyPathOld = "$sysDrive\Chocolatey"
+$insecureRootInstallPath = "$env:SystemDrive\Chocolatey"
 
 $originalForegroundColor = $host.ui.RawUI.ForegroundColor
 
@@ -135,14 +134,15 @@ function Initialize-Chocolatey {
     }
 
     # variable to allow insecure directory:
-    $allowInsecureRootInstall = $false
-    if ($env:ChocolateyAllowInsecureRootDirectory -eq 'true') {
-        $allowInsecureRootInstall = $true
-    }
+    $allowInsecureRootInstall = $env:ChocolateyAllowInsecureRootDirectory -eq 'true'
 
     # if we have an already environment variable path, use it.
     $alreadyInitializedNugetPath = Get-ChocolateyInstallFolder
-    if ($alreadyInitializedNugetPath -and $alreadyInitializedNugetPath -ne $chocolateyPath -and ($allowInsecureRootInstall -or $alreadyInitializedNugetPath -ne $defaultChocolateyPathOld)) {
+    
+    $useCustomInstallPath = $alreadyInitializedNugetPath -and
+        $alreadyInitializedNugetPath -ne $chocolateyPath -and
+        ($allowInsecureRootInstall -or $alreadyInitializedNugetPath -ne $insecureRootInstallPath)
+    if ($useCustomInstallPath) {
         $chocolateyPath = $alreadyInitializedNugetPath
     }
     else {
@@ -194,11 +194,6 @@ Creating Chocolatey CLI folders if they do not already exist.
     $realModule = Join-Path $chocolateyPath "helpers\chocolateyInstaller.psm1"
     Import-Module "$realModule" -Force
 
-    if (-not $allowInsecureRootInstall -and (Test-Path($defaultChocolateyPathOld))) {
-        Upgrade-OldChocolateyInstall $defaultChocolateyPathOld $chocolateyPath
-        Install-ChocolateyBinFiles $chocolateyPath $chocolateyExePath
-    }
-
     Add-ChocolateyProfile
     Invoke-Chocolatey-Initial
     if ($env:ChocolateyExitCode -eq $null -or $env:ChocolateyExitCode -eq '') {
@@ -218,10 +213,6 @@ Run choco /? for a list of functions.
 You may need to shut down and restart powershell and/or consoles
  first prior to using choco.
 "@ | Write-Output
-    }
-
-    if (-not $allowInsecureRootInstall) {
-        Remove-OldChocolateyInstall $defaultChocolateyPathOld
     }
 
     Remove-UnsupportedShimFiles -Paths $chocolateyExePath
@@ -366,87 +357,6 @@ function Ensure-Permissions {
         Write-ChocolateyWarning "Not able to set permissions for $folder."
     }
     $ErrorActionPreference = $currentEA
-}
-
-function Upgrade-OldChocolateyInstall {
-    param(
-        [string]$chocolateyPathOld = "$sysDrive\Chocolatey",
-        [string]$chocolateyPath = "$($env:ALLUSERSPROFILE)\chocolatey"
-    )
-
-    Write-Debug "Upgrade-OldChocolateyInstall"
-
-    if (Test-Path $chocolateyPathOld) {
-        Write-Output "Attempting to upgrade `'$chocolateyPathOld`' to `'$chocolateyPath`'."
-        Write-ChocolateyWarning "Copying the contents of `'$chocolateyPathOld`' to `'$chocolateyPath`'. `n This step may fail if you have anything in this folder running or locked."
-        Write-Output 'If it fails, just manually copy the rest of the items out and then delete the folder.'
-        Write-ChocolateyWarning "!!!! ATTN: YOU WILL NEED TO CLOSE AND REOPEN YOUR SHELL !!!!"
-        #-ForegroundColor Magenta -BackgroundColor Black
-
-        $chocolateyExePathOld = Join-Path $chocolateyPathOld 'bin'
-        'Machine', 'User' |
-            ForEach-Object {
-                $path = Get-EnvironmentVariable -Name 'PATH' -Scope $_
-                $updatedPath = [System.Text.RegularExpressions.Regex]::Replace($path, [System.Text.RegularExpressions.Regex]::Escape($chocolateyExePathOld) + '(?>;)?', '', [System.Text.RegularExpressions.RegexOptions]::IgnoreCase)
-                if ($updatedPath -ne $path) {
-                    Write-Output "Updating `'$_`' PATH to reflect removal of '$chocolateyPathOld'."
-                    try {
-                        Set-EnvironmentVariable -Name 'Path' -Value $updatedPath -Scope $_ -ErrorAction Stop
-                    }
-                    catch {
-                        Write-ChocolateyWarning "Was not able to remove the old environment variable from PATH. You will need to do this manually"
-                    }
-                }
-            }
-
-        Copy-Item "$chocolateyPathOld\lib\*" "$chocolateyPath\lib" -Force -Recurse
-
-        $from = "$chocolateyPathOld\bin"
-        $to = "$chocolateyPath\bin"
-        # TODO: This exclusion list needs to be updated once shims are removed
-        $exclude = @("choco.exe", "RefreshEnv.cmd")
-        Get-ChildItem -Path $from -Recurse -Exclude $exclude |
-            ForEach-Object {
-                Write-Debug "Copying $_ `n to $to"
-                if ($_.PSIsContainer) {
-                    Copy-Item $_ -Destination (Join-Path $to $_.Parent.FullName.Substring($from.length)) -Force -ErrorAction SilentlyContinue
-                }
-                else {
-                    $fileToMove = (Join-Path $to $_.FullName.Substring($from.length))
-                    try {
-                        Copy-Item $_ -Destination $fileToMove -Exclude $exclude -Force -ErrorAction Stop
-                    }
-                    catch {
-                        Write-ChocolateyWarning "Was not able to move `'$fileToMove`'. You may need to reinstall the shim"
-                    }
-                }
-            }
-    }
-}
-
-function Remove-OldChocolateyInstall {
-    param(
-        [string]$chocolateyPathOld = "$sysDrive\Chocolatey"
-    )
-    Write-Debug "Remove-OldChocolateyInstall"
-
-    if (Test-Path $chocolateyPathOld) {
-        Write-ChocolateyWarning "This action will result in Log Errors, you can safely ignore those. `n You may need to finish removing '$chocolateyPathOld' manually."
-        try {
-            Get-ChildItem -Path "$chocolateyPathOld" | ForEach-Object {
-                if (Test-Path $_.FullName) {
-                    Write-Debug "Removing $_ unless matches .log"
-                    Remove-Item $_.FullName -Exclude *.log -Recurse -Force -ErrorAction SilentlyContinue
-                }
-            }
-
-            Write-Output "Attempting to remove `'$chocolateyPathOld`'. This may fail if something in the folder is being used or locked."
-            Remove-Item "$($chocolateyPathOld)" -Force -Recurse -ErrorAction Stop
-        }
-        catch {
-            Write-ChocolateyWarning "Was not able to remove `'$chocolateyPathOld`'. You will need to manually remove it."
-        }
-    }
 }
 
 function Install-ChocolateyFiles {
@@ -874,10 +784,10 @@ function Invoke-Chocolatey-Initial {
 Export-ModuleMember -Function Initialize-Chocolatey
 
 # SIG # Begin signature block
-# MIInKwYJKoZIhvcNAQcCoIInHDCCJxgCAQExDzANBglghkgBZQMEAgEFADB5Bgor
+# MIInJQYJKoZIhvcNAQcCoIInFjCCJxICAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCArPR/MaAFOnPhm
-# wTraOHhBiut3LMThkjxzi7DsT2up/qCCIK4wggWNMIIEdaADAgECAhAOmxiO+dAt
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCAL5XDIHTSoe/0U
+# 1fpADM55u4sth4hYys5hdS4zocysbqCCIKgwggWNMIIEdaADAgECAhAOmxiO+dAt
 # 5+/bUOIIQBhaMA0GCSqGSIb3DQEBDAUAMGUxCzAJBgNVBAYTAlVTMRUwEwYDVQQK
 # EwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAiBgNV
 # BAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yMjA4MDEwMDAwMDBa
@@ -978,109 +888,109 @@ Export-ModuleMember -Function Initialize-Chocolatey
 # Oj9FpsToFpFSi0HASIRLlk2rREDjjfAVKM7t8RhWByovEMQMCGQ8M4+uKIw8y4+I
 # Cw2/O/TOHnuO77Xry7fwdxPm5yg/rBKupS8ibEH5glwVZsxsDsrFhsP2JjMMB0ug
 # 0wcCampAMEhLNKhRILutG4UI4lkNbcoFUCvqShyepf2gpx8GdOfy1lKQ/a+FSCH5
-# Vzu0nAPthkX0tGFuv2jiJmCG6sivqf6UHedjGzqGVnhOMIIGwjCCBKqgAwIBAgIQ
-# BUSv85SdCDmmv9s/X+VhFjANBgkqhkiG9w0BAQsFADBjMQswCQYDVQQGEwJVUzEX
+# Vzu0nAPthkX0tGFuv2jiJmCG6sivqf6UHedjGzqGVnhOMIIGvDCCBKSgAwIBAgIQ
+# C65mvFq6f5WHxvnpBOMzBDANBgkqhkiG9w0BAQsFADBjMQswCQYDVQQGEwJVUzEX
 # MBUGA1UEChMORGlnaUNlcnQsIEluYy4xOzA5BgNVBAMTMkRpZ2lDZXJ0IFRydXN0
-# ZWQgRzQgUlNBNDA5NiBTSEEyNTYgVGltZVN0YW1waW5nIENBMB4XDTIzMDcxNDAw
-# MDAwMFoXDTM0MTAxMzIzNTk1OVowSDELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDkRp
-# Z2lDZXJ0LCBJbmMuMSAwHgYDVQQDExdEaWdpQ2VydCBUaW1lc3RhbXAgMjAyMzCC
-# AiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBAKNTRYcdg45brD5UsyPgz5/X
-# 5dLnXaEOCdwvSKOXejsqnGfcYhVYwamTEafNqrJq3RApih5iY2nTWJw1cb86l+uU
-# UI8cIOrHmjsvlmbjaedp/lvD1isgHMGXlLSlUIHyz8sHpjBoyoNC2vx/CSSUpIIa
-# 2mq62DvKXd4ZGIX7ReoNYWyd/nFexAaaPPDFLnkPG2ZS48jWPl/aQ9OE9dDH9kgt
-# XkV1lnX+3RChG4PBuOZSlbVH13gpOWvgeFmX40QrStWVzu8IF+qCZE3/I+PKhu60
-# pCFkcOvV5aDaY7Mu6QXuqvYk9R28mxyyt1/f8O52fTGZZUdVnUokL6wrl76f5P17
-# cz4y7lI0+9S769SgLDSb495uZBkHNwGRDxy1Uc2qTGaDiGhiu7xBG3gZbeTZD+BY
-# QfvYsSzhUa+0rRUGFOpiCBPTaR58ZE2dD9/O0V6MqqtQFcmzyrzXxDtoRKOlO0L9
-# c33u3Qr/eTQQfqZcClhMAD6FaXXHg2TWdc2PEnZWpST618RrIbroHzSYLzrqawGw
-# 9/sqhux7UjipmAmhcbJsca8+uG+W1eEQE/5hRwqM/vC2x9XH3mwk8L9CgsqgcT2c
-# kpMEtGlwJw1Pt7U20clfCKRwo+wK8REuZODLIivK8SgTIUlRfgZm0zu++uuRONhR
-# B8qUt+JQofM604qDy0B7AgMBAAGjggGLMIIBhzAOBgNVHQ8BAf8EBAMCB4AwDAYD
-# VR0TAQH/BAIwADAWBgNVHSUBAf8EDDAKBggrBgEFBQcDCDAgBgNVHSAEGTAXMAgG
-# BmeBDAEEAjALBglghkgBhv1sBwEwHwYDVR0jBBgwFoAUuhbZbU2FL3MpdpovdYxq
-# II+eyG8wHQYDVR0OBBYEFKW27xPn783QZKHVVqllMaPe1eNJMFoGA1UdHwRTMFEw
-# T6BNoEuGSWh0dHA6Ly9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydFRydXN0ZWRH
-# NFJTQTQwOTZTSEEyNTZUaW1lU3RhbXBpbmdDQS5jcmwwgZAGCCsGAQUFBwEBBIGD
-# MIGAMCQGCCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wWAYIKwYB
-# BQUHMAKGTGh0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydFRydXN0
-# ZWRHNFJTQTQwOTZTSEEyNTZUaW1lU3RhbXBpbmdDQS5jcnQwDQYJKoZIhvcNAQEL
-# BQADggIBAIEa1t6gqbWYF7xwjU+KPGic2CX/yyzkzepdIpLsjCICqbjPgKjZ5+PF
-# 7SaCinEvGN1Ott5s1+FgnCvt7T1IjrhrunxdvcJhN2hJd6PrkKoS1yeF844ektrC
-# QDifXcigLiV4JZ0qBXqEKZi2V3mP2yZWK7Dzp703DNiYdk9WuVLCtp04qYHnbUFc
-# jGnRuSvExnvPnPp44pMadqJpddNQ5EQSviANnqlE0PjlSXcIWiHFtM+YlRpUurm8
-# wWkZus8W8oM3NG6wQSbd3lqXTzON1I13fXVFoaVYJmoDRd7ZULVQjK9WvUzF4UbF
-# KNOt50MAcN7MmJ4ZiQPq1JE3701S88lgIcRWR+3aEUuMMsOI5ljitts++V+wQtaP
-# 4xeR0arAVeOGv6wnLEHQmjNKqDbUuXKWfpd5OEhfysLcPTLfddY2Z1qJ+Panx+VP
-# NTwAvb6cKmx5AdzaROY63jg7B145WPR8czFVoIARyxQMfq68/qTreWWqaNYiyjvr
-# moI1VygWy2nyMpqy0tg6uLFGhmu6F/3Ed2wVbK6rr3M66ElGt9V/zLY4wNjsHPW2
-# obhDLN9OTH0eaHDAdwrUAuBcYLso/zjlUlrWrBciI0707NMX+1Br/wd3H3GXREHJ
-# uEbTbDJ8WC9nR2XlG3O2mflrLAZG70Ee8PBf4NvZrZCARK+AEEGKMIIG7TCCBNWg
-# AwIBAgIQBNI793flHTneCMtwLiiYFTANBgkqhkiG9w0BAQsFADBpMQswCQYDVQQG
-# EwJVUzEXMBUGA1UEChMORGlnaUNlcnQsIEluYy4xQTA/BgNVBAMTOERpZ2lDZXJ0
-# IFRydXN0ZWQgRzQgQ29kZSBTaWduaW5nIFJTQTQwOTYgU0hBMzg0IDIwMjEgQ0Ex
-# MB4XDTI0MDUwOTAwMDAwMFoXDTI3MDUxMTIzNTk1OVowdTELMAkGA1UEBhMCVVMx
-# DzANBgNVBAgTBkthbnNhczEPMA0GA1UEBxMGVG9wZWthMSEwHwYDVQQKExhDaG9j
-# b2xhdGV5IFNvZnR3YXJlLCBJbmMxITAfBgNVBAMTGENob2NvbGF0ZXkgU29mdHdh
-# cmUsIEluYzCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBAPDJgdZWj0RV
-# lBBBniCyGy19FB736U5AahB+dAw3nmafOEeG+syql0m9kzV0gu4bSd4Al587ioAG
-# DUPAGhXf0R+y11cx7c1cgdyxvfBvfMEkgD7sOUeF9ggZJc0YZ4qc7Pa6qqMpHDru
-# pjshvLmQMSLaGKF68m+w2mJiZkLMYBEotPiAC3+IzI1MQqidCfN6rfQUmtcKyrVz
-# 2zCt8CvuR3pSyNCBcQgKZ/+NwBfDqPTt1wKq5JCIQiLnbDZwJ9F5433enzgUGQgh
-# KRoIwfp/hap7t7lrNf859Xe1/zHT4qtNgzGqSdJ2Kbz1YAMFjZokYHv/sliyxJN9
-# 7++0BApX2t45JsQaqyQ60TSKxqOH0JIIDeYgwxfJ8YFmuvt7T4zVM8u02Axp/1YV
-# nKP2AOVca6FDe9EiccrexAWPGoP+WQi8WFQKrNVKr5XTLI0MNTjadOHfF0XUToyF
-# H8FVnZZV1/F1kgd/bYbt/0M/QkS4FGmJoqT8dyRyMkTlTynKul4N3QIDAQABo4IC
-# AzCCAf8wHwYDVR0jBBgwFoAUaDfg67Y7+F8Rhvv+YXsIiGX0TkIwHQYDVR0OBBYE
-# FFpfZUilS5A+fjYV80ib5qKkBoczMD4GA1UdIAQ3MDUwMwYGZ4EMAQQBMCkwJwYI
-# KwYBBQUHAgEWG2h0dHA6Ly93d3cuZGlnaWNlcnQuY29tL0NQUzAOBgNVHQ8BAf8E
-# BAMCB4AwEwYDVR0lBAwwCgYIKwYBBQUHAwMwgbUGA1UdHwSBrTCBqjBToFGgT4ZN
-# aHR0cDovL2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0VHJ1c3RlZEc0Q29kZVNp
-# Z25pbmdSU0E0MDk2U0hBMzg0MjAyMUNBMS5jcmwwU6BRoE+GTWh0dHA6Ly9jcmw0
-# LmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydFRydXN0ZWRHNENvZGVTaWduaW5nUlNBNDA5
-# NlNIQTM4NDIwMjFDQTEuY3JsMIGUBggrBgEFBQcBAQSBhzCBhDAkBggrBgEFBQcw
-# AYYYaHR0cDovL29jc3AuZGlnaWNlcnQuY29tMFwGCCsGAQUFBzAChlBodHRwOi8v
-# Y2FjZXJ0cy5kaWdpY2VydC5jb20vRGlnaUNlcnRUcnVzdGVkRzRDb2RlU2lnbmlu
-# Z1JTQTQwOTZTSEEzODQyMDIxQ0ExLmNydDAJBgNVHRMEAjAAMA0GCSqGSIb3DQEB
-# CwUAA4ICAQAW9ANNkR2cF6ulbM+/XUWeWqC7UTqtsRwj7WAo8XTr52JebRchTGDH
-# BZP9sDRZsFt+lPcPvBrv41kWoaFBmebTaPMh6YDHaON+uc19CTWXsMh8eog0lzGU
-# iA3mKdbVit0udrgNlBUqTIuvMlMFIARWSz90FMeQrCFokLmqoqjp7u0sVPM7ng6T
-# 9D8ct/m5LSpIa5TJCjAfyfw75GK0wzTDdTi1MgiAIyX0EedMrEwXjOjSApQ+uhIW
-# v/AHDf8ukJzDFTTeiUkYZ1w++z70QZkzLfQTi6eH9vqgyXWcnGCwOxKquqe8RSIe
-# M3FdtLstn9nI8S4qeiKdmomG6FAZTzYiGULJdJGsLh6Uii56zZdq3bSre/yrfed4
-# hf/0MqEtWSU7LpkWM8AApRkIKRBZIQ73/7WxwsF9kHoZxqoRMDGTzWt+S7/XrSOa
-# QbKf0CxdxMPHKC2A1u3xGNDChtQEwpHxYXf/teD7GeFYFQJg/wn4dC72mZze97+c
-# YcpmI4R13Q7owmRthK1hnuq4EOQIcoTPbQXiaRzULbYrcOnJi7EbXcqdeAAnZAyV
-# b6zGqAaE9Sw4RYvkosL5IlBgrdIwSFJMbeirBoM2GukIHQ8UaEu3l1PoNQvVbqM1
-# 8zHiN4WA4rp9G9wfcAlZWq9iKF34sA+Xu03qSVaKPKn6YJMl5PfUsDGCBdMwggXP
-# AgEBMH0waTELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDkRpZ2lDZXJ0LCBJbmMuMUEw
-# PwYDVQQDEzhEaWdpQ2VydCBUcnVzdGVkIEc0IENvZGUgU2lnbmluZyBSU0E0MDk2
-# IFNIQTM4NCAyMDIxIENBMQIQBNI793flHTneCMtwLiiYFTANBglghkgBZQMEAgEF
-# AKCBhDAYBgorBgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgor
-# BgEEAYI3AgEEMBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMC8GCSqGSIb3
-# DQEJBDEiBCDGe5bdr9fhZlgcmD0adH88bZKumDvnmMPc9syGf+0gjTANBgkqhkiG
-# 9w0BAQEFAASCAYA+7vMPYKMLM9YYgi74s1I/0mfFEOTHAZ1q8M7PQNczDxMBd6nT
-# QLlImypyhnYyAmyq1pqheD+zfRS0JAkrzFAqjxefGQka/Jvwe1/vyTOy61pUoHWD
-# MvUTswW+VPLjuk2d61bgiliINYS1oTz1MjWlUPMyMdP8n2+ger+PJPO8CPLvCLU3
-# PFJWF+29r48Wkfj7IobT3CcFlsOw5B9xIhHNNf6MLcfjUJO4rtDketHHTKqHwJlG
-# uU+POoAG+3agrRulYNBItW+byP78gwdCjGh+cWiovbbCgJ3CPu7PSSHdV4J/sA6G
-# 0BbhfcHhqcOmWpnpcgLy4+rMTUWVaQWokMuVtK4SVCHTxdyOw/+/LtcKvrnQyuUd
-# VwpkD+axSyqGOmqEqIeIO8LkPTI/zHm01IkxWfdzeHYs8jK0egW38U8ohe/bUXf2
-# KGdHBiv2j7iNYaOa2KplHBumb3XnIzme6u5Mo3GA/FGmAVk7TZt/1oA2/cuIa0vC
-# xqVcv0uH7jDK4KehggMgMIIDHAYJKoZIhvcNAQkGMYIDDTCCAwkCAQEwdzBjMQsw
-# CQYDVQQGEwJVUzEXMBUGA1UEChMORGlnaUNlcnQsIEluYy4xOzA5BgNVBAMTMkRp
-# Z2lDZXJ0IFRydXN0ZWQgRzQgUlNBNDA5NiBTSEEyNTYgVGltZVN0YW1waW5nIENB
-# AhAFRK/zlJ0IOaa/2z9f5WEWMA0GCWCGSAFlAwQCAQUAoGkwGAYJKoZIhvcNAQkD
-# MQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwNTMwMTk1ODQxWjAvBgkq
-# hkiG9w0BCQQxIgQg5YQcegwbGwxZCDsCktISkjvIBghmn0esLtQVM6MncyEwDQYJ
-# KoZIhvcNAQEBBQAEggIAQ4Jwo+bD++jtMq9OaaNQ+lRdtb7eS2QKvSqGparxFDw1
-# Y7H4Kd53LIfKJvibvOaPCU4o8J2Qml6MSLLdSTqR2Sndq52c1eBsqYFOx3Zhbee0
-# l/73uf8R47KmUUva2n2rkohfNtwMkMiMn9pYUxvGLqz5YtJthJBPJ+3FDCmMlbwC
-# e1/tPvxM3cB1S9N3kQTk0/Br8wNbgg8bV11cDckQhtXR7+cq3NJrLoDcgZUJGUHJ
-# sZj45sEwCJavR4LEQauMXdoMlhWDTxATXdf8VcLR6c/D4UVhnNOxtKBevJTCowXC
-# 5C8nQRZib0jKZ4aVTPO6M/voFIn3GArb4sEK9Hv7kd0+5LK9xzB3jJ7k3Qp0Lyf2
-# s9w3wgUF3APEZuCFOONHFHZraPyBixjALJDppZveWvOkPyWodYHnMdWnIRxJW6PX
-# jL9QbXLO+kpZds0PcDt9ebAP9meuarZIUEl7BSthP4N5KF/BNQbpetVgWRCFuZJ3
-# fSO9qrmQCtGm6S7ldYUgChUR2pHU+N3y1kPhmsr2bu/WDtIFojZxrickwHajrX83
-# 24axIasm3XjdMUWmhZLAZo48QN1c8hUwtiwTLo+8ZGUwmjbLEp4v7WDBI/ZcD0WW
-# 67XftIHKVDi4gJJyR9uKQdFrmIIqOHeJbgffxhwuEIlDQ3X45Umw+rymBiKOGxA=
+# ZWQgRzQgUlNBNDA5NiBTSEEyNTYgVGltZVN0YW1waW5nIENBMB4XDTI0MDkyNjAw
+# MDAwMFoXDTM1MTEyNTIzNTk1OVowQjELMAkGA1UEBhMCVVMxETAPBgNVBAoTCERp
+# Z2lDZXJ0MSAwHgYDVQQDExdEaWdpQ2VydCBUaW1lc3RhbXAgMjAyNDCCAiIwDQYJ
+# KoZIhvcNAQEBBQADggIPADCCAgoCggIBAL5qc5/2lSGrljC6W23mWaO16P2RHxjE
+# iDtqmeOlwf0KMCBDEr4IxHRGd7+L660x5XltSVhhK64zi9CeC9B6lUdXM0s71EOc
+# Re8+CEJp+3R2O8oo76EO7o5tLuslxdr9Qq82aKcpA9O//X6QE+AcaU/byaCagLD/
+# GLoUb35SfWHh43rOH3bpLEx7pZ7avVnpUVmPvkxT8c2a2yC0WMp8hMu60tZR0Cha
+# V76Nhnj37DEYTX9ReNZ8hIOYe4jl7/r419CvEYVIrH6sN00yx49boUuumF9i2T8U
+# uKGn9966fR5X6kgXj3o5WHhHVO+NBikDO0mlUh902wS/Eeh8F/UFaRp1z5SnROHw
+# SJ+QQRZ1fisD8UTVDSupWJNstVkiqLq+ISTdEjJKGjVfIcsgA4l9cbk8Smlzddh4
+# EfvFrpVNnes4c16Jidj5XiPVdsn5n10jxmGpxoMc6iPkoaDhi6JjHd5ibfdp5uzI
+# Xp4P0wXkgNs+CO/CacBqU0R4k+8h6gYldp4FCMgrXdKWfM4N0u25OEAuEa3Jyidx
+# W48jwBqIJqImd93NRxvd1aepSeNeREXAu2xUDEW8aqzFQDYmr9ZONuc2MhTMizch
+# NULpUEoA6Vva7b1XCB+1rxvbKmLqfY/M/SdV6mwWTyeVy5Z/JkvMFpnQy5wR14GJ
+# cv6dQ4aEKOX5AgMBAAGjggGLMIIBhzAOBgNVHQ8BAf8EBAMCB4AwDAYDVR0TAQH/
+# BAIwADAWBgNVHSUBAf8EDDAKBggrBgEFBQcDCDAgBgNVHSAEGTAXMAgGBmeBDAEE
+# AjALBglghkgBhv1sBwEwHwYDVR0jBBgwFoAUuhbZbU2FL3MpdpovdYxqII+eyG8w
+# HQYDVR0OBBYEFJ9XLAN3DigVkGalY17uT5IfdqBbMFoGA1UdHwRTMFEwT6BNoEuG
+# SWh0dHA6Ly9jcmwzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydFRydXN0ZWRHNFJTQTQw
+# OTZTSEEyNTZUaW1lU3RhbXBpbmdDQS5jcmwwgZAGCCsGAQUFBwEBBIGDMIGAMCQG
+# CCsGAQUFBzABhhhodHRwOi8vb2NzcC5kaWdpY2VydC5jb20wWAYIKwYBBQUHMAKG
+# TGh0dHA6Ly9jYWNlcnRzLmRpZ2ljZXJ0LmNvbS9EaWdpQ2VydFRydXN0ZWRHNFJT
+# QTQwOTZTSEEyNTZUaW1lU3RhbXBpbmdDQS5jcnQwDQYJKoZIhvcNAQELBQADggIB
+# AD2tHh92mVvjOIQSR9lDkfYR25tOCB3RKE/P09x7gUsmXqt40ouRl3lj+8QioVYq
+# 3igpwrPvBmZdrlWBb0HvqT00nFSXgmUrDKNSQqGTdpjHsPy+LaalTW0qVjvUBhcH
+# zBMutB6HzeledbDCzFzUy34VarPnvIWrqVogK0qM8gJhh/+qDEAIdO/KkYesLyTV
+# OoJ4eTq7gj9UFAL1UruJKlTnCVaM2UeUUW/8z3fvjxhN6hdT98Vr2FYlCS7Mbb4H
+# v5swO+aAXxWUm3WpByXtgVQxiBlTVYzqfLDbe9PpBKDBfk+rabTFDZXoUke7zPgt
+# d7/fvWTlCs30VAGEsshJmLbJ6ZbQ/xll/HjO9JbNVekBv2Tgem+mLptR7yIrpaid
+# RJXrI+UzB6vAlk/8a1u7cIqV0yef4uaZFORNekUgQHTqddmsPCEIYQP7xGxZBIhd
+# mm4bhYsVA6G2WgNFYagLDBzpmk9104WQzYuVNsxyoVLObhx3RugaEGru+SojW4dH
+# PoWrUhftNpFC5H7QEY7MhKRyrBe7ucykW7eaCuWBsBb4HOKRFVDcrZgdwaSIqMDi
+# CLg4D+TPVgKx2EgEdeoHNHT9l3ZDBD+XgbF+23/zBjeCtxz+dL/9NWR6P2eZRi7z
+# cEO1xwcdcqJsyz/JceENc2Sg8h3KeFUCS7tpFk7CrDqkMIIG7TCCBNWgAwIBAgIQ
+# BNI793flHTneCMtwLiiYFTANBgkqhkiG9w0BAQsFADBpMQswCQYDVQQGEwJVUzEX
+# MBUGA1UEChMORGlnaUNlcnQsIEluYy4xQTA/BgNVBAMTOERpZ2lDZXJ0IFRydXN0
+# ZWQgRzQgQ29kZSBTaWduaW5nIFJTQTQwOTYgU0hBMzg0IDIwMjEgQ0ExMB4XDTI0
+# MDUwOTAwMDAwMFoXDTI3MDUxMTIzNTk1OVowdTELMAkGA1UEBhMCVVMxDzANBgNV
+# BAgTBkthbnNhczEPMA0GA1UEBxMGVG9wZWthMSEwHwYDVQQKExhDaG9jb2xhdGV5
+# IFNvZnR3YXJlLCBJbmMxITAfBgNVBAMTGENob2NvbGF0ZXkgU29mdHdhcmUsIElu
+# YzCCAaIwDQYJKoZIhvcNAQEBBQADggGPADCCAYoCggGBAPDJgdZWj0RVlBBBniCy
+# Gy19FB736U5AahB+dAw3nmafOEeG+syql0m9kzV0gu4bSd4Al587ioAGDUPAGhXf
+# 0R+y11cx7c1cgdyxvfBvfMEkgD7sOUeF9ggZJc0YZ4qc7Pa6qqMpHDrupjshvLmQ
+# MSLaGKF68m+w2mJiZkLMYBEotPiAC3+IzI1MQqidCfN6rfQUmtcKyrVz2zCt8Cvu
+# R3pSyNCBcQgKZ/+NwBfDqPTt1wKq5JCIQiLnbDZwJ9F5433enzgUGQghKRoIwfp/
+# hap7t7lrNf859Xe1/zHT4qtNgzGqSdJ2Kbz1YAMFjZokYHv/sliyxJN97++0BApX
+# 2t45JsQaqyQ60TSKxqOH0JIIDeYgwxfJ8YFmuvt7T4zVM8u02Axp/1YVnKP2AOVc
+# a6FDe9EiccrexAWPGoP+WQi8WFQKrNVKr5XTLI0MNTjadOHfF0XUToyFH8FVnZZV
+# 1/F1kgd/bYbt/0M/QkS4FGmJoqT8dyRyMkTlTynKul4N3QIDAQABo4ICAzCCAf8w
+# HwYDVR0jBBgwFoAUaDfg67Y7+F8Rhvv+YXsIiGX0TkIwHQYDVR0OBBYEFFpfZUil
+# S5A+fjYV80ib5qKkBoczMD4GA1UdIAQ3MDUwMwYGZ4EMAQQBMCkwJwYIKwYBBQUH
+# AgEWG2h0dHA6Ly93d3cuZGlnaWNlcnQuY29tL0NQUzAOBgNVHQ8BAf8EBAMCB4Aw
+# EwYDVR0lBAwwCgYIKwYBBQUHAwMwgbUGA1UdHwSBrTCBqjBToFGgT4ZNaHR0cDov
+# L2NybDMuZGlnaWNlcnQuY29tL0RpZ2lDZXJ0VHJ1c3RlZEc0Q29kZVNpZ25pbmdS
+# U0E0MDk2U0hBMzg0MjAyMUNBMS5jcmwwU6BRoE+GTWh0dHA6Ly9jcmw0LmRpZ2lj
+# ZXJ0LmNvbS9EaWdpQ2VydFRydXN0ZWRHNENvZGVTaWduaW5nUlNBNDA5NlNIQTM4
+# NDIwMjFDQTEuY3JsMIGUBggrBgEFBQcBAQSBhzCBhDAkBggrBgEFBQcwAYYYaHR0
+# cDovL29jc3AuZGlnaWNlcnQuY29tMFwGCCsGAQUFBzAChlBodHRwOi8vY2FjZXJ0
+# cy5kaWdpY2VydC5jb20vRGlnaUNlcnRUcnVzdGVkRzRDb2RlU2lnbmluZ1JTQTQw
+# OTZTSEEzODQyMDIxQ0ExLmNydDAJBgNVHRMEAjAAMA0GCSqGSIb3DQEBCwUAA4IC
+# AQAW9ANNkR2cF6ulbM+/XUWeWqC7UTqtsRwj7WAo8XTr52JebRchTGDHBZP9sDRZ
+# sFt+lPcPvBrv41kWoaFBmebTaPMh6YDHaON+uc19CTWXsMh8eog0lzGUiA3mKdbV
+# it0udrgNlBUqTIuvMlMFIARWSz90FMeQrCFokLmqoqjp7u0sVPM7ng6T9D8ct/m5
+# LSpIa5TJCjAfyfw75GK0wzTDdTi1MgiAIyX0EedMrEwXjOjSApQ+uhIWv/AHDf8u
+# kJzDFTTeiUkYZ1w++z70QZkzLfQTi6eH9vqgyXWcnGCwOxKquqe8RSIeM3FdtLst
+# n9nI8S4qeiKdmomG6FAZTzYiGULJdJGsLh6Uii56zZdq3bSre/yrfed4hf/0MqEt
+# WSU7LpkWM8AApRkIKRBZIQ73/7WxwsF9kHoZxqoRMDGTzWt+S7/XrSOaQbKf0Cxd
+# xMPHKC2A1u3xGNDChtQEwpHxYXf/teD7GeFYFQJg/wn4dC72mZze97+cYcpmI4R1
+# 3Q7owmRthK1hnuq4EOQIcoTPbQXiaRzULbYrcOnJi7EbXcqdeAAnZAyVb6zGqAaE
+# 9Sw4RYvkosL5IlBgrdIwSFJMbeirBoM2GukIHQ8UaEu3l1PoNQvVbqM18zHiN4WA
+# 4rp9G9wfcAlZWq9iKF34sA+Xu03qSVaKPKn6YJMl5PfUsDGCBdMwggXPAgEBMH0w
+# aTELMAkGA1UEBhMCVVMxFzAVBgNVBAoTDkRpZ2lDZXJ0LCBJbmMuMUEwPwYDVQQD
+# EzhEaWdpQ2VydCBUcnVzdGVkIEc0IENvZGUgU2lnbmluZyBSU0E0MDk2IFNIQTM4
+# NCAyMDIxIENBMQIQBNI793flHTneCMtwLiiYFTANBglghkgBZQMEAgEFAKCBhDAY
+# BgorBgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3
+# AgEEMBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMC8GCSqGSIb3DQEJBDEi
+# BCAXdWERxt/icJ3hjd9UiCpI/37QMZsAxrqZ34YtoWP9kDANBgkqhkiG9w0BAQEF
+# AASCAYDs22ymyh45e1cXWkGp5QuqY1EP1JoOcSNjELa5+SE7JITF3N6NrlCX6WM/
+# H2x25toqlabwjrqjzFGI3Z/PTURHDgnKQhtrpm0SXMUvISfVDSrjfyEqo+r49ImP
+# oWOOXphkxNYH+I+beZQs5cJRXkqcnHtuMu5oVzWCoQutgCBcJ+2WoarJMuWvSkSq
+# BL3CP7Sm2CBkPeICocXsXdsZXB5H3uFQRMfyJz8ZS2iFV4DV//VfcyYVqjBJ/W26
+# cdgR4iwllvFQY6rNQTSPHPN9uM5XzEJH5GDPfrMie+jfRTSYVjiznm4KK92FNKg3
+# Qj7fI5A1+FEIsT1ww8V6zDaMiWchb7/EAkpGHN/5Ud8vljfWbeAg6KFQ3CelpgBQ
+# p9cJTz3RGoINN7e1E5nOdOYeSdeoAhBxjaeShs9zUrohppsEgdfypEKHjC820Wz5
+# mEocN9194sk18JLOA31157oY2VVUnKmX5cXuJfrKiTgOebtIEkdnTc0tJcdYsXNz
+# 9lfx0PuhggMgMIIDHAYJKoZIhvcNAQkGMYIDDTCCAwkCAQEwdzBjMQswCQYDVQQG
+# EwJVUzEXMBUGA1UEChMORGlnaUNlcnQsIEluYy4xOzA5BgNVBAMTMkRpZ2lDZXJ0
+# IFRydXN0ZWQgRzQgUlNBNDA5NiBTSEEyNTYgVGltZVN0YW1waW5nIENBAhALrma8
+# Wrp/lYfG+ekE4zMEMA0GCWCGSAFlAwQCAQUAoGkwGAYJKoZIhvcNAQkDMQsGCSqG
+# SIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQxMDI5MjE0NDEwWjAvBgkqhkiG9w0B
+# CQQxIgQg0DDuo+Q/agbHq5fwMcgOhZjC/qkLi3O5EEeOtiFVK3cwDQYJKoZIhvcN
+# AQEBBQAEggIAJi3PKc34pOS57XYbtIwfEH3jGIC1hBwImdAjeiny5XCUzDJ+MCb/
+# kasK1TsiIf5+O4B8SPSPQsi+9nFHmpyxnO+KFiPM6qv0pI2Uy3VUofLd+J0EiL7A
+# IwwR2Q4nZcQwt5sUX47QiW/NM9+95zuSv3isZp0gEqkgRlm0D1oswOl9wbsRQFzl
+# gHyemdiDFdNf4MoEZhAKa5w41uJVAKfm5Q41l6sXDLNTOkw+cggwHKnaBiA74+Hi
+# HgDGtE9fdQWBhn577tuoHL7YP2ta1b/eYIVuchukub38wTps1KX8riaVbYGNt5M2
+# v9AfiT4MbpzOPZXFbgW6oyztxCS/pXQLYESytIY4M4SUtA4MxsD2bFMJjwcA9IZL
+# 7XJklq+q+02kcvzZKLIK6dcfxfBsy714VVZpc7CAlAGT5JjsYYL3HrcQ83fFlENv
+# a8ley6s/fMLtw0nZXC46kZfHBBRO2Um7wSQsf6k9TRDt+/vF+aNo1jpRDu0Jlw8o
+# Q0h4udyE/8BTLl88Sv7cttVk7E//2vA2NjUy74n9UcOMx4DbwlSa7xCP2V/j7+uJ
+# sDFbogq46ONf26yMs5V2PkHObaYovCfWp2qSm6ArwJOqQac0RbpndFCEwWAt4iss
+# oSdMIYFkh0U4BPdavX84Tl9AjmZleEZ9Pw+lqd9JAxe4xVKDXHdG1po=
 # SIG # End signature block

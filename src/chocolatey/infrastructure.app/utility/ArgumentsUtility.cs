@@ -55,6 +55,16 @@ namespace chocolatey.infrastructure.app.utility
 
         public static IEnumerable<string> DecryptPackageArgumentsFile(IFileSystem fileSystem, string id, string version)
         {
+            return DecryptPackageArgumentsFile(fileSystem, id, version, redactSensitiveArguments: true, throwOnFailure: false);
+        }
+
+        public static IEnumerable<string> DecryptPackageArgumentsFile(
+            IFileSystem fileSystem,
+            string id,
+            string version,
+            bool redactSensitiveArguments,
+            bool throwOnFailure)
+        {
             var argumentsPath = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, ".chocolatey", "{0}.{1}".FormatWith(id, version));
             var argumentsFile = fileSystem.CombinePaths(argumentsPath, ".arguments");
 
@@ -79,11 +89,30 @@ namespace chocolatey.infrastructure.app.utility
                 yield break;
             }
 
-            // The following code is borrowed from the Chocolatey codebase, should
-            // be extracted to a separate location in choco executable so we can re-use it.
-            var packageArgumentsUnencrypted = arguments.Contains(" --") && arguments.ToStringSafe().Length > 4
-                ? arguments
-                : NugetEncryptionUtility.DecryptString(arguments);
+            string packageArgumentsUnencrypted = string.Empty;
+
+            try
+            {
+                packageArgumentsUnencrypted = arguments.Contains(" --") && arguments.ToStringSafe().Length > 4
+                    ? arguments
+                    : NugetEncryptionUtility.DecryptString(arguments);
+
+            }
+            catch (Exception ex)
+            {
+                var firstMessage = "There was an error attempting to decrypt the contents of the .arguments file for version '{0}' of package '{1}'.  See log file for more information.".FormatWith(version, id);
+                var secondMessage = "We failed to decrypt '{0}'. Error from decryption:{1}  '{2}'".FormatWith(argumentsFile, Environment.NewLine, ex.Message.Trim());
+
+                if (throwOnFailure)
+                {
+                    "chocolatey".Log().Error(firstMessage);
+                    "chocolatey".Log().Error(secondMessage);
+                    throw;
+                }
+
+                "chocolatey".Log().Debug(firstMessage);
+                "chocolatey".Log().Debug(secondMessage);
+            }
 
             // Lets do a global check first to see if there are any sensitive arguments
             // before we filter out the values used later.
@@ -102,7 +131,7 @@ namespace chocolatey.infrastructure.app.utility
                 var optionName = packageArgumentSplit[0].ToStringSafe();
                 var optionValue = string.Empty;
 
-                if (packageArgumentSplit.Length == 2 && isSensitiveArgument)
+                if (packageArgumentSplit.Length == 2 && isSensitiveArgument && redactSensitiveArguments)
                 {
                     optionValue = "[REDACTED ARGUMENT]";
                 }

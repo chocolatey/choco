@@ -148,6 +148,19 @@ namespace chocolatey.infrastructure.app.nuget
                     {
                         var takeNumber = GetTakeAmount(configuration);
 
+                        if (takeNumber != 30)
+                        {
+                            var warning = "The page size has been specified to be {0:N0} packages. There are known issues with some repositories when you use a page size other than 30.".FormatWith(takeNumber);
+                            if (configuration.RegularOutput)
+                            {
+                                "chocolatey".Log().Warn(warning);
+                            }
+                            else
+                            {
+                                "chocolatey".Log().Debug(warning);
+                            }
+                        }
+
                         var partResults = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadataIdOnly());
                         var latestResults = new List<IPackageSearchMetadata>();
 
@@ -305,13 +318,10 @@ namespace chocolatey.infrastructure.app.nuget
 
         private static int GetTakeAmount(ChocolateyConfiguration configuration)
         {
-            // We calculate the amount of items we take at the same time, while making
-            // sure to take the minimum value of 30 packages which we know is a safe value
-            // to take from CCR and other feeds to minimize any issues that can happen.
 
             if (configuration.ListCommand.Page.HasValue || configuration.ListCommand.ExplicitPageSize)
             {
-                return Math.Min(configuration.ListCommand.PageSize, 30);
+                return configuration.ListCommand.PageSize;
             }
 
             return 30;

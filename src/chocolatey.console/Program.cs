@@ -16,9 +16,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Microsoft.Win32;
 using chocolatey.infrastructure.information;
 using chocolatey.infrastructure.app;
@@ -270,6 +270,7 @@ namespace chocolatey.console
                 );
         }
 
+        [Conditional("DEBUG")]
         private static void PauseIfDebug()
         {
 #if DEBUG

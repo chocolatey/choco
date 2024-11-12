@@ -1,4 +1,4 @@
-﻿Describe 'Install-ChocolateyPath helper function tests' -Tags Cmdlets {
+﻿Describe 'Install-ChocolateyPath helper function tests' -Tags InstallChocolateyPath, Cmdlets {
     BeforeAll {
         Initialize-ChocolateyTestInstall
 
@@ -10,7 +10,36 @@
         Remove-Module "chocolateyInstaller" -Force
     }
 
-    Context 'Adding and removing PATH values' -ForEach @(
+    Context 'Unit tests' -Tags WhatIf -ForEach @(
+        @{ Scope = 'Process' }
+        @{ Scope = 'User' }
+        @{ Scope = 'Machine' }
+    ) {
+        BeforeAll {
+            $Preamble = [scriptblock]::Create("Import-Module '$testLocation\helpers\chocolateyInstaller.psm1' -Global")
+        }
+
+        It 'stores the value <_> in the desired PATH scope' -TestCases @("C:\test", "C:\tools") {
+            $Command = [scriptblock]::Create("Install-ChocolateyPath -Path '$_' -Scope $Scope -WhatIf")
+            
+            $results = Get-WhatIfResult -Preamble $Preamble -Command $Command
+            $results.WhatIf[0] | Should -BeExactly "What if: Performing the operation ""Set $Scope environment variable"" on target ""PATH""." -Because $results.Output
+
+            if ($Scope -ne 'Process') {
+                $results.WhatIf[1] | Should -BeExactly 'What if: Performing the operation "Notify system of changes" on target "Environment variables".' -Because $results.Output
+                $results.WhatIf[2] | Should -BeExactly 'What if: Performing the operation "Refresh all environment variables" on target "Current process".' -Because $results.Output
+            }
+        }
+
+        It 'skips adding the value if it is already present' {
+            $targetPathEntry = [Environment]::GetEnvironmentVariable('PATH', $Scope) -split ';' | Select-Object -Last 1
+            $Command = [scriptblock]::Create("Install-ChocolateyPath -Path '$targetPathEntry' -Scope $Scope -WhatIf")
+            $result = Get-WhatIfResult -Preamble $Preamble -Command $Command
+            $result.WhatIf | Should -BeNullOrEmpty -Because "we should skip adding values that already exist. Output:`n$($result.Output)"
+        }
+    }
+
+    Context 'Adding and removing PATH values' -Tag VMOnly -ForEach @(
         @{ Scope = 'Process' }
         @{ Scope = 'User' }
         @{ Scope = 'Machine' }
@@ -55,7 +84,7 @@
     }
 }
 
-Describe 'Install-ChocolateyPath end-to-end tests with add-path package modifying <Scope> PATH' -Tags Cmdlet -ForEach @(
+Describe 'Install-ChocolateyPath end-to-end tests with add-path package modifying <Scope> PATH' -Tags Cmdlet, UninstallChocolateyPath, VMOnly -ForEach @(
     @{ Scope = 'User' }
     @{ Scope = 'Machine' }
 ) {

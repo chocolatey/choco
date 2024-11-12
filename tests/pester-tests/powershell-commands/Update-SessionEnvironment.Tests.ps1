@@ -1,9 +1,19 @@
-﻿Describe 'Update-SessionEnvironment helper function tests' -Tag Cmdlets {
+﻿Describe 'Update-SessionEnvironment helper function tests' -Tag UpdateSessionEnvironment, Cmdlets {
     BeforeAll {
         Initialize-ChocolateyTestInstall
 
         $testLocation = Get-ChocolateyTestLocation
         Import-Module "$testLocation\helpers\chocolateyInstaller.psm1"
+    }
+    
+    Context 'Unit tests' -Tag WhatIf {
+        It 'refreshes the current session environment variables' {
+            $Preamble = [scriptblock]::Create("Import-Module '$testLocation\helpers\chocolateyInstaller.psm1'")
+            $Command = [scriptblock]::Create("Update-SessionEnvironment -WhatIf")
+            
+            $results = Get-WhatIfResult -Preamble $Preamble -Command $Command
+            $results.WhatIf | Should -BeExactly 'What if: Performing the operation "Refresh all environment variables" on target "Current process".'
+        }
     }
 
     Context 'Refreshing environment' {

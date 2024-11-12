@@ -2,6 +2,7 @@
   "solution": {
     "path": "chocolatey.sln",
     "projects": [
+      "Chocolatey.PowerShell\\Chocolatey.PowerShell.csproj",
       "chocolatey.console\\chocolatey.console.csproj",
       "chocolatey.resources\\chocolatey.resources.csproj",
       "chocolatey.tests.integration\\chocolatey.tests.integration.csproj",

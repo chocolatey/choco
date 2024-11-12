@@ -22,6 +22,8 @@ object Chocolatey : BuildType({
     id = AbsoluteId("Chocolatey")
     name = "Chocolatey CLI (Built with Unit Tests)"
 
+    templates(AbsoluteId("SlackNotificationTemplate"))
+
     artifactRules = """
     """.trimIndent()
 
@@ -86,12 +88,15 @@ object Chocolatey : BuildType({
 
     requirements {
         doesNotExist("docker.server.version")
+        doesNotContain("teamcity.agent.name", "Docker")
     }
 })
 
 object ChocolateySchd : BuildType({
     id = AbsoluteId("ChocolateySchd")
     name = "Chocolatey CLI (Scheduled Integration Testing)"
+
+    templates(AbsoluteId("SlackNotificationTemplate"))
 
     artifactRules = """
     """.trimIndent()
@@ -150,12 +155,15 @@ object ChocolateySchd : BuildType({
 
     requirements {
         doesNotExist("docker.server.version")
+        doesNotContain("teamcity.agent.name", "Docker")
     }
 })
 
 object ChocolateyQA : BuildType({
     id = AbsoluteId("ChocolateyQA")
     name = "Chocolatey CLI (SonarQube)"
+
+    templates(AbsoluteId("SlackNotificationTemplate"))
 
     artifactRules = """
     """.trimIndent()
@@ -216,12 +224,15 @@ object ChocolateyQA : BuildType({
 
     requirements {
         doesNotExist("docker.server.version")
+        doesNotContain("teamcity.agent.name", "Docker")
     }
 })
 
 object ChocolateySign : BuildType({
     id = AbsoluteId("ChocolateySign")
     name = "Chocolatey CLI (Script Signing)"
+
+    templates(AbsoluteId("SlackNotificationTemplate"))
 
     artifactRules = """
     """.trimIndent()
@@ -286,12 +297,15 @@ object ChocolateySign : BuildType({
 
     requirements {
         doesNotExist("docker.server.version")
+        doesNotContain("teamcity.agent.name", "Docker")
     }
 })
 
 object ChocolateyDockerWin : BuildType({
     id = AbsoluteId("ChocolateyDockerWin")
     name = "Docker (Windows)"
+
+    templates(AbsoluteId("SlackNotificationTemplate"))
 
     params {
         // TeamCity has suggested "${Chocolatey.depParamRefs.buildNumber}"
@@ -340,12 +354,15 @@ object ChocolateyDockerWin : BuildType({
     requirements {
         contains("docker.server.osType", "windows")
         exists("docker.server.version")
+        contains("teamcity.agent.name", "Docker")
     }
 })
 
 object ChocolateyPosix : BuildType({
     id = AbsoluteId("ChocolateyPosix")
     name = "Docker (Linux)"
+
+    templates(AbsoluteId("SlackNotificationTemplate"))
 
     params {
         param("env.CAKE_NUGET_SOURCE", "") // The Cake version we use has issues with authing to our private source on Linux
@@ -452,5 +469,6 @@ object ChocolateyPosix : BuildType({
     requirements {
         contains("docker.server.osType", "linux")
         exists("docker.server.version")
+        contains("teamcity.agent.name", "Docker")
     }
 })

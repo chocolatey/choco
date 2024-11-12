@@ -1925,6 +1925,11 @@ ATTENTION: You must take manual action to remove {1} from
                 return;
             }
 
+            if (!_fileSystem.DirectoryExists(packageDirectory))
+            {
+                return;
+            }
+
             if (packageDirectory.IsEqualTo(ApplicationParameters.InstallLocation) || packageDirectory.IsEqualTo(ApplicationParameters.PackagesLocation))
             {
                 packageResult.Messages.Add(

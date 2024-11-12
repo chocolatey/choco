@@ -12,7 +12,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v4.1.0
+      - uses: actions/stale@v9
         id: stale
         with:
           days-before-stale: 30
@@ -24,9 +24,10 @@ jobs:
           only-labels: '0 - Waiting on User'
           close-issue-label: "No Response / Stale"
           close-pr-label: "No Response / Stale"
-          exempt-issue-labels: 'Security / CVE'
-          exempt-pr-labels: 'Security / CVE'
-          labels-to-remove-when-unstale: '0 - Wating on User,Pending closure'
+          exempt-issue-labels: 'Security / CVE,2 - Working,3 - Review'
+          exempt-pr-labels: 'Security / CVE,2 - Working,3 - Review'
+          labels-to-remove-when-unstale: '0 - Waiting on User,Pending closure'
+          remove-stale-when-updated: true
           stale-issue-message: |
             Is this still relevant? If so, what is blocking it? Is there anything you can do to help move it forward?
             This issue will be closed in 14 days if it continues to be inactive.

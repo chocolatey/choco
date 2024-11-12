@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>failingdependency</id>
+    <version>1.0.0</version>
+    <title>dependencyfailure (Install)</title>
+    <authors>__REPLACE_AUTHORS_OF_SOFTWARE_COMMA_SEPARATED__</authors>
+    <projectUrl>https://_Software_Location_REMOVE_OR_FILL_OUT_</projectUrl>
+    <tags>dependencyfailure admin SPACE_SEPARATED</tags>
+    <summary>Package that fails to install. Used as part of dependency tree.</summary>
+    <description>Package that fails to install. Used as part of dependency tree.</description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

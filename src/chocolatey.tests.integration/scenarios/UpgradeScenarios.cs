@@ -28,6 +28,10 @@ using NuGet.Configuration;
 using NuGet.Packaging;
 using NUnit.Framework;
 using FluentAssertions;
+using WireMock.Server;
+using WireMock.RequestBuilders;
+using WireMock.ResponseBuilders;
+using WireMock.FluentAssertions;
 
 namespace chocolatey.tests.integration.scenarios
 {
@@ -2946,6 +2950,10 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        /// <summary>
+        /// This test suite tests upgrading isdependency from 1.0.0 while hasdependency is pinned to a version that does not allow
+        /// for isdependency to upgrade to the latest available in the source.
+        /// </summary>
         public class When_upgrading_a_dependency_with_parent_being_pinned_and_depends_on_a_range_less_than_upgrade_version : ScenariosBase
         {
             public override void Context()
@@ -4237,6 +4245,7 @@ namespace chocolatey.tests.integration.scenarios
                     .WhoseValue.Should().NotContain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for upgradepackage 1.1.0"));
             }
         }
+        
         public class When_upgrading_an_existing_package_with_uppercase_id : ScenariosBase
         {
             private PackageResult _packageResult;
@@ -4785,7 +4794,6 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-
         public class When_upgrading_a_package_with_beforeModify_script_with_dependencies_with_beforeModify_scripts_and_hooks : ScenariosBase
         {
             private const string TargetPackageName = "hasdependencywithbeforemodify";
@@ -4951,6 +4959,414 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_not_have_warning_package_result()
             {
                 Results.Should().AllSatisfy(r => r.Value.Warning.Should().BeFalse());
+            }
+        }
+
+        [WindowsOnly]
+        public class When_upgrading_a_package_when_there_is_an_exception_thrown_from_server_when_downloading_nupkg_file : ScenariosBase
+        {
+            private WireMockServer _wireMockServer;
+
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+
+                // Start WireMockServer using a random port
+                _wireMockServer = WireMockServer.Start();
+
+                // Force outgoing Chocolatey CLI HTTP requests to go to WireMock.NET Server
+                Configuration.Sources = $"{_wireMockServer.Url}/api/v2/";
+
+                // Set configuration to prevent re-use of cached HTTP Requests
+                Configuration.CacheExpirationInMinutes = -1;
+
+                // The WireMock.Net Server is setup to reply to requests made when _NOT_
+                // using repository optimizations, so let's make sure that we are using
+                // that configuration explicitly.  It was found that when running all
+                // the integration tests together, this value could be set to true
+                // elsewhere, which then causes tests here to fail. This is far from ideal,
+                // and the Configuration should have been reset when starting this scenario
+                // but for now, let's explicitly set to false, as this is what we know
+                // the WireMock.Net server will respond with.
+                Configuration.Features.UsePackageRepositoryOptimizations = false;
+
+                _wireMockServer.Given(
+                    Request.Create().WithPath("/api/v2/").UsingGet()
+                )
+                .RespondWith(
+                    Response.Create()
+                    .WithStatusCode(200)
+                        .WithHeader("Content-Type", "application/xml;charset=utf-8")
+                        .WithHeader("DataServiceVersion", "1.0;")
+                        .WithBody(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<service xml:base=""{0}/api/v2/"" xmlns:atom=""http://www.w3.org/2005/Atom"" xmlns:app=""http://www.w3.org/2007/app"" xmlns=""http://www.w3.org/2007/app"">
+<workspace>
+<atom:title>Default</atom:title>
+<collection href=""Packages"">
+<atom:title>Packages</atom:title>
+</collection>
+</workspace>
+</service>".FormatWith(_wireMockServer.Url))
+                );
+
+                _wireMockServer.Given(
+                    Request.Create().WithPath("/api/v2/$metadata").UsingGet()
+                )
+                .RespondWith(
+                    Response.Create()
+                    .WithStatusCode(200)
+                    .WithHeader("Content-Type", "application/xml;charset=utf-8")
+                    .WithHeader("DataServiceVersion", "2.0;")
+                    .WithBody(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<edmx:Edmx Version=""1.0"" xmlns:edmx=""http://schemas.microsoft.com/ado/2007/06/edmx"">
+  <edmx:DataServices xmlns:m=""http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"" m:DataServiceVersion=""2.0"">
+    <Schema Namespace=""CCR.Website"" xmlns:d=""http://schemas.microsoft.com/ado/2007/08/dataservices"" xmlns:m=""http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"" xmlns=""http://schemas.microsoft.com/ado/2006/04/edm"">
+      <EntityType Name=""V2FeedPackage"" m:HasStream=""true"">
+        <Key>
+          <PropertyRef Name=""Id"" />
+          <PropertyRef Name=""Version"" />
+        </Key>
+        <Property Name=""Id"" Type=""Edm.String"" Nullable=""false"" m:FC_TargetPath=""SyndicationTitle"" m:FC_ContentKind=""text"" m:FC_KeepInContent=""false"" />
+        <Property Name=""Version"" Type=""Edm.String"" Nullable=""false"" />
+        <Property Name=""Title"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""Summary"" Type=""Edm.String"" Nullable=""true"" m:FC_TargetPath=""SyndicationSummary"" m:FC_ContentKind=""text"" m:FC_KeepInContent=""false"" />
+        <Property Name=""Description"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""Tags"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""Authors"" Type=""Edm.String"" Nullable=""true"" m:FC_TargetPath=""SyndicationAuthorName"" m:FC_ContentKind=""text"" m:FC_KeepInContent=""false"" />
+        <Property Name=""Copyright"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""Created"" Type=""Edm.DateTime"" Nullable=""false"" />
+        <Property Name=""Dependencies"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""DownloadCount"" Type=""Edm.Int32"" Nullable=""false"" />
+        <Property Name=""VersionDownloadCount"" Type=""Edm.Int32"" Nullable=""false"" />
+        <Property Name=""GalleryDetailsUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""ReportAbuseUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""IconUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""IsLatestVersion"" Type=""Edm.Boolean"" Nullable=""false"" />
+        <Property Name=""IsAbsoluteLatestVersion"" Type=""Edm.Boolean"" Nullable=""false"" />
+        <Property Name=""IsPrerelease"" Type=""Edm.Boolean"" Nullable=""false"" />
+        <Property Name=""Language"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""LastUpdated"" Type=""Edm.DateTime"" Nullable=""false"" m:FC_TargetPath=""SyndicationUpdated"" m:FC_ContentKind=""text"" m:FC_KeepInContent=""false"" />
+        <Property Name=""Published"" Type=""Edm.DateTime"" Nullable=""false"" />
+        <Property Name=""LicenseUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""RequireLicenseAcceptance"" Type=""Edm.Boolean"" Nullable=""false"" />
+        <Property Name=""PackageHash"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""PackageHashAlgorithm"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""PackageSize"" Type=""Edm.Int64"" Nullable=""false"" />
+        <Property Name=""ProjectUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""ReleaseNotes"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""ProjectSourceUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""PackageSourceUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""DocsUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""MailingListUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""BugTrackerUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""IsApproved"" Type=""Edm.Boolean"" Nullable=""false"" />
+        <Property Name=""PackageStatus"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""PackageSubmittedStatus"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""PackageTestResultUrl"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""PackageTestResultStatus"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""PackageTestResultStatusDate"" Type=""Edm.DateTime"" Nullable=""true"" />
+        <Property Name=""PackageValidationResultStatus"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""PackageValidationResultDate"" Type=""Edm.DateTime"" Nullable=""true"" />
+        <Property Name=""PackageCleanupResultDate"" Type=""Edm.DateTime"" Nullable=""true"" />
+        <Property Name=""PackageReviewedDate"" Type=""Edm.DateTime"" Nullable=""true"" />
+        <Property Name=""PackageApprovedDate"" Type=""Edm.DateTime"" Nullable=""true"" />
+        <Property Name=""PackageReviewer"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""IsDownloadCacheAvailable"" Type=""Edm.Boolean"" Nullable=""false"" />
+        <Property Name=""DownloadCacheStatus"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""DownloadCacheDate"" Type=""Edm.DateTime"" Nullable=""true"" />
+        <Property Name=""DownloadCache"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""PackageScanStatus"" Type=""Edm.String"" Nullable=""true"" />
+        <Property Name=""PackageScanResultDate"" Type=""Edm.DateTime"" Nullable=""true"" />
+        <Property Name=""PackageScanFlagResult"" Type=""Edm.String"" Nullable=""true"" />
+      </EntityType>
+      <EntityContainer Name=""FeedContext_x0060_1"" m:IsDefaultEntityContainer=""true"">
+        <EntitySet Name=""Packages"" EntityType=""CCR.Website.V2FeedPackage"" />
+        <FunctionImport Name=""Packages"" EntitySet=""Packages"" ReturnType=""Collection(CCR.Website.V2FeedPackage)"" m:HttpMethod=""GET"" />
+        <FunctionImport Name=""Search"" EntitySet=""Packages"" ReturnType=""Collection(CCR.Website.V2FeedPackage)"" m:HttpMethod=""GET"">
+          <Parameter Name=""searchTerm"" Type=""Edm.String"" Mode=""In"" />
+          <Parameter Name=""targetFramework"" Type=""Edm.String"" Mode=""In"" />
+          <Parameter Name=""includePrerelease"" Type=""Edm.Boolean"" Mode=""In"" />
+        </FunctionImport>
+        <FunctionImport Name=""FindPackagesById"" EntitySet=""Packages"" ReturnType=""Collection(CCR.Website.V2FeedPackage)"" m:HttpMethod=""GET"">
+          <Parameter Name=""id"" Type=""Edm.String"" Mode=""In"" />
+        </FunctionImport>
+        <FunctionImport Name=""GetUpdates"" EntitySet=""Packages"" ReturnType=""Collection(CCR.Website.V2FeedPackage)"" m:HttpMethod=""GET"">
+          <Parameter Name=""packageIds"" Type=""Edm.String"" Mode=""In"" />
+          <Parameter Name=""versions"" Type=""Edm.String"" Mode=""In"" />
+          <Parameter Name=""includePrerelease"" Type=""Edm.Boolean"" Mode=""In"" />
+          <Parameter Name=""includeAllVersions"" Type=""Edm.Boolean"" Mode=""In"" />
+          <Parameter Name=""targetFrameworks"" Type=""Edm.String"" Mode=""In"" />
+        </FunctionImport>
+      </EntityContainer>
+    </Schema>
+  </edmx:DataServices>
+</edmx:Edmx>")
+                );
+
+                _wireMockServer.Given(
+                    Request.Create()
+                    .WithPath("/api/v2/FindPackagesById()")
+                    .UsingGet()
+                )
+                .RespondWith(
+                    Response.Create()
+                    .WithStatusCode(200)
+                    .WithHeader("Content-Type", "application/atom+xml;charset=utf-8")
+                    .WithHeader("DataServiceVersion", "2.0;")
+                    .WithBody(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<feed xml:base=""{0}/api/v2/"" xmlns:d=""http://schemas.microsoft.com/ado/2007/08/dataservices"" xmlns:m=""http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"" xmlns=""http://www.w3.org/2005/Atom"">
+  <title type=""text"">Packages</title>
+  <id>{0}/api/v2/Packages</id>
+  <updated>2024-08-13T21:56:43Z</updated>
+  <link rel=""self"" title=""Packages"" href=""Packages"" />
+  <entry>
+    <id>{0}/api/v2/Packages(Id='upgradepackage',Version='2.0.0')</id>
+    <title type=""text"">upgradepackage</title>
+    <summary type=""text"">A package used to test upgrading of packages.</summary>
+    <updated>2024-08-08T05:11:50Z</updated>
+    <author>
+      <name>Chocolatey Software, Inc.</name>
+    </author>
+    <link rel=""edit-media"" title=""V2FeedPackage"" href=""Packages(Id='upgradepackage',Version='2.0.0')/$value"" />
+    <link rel=""edit"" title=""V2FeedPackage"" href=""Packages(Id='upgradepackage',Version='2.0.0')"" />
+    <category term=""CCR.Website.V2FeedPackage"" scheme=""http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"" />
+    <content type=""application/zip"" src=""{0}/api/v2/package/upgradepackage/2.0.0"" />
+    <m:properties xmlns:m=""http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"" xmlns:d=""http://schemas.microsoft.com/ado/2007/08/dataservices"">
+      <d:Version>2.0.0</d:Version>
+      <d:Title>Upgrade Package</d:Title>
+      <d:Description>My Description!</d:Description>
+      <d:Tags>a b c d</d:Tags>
+      <d:Copyright>Chocolatey Software, Inc.</d:Copyright>
+      <d:Created m:type=""Edm.DateTime"">2024-08-07T00:06:31.233</d:Created>
+      <d:Dependencies></d:Dependencies>
+      <d:DownloadCount m:type=""Edm.Int32"">289183</d:DownloadCount>
+      <d:VersionDownloadCount m:type=""Edm.Int32"">63</d:VersionDownloadCount>
+      <d:GalleryDetailsUrl>{0}/packages/upgradepackage/2.0.0</d:GalleryDetailsUrl>
+      <d:ReportAbuseUrl>{0}/package/ReportAbuse/upgradepackage/2.0.0</d:ReportAbuseUrl>
+      <d:IconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</d:IconUrl>
+      <d:IsLatestVersion m:type=""Edm.Boolean"">true</d:IsLatestVersion>
+      <d:IsAbsoluteLatestVersion m:type=""Edm.Boolean"">false</d:IsAbsoluteLatestVersion>
+      <d:IsPrerelease m:type=""Edm.Boolean"">false</d:IsPrerelease>
+      <d:Language></d:Language>
+      <d:Published m:type=""Edm.DateTime"">2024-08-07T00:06:31.233</d:Published>
+      <d:LicenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</d:LicenseUrl>
+      <d:RequireLicenseAcceptance m:type=""Edm.Boolean"">false</d:RequireLicenseAcceptance>
+      <d:PackageHash>GUXyvEC3y5y5S371LWHRbkEQ+fBxHAcm7d+/fweK+FYx1N2xMSlph+NGLyC3MEvecWY+EXNgRF7L7Km/u0oS8g==</d:PackageHash>
+      <d:PackageHashAlgorithm>SHA512</d:PackageHashAlgorithm>
+      <d:PackageSize m:type=""Edm.Int64"">5358</d:PackageSize>
+      <d:ProjectUrl>https://github.com/chocolatey/choco</d:ProjectUrl>
+      <d:ReleaseNotes>See all - https://docs.chocolatey.org/en-us/choco/release-notes</d:ReleaseNotes>
+      <d:ProjectSourceUrl></d:ProjectSourceUrl>
+      <d:PackageSourceUrl>https://github.com/chocolatey/choco/tree/develop/nuspec/chocolatey/chocolatey</d:PackageSourceUrl>
+      <d:DocsUrl>https://docs.chocolatey.org/en-us/</d:DocsUrl>
+      <d:MailingListUrl>https://groups.google.com/forum/#!forum/chocolatey</d:MailingListUrl>
+      <d:BugTrackerUrl>https://github.com/chocolatey/choco/issues</d:BugTrackerUrl>
+      <d:IsApproved m:type=""Edm.Boolean"">true</d:IsApproved>
+      <d:PackageStatus>Approved</d:PackageStatus>
+      <d:PackageSubmittedStatus>Ready</d:PackageSubmittedStatus>
+      <d:PackageTestResultUrl></d:PackageTestResultUrl>
+      <d:PackageTestResultStatus>Exempted</d:PackageTestResultStatus>
+      <d:PackageTestResultStatusDate m:type=""Edm.DateTime"" m:null=""true""></d:PackageTestResultStatusDate>
+      <d:PackageValidationResultStatus>Passing</d:PackageValidationResultStatus>
+      <d:PackageValidationResultDate m:type=""Edm.DateTime"">2024-08-07T02:36:24.62</d:PackageValidationResultDate>
+      <d:PackageCleanupResultDate m:type=""Edm.DateTime"" m:null=""true""></d:PackageCleanupResultDate>
+      <d:PackageReviewedDate m:type=""Edm.DateTime"">2024-08-07T03:58:15.683</d:PackageReviewedDate>
+      <d:PackageApprovedDate m:type=""Edm.DateTime"">2024-08-07T03:58:15.683</d:PackageApprovedDate>
+      <d:PackageReviewer></d:PackageReviewer>
+      <d:IsDownloadCacheAvailable m:type=""Edm.Boolean"">false</d:IsDownloadCacheAvailable>
+      <d:DownloadCacheStatus>Checked</d:DownloadCacheStatus>
+      <d:DownloadCacheDate m:type=""Edm.DateTime"">2024-08-07T04:59:31.147</d:DownloadCacheDate>
+      <d:DownloadCache></d:DownloadCache>
+      <d:PackageScanStatus>NotFlagged</d:PackageScanStatus>
+      <d:PackageScanResultDate m:type=""Edm.DateTime"">2024-08-07T03:58:15.683</d:PackageScanResultDate>
+      <d:PackageScanFlagResult>None</d:PackageScanFlagResult>
+    </m:properties>
+  </entry>
+</feed>".FormatWith(_wireMockServer.Url))
+                );
+
+                _wireMockServer.Given(
+                    Request.Create()
+                    .WithPath("/api/v2/Packages(Id='upgradepackage',Version='2.0.0')")
+                    .UsingGet()
+                )
+                .RespondWith(
+                    Response.Create()
+                    .WithStatusCode(200)
+                    .WithHeader("Content-Type", "application/xml;charset=utf-8")
+                    .WithHeader("DataServiceVersion", "2.0;")
+                    .WithBody(@"<?xml version=""1.0"" encoding=""utf-8"" standalone=""yes""?>
+<entry>
+  <id>{0}}/api/v2/Packages(Id='upgradepackage',Version='2.0.0')</id>
+  <title type=""text"">upgradepackage</title>
+  <summary type=""text"">A package used to test upgrading of packages.</summary>
+  <updated>2024-08-08T05:11:50Z</updated>
+  <author>
+    <name>Chocolatey Software, Inc.</name>
+  </author>
+  <link rel=""edit-media"" title=""V2FeedPackage"" href=""Packages(Id='upgradepackage',Version='2.0.0')/$value"" />
+  <link rel=""edit"" title=""V2FeedPackage"" href=""Packages(Id='upgradepackage',Version='2.0.0')"" />
+  <category term=""CCR.Website.V2FeedPackage"" scheme=""http://schemas.microsoft.com/ado/2007/08/dataservices/scheme"" />
+  <content type=""application/zip"" src=""{0}/api/v2/package/upgradepackage/2.0.0"" />
+  <m:properties xmlns:m=""http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"" xmlns:d=""http://schemas.microsoft.com/ado/2007/08/dataservices"">
+    <d:Version>2.0.0</d:Version>
+    <d:Title>Upgrade Package</d:Title>
+    <d:Description>My Description!</d:Description>
+    <d:Tags>a b c d</d:Tags>
+    <d:Copyright>Chocolatey Software, Inc.</d:Copyright>
+    <d:Created m:type=""Edm.DateTime"">2024-08-07T00:06:31.233</d:Created>
+    <d:Dependencies></d:Dependencies>
+    <d:DownloadCount m:type=""Edm.Int32"">289183</d:DownloadCount>
+    <d:VersionDownloadCount m:type=""Edm.Int32"">63</d:VersionDownloadCount>
+    <d:GalleryDetailsUrl>{0}/packages/upgradepackage/2.0.0</d:GalleryDetailsUrl>
+    <d:ReportAbuseUrl>{0}/package/ReportAbuse/upgradepackage/2.0.0</d:ReportAbuseUrl>
+    <d:IconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</d:IconUrl>
+    <d:IsLatestVersion m:type=""Edm.Boolean"">true</d:IsLatestVersion>
+    <d:IsAbsoluteLatestVersion m:type=""Edm.Boolean"">false</d:IsAbsoluteLatestVersion>
+    <d:IsPrerelease m:type=""Edm.Boolean"">false</d:IsPrerelease>
+    <d:Language></d:Language>
+    <d:Published m:type=""Edm.DateTime"">2024-08-07T00:06:31.233</d:Published>
+    <d:LicenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</d:LicenseUrl>
+    <d:RequireLicenseAcceptance m:type=""Edm.Boolean"">false</d:RequireLicenseAcceptance>
+    <d:PackageHash>GUXyvEC3y5y5S371LWHRbkEQ+fBxHAcm7d+/fweK+FYx1N2xMSlph+NGLyC3MEvecWY+EXNgRF7L7Km/u0oS8g==</d:PackageHash>
+    <d:PackageHashAlgorithm>SHA512</d:PackageHashAlgorithm>
+    <d:PackageSize m:type=""Edm.Int64"">5358</d:PackageSize>
+    <d:ProjectUrl>https://github.com/chocolatey/choco</d:ProjectUrl>
+    <d:ReleaseNotes>See all - https://docs.chocolatey.org/en-us/choco/release-notes</d:ReleaseNotes>
+    <d:ProjectSourceUrl></d:ProjectSourceUrl>
+    <d:PackageSourceUrl>https://github.com/chocolatey/choco/tree/develop/nuspec/chocolatey/chocolatey</d:PackageSourceUrl>
+    <d:DocsUrl>https://docs.chocolatey.org/en-us/</d:DocsUrl>
+    <d:MailingListUrl>https://groups.google.com/forum/#!forum/chocolatey</d:MailingListUrl>
+    <d:BugTrackerUrl>https://github.com/chocolatey/choco/issues</d:BugTrackerUrl>
+    <d:IsApproved m:type=""Edm.Boolean"">true</d:IsApproved>
+    <d:PackageStatus>Approved</d:PackageStatus>
+    <d:PackageSubmittedStatus>Ready</d:PackageSubmittedStatus>
+    <d:PackageTestResultUrl></d:PackageTestResultUrl>
+    <d:PackageTestResultStatus>Exempted</d:PackageTestResultStatus>
+    <d:PackageTestResultStatusDate m:type=""Edm.DateTime"" m:null=""true""></d:PackageTestResultStatusDate>
+    <d:PackageValidationResultStatus>Passing</d:PackageValidationResultStatus>
+    <d:PackageValidationResultDate m:type=""Edm.DateTime"">2024-08-07T02:36:24.62</d:PackageValidationResultDate>
+    <d:PackageCleanupResultDate m:type=""Edm.DateTime"" m:null=""true""></d:PackageCleanupResultDate>
+    <d:PackageReviewedDate m:type=""Edm.DateTime"">2024-08-07T03:58:15.683</d:PackageReviewedDate>
+    <d:PackageApprovedDate m:type=""Edm.DateTime"">2024-08-07T03:58:15.683</d:PackageApprovedDate>
+    <d:PackageReviewer></d:PackageReviewer>
+    <d:IsDownloadCacheAvailable m:type=""Edm.Boolean"">false</d:IsDownloadCacheAvailable>
+    <d:DownloadCacheStatus>Checked</d:DownloadCacheStatus>
+    <d:DownloadCacheDate m:type=""Edm.DateTime"">2024-08-07T04:59:31.147</d:DownloadCacheDate>
+    <d:DownloadCache></d:DownloadCache>
+    <d:PackageScanStatus>NotFlagged</d:PackageScanStatus>
+    <d:PackageScanResultDate m:type=""Edm.DateTime"">2024-08-07T03:58:15.683</d:PackageScanResultDate>
+    <d:PackageScanFlagResult>None</d:PackageScanFlagResult>
+  </m:properties>
+</entry>".FormatWith(_wireMockServer.Url))
+                );
+
+                _wireMockServer.Given(
+                    Request.Create()
+                    .WithPath("/api/v2/package/upgradepackage/2.0.0")
+                    .UsingGet()
+                )
+                .RespondWith(
+                    Response.Create()
+                    .WithStatusCode(503)
+                );
+            }
+
+            public override void AfterObservations()
+            {
+                base.AfterObservations();
+                _wireMockServer.Stop();
+            }
+
+            public override void Because()
+            {
+                Results = Service.Upgrade(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void Should_not_remove_package_from_the_lib_directory()
+            {
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
+
+                DirectoryAssert.Exists(packageDir);
+            }
+
+            [Fact]
+            public void Should_not_upgrade_the_package()
+            {
+                var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
+                using (var packageReader = new PackageArchiveReader(packageFile))
+                {
+                    packageReader.NuspecReader.GetVersion().ToNormalizedStringChecked().Should().Be("1.0.0");
+                }
+            }
+
+            [Fact]
+            public void Should_not_have_the_erroring_upgraded_package_in_the_lib_bad_directory()
+            {
+                // This is due to the fact that no nupkg was actually downloaded from the server
+
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bad", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void Should_delete_the_rollback()
+            {
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
+
+                DirectoryAssert.DoesNotExist(packageDir);
+            }
+
+            [Fact]
+            public void Should_contain_a_warning_message_that_it_was_unable_to_upgrade_a_package()
+            {
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
+            }
+
+            [Fact]
+            public void Should_not_have_a_successful_package_result()
+            {
+                _packageResult.Success.Should().BeFalse();
+            }
+
+            [Fact]
+            public void Should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.Should().BeFalse();
+            }
+
+            [Fact]
+            public void Should_not_have_warning_package_result()
+            {
+                _packageResult.Warning.Should().BeFalse();
+            }
+
+            [Fact]
+            public void Should_have_an_error_package_result()
+            {
+                _packageResult.Messages.Should().Contain(m => m.MessageType == ResultType.Error);
+            }
+
+            [Fact]
+            public void Should_have_expected_error_in_package_result()
+            {
+                Results.Should().AllSatisfy(r =>
+                    r.Value.Messages.Should().Contain(m =>
+                        m.MessageType == ResultType.Error &&
+                        m.Message.Contains(@"upgradepackage not upgraded. An error occurred during installation:
+ Error downloading 'upgradepackage.2.0.0' from '{0}/api/v2/package/upgradepackage/2.0.0'.".FormatWith(_wireMockServer.Url))));
+            }
+
+            [Fact]
+            public void Should_have_requested_download_of_package()
+            {
+                _wireMockServer.Should().HaveReceivedACall().AtUrl("{0}/api/v2/package/upgradepackage/2.0.0".FormatWith(_wireMockServer.Url));
             }
         }
     }

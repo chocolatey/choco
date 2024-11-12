@@ -15,9 +15,16 @@
 // limitations under the License.
 
 using System;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
+using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
+using System.Security.Permissions;
+using System.Security;
 using System.Security.Principal;
 using chocolatey.infrastructure.platforms;
+using Microsoft.Win32.SafeHandles;
 
 namespace chocolatey.infrastructure.information
 {
@@ -158,6 +165,130 @@ namespace chocolatey.infrastructure.information
             return isSystem;
         }
 
+        public static ProcessTree GetProcessTree()
+        {
+            return GetProcessTree(null);
+        }
+
+        public static ProcessTree GetProcessTree(Process process)
+        {
+            if (process == null)
+            {
+                process = Process.GetCurrentProcess();
+            }
+
+            var tree = new ProcessTree(process.ProcessName);
+
+            if (Platform.GetPlatform() != PlatformType.Windows)
+            {
+                return tree;
+            }
+
+            try
+            {
+                try
+                {
+                    tree = PopulateProcessTreeInternal(tree, process);
+                }
+                catch (TypeLoadException ex) when (ex is DllNotFoundException || ex is EntryPointNotFoundException)
+                {
+                    try
+                    {
+                        // These exceptions mean the lookup failed because the DLL is missing or the entry point is no longer present.
+                        // Ignore these and fall back to the alternative p/invoke method if we haven't already.
+                        tree = PopulateProcessTreeStable(tree, process);
+                    }
+                    catch (TypeLoadException)
+                    {
+                        "chocolatey".Log().Warn(logging.ChocolateyLoggers.LogFileOnly, "All available methods of querying processes from the win32 APIs are broken or critical DLLs are missing.");
+                    }
+                }
+            }
+            catch (Win32Exception ex)
+            {
+                "chocolatey".Log().Warn(logging.ChocolateyLoggers.LogFileOnly, "Unhandled Win32Exception ({0}) in finding parent processes.", ex.Message);
+            }
+
+            return tree;
+        }
+
+        private static ProcessTree PopulateProcessTreeInternal(ProcessTree tree, Process currentProcess)
+        {
+            Process nextProcess = null;
+            try
+            {
+                while (true)
+                {
+                    var parentProcess = ParentProcessHelperInternal.GetParentProcess(nextProcess ?? currentProcess);
+
+                    if (parentProcess is null)
+                    {
+                        break;
+                    }
+
+                    nextProcess = parentProcess;
+                    tree.Processes.AddLast(nextProcess.ProcessName);
+                }
+            }
+            catch (Win32Exception ex)
+            {
+                // Native error code 5 is access denied.
+                // This usually happens if the parent executable
+                // is running as a different user, in which case
+                // we are not able to get the necessary handle for
+                // the process.
+                if (ex.NativeErrorCode != 5)
+                {
+                    throw;
+                }
+                else
+                {
+                    "chocolatey".Log().Debug(logging.ChocolateyLoggers.LogFileOnly, "Unable to get parent process for '{0}'. Ignoring...", currentProcess.ProcessName);
+                }
+            }
+
+            return tree;
+        }
+
+        private static ProcessTree PopulateProcessTreeStable(ProcessTree tree, Process currentProcess)
+        {
+            Process nextProcess = null;
+            try
+            {
+                while (true)
+                {
+                    var parentProcess = ParentProcessHelperStable.GetParentProcess(nextProcess ?? currentProcess);
+
+                    if (parentProcess is null)
+                    {
+                        break;
+                    }
+
+                    nextProcess = parentProcess;
+                    tree.Processes.AddLast(nextProcess.ProcessName);
+                }
+            }
+            catch (Win32Exception ex)
+            {
+                // Native error code 5 is access denied.
+                // This usually happens if the parent executable
+                // is running as a different user, in which case
+                // we are not able to get the necessary handle for
+                // the process.
+                if (ex.NativeErrorCode != 5)
+                {
+                    throw;
+                }
+                else
+                {
+                    "chocolatey".Log().Debug(logging.ChocolateyLoggers.LogFileOnly, "Unable to get parent process for '{0}'. Ignoring...", currentProcess.ProcessName);
+                }
+            }
+
+            return tree;
+        }
+
+
         /*
          https://msdn.microsoft.com/en-us/library/windows/desktop/aa376402.aspx
          BOOL WINAPI ConvertStringSidToSid(
@@ -242,6 +373,174 @@ namespace chocolatey.infrastructure.information
             TokenElevationTypeDefault = 1,
             TokenElevationTypeFull,
             TokenElevationTypeLimited
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct ParentProcessHelperInternal
+        {
+            internal IntPtr Reserved1;
+            internal IntPtr PebBaseAddress;
+            internal IntPtr Reserved2_0;
+            internal IntPtr Reselved2_1;
+            internal IntPtr UniqueProcessId;
+            internal IntPtr InheritedFromUniqueProcessId;
+
+            [DllImport("ntdll.dll")]
+            private static extern int NtQueryInformationProcess(IntPtr processHandle, int processInformationClass, ref ParentProcessHelperInternal processInformation, int processInformationLength, out int returnLength);
+
+            public static Process GetParentProcess(Process process)
+            {
+                return GetParentProcess(process.Handle);
+            }
+
+            public static Process GetParentProcess(IntPtr handle)
+            {
+                try
+                {
+                    var processUtilities = new ParentProcessHelperInternal();
+
+                    // https://learn.microsoft.com/en-us/windows/win32/api/winternl/nf-winternl-ntqueryinformationprocess#process_basic_information
+                    // Retrieves a pointer to a PEB structure that can be used to determine whether the specified process is being debugged,
+                    // and a unique value used by the system to identify the specified process. 
+                    // It also includes the `InheritedFromUniqueProcessId` value which we can use to look up the parent process directly.
+                    const int processBasicInformation = 0;
+
+                    var status = NtQueryInformationProcess(handle, processBasicInformation, ref processUtilities, Marshal.SizeOf(processUtilities), out _);
+
+                    if (status != 0)
+                    {
+                        return null;
+                    }
+
+                    return Process.GetProcessById(processUtilities.InheritedFromUniqueProcessId.ToInt32());
+                }
+                catch (ArgumentException)
+                {
+                    return null;
+                }
+            }
+        }
+
+
+        private static class ParentProcessHelperStable
+        {
+            public static Process GetParentProcess(Process process)
+            {
+                var processId = ParentProcessId(process.Id);
+
+                if (processId == -1)
+                {
+                    return null;
+                }
+                else
+                {
+                    return Process.GetProcessById(processId);
+                }
+            }
+
+            private static int ParentProcessId(int id)
+            {
+                var pe32 = new PROCESSENTRY32
+                {
+                    dwSize = (uint)Marshal.SizeOf(typeof(PROCESSENTRY32))
+                };
+
+                using (var hSnapshot = CreateToolhelp32Snapshot(SnapshotFlags.Process, (uint)id))
+                {
+                    if (hSnapshot.IsInvalid)
+                    {
+                        throw new Win32Exception();
+                    }
+
+                    if (!Process32First(hSnapshot, ref pe32))
+                    {
+                        var errno = Marshal.GetLastWin32Error();
+
+                        if (errno == ERROR_NO_MORE_FILES)
+                        {
+                            return -1;
+                        }
+
+                        throw new Win32Exception(errno);
+                    }
+
+                    do
+                    {
+                        if (pe32.th32ProcessID == (uint)id)
+                        {
+                            return (int)pe32.th32ParentProcessID;
+                        }
+                    } while (Process32Next(hSnapshot, ref pe32));
+                }
+
+                return -1;
+            }
+
+            private const int ERROR_NO_MORE_FILES = 0x12;
+            [DllImport("kernel32.dll", SetLastError = true)]
+            private static extern SafeSnapshotHandle CreateToolhelp32Snapshot(SnapshotFlags flags, uint id);
+
+            [DllImport("kernel32.dll", SetLastError = true)]
+            private static extern bool Process32First(SafeSnapshotHandle hSnapshot, ref PROCESSENTRY32 lppe);
+
+            [DllImport("kernel32.dll", SetLastError = true)]
+            private static extern bool Process32Next(SafeSnapshotHandle hSnapshot, ref PROCESSENTRY32 lppe);
+
+            [Flags]
+            private enum SnapshotFlags : uint
+            {
+                HeapList = 0x00000001,
+                Process = 0x00000002,
+                Thread = 0x00000004,
+                Module = 0x00000008,
+                Module32 = 0x00000010,
+                All = (HeapList | Process | Thread | Module),
+                Inherit = 0x80000000,
+                NoHeaps = 0x40000000
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            private struct PROCESSENTRY32
+            {
+#pragma warning disable IDE1006 // Naming Styles
+                public uint dwSize;
+                public uint cntUsage;
+                public uint th32ProcessID;
+                public IntPtr th32DefaultHeapID;
+                public uint th32ModuleID;
+                public uint cntThreads;
+                public uint th32ParentProcessID;
+                public int pcPriClassBase;
+                public uint dwFlags;
+                [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+                public string szExeFile;
+#pragma warning restore IDE1006 // Naming Styles
+            }
+
+            [SuppressUnmanagedCodeSecurity, HostProtection(SecurityAction.LinkDemand, MayLeakOnAbort = true)]
+            internal sealed class SafeSnapshotHandle : SafeHandleMinusOneIsInvalid
+            {
+                internal SafeSnapshotHandle()
+                    : base(true)
+                {
+                }
+
+                [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
+                internal SafeSnapshotHandle(IntPtr handle)
+                    : base(true)
+                {
+                    SetHandle(handle);
+                }
+
+                protected override bool ReleaseHandle()
+                {
+                    return CloseHandle(handle);
+                }
+
+                [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
+                [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true, ExactSpelling = true)]
+                private static extern bool CloseHandle(IntPtr handle);
+            }
         }
 
 #pragma warning disable IDE0022, IDE1006

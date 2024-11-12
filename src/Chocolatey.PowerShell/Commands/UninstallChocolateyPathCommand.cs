@@ -21,7 +21,7 @@ using Chocolatey.PowerShell.Shared;
 
 namespace Chocolatey.PowerShell.Commands
 {
-    [Cmdlet(VerbsLifecycle.Uninstall, "ChocolateyPath")]
+    [Cmdlet(VerbsLifecycle.Uninstall, "ChocolateyPath", SupportsShouldProcess = true, ConfirmImpact = ConfirmImpact.Medium)]
     [OutputType(typeof(void))]
     public class UninstallChocolateyPathCommand : ChocolateyCmdlet
     {

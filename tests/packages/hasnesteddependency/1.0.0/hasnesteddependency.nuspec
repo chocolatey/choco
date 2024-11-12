@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata>
+        <id>hasnesteddependency</id>
+        <version>1.0.0</version>
+        <title>hasnesteddependency</title>
+        <authors>Chocolatey Software</authors>
+        <owners>chocolatey</owners>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Package used for testing nested dependencies.</description>
+        <summary>Package used for testing nested dependencies.</summary>
+        <releaseNotes />
+        <copyright />
+        <tags>hasnesteddependency admin</tags>
+        <dependencies>
+            <dependency id="hasdependency" version="1.0.0" />
+        </dependencies>
+    </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>

@@ -154,23 +154,23 @@
     <command:relatedLinks>
       <maml:navigationLink>
         <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://docs.chocolatey.org/en-us/create/functions/get-environmentvariable</maml:uri>
+        <maml:uri>https://docs.chocolatey.org/en-us/create/cmdlets/get-environmentvariable</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Get-EnvironmentVariableNames</maml:linkText>
-        <maml:uri>xref:get-environmentvariablenames</maml:uri>
+        <maml:uri>xref:get-environmentvariablenames,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Set-EnvironmentVariable</maml:linkText>
-        <maml:uri>xref:set-environmentvariable</maml:uri>
+        <maml:uri>xref:set-environmentvariable,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Cmdlet Reference</maml:linkText>
-        <maml:uri>xref:powershell-cmdlet-reference</maml:uri>
+        <maml:uri>xref:powershell-cmdlet-reference,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Function Reference</maml:linkText>
-        <maml:uri>xref:powershell-reference</maml:uri>
+        <maml:uri>xref:powershell-reference,d-block</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -274,23 +274,23 @@
     <command:relatedLinks>
       <maml:navigationLink>
         <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://docs.chocolatey.org/en-us/create/functions/get-environmentvariablenames</maml:uri>
+        <maml:uri>https://docs.chocolatey.org/en-us/create/cmdlets/get-environmentvariablenames</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
-        <maml:linkText>Get-EnvironmentVariable</maml:linkText>
-        <maml:uri>xref:get-environmentvariable</maml:uri>
+        <maml:linkText>Get-EnvironmentVariableNames</maml:linkText>
+        <maml:uri>xref:get-environmentvariablenames,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Set-EnvironmentVariable</maml:linkText>
-        <maml:uri>xref:set-environmentvariable</maml:uri>
+        <maml:uri>xref:set-environmentvariable,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Cmdlet Reference</maml:linkText>
-        <maml:uri>xref:powershell-cmdlet-reference</maml:uri>
+        <maml:uri>xref:powershell-cmdlet-reference,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Function Reference</maml:linkText>
-        <maml:uri>xref:powershell-reference</maml:uri>
+        <maml:uri>xref:powershell-reference,d-block</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -300,8 +300,7 @@
       <command:verb>Install</command:verb>
       <command:noun>ChocolateyPath</command:noun>
       <maml:description>
-        <maml:para>&gt; :choco-info: NOTE &gt; &gt; Administrative Access Required when `-PathType 'Machine'.`</maml:para>
-        <maml:para>This puts a directory to the PATH environment variable.</maml:para>
+        <maml:para>&gt; :choco-info: NOTE &gt; &gt; Administrative Access Required when `-PathType 'Machine'.` This puts a directory to the PATH environment variable.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
@@ -351,6 +350,28 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+          <maml:name>Confirm</maml:name>
+          <maml:description>
+            <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+          <maml:name>WhatIf</maml:name>
+          <maml:description>
+            <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
@@ -390,6 +411,30 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+        <maml:name>Confirm</maml:name>
+        <maml:description>
+          <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+        <maml:name>WhatIf</maml:name>
+        <maml:description>
+          <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
     </command:parameters>
     <command:inputTypes />
     <command:returnValues />
@@ -401,7 +446,7 @@
     </maml:alertSet>
     <command:examples>
       <command:example>
-        <maml:title>-------------------------- Example 1 --------------------------</maml:title>
+        <maml:title>-------------------------- Example 2 --------------------------</maml:title>
         <dev:code>PS C:\&gt; Install-ChocolateyPath -PathToInstall "$($env:SystemDrive)\tools\gittfs"</dev:code>
         <dev:remarks>
           <maml:para>Adds the target path to the current user's PATH.</maml:para>
@@ -418,35 +463,35 @@
     <command:relatedLinks>
       <maml:navigationLink>
         <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://docs.chocolatey.org/en-us/create/functions/install-chocolateypath</maml:uri>
+        <maml:uri>https://docs.chocolatey.org/en-us/create/cmdlets/install-chocolateypath</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Uninstall-ChocolateyPath</maml:linkText>
-        <maml:uri>xref:uninstall-chocolateypath</maml:uri>
+        <maml:uri>xref:uninstall-chocolateypath,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Install-ChocolateyEnvironmentVariable</maml:linkText>
-        <maml:uri>xref:install-chocolateyenvironmentvariable</maml:uri>
+        <maml:uri>xref:install-chocolateyenvironmentvariable,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
-        <maml:linkText>Get-EnvironmentVariable</maml:linkText>
-        <maml:uri>xref:get-environmentvariable</maml:uri>
+        <maml:linkText>Get-EnvironmentVariableNames</maml:linkText>
+        <maml:uri>xref:get-environmentvariablenames,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Set-EnvironmentVariable</maml:linkText>
-        <maml:uri>xref:set-environmentvariable</maml:uri>
+        <maml:uri>xref:set-environmentvariable,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Get-ToolsLocation</maml:linkText>
-        <maml:uri>xref:get-toolslocation</maml:uri>
+        <maml:uri>xref:get-toolslocation,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Cmdlet Reference</maml:linkText>
-        <maml:uri>xref:powershell-cmdlet-reference</maml:uri>
+        <maml:uri>xref:powershell-cmdlet-reference,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Function Reference</maml:linkText>
-        <maml:uri>xref:powershell-reference</maml:uri>
+        <maml:uri>xref:powershell-reference,d-block</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -456,8 +501,7 @@
       <command:verb>Set</command:verb>
       <command:noun>EnvironmentVariable</command:noun>
       <maml:description>
-        <maml:para>&gt; :choco-info: NOTE &gt; &gt; Administrative Access Required when `-Scope 'Machine'.`</maml:para>
-        <maml:para>DO NOT USE. Not part of the public API. Use `Install-ChocolateyEnvironmentVariable` instead.</maml:para>
+        <maml:para>&gt; :choco-info: NOTE &gt; &gt; Administrative Access Required when `-Scope 'Machine'.` DO NOT USE. Not part of the public API. Use `Install-ChocolateyEnvironmentVariable` instead.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
@@ -519,6 +563,28 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+          <maml:name>Confirm</maml:name>
+          <maml:description>
+            <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+          <maml:name>WhatIf</maml:name>
+          <maml:description>
+            <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
@@ -570,6 +636,30 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+        <maml:name>Confirm</maml:name>
+        <maml:description>
+          <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+        <maml:name>WhatIf</maml:name>
+        <maml:description>
+          <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
     </command:parameters>
     <command:inputTypes />
     <command:returnValues />
@@ -590,31 +680,31 @@
     <command:relatedLinks>
       <maml:navigationLink>
         <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://docs.chocolatey.org/en-us/create/functions/set-environmentvariable</maml:uri>
+        <maml:uri>https://docs.chocolatey.org/en-us/create/cmdlets/set-environmentvariable</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Install-ChocolateyEnvironmentVariable</maml:linkText>
-        <maml:uri>xref:install-chocolateyenvironmentvariable</maml:uri>
+        <maml:uri>xref:install-chocolateyenvironmentvariable,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Uninstall-ChocolateyEnvironmentVariable</maml:linkText>
-        <maml:uri>xref:uninstall-chocolateyenvironmentvariable</maml:uri>
+        <maml:uri>xref:uninstall-chocolateyenvironmentvariable,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Install-ChocolateyPath</maml:linkText>
-        <maml:uri>xref:install-chocolateypath</maml:uri>
+        <maml:uri>xref:install-chocolateypath,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
-        <maml:linkText>Get-EnvironmentVariable</maml:linkText>
-        <maml:uri>xref:get-environmentvariable</maml:uri>
+        <maml:linkText>Get-EnvironmentVariableNames</maml:linkText>
+        <maml:uri>xref:get-environmentvariablenames,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Cmdlet Reference</maml:linkText>
-        <maml:uri>xref:powershell-cmdlet-reference</maml:uri>
+        <maml:uri>xref:powershell-cmdlet-reference,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Function Reference</maml:linkText>
-        <maml:uri>xref:powershell-reference</maml:uri>
+        <maml:uri>xref:powershell-reference,d-block</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -690,15 +780,15 @@
     <command:relatedLinks>
       <maml:navigationLink>
         <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://docs.chocolatey.org/en-us/create/functions/test-processadminrights</maml:uri>
+        <maml:uri>https://docs.chocolatey.org/en-us/create/cmdlets/test-processadminrights</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Cmdlet Reference</maml:linkText>
-        <maml:uri>xref:powershell-cmdlet-reference</maml:uri>
+        <maml:uri>xref:powershell-cmdlet-reference,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Function Reference</maml:linkText>
-        <maml:uri>xref:powershell-reference</maml:uri>
+        <maml:uri>xref:powershell-reference,d-block</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -708,8 +798,7 @@
       <command:verb>Uninstall</command:verb>
       <command:noun>ChocolateyPath</command:noun>
       <maml:description>
-        <maml:para>&gt; :choco_info: NOTE &gt; &gt; Administrative Access Required when `-PathType 'Machine'.`</maml:para>
-        <maml:para>This puts a directory to the PATH environment variable.</maml:para>
+        <maml:para>&gt; :choco-info: NOTE &gt; &gt; Administrative Access Required when `-PathType 'Machine'.` This puts a directory to the PATH environment variable.</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
@@ -759,6 +848,28 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+          <maml:name>Confirm</maml:name>
+          <maml:description>
+            <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+          <maml:name>WhatIf</maml:name>
+          <maml:description>
+            <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
@@ -798,6 +909,30 @@
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+        <maml:name>Confirm</maml:name>
+        <maml:description>
+          <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+        <maml:name>WhatIf</maml:name>
+        <maml:description>
+          <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
     </command:parameters>
     <command:inputTypes />
     <command:returnValues />
@@ -825,35 +960,35 @@
     <command:relatedLinks>
       <maml:navigationLink>
         <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://docs.chocolatey.org/en-us/create/functions/uninstall-chocolateypath</maml:uri>
+        <maml:uri>https://docs.chocolatey.org/en-us/create/cmdlets/uninstall-chocolateypath</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Install-ChocolateyPath</maml:linkText>
-        <maml:uri>xref:install-chocolateypath</maml:uri>
+        <maml:uri>xref:install-chocolateypath,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Install-ChocolateyEnvironmentVariable</maml:linkText>
-        <maml:uri>xref:install-chocolateyenvironmentvariable</maml:uri>
+        <maml:uri>xref:install-chocolateyenvironmentvariable,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
-        <maml:linkText>Get-EnvironmentVariable</maml:linkText>
-        <maml:uri>xref:get-environmentvariable</maml:uri>
+        <maml:linkText>Get-EnvironmentVariableNames</maml:linkText>
+        <maml:uri>xref:get-environmentvariablenames,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Set-EnvironmentVariable</maml:linkText>
-        <maml:uri>xref:set-environmentvariable</maml:uri>
+        <maml:uri>xref:set-environmentvariable,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Get-ToolsLocation</maml:linkText>
-        <maml:uri>xref:get-toolslocation</maml:uri>
+        <maml:uri>xref:get-toolslocation,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Cmdlet Reference</maml:linkText>
-        <maml:uri>xref:powershell-cmdlet-reference</maml:uri>
+        <maml:uri>xref:powershell-cmdlet-reference,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Function Reference</maml:linkText>
-        <maml:uri>xref:powershell-reference</maml:uri>
+        <maml:uri>xref:powershell-reference,d-block</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>
@@ -885,6 +1020,28 @@
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+          <maml:name>Confirm</maml:name>
+          <maml:description>
+            <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+          <maml:name>WhatIf</maml:name>
+          <maml:description>
+            <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+          </maml:description>
+          <dev:type>
+            <maml:name>SwitchParameter</maml:name>
+            <maml:uri />
+          </dev:type>
+          <dev:defaultValue>False</dev:defaultValue>
+        </command:parameter>
       </command:syntaxItem>
     </command:syntax>
     <command:parameters>
@@ -899,6 +1056,30 @@
           <maml:uri />
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
+        <maml:name>Confirm</maml:name>
+        <maml:description>
+          <maml:para>Prompts you for confirmation before running the cmdlet.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="wi">
+        <maml:name>WhatIf</maml:name>
+        <maml:description>
+          <maml:para>Shows what would happen if the cmdlet runs. The cmdlet is not run.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
+        <dev:type>
+          <maml:name>SwitchParameter</maml:name>
+          <maml:uri />
+        </dev:type>
+        <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
     </command:parameters>
     <command:inputTypes />
@@ -921,15 +1102,15 @@
     <command:relatedLinks>
       <maml:navigationLink>
         <maml:linkText>Online Version:</maml:linkText>
-        <maml:uri>https://docs.chocolatey.org/en-us/create/functions/update-sessionenvironment</maml:uri>
+        <maml:uri>https://docs.chocolatey.org/en-us/create/cmdlets/update-sessionenvironment</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Cmdlet Reference</maml:linkText>
-        <maml:uri>xref:powershell-cmdlet-reference</maml:uri>
+        <maml:uri>xref:powershell-cmdlet-reference,mb-3 d-block</maml:uri>
       </maml:navigationLink>
       <maml:navigationLink>
         <maml:linkText>Function Reference</maml:linkText>
-        <maml:uri>xref:powershell-reference</maml:uri>
+        <maml:uri>xref:powershell-reference,d-block</maml:uri>
       </maml:navigationLink>
     </command:relatedLinks>
   </command:command>

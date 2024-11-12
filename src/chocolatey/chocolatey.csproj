@@ -85,18 +85,6 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficialNo7zip|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\ReleaseOfficialNo7zip\</OutputPath>
-    <DefineConstants>TRACE;FORCE_CHOCOLATEY_OFFICIAL_KEY</DefineConstants>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <DocumentationFile>bin\Release\chocolatey.xml</DocumentationFile>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AlphaFS, Version=2.1.0.0, Culture=neutral, PublicKeyToken=4d31a58f7d7ad5c9, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -241,7 +229,9 @@
     <Compile Include="infrastructure.app\rules\RuleIdentifiers.cs" />
     <Compile Include="infrastructure.app\rules\ServicableMetadataRule.cs" />
     <Compile Include="infrastructure.app\rules\VersionMetadataRule.cs" />
+    <Compile Include="infrastructure.app\services\IProcessCollectorService.cs" />
     <Compile Include="infrastructure.app\services\RuleService.cs" />
+    <Compile Include="infrastructure.app\services\ProcessCollectorService.cs" />
     <Compile Include="infrastructure.app\validations\CacheFolderValidationLockdown.cs" />
     <Compile Include="infrastructure\commands\ExitCodeDescription.cs" />
     <Compile Include="infrastructure\cryptography\DefaultEncryptionUtility.cs" />
@@ -275,6 +265,7 @@
     <Compile Include="infrastructure\filesystem\FileSystem.cs" />
     <Compile Include="FileSystemExtensions.cs" />
     <Compile Include="infrastructure\information\ExtensionInformation.cs" />
+    <Compile Include="infrastructure\information\ProcessTree.cs" />
     <Compile Include="infrastructure\logging\AggregateLog.cs" />
     <Compile Include="infrastructure\logging\LogLevelType.cs" />
     <Compile Include="infrastructure\logging\LogMessage.cs" />
