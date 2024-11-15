@@ -47,7 +47,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         public Task<CredentialResponse> GetAsync(Uri uri, IWebProxy proxy, CredentialRequestType credentialType, string message, bool isRetry, bool nonInteractive, CancellationToken cancellationToken)
         {
-            if (uri == null)
+            if (uri is null)
             {
                 throw new ArgumentNullException("uri");
             }
@@ -86,59 +86,55 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             // credentials were not explicit
-            // discover based on closest match in sources
-            var candidateSources = _config.MachineSources.Where(
-                s =>
-                {
-                    var sourceUrl = s.Key.TrimEnd('/');
-
-                    try
-                    {
-                        var sourceUri = new Uri(sourceUrl);
-                        return sourceUri.Host.IsEqualTo(uri.Host)
-                            && !string.IsNullOrWhiteSpace(s.Username)
-                            && !string.IsNullOrWhiteSpace(s.EncryptedPassword);
-                    }
-                    catch (Exception)
-                    {
-                        this.Log().Error("Source '{0}' is not a valid Uri".FormatWith(sourceUrl));
-                    }
-
-                    return false;
-                }).ToList();
-
+            // find matching source(s) in sources list
+            var trimmedTargetUri = new Uri(uri.AbsoluteUri.TrimEnd('/'));
             MachineSourceConfiguration source = null;
 
-
-            if (candidateSources.Count == 1)
+            // If the user has specified --source with a *named* source and not a URL, try to find the matching one
+            // with the correct URL for this credential request.
+            var namedExplicitSources = _config.ExplicitSources?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(s => !Uri.IsWellFormedUriString(s, UriKind.Absolute))
+                .ToList();
+            if (namedExplicitSources?.Count > 0)
             {
-                // only one match, use it
-                source = candidateSources.FirstOrDefault();
+                // Uri.Equals() and == operator compare hostnames case-insensitively and the remainder of the url case-sensitively
+                // while ignoring #fragments on the URLs, but does care about trailing slashes, which we do not here.
+                source = _config.MachineSources
+                    .Where(s => namedExplicitSources.Contains(s.Name) && new Uri(s.Key.TrimEnd('/')) == trimmedTargetUri)
+                    .FirstOrDefault();
             }
-            else if (candidateSources.Count > 1)
-            {
-                // find the source that is the closest match
-                foreach (var candidateSource in candidateSources.OrEmpty())
-                {
-                    var candidateRegEx = new Regex(Regex.Escape(candidateSource.Key.TrimEnd('/')), RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
-                    if (candidateRegEx.IsMatch(uri.OriginalString.TrimEnd('/')))
-                    {
-                        this.Log().Debug("Source selected will be '{0}'".FormatWith(candidateSource.Key.TrimEnd('/')));
-                        source = candidateSource;
-                        break;
-                    }
-                }
 
-                if (source == null && !isRetry)
+            if (source is null)
+            {
+                // Could not find a valid source by name, or the source(s) specified were all URLs.
+                // Try to look up the target URL in the saved machine sources to attempt to match credentials.
+                //
+                // Note: This behaviour remains as removing it would be a breaking change, but we may want
+                // to remove this in a future version, as specifying an explicit URL should potentially
+                // not go looking in the configuration file for saved credentials anyway.
+                var candidateSources = _config.MachineSources
+                    .Where(s => !string.IsNullOrWhiteSpace(s.Username)
+                        && !string.IsNullOrWhiteSpace(s.EncryptedPassword)
+                        && Uri.TryCreate(s.Key.TrimEnd('/'), UriKind.Absolute, out var trimmedSourceUri)
+                        && trimmedSourceUri == trimmedTargetUri)
+                    .ToList();
+
+                if (candidateSources.Count == 1)
                 {
-                    // use the first source. If it fails, fall back to grabbing credentials from the user
+                    // only one match, use it
+                    source = candidateSources.First();
+                }
+                else if (candidateSources.Count > 1 && !isRetry)
+                {
+                    // Use the credentials from the first found source, unless it's a retry (creds already tried and failed)
+                    // use the first source. If it fails, fall back to grabbing credentials from the user.
                     var candidateSource = candidateSources.First();
                     this.Log().Debug("Evaluated {0} candidate sources but was unable to find a match, using {1}".FormatWith(candidateSources.Count, candidateSource.Key.TrimEnd('/')));
                     source = candidateSource;
                 }
             }
 
-            if (source == null)
+            if (source is null)
             {
                 ICredentials credential = CredentialCache.DefaultNetworkCredentials;
 
@@ -146,7 +142,6 @@ namespace chocolatey.infrastructure.app.nuget
                 {
                     this.Log().Debug("This is a retry attempt. Asking user for credentials for '{0}'".FormatWith(uri.OriginalString));
                     credential = GetUserCredentials(uri, proxy, credentialType);
-
                 }
 
                 return Task.FromResult(new CredentialResponse(credential));

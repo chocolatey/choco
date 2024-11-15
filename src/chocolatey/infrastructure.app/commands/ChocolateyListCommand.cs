@@ -85,7 +85,7 @@ namespace chocolatey.infrastructure.app.commands
                      "Source - Name of alternative source to use, for example 'windowsfeatures', 'ruby', 'cygwin', or 'python'.",
                      option =>
                      {
-                         configuration.Sources = option.UnquoteSafe();
+                         configuration.Sources = configuration.ExplicitSources = option.UnquoteSafe();
                          configuration.ListCommand.ExplicitSource = true;
                      })
                 .Add("idonly|id-only",
