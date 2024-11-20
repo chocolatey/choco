@@ -167,6 +167,7 @@ Task("Prepare-Chocolatey-Packages")
     .IsDependeeOf("Create-Chocolatey-Packages")
     .IsDependeeOf("Verify-PowerShellScripts")
     .IsDependeeOf("Sign-Assemblies")
+    .IsDependentOn("Copy-Nuspec-Folders")
     .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping because not running on Windows")
     .WithCriteria(() => BuildParameters.ShouldRunChocolatey, "Skipping because execution of Chocolatey has been disabled")
     .Does(() =>
@@ -363,7 +364,6 @@ Task("Prepare-NuGet-Packages")
 
 Task("Prepare-MSI")
     .WithCriteria(() => BuildParameters.ShouldBuildMsi, "Skipping because creation of MSI has been disabled")
-    .WithCriteria(() => BuildParameters.IsTagged, "Skipping because build is not tagged")
     .IsDependeeOf("Build-MSI")
     .Does(() =>
 {
@@ -377,9 +377,6 @@ Task("Prepare-MSI")
         );
     }
 });
-
-BuildParameters.Tasks.BuildMsiTask
-    .WithCriteria(() => BuildParameters.IsTagged, "Skipping because build is not tagged");
 
 Task("Create-TarGz-Packages")
     .IsDependentOn("Build")
@@ -438,7 +435,7 @@ BuildParameters.SetParameters(context: Context,
                             getMsisToSign: getMsisToSign,
                             getILMergeConfigs: getILMergeConfigs,
                             preferDotNetGlobalToolUsage: !IsRunningOnWindows(),
-                            shouldBuildMsi: true,
+                            shouldBuildMsi: false,
                             msiUsedWithinNupkg: false,
                             shouldAuthenticodeSignMsis: true,
                             shouldRunNuGet: IsRunningOnWindows(),

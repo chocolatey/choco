@@ -97,6 +97,8 @@
             Invoke-Choco install upgradepackage --version 1.0.0
             $argumentsFile = Join-Path $env:ChocolateyInstall ".chocolatey/upgradepackage.1.0.0/.arguments"
             $FileContents | Set-Content -Path $argumentsFile -Encoding utf8 -Force
+            # Remove the `download` directory so the download command doesn't fail the second test.
+            Remove-Item -Path $PWD/download -Recurse -Force -ErrorAction SilentlyContinue
 
             $Output = Invoke-Choco $Command @Parameters --debug
         }
