@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -70,10 +70,9 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 };
             }
 
-            [OneTimeSetUp]
-            public async Task OneTimeSetup()
+            public override void Because()
             {
-                await With();
+                With().Wait();
             }
 
             public virtual async Task With()
@@ -83,91 +82,95 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
         }
 
-        public class When_using_explicit_credentials_and_source_param : ChocolateyNugetCredentialProviderSpecsBase
+        public class When_Using_Explicit_Credentials_And_Source_Param : ChocolateyNugetCredentialProviderSpecsBase
         {
-            public override void Because()
+            public override void Context()
             {
+                base.Context();
                 Configuration.Sources = Configuration.ExplicitSources = TargetSourceUrl;
                 Configuration.SourceCommand.Username = "user";
                 Configuration.SourceCommand.Password = "totally_secure_password!!!";
             }
 
             [Fact]
-            public void Creates_a_valid_credential()
+            public void Should_Create_Credentials()
             {
                 Result.Should().NotBeNull();
             }
 
             [Fact]
-            public void Provides_the_correct_username()
+            public void Should_Provide_The_Correct_Username()
             {
                 Result.UserName.Should().Be("user");
             }
 
             [Fact]
-            public void Provides_the_correct_password()
+            public void Should_Provide_The_Correct_Password()
             {
                 Result.Password.Should().Be("totally_secure_password!!!");
             }
         }
 
-        public class When_a_source_name_is_provided : ChocolateyNugetCredentialProviderSpecsBase
+        public class When_A_Source_Name_Is_Provided : ChocolateyNugetCredentialProviderSpecsBase
         {
-            public override void Because()
+            public override void Context()
             {
+                base.Context();
                 Configuration.Sources = TargetSourceUrl;
                 Configuration.ExplicitSources = TargetSourceName;
             }
 
             [Fact]
-            public void Finds_the_saved_source_and_returns_the_credential()
+            public void Should_Find_The_Saved_Source_And_Returns_The_Credential()
             {
                 Result.Should().NotBeNull();
             }
 
             [Fact]
-            public void Provides_the_correct_username()
+            public void Should_Provide_The_Correct_Username()
             {
                 Result.UserName.Should().Be(Username);
             }
 
             [Fact]
-            public void Provides_the_correct_password()
+            public void Should_Provide_The_Correct_Password()
             {
                 Result.Password.Should().Be(Password);
             }
         }
 
-        public class When_a_source_url_matching_a_saved_source_is_provided : ChocolateyNugetCredentialProviderSpecsBase
+        public class When_A_Source_Url_Matching_A_Saved_Source_Is_Provided : ChocolateyNugetCredentialProviderSpecsBase
         {
-            public override void Because()
+            public override void Context()
             {
+                base.Context();
                 Configuration.Sources = Configuration.ExplicitSources = TargetSourceUrl;
             }
 
             [Fact]
-            public void Finds_the_saved_source_and_returns_the_credential()
+            public void Should_Find_The_Saved_Source_And_Return_The_Credential()
             {
                 Result.Should().NotBeNull();
             }
 
             [Fact]
-            public void Provides_the_correct_username()
+            public void Should_Provide_The_Correct_Username()
             {
                 Result.UserName.Should().Be(Username);
             }
 
             [Fact]
-            public void Provides_the_correct_password()
+            public void Should_Provide_The_Correct_Password()
             {
                 Result.Password.Should().Be(Password);
             }
         }
 
-        public class Looks_up_source_url_when_name_and_credentials_is_provided : ChocolateyNugetCredentialProviderSpecsBase
+        public class Looks_Up_Source_Url_When_Name_And_Credentials_Is_Provided : ChocolateyNugetCredentialProviderSpecsBase
         {
-            public override void Because()
+            public override void Context()
             {
+                base.Context();
                 Configuration.Sources = TargetSourceUrl;
                 Configuration.ExplicitSources = TargetSourceName;
 
@@ -176,28 +179,29 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void Creates_and_returns_the_credential()
+            public void Should_Create_And_Return_The_Credential()
             {
                 Result.Should().NotBeNull();
             }
 
             [Fact]
-            public void Provides_the_correct_username()
+            public void Should_Provide_The_Correct_Username()
             {
                 Result.UserName.Should().Be(Username);
             }
 
             [Fact]
-            public void Provides_the_correct_password()
+            public void Should_Provide_The_Correct_Password()
             {
                 Result.Password.Should().Be(Password);
             }
         }
 
-        public class When_no_matching_source_is_found_by_url : ChocolateyNugetCredentialProviderSpecsBase
+        public class When_No_Matching_Source_Is_Found_By_Url : ChocolateyNugetCredentialProviderSpecsBase
         {
-            public override void Because()
+            public override void Context()
             {
+                base.Context();
                 Configuration.Sources = Configuration.ExplicitSources = "https://unknownurl.com/api/v2/";
             }
 
@@ -208,98 +212,102 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void Returns_the_default_network_credential()
+            public void Should_Return_The_Default_Network_Credential()
             {
                 Result.Should().Be(CredentialCache.DefaultNetworkCredentials);
             }
         }
 
-        public class When_multiple_named_sources_are_provided : ChocolateyNugetCredentialProviderSpecsBase
+        public class When_Multiple_Named_Sources_Are_Provided : ChocolateyNugetCredentialProviderSpecsBase
         {
-            public override void Because()
+            public override void Context()
             {
+                base.Context();
                 Configuration.Sources = Configuration.MachineSources.Select(s => s.Key).Join(";");
                 Configuration.ExplicitSources = Configuration.MachineSources.Select(s => s.Name).Join(";");
             }
 
             [Fact]
-            public void Finds_the_correct_saved_source_for_the_target_uri_and_returns_the_credential()
+            public void Should_Find_The_Correct_Saved_Source_For_The_Target_Uri_And_Return_The_Credential()
             {
                 Result.Should().NotBeNull();
             }
 
             [Fact]
-            public void Provides_the_correct_username()
+            public void Should_Provide_The_Correct_Username()
             {
                 Result.UserName.Should().Be(Username);
             }
 
             [Fact]
-            public void Provides_the_correct_password()
+            public void Should_Provide_The_Correct_Password()
             {
                 Result.Password.Should().Be(Password);
             }
         }
 
-        public class When_multiple_source_urls_are_provided : ChocolateyNugetCredentialProviderSpecsBase
+        public class When_Multiple_Source_Urls_Are_Provided : ChocolateyNugetCredentialProviderSpecsBase
         {
-            public override void Because()
+            public override void Context()
             {
+                base.Context();
                 Configuration.Sources = Configuration.ExplicitSources = $"https://unknownurl.com/api/v2/;{TargetSourceUrl}";
             }
 
             [Fact]
-            public void Finds_the_saved_source_and_returns_the_credential()
+            public void Should_Find_The_Saved_Source_And_Return_The_Credential()
             {
                 Result.Should().NotBeNull();
             }
 
             [Fact]
-            public void Provides_the_correct_username()
+            public void Should_Provide_The_Correct_Username()
             {
                 Result.UserName.Should().Be(Username);
             }
 
             [Fact]
-            public void Provides_the_correct_password()
+            public void Should_Provide_The_Correct_Password()
             {
                 Result.Password.Should().Be(Password);
             }
         }
 
-        public class When_a_mix_of_named_and_url_sources_are_provided : ChocolateyNugetCredentialProviderSpecsBase
+        public class When_A_Mix_Of_Named_And_Url_Sources_Are_Provided : ChocolateyNugetCredentialProviderSpecsBase
         {
-            public override void Because()
+            public override void Context()
             {
+                base.Context();
                 Configuration.Sources = $"https://unknownurl.com/api/v2/;{TargetSourceUrl}";
                 Configuration.ExplicitSources = $"https://unknownurl.com/api/v2/;{TargetSourceName}";
             }
 
             [Fact]
-            public void Finds_the_saved_source_and_returns_the_credential()
+            public void Should_Find_The_Saved_Source_And_Return_The_Credential()
             {
                 Result.Should().NotBeNull();
             }
 
             [Fact]
-            public void Provides_the_correct_username()
+            public void Should_Provide_The_Correct_Username()
             {
                 Result.UserName.Should().Be(Username);
             }
 
             [Fact]
-            public void Provides_the_correct_password()
+            public void Should_Provide_The_Correct_Password()
             {
                 Result.Password.Should().Be(Password);
             }
         }
 
         // This is a regression test for issue #3565
-        public class When_a_url_matching_the_hostname_only_of_a_saved_source_is_provided : ChocolateyNugetCredentialProviderSpecsBase
+        public class When_A_Url_Matching_The_Hostname_Only_Of_A_Saved_Source_Is_Provided : ChocolateyNugetCredentialProviderSpecsBase
         {
             private Uri _otherRepoUri;
-            public override void Because()
+            public override void Context()
             {
+                base.Context();
                 _otherRepoUri = new Uri(TargetSourceUri.GetComponents(UriComponents.SchemeAndServer, UriFormat.Unescaped) + "/other_path/repository/");
                 Configuration.Sources = Configuration.ExplicitSources = _otherRepoUri.AbsoluteUri;
             }
@@ -311,7 +319,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
 
             [Fact]
-            public void Returns_the_default_network_credential()
+            public void Should_Return_The_Default_Network_Credential()
             {
                 Result.Should().Be(CredentialCache.DefaultNetworkCredentials);
             }

@@ -95,6 +95,7 @@ namespace chocolatey.infrastructure.app.nuget
             var namedExplicitSources = _config.ExplicitSources?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(s => !Uri.IsWellFormedUriString(s, UriKind.Absolute))
                 .ToList();
+
             if (namedExplicitSources?.Count > 0)
             {
                 // Uri.Equals() and == operator compare hostnames case-insensitively and the remainder of the url case-sensitively
