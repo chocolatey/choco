@@ -252,6 +252,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </summary>
         public string Sources { get; set; }
 
+        /// <summary>
+        /// One or more source locations set by comamnd line only. Semi-colon delimited.
+        /// <strong>Do not set this anywhere other than parsing CLI arguments for commands.</strong>
+        /// </summary>
+        public string ExplicitSources { get; set; }
+
         public string SourceType { get; set; }
 
         // top level commands
