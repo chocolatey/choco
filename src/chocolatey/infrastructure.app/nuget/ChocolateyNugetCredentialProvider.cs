@@ -92,16 +92,19 @@ namespace chocolatey.infrastructure.app.nuget
 
             // If the user has specified --source with a *named* source and not a URL, try to find the matching one
             // with the correct URL for this credential request.
-            var namedExplicitSources = _config.ExplicitSources?.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+            // Lower case all of the explicitly named sources so that we can use .Contains to compare them.
+            var namedExplicitSources = _config.ExplicitSources?.ToLower().Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
                 .Where(s => !Uri.IsWellFormedUriString(s, UriKind.Absolute))
                 .ToList();
 
             if (namedExplicitSources?.Count > 0)
             {
-                // Uri.Equals() and == operator compare hostnames case-insensitively and the remainder of the url case-sensitively
-                // while ignoring #fragments on the URLs, but does care about trailing slashes, which we do not here.
+                // Instead of using Uri.Equals(), we're using Uri.Compare() on the HttpRequestUrl components as this allows
+                // us to ignore the case of everything.
                 source = _config.MachineSources
-                    .Where(s => namedExplicitSources.Contains(s.Name) && new Uri(s.Key.TrimEnd('/')) == trimmedTargetUri)
+                    .Where(s => namedExplicitSources.Contains(s.Name.ToLower())
+                    && Uri.TryCreate(s.Key.TrimEnd('/'), UriKind.Absolute, out var trimmedSourceUri)
+                    && Uri.Compare(trimmedSourceUri, trimmedTargetUri, UriComponents.HttpRequestUrl, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0)
                     .FirstOrDefault();
             }
 
@@ -113,11 +116,12 @@ namespace chocolatey.infrastructure.app.nuget
                 // Note: This behaviour remains as removing it would be a breaking change, but we may want
                 // to remove this in a future version, as specifying an explicit URL should potentially
                 // not go looking in the configuration file for saved credentials anyway.
+                // See GitHub Issue: https://github.com/chocolatey/choco/issues/3573
                 var candidateSources = _config.MachineSources
                     .Where(s => !string.IsNullOrWhiteSpace(s.Username)
                         && !string.IsNullOrWhiteSpace(s.EncryptedPassword)
                         && Uri.TryCreate(s.Key.TrimEnd('/'), UriKind.Absolute, out var trimmedSourceUri)
-                        && trimmedSourceUri == trimmedTargetUri)
+                        && Uri.Compare(trimmedSourceUri, trimmedTargetUri, UriComponents.HttpRequestUrl, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0)
                     .ToList();
 
                 if (candidateSources.Count == 1)
