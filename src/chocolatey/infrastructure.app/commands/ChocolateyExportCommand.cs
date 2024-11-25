@@ -20,6 +20,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml;
+using System.Xml.Serialization;
 using chocolatey.infrastructure.app.attributes;
 using chocolatey.infrastructure.commandline;
 using chocolatey.infrastructure.app.configuration;
@@ -36,11 +37,19 @@ namespace chocolatey.infrastructure.app.commands
     {
         private readonly INugetService _nugetService;
         private readonly IFileSystem _fileSystem;
+        private readonly IChocolateyPackageInformationService _packageInfoService;
+        private readonly IChocolateyPackageService _packageService;
 
-        public ChocolateyExportCommand(INugetService nugetService, IFileSystem fileSystem)
+        public ChocolateyExportCommand(
+            INugetService nugetService,
+            IFileSystem fileSystem,
+            IChocolateyPackageInformationService packageInfoService,
+            IChocolateyPackageService packageService)
         {
             _nugetService = nugetService;
             _fileSystem = fileSystem;
+            _packageInfoService = packageInfoService;
+            _packageService = packageService;
         }
 
         public void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
@@ -52,6 +61,12 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("include-version-numbers|include-version",
                      "Include Version Numbers - controls whether or not version numbers for each package appear in generated file.  Defaults to false.",
                      option => configuration.ExportCommand.IncludeVersionNumbers = option != null)
+                .Add("include-arguments|include-remembered-arguments",
+                    "Include Remembered Arguments - controls whether or not remembered arguments for each package appear in generated file.  Defaults to false. Available in 2.3.0+",
+                    option => configuration.ExportCommand.IncludeRememberedPackageArguments = option != null)
+                .Add("exclude-pins",
+                    "Exclude Pins - controls whether or not pins are included. Only applies if remembered arguments are exported. Defaults to false. Available in 2.4.0+",
+                    option => configuration.ExportCommand.ExcludePins = option != null)
                 ;
         }
 
@@ -95,12 +110,15 @@ those packages onto new machine using `choco install packages.config`.
             "chocolatey".Log().Info(@"
     choco export
     choco export --include-version-numbers
+    choco export --include-version-numbers --include-remembered-arguments
+    choco export --include-remembered-arguments --exclude-pins
     choco export ""'c:\temp\packages.config'""
     choco export ""'c:\temp\packages.config'"" --include-version-numbers
     choco export -o=""'c:\temp\packages.config'""
     choco export -o=""'c:\temp\packages.config'"" --include-version-numbers
     choco export --output-file-path=""'c:\temp\packages.config'""
     choco export --output-file-path=""'c:\temp\packages.config'"" --include-version-numbers
+    choco export --output-file-path=""""'c:\temp\packages.config'"""" --include-remembered-arguments
 
 NOTE: See scripting in the command reference (`choco -?`) for how to
  write proper scripts and integrations.
@@ -131,39 +149,90 @@ If you find other exit codes that we have not yet documented, please
 
         public void DryRun(ChocolateyConfiguration configuration)
         {
-            this.Log().Info("Export would have been with options: {0} Output File Path={1}{0} Include Version Numbers:{2}".FormatWith(Environment.NewLine, configuration.ExportCommand.OutputFilePath, configuration.ExportCommand.IncludeVersionNumbers));
+            this.Log().Info("Export would have been with options: {0} Output File Path={1}{0} Include Version Numbers:{2}{0} Include Remembered Arguments: {3}{0}  Exclude Pins: {4}".FormatWith(
+                Environment.NewLine,
+                configuration.ExportCommand.OutputFilePath,
+                configuration.ExportCommand.IncludeVersionNumbers,
+                configuration.ExportCommand.IncludeRememberedPackageArguments,
+                configuration.ExportCommand.ExcludePins));
         }
 
         public void Run(ChocolateyConfiguration configuration)
         {
-            var packageResults = _nugetService.GetInstalledPackages(configuration);
-            var settings = new XmlWriterSettings { Indent = true, Encoding = new UTF8Encoding(false) };
+            var installedPackages = _nugetService.GetInstalledPackages(configuration);
+            var xmlWriterSettings = new XmlWriterSettings { Indent = true, Encoding = new UTF8Encoding(false) };
+
+            configuration.CreateBackup();
 
             FaultTolerance.TryCatchWithLoggingException(
                 () =>
                 {
+                    var packagesConfig = new PackagesConfigFileSettings();
+                    packagesConfig.Packages = new HashSet<PackagesConfigFilePackageSetting>();
+
                     using (var stringWriter = new StringWriter())
                     {
-                        using (var xw = XmlWriter.Create(stringWriter, settings))
+                        using (var xw = XmlWriter.Create(stringWriter, xmlWriterSettings))
                         {
-                            xw.WriteProcessingInstruction("xml", "version=\"1.0\" encoding=\"utf-8\"");
-                            xw.WriteStartElement("packages");
-
-                            foreach (var packageResult in packageResults)
+                            foreach (var packageResult in installedPackages)
                             {
-                                xw.WriteStartElement("package");
-                                xw.WriteAttributeString("id", packageResult.PackageMetadata.Id);
+                                var packageElement = new PackagesConfigFilePackageSetting
+                                {
+                                    Id = packageResult.PackageMetadata.Id
+                                };
 
                                 if (configuration.ExportCommand.IncludeVersionNumbers)
                                 {
-                                    xw.WriteAttributeString("version", packageResult.PackageMetadata.Version.ToString());
+                                    packageElement.Version = packageResult.PackageMetadata.Version.ToString();
                                 }
 
-                                xw.WriteEndElement();
+                                if (configuration.ExportCommand.IncludeRememberedPackageArguments)
+                                {
+                                    var pkgInfo = _packageInfoService.Get(packageResult.PackageMetadata);
+                                    configuration.Features.UseRememberedArgumentsForUpgrades = true;
+                                    var rememberedConfig =  _nugetService.GetPackageConfigFromRememberedArguments(configuration, pkgInfo);
+
+                                    // Mirrors the arguments captured in ChocolateyPackageService.CaptureArguments()
+                                    if (configuration.Prerelease) packageElement.Prerelease = true;
+                                    if (configuration.IgnoreDependencies) packageElement.IgnoreDependencies = true;
+                                    if (configuration.ForceX86) packageElement.ForceX86 = true;
+                                    if (!string.IsNullOrWhiteSpace(configuration.InstallArguments)) packageElement.InstallArguments = configuration.InstallArguments;
+                                    if (configuration.OverrideArguments) packageElement.OverrideArguments = true;
+                                    if (configuration.ApplyInstallArgumentsToDependencies) packageElement.ApplyInstallArgumentsToDependencies = true;
+                                    if (!string.IsNullOrWhiteSpace(configuration.PackageParameters)) packageElement.PackageParameters = configuration.PackageParameters;
+                                    if (configuration.ApplyPackageParametersToDependencies) packageElement.ApplyPackageParametersToDependencies = true;
+                                    if (configuration.AllowDowngrade) packageElement.AllowDowngrade = true;
+                                    if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.Username)) packageElement.User = configuration.SourceCommand.Username;
+                                    if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.Password)) packageElement.Password = configuration.SourceCommand.Password;
+                                    if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.Certificate)) packageElement.Cert = configuration.SourceCommand.Certificate;
+                                    if (!string.IsNullOrWhiteSpace(configuration.SourceCommand.CertificatePassword)) packageElement.CertPassword = configuration.SourceCommand.CertificatePassword;
+                                    // Arguments from the global options set
+                                    if (configuration.CommandExecutionTimeoutSeconds != ApplicationParameters.DefaultWaitForExitInSeconds)
+                                    {
+                                        packageElement.ExecutionTimeout = configuration.CommandExecutionTimeoutSeconds;
+                                    }
+                                    // This was discussed in the PR, and because it is potentially system specific, it should not be included in the exported file
+                                    // if (!string.IsNullOrWhiteSpace(configuration.CacheLocation)) packageElement.CacheLocation = configuration.CacheLocation;
+                                    // if (configuration.Features.FailOnStandardError) packageElement.FailOnStderr = true;
+                                    // if (!configuration.Features.UsePowerShellHost) packageElement.UseSystemPowershell = true;
+
+                                    if (!configuration.ExportCommand.ExcludePins && pkgInfo.IsPinned)
+                                    {
+                                        xw.WriteAttributeString("pinPackage", "true");
+                                    }
+
+                                    // Make sure to reset the configuration so as to be able to parse the next set of remembered arguments
+                                    configuration.RevertChanges();
+                                }
+
+                                packagesConfig.Packages.Add(packageElement);
                             }
 
-                            xw.WriteEndElement();
-                            xw.Flush();
+                            XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
+                            ns.Add("", "");
+
+                            var packagesConfigSerializer = new XmlSerializer(typeof(PackagesConfigFileSettings));
+                            packagesConfigSerializer.Serialize(xw, packagesConfig, ns);
                         }
 
                         var fullOutputFilePath = _fileSystem.GetFullPath(configuration.ExportCommand.OutputFilePath);
