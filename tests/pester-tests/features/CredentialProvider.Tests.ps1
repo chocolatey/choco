@@ -1,28 +1,35 @@
-﻿Describe 'Ensuring credentials do not bleed from configured sources' -Tag CredentialProvider -ForEach @(
+﻿# These tests are to ensure that credentials from one configured and enabled source are not
+# picked up and used when a URL is matching based on the hostname. These tests use an authenticated
+# source without explicitly providing a username/password. It is expected that Chocolatey will prompt for
+# the username and password.
+Describe 'Ensuring credentials do not bleed from configured sources' -Tag CredentialProvider -ForEach @(
+    # Info and outdated are returning 0 in all test cases we've thrown at them.
+    # Suspect the only way either of these commands actually return non-zero is in a scenario where
+    # something goes catastrophically wrong outside of the actual command calls.
     @{
         Command = 'info'
         ExitCode = 0
-}
-    @{
-        Command = 'install'
-        ExitCode = 1
-}
+    }
     @{
         Command = 'outdated'
         ExitCode = 0
-}
+    }
+    @{
+        Command = 'install'
+        ExitCode = 1
+    }
     @{
         Command = 'search'
         ExitCode = 1
-}
+    }
     @{
         Command = 'upgrade'
         ExitCode = 1
-}
+    }
     @{
         Command = 'download'
         ExitCode = 1
-}
+    }
 ) {
     BeforeDiscovery {
         $HasLicensedExtension = Test-PackageIsEqualOrHigher -PackageName 'chocolatey.extension' -Version '6.0.0'
