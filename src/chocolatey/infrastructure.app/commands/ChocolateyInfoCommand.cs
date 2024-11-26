@@ -38,7 +38,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add(
                     "s=|source=",
                     "Source - Source location for install. Can use special 'windowsfeatures', 'ruby', 'cygwin', or 'python' sources. Defaults to configured sources.",
-                    option => configuration.Sources = option.UnquoteSafe())
+                    option => configuration.Sources = configuration.ExplicitSources = option.UnquoteSafe())
                 .Add(
                     "l|lo|localonly|local-only",
                     "LocalOnly - Only search against local machine items.",

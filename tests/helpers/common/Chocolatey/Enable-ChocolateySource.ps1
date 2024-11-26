@@ -9,9 +9,7 @@ function Enable-ChocolateySource {
         [switch]$All
     )
     # Significantly weird behaviour with piping this source list by property name.
-    $CurrentSources = (Invoke-Choco source list -r).Lines | ConvertFrom-ChocolateyOutput -Command SourceList | Where-Object {
-        $_.Name -like $Name
-    }
+    $CurrentSources = Get-ChocolateySource -Name $Name
     foreach ($Source in $CurrentSources) {
         $null = Invoke-Choco source enable --name $Source.Name
     }
