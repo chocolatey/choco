@@ -49,7 +49,7 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.SourceCommand.Name = option.remove_surrounding_quotes())
                 .Add("s=|source=",
                      "Source - The source. This can be a folder/file share or an http location. If it is a url, it will be a location you can go to in a browser and it returns OData with something that says Packages in the browser, similar to what you see when you go to https://community.chocolatey.org/api/v2/. Required with add action. Defaults to empty.",
-                     option => configuration.Sources = option.remove_surrounding_quotes())
+                     option => configuration.Sources = configuration.ExplicitSources = option.remove_surrounding_quotes())
                 .Add("u=|user=",
                      "User - used with authenticated feeds. Defaults to empty.",
                      option => configuration.SourceCommand.Username = option.remove_surrounding_quotes())
