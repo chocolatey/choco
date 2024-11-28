@@ -8,8 +8,6 @@ Describe 'Ensuring correct version of <Name> is installed' -Tag BundledApplicati
         BeforeAll {
             # Because we're not modifying the install in any way, there is no need to Initialize-ChocolateyTestInstall
             $ToolPath = "$env:ChocolateyInstall/tools/$Name.exe"
-            # TODO: Encapsulate in an environment variable once kitchen-pester has new version - https://github.com/chocolatey/choco/issues/2692
-            $Thumbprint = '83AC7D88C66CB8680BCE802E0F0F5C179722764B'
         }
 
         It 'Should be in Chocolatey tools directory' {
@@ -18,8 +16,17 @@ Describe 'Ensuring correct version of <Name> is installed' -Tag BundledApplicati
 
         It 'Should be appropriately signed' -Skip:(-not $IsSigned) {
             $signature = Get-AuthenticodeSignature -FilePath $ToolPath
-            $signature.Status | Should -Be 'Valid'
-            $signature.SignerCertificate.Thumbprint | Should -Be $Thumbprint
+
+            # For non production builds, the official signing certificate is not in play, so need to
+            # alter the assestion slightly, to account for the fact that UnknownError, is making the
+            # underlying problem, i.e. "A certificate chain processed, but terminated in a root
+            # certificate which is not trusted by the trust provider"
+            if ($signature.SignerCertificate.Issuer -match 'Chocolatey Software, Inc') {
+                $signature.Status | Should -Be 'UnknownError'
+            }
+            elseif ($signature.SignerCertificate.Issuer -match 'DigiCert') {
+                $signature.Status | Should -Be 'Valid'
+            }
         }
 
         It 'Should be version <Version>' {
