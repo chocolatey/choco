@@ -56,10 +56,11 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $
         }
 
         It "Should Report the actual cause of the error" {
-            $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse"
-            $Output.Lines | Should -Contain "An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below..."
-            $Output.String | Should -Match "Failed to process request. '"
-            $Output.Lines | Should -Contain "The remote server returned an error: (409) Conflict.."
+            $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse" -Because $Output.String
+            # The output seen in Team City differs from when run locally. The following strings are
+            # consistent between both output messages, and should be sufficient to identify issues.
+            $Output.String | Should -Match "An error has occurred. "
+            $Output.String | Should -Match "package version already exists on the repository"
         }
     }
 

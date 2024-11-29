@@ -111,7 +111,10 @@ namespace chocolatey.infrastructure.app.nuget
                     .Where(s => !string.IsNullOrWhiteSpace(s.Username)
                         && !string.IsNullOrWhiteSpace(s.EncryptedPassword)
                         && Uri.TryCreate(s.Key.TrimEnd('/'), UriKind.Absolute, out var trimmedSourceUri)
-                        && Uri.Compare(trimmedSourceUri, trimmedTargetUri, UriComponents.HttpRequestUrl, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0)
+                        && (Uri.Compare(trimmedSourceUri, trimmedTargetUri, UriComponents.HttpRequestUrl, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0
+                            // If the target starts with a machine source, we're in a scenario where NuGet is now trying to download the package.
+                            // For whatever reason NuGet sometimes forgets the credentials between discovering the package and downloading the package.
+                            || trimmedTargetUri.ToString().StartsWith(trimmedSourceUri.ToString(), StringComparison.OrdinalIgnoreCase)))
                     .ToList();
 
                 if (candidateSources.Count == 1)
