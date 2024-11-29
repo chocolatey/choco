@@ -48,6 +48,7 @@ function Remove-ShimWithAuthenticodeSignature {
   $possibleSignatures = @(
     'RealDimensions Software, LLC'
     'Chocolatey Software, Inc\.'
+    'Chocolatey Software, Inc'
   )
 
   $possibleSignatures | ForEach-Object {
