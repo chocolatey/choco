@@ -316,6 +316,9 @@ Task("Prepare-NuGet-Packages")
     CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.xml", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/lib/chocolatey.xml");
 });
 
+BuildParameters.Tasks.BuildMsiTask
+    .WithCriteria(false, "Skipping MSI because this version does not have an MSI");
+
 ///////////////////////////////////////////////////////////////////////////////
 // RECIPE SCRIPT
 ///////////////////////////////////////////////////////////////////////////////
