@@ -79,59 +79,60 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             // credentials were not explicit
-            // discover based on closest match in sources
-            var candidateSources = _config.MachineSources.Where(
-                s =>
-                {
-                    var sourceUrl = s.Key.TrimEnd('/');
-
-                    try
-                    {
-                        var sourceUri = new Uri(sourceUrl);
-                        return sourceUri.Host.is_equal_to(uri.Host)
-                            && !string.IsNullOrWhiteSpace(s.Username)
-                            && !string.IsNullOrWhiteSpace(s.EncryptedPassword);
-                    }
-                    catch (Exception)
-                    {
-                        this.Log().Error("Source '{0}' is not a valid Uri".format_with(sourceUrl));
-                    }
-
-                    return false;
-                }).ToList();
-
+            // find matching source(s) in sources list
+            var trimmedTargetUri = new Uri(uri.AbsoluteUri.TrimEnd('/'));
             MachineSourceConfiguration source = null;
 
+            // If the user has specified --source with a *named* source and not a URL, try to find the matching one
+            // with the correct URL for this credential request.
+            // Lower case all of the explicitly named sources so that we can use .Contains to compare them.
+            var namedExplicitSources = _config.ExplicitSources?.ToLower().Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(s => !Uri.IsWellFormedUriString(s, UriKind.Absolute))
+                .ToList();
 
-            if (candidateSources.Count == 1)
+            if (namedExplicitSources?.Count > 0)
             {
-                // only one match, use it
-                source = candidateSources.FirstOrDefault();
+                // Instead of using Uri.Equals(), we're using Uri.Compare() on the HttpRequestUrl components as this allows
+                // us to ignore the case of everything.
+                source = _config.MachineSources
+                    .Where(s => namedExplicitSources.Contains(s.Name.ToLower())
+                    && Uri.TryCreate(s.Key.TrimEnd('/'), UriKind.Absolute, out var trimmedSourceUri)
+                    && Uri.Compare(trimmedSourceUri, trimmedTargetUri, UriComponents.HttpRequestUrl, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0)
+                    .FirstOrDefault();
             }
-            else if (candidateSources.Count > 1)
+            
+            if (source is null)
             {
-                // find the source that is the closest match
-                foreach (var candidateSource in candidateSources.or_empty_list_if_null())
-                {
-                    var candidateRegEx = new Regex(Regex.Escape(candidateSource.Key.TrimEnd('/')),RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
-                    if (candidateRegEx.IsMatch(uri.OriginalString.TrimEnd('/')))
-                    {
-                        this.Log().Debug("Source selected will be '{0}'".format_with(candidateSource.Key.TrimEnd('/')));
-                        source = candidateSource;
-                        break;
-                    }
-                }
+                // Could not find a valid source by name, or the source(s) specified were all URLs.
+                // Try to look up the target URL in the saved machine sources to attempt to match credentials.
+                //
+                // Note: This behaviour remains as removing it would be a breaking change.
+                var candidateSources = _config.MachineSources
+                    .Where(s => !string.IsNullOrWhiteSpace(s.Username)
+                        && !string.IsNullOrWhiteSpace(s.EncryptedPassword)
+                        && Uri.TryCreate(s.Key.TrimEnd('/'), UriKind.Absolute, out var trimmedSourceUri)
+                        && (Uri.Compare(trimmedSourceUri, trimmedTargetUri, UriComponents.HttpRequestUrl, UriFormat.Unescaped, StringComparison.OrdinalIgnoreCase) == 0
+                            // If the target starts with a machine source, we're in a scenario where NuGet is now trying to download the package.
+                            // For whatever reason NuGet sometimes forgets the credentials between discovering the package and downloading the package.
+                            || trimmedTargetUri.ToString().StartsWith(trimmedSourceUri.ToString(), StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
 
-                if (source == null && !retrying)
+                if (candidateSources.Count == 1)
                 {
-                    // use the first source. If it fails, fall back to grabbing credentials from the user
+                    // only one match, use it
+                    source = candidateSources.First();
+                }
+                else if (candidateSources.Count > 1 && !retrying)
+                {
+                    // Use the credentials from the first found source, unless it's a retry (creds already tried and failed)
+                    // use the first source. If it fails, fall back to grabbing credentials from the user.
                     var candidateSource = candidateSources.First();
                     this.Log().Debug("Evaluated {0} candidate sources but was unable to find a match, using {1}".format_with(candidateSources.Count, candidateSource.Key.TrimEnd('/')));
                     source = candidateSource;
                 }
             }
 
-            if (source == null)
+            if (source is null)
             {
                 this.Log().Debug("Asking user for credentials for '{0}'".format_with(uri.OriginalString));
                 return get_credentials_from_user(uri, proxy, credentialType);
