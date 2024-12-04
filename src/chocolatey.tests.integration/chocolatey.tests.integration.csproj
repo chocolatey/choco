@@ -485,6 +485,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="infrastructure.app\builders\ConfigurationBuilderSpecs.cs" />
+    <Compile Include="infrastructure.app\nuget\NugetListSpecs.cs" />
     <Compile Include="infrastructure.app\services\FilesServiceSpecs.cs" />
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
     <Compile Include="infrastructure\cryptography\CryptoHashProviderSpecs.cs" />

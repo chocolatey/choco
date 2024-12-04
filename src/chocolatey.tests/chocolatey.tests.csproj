@@ -186,6 +186,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyUnpackSelfCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyUpgradeCommandSpecs.cs" />
     <Compile Include="infrastructure.app\configuration\ConfigurationOptionsSpec.cs" />
+    <Compile Include="infrastructure.app\nuget\ChocolateyNugetCredentialProviderSpecs.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyNugetLoggerSpecs.cs" />
     <Compile Include="infrastructure.app\nuget\ChocolateyNuGetProjectContextSpecs.cs" />
     <Compile Include="infrastructure.app\nuget\NugetCommonSpecs.cs" />

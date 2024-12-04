@@ -203,6 +203,27 @@ namespace chocolatey.infrastructure.app.nuget
                                 }
                             }
                         }
+                        else if (version != null)
+                        {
+                            // We need to look up any packages that do not have a matching version number.
+
+                            foreach (var package in latestResults)
+                            {
+                                if (package.Identity.Version != version)
+                                {
+                                    var result = FindPackage(package.Identity.Id, configuration, nugetLogger, (SourceCacheContext)cacheContext, new[] { repositoryResources }, version);
+
+                                    if (result != null)
+                                    {
+                                        results.Add(result);
+                                    }
+                                }
+                                else
+                                {
+                                    results.Add(package);
+                                }
+                            }
+                        }
                         else
                         {
                             results.AddRange(latestResults);

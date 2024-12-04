@@ -262,6 +262,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// </summary>
         public string Sources { get; set; }
 
+        /// <summary>
+        /// One or more source locations set by comamnd line only. Semi-colon delimited.
+        /// <strong>Do not set this anywhere other than parsing CLI arguments for commands.</strong>
+        /// </summary>
+        public string ExplicitSources { get; set; }
+
         public string SourceType { get; set; }
         public bool IncludeConfiguredSources { get; set; }
 
@@ -597,6 +603,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool NotBroken { get; set; }
         public bool IncludeVersionOverrides { get; set; }
         public bool ExplicitPageSize { get; set; }
+        [Obsolete("This property is deprecated and will be removed in v3. Check if the top-level ExplicitSources property is set instead.")]
         public bool ExplicitSource { get; set; }
     }
 
