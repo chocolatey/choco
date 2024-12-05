@@ -43,7 +43,7 @@ namespace chocolatey.infrastructure.app.commands
             optionSet
                 .Add("s=|source=",
                      "Source - Source location for install. Can use special 'windowsfeatures', 'ruby', 'cygwin', or 'python' sources. Defaults to sources.",
-                     option => configuration.Sources = option.UnquoteSafe())
+                     option => configuration.Sources = configuration.ExplicitSources = option.UnquoteSafe())
                 .Add("idonly|id-only",
                      "Id Only - Only return Package Ids in the list results.",
                      option => configuration.ListCommand.IdOnly = option != null)

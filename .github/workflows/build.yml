@@ -50,7 +50,7 @@ jobs:
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Build with .Net Framework
       shell: powershell
-      run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=unit --shouldRunOpenCover=false
+      run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=unit --shouldRunOpenCover=false --shouldBuildMsi=true
     - name: Upload Windows build results
       uses: actions/upload-artifact@v3
       # Always upload build results
@@ -67,6 +67,7 @@ jobs:
           code_drop\Packages\NuGet\*.nupkg
           code_drop\Packages\Chocolatey\*.nupkg
           code_drop\MsBuild.log
+          code_drop\MSIs\en-US\chocolatey-*.msi
   #  - uses: coverallsapp/github-action@master
   #    with:
   #      github-token: ${{ secrets.GITHUB_TOKEN }}

@@ -72,10 +72,17 @@ Describe "Chocolatey User Agent" -Tag Chocolatey, UserAgent {
 
         $userAgent = $matches['UserAgent']
 
-        $userAgent -match 'Chocolatey Command Line/(?<Version>[a-z0-9.-]+) ([a-z ]+/(<?LicensedVersion>[a-z0-9.-]+) )?\((?<RootProcess>[^,)]+)(?:, (?<ParentProcess>[^)]+))?\) via NuGet Client' |
+        $userAgent -match 'Chocolatey Command Line/(?<Version>[a-z0-9.-]+) ([a-z ]+/(?<LicensedVersion>[a-z0-9.-]+) )?\((?<RootProcess>[^,)]+)(?:, (?<ParentProcess>[^)]+))?\) via NuGet Client' |
             Should -BeTrue -Because "the user agent string should contain the choco.exe version, the licensed extension version if any, and any parent processes. $logLine"
 
         $matches['Version'] | Should -Be $ChocolateyVersion -Because "the user agent string should contain the currently running Chocolatey version. $logLine"
+
+        if (Test-PackageIsEqualOrHigher -PackageName 'chocolatey.extension' -Version '6.3.0-alpha') {
+            # We are not asserting the Licensed Extension version here as the Chocolatey package version often
+            # mismatches the assembly version.
+            $matches['LicensedVersion'] | Should -Not -BeNullOrEmpty -Because "Chocolatey Licensed Extension is installed and should be in the user agent. $logLine"
+        }
+
         $filteredProcesses = @($Processes | Where-Object { $_ -notin $ExcludedProcesses })
         
         if ($filteredProcesses.Count -gt 1) {

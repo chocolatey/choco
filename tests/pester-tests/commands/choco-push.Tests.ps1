@@ -152,6 +152,9 @@ Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($
 
             if ($UseConfig) {
                 $null = Invoke-Choco apikey add --source $RepositoryToUse$RepositoryEndpoint --api-key $ApiKey
+                # Add the Nuget source so that the push doesn't prompt for credentials.
+                # See https://github.com/chocolatey/choco/issues/2026#issuecomment-2423828013
+                $null = Invoke-Choco source add --name temporary-nuget --source $RepositoryToUse$RepositoryEndpoint --user $env:NUGET_SOURCE_USERNAME --password $env:NUGET_SOURCE_PASSWORD
                 # Ensure the key is null (should always be, but scoping can be wonky)
                 $KeyParameter = $null
             } else {
