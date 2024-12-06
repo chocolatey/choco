@@ -217,6 +217,9 @@ be used in place.
 NOTE: You can also use `Install-ChocolateyInstallPackage` for the same
 functionality (see links).
 
+.PARAMETER Credentials
+OPTIONAL A System.Net.ICredentials-Object that can be used for downloading files from a server which requires user authentication.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -364,6 +367,7 @@ Install-ChocolateyZipPackage
         [alias("useOnlyPackageSilentArgs")][switch] $useOnlyPackageSilentArguments = $false,
         [parameter(Mandatory = $false)][switch]$useOriginalLocation,
         [parameter(Mandatory = $false)][scriptblock] $beforeInstall,
+        [parameter(Mandatory = $false)][System.Net.ICredentials] $credentials = $null,
         [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
     )
     [string]$silentArgs = $silentArgs -join ' '
@@ -413,6 +417,7 @@ Install-ChocolateyZipPackage
             -Checksum64 $checksum64 `
             -ChecksumType64 $checksumType64 `
             -Options $options `
+            -Credentials $credentials `
             -GetOriginalFileName
     }
 
