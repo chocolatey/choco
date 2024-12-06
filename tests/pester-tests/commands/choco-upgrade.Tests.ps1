@@ -165,7 +165,8 @@
             $null = Invoke-Choco install wget
             $null = Invoke-Choco install curl
 
-            $Output = Invoke-Choco upgrade all
+            # Exclude packages not involved in these tests to ensure that they don't report false positives
+            $Output = Invoke-Choco upgrade all --except="chocolatey,chocolatey.extension,chocolatey-agent,pester,chocolatey-license-business"
         }
 
         It 'Exits with Success (0)' {
