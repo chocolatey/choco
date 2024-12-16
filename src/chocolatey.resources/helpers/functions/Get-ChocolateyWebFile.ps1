@@ -301,7 +301,7 @@ Get-FtpFile
             $fileFullPath = $fileFullPath -replace '\\chocolatey\\chocolatey\\', '\chocolatey\'
             $fileDirectory = [System.IO.Path]::GetDirectoryName($fileFullPath)
             $originalFileName = [System.IO.Path]::GetFileName($fileFullPath)
-            $fileFullPath = Get-WebFileName -Url $url -DefaultName $originalFileName
+            $fileFullPath = Get-WebFileName -Url $url -DefaultName $originalFileName -Options $options
             $fileFullPath = Join-Path $fileDirectory $fileFullPath
             $fileFullPath = [System.IO.Path]::GetFullPath($fileFullPath)
         }
@@ -324,7 +324,7 @@ Get-FtpFile
     $headers = @{}
     if ($url.StartsWith('http')) {
         try {
-            $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
+            $headers = Get-WebHeaders -Url $url -ErrorAction "Stop" -Options $options
         }
         catch {
             if ($PSVersionTable.PSVersion -lt (New-Object 'Version' 3, 0)) {
@@ -333,7 +333,7 @@ Get-FtpFile
                 $originalProtocol = [System.Net.ServicePointManager]::SecurityProtocol
                 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Ssl3
                 try {
-                    $headers = Get-WebHeaders -Url $url -ErrorAction "Stop"
+                    $headers = Get-WebHeaders -Url $url -ErrorAction "Stop" -Options $options
                 }
                 catch {
                     Write-Host "Attempt to get headers for $url failed.`n  $($_.Exception.Message)"

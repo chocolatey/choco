@@ -52,6 +52,7 @@ Get-WebFile
     param(
         [parameter(Mandatory = $false, Position = 0)][string] $url = '',
         [parameter(Mandatory = $false, Position = 1)][string] $userAgent = 'chocolatey command line',
+        [parameter(Mandatory = $false, Position = 2)][hashtable] $options = @{Headers = @{} },
         [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
     )
 
@@ -61,7 +62,7 @@ Get-WebFile
         return @{}
     }
 
-    $request = [System.Net.HttpWebRequest]::Create($url);
+    [System.Net.HttpWebRequest] $request = [System.Net.HttpWebRequest]::Create($url);
     $defaultCreds = [System.Net.CredentialCache]::DefaultCredentials
     if ($defaultCreds -ne $null) {
         $request.Credentials = $defaultCreds
@@ -128,7 +129,38 @@ Get-WebFile
 
     #http://stackoverflow.com/questions/518181/too-many-automatic-redirections-were-attempted-error-message-when-using-a-httpw
     $request.CookieContainer = New-Object System.Net.CookieContainer
-    if ($userAgent -ne $null) {
+
+    if ($options.Headers -ne $null) {
+        foreach ($key in $options.Headers.Keys) {
+            # https://learn.microsoft.com/en-us/dotnet/api/system.net.httpwebrequest.headers?view=net-8.0#remarks
+            switch ($key.ToLower()) {
+                'accept' { $request.Accept = $options.Headers[$key] }
+                'connection' { }
+                'content-length' { $request.ContentLength = $options.Headers[$key] }
+                'content-type' { $request.ContentType = $options.Headers[$key] }
+                'expect' { $request.Expect = $options.Headers[$key] }
+                'date' { $request.Date = $options.Headers[$key] }
+                'host' { $request.Host = $options.Headers[$key] }
+                'if-modified-since' { $request.IfModifiedSince = $options.Headers[$key] }
+                'range' { }
+                'referer' { $request.Referer = $options.Headers[$key] }
+                'transfer-encoding' { }
+                'user-agent' { $request.UserAgent = $options.Headers[$key] }
+
+                Default {
+                    if ([System.Net.WebHeaderCollection]::IsRestricted($key)) {
+                        Write-Warning "Skipping restricted header `'$key`' not currently supported by Chocolatey"
+                    }
+                    else {
+                        # Only add headers that don't match a request property
+                        $request.Headers.Add($key, $options.Headers[$key])
+                    }
+                }
+            }
+        }
+    }
+
+    if ($userAgent -ne $null -and $options.Headers['User-Agent'] -eq $null) {
         Write-Debug "Setting the UserAgent to `'$userAgent`'"
         $request.UserAgent = $userAgent
     }
