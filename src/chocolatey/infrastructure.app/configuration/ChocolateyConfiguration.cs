@@ -252,8 +252,10 @@ NOTE: Hiding sensitive configuration data! Please double and triple
 
         // configuration set variables
         public string CacheLocation { get; set; }
+        public bool CacheLocationArgumentWasPassed { get; set; }
 
         public int CommandExecutionTimeoutSeconds { get; set; }
+        public bool CommandExecutionTimeoutSecondsArgumentWasPassed { get; set; }
         public int WebRequestTimeoutSeconds { get; set; }
         public string DefaultTemplateName { get; set; }
 
@@ -732,6 +734,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     public sealed class ExportCommandConfiguration
     {
         public bool IncludeVersionNumbers { get; set; }
+        public bool IncludeRememberedPackageArguments { get; set; }
 
         public string OutputFilePath { get; set; }
     }
