@@ -208,9 +208,9 @@ You need to restart this machine prior to using choco.
     } else {
         @"
 Chocolatey CLI (choco.exe) is now ready.
-You can call choco from anywhere, command line or powershell by typing choco.
+You can call choco from anywhere, command line or PowerShell by typing choco.
 Run choco /? for a list of functions.
-You may need to shut down and restart powershell and/or consoles
+You may need to shut down and restart PowerShell and/or consoles
  first prior to using choco.
 "@ | Write-Output
     }
