@@ -29,6 +29,7 @@ The Chocolatey team has very explicit information here regarding the process for
   - [Submit Pull Request (PR)](#submit-pull-request-pr)
   - [Respond to Feedback on Pull Request](#respond-to-feedback-on-pull-request)
 - [Other General Information](#other-general-information)
+- [`Chocolatey.PowerShell` Guidelines](#chocolateypowershell-project)
 
 <!-- /TOC -->
 
@@ -281,3 +282,7 @@ The helpers/utility functions that are available to the packages are what we con
 If you reformat code or hit core functionality without an approval from a person on the Chocolatey Team, it's likely that no matter how awesome it looks afterwards, it will probably not get accepted. Reformatting code makes it harder for us to evaluate exactly what was changed.
 
 If you do these things, it will be make evaluation and acceptance easy. Now if you stray outside of the guidelines we have above, it doesn't mean we are going to ignore your pull request. It will just make things harder for us.  Harder for us roughly translates to a longer SLA for your pull request.
+
+## `Chocolatey.PowerShell` Guidelines
+
+Specific contribution guidelines for the `Chocolatey.PowerShell` project can be found in its [`CONTRIBUTING.md`](./src/Chocolatey.PowerShell/CONTRIBUTING.md) file.
