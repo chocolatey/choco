@@ -28,7 +28,7 @@ _ReSharper*
 *userprefs
 *.nupkg
 
-TestResult.xml
+TestResult[s].xml
 submit.xml
 SolutionVersion.cs
 SolutionVersion.vb
