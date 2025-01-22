@@ -448,7 +448,15 @@ namespace chocolatey
                 var traceAppenderName = "{0}LoggingColoredConsoleAppender".FormatWith(ChocolateyLoggers.Trace.ToStringSafe());
                 Log4NetAppenderConfiguration.EnableDebugLoggingIf(configuration.Debug, verboseAppenderName, traceAppenderName);
                 Log4NetAppenderConfiguration.EnableVerboseLoggingIf(configuration.Verbose, configuration.Debug, verboseAppenderName);
-                Log4NetAppenderConfiguration.EnableTraceLoggingIf(configuration.Trace, traceAppenderName);
+
+                var logger = ChocolateyLoggers.Normal;
+
+                if (!configuration.RegularOutput)
+                {
+                    logger = ChocolateyLoggers.LogFileOnly;
+                }
+
+                "chocolatey".Log().Warn(logger, "Usage of the --trace option is only allowed when running from an elevated session.");
             }
             finally
             {
