@@ -446,7 +446,22 @@ namespace chocolatey
                 var traceAppenderName = "{0}LoggingColoredConsoleAppender".format_with(ChocolateyLoggers.Trace.to_string());
                 Log4NetAppenderConfiguration.set_logging_level_debug_when_debug(configuration.Debug, verboseAppenderName, traceAppenderName);
                 Log4NetAppenderConfiguration.set_verbose_logger_when_verbose(configuration.Verbose, configuration.Debug, verboseAppenderName);
-                Log4NetAppenderConfiguration.set_trace_logger_when_trace(configuration.Trace, traceAppenderName);
+
+                if (configuration.Information.IsProcessElevated)
+                {
+                    Log4NetAppenderConfiguration.set_trace_logger_when_trace(configuration.Trace, traceAppenderName);
+                }
+                else
+                {
+                    var logger = ChocolateyLoggers.Normal;
+
+                    if (!configuration.RegularOutput)
+                    {
+                        logger = ChocolateyLoggers.LogFileOnly;
+                    }
+
+                    "chocolatey".Log().Warn(logger, "Usage of the --trace option is only allowed when running from an elevated session.");
+                }
             }
             finally
             {
