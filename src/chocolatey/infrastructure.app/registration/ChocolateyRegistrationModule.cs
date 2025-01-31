@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -44,7 +44,7 @@ namespace chocolatey.infrastructure.app.registration
             //nuget
             registrator.register_service<ILogger, ChocolateyNugetLogger>();
             registrator.register_service<INugetService, NugetService>();
-            registrator.register_service<IPackageDownloader, PackageDownloader>();
+            registrator.register_service<IPackageDownloader, ChocolateyPackageDownloader>();
             registrator.register_service<IPowershellService, PowershellService>();
             registrator.register_service<IChocolateyPackageInformationService, ChocolateyPackageInformationService>();
             registrator.register_service<IShimGenerationService, ShimGenerationService>();

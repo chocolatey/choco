@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,9 +17,9 @@
 namespace chocolatey.infrastructure.app.nuget
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Linq;
     using System.Net;
-    using System.Text.RegularExpressions;
     using commandline;
     using NuGet;
     using configuration;
@@ -29,6 +29,7 @@ namespace chocolatey.infrastructure.app.nuget
 
     public sealed class ChocolateyNugetCredentialProvider : ICredentialProvider
     {
+        private static readonly ConcurrentDictionary<Uri, Uri> _resolveDownloadUrls = new ConcurrentDictionary<Uri, Uri>();
         private readonly ChocolateyConfiguration _config;
 
         private const string INVALID_URL = "http://somewhere123zzaafasd.invalid";
@@ -36,6 +37,28 @@ namespace chocolatey.infrastructure.app.nuget
         public ChocolateyNugetCredentialProvider(ChocolateyConfiguration config)
         {
             _config = config;
+        }
+
+        public static void add_download_url_from_package(IPackageName package)
+        {
+            if (package == null)
+            {
+                return;
+            }
+
+            var servicePackage = package as DataServicePackage;
+
+            if (servicePackage == null)
+            {
+                return;
+            }
+
+            var sourceUri = get_source_url(servicePackage);
+
+            if (servicePackage != null && sourceUri != null && servicePackage.DownloadUrl != null && !servicePackage.DownloadUrl.ToString().StartsWith(sourceUri.ToString(), StringComparison.InvariantCultureIgnoreCase))
+            {
+                _resolveDownloadUrls.TryAdd(servicePackage.DownloadUrl, sourceUri);
+            }
         }
 
         public ICredentials GetCredentials(Uri uri, IWebProxy proxy, CredentialType credentialType, bool retrying)
@@ -48,6 +71,12 @@ namespace chocolatey.infrastructure.app.nuget
             if (retrying)
             {
                 this.Log().Warn("Invalid credentials specified.");
+            }
+
+            Uri resolveUri;
+            if (_resolveDownloadUrls.TryGetValue(uri, out resolveUri))
+            {
+                return GetCredentials(resolveUri, proxy, credentialType, retrying);
             }
 
             var configSourceUri = new Uri(INVALID_URL);
@@ -178,6 +207,26 @@ namespace chocolatey.infrastructure.app.nuget
                 };
 
             return credentials;
+        }
+
+        private static Uri get_source_url(IPackage package)
+        {
+            var type = package.GetType();
+            var property = type.GetProperty("Context", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            if (property == null)
+            {
+                return null;
+            }
+
+            var context = property.GetValue(package, new object[0]) as IDataServiceContext;
+
+            if (context == null)
+            {
+                return null;
+            }
+
+            return context.BaseUri;
         }
     }
 

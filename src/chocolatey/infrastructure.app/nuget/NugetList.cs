@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,7 +40,7 @@ namespace chocolatey.infrastructure.app.nuget
 
         private static IQueryable<IPackage> execute_package_search(ChocolateyConfiguration configuration, ILogger nugetLogger)
         {
-            var packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger, new PackageDownloader());
+            var packageRepository = NugetCommon.GetRemoteRepository(configuration, nugetLogger, new ChocolateyPackageDownloader());
             var searchTermLower = configuration.Input.to_lower();
 
             // Whether or not the package is remote determines two things:

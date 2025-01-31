@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -173,7 +173,7 @@ namespace chocolatey.infrastructure.app.nuget
         // keep this here for the licensed edition for now
         public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
         {
-            return GetPackageManager(configuration, nugetLogger, new PackageDownloader(), installSuccessAction, uninstallSuccessAction, addUninstallHandler);
+            return GetPackageManager(configuration, nugetLogger, new ChocolateyPackageDownloader(), installSuccessAction, uninstallSuccessAction, addUninstallHandler);
         }
 
         public static IPackageManager GetPackageManager(ChocolateyConfiguration configuration, ILogger nugetLogger, IPackageDownloader packageDownloader, Action<PackageOperationEventArgs> installSuccessAction, Action<PackageOperationEventArgs> uninstallSuccessAction, bool addUninstallHandler)
