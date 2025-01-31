@@ -26,7 +26,7 @@ jobs:
         chmod +x build.sh
         $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=unit
     - name: Upload Ubuntu build results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       # Always upload build results
       if: ${{ always() }}
       with:
@@ -52,7 +52,7 @@ jobs:
       shell: powershell
       run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=unit --shouldRunOpenCover=false --shouldBuildMsi=true
     - name: Upload Windows build results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       # Always upload build results
       if: ${{ always() }}
       with:
@@ -92,7 +92,7 @@ jobs:
         chmod +x build.sh
         $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=unit
     - name: Upload MacOS build results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       # Always upload build results
       if: ${{ always() }}
       with:
