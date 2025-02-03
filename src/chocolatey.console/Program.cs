@@ -150,7 +150,7 @@ namespace chocolatey.console
                 {
                     Log4NetAppenderConfiguration.EnableTraceLoggingIf(config.Trace, traceAppenderName);
                 }
-                else
+                else if (config.Trace)
                 {
                     var logger = ChocolateyLoggers.Normal;
 
