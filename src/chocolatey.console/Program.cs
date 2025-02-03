@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2022 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -147,7 +147,7 @@ namespace chocolatey.console
                 {
                     Log4NetAppenderConfiguration.set_trace_logger_when_trace(config.Trace, traceAppenderName);
                 }
-                else
+                else if (config.Trace)
                 {
                     var logger = ChocolateyLoggers.Normal;
 
