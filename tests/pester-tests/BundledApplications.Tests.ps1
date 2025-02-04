@@ -3,7 +3,7 @@
 Describe 'Ensuring correct version of <Name> is installed' -Tag BundledApplications -ForEach @(
     @{ Name = 'shimgen' ; Version = '2.0.0' ; IsSigned = $true }
     @{ Name = 'checksum' ; Version = '0.3.1' ; IsSigned = $true }
-    @{ Name = '7z' ; Version = '24.08' ; IsSigned = $false }
+    @{ Name = '7z' ; Version = '24.09' ; IsSigned = $false }
 ) {
     Context '<Name> is correctly installed' {
         BeforeAll {
