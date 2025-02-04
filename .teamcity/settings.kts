@@ -39,6 +39,7 @@ object Chocolatey : BuildType({
 
         branchFilter = """
             +:*
+            -:support/*
         """.trimIndent()
     }
 
