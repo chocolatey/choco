@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2023 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -396,7 +396,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 Action = () => Service.Upgrade(Configuration);
                 Configuration.CommandName = "upgrade";
             }
-        }   
+        }
 
         public class When_ChocolateyPackageService_tries_to_upgrade_noop_nupkg_file : When_ChocolateyPackageService_tries_to_install_nupkg_file
         {
@@ -438,7 +438,7 @@ namespace chocolatey.tests.infrastructure.app.services
             [Fact]
             public void Should_Return_0_Exit_Code()
             {
-                using(new AssertionScope())
+                using (new AssertionScope())
                 {
                     MockLogger.Messages.Should().ContainKey("Warn").WhoseValue.Should().Contain(m => m.Contains("Chocolatey upgraded 0/1 packages."));
                     Environment.ExitCode.Should().Be(0);

@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -4245,7 +4245,7 @@ namespace chocolatey.tests.integration.scenarios
                     .WhoseValue.Should().NotContain(m => m.Contains("pre-beforemodify-all.ps1 hook ran for upgradepackage 1.1.0"));
             }
         }
-        
+
         public class When_upgrading_an_existing_package_with_uppercase_id : ScenariosBase
         {
             private PackageResult _packageResult;

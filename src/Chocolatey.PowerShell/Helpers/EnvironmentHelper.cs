@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2024 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -37,7 +37,7 @@ namespace Chocolatey.PowerShell.Helpers
         /// <param name="scope">The scope to look in for the environment variable.</param>
         /// <returns>The value of the environment variable as a string.</returns>
         public static string GetVariable(PSCmdlet cmdlet, string name, EnvironmentVariableTarget scope)
-        { 
+        {
             return GetVariable(cmdlet, name, scope, preserveVariables: false);
         }
 
