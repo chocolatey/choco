@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -146,7 +146,7 @@ If you find other exit codes that we have not yet documented, please
         public virtual void run(ChocolateyConfiguration configuration)
         {
             var packageManager = NugetCommon.GetPackageManager(configuration, _nugetLogger,
-                                                               new PackageDownloader(),
+                                                               new ChocolateyPackageDownloader(),
                                                                installSuccessAction: null,
                                                                uninstallSuccessAction: null,
                                                                addUninstallHandler: false);
