@@ -59,31 +59,6 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
         PrimaryAssemblyName = BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.dll",
         AssemblyPaths = assembliesToILMerge });
 
-    if (DirectoryExists(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/"))
-    {
-        var no7zAssembliesToILMerge = GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/*.{exe|dll}")
-                                - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/choco.exe")
-                                - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/System.Management.Automation.dll")
-                                - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/chocolatey.tests*.dll")
-                                - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/{Moq|nunit.framework|Should}.dll");
-
-        Information("The following assemblies have been selected to be ILMerged for choco.exe No7zip Version...");
-        foreach (var assemblyToILMerge in no7zAssembliesToILMerge)
-        {
-            Information(assemblyToILMerge.FullPath);
-        }
-
-        mergeConfigs.Add(new ILMergeConfig() {
-            KeyFile = BuildParameters.StrongNameKeyPath,
-            LogFile = BuildParameters.Paths.Directories.Build + "/ilmerge-chocono7zipexe.log",
-            TargetPlatform = targetPlatform,
-            Target = "exe",
-            Internalize = BuildParameters.RootDirectoryPath + "/src/chocolatey.console/ilmerge.internalize.ignore.txt",
-            Output = BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip_merged/choco.exe",
-            PrimaryAssemblyName = BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/choco.exe",
-            AssemblyPaths = no7zAssembliesToILMerge });
-    }
-
     return mergeConfigs;
 };
 
@@ -92,11 +67,6 @@ Func<FilePathCollection> getScriptsToVerify = () =>
     var scriptsToVerify = GetFiles("./src/chocolatey.resources/**/*.{ps1|psm1|psd1}") +
                         GetFiles(BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/**/*.{ps1|psm1|psd1}") +
                         GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/**/*.{ps1|psm1|psd1}");
-
-    if (DirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip"))
-    {
-        scriptsToVerify += GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/**/*.{ps1|psm1|psd1}");
-    }
 
     Information("The following PowerShell scripts have been selected to be verified...");
     foreach (var scriptToVerify in scriptsToVerify)
@@ -127,13 +97,6 @@ Func<FilePathCollection> getFilesToSign = () =>
                     + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe")
                     + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/tools/{checksum|shimgen}.exe")
                     + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/redirects/*.exe");
-
-    if (DirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip"))
-    {
-        filesToSign += GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/tools/chocolateyInstall/choco.exe")
-                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/tools/chocolateyInstall/tools/{checksum|shimgen}.exe")
-                    + GetFiles(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/tools/chocolateyInstall/redirects/*.exe");
-    }
 
     Information("The following assemblies have been selected to be signed...");
     foreach (var fileToSign in filesToSign)
@@ -185,122 +148,6 @@ Task("Prepare-Chocolatey-Packages")
     }
 });
 
-Task("Build-ChocolateyNo7zip")
-    .WithCriteria(() => BuildParameters.Configuration == "ReleaseOfficial", "Skipping No7zip because this isn't an official release")
-    .IsDependentOn("Build")
-    .IsDependentOn("Test")
-    .IsDependeeOf("Run-ILMerge")
-    .Does<BuildData>(data => RequireTool(ToolSettings.MSBuildExtensionPackTool, () =>
-{
-    Information("Building {0} with No7zip", BuildParameters.SolutionFilePath);
-
-    CleanDirectory(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/");
-
-    var no7zLogPath = BuildParameters.Paths.Files.BuildLogFilePath.ToString().Replace("\\.(\\S+)$", "-no7zip.${1}");
-
-    if (BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows)
-    {
-        var msbuildSettings = new MSBuildSettings
-        {
-            ToolPath = ToolSettings.MSBuildToolPath
-        }
-            .SetPlatformTarget(ToolSettings.BuildPlatformTarget)
-            .UseToolVersion(ToolSettings.BuildMSBuildToolVersion)
-            .WithProperty("OutputPath", MakeAbsolute(new DirectoryPath(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip/")).FullPath)
-            .WithProperty("TreatWarningsAsErrors", BuildParameters.TreatWarningsAsErrors.ToString())
-            .WithTarget("Build")
-            .SetMaxCpuCount(ToolSettings.MaxCpuCount)
-            .SetConfiguration("ReleaseOfficialNo7zip")
-            .WithLogger(
-                Context.Tools.Resolve("MSBuild.ExtensionPack.Loggers.dll").FullPath,
-                "XmlFileLogger",
-                string.Format(
-                    "logfile=\"{0}\";invalidCharReplacement=_;verbosity=Detailed;encoding=UTF-8",
-                    no7zLogPath
-                )
-            );
-
-        MSBuild(BuildParameters.SolutionFilePath, msbuildSettings);
-    }
-
-    if (FileExists(no7zLogPath))
-    {
-        BuildParameters.BuildProvider.UploadArtifact(no7zLogPath);
-    }
-}));
-
-Task("Prepare-ChocolateyNo7zip-Package")
-    .WithCriteria(() => BuildParameters.Configuration == "ReleaseOfficial", "Skipping No7zip because this isn't an official release")
-    .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping because not running on Windows")
-    .WithCriteria(() => BuildParameters.ShouldRunChocolatey, "Skipping because execution of Chocolatey has been disabled")
-    .IsDependentOn("Build-ChocolateyNo7zip")
-    .IsDependeeOf("Sign-Assemblies")
-    .IsDependeeOf("Verify-PowerShellScripts")
-    .IsDependeeOf("Create-ChocolateyNo7zip-Package")
-    .Does(() =>
-{
-    var nuspecDirectory = BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip";
-    // Copy the Nuget/Chocolatey directory from Root Folder to temp/nuspec/chocolatey-no7zip
-    EnsureDirectoryExists(nuspecDirectory);
-    CopyFiles(GetFiles("./nuspec/chocolatey/**/*"), nuspecDirectory, true);
-
-    // Copy legal documents
-    CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.md", nuspecDirectory + "/tools/chocolateyInstall/CREDITS.txt");
-
-    // Run Chocolatey Unpackself
-    CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco-no7zip_merged/choco.exe", nuspecDirectory + "/tools/chocolateyInstall/choco.exe");
-
-    StartProcess(nuspecDirectory + "/tools/chocolateyInstall/choco.exe", new ProcessSettings{ Arguments = "unpackself -f -y --allow-unofficial-build" });
-
-    // Tidy up logs and config folder which are not required
-    var logsDirectory = nuspecDirectory + "/tools/chocolateyInstall/logs";
-    var configDirectory = nuspecDirectory + "/tools/chocolateyInstall/config";
-
-    if (DirectoryExists(logsDirectory))
-    {
-        DeleteDirectory(logsDirectory, new DeleteDirectorySettings {
-            Recursive = true,
-            Force = true
-        });
-    }
-
-    if (DirectoryExists(configDirectory))
-    {
-        DeleteDirectory(configDirectory, new DeleteDirectorySettings {
-            Recursive = true,
-            Force = true
-        });
-    }
-});
-
-Task("Create-ChocolateyNo7zip-Package")
-    .WithCriteria(() => BuildParameters.Configuration == "ReleaseOfficial", "Skipping No7zip because this isn't an official release")
-    .WithCriteria(() => BuildParameters.ShouldRunChocolatey, "Skipping because execution of Chocolatey has been disabled")
-    .WithCriteria(() => BuildParameters.BuildAgentOperatingSystem == PlatformFamily.Windows, "Skipping because not running on Windows")
-    .IsDependentOn("Prepare-ChocolateyNo7zip-Package")
-    .IsDependeeOf("Package")
-    .Does(() =>
-{
-    var nuspecDirectory = BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "-no7zip/";
-    var nuspecFile = nuspecDirectory + "chocolatey.nuspec";
-
-    ChocolateyPack(nuspecFile, new ChocolateyPackSettings {
-        AllowUnofficial = true,
-        Version = BuildParameters.Version.PackageVersion,
-        OutputDirectory = nuspecDirectory,
-        WorkingDirectory = BuildParameters.Paths.Directories.PublishedApplications
-    });
-
-    MoveFile(
-        nuspecDirectory + "chocolatey." + BuildParameters.Version.PackageVersion + ".nupkg",
-        BuildParameters.Paths.Directories.ChocolateyPackages + "/chocolatey-no7zip." + BuildParameters.Version.PackageVersion + ".nupkg"
-    );
-
-    // Due to the fact that we have chosen to ignore the no7zip package via the chocolateyNupkgGlobbingPattern, it will
-    // no longer be automatically uploaded via Chocolatey.Cake.Recipe, so we need to handle that work here.
-    BuildParameters.BuildProvider.UploadArtifact(BuildParameters.Paths.Directories.ChocolateyPackages + "/chocolatey-no7zip." + BuildParameters.Version.PackageVersion + ".nupkg");
-});
-
 Task("Prepare-NuGet-Packages")
     .WithCriteria(() => BuildParameters.ShouldRunNuGet, "Skipping because execution of NuGet has been disabled")
     .IsDependeeOf("Create-NuGet-Packages")
@@ -348,7 +195,7 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunNuGet: IsRunningOnWindows(),
                             shouldAuthenticodeSignPowerShellScripts: IsRunningOnWindows(),
                             shouldPublishAwsLambdas: false,
-                            chocolateyNupkgGlobbingPattern: "/**/chocolatey[!-no7zip]*.nupkg");
+                            chocolateyNupkgGlobbingPattern: "/**/chocolatey*.nupkg");
 
 ToolSettings.SetToolSettings(context: Context,
                             buildMSBuildToolVersion: MSBuildToolVersion.NET40);
