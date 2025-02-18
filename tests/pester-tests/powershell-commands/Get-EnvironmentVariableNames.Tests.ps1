@@ -11,9 +11,9 @@ Describe 'Get-EnvironmentVariable helper function tests' -Tags Cmdlets {
         @{ Scope = 'User' }
         @{ Scope = 'Machine' }
     ) {
-        It 'Gets the complete list of environment variables in the <Scope> scope"' -ForEach $variables {
-            $expectedValue = [Environment]::GetEnvironmentVariables($Scope).Keys
-            Get-EnvironmentVariableNames -Scope $Scope | Should -Be $expectedValue
+        It 'Gets the complete list of environment variables in the <Scope> scope"' {
+            $expectedValue = [Environment]::GetEnvironmentVariables($Scope).Keys | Sort-Object
+            Get-EnvironmentVariableNames -Scope $Scope | Sort-Object | Should -Be $expectedValue
         }
     }
 }
