@@ -37,16 +37,20 @@ namespace chocolatey.tests.infrastructure.app.commands
             protected Mock<INugetService> NugetService = new Mock<INugetService>();
             protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
             protected ChocolateyConfiguration Configuration = new ChocolateyConfiguration();
+            protected Mock<IChocolateyPackageInformationService> PackageInfoService = new Mock<IChocolateyPackageInformationService>();
+            protected Mock<IChocolateyPackageService> PackageService = new Mock<IChocolateyPackageService>();
 
             public override void Context()
             {
-                Command = new ChocolateyExportCommand(NugetService.Object, FileSystem.Object);
+                Command = new ChocolateyExportCommand(NugetService.Object, FileSystem.Object, PackageInfoService.Object, PackageService.Object);
             }
 
             public void Reset()
             {
                 NugetService.ResetCalls();
                 FileSystem.ResetCalls();
+                PackageInfoService.ResetCalls();
+                PackageService.ResetCalls();
             }
         }
 
@@ -103,6 +107,24 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_add_include_version_to_the_option_set()
             {
                 _optionSet.Contains("include-version").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_include_arguments_to_the_option_set()
+            {
+                _optionSet.Contains("include-arguments").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_include_remembered_arguments_to_the_option_set()
+            {
+                _optionSet.Contains("include-remembered-arguments").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_exclude_pins_to_the_option_set()
+            {
+                _optionSet.Contains("exclude-pins").Should().BeTrue();
             }
         }
 
