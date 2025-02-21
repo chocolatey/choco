@@ -38,7 +38,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficial|AnyCPU' or '$(Configuration)|$(Platform)' == 'ReleaseOfficialNo7zip|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficial|AnyCPU'">
     <OutputPath>bin\ReleaseOfficial\</OutputPath>
     <DefineConstants>TRACE;FORCE_CHOCOLATEY_OFFICIAL_KEY</DefineConstants>
     <Optimize>true</Optimize>
@@ -104,7 +104,7 @@
     <EmbeddedResource Include="redirects\cpush.exe" />
     <EmbeddedResource Include="redirects\cuninst.exe" />
     <EmbeddedResource Include="redirects\cup.exe" />
-    <EmbeddedResource Include="tools\7zip.license.txt" Condition="'$(Configuration)' != 'ReleaseOfficialNo7zip'" />
+    <EmbeddedResource Include="tools\7zip.license.txt" />
     <EmbeddedResource Include="tools\checksum.exe" />
     <EmbeddedResource Include="tools\checksum.license.txt" />
     <EmbeddedResource Include="tools\shimgen.exe" />
@@ -155,15 +155,15 @@
   <ItemGroup>
     <EmbeddedResource Include="helpers\functions\Get-UninstallRegistryKey.ps1" />
   </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)' != 'ReleaseOfficialNo7zip'">
+  <ItemGroup>
     <EmbeddedResource Include="tools\7z.dll" />
     <EmbeddedResource Include="tools\7z.exe" />
   </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)' != 'ReleaseOfficialNo7zip'">
+  <ItemGroup>
     <EmbeddedResource Include="tools\7z.exe.ignore" />
     <EmbeddedResource Include="tools\7z.exe.manifest" />
   </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)' != 'ReleaseOfficialNo7zip'">
+  <ItemGroup>
     <EmbeddedResource Include="tools\7z.dll.manifest" />
   </ItemGroup>
   <ItemGroup>
