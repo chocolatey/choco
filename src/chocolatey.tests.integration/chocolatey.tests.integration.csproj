@@ -66,22 +66,22 @@
       <HintPath>..\packages\AnyOf.0.3.0\lib\net45\AnyOf.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Common">
-      <HintPath>..\packages\Chocolatey.NuGet.Common.3.4.2\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Common.3.4.3\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Configuration">
-      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.4.2\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.4.3\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Frameworks">
-      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.4.2\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.4.3\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Packaging">
-      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.4.2\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.4.3\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Protocol">
-      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.4.2\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.4.3\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Versioning">
-      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.4.2\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.4.3\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="Fare, Version=2.2.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Fare.2.2.1\lib\net35\Fare.dll</HintPath>
