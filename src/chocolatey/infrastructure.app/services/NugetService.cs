@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2023 Chocolatey Software, Inc
+// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -618,7 +618,7 @@ folder.");
                     // We have already processed this package (likely during dependency resolution of another package).
                     continue;
                 }
-                
+
                 // We need to ensure we are using a clean configuration file
                 // before we start reading it.
                 config.RevertChanges();
@@ -820,7 +820,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
 
                         foreach (var pkgMetadata in packagesToInstall)
-                        
+
                         {
                             var errorResult = packageResultsToReturn.GetOrAdd(pkgMetadata.Identity.Id, new PackageResult(pkgMetadata, pathResolver.GetInstallPath(pkgMetadata.Identity)));
                             errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -878,7 +878,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall)
                                 .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                             this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                            
+
                             if (config.Features.StopOnFirstPackageFailure)
                             {
                                 throw new ApplicationException("Stopping further execution as {0} has failed install.".FormatWith(packageToUninstall.Identity.Id));
@@ -1354,12 +1354,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             var logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
                             packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                             packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-                            
+
                             if (config.RegularOutput)
                             {
                                 this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                             }
-                            
+
                             continue;
                         }
                         else
@@ -1371,7 +1371,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             {
                                 this.Log().Warn(ChocolateyLoggers.Important, logMessage);
                             }
-                            
+
                             config.PinPackage = true;
                         }
                     }
@@ -1453,7 +1453,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
 
                         var removedSources = new HashSet<SourcePackageDependencyInfo>();
-                        
+
                         if (!config.UpgradeCommand.IgnorePinned)
                         {
                             removedSources.AddRange(RemovePinnedSourceDependencies(sourcePackageDependencyInfos, allLocalPackages));
@@ -1648,7 +1648,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             {
                                 var logMessage = StringResources.ErrorMessages.DependencyFailedToInstall.FormatWith(packageDependencyInfo.Id, packageDependencyInfo.Version);
                                 packageResultsToReturn.GetOrAdd(
-                                        packageDependencyInfo.Id, 
+                                        packageDependencyInfo.Id,
                                         new PackageResult(packageDependencyInfo.Id, packageDependencyInfo.Version.ToFullStringChecked(), string.Empty)
                                     )
                                     .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
@@ -1686,7 +1686,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                         packageResultsToReturn.GetOrAdd(packageToUninstall.Name, packageToUninstall)
                                             .Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                                        
+
                                         if (config.Features.StopOnFirstPackageFailure)
                                         {
                                             throw new ApplicationException("Stopping further execution as {0} has failed.".FormatWith(packageDependencyInfo.Id));
@@ -1951,7 +1951,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             }
 
             var packageArguments = ArgumentsUtility.DecryptPackageArgumentsFile(
-                _fileSystem, 
+                _fileSystem,
                 packageInfo.Package.Id,
                 packageInfo.Package.Version.ToNormalizedStringChecked(),
                 redactSensitiveArguments: false,
@@ -3128,7 +3128,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 {
                     using (var metadataFileStream = downloadResult.PackageReader.GetStream(PackagingCoreConstants.NupkgMetadataFileExtension))
                     {
-                        var metadataFileContents = NupkgMetadataFileFormat.Read(metadataFileStream, 
+                        var metadataFileContents = NupkgMetadataFileFormat.Read(metadataFileStream,
                                                                                 _nugetLogger,
                                                                                 PackagingCoreConstants.NupkgMetadataFileExtension);
 

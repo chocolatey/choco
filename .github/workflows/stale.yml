@@ -12,6 +12,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
+      # Action GitHub repository: https://github.com/actions/stale
       - uses: actions/stale@v9
         id: stale
         with:
@@ -20,13 +21,14 @@ jobs:
           exempt-all-assignees: false
           exempt-draft-pr: true
           stale-issue-label: "Pending Closure"
-          stale-pr-label: 'Pending Closure'
-          only-labels: '0 - Waiting on User'
+          stale-pr-label: "Pending Closure"
+          only-labels: "0 - Waiting on User"
           close-issue-label: "No Response / Stale"
+          close-issue-reason: "not_planned"
           close-pr-label: "No Response / Stale"
-          exempt-issue-labels: 'Security / CVE,2 - Working,3 - Review'
-          exempt-pr-labels: 'Security / CVE,2 - Working,3 - Review'
-          labels-to-remove-when-unstale: '0 - Waiting on User,Pending closure'
+          exempt-issue-labels: "Security,2 - Working,3 - Review"
+          exempt-pr-labels: "Security,2 - Working,3 - Review"
+          labels-to-remove-when-unstale: "0 - Waiting on User,Pending closure"
           remove-stale-when-updated: true
           stale-issue-message: |
             Is this still relevant? If so, what is blocking it? Is there anything you can do to help move it forward?
@@ -37,13 +39,18 @@ jobs:
             As this issue seems to have been inactive for quite some time now, it has been automatically closed.
             If you feel this is a valid issue, please feel free to re-open the issue if / when a pull request
             has been added.
-            Thank you for your contribution.
 
+            Thank you for your contribution.
+          stale-pr-message: |
+            Is this still relevant? If so, what is blocking it? Is there anything you can do to help move it forward?
+            This pull request will be closed in 14 days if it continues to be inactive.
           close-pr-message: |
             Dear contributor,
 
             As this PR seems to have been inactive for 30 days after changes / additional information
             was requested, it has been automatically closed.
+
             If you feel the changes are still valid, please re-open the PR once all changes or additional information
             that was requested has been added.
+
             Thank you for your contribution.

@@ -61,45 +61,27 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficialNo7zip|AnyCPU'">
-    <OutputPath>bin\ReleaseOfficialNo7zip\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficialNo7zip|AnyCPU'">
-    <OutputPath>bin\ReleaseOfficialNo7zip\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="AnyOf, Version=0.3.0.0, Culture=neutral, PublicKeyToken=b35e6abbb527c6b1, processorArchitecture=MSIL">
       <HintPath>..\packages\AnyOf.0.3.0\lib\net45\AnyOf.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Common">
-      <HintPath>..\packages\Chocolatey.NuGet.Common.3.4.2\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Common.3.4.3\lib\net472\Chocolatey.NuGet.Common.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Configuration">
-      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.4.2\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Configuration.3.4.3\lib\net472\Chocolatey.NuGet.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Frameworks">
-      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.4.2\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Frameworks.3.4.3\lib\net472\Chocolatey.NuGet.Frameworks.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Packaging">
-      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.4.2\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Packaging.3.4.3\lib\net472\Chocolatey.NuGet.Packaging.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Protocol">
-      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.4.2\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Protocol.3.4.3\lib\net472\Chocolatey.NuGet.Protocol.dll</HintPath>
     </Reference>
     <Reference Include="Chocolatey.NuGet.Versioning">
-      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.4.2\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
+      <HintPath>..\packages\Chocolatey.NuGet.Versioning.3.4.3\lib\net472\Chocolatey.NuGet.Versioning.dll</HintPath>
     </Reference>
     <Reference Include="Fare, Version=2.2.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
       <HintPath>..\packages\Fare.2.2.1\lib\net35\Fare.dll</HintPath>
@@ -394,9 +376,6 @@
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Pipelines, Version=4.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.IO.Pipelines.4.5.3\lib\netstandard2.0\System.IO.Pipelines.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Linq.Dynamic.Core, Version=1.3.12.0, Culture=neutral, PublicKeyToken=0f07ec44de6ac832, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Linq.Dynamic.Core.1.3.12\lib\net46\System.Linq.Dynamic.Core.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory, Version=4.0.1.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.4\lib\net461\System.Memory.dll</HintPath>

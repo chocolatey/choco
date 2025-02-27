@@ -1,4 +1,4 @@
-// Copyright © 2017 - 2021 Chocolatey Software, Inc
+// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -344,9 +344,9 @@ namespace chocolatey.tests.integration.scenarios
             [Platform(Exclude = "Mono")]
             public void Should_contain_message_with_download_uri()
             {
-                var packagePath = "file:///{0}/{1}.{2}{3}".FormatWith(Configuration.Sources.Replace("\\","/"), Configuration.PackageNames,
+                var packagePath = "file:///{0}/{1}.{2}{3}".FormatWith(Configuration.Sources.Replace("\\", "/"), Configuration.PackageNames,
                     TestVersion(), NuGetConstants.PackageExtension);
-               var message = "Package download location '{0}'".FormatWith(packagePath);
+                var message = "Package download location '{0}'".FormatWith(packagePath);
 
                 MockLogger.Messages.Should().ContainKey(LogLevel.Debug.ToString()).WhoseValue.Should()
                     .Contain(message);

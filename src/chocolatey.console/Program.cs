@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2023 Chocolatey Software, Inc
+﻿// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -150,7 +150,7 @@ namespace chocolatey.console
                 {
                     Log4NetAppenderConfiguration.EnableTraceLoggingIf(config.Trace, traceAppenderName);
                 }
-                else
+                else if (config.Trace)
                 {
                     var logger = ChocolateyLoggers.Normal;
 
@@ -161,7 +161,7 @@ namespace chocolatey.console
 
                     "chocolatey".Log().Warn(logger, "Usage of the --trace option is only allowed when running from an elevated session.");
                 }
-                
+
                 "chocolatey".Log().Debug(() => "{0} is running on {1} v {2}".FormatWith(ApplicationParameters.Name, config.Information.PlatformType, config.Information.PlatformVersion.ToStringSafe()));
                 //"chocolatey".Log().Debug(() => "Command Line: {0}".FormatWith(Environment.CommandLine));
 

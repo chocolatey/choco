@@ -72,7 +72,9 @@ object Chocolatey : BuildType({
 
     triggers {
         vcs {
-            branchFilter = ""
+            branchFilter = """
+                -:support/*
+            """.trimIndent()
         }
     }
 
