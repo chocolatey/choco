@@ -17,7 +17,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Cache Tools
-      uses: actions/cache@v3.0.11
+      uses: actions/cache@v4
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
@@ -44,7 +44,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Cache Tools
-      uses: actions/cache@v3.0.11
+      uses: actions/cache@v4
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
@@ -83,7 +83,7 @@ jobs:
       with:
         fetch-depth: 0
     - name: Cache Tools
-      uses: actions/cache@v3.0.11
+      uses: actions/cache@v4
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
@@ -111,7 +111,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Cache Tools
-        uses: actions/cache@v3.0.11
+        uses: actions/cache@v4
         with:
           path: tools
           key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
