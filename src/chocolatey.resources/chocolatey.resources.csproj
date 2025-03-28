@@ -70,9 +70,6 @@
     <EmbeddedResource Include="helpers\functions\Format-FileSize.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="helpers\functions\Get-ChocolateyConfigValue.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="helpers\functions\Get-ChocolateyPath.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
