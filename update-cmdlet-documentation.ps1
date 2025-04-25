@@ -95,7 +95,7 @@ $newOrUpdatedFiles = @(
     Update-MarkdownHelp -Path $documentationPath -ExcludeDontShow | Where-Object BaseName -ne $NewCommand
 )
 
-$incompleteFiles = $newOrUpdatedFiles | Select-String '\{\{[^}]+}}' | Select-Object -ExpandProperty Path
+$incompleteFiles = $newOrUpdatedFiles | Select-String '\{\{[^}]+}}' | Select-Object -ExpandProperty Path -Unique
 
 if ($incompleteFiles) {
     Write-Warning "The following files contain {{ template tokens }} from PlatyPS that must be replaced with help content before they are committed to the repository:"
