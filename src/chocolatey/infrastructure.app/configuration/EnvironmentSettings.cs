@@ -124,6 +124,11 @@ namespace chocolatey.infrastructure.app.configuration
                 Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyAllowEmptyChecksumsSecure, "true");
             }
 
+            if (config.Features.UseBuiltinCompression)
+            {
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyUseBuiltinCompression, "true");
+            }
+
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyRequestTimeout, config.WebRequestTimeoutSeconds.ToStringSafe() + "000");
 
             if (config.CommandExecutionTimeoutSeconds != 0)
