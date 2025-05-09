@@ -20,8 +20,13 @@ using System.IO;
 using System;
 using System.Management.Automation;
 using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
 
 using static chocolatey.StringResources;
+using chocolatey;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Chocolatey.PowerShell.Helpers
 {
@@ -132,6 +137,30 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
+        /// Determines if the given <paramref name="childPath"/> is a child of the given <paramref name="parentPath"/>.
+        /// </summary>
+        /// <remarks>
+        /// This assumes the following:
+        /// <list type="bullet">
+        /// <item>The file system is case insensitive or the casing is irrelevant; if the casing of the parent path differs,
+        /// it will return <c>false</c> to be safe.</item>
+        /// <item>Both paths are already expanded; ensure you have called <see cref="GetUnresolvedPath(PSCmdlet, string)"/>
+        /// before passing paths into this method.</item>
+        /// </list>
+        /// </remarks>
+        /// <param name="parentPath">The full, expanded path of the parent directory.</param>
+        /// <param name="childPath">The full, expanded path of the child item to be checked.</param>
+        /// <returns>True if the child path is a child path of the parent.</returns>
+        public static bool IsChildPath(string parentPath, string childPath)
+        {
+            // Determining if a file system is case sensitive is non-trivial.
+            // For our use cases, we make the safer assumption that people aren't
+            // messing around with mixed casing and will assume false if the casing
+            // of the parent path differs.
+            return childPath.StartsWith(parentPath, StringComparison.OrdinalIgnoreCase);
+        }
+
+        /// <summary>
         /// Test the equality of two values, based on PowerShell's equality checks, case insensitive for string values.
         /// Equivalent to <c>-eq</c> in PowerShell.
         /// </summary>
@@ -190,6 +219,16 @@ namespace Chocolatey.PowerShell.Helpers
         public static bool ContainerExists(PSCmdlet cmdlet, string path)
         {
             return cmdlet.InvokeProvider.Item.IsContainer(path);
+        }
+
+        /// <summary>
+        /// Gets the current filesystem directory location in the session.
+        /// </summary>
+        /// <param name="cmdlet">The cmdlet calling the method.</param>
+        /// <returns>The path to the current directory.</returns>
+        public static string GetCurrentDirectory(PSCmdlet cmdlet)
+        {
+            return cmdlet.SessionState.Path.CurrentFileSystemLocation?.ToString();
         }
 
         /// <summary>
@@ -258,7 +297,13 @@ namespace Chocolatey.PowerShell.Helpers
         /// <returns>A <see cref="Collection{PSObject}"/> containing the references to the item(s) created.</returns>
         public static Collection<PSObject> NewItem(PSCmdlet cmdlet, string path, string name, string itemType)
         {
-            return cmdlet.InvokeProvider.Item.New(path, name, itemType, content: string.Empty);
+            var shouldProcessPath = string.IsNullOrEmpty(name) ? path : CombinePaths(cmdlet, path, name);
+            if (cmdlet.ShouldProcess(shouldProcessPath, $"Create {itemType}"))
+            {
+                return cmdlet.InvokeProvider.Item.New(path, name, itemType, content: string.Empty);
+            }
+
+            return new Collection<PSObject>();
         }
 
         /// <summary>
@@ -295,6 +340,99 @@ namespace Chocolatey.PowerShell.Helpers
         {
             return NewItem(cmdlet, path, itemType: "Directory");
         }
+
+        /// <summary>
+        /// Similar to <c>-match</c>, returns <c>true</c> if the <paramref name="input"/> matches the given <paramref name="pattern"/> string.
+        /// </summary>
+        /// <param name="input">The string to compare</param>
+        /// <param name="pattern">The pattern to compare against</param>
+        /// <param name="caseSensitive">Whether to match the string case sensitively</param>
+        /// <returns>True if the string matches, false otherwise</returns>
+        public static bool IsMatch(string input, string pattern, bool caseSensitive)
+        {
+            return Regex.IsMatch(input, pattern, caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+        }
+
+        /// <summary>
+        /// Similar to <c>-match</c>, returns <c>true</c> if the <paramref name="input"/> matches the given <paramref name="pattern"/> string, case-insensitively.
+        /// </summary>
+        /// <param name="input">The string to compare</param>
+        /// <param name="pattern">The pattern to compare against</param>
+        /// <returns>True if the string matches, false otherwise</returns>
+        public static bool IsMatch(string input, string pattern)
+        {
+            return IsMatch(input, pattern, caseSensitive: false);
+        }
+
+        /// <summary>
+        /// Similar to <c>-replace</c>, performs a Regex replacement in the input string, optionally case-sensitive.
+        /// </summary>
+        /// <param name="input">The source string.</param>
+        /// <param name="pattern">The Regex pattern string.</param>
+        /// <param name="replacement">The replacement string.</param>
+        /// <param name="caseSensitive">Performs the replacement case-sensitively if true, otherwise ignores case.</param>
+        /// <returns>The resulting string after the replacement has been performed.</returns>
+        public static string Replace(string input, string pattern, string replacement, bool caseSensitive)
+        {
+            return Regex.Replace(input, pattern, replacement, caseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase);
+        }
+
+        /// <summary>
+        /// Similar to <c>-replace</c>, performs a Regex replacement in the input string, case-insensitively.
+        /// </summary>
+        /// <param name="input">The source string.</param>
+        /// <param name="pattern">The Regex pattern string.</param>
+        /// <param name="replacement">The replacement string.</param>
+        /// <returns>The resulting string after the replacement has been performed.</returns>
+        public static string Replace(string input, string pattern, string replacement)
+        {
+            return Replace(input, pattern, replacement, caseSensitive: false);
+        }
+
+        /// <summary>
+        /// Creates or overwrites the file specified by <paramref name="path"/> with the provided <paramref name="content"/>.
+        /// </summary>
+        /// <param name="cmdlet">The calling cmdlet.</param>
+        /// <param name="path">The path to the file to create or overwrite.</param>
+        /// <param name="content">The new file content.</param>
+        /// <param name="encoding">The encoding to write the file as.</param>
+        /// <exception cref="IOException">Error writing to the file.</exception>        
+        public static void SetContent(PSCmdlet cmdlet, string path, string content, Encoding encoding)
+        {
+            var fullPath = GetUnresolvedPath(cmdlet, path);
+
+            if (cmdlet.ShouldProcess(path, "Write content to file"))
+            {
+                using (var writer = new StreamWriter(fullPath, append: false, encoding))
+                {
+                    try
+                    {
+                        writer.Write(content);
+                        writer.Flush();
+                    }
+                    catch (IOException)
+                    {
+                        throw;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Sets the exit code for when the PowerShell host exits. Note that this does not terminate the process, just updates the
+        /// exit code for when it is exited.
+        /// </summary>
+        /// <param name="cmdlet">The calling cmdlet.</param>
+        /// <param name="exitCode">The exit code to set.</param>
+        public static void SetExitCode(PSCmdlet cmdlet, int exitCode)
+        {
+            if (cmdlet.ShouldProcess("exit code", $"Set exit code to {exitCode}"))
+            {
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyExitCode, exitCode.ToString());
+                cmdlet.Host.SetShouldExit(exitCode);
+            }
+        }
+
 
         /// <summary>
         /// Gets the path to the location of <c>powershell.exe</c>.

@@ -150,6 +150,13 @@ namespace chocolatey
                 public const string ChocolateyResponseTimeout = "chocolateyResponseTimeout";
 
                 /// <summary>
+                /// Whether the use of 7-Zip when unpacking zip/etc archives during package installation should be disabled.
+                /// This is primarily used by Expand-Chocolatey-Archive and Install-ChocolateyZipPackage.
+                /// </summary>
+                /// <remarks>The fallback is use of <see cref="global::System.IO.Compression"/>, which will have limitations and mainly work on zip archives.</remarks>
+                public const string ChocolateyUseBuiltinCompression = nameof(ChocolateyUseBuiltinCompression);
+
+                /// <summary>
                 /// The 4-part assembly version number of Chocolatey CLI that the user is currently using.
                 /// </summary>
                 public const string ChocolateyVersion = "CHOCOLATEY_VERSION";
@@ -292,6 +299,14 @@ namespace chocolatey
                 [EditorBrowsable(EditorBrowsableState.Never)]
                 [Browsable(false)]
                 internal const string ChocolateyInstallArguments = "chocolateyInstallArguments";
+
+                /// <summary>
+                /// Not used by Chocolatey CLI, but here as a reference point as it is set by Chocolatey Licensed Extension
+                /// when using the --install-directory option.
+                /// </summary>
+                [EditorBrowsable(EditorBrowsableState.Never)]
+                [Browsable(false)]
+                internal const string ChocolateyInstallDirectoryPackage = nameof(ChocolateyInstallDirectoryPackage);
 
                 /// <summary>
                 /// The identified type of the installer the package uses during installation.
