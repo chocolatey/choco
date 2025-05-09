@@ -464,6 +464,9 @@ namespace chocolatey.infrastructure.app.builders
                         .Add("skipcompatibilitychecks|skip-compatibility-checks",
                             "SkipCompatibilityChecks - Prevent warnings being shown before and after command execution when a runtime compatibility problem is found between the version of Chocolatey and the Chocolatey Licensed Extension.",
                             option => config.DisableCompatibilityChecks = option != null)
+                        .Add("use-builtin-compression",
+                            "UseBuiltinCompression - Use builtin compression routines rather than 7-Zip for extracting archives during package installations. Available in 3.0.0+",
+                            option => config.Features.UseBuiltinCompression = option != null)
                         .Add(StringResources.Options.IgnoreHttpCache,
                             StringResources.OptionDescriptions.IgnoreHttpCache,
                             option =>
