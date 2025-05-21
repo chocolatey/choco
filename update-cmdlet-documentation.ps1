@@ -63,13 +63,13 @@ $renamedFiles = Get-ChildItem -Path $documentationPath -Filter '*.md*' |
                     "[${label}](xref:${xref}#${anchor},${classes})"
                 }
                 elseif ($classes) {
-                    "[${label}](xref:${xref},${classes})"     
+                    "[${label}](xref:${xref},${classes})"
                 }
                 elseif ($anchor) {
-                    "[${label}](xref:${xref}#${anchor})"                    
+                    "[${label}](xref:${xref}#${anchor})"
                 }
                 else {
-                    "[${label}](xref:${xref})"      
+                    "[${label}](xref:${xref})"
                 }
 
             }
@@ -97,17 +97,7 @@ $newOrUpdatedFiles = @(
 
 $incompleteFiles = $newOrUpdatedFiles | Select-String '\{\{[^}]+}}' | Select-Object -ExpandProperty Path -Unique
 
-if ($incompleteFiles) {
-    Write-Warning "The following files contain {{ template tokens }} from PlatyPS that must be replaced with help content before they are committed to the repository:"
-    $incompleteFiles | Write-Warning
-
-    if ($OpenUnfinished) {
-        $incompleteFiles | Invoke-Item
-    }
-
-    Write-Warning "Run this script again once these files have been updated in order to generate the XML help documentation for the module."
-}
-else {
+if (-not $incompleteFiles) {
     New-ExternalHelp -Path $documentationPath -OutputPath "$PSScriptRoot/src/Chocolatey.PowerShell" -Force
 }
 
@@ -115,7 +105,7 @@ $newOrUpdatedFiles = $newOrUpdatedFiles |
     Rename-Item -NewName { $_.BaseName + ".mdx" } -PassThru |
     ForEach-Object {
         $content = Get-Content -Path $_.FullName
-        
+
         $frontMatterBounds = 0
         $content = $content | ForEach-Object {
             if ($_ -match '\[(?<name>[^\]]+)\]\(xref:(?<xref>[^#,]+)(#(?<anchor>[^,]+))?(?:,(?<classes>[^)]+))?\)') {
@@ -162,6 +152,18 @@ $newOrUpdatedFiles = $newOrUpdatedFiles |
 
         $_
     }
+
+$incompleteFiles = $newOrUpdatedFiles | Where-Object { $incompleteFiles -match "$($_.BaseName).md$" }
+if ($incompleteFiles) {
+    Write-Warning "The following files contain {{ template tokens }} from PlatyPS that must be replaced with help content before they are committed to the repository:"
+    $incompleteFiles | Write-Warning
+
+    if ($OpenUnfinished) {
+       $incompleteFiles | ForEach-Object { code $_.FullName -r }
+    }
+
+    Write-Warning "Run this script again once these files have been updated in order to generate the XML help documentation for the module."
+}
 
 # Output the new/updated files so calling user knows what files the script has touched.
 $newOrUpdatedFiles
