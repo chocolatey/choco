@@ -58,7 +58,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\GetChocolateyConfigValueCommand.cs" />
     <Compile Include="Commands\AssertValidChecksumCommand.cs" />
+    <Compile Include="Helpers\ConfigHelper.cs" />
     <Compile Include="Shared\ChecksumExeNotFoundException.cs" />
     <Compile Include="Shared\ChecksumVerificationFailedException.cs" />
     <Compile Include="Shared\ChecksumMissingException.cs" />
