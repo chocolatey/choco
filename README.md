@@ -39,7 +39,7 @@ You can just call me choco.
 
 | GitHub Action                                                                                                                                                                                                  |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/develop?logo=github)](https://github.com/chocolatey/choco/actions/workflows/build.yml)  |
+| [![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/chocolatey/choco/build.yml?branch=develop&logo=github)](https://github.com/chocolatey/choco/actions/workflows/build.yml)  |
 
 ## Chat Room
 
