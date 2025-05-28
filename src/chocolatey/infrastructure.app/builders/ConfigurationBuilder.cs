@@ -420,11 +420,16 @@ namespace chocolatey.infrastructure.app.builders
                                 if (timeout > 0 || timeoutString.IsEqualTo("0"))
                                 {
                                     config.CommandExecutionTimeoutSeconds = timeout;
+                                    config.CommandExecutionTimeoutSecondsArgumentWasPassed = true;
                                 }
                             })
                         .Add("c=|cache=|cachelocation=|cache-location=",
                              "CacheLocation - Location for download cache, defaults to %TEMP% or value in chocolatey.config file.",
-                             option => config.CacheLocation = option.UnquoteSafe())
+                             option =>
+                             {
+                                 config.CacheLocation = option.UnquoteSafe();
+                                 config.CacheLocationArgumentWasPassed = true;
+                             })
                         .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
                              "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
                              option => config.AllowUnofficialBuild = option != null)
