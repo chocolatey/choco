@@ -1,0 +1,17 @@
+name: 'Add Comment To New Issue'
+on:
+  issues:
+    types: opened
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  new_issue_comment:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: GrantBirki/comment@v2.1.0
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            **To vote for this issue, please add a 👍 emoji to the issue description. Votes in comments are not recorded.**
