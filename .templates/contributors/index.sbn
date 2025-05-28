@@ -1,0 +1,13 @@
+{{-
+    include 'release-info'
+    if milestone.target.description
+        include 'milestone'
+    end
+    include 'issues' | string.rstrip
+    if contributors.count > 0
+        include 'contributors'
+    end
+    if template_kind == "CREATE"
+        include 'create/footer'
+    end
+~}}

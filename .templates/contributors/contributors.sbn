@@ -1,0 +1,9 @@
+
+
+__Contributors__
+
+{{ contributors.count }} contributors made this release possible.
+
+{{ for contributor in contributors.items
+    include 'contributor-details'
+end }}

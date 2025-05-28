@@ -1,0 +1,4 @@
+{{
+    if commits.count > 0
+}}As part of this release we had [{{ commits.count }} {{ commits.count | string.pluralize "commit" "commits" }}]({{ commits.html_url }}).
+{{  end -}}
