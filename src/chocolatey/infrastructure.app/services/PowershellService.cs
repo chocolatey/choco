@@ -279,7 +279,7 @@ namespace chocolatey.infrastructure.app.services
                         this.Log().Info(ChocolateyLoggers.Important, () => @"choco feature enable -n allowGlobalConfirmation");
 
                         var selection = InteractivePrompt.PromptForConfirmation(@"Do you want to run the script?",
-                            new[] { "yes", "all - yes to all", "no", "print" },
+                            new[] { "yes", "all scripts", "no", "print" },
                             defaultChoice: null,
                             requireAnswer: true,
                             allowShortAnswer: true,
@@ -305,7 +305,7 @@ namespace chocolatey.infrastructure.app.services
                             shouldRun = true;
                         }
 
-                        if (selection.IsEqualTo("all - yes to all"))
+                        if (selection.IsEqualTo("all scripts"))
                         {
                             configuration.PromptForConfirmation = false;
                             shouldRun = true;
