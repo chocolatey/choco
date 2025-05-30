@@ -51,6 +51,8 @@
       <Link>Shared\StringResources.cs</Link>
     </Compile>
     <Compile Include="Commands\GetPackageParameterCommand.cs" />
+    <Compile Include="Commands\GetPackageScriptParametersCommand.cs" />
+    <Compile Include="Helpers\PackageParameter.cs" />
     <Compile Include="..\SolutionVersion.cs">
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
