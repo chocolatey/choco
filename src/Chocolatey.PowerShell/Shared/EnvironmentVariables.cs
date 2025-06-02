@@ -14,17 +14,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using chocolatey;
+
 namespace Chocolatey.PowerShell.Shared
 {
+
+    [Obsolete("This class has been deprecated, make use of chocolatey.StringResources.EnvironmentVariables instead.", error: false)]
     public static class EnvironmentVariables
     {
-        public const string ChocolateyLastPathUpdate = "ChocolateyLastPathUpdate";
-        public const string ComputerName = "COMPUTERNAME";
-        public const string Path = "PATH";
-        public const string ProcessorArchitecture = "PROCESSOR_ARCHITECTURE";
-        public const string PSModulePath = "PSModulePath";
-        public const string System = "SYSTEM";
-        public const string SystemRoot = "SystemRoot";
-        public const string Username = "USERNAME";
+        public const string ChocolateyLastPathUpdate = StringResources.EnvironmentVariables.Package.ChocolateyLastPathUpdate;
+        public const string ComputerName = StringResources.EnvironmentVariables.System.ComputerName;
+        public const string Path = StringResources.EnvironmentVariables.System.Path;
+        public const string ProcessorArchitecture = StringResources.EnvironmentVariables.System.ProcessorArchitecture;
+        public const string PSModulePath = StringResources.EnvironmentVariables.System.PSModulePath;
+        [Obsolete("This constant has been replaced by EnvironmentNames.System.")]
+        public const string System = EnvironmentNames.System;
+        public const string SystemRoot = StringResources.EnvironmentVariables.System.SystemRoot;
+        public const string Username = StringResources.EnvironmentVariables.System.Username;
     }
 }

@@ -20,7 +20,7 @@ using System.IO;
 using System.Management.Automation;
 using System.Text;
 using System.Text.RegularExpressions;
-using Chocolatey.PowerShell.Shared;
+using static chocolatey.StringResources;
 
 namespace Chocolatey.PowerShell.Helpers
 {
@@ -106,7 +106,7 @@ namespace Chocolatey.PowerShell.Helpers
         /// <param name="scope">The target scope of the PATH variable to modify.</param>
         public static void InstallPathEntry(PSCmdlet cmdlet, string pathEntry, EnvironmentVariableTarget scope)
         {
-            var pathEntries = new List<string>(ParsePathString(EnvironmentHelper.GetVariable(cmdlet, EnvironmentVariables.Path, scope, preserveVariables: true)));
+            var pathEntries = new List<string>(ParsePathString(EnvironmentHelper.GetVariable(cmdlet, EnvironmentVariables.System.Path, scope, preserveVariables: true)));
             if (FindPathIndex(pathEntries, pathEntry) == -1)
             {
                 PSHelper.WriteHost(cmdlet, $"PATH environment variable does not have {pathEntry} in it. Adding...");
@@ -116,7 +116,7 @@ namespace Chocolatey.PowerShell.Helpers
 
                 void updatePath()
                 {
-                    EnvironmentHelper.SetVariable(cmdlet, EnvironmentVariables.Path, scope, newPath);
+                    EnvironmentHelper.SetVariable(cmdlet, EnvironmentVariables.System.Path, scope, newPath);
                 }
 
                 if (scope == EnvironmentVariableTarget.Machine)
@@ -138,7 +138,7 @@ namespace Chocolatey.PowerShell.Helpers
         /// <param name="scope">The target scope of the PATH variable to modify.</param>
         public static void UninstallPathEntry(PSCmdlet cmdlet, string pathEntry, EnvironmentVariableTarget scope)
         {
-            var pathEntries = new List<string>(ParsePathString(EnvironmentHelper.GetVariable(cmdlet, EnvironmentVariables.Path, scope, preserveVariables: true)));
+            var pathEntries = new List<string>(ParsePathString(EnvironmentHelper.GetVariable(cmdlet, EnvironmentVariables.System.Path, scope, preserveVariables: true)));
             var removeIndex = FindPathIndex(pathEntries, pathEntry);
             if (removeIndex >= 0)
             {
@@ -149,7 +149,7 @@ namespace Chocolatey.PowerShell.Helpers
 
                 void updatePath()
                 {
-                    EnvironmentHelper.SetVariable(cmdlet, EnvironmentVariables.Path, scope, newPath);
+                    EnvironmentHelper.SetVariable(cmdlet, EnvironmentVariables.System.Path, scope, newPath);
                 }
 
                 if (scope == EnvironmentVariableTarget.Machine)

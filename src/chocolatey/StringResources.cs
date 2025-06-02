@@ -546,14 +546,7 @@ namespace chocolatey
                 internal const string PSModulePath = nameof(PSModulePath);
 
                 /// <summary>
-                /// The system.
-                /// </summary>
-                [EditorBrowsable(EditorBrowsableState.Never)]
-                [Browsable(false)]
-                internal const string SystemName = "SYSTEM";
-
-                /// <summary>
-                /// The system root.
+                /// The default location when Windows has been installed to.
                 /// </summary>
                 [EditorBrowsable(EditorBrowsableState.Never)]
                 [Browsable(false)]
