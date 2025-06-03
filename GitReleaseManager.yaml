@@ -25,8 +25,10 @@ create:
   include-sha-section: true
   sha-section-heading: "SHA256 Hashes of the release artifacts"
   sha-section-line-format: "- `{1}\t{0}`"
+  include-contributors: true
 close:
   use-issue-comments: true
+  set-due-date: true
   issue-comment: |-
     :tada: This issue has been resolved in version {milestone} :tada:
 
