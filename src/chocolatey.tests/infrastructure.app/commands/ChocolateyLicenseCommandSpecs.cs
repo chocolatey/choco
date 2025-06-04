@@ -98,7 +98,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_throw_when_more_than_one_unparsed_arg_is_passed()
             {
                 Reset();
-                _unparsedArgs.Add("wtf");
+                _unparsedArgs.Add("abc");
                 _unparsedArgs.Add("bbq");
                 var errored = false;
                 Exception error = null;
@@ -143,7 +143,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_set_unrecognized_values_to_info_as_the_subcommand()
             {
                 Reset();
-                _unparsedArgs.Add("wtf");
+                _unparsedArgs.Add("abc");
                 _because();
 
                 Configuration.LicenseCommand.Command.Should().Be(LicenseCommandType.Info);
