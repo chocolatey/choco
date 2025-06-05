@@ -63,6 +63,7 @@
     </Compile>
     <Compile Include="Commands\GetEnvironmentVariableCommand.cs" />
     <Compile Include="Commands\GetEnvironmentVariableNamesCommand.cs" />
+    <Compile Include="Commands\GetPackageParameterCommand.cs" />
     <Compile Include="Commands\InstallChocolateyPathCommand.cs" />
     <Compile Include="Commands\SetEnvironmentVariableCommand.cs" />
     <Compile Include="Commands\TestProcessAdminRightsCommand.cs" />
