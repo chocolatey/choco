@@ -130,7 +130,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 var messages = MockLogger.MessagesFor(LogLevel.Info);
                 messages.Should().HaveCount(2);
                 messages[0].Should().Contain("Support Command");
-                messages[1].Should().Contain("As an open-source user of Chocolatey CLI, we are not able to");
+                messages[1].Should().Contain("As a user of Chocolatey CLI open-source, we are unable to");
             }
         }
     }
