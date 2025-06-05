@@ -46,11 +46,10 @@ namespace chocolatey.infrastructure.app.commands
         {
             this.Log().Info(ChocolateyLoggers.Important, "Support Command");
             this.Log().Info(@"
-As an open-source user of Chocolatey CLI, we are not able to
+As a user of Chocolatey CLI open-source, we are unable to
  provide private support. See https://chocolatey.org/support
  for details.
 ");
-
         }
 
         public void DryRun(ChocolateyConfiguration configuration)
@@ -65,23 +64,21 @@ As an open-source user of Chocolatey CLI, we are not able to
             if (config.Information.IsLicensedVersion)
             {
                 this.Log().Warn(@"
-As a licensed customer, you can access our Support Team, however,
+As a licensed customer, you can access our Support Team. However,
  it looks like the Chocolatey Licensed Extension package is not
- currently installed. Ensure that you run:
- `choco install chocolatey.extension`
- and run `choco support` again.
+ currently installed. Please run
+ `choco install chocolatey.extension` and run `choco support`
+ again.
 ");
             }
             else
             {
                 this.Log().Info(@"
 Unfortunately, we are unable to provide private support for
- open-source users. However, there are a lot of avenues for open
- source users within the community to get the help they need.
-
-If you are an open-source user, please visit
- https://chocolatey.org/support for the full list of options, or
- https://docs.chocolatey.org for our open source documentation.
+ open-source users. However, there is community assistance
+ available. Please visit: 
+ https://chocolatey.org/support for support options, or
+ https://docs.chocolatey.org for our open-source documentation.
 ");
             }
         }
