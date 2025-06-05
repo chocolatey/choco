@@ -151,6 +151,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyApiKeyCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyConfigCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyRuleCommandSpecs.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateySupportCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyTemplateCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyExportCommandSpecs.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyFeatureCommandSpecs.cs" />

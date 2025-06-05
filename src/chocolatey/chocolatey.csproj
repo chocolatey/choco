@@ -181,6 +181,7 @@
     <Compile Include="infrastructure.app\commands\ChocolateyCacheCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyRuleCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateySupportCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyTemplateCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyCommandBase.cs" />
     <Compile Include="infrastructure.app\domain\ApiKeyCommandType.cs" />
