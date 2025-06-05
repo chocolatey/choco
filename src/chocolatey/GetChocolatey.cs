@@ -16,8 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 using chocolatey.infrastructure.licensing;
 using SimpleInjector;
 using chocolatey.infrastructure.app;
@@ -40,7 +38,7 @@ using chocolatey.resources;
 using Assembly = chocolatey.infrastructure.adapters.Assembly;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 using ILog = chocolatey.infrastructure.logging.ILog;
-using System.Linq;
+using static chocolatey.StringResources;
 
 namespace chocolatey
 {
@@ -505,19 +503,19 @@ namespace chocolatey
             var chocolateyInstall = string.Empty;
 
 #if !DEBUG
-            chocolateyInstall = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, EnvironmentVariableTarget.Machine);
+            chocolateyInstall = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall, EnvironmentVariableTarget.Machine);
             if (string.IsNullOrWhiteSpace(chocolateyInstall))
             {
-                chocolateyInstall = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, EnvironmentVariableTarget.User);
+                chocolateyInstall = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall, EnvironmentVariableTarget.User);
             }
 #endif
 
             if (string.IsNullOrWhiteSpace(chocolateyInstall))
             {
-                chocolateyInstall = Environment.GetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName);
+                chocolateyInstall = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall);
             }
 
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, chocolateyInstall);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall, chocolateyInstall);
         }
 
         private void ExtractResources()
@@ -538,8 +536,8 @@ namespace chocolatey
             }
             catch (Exception ex)
             {
-                this.Log().Warn(ChocolateyLoggers.Important, "Please ensure that ChocolateyInstall environment variable is set properly and you've run once as an administrator to ensure all resources are extracted.");
-                this.Log().Error("Unable to extract resources. Please ensure the ChocolateyInstall environment variable is set properly. You may need to run once as an admin to ensure all resources are extracted. Details:{0} {1}".FormatWith(Environment.NewLine, ex.ToString()));
+                this.Log().Warn(ChocolateyLoggers.Important, "Please ensure that {0} environment variable is set properly and you've run once as an administrator to ensure all resources are extracted.", EnvironmentVariables.System.ChocolateyInstall);
+                this.Log().Error("Unable to extract resources. Please ensure the {2} environment variable is set properly. You may need to run once as an admin to ensure all resources are extracted. Details:{0} {1}", Environment.NewLine, ex.ToString(), EnvironmentVariables.System.ChocolateyInstall);
             }
 #endif
         }

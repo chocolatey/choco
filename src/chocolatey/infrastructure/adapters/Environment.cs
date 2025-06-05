@@ -17,6 +17,7 @@
 using System;
 using System.Collections;
 using chocolatey.infrastructure.app;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.adapters
 {
@@ -37,7 +38,7 @@ namespace chocolatey.infrastructure.adapters
             get
             {
                 // ARM64 bit architecture has a x86-32 emulator, so return false
-                if (System.Environment.GetEnvironmentVariable(ApplicationParameters.Environment.ProcessorArchitecture).ToStringSafe().IsEqualTo(ApplicationParameters.Environment.Arm64ProcessorArchitecture))
+                if (System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.ProcessorArchitecture).ToStringSafe().IsEqualTo(ApplicationParameters.Environment.Arm64ProcessorArchitecture))
                 {
                     return false;
                 }

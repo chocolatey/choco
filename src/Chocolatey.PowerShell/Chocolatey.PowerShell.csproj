@@ -58,6 +58,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\chocolatey\StringResources.cs">
+      <Link>Shared\StringResources.cs</Link>
+    </Compile>
     <Compile Include="Commands\GetEnvironmentVariableCommand.cs" />
     <Compile Include="Commands\GetEnvironmentVariableNamesCommand.cs" />
     <Compile Include="Commands\InstallChocolateyPathCommand.cs" />
@@ -75,6 +78,7 @@
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
     <Compile Include="Shared\ChocolateyCmdlet.cs" />
+    <Compile Include="Shared\EnvironmentNames.cs" />
     <Compile Include="Shared\EnvironmentVariables.cs" />
     <Compile Include="Win32\NativeMethods.cs" />
   </ItemGroup>

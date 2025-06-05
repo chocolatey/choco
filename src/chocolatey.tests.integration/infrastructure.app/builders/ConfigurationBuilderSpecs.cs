@@ -32,6 +32,7 @@ using chocolatey.infrastructure.registration;
 using Microsoft.Win32;
 using chocolatey.tests.integration.scenarios;
 using FluentAssertions;
+using static chocolatey.StringResources;
 
 namespace chocolatey.tests.integration.infrastructure.app.builders
 {
@@ -116,11 +117,11 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
 
                 if (EnvironmentVariableSet)
                 {
-                    Environment.Setup(e => e.GetEnvironmentVariable(It.IsIn("http_proxy", "https_proxy"))).Returns(EnvironmentVariableProxyValue);
+                    Environment.Setup(e => e.GetEnvironmentVariable(It.IsIn(EnvironmentVariables.System.HttpProxy, EnvironmentVariables.System.HttpsProxy))).Returns(EnvironmentVariableProxyValue);
                 }
                 else
                 {
-                    Environment.Setup(e => e.GetEnvironmentVariable(It.IsIn("http_proxy", "https_proxy"))).Returns(string.Empty);
+                    Environment.Setup(e => e.GetEnvironmentVariable(It.IsIn(EnvironmentVariables.System.HttpProxy, EnvironmentVariables.System.HttpsProxy))).Returns(string.Empty);
                 }
 
                 if (ConfigSet)
@@ -192,11 +193,11 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
 
                 if (EnvironmentVariableSet)
                 {
-                    Environment.Setup(e => e.GetEnvironmentVariable("no_proxy")).Returns(EnvironmentVariableProxyValue);
+                    Environment.Setup(e => e.GetEnvironmentVariable(EnvironmentVariables.System.NoProxy)).Returns(EnvironmentVariableProxyValue);
                 }
                 else
                 {
-                    Environment.Setup(e => e.GetEnvironmentVariable("no_proxy")).Returns(string.Empty);
+                    Environment.Setup(e => e.GetEnvironmentVariable(EnvironmentVariables.System.NoProxy)).Returns(string.Empty);
                 }
 
                 if (ArgumentSet)

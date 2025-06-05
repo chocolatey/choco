@@ -25,6 +25,7 @@ using System.Security;
 using System.Security.Principal;
 using chocolatey.infrastructure.platforms;
 using Microsoft.Win32.SafeHandles;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.information
 {
@@ -140,12 +141,12 @@ namespace chocolatey.infrastructure.information
 
         public static bool UserIsTerminalServices()
         {
-            return Environment.GetEnvironmentVariable("SESSIONNAME").ToStringSafe().ContainsSafe("rdp-");
+            return Environment.GetEnvironmentVariable(EnvironmentVariables.System.SessionName).ToStringSafe().ContainsSafe("rdp-");
         }
 
         public static bool UserIsRemote()
         {
-            return UserIsTerminalServices() || Environment.GetEnvironmentVariable("SESSIONNAME").ToStringSafe() == string.Empty;
+            return UserIsTerminalServices() || Environment.GetEnvironmentVariable(EnvironmentVariables.System.SessionName).ToStringSafe() == string.Empty;
         }
 
         public static bool UserIsSystem()
