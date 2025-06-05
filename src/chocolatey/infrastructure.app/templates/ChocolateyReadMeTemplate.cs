@@ -144,7 +144,7 @@ The following are experimental or use not recommended:
  * {EnvironmentVariables.Package.ChocolateyChecksumType32} - Was `--download-checksum-type` passed?
  * {EnvironmentVariables.Package.ChocolateyChecksum64} - Was `--download-checksum-x64` passed?
  * {EnvironmentVariables.Package.ChocolateyChecksumType64} - Was `--download-checksum-type-x64` passed?
- * ChocolateyPackageExitCode - The exit code of the script that just ran - usually set by `Set-PowerShellExitCode`
+ * {EnvironmentVariables.Package.ChocolateyExitCode} - The exit code of the script that just ran - usually set by `Set-PowerShellExitCode`
  * {EnvironmentVariables.Package.ChocolateyLastPathUpdate} - Set by Chocolatey as part of install, but not used for anything in particular in packaging.
  * {EnvironmentVariables.Package.ChocolateyProxyLocation} - The explicit proxy location as set in the configuration `proxy`
  * ChocolateyDownloadCache - Use available download cache? Set by `--skip-download-cache`, `--use-download-cache`, or feature `downloadCache`
