@@ -51,7 +51,7 @@ Describe "choco support" -Tag Chocolatey, SupportCommand {
             $ExpectedOutput = if($HasLicensedExtension) {
                 "As a licensed customer, you can reach out to"
             } else {
-                "As an open-source user of Chocolatey CLI, we are not able to"
+                "As a user of Chocolatey CLI open-source, we are unable to"
             }
             $Output.Lines | Should -Contain $ExpectedOutput -Because $Output.String
         }
