@@ -1,6 +1,6 @@
 ﻿Import-Module helpers/common-helpers
 
-Describe "choco support" -Tag Chocolatey, SupportCommand {
+Describe "choco license" -Tag Chocolatey, LicenseCommand {
     BeforeDiscovery {
         $HasLicensedExtension = Test-PackageIsEqualOrHigher -PackageName 'chocolatey.extension' -Version '6.0.0'
     }
@@ -15,45 +15,40 @@ Describe "choco support" -Tag Chocolatey, SupportCommand {
         Remove-ChocolateyTestInstall
     }
 
-    Context "Support" {
+    Context "License (<_>)" -ForEach @("", "info", "bob") -Skip:($HasLicensedExtension) {
         BeforeAll {
-            $Output = Invoke-Choco support
+            $Output = Invoke-Choco license $_
         }
 
         It "Exits successfully (0)" {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        It "Reports support options" {
+        It "Reports available license" {
             $ExpectedOutput = if($HasLicensedExtension) {
-                "Howdy, you have access to private support channels."
+                "Registered to:"
             } else {
-                "Unfortunately, we are unable to provide private support for"
+                "No Chocolatey license found."
             }
             $Output.Lines | Should -Contain $ExpectedOutput -Because $Output.String
         }
     }
 
-    Context "Help Documentation (<_>)" -ForEach @("--help", "-?", "-help") {
+    Context "Help Documentation (<_>) - OSS" -ForEach @("--help", "-?", "-help") {
         BeforeAll {
-            $Output = Invoke-Choco support $_
+            $Output = Invoke-Choco license $_
         }
 
         It "Exits successfully (0)" {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        It "Outputs Help for Support" {
-            $Output.String | Should -Match "Support Command" -Because $Output.String
+        It "Outputs Help for License" {
+            $Output.String | Should -Match "License Command" -Because $Output.String
         }
 
-        It "Outputs Help for Support" {
-            $ExpectedOutput = if($HasLicensedExtension) {
-                "As a licensed customer, you can reach out to"
-            } else {
-                "As a user of Chocolatey CLI open-source, we are unable to"
-            }
-            $Output.Lines | Should -Contain $ExpectedOutput -Because $Output.String
+        It "Outputs help documentation for license command" {
+            $Output.Lines | Should -Contain "Show information about the current Chocolatey CLI license." -Because $Output.String
         }
     }
 
