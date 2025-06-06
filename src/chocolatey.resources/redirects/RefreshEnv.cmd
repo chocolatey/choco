@@ -59,7 +59,6 @@ if !IsExternal!==1 (
     exit 1
 )
 
-endlocal
 :: End code from @beatcracker
 @echo off
 ::
@@ -80,7 +79,18 @@ goto main
 :SetFromReg
     "%WinDir%\System32\Reg" QUERY "%~1" /v "%~2" > "%TEMP%\_envset.tmp" 2>NUL
     for /f "usebackq skip=2 tokens=2,*" %%A IN ("%TEMP%\_envset.tmp") do (
-        echo/set "%~3=%%B"
+        set "tempvar=%%B"
+        REM Remove double quotes from temporary value
+        set "__tempvar=!tempvar:"=!"
+
+        REM If the dequoted string differs from the original string, the variable contains double quotes.
+        REM Escape the | and & in the variable to avoid errors.
+        if NOT "!__tempvar!" == "!tempvar!" (
+            set "tempvar=!tempvar:|=^|!"
+            set "tempvar=!tempvar:&=^&!"
+        )
+
+        echo/set "%~3=!tempvar!"
     )
     goto :EOF
 
@@ -104,6 +114,8 @@ goto main
     :: Special handling for PATH - mix both User and System
     call :SetFromReg "HKLM\System\CurrentControlSet\Control\Session Manager\Environment" Path Path_HKLM >> "%TEMP%\_env.cmd"
     call :SetFromReg "HKCU\Environment" Path Path_HKCU >> "%TEMP%\_env.cmd"
+
+    endlocal
 
     :: Caution: do not insert space-chars before >> redirection sign
     echo/set "Path=%%Path_HKLM%%;%%Path_HKCU%%" >> "%TEMP%\_env.cmd"
