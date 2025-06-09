@@ -39,7 +39,7 @@ There are quite a few commands you can call - you should check out the [command 
 
 - Help - choco -? or choco command -?
 - Search - choco search something
-- List - choco list -lo
+- List - choco list
 - Config - choco config list
 - Install - choco install baretail
 - Pin - choco pin windirstat
