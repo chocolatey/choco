@@ -70,6 +70,16 @@ namespace chocolatey.infrastructure.app.configuration
         {
             ResetEnvironmentVariables(config);
 
+            // During the Chocolatey execution, it is possible that the EnvironmentVariables property of
+            // the ChocolateyConfiguration object has been updated to include values that should be written
+            // out as environment variables into the current PowerShell session.  As example of this would
+            // be the previous package version during the exection of a `choco upgrade` command.  We need
+            // to loop through this collection, and write them out as environment variables.
+            foreach (var environmentVariable in config.Information.EnvironmentVariables)
+            {
+                Environment.SetEnvironmentVariable(environmentVariable.Key, environmentVariable.Value);
+            }
+
             Environment.SetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall, ApplicationParameters.InstallLocation);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyVersion, config.Information.ChocolateyVersion);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyProductVersion, config.Information.ChocolateyProductVersion);

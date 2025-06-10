@@ -49,6 +49,7 @@ using NuGet.ProjectManagement;
 using NuGet.Protocol.Core.Types;
 using NuGet.Resolver;
 using NuGet.Versioning;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app.services
 {
@@ -1335,6 +1336,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     if (availablePackage.Identity.Version > installedPackage.PackageMetadata.Version)
                     {
                         var logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version);
+
                         packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
                         if (config.RegularOutput)
@@ -1709,6 +1711,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                     BackupAndRunBeforeModify(packageToUninstall, oldPkgInfo, config, beforeUpgradeAction);
 
+                                    // At this point, we know the version of both the new package that is being installed, and the
+                                    // version that was currently installed.  This information was used to perform the backup in
+                                    // the line above, and can therefore be trusted.  Take this information and add an entry in the
+                                    // EnvironmnetVariables collection, which will later be written into the PowerShell sesssion as
+                                    // envrionment variables.
+                                    config.Information.EnvironmentVariables[EnvironmentVariables.Package.ChocolateyPreviousPackageVersion] = oldPkgInfo.Package.Version.ToNormalizedStringChecked();
+
                                     packageToUninstall.InstallLocation = pathResolver.GetInstallPath(packageToUninstall.Identity);
                                     try
                                     {
@@ -1761,6 +1770,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                         projectContext,
                                         CancellationToken.None).GetAwaiter().GetResult();
 
+                                    // To make sure that there is no "pollution" of a previous package version into another package
+                                    // operation, such as during a `choco upgrade all` or when upgrading a package that has one or
+                                    // more dependencies, we need to make sure to clear the entry in the EnvironmentVariables collection,
+                                    // and rely on this being set again when the current and previous package versions are "known" again.
+                                    config.Information.EnvironmentVariables[EnvironmentVariables.Package.ChocolateyPreviousPackageVersion] = null;
                                 }
 
                                 var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
