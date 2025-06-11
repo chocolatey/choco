@@ -175,6 +175,11 @@ namespace chocolatey
                 public const string OsVersion = "OS_VERSION";
 
                 /// <summary>
+                /// The normalized version of the currently installed package version - set during package upgrade.
+                /// </summary>
+                public const string ChocolateyPreviousPackageVersion = nameof(ChocolateyPreviousPackageVersion);
+
+                /// <summary>
                 /// The location where temporary files should be stored during PowerShell execution.
                 /// </summary>
                 /// <remarks>

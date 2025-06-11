@@ -530,6 +530,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     [Serializable]
     public sealed class InformationCommandConfiguration
     {
+        public InformationCommandConfiguration()
+        {
+            EnvironmentVariables = new Dictionary<string, string>();
+        }
+
         // application set variables
         public PlatformType PlatformType { get; set; }
 
@@ -552,6 +557,15 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IsLicensedAssemblyLoaded { get; set; }
         public string LicenseType { get; set; }
         public string CurrentDirectory { get; set; }
+
+        /// <summary>
+        /// A collection of values that should be written out as environment variables
+        /// within the PowerShell execution that Chocolatey CLI creates. This allows
+        /// for passing information, such as the previous Chocolatey package version
+        /// during `choco upgrade` through to the method that writes the environment
+        /// variables into the PowerShell session.
+        /// </summary>
+        public Dictionary<string, string> EnvironmentVariables { get; set; }
     }
 
     [Serializable]
