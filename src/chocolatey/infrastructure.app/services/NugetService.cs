@@ -1769,12 +1769,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                         downloadResult,
                                         projectContext,
                                         CancellationToken.None).GetAwaiter().GetResult();
-
-                                    // To make sure that there is no "pollution" of a previous package version into another package
-                                    // operation, such as during a `choco upgrade all` or when upgrading a package that has one or
-                                    // more dependencies, we need to make sure to clear the entry in the EnvironmentVariables collection,
-                                    // and rely on this being set again when the current and previous package versions are "known" again.
-                                    config.Information.EnvironmentVariables[EnvironmentVariables.Package.ChocolateyPreviousPackageVersion] = null;
                                 }
 
                                 var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
@@ -1855,6 +1849,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 {
                                     continueAction.Invoke(errorResult, config);
                                 }
+                            }
+                            finally
+                            {
+                                // To make sure that there is no "pollution" of a previous package version into another package
+                                // operation, such as during a `choco upgrade all` or when upgrading a package that has one or
+                                // more dependencies, we need to make sure to clear the entry in the EnvironmentVariables collection,
+                                // and rely on this being set again when the current and previous package versions are "known" again.
+                                config.Information.EnvironmentVariables[EnvironmentVariables.Package.ChocolateyPreviousPackageVersion] = null;
                             }
                         }
                     }
