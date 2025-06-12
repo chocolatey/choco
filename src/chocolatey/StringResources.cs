@@ -83,6 +83,12 @@ namespace chocolatey
                 public const string ChocolateyLicenseType = nameof(ChocolateyLicenseType);
 
                 /// <summary>
+                /// Whether the user has requested to explicitly make the package installation not silent.
+                /// </summary>
+                /// <remarks>Available in v2.5.0+</remarks>
+                public const string ChocolateyNotSilent = nameof(ChocolateyNotSilent);
+
+                /// <summary>
                 /// The location that the package was found to be installed to. When found will be
                 /// outputted by Chocolatey CLI at the end of its execution.
                 /// </summary>
