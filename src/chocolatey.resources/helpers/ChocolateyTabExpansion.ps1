@@ -35,31 +35,31 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
         Where-Object { $_ -like "$filter*" }
 }
 
-$script:chocoCommands = @('-?','search','list','info','install','outdated','upgrade','uninstall','new','pack','push','-h','--help','pin','source','config','feature','apikey','export','help','template','cache','--version','rule')
+$script:chocoCommands = @('-?','apikey','cache','config','export','feature','help','info','install','list','new','outdated','pack','pin','push','rule','search','source','template','uninstall','upgrade','-h','--help','--version')
 
 # ensure these all have a space to start, or they will cause issues
-$allcommands = " --debug --verbose --trace --noop --help -? --online --accept-license --confirm --limit-output --no-progress --log-file='' --execution-timeout='' --cache-location='' --proxy='' --proxy-user='' --proxy-password='' --proxy-bypass-list='' --proxy-bypass-on-local --force --no-color --skip-compatibility-checks --ignore-http-cache"
+$allCommands = " --accept-license --cache-location='' --confirm --debug --execution-timeout='' --force --help -? --ignore-http-cache --limit-output --log-file='' --no-color --no-progress --noop --online --proxy='' --proxy-bypass-list='' --proxy-bypass-on-local --proxy-password='' --proxy-user='' --skip-compatibility-checks --trace --verbose"
 
 $commandOptions = @{
-    list      = "--id-only --pre --exact --by-id-only --id-starts-with --detailed --prerelease --include-programs --source='' --page='' --page-size=''"
-    search    = "--id-only --pre --exact --by-id-only --id-starts-with --detailed --approved-only --not-broken --source='' --user='' --password='' --prerelease --include-programs --page='' --page-size='' --order-by-popularity --download-cache-only --disable-package-repository-optimizations --include-configured-sources"
-    info      = "--source='' --local-only --version='' --prerelease --user='' --password='' --cert='' --certpassword='' --disable-package-repository-optimizations --include-configured-sources"
-    install   = "-y -whatif --pre --version='' --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --user='' --password='' --prerelease --forcex86 --not-silent --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --allow-downgrade --force-dependencies --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --stop-on-first-package-failure --disable-package-repository-optimizations --pin --include-configured-sources"
-    pin       = "--name='' --version=''"
-    outdated  = "--source='' --user='' --password='' --ignore-pinned --ignore-unfound --pre --prerelease --disable-package-repository-optimizations --include-configured-sources"
-    upgrade   = "-y -whatif --pre --version='' --except='' --params='' --install-arguments='' --override-arguments --ignore-dependencies --source='' --source='windowsfeatures' --user='' --password='' --prerelease --forcex86 --not-silent --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --allow-downgrade --require-checksums --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --fail-on-unfound --fail-on-not-installed --ignore-checksums --allow-empty-checksums --allow-empty-checksums-secure --download-checksum='' --download-checksum-type='' --download-checksum-x64='' --download-checksum-type-x64='' --exclude-prerelease --stop-on-first-package-failure --use-remembered-options --ignore-remembered-options --skip-when-not-installed --install-if-not-installed --disable-package-repository-optimizations --pin --ignore-pinned --include-configured-sources"
-    uninstall = "-y -whatif --force-dependencies --remove-dependencies --all-versions --source='windowsfeatures' --version='' --uninstall-arguments='' --override-arguments --not-silent --params='' --package-parameters='' --exit-when-reboot-detected --ignore-detected-reboot --use-package-exit-codes --ignore-package-exit-codes --skip-automation-scripts --use-autouninstaller --skip-autouninstaller --fail-on-autouninstaller --ignore-autouninstaller-failure --stop-on-first-package-failure"
-    new       = "--template-name='' --output-directory='' --automaticpackage --version='' --maintainer='' packageversion='' maintainername='' maintainerrepo='' installertype='' url='' url64='' silentargs='' --use-built-in-template"
-    pack      = "--version='' --output-directory=''"
-    push      = "--source='' --api-key='' --timeout=''"
-    source    = "--name='' --source='' --user='' --password='' --priority='' --bypass-proxy --allow-self-service"
-    config    = "--name='' --value=''"
-    feature   = "--name=''"
-    apikey    = "--source='' --api-key='' --remove"
-    export    = "--include-version-numbers --output-file-path=''"
-    template  = "--name=''"
+    apikey    = "--api-key='' --remove --source=''"
     cache     = "--expired"
+    config    = "--name='' --value=''"
+    export    = "--include-version-numbers --output-file-path=''"
+    feature   = "--name=''"
+    info      = "--cert='' --certpassword='' --disable-package-repository-optimizations --include-configured-sources --local-only --password='' --prerelease --source='' --user='' --version=''"
+    install   = "--allow-downgrade --allow-empty-checksums --allow-empty-checksums-secure --disable-package-repository-optimizations --download-checksum='' --download-checksum-x64='' --download-checksum-type='' --download-checksum-type-x64='' --exit-when-reboot-detected --force-dependencies --forcex86 --ignore-checksums --ignore-dependencies --ignore-detected-reboot --ignore-package-exit-codes --include-configured-sources --install-arguments='' --not-silent --override-arguments --package-parameters='' --params='' --password='' --pin --pre --prerelease --require-checksums --skip-automation-scripts --source='' --source='windowsfeatures' --stop-on-first-package-failure --use-package-exit-codes --user='' --version='' -whatif  -y"
+    list      = "--by-id-only --detailed --exact --id-only --id-starts-with --include-programs --page='' --page-size='' --pre --prerelease --source=''"
+    new       = "--automaticpackage installertype='' --maintainer='' maintainername='' maintainerrepo='' --output-directory='' packageversion='' silentargs='' --template-name='' url='' url64='' --use-built-in-template --version=''"
+    outdated  = "--disable-package-repository-optimizations --ignore-pinned --ignore-unfound --include-configured-sources --password='' --pre --prerelease --source='' --user=''"
+    pack      = "--output-directory='' --version=''"
+    pin       = "--name='' --version=''"
+    push      = "--api-key='' --source='' --timeout=''"
     rule      = "--name=''"
+    search    = "--approved-only --by-id-only --detailed --disable-package-repository-optimizations --download-cache-only --exact --id-only --id-starts-with --include-configured-sources --include-programs --not-broken --order-by-popularity --page='' --page-size='' --password='' --pre --prerelease --source='' --user=''"
+    source    = " --allow-self-service --bypass-proxy --name='' --password='' --priority='' --source='' --user=''"
+    template  = "--name=''"
+    uninstall = "--all-versions --exit-when-reboot-detected --fail-on-autouninstaller --force-dependencies --ignore-autouninstaller-failure --ignore-detected-reboot --ignore-package-exit-codes --not-silent --override-arguments --params='' --package-parameters='' --remove-dependencies --skip-automation-scripts --skip-autouninstaller --source='windowsfeatures' --stop-on-first-package-failure --uninstall-arguments='' --use-autouninstaller --use-package-exit-codes --version='' -whatif -y"
+    upgrade   = "--allow-downgrade --allow-empty-checksums --allow-empty-checksums-secure --disable-package-repository-optimizations --download-checksum='' --download-checksum-x64='' --download-checksum-type='' --download-checksum-type-x64='' --except='' --exclude-prerelease --exit-when-reboot-detected --fail-on-not-installed --fail-on-unfound --forcex86 --ignore-checksums --ignore-dependencies --ignore-detected-reboot --ignore-package-exit-codes --ignore-pinned --ignore-remembered-options --include-configured-sources --install-arguments='' --install-if-not-installed --not-silent --override-arguments --package-parameters='' --params='' --password='' --pin --pre --prerelease --require-checksums --skip-automation-scripts --skip-when-not-installed --source='' --source='windowsfeatures' --stop-on-first-package-failure --use-package-exit-codes --use-remembered-options --user='' --version='' -whatif -y"
 }
 
 $commandOptions['find'] = $commandOptions['search']
@@ -74,16 +74,16 @@ if (Test-Path $licenseFile) {
         'optimize'
     )
 
-    $commandOptions.download = "--internalize --internalize-all-urls --ignore-dependencies --installed-packages --ignore-unfound-packages --resources-location='' --download-location='' --outputdirectory='' --source='' --version='' --prerelease --user='' --password='' --cert='' --certpassword='' --append-use-original-location --recompile --disable-package-repository-optimizations"
-    $commandOptions.sync = "--output-directory='' --id='' --package-id=''"
-    $commandOptions.optimize = "--deflate-nupkg-only --id=''"
+    $commandOptions.download = "--append-use-original-location --cert='' --certpassword='' --disable-package-repository-optimizations --download-location='' --ignore-dependencies --ignore-unfound-packages --installed-packages --internalize --internalize-all-urls --outputdirectory='' --password='' --prerelease --recompile --resources-location='' --source='' --user='' --version=''"
+    $commandOptions.sync = "--id='' --output-directory='' --package-id=''"
+    $commandOptions.optimize = "--id='' --deflate-nupkg-only"
 
     # Add pro switches to commands that have additional switches on Pro
-    $proInstallUpgradeOptions = " --install-directory='' --package-parameters-sensitive='' --max-download-rate='' --install-arguments-sensitive='' --skip-download-cache --use-download-cache --skip-virus-check --virus-check --virus-positives-minimum='' --deflate-package-size --no-deflate-package-size --deflate-nupkg-only"
+    $proInstallUpgradeOptions = " --deflate-nupkg-only--deflate-package-size --install-arguments-sensitive='' --install-directory='' --max-download-rate='' --package-parameters-sensitive='' --no-deflate-package-size --skip-download-cache --skip-virus-check --use-download-cache --virus-check --virus-positives-minimum=''"
 
     $commandOptions.install += $proInstallUpgradeOptions
     $commandOptions.upgrade += $proInstallUpgradeOptions + " --exclude-chocolatey-packages-during-upgrade-all --include-chocolatey-packages-during-upgrade-all"
-    $commandOptions.new += " --build-package --use-original-location --keep-remote --url='' --url64='' --checksum='' --checksum64='' --checksumtype='' --pause-on-error"
+    $commandOptions.new += " --build-package --checksum='' --checksum64='' --checksumtype='' --keep-remote --pause-on-error --url='' --url64='' --use-original-location"
     $commandOptions.pin += " --note=''"
 
     # Add Business-only commands and options if the license is a Business or Trial license
@@ -101,10 +101,10 @@ if (Test-Path $licenseFile) {
 
         $commandOptions.list += " --audit"
         $commandOptions.uninstall += " --from-programs-and-features"
-        $commandOptions.new += " --file='' --file64='' --from-programs-and-features --remove-architecture-from-name --include-architecture-in-name"
+        $commandOptions.new += " --file='' --file64='' --from-programs-and-features --include-architecture-in-name --remove-architecture-from-name"
 
         # Add --use-self-service to commands that support it
-        $selfServiceCommands = 'list', 'find', 'search', 'info', 'install', 'upgrade', 'uninstall', 'pin', 'outdated', 'push', 'download', 'sync', 'optimize'
+        $selfServiceCommands = 'download', 'find', 'info', 'install', 'list', 'optimize', 'outdated', 'pin', 'push', 'search', 'sync', 'uninstall', 'upgrade'
         foreach ($command in $selfServiceCommands) {
             $commandOptions.$command += ' --use-self-service'
         }
@@ -112,7 +112,7 @@ if (Test-Path $licenseFile) {
 }
 
 foreach ($key in @($commandOptions.Keys)) {
-    $commandOptions.$key += $allcommands
+    $commandOptions.$key += $allCommands
 }
 
 # Consistent ordering for commands so the added pro commands aren't weirdly out of order
@@ -167,9 +167,19 @@ function Get-AliasPattern($exe) {
 function ChocolateyTabExpansion($lastBlock) {
     switch -regex ($lastBlock -replace "^$(Get-AliasPattern choco) ", "") {
 
-        # Handles uninstall package names
-        "^uninstall\s+(?<package>[^\.][^-\s]*)$" {
-            chocoLocalPackages $matches['package']
+        # Handles cache first tab
+        "^(cache)\s+(?<subcommand>[^-\s]*)$" {
+            @('list', 'remove', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+        }
+
+        # Handles config first tab
+        "^(config)\s+(?<subcommand>[^-\s]*)$" {
+            @('list', 'get', 'set', 'unset', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+        }
+
+        # Handles feature first tab
+        "^(feature)\s+(?<subcommand>[^-\s]*)$" {
+            @('list', 'get', 'disable', 'enable', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
         # Handles install package names
@@ -177,13 +187,8 @@ function ChocolateyTabExpansion($lastBlock) {
             chocoRemotePackages $matches['package']
         }
 
-        # Handles upgrade / uninstall package names
-        "^upgrade\s+(?<package>[^\.][^-\s]*)$" {
-            chocoLocalPackagesUpgrade $matches['package']
-        }
-
-        # Handles list/search first tab
-        "^(list|search|find)\s+(?<subcommand>[^-\s]*)$" {
+        # Handles list first tab
+        "^(list)\s+(?<subcommand>[^-\s]*)$" {
             @('<filter>', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
@@ -197,9 +202,19 @@ function ChocolateyTabExpansion($lastBlock) {
             @('<PathtoNuspec>', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
+        # Handles pin first tab
+        "^(pin)\s+(?<subcommand>[^-\s]*)$" {
+            @('list', 'add', 'remove', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+        }
+
         # Handles push first tab
         "^(push)\s+(?<subcommand>[^-\s]*)$" {
             @('<PathtoNupkg>', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+        }
+
+        # Handles search first tab
+        "^(search|find)\s+(?<subcommand>[^-\s]*)$" {
+            @('<filter>', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
         # Handles source first tab
@@ -207,28 +222,19 @@ function ChocolateyTabExpansion($lastBlock) {
             @('list', 'add', 'remove', 'disable', 'enable', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
-        # Handles pin first tab
-        "^(pin)\s+(?<subcommand>[^-\s]*)$" {
-            @('list', 'add', 'remove', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
-        }
-
-        # Handles feature first tab
-        "^(feature)\s+(?<subcommand>[^-\s]*)$" {
-            @('list', 'get', 'disable', 'enable', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
-        }
-        # Handles config first tab
-        "^(config)\s+(?<subcommand>[^-\s]*)$" {
-            @('list', 'get', 'set', 'unset', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
-        }
-
         # Handles template first tab
         "^(template)\s+(?<subcommand>[^-\s]*)$" {
             @('list', 'info', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
-        # Handles cache first tab
-        "^(cache)\s+(?<subcommand>[^-\s]*)$" {
-            @('list', 'remove', '-?') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+        # Handles uninstall package names
+        "^uninstall\s+(?<package>[^\.][^-\s]*)$" {
+            chocoLocalPackages $matches['package']
+        }
+
+        # Handles upgrade / uninstall package names
+        "^upgrade\s+(?<package>[^\.][^-\s]*)$" {
+            chocoLocalPackagesUpgrade $matches['package']
         }
 
         # Handles more options after others
@@ -265,21 +271,21 @@ if ($PowerTab_RegisterTabExpansion) {
 }
 
 # PowerShell up to v5.x: use a custom TabExpansion function.
-if ($PSVersionTable.PSVersion.Major -lt 5) { 
+if ($PSVersionTable.PSVersion.Major -lt 5) {
     if (Test-Path Function:\TabExpansion) {
         Rename-Item Function:\TabExpansion TabExpansionBackup
     }
 
     function TabExpansion($line, $lastWord) {
         $lastBlock = [System.Text.RegularExpressions.Regex]::Split($line, '[|;]')[-1].TrimStart()
-    
+
 
         switch -regex ($lastBlock) {
             # Execute Chocolatey tab completion for all choco-related commands
             "^$(Get-AliasPattern choco) (.*)" {
                 ChocolateyTabExpansion $lastBlock
             }
-    
+
             # Fall back on existing tab expansion
             default {
                 if (Test-Path Function:\TabExpansionBackup) {
@@ -293,10 +299,10 @@ else { # PowerShell v5+: use the Register-ArgumentCompleter cmdlet (PowerShell n
     function script:Get-AliasNames($exe) {
         @($exe) + @(Get-Alias | Where-Object { $_.Definition -eq $exe } | Select-Object -Exp Name)
     }
-    
+
     Register-ArgumentCompleter -Native -CommandName (Get-AliasNames choco) -ScriptBlock {
         param($wordToComplete, $commandAst, $cursorColumn)
-    
+
         # NOTE:
         # * The stringified form of $commandAst is the command's own command line (irrespective of
         #   whether other statements are on the same line or whether it is part of a pipeline).
@@ -306,7 +312,7 @@ else { # PowerShell v5+: use the Register-ArgumentCompleter cmdlet (PowerShell n
         $ownCommandLine = [string] $commandAst
         $ownCommandLine = $ownCommandLine.Substring(0, [Math]::Min($ownCommandLine.Length, $cursorColumn))
         $ownCommandLine += ' ' * ($cursorColumn - $ownCommandLine.Length)
-    
+
         ChocolateyTabExpansion $ownCommandLine
     }
 }
