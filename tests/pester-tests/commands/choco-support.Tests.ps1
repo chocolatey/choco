@@ -1,14 +1,12 @@
 ﻿Import-Module helpers/common-helpers
 
 Describe "choco support" -Tag Chocolatey, SupportCommand {
-    BeforeDiscovery {
-        $HasLicensedExtension = Test-PackageIsEqualOrHigher -PackageName 'chocolatey.extension' -Version '6.0.0'
-    }
-
     BeforeAll {
         Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
         New-ChocolateyInstallSnapshot
+
+        $HasLicensedExtension = Test-PackageIsEqualOrHigher -PackageName 'chocolatey.extension' -Version '6.0.0'
     }
 
     AfterAll {
@@ -43,7 +41,7 @@ Describe "choco support" -Tag Chocolatey, SupportCommand {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
-        It "Outputs Help for Support" {
+        It "Outputs Support Command Title in Help Documentation" {
             $Output.String | Should -Match "Support Command" -Because $Output.String
         }
 
