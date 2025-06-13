@@ -89,6 +89,13 @@ namespace chocolatey
                 public const string ChocolateyNotSilent = nameof(ChocolateyNotSilent);
 
                 /// <summary>
+                /// The name or identifier of the package that is being handled.
+                /// </summary>
+                /// <seealso cref="ChocolateyPackageName" />
+                /// <remarks>Available in v2.5.0+</remarks>
+                public const string ChocolateyPackageId = nameof(ChocolateyPackageId);
+
+                /// <summary>
                 /// The location that the package was found to be installed to. When found will be
                 /// outputted by Chocolatey CLI at the end of its execution.
                 /// </summary>

@@ -18,6 +18,7 @@ Describe "Ensuring Chocolatey Environment variables are correct (<_>)" -ForEach 
             @{ Name = 'TMP' ; Value = "C:\Temp\$PID" }
             @{ Name = 'ChocolateyPackageFolder' ; Value = '{0}\lib\test-environment' }
             @{ Name = 'ChocolateyPackageName' ; Value = 'test-environment' }
+            @{ Name = 'ChocolateyPackageId' ; Value = 'test-environment' }
             @{ Name = 'ChocolateyPackageTitle' ; Value = 'test-environment (Install)' }
             @{ Name = 'ChocolateyPackageVersion' ; Value = '1.0.0' }
             @{ Name = 'ChocolateyPreviousPackageVersion' ; Value = '0.9.0' }
