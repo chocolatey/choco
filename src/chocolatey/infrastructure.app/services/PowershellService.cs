@@ -489,6 +489,7 @@ namespace chocolatey.infrastructure.app.services
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksumType64, null);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyForceX86, null);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.DownloadCacheAvailable, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyNotSilent, null);
 
             // we only want to pass the following args to packages that would apply.
             // like choco install git --params '' should pass those params to git.install,
@@ -535,6 +536,11 @@ namespace chocolatey.infrastructure.app.services
             if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksumType64))
             {
                 Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksumType64, configuration.DownloadChecksumType64);
+            }
+
+            if (configuration.NotSilent)
+            {
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyNotSilent, "true");
             }
 
             if (configuration.ForceX86)
