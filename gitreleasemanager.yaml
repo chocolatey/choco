@@ -1,37 +1,40 @@
 issue-labels-include:
-- Breaking Change
-- Deprecate
-- Feature
-- C4B Feature
-- Bug
-- Improvement
-- Documentation
+  - Breaking Change
+  - Deprecate
+  - Feature
+  - C4B Feature
+  - Bug
+  - Improvement
+  - Documentation
+  - Dependency Change
 issue-labels-exclude:
-- Internal Refactoring
-- Build
-- NO RELEASE NOTES
+  - Internal Refactoring
+  - BuildAutomation
+  - NO RELEASE NOTES
 issue-labels-alias:
-    - name:    Documentation
-      header:  Documentation
-      plural:  Documentation
-    - name: Bug
-      header: Bug Fix
-      plural: Bug Fixes
-    - name: Deprecate
-      header: Deprecated Feature
-      plural: Deprecated Features
+  - name:    Documentation
+    header:  Documentation
+    plural:  Documentation
+  - name:    Bug
+    header:  Bug Fix
+    plural:  Bug Fixes
+  - name:    Deprecate
+    header:  Deprecated Feature
+    plural:  Deprecated Features
 create:
-    include-sha-section: true
-    sha-section-heading: "SHA256 Hashes of the release artifacts"
-    sha-section-line-format: "- `{1}\t{0}`"
+  include-sha-section: true
+  sha-section-heading: "SHA256 Hashes of the release artifacts"
+  sha-section-line-format: "- `{1}\t{0}`"
+  include-contributors: true
 close:
   use-issue-comments: true
+  set-due-date: true
   issue-comment: |-
     :tada: This issue has been resolved in version {milestone} :tada:
 
     The release is available on:
 
     - [GitHub Release](https://github.com/{owner}/{repository}/releases/tag/{milestone})
-    - [Chocolatey Package](https://chocolatey.org/packages/chocolatey/{milestone})
+    - [Chocolatey Package](https://community.chocolatey.org/packages/chocolatey/{milestone})
 
     Your **[GitReleaseManager](https://github.com/GitTools/GitReleaseManager)** bot :package: :rocket:
