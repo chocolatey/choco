@@ -1,0 +1,1 @@
+<a href="{{contributor.html_url}}"><img src="{{contributor.avatar_url}}" alt="{{contributor.login}}" height="32" width="32"/></a> 
