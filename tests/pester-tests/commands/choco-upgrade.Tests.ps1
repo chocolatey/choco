@@ -834,6 +834,29 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
+    Context 'Upgrading a package using a single quote in the parameters and remembering arguments' -Tag Arguments {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateyFeature -Name "useRememberedArgumentsForUpgrades"
+
+            $null = Invoke-Choco install test-environment --package-parameters="/Comment:It's Great! /SubmittedBy:Kim" --version 0.9
+            $Output = Invoke-Choco upgrade test-environment
+        }
+
+        It "Exits successfully (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should warn about possible upgrade failure" {
+            $Output.Lines | Should -Contain "Upgrade failures may be related to this issue." -Because $Output.String
+        }
+
+        It "Should give diagnostic information" {
+            $Output.Lines | Should -Contain "To troubleshoot, run: ``choco info test-environment --local-only`` and review the package" -Because $Output.String
+        }
+    }
+
     Context 'Upgrading a package using double-dash arguments in package arguments' -Tag Arguments {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
