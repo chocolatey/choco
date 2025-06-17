@@ -192,6 +192,7 @@
     <Compile Include="infrastructure.app\utility\ArgumentsUtilitySpecs.cs" />
     <Compile Include="infrastructure\adapters\AssemblySpecs.cs" />
     <Compile Include="infrastructure\adapters\ConsoleSpecs.cs" />
+    <Compile Include="infrastructure\adapters\EnvironmentSpecs.cs" />
     <Compile Include="infrastructure\commandline\OptionsSpecs.cs" />
     <Compile Include="infrastructure\commandline\ReadKeyTimeoutSpecs.cs" />
     <Compile Include="infrastructure\commands\ExternalCommandArgsBuilderSpecs.cs" />
