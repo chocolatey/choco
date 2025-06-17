@@ -195,6 +195,7 @@
     <Compile Include="infrastructure\adapters\EnvironmentSpecs.cs" />
     <Compile Include="infrastructure\commandline\OptionsSpecs.cs" />
     <Compile Include="infrastructure\commandline\ReadKeyTimeoutSpecs.cs" />
+    <Compile Include="infrastructure\commandline\ReadLineTimeoutSpecs.cs" />
     <Compile Include="infrastructure\commands\ExternalCommandArgsBuilderSpecs.cs" />
     <Compile Include="infrastructure\commandline\InteractivePromptSpecs.cs" />
     <Compile Include="infrastructure\commands\CommandExecutorSpecs.cs" />
