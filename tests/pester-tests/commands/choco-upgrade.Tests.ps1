@@ -834,6 +834,30 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
+    Context 'Upgrading a package using double-dash arguments in package arguments' -Tag Arguments {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateyFeature -Name "useRememberedArgumentsForUpgrades"
+
+            $null = Invoke-Choco install test-environment --package-parameters="'--quiet --norestart --wait --includeRecommended --includeOptional'" --verbose --version 0.9
+
+            $Output = Invoke-Choco upgrade test-environment --verbose
+        }
+
+        It "Exits successfully (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should have set the expected package parameter to environment variable" {
+            $Output.Lines | Should -Contain "chocolateyPackageParameters=--quiet --norestart --wait --includeRecommended --includeOptional" -Because $Output.String
+        }
+
+        It "Should report 1 out of 1 packages upgraded" {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 1/1 packages." -Because $Output.String
+        }
+    }
+
     # This needs to be (almost) the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths

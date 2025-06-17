@@ -118,8 +118,7 @@ namespace chocolatey.infrastructure.app.utility
             // before we filter out the values used later.
             var sensitiveArgs = SensitiveArgumentsProvided(packageArgumentsUnencrypted);
 
-            var packageArgumentsSplit =
-                packageArgumentsUnencrypted.Split(new[] { " --" }, StringSplitOptions.RemoveEmptyEntries);
+            var packageArgumentsSplit = SplitOnArguments(packageArgumentsUnencrypted);
 
             foreach (var packageArgument in packageArgumentsSplit.OrEmpty())
             {
@@ -146,6 +145,151 @@ namespace chocolatey.infrastructure.app.utility
 
                 yield return "--{0}{1}".FormatWith(optionName, string.IsNullOrWhiteSpace(optionValue) ? string.Empty : "=" + optionValue);
             }
+        }
+
+        private static IEnumerable<string> SplitOnArguments(string packageArgumentsUnencrypted)
+        {
+            if (string.IsNullOrWhiteSpace(packageArgumentsUnencrypted))
+            {
+                yield break;
+            }
+
+            var previousEscaped = false;
+            var inDoubleQuote = false;
+            var inSingleQuote = false;
+
+            var isArgument = false;
+            var start = 0;
+
+            for (var i = 0; i < packageArgumentsUnencrypted.Length; i++)
+            {
+                var character = packageArgumentsUnencrypted[i];
+
+                switch (character)
+                {
+                    case '\\':
+                        previousEscaped = !previousEscaped;
+                        break;
+
+                    case '"':
+                        if (!previousEscaped)
+                        {
+                            inDoubleQuote = !inDoubleQuote;
+
+                            if (inDoubleQuote && !inSingleQuote && Peek(packageArgumentsUnencrypted, i + 1, '\''))
+                            {
+                                i += 2;
+                                inDoubleQuote = false;
+                                SkipWhile(packageArgumentsUnencrypted, "'\"", ref i);
+                            }
+                        }
+                        
+                        previousEscaped = false;
+                        break;
+
+                    case '\'':
+                        if (!previousEscaped)
+                        {
+                            inSingleQuote = !inSingleQuote;
+
+                            if (inSingleQuote && !inDoubleQuote&& Peek(packageArgumentsUnencrypted, i + 1, '"'))
+                            {
+                                i += 2;
+                                inSingleQuote = false;
+                                SkipWhile(packageArgumentsUnencrypted, "\"'", ref i);
+                            }
+                        }
+                        previousEscaped = false;
+                        break;
+
+                    case '-':
+                        if (!isArgument && i + 1 < packageArgumentsUnencrypted.Length && Peek(packageArgumentsUnencrypted, i + 1, '-'))
+                        {
+                            isArgument = true;
+                            i++;
+                            start = i + 1;
+                        }
+                        break;
+
+                    case ' ':
+                        if (isArgument && !inSingleQuote && !inDoubleQuote)
+                        {
+                            isArgument = false;
+
+                            if (start > -1)
+                            {
+                                yield return packageArgumentsUnencrypted.Substring(start, i - start);
+                            }
+
+                            start = -1;
+                        }
+                        break;
+
+                    default:
+                        previousEscaped = false;
+                        break;
+                }
+            }
+
+            if (isArgument && start > -1)
+            {
+                yield return packageArgumentsUnencrypted.Substring(start);
+            }
+        }
+
+        private static void SkipWhile(string value, string expectedCharacters, ref int index, int depth = 0)
+        {
+            // We want to ensure that we do not enter a recursive stack overflow.
+            const int maxDepth = 120;
+
+            if (depth > maxDepth || string.IsNullOrEmpty(expectedCharacters))
+            {
+                // There is nothing to test, so it is always true.
+                return;
+            }
+
+            while (index < value.Length && !Peek(value, index, expectedCharacters[0]))
+            {
+                if (Peek(value, index, '\\'))
+                {
+                    // In this case the next character is escaped,
+                    // as such we need to ignore this characetr and
+                    // increment the index an additional time.
+                    index++;
+                }
+
+                index++;
+            }
+
+            index++;
+
+            // We have found the first character, then we need to check the remaining
+            // characters to determine if they are present or not.
+            for (var i = 1; i < expectedCharacters.Length && index + i - 1 < value.Length; i++)
+            {
+                if (!Peek(value, index + i - 1, expectedCharacters[i]))
+                {
+                    // We need to continue the skipping, as
+                    // no match was found
+                    SkipWhile(value, expectedCharacters, ref index, depth + 1);
+                    return;
+                }
+            }
+        }
+
+        private static bool Peek(string value, int index, char characterToTest)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return false;
+            }
+
+            if (index >= value.Length)
+            {
+                return false;
+            }
+
+            return value[index] == characterToTest;
         }
 
 #pragma warning disable IDE0022, IDE1006
