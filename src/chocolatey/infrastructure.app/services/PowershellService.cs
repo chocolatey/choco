@@ -216,7 +216,7 @@ namespace chocolatey.infrastructure.app.services
 
         private string EscapePowerShellArguments(string argument)
         {
-            return argument.ToStringSafe().Replace("\"", "\\\"");
+            return argument.ToStringSafe().Replace("\"", "\\\"").Replace("'", "''");
         }
 
         public bool RunAction(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)

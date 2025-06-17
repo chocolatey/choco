@@ -2270,6 +2270,31 @@ To install a local, or remote file, you may use:
         }
     }
 
+    Context 'Installing a package using a single quote in the parameters' -Tag Arguments {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            
+            $Output = Invoke-Choco install test-params --package-parameters="/Comment:It's great! /SubmittedBy:Kim"
+        }
+        
+        It "Exits successfully (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should output expected package parameters (<Name>=<Value>)" -ForEach @(
+            @{
+                Name = 'Comment'
+                Value = 'It''s great!'
+            }
+            @{
+                Name = 'SubmittedBy'
+                Value = 'Kim'
+            }
+        ) {
+            $Output.Lines | Should -Contain "WARNING:  - $Name = $Value"
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths
