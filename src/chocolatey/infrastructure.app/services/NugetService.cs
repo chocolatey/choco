@@ -1980,6 +1980,41 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             }
 
             var originalConfig = config.DeepCopy();
+
+            if (CountCharacter(packageArgumentsUnencrypted, '\'') % 2 != 0 || CountCharacter(packageArgumentsUnencrypted, '"') % 2 != 0)
+            {
+                if (config.CommandName.IsEqualTo("install"))
+                {
+                    // Install normally do not have any remembered arguments,
+                    // but we add this for future warnings if it becomes supported.
+                    this.Log().Warn(@"Potentially problematic package or install arguments detected.
+Install failures may be related to this issue.
+");
+                }
+                else if (config.CommandName.IsEqualTo("upgrade"))
+                {
+                    this.Log().Warn(@"Potentially problematic package or install arguments detected.
+Upgrade failures may be related to this issue.
+
+To troubleshoot, run: `choco info {0} --local-only` and review the package
+and argument details.
+",
+                        config.PackageNames);
+                }
+                else if (config.CommandName.IsEqualTo("uninstall"))
+                {
+                    // Remembered arguments are not used during uninstallations,
+                    // but we add it here for future warnings if it becomes added.
+                    this.Log().Warn(@"Potentially problematic package or uninstall arguments detected.
+Uninstall failures may be related to this issue.
+
+To troubleshoot, run: `choco info {0} --local-only` and review the package
+and argument details.
+",
+                        config.PackageNames);
+                }
+            }
+
             // this changes config globally
             ConfigurationOptions.OptionSet.Parse(packageArguments);
 
@@ -2005,6 +2040,26 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             }
 
             return originalConfig;
+        }
+
+        private int CountCharacter(string value, char character)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return 0;
+            }
+
+            var characterCount = 0;
+
+            for (var i = 0; i < value.Length; i++)
+            {
+                if (value[i] == character)
+                {
+                    characterCount++;
+                }
+            }
+
+            return characterCount;
         }
 
         private bool HasMissingDependency(PackageResult package, List<PackageResult> allLocalPackages)
