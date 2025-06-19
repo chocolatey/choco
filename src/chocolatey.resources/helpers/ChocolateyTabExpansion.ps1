@@ -56,7 +56,7 @@ $commandOptions = @{
     pin       = "--name='' --version=''"
     push      = "--api-key='' --source=''"
     rule      = "--name=''"
-    search    = "--all-versions --approved-only --by-id-only --by-tag-only --cert='' --certpassword='' --detail --disable-repository-optimizations --download-cache-only --exact --id-only --id-starts-with --include-configured-sources --include-programs --not-broken --order-by-popularity --page='' --page-size='' --password='' --prerelease --source='' --user=''"
+    search    = "--all-versions --approved-only --by-id-only --by-tag-only --cert='' --certpassword='' --detail --disable-repository-optimizations --download-cache-only --exact --id-only --id-starts-with --include-configured-sources --include-programs --not-broken --order-by='' --order-by-popularity --page='' --page-size='' --password='' --prerelease --source='' --user=''"
     source    = "--admin-only --allow-self-service --bypass-proxy --cert='' --certpassword='' --name='' --password='' --priority='' --source='' --user=''"
     support   = ""
     template  = "--name=''"
@@ -155,7 +155,7 @@ function script:chocoRemotePackages($filter) {
     if ($filter -and $filter.StartsWith(".")) {
         return;
     } #file search
-    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' -r --id-starts-with --order-by-popularity) |
+    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' -r --id-starts-with --order-by='popularity') |
         Where-Object { $_ -like "$filter*" } |
         ForEach-Object { $_.Split('|')[0] }
 }
@@ -164,6 +164,22 @@ function Get-AliasPattern($exe) {
     $aliases = @($exe) + @(Get-Alias | Where-Object { $_.Definition -eq $exe } | Select-Object -Exp Name)
 
     "($($aliases -join '|'))"
+}
+
+function Get-ChocoOrderByOptions {
+    <#
+        .SYNOPSIS
+        Returns the list of canonical --order-by values for Chocolatey.
+
+        .DESCRIPTION
+        These values correspond to the distinct, non-aliased entries in the
+        PackageOrder enum. They are sorted alphabetically and must be updated
+        manually when the enum changes.
+
+        .OUTPUTS
+        A string in the format "Id|LastPublished|Popularity|Title|Unsorted"
+    #>
+    return @("Id", "LastPublished", "Popularity", "Title", "Unsorted")
 }
 
 function ChocolateyTabExpansion($lastBlock) {
@@ -253,6 +269,13 @@ function ChocolateyTabExpansion($lastBlock) {
         "^upgrade\s+(?<package>[^\.][^-\s]*)$" {
             chocoLocalPackagesUpgrade $matches['package']
         }
+
+        # Custom completion for --order-by values
+        "^search.*--order-by='?(?<prefix>.*)'?$" {
+            $prefix = $matches['prefix']
+            return Get-ChocoOrderByOptions | Where-Object { $_ -like "$prefix*" } | ForEach-Object { "--order-by='$_'"}
+        }
+
 
         # Handles more options after others
         "^(?<cmd>$($commandOptions.Keys -join '|'))(?<currentArguments>.*)\s+(?<op>\S*)$" {
