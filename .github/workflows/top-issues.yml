@@ -1,0 +1,27 @@
+name: Top Issues Action
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '12 05 */1 * *'
+
+jobs:
+  ShowTopIssues:
+    name: Display top issues
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run top issues action
+        uses: rickstaa/top-issues-action@v1
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          top_list_size: 10
+          label: false
+          dashboard: true
+          dashboard_label: "Top Issues Dashboard"
+          dashboard_show_total_reactions: true
+          top_issues: true
+          top_bugs: true
+          bug_label: "Bug"
+          top_features: true
+          feature_label: "Enhancement"
+          custom_label: "Improvement"
