@@ -607,6 +607,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public ListCommandConfiguration()
         {
             PageSize = 25;
+            OrderBy = PackageOrder.Id;
         }
 
         // list
@@ -620,7 +621,28 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ByIdOnly { get; set; }
         public bool ByTagOnly { get; set; }
         public bool IdStartsWith { get; set; }
-        public bool OrderByPopularity { get; set; }
+        public PackageOrder OrderBy { get; set; }
+
+        [Obsolete("This property is deprecated and will be removed in version 3.0. Use the 'OrderBy' property instead.")]
+        public bool OrderByPopularity
+        {
+            get
+            {
+                return OrderBy == PackageOrder.Popularity;
+            }
+            set
+            {
+                if (value)
+                {
+                    OrderBy = PackageOrder.Popularity;
+                }
+                else
+                {
+                    OrderBy = PackageOrder.Id;
+                }
+            }
+        }
+
         public bool ApprovedOnly { get; set; }
         public bool DownloadCacheAvailable { get; set; }
         public bool NotBroken { get; set; }

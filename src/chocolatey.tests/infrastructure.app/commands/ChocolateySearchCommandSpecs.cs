@@ -24,6 +24,7 @@ using chocolatey.infrastructure.app.services;
 using chocolatey.infrastructure.commandline;
 using Moq;
 using FluentAssertions;
+using chocolatey.infrastructure.app.domain;
 
 namespace chocolatey.tests.infrastructure.app.commands
 {
@@ -38,6 +39,8 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public override void Context()
             {
+                MockLogger.Reset();
+
                 Configuration.Sources = "bob";
                 Command = new ChocolateySearchCommand(PackageService.Object);
             }
@@ -259,6 +262,24 @@ namespace chocolatey.tests.infrastructure.app.commands
             {
                 _optionSet.Contains("p").Should().BeTrue();
             }
+
+            [Fact]
+            public void Should_add_order_by_to_the_option_set()
+            {
+                _optionSet.Contains("order-by").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_add_order_by_popularity_to_the_option_set()
+            {
+                _optionSet.Contains("order-by-popularity").Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_have_marked_order_by_popularity_as_deprecated()
+            {
+                _optionSet["order-by-popularity"].Description.Should().Contain("Deprecated");
+            }
         }
 
         public class When_handling_additional_argument_parsing : ChocolateySearchCommandSpecsBase
@@ -313,6 +334,192 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_call_service_list_noop()
             {
                 PackageService.Verify(c => c.ListDryRun(Configuration), Times.Once);
+            }
+        }
+
+        [NUnit.Framework.TestFixtureSource(nameof(TestOrders))]
+        public class When_handling_order_by_parameter_correctly_parses_argument : ChocolateySearchCommandSpecsBase
+        {
+            private OptionSet _optionSet;
+            private OptionContext _optionContext;
+            private PackageOrder _order;
+            private string _orderString;
+
+            public When_handling_order_by_parameter_correctly_parses_argument(string orderString)
+            {
+                _orderString = orderString;
+                _order = (PackageOrder)Enum.Parse(typeof(PackageOrder), _orderString);
+            }
+
+            private static object[] TestOrders
+            {
+                get
+                {
+                    var values = Enum.GetNames(typeof(PackageOrder));
+                    var result = new List<object>();
+
+                    foreach (var value in values)
+                    {
+                        result.Add(new object[] { value });
+                    }
+
+                    return result.ToArray();
+                }
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                _optionSet = new OptionSet();
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
+                _optionContext = new OptionContext(_optionSet)
+                {
+                    Option = _optionSet["order-by"]
+                };
+                _optionContext.OptionName = _optionContext.Option.Names.First();
+                _optionContext.OptionValues.Add(_orderString);
+            }
+
+            public override void Because()
+            {
+                _optionContext.Option.Invoke(_optionContext);
+            }
+
+            [Fact]
+            public void Should_have_set_expected_package_sort_on_config()
+            {
+                Configuration.ListCommand.OrderBy.Should().Be(_order);
+            }
+        }
+
+        [NUnit.Framework.TestFixture(null)]
+        [NUnit.Framework.TestFixture("")]
+        public class When_handling_order_by_with_empty_values : ChocolateySearchCommandSpecsBase
+        {
+            private OptionSet _optionSet;
+            private OptionContext _optionContext;
+            private Exception _ex = null;
+            private string _testValue;
+
+            public When_handling_order_by_with_empty_values(string testValue)
+            {
+                _testValue = testValue;
+            }
+
+            public override void Context()
+            {
+                base.Context();
+
+                _optionSet = new OptionSet();
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
+                _optionContext = new OptionContext(_optionSet)
+                {
+                    Option = _optionSet["order-by"]
+                };
+                _optionContext.OptionName = _optionContext.Option.Names.First();
+                _optionContext.OptionValues.Add(_testValue);
+            }
+
+            public override void Because()
+            {
+                try
+                {
+                    _optionContext.Option.Invoke(_optionContext);
+                }
+                catch (Exception ex)
+                {
+                    _ex = ex;
+                }
+            }
+
+            [Fact]
+            public void Should_have_thrown_expected_exception()
+            {
+                _ex.Should().NotBeNull()
+                    .And.BeOfType<ApplicationException>()
+                    .Which.Message.Should().StartWith("No '--order-by' clause was provided. Specify one of the supported clauses:");
+            }
+        }
+
+        public class When_handling_order_by_with_unsupported_value : ChocolateySearchCommandSpecsBase
+        {
+            private OptionSet _optionSet;
+            private OptionContext _optionContext;
+            private Exception _ex = null;
+
+            public override void Context()
+            {
+                base.Context();
+
+                _optionSet = new OptionSet();
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
+                _optionContext = new OptionContext(_optionSet)
+                {
+                    Option = _optionSet["order-by"]
+                };
+                _optionContext.OptionName = _optionContext.Option.Names.First();
+                _optionContext.OptionValues.Add("NotExisting");
+            }
+
+            public override void Because()
+            {
+                try
+                {
+                    _optionContext.Option.Invoke(_optionContext);
+                }
+                catch (Exception ex)
+                {
+                    _ex = ex;
+                }
+            }
+
+            [Fact]
+            public void Should_have_thrown_expected_exception()
+            {
+                _ex.Should().NotBeNull()
+                    .And.BeOfType<ApplicationException>()
+                    .Which.Message.Should().StartWith("The '--order-by' clause 'NotExisting' is not recognized. Use one of the supported clauses:");
+            }
+        }
+
+        public class When_handling_order_by_popularity : ChocolateySearchCommandSpecsBase
+        {
+            private OptionSet _optionSet;
+            private OptionContext _optionContext;
+
+            public override void Context()
+            {
+                base.Context();
+
+                _optionSet = new OptionSet();
+                Command.ConfigureArgumentParser(_optionSet, Configuration);
+                _optionContext = new OptionContext(_optionSet)
+                {
+                    Option = _optionSet["order-by-popularity"]
+                };
+                _optionContext.OptionName = _optionContext.Option.Names.First();
+                _optionContext.OptionValues.Add(bool.TrueString);
+            }
+
+            public override void Because()
+            {
+                _optionContext.Option.Invoke(_optionContext);
+            }
+
+            [Fact]
+            public void Should_have_set_expected_order_by_property_value()
+            {
+                Configuration.ListCommand.OrderBy.Should().Be(PackageOrder.Popularity);
+            }
+
+            [Fact]
+            public void Should_have_outputted_warning_message()
+            {
+                MockLogger.Messages.Should()
+                    .ContainKey(LogLevel.Warn.ToString())
+                    .WhoseValue.Should().Contain(@"'--order-by-popularity' is deprecated and will be removed in a future release.
+ Use '--order-by='Popularity'' instead.");
             }
         }
 
