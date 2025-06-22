@@ -46,7 +46,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("t=|template=|template-name=",
                      "TemplateName - Use a named template in {0}\\templates\\templatename instead of built-in template.".FormatWith(ApplicationParameters.InstallLocation),
                      option => configuration.NewCommand.TemplateName = option.UnquoteSafe())
-                .Add("name=",
+                .Add("n=|name=",
                      "Name [Required]- the name of the package. Can be passed as first parameter without \"--name=\".",
                      option =>
                          {

@@ -44,7 +44,7 @@ namespace chocolatey.infrastructure.app.commands
 
             optionSet
                 .Add(
-                    "name=",
+                    "n=|name=",
                     "Name - the name of the config setting. Required with some actions. Defaults to empty.",
                     option => configuration.ConfigCommand.Name = option.UnquoteSafe())
                 .Add(
