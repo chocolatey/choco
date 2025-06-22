@@ -81,6 +81,12 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
 
             [Fact]
+            public void Should_add_short_version_name_to_the_option_set()
+            {
+                _optionSet.Contains("n").Should().BeTrue();
+            }
+
+            [Fact]
             public void Should_add_value_to_the_option_set()
             {
                 _optionSet.Contains("value").Should().BeTrue();
