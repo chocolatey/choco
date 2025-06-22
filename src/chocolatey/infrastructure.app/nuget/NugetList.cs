@@ -461,12 +461,12 @@ namespace chocolatey.infrastructure.app.nuget
                     return query
                         .OrderByDescending(q => q.Published)
                         .ThenBy(q => q.Identity.Id)
-                        .ThenBy(q => q.Identity.Version);
+                        .ThenByDescending(q => q.Identity.Version);
 
                 case domain.PackageOrder.Id:
                     return query.OrderBy(q => q.Identity.Id)
                         .ThenBy(q => q.Title)
-                        .ThenBy(q => q.Identity.Version);
+                        .ThenByDescending(q => q.Identity.Version);
 
                 case domain.PackageOrder.Popularity:
                     return query
@@ -479,7 +479,7 @@ namespace chocolatey.infrastructure.app.nuget
                         // Fallback to Id if Title is missing
                         .OrderBy(q => q.Title ?? q.Identity.Id)
                         .ThenBy(q => q.Identity.Id)
-                        .ThenBy(q => q.Identity.Version);
+                        .ThenByDescending(q => q.Identity.Version);
 
                 default:
                     // Since we return an IOrderedEnumerable, some form of ordering must be applied,
