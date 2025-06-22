@@ -90,6 +90,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 [NUnit.Framework.TestCase("pre")]
                 [NUnit.Framework.TestCase("includeprograms")]
                 [NUnit.Framework.TestCase("i")]
+                [NUnit.Framework.TestCase("ignore-pinned")]
                 public void Should_add_to_option_set(string option)
                 {
                     _optionSet.Contains(option).Should().BeTrue();

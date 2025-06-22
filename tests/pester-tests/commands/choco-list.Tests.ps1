@@ -37,9 +37,49 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         }
     }
 
+    Context "Listing packages ignoring pinned packages" {
+        BeforeAll {
+            $null = Invoke-Choco pin add --name="installpackage"
+
+            $Output = Invoke-Choco list --ignore-pinned
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should contain non-pinned packages" {
+            $Output.Lines | Should -Contain "upgradepackage 1.0.0"
+        }
+
+        It "Should not contain pinned packages" {
+            $Output.Lines | Should -Not -Contain "installpackage 1.0.0"
+        }
+    }
+
+    Context "Listing packages ignoring pinned packages (limiting output)" {
+        BeforeAll {
+            $null = Invoke-Choco pin add --name="installpackage"
+
+            $Output = Invoke-Choco list --ignore-pinned --limit-output
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should contain non-pinned packages" {
+            $Output.Lines | Should -Contain "upgradepackage|1.0.0"
+        }
+
+        It "Should not contain pinned packages" {
+            $Output.Lines | Should -Not -Contain "installpackage|1.0.0"
+        }
+    }
+
     Context "Listing local packages (limiting output)" {
         BeforeAll {
-            $Output = Invoke-Choco list --LimitOutput
+            $Output = Invoke-Choco list --limit-output
         }
 
         It "Exits with Success (0)" {

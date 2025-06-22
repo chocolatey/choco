@@ -625,6 +625,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ByIdOnly { get; set; }
         public bool ByTagOnly { get; set; }
         public bool IdStartsWith { get; set; }
+        public bool IgnorePinned { get; set; }
         public PackageOrder OrderBy { get; set; }
 
         [Obsolete("This property is deprecated and will be removed in version 3.0. Use the 'OrderBy' property instead.")]
