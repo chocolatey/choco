@@ -659,11 +659,18 @@ namespace chocolatey
         public static class OptionDescriptions
         {
             public const string IncludeHeaders = "Include header names when --limit-output is used. Requires Chocolatey CLI 2.5.0+";
+            public const string IgnoreHttpCache = "Ignore any HTTP caches that have previously been created when querying sources, and create new caches. Available in 2.1.0+";
+        }
+
+        public static class FeatureDescriptions
+        {
+            public const string UseHttpCache = "Create and use HTTP caches when querying sources. Available in 2.5.0+";
         }
 
         public static class Options
         {
             public const string IncludeHeaders = "include-headers";
+            public const string IgnoreHttpCache = "ignore-http-cache";
         }
     }
 }
