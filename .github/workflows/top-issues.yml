@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run top issues action
-        uses: rickstaa/top-issues-action@v1
+        uses: rickstaa/top-issues-action@v1.3.101
         env:
           github_token: ${{ secrets.GITHUB_TOKEN }}
         with:
