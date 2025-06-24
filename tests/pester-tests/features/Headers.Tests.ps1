@@ -6,100 +6,85 @@ Describe "choco headers tests" -Tag Chocolatey, HeadersFeature {
 
         $Commands = @(
             @{
-                Command = 'apikey'
-                CommandLine = 'list'
+                CommandArguments = 'apikey', 'list'
                 ExpectedHeaders = 'Source|ApiKey'
-                SkipTest = $false
             }
             @{
-                Command = 'config'
-                CommandLine = 'list'
+                CommandArguments = 'config', 'list'
                 ExpectedHeaders = 'Name|Value|Description'
-                SkipTest = $false
             }
             @{
-                Command = 'feature'
-                CommandLine = 'list'
+                CommandArguments = 'feature', 'list'
                 ExpectedHeaders = 'Name|Enabled|Description'
-                SkipTest = $false
             }
             @{
-                Command = 'info'
-                CommandLine = "chocolatey", "--local-only"
+                CommandArguments = 'info', 'chocolatey', '--local-only', '--pre'
                 ExpectedHeaders = 'Id|Version'
-                SkipTest = $false
             }
             @{
-                Command = 'license'
-                CommandLine = 'info'
-                ExpectedHeaders = 'Name|Type|ExpirationDate|NodeCount'
-                SkipTest = $isLicensed
-            }
-            @{
-                Command = 'list'
+                CommandArguments = 'list'
                 ExpectedHeaders = 'Id|Version'
-                SkipTest = $false
             }
             @{
-                Command = 'outdated'
+                CommandArguments = 'outdated', '--ignore-unfound', '--ignore-pinned'
                 ExpectedHeaders = 'Id|Version|AvailableVersion|Pinned'
-                SkipTest = $false
             }
             @{
-                # Needs to pin something...
-                Command = 'pin'
-                CommandLine = 'list'
+                CommandArguments = 'pin', 'list'
                 ExpectedHeaders = 'Id|Version'
-                SkipTest = $false
             }
             @{
-                Command = 'rule'
-                CommandLine = 'list'
+                CommandArguments = 'rule', 'list'
                 ExpectedHeaders = 'Severity|Id|Summary|HelpUrl'
-                SkipTest = $false
             }
             @{
-                Command = 'search'
-                CommandLine = 'windirstat'
+                CommandArguments = 'search', 'windirstat'
                 ExpectedHeaders = 'Id|Version'
-                SkipTest = $false
             }
             @{
-                Command = 'source'
-                CommandLine = 'list'
+                CommandArguments = 'source', 'list'
                 ExpectedHeaders = 'Name|Source|Disabled|UserName|Certificate|Priority|BypassProxy|AllowSelfService|AdminOnly'
-                SkipTest = $false
             }
             @{
-                Command = 'template'
-                CommandLine = 'list'
+                CommandArguments = 'template', 'list'
                 ExpectedHeaders = 'Name|Version'
-                SkipTest = $false
             }
         )
+
+        if ($isLicensed) {
+            $Commands += @{
+                CommandArguments = 'license', 'info'
+                ExpectedHeaders = 'Name|Type|ExpirationDate|NodeCount'
+            }
+        }
     }
     BeforeAll {
         Initialize-ChocolateyTestInstall
 
-        New-ChocolateyInstallSnapshot
-
         # These are needed in order to test the choco pin list execution
         # as well as the choco apikey list as the headers will only be shown
-        # when there is a pinned package
+        # when there is a pinned package. Finally, we need to install an
+        # outdated package, so that the headers show in the choco outdated
+        # command.
         $null = Invoke-Choco pin add --name="chocolatey"
 
-        $null = Invoke-Choco apikey add --source "https://community.chocolatey.org/api/v2" --api-key "bob"
+        $null = Invoke-Choco apikey add --source "https://test.com/api/add/" --api-key "test-api-key"
+
+        $null = Invoke-Choco install upgradepackage --version 1.0.0 --confirm
+
+        New-ChocolateyInstallSnapshot
     }
 
     AfterAll {
         Remove-ChocolateyTestInstall
     }
 
-    Context "Outputs headers for <Command> when '--include-headers' provided configured" -ForEach $Commands -Skip:($SkipTest) {
+    Context "Outputs headers for <CommandArguments> when '--include-headers' provided configured" -ForEach $Commands {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot -NoSnapshotCopy
 
-            $Output = Invoke-Choco $Command @CommandLine --limit-output --include-headers
+            [string[]]$chocoArgs = @($CommandArguments) + @('--limit-output', '--include-headers')
+            $Output = Invoke-Choco @chocoArgs
         }
 
         It 'Exits success (0)' {
@@ -117,11 +102,12 @@ Describe "choco headers tests" -Tag Chocolatey, HeadersFeature {
         }
     }
 
-    Context "Does not output headers for <Command> by default" -ForEach $Commands -Skip:($SkipTest) {
+    Context "Does not output headers for <CommandArguments> by default" -ForEach $Commands {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot -NoSnapshotCopy
 
-            $Output = Invoke-Choco $Command @CommandLine --limit-output
+            [string[]]$chocoArgs = @($CommandArguments) + @('--limit-output')
+            $Output = Invoke-Choco @chocoArgs
         }
 
         It 'Exits success (0)' {
@@ -139,16 +125,17 @@ Describe "choco headers tests" -Tag Chocolatey, HeadersFeature {
         }
     }
 
-    Context "Includes headers when feature enabled" -Skip:($SkipTest) {
+    Context "Includes headers when feature enabled" {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
             Enable-ChocolateyFeature -Name AlwaysIncludeHeaders
         }
 
-        Context "Includes headers for <Command>" -ForEach $Commands {
+        Context "Includes headers for <CommandArguments>" -ForEach $Commands {
             BeforeAll {
-                $Output = Invoke-Choco $Command @CommandLine --limit-output
+                [string[]]$chocoArgs = @($CommandArguments) + @('--limit-output')
+                $Output = Invoke-Choco @chocoArgs
             }
 
             It 'Exits success (0)' {

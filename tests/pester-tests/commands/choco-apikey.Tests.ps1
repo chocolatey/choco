@@ -119,7 +119,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
             $key = $Key
             $config = $apiKeys.Where{ $_.source -eq "https://test.com/api/$key" }
             $config | Should -HaveCount 1
-            $config.key | Should -Not -BeNullOrEmpty # The key is encryped, so we don't test the value
+            $config.key | Should -Not -BeNullOrEmpty # The key is encrypted, so we don't test the value
         }
     }
 
@@ -163,7 +163,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
             $key = $Key
             $config = $apiKeys.Where{ $_.source -eq "https://test.com/api/add/$key" }
             $config | Should -HaveCount 1
-            $config.key | Should -Not -BeNullOrEmpty # The key is encryped, so we don't test the value
+            $config.key | Should -Not -BeNullOrEmpty # The key is encrypted, so we don't test the value
         }
     }
 
@@ -211,7 +211,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
             $key = $Key
             $config = $apiKeys.Where{ $_.source -eq "https://test.com/api/$key" }
             $config | Should -HaveCount 1
-            $config.key | Should -Not -BeNullOrEmpty # The key is encryped, so we don't test the value
+            $config.key | Should -Not -BeNullOrEmpty # The key is encrypted, so we don't test the value
         }
     }
 
@@ -259,7 +259,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, ApiKeyCommand {
             $key = $Key
             $config = $apiKeys.Where{ $_.source -eq "https://test.com/api/add/$key" }
             $config | Should -HaveCount 1
-            $config.key | Should -Not -BeNullOrEmpty # The key is encryped, so we don't test the value
+            $config.key | Should -Not -BeNullOrEmpty # The key is encrypted, so we don't test the value
         }
     }
 
