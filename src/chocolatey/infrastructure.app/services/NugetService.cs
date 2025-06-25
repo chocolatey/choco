@@ -192,8 +192,26 @@ that uses these options.");
 
             var decryptionFailures = new List<ChocolateyPackageInformation>();
 
+            // This is required, since we only want to show the header if there are any Packages
+            // to be shown, which will be when we are printing the first Package
+            var hasHeaderRowBeenOutput = false;
+
             foreach (var pkg in NugetList.GetPackages(config, _nugetLogger, _fileSystem))
             {
+                if (!config.QuietOutput && !config.RegularOutput && config.IncludeHeaders && !hasHeaderRowBeenOutput)
+                {
+                    if (config.ListCommand.IdOnly)
+                    {
+                        OutputHelpers.LimitedOutput("Id");
+                        hasHeaderRowBeenOutput = true;
+                    }
+                    else
+                    {
+                        OutputHelpers.LimitedOutput("Id", "Version");
+                        hasHeaderRowBeenOutput = true;
+                    }
+                }
+
                 var package = pkg; // for lamda access
                 string packageArgumentsUnencrypted = null;
 
@@ -1270,7 +1288,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         else
                         {
                             //last one is whether this package is pinned or not
-                            this.Log().Info("{0}|{1}|{1}|{2}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -1291,7 +1309,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                         else
                         {
-                            this.Log().Info("{0}|{1}|{1}|{2}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -1317,7 +1335,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                             else
                             {
-                                this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe()));
+                                OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe());
                             }
                         }
 
@@ -1345,7 +1363,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                         else
                         {
-                            this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToStringSafe(), isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -1885,6 +1903,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             config.CreateBackup();
 
+            // This is required, since we only want to show the header if there are any Outdated packages
+            // to be shown, which will be when we are printing the first Outdated package
+            var hasHeaderRowBeenOutput = false;
             foreach (var packageName in packageNames)
             {
                 // We need to ensure we are using a clean configuration file
@@ -1942,7 +1963,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).{3} Source(s): \"{4}\"".FormatWith(installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version, Environment.NewLine, config.Sources);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                if (!config.RegularOutput && config.IncludeHeaders && !hasHeaderRowBeenOutput)
+                {
+                    OutputHelpers.LimitedOutput("Id", "Version", "AvailableVersion", "Pinned");
+                    hasHeaderRowBeenOutput = true;
+                }
+
+                OutputHelpers.LimitedOutput(installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe());
             }
 
             // Reset the configuration again once we are completely done with the processing of

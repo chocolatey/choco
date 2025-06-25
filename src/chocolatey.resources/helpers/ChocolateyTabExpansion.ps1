@@ -38,7 +38,7 @@ function script:chocoCmdOperations($commands, $command, $filter, $currentArgumen
 $script:chocoCommands = @('apikey','cache','config','export','feature','help','info','install','license','list','new','outdated','pack','pin','push','rule','search','source','support','template','uninstall','upgrade','--help','--version')
 
 # ensure these all have a space to start, or they will cause issues
-$allCommands = " --accept-license --cache-location='' --debug --fail-on-standard-error --force --help --ignore-http-cache --limit-output --log-file='' --no-color --no-progress --noop --online --proxy='' --proxy-bypass-list='' --proxy-bypass-on-local --proxy-password='' --proxy-user='' --skip-compatibility-checks --timeout='' --trace --use-system-powershell --verbose --yes"
+$allCommands = " --accept-license --cache-location='' --debug --fail-on-standard-error --force --help --ignore-http-cache --include-headers --limit-output --log-file='' --no-color --no-progress --noop --online --proxy='' --proxy-bypass-list='' --proxy-bypass-on-local --proxy-password='' --proxy-user='' --skip-compatibility-checks --timeout='' --trace --use-system-powershell --verbose --yes"
 
 $commandOptions = @{
     apikey    = "--api-key='' --source=''"

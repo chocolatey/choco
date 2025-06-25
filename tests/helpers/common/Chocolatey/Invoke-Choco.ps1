@@ -18,7 +18,7 @@
     )
     begin {
         $chocoPath = Get-ChocoPath
-        $firstArgument, [string[]]$remainingArguments = $Arguments
+        $firstArgument, [string[]]$remainingArguments = $Arguments.ForEach{$_}
         $arguments = @(
             $firstArgument
             '--allow-unofficial'

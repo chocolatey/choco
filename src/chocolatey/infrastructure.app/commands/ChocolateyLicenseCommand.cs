@@ -116,8 +116,14 @@ namespace chocolatey.infrastructure.app.commands
             }
             else
             {
-                // Headers: Name, LicenseType, ExpirationDate, NodeCount
-                this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(ourLicense.Name, ourLicense.LicenseType, ourLicense.ExpirationDate?.ToString("yyyy-MM-dd"), nodeCount));
+                // This if we get here, there is a license to display, it is "safe" to always
+                // output the header row
+                if (config.IncludeHeaders)
+                {
+                    OutputHelpers.LimitedOutput("Name", "Type", "ExpirationDate", "NodeCount");
+                }
+
+                OutputHelpers.LimitedOutput(ourLicense.Name, ourLicense.LicenseType.ToString(), ourLicense.ExpirationDate?.ToString("yyyy-MM-dd"), nodeCount.ToString());
             }
         }
 
