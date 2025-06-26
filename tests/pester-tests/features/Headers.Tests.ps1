@@ -14,32 +14,12 @@ Describe "choco headers tests" -Tag Chocolatey, HeadersFeature {
                 ExpectedHeaders = 'Name|Value|Description'
             }
             @{
-                CommandArguments = 'feature', 'list'
-                ExpectedHeaders = 'Name|Enabled|Description'
-            }
-            @{
-                CommandArguments = 'info', 'chocolatey', '--local-only', '--pre'
-                ExpectedHeaders = 'Id|Version'
-            }
-            @{
-                CommandArguments = 'list'
-                ExpectedHeaders = 'Id|Version'
-            }
-            @{
                 CommandArguments = 'outdated', '--ignore-unfound', '--ignore-pinned'
                 ExpectedHeaders = 'Id|Version|AvailableVersion|Pinned'
             }
             @{
-                CommandArguments = 'pin', 'list'
-                ExpectedHeaders = 'Id|Version'
-            }
-            @{
                 CommandArguments = 'rule', 'list'
                 ExpectedHeaders = 'Severity|Id|Summary|HelpUrl'
-            }
-            @{
-                CommandArguments = 'search', 'windirstat'
-                ExpectedHeaders = 'Id|Version'
             }
             @{
                 CommandArguments = 'source', 'list'
@@ -56,6 +36,37 @@ Describe "choco headers tests" -Tag Chocolatey, HeadersFeature {
                 CommandArguments = 'license', 'info'
                 ExpectedHeaders = 'Name|Type|ExpirationDate|NodeCount'
             }
+        }
+
+        # Since the concept of including a header row has _not_ yet been added to
+        # Chocolatey Licensed Extension, when running tests when it is installed
+        # will fail, as the header rows will not be output correctly. Until a new
+        # release of Licensed Extension is made (the currently released version is
+        # 6.3.1), we can only run the following tests when running open source
+        # Chocolatey CLI.
+        if (-Not $isLicensed) {
+            $Commands += @(
+                @{
+                    CommandArguments = 'feature', 'list'
+                    ExpectedHeaders = 'Name|Enabled|Description'
+                }
+                @{
+                    CommandArguments = 'info', 'chocolatey', '--local-only', '--pre'
+                    ExpectedHeaders = 'Id|Version'
+                }
+                @{
+                    CommandArguments = 'list'
+                    ExpectedHeaders = 'Id|Version'
+                }
+                @{
+                    CommandArguments = 'pin', 'list'
+                    ExpectedHeaders = 'Id|Version'
+                }
+                @{
+                    CommandArguments = 'search', 'windirstat'
+                    ExpectedHeaders = 'Id|Version'
+                }
+            )
         }
     }
     BeforeAll {
