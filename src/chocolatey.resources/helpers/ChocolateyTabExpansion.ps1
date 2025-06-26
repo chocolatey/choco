@@ -135,6 +135,22 @@ function script:chocoCommands($filter) {
     $cmdList #| sort
 }
 
+function script:chocoApiKeysList() {
+    @(& $script:choco apikey list --limit-output) | ForEach-Object { $_.Split('|')[0] }
+}
+
+function script:chocoConfigsList() {
+    @(& $script:choco config list --limit-output) | ForEach-Object { $_.Split('|')[0] }
+}
+
+function script:chocoFeaturesList() {
+    @(& $script:choco feature list --limit-output) | ForEach-Object { $_.Split('|')[0] }
+}
+
+function script:chocoLocalNonPinnedPackages() {
+    @(& $script:choco list --limit-output --ignore-pinned) | ForEach-Object { $_.Split('|')[0] }
+}
+
 function script:chocoLocalPackages($filter) {
     if ($filter -and $filter.StartsWith(".")) {
         return;
@@ -149,6 +165,10 @@ function script:chocoLocalPackagesUpgrade($filter) {
     @('all|') + @(& $script:choco list $filter -r --id-starts-with) |
         Where-Object { $_ -like "$filter*" } |
         ForEach-Object { $_.Split('|')[0] }
+}
+
+function script:chocoLocalPinnedPackages() {
+    @(& $script:choco pin list --limit-output) | ForEach-Object { $_.Split('|')[0] }
 }
 
 function script:chocoRemotePackages($filter) {
@@ -169,6 +189,18 @@ function script:chocoRemotePackageVersions($Name, $Version) {
         } else {
             $packageVersions | Select-Object -ExpandProperty Version -First 30
         }
+}
+
+function script:chocoRulesList() {
+    @(& $script:choco rule list --limit-output) | ForEach-Object { $_.Split('|')[1] }
+}
+
+function script:chocoSourcesList() {
+    @(& $script:choco source list --limit-output) | ForEach-Object { $_.Split('|')[0] }
+}
+
+function script:chocoTemplatesList() {
+    @(& $script:choco template list --limit-output) | ForEach-Object { $_.Split('|')[0] }
 }
 
 function Get-AliasPattern($exe) {
@@ -201,6 +233,12 @@ function ChocolateyTabExpansion($lastBlock) {
             @('add', 'list', 'remove', '--help') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
+        # Custom completion choco apikey remove
+        "^apikey remove.*--source='?(?<source>.*)'?$" {
+            $name = $matches['source']
+            return chocoApiKeysList | Where-Object { $_ -like "*$source*" } | ForEach-Object { "--source='$_'"}
+        }
+
         # Handles cache first tab
         "^(cache)\s+(?<subcommand>[^-\s]*)$" {
             @('list', 'remove', '--help') | Where-Object { $_ -like "$($matches['subcommand'])*" }
@@ -211,9 +249,21 @@ function ChocolateyTabExpansion($lastBlock) {
             @('get', 'list', 'set', 'unset', '--help') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
+        # Custom completion choco config get/set/unset
+        "^config (get|set|unset).*--name='?(?<name>.*)'?$" {
+            $name = $matches['name']
+            return chocoConfigsList | Where-Object { $_ -like "*$name*" } | ForEach-Object { "--name='$_'"}
+        }
+
         # Handles feature first tab
         "^(feature)\s+(?<subcommand>[^-\s]*)$" {
             @('disable', 'enable', 'get', 'list', '--help') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+        }
+
+        # Custom completion choco feature get/enable/disable
+        "^feature (get|disable|enable).*--name='?(?<name>.*)'?$" {
+            $name = $matches['name']
+            return chocoFeaturesList | Where-Object { $_ -like "*$name*" } | ForEach-Object { "--name='$_'"}
         }
 
         # Handles install/upgrade package versions for a specific package
@@ -251,6 +301,18 @@ function ChocolateyTabExpansion($lastBlock) {
             @('add', 'list', 'remove', '--help') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
+        # Custom completion choco pin add
+        "^pin add.*--name='?(?<name>.*)'?$" {
+            $name = $matches['name']
+            return chocoLocalNonPinnedPackages | Where-Object { $_ -like "*$name*" } | ForEach-Object { "--name='$_'"}
+        }
+
+        # Custom completion choco pin remove
+        "^pin remove.*--name='?(?<name>.*)'?$" {
+            $name = $matches['name']
+            return chocoLocalPinnedPackages | Where-Object { $_ -like "*$name*" } | ForEach-Object { "--name='$_'"}
+        }
+
         # Handles push first tab
         "^(push)\s+(?<subcommand>[^-\s]*)$" {
             @('<PathtoNupkg>', '--help') | Where-Object { $_ -like "$($matches['subcommand'])*" }
@@ -259,6 +321,12 @@ function ChocolateyTabExpansion($lastBlock) {
         # Handles rule first tab
         "^(rule)\s+(?<subcommand>[^-\s]*)$" {
             @('get', 'list', '--help') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+        }
+
+        # Custom completion choco rule get
+        "^rule get.*--name='?(?<name>.*)'?$" {
+            $name = $matches['name']
+            return chocoRulesList | Where-Object { $_ -like "*$name*" } | ForEach-Object { "--name='$_'"}
         }
 
         # Handles search first tab
@@ -271,9 +339,21 @@ function ChocolateyTabExpansion($lastBlock) {
             @('add', 'disable', 'enable', 'list', 'remove', '--help') | Where-Object { $_ -like "$($matches['subcommand'])*" }
         }
 
+        # Custom completion choco source disable/enable/remove
+        "^source (disable|enable|remove).*--name='?(?<name>.*)'?$" {
+            $name = $matches['name']
+            return chocoSourcesList | Where-Object { $_ -like "*$name*" } | ForEach-Object { "--name='$_'"}
+        }
+
         # Handles template first tab
         "^(template)\s+(?<subcommand>[^-\s]*)$" {
             @('info', 'list', '--help') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+        }
+
+        # Custom completion choco template info
+        "^template info.*--name='?(?<name>.*)'?$" {
+            $name = $matches['name']
+            return chocoTemplatesList | Where-Object { $_ -like "*$name*" } | ForEach-Object { "--name='$_'"}
         }
 
         # Handles uninstall package names
@@ -291,7 +371,6 @@ function ChocolateyTabExpansion($lastBlock) {
             $prefix = $matches['prefix']
             return Get-ChocoOrderByOptions | Where-Object { $_ -like "$prefix*" } | ForEach-Object { "--order-by='$_'"}
         }
-
 
         # Handles more options after others
         "^(?<cmd>$($commandOptions.Keys -join '|'))(?<currentArguments>.*)\s+(?<op>\S*)$" {
