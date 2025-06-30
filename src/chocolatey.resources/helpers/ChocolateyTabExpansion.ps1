@@ -160,6 +160,17 @@ function script:chocoRemotePackages($filter) {
         ForEach-Object { $_.Split('|')[0] }
 }
 
+function script:chocoRemotePackageVersions($Name, $Version) {
+        $packageVersions = & $script:choco search $Name --exact --all-versions --limit-output --include-headers --order-by='LastPublished' |
+            ConvertFrom-Csv -Delimiter '|'
+
+        if ($Version -and $packageVersions) {
+            $packageVersions | Where-Object Version -Like "$Version*" | Select-Object -ExpandProperty Version -First 30
+        } else {
+            $packageVersions | Select-Object -ExpandProperty Version -First 30
+        }
+}
+
 function Get-AliasPattern($exe) {
     $aliases = @($exe) + @(Get-Alias | Where-Object { $_.Definition -eq $exe } | Select-Object -Exp Name)
 
@@ -203,6 +214,11 @@ function ChocolateyTabExpansion($lastBlock) {
         # Handles feature first tab
         "^(feature)\s+(?<subcommand>[^-\s]*)$" {
             @('disable', 'enable', 'get', 'list', '--help') | Where-Object { $_ -like "$($matches['subcommand'])*" }
+        }
+
+        # Handles install/upgrade package versions for a specific package
+        "^(install|upgrade)\s+(?<package>[^\.\-][^\s]+).*--version='?(?<version>[^\s']*)'?$" {
+            chocoRemotePackageVersions -Name $matches['package'] -Version $matches['version'] | ForEach-Object { "--version='$_'" }
         }
 
         # Handles install package names
