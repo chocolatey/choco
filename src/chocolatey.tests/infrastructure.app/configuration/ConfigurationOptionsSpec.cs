@@ -24,6 +24,7 @@ using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.commandline;
 using Moq;
 using FluentAssertions;
+using NUnit.Framework;
 
 namespace chocolatey.tests.infrastructure.app.configuration
 {
@@ -337,6 +338,29 @@ namespace chocolatey.tests.infrastructure.app.configuration
                 BecauseAction();
 
                 Config.UnsuccessfulParsing.Should().BeTrue();
+            }
+
+            // This test uses the [Combinatorial] attribute to run multiple times,
+            // trying out every possible combination of the input values we've defined.
+            // It helps us make sure the code works across many different scenarios.
+            // Even though this is how NUnit works by default, we include the attribute
+            // to make it clear what's happening and to prevent surprises in the future.
+            [Fact, Combinatorial]
+            public void Should_Throw_Exception_When_Short_Name_Verbose_Is_Used_With_Value(
+                [Values(null, "install ")] string command,
+                [Values('/', '-')] char @switch,
+                [Values('=', ':', ' ')] char seperator,
+                [Values(null, '\'', '"')] char? quote)
+            {
+                Args.Add(command + @switch + "v" + seperator + quote + "5.2.1" + quote);
+
+                BecauseAction.Should().Throw<ApplicationException>()
+                    .WithMessage(@"
+A value was passed to the `-v` option, but this option does not support an
+ explicit value.
+
+Did you mean to use `--version='5.2.1'` instead?
+");
             }
         }
     }
