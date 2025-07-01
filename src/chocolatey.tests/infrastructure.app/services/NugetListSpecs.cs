@@ -58,12 +58,12 @@ namespace chocolatey.tests.infrastructure.app.services
                     new object[] { packages, orderBy });
             }
 
-            protected SearchOrderBy? GetSortOrder(PackageOrder orderBy, bool useMultiVersionOrdering)
+            protected SearchOrderBy? GetSortOrder(PackageOrder orderBy, bool useMultiVersionOrdering, bool outputWarnings = true)
             {
                 return InvokeStaticMethod<SearchOrderBy?>(
                     typeof(NugetList),
                     "GetSortOrder",
-                    new object[] { orderBy, useMultiVersionOrdering });
+                    new object[] { orderBy, useMultiVersionOrdering, outputWarnings });
             }
         }
 

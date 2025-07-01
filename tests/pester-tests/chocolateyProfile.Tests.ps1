@@ -432,5 +432,70 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
             $Completions | Should -Contain "--user=''" -Because $becauseCompletions
             $Completions | Should -Contain "--version=''" -Because $becauseCompletions
         }
+
+        It "Should list versions for <_> isdependency --version=" -ForEach @('install', 'upgrade') {
+            $Command = "choco $_ isdependency --version="
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
+        }
+
+        It "Should list versions for <_> isdependency --version='" -ForEach @('install', 'upgrade') {
+            $Command = "choco $_ isdependency --version='"
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
+        }
+
+        It "Should list versions for <_> isdependency --version=''" -ForEach @('install', 'upgrade') {
+            $Command = "choco $_ isdependency --version=''"
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn ($Command.Length - 1)).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
+        }
+
+        It "Should list versions for <_> isdependency --version='' without moving cursor" -ForEach @('install', 'upgrade') {
+            $Command = "choco $_ isdependency --version=''"
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn ($Command.Length)).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
+        }
+
+        It "Should list 2.x versions for <_> isdependency --version='2" -ForEach @('install', 'upgrade') {
+            $Command = "choco $_ isdependency --version='2"
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn ($Command.Length)).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
+            $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
+            $Completions | Should -Not -Contain "--version='1.1.0'" -Because $becauseCompletions
+            $Completions | Should -Not -Contain "--version='1.0.1'" -Because $becauseCompletions
+            $Completions | Should -Not -Contain "--version='1.0.0'" -Because $becauseCompletions
+        }
     }
 }
