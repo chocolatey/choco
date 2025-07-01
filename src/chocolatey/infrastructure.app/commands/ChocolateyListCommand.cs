@@ -135,7 +135,10 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.ListCommand.IdStartsWith = option != null)
                  .Add("detail|detailed",
                      "Detailed - Alias for verbose.",
-                     option => configuration.Verbose = option != null);
+                     option => configuration.Verbose = option != null)
+                 .Add("ignore-pinned",
+                     "Ignore Pinned - Ignore pinned packages. Defaults to false.",
+                     option => configuration.ListCommand.IgnorePinned = option != null);
         }
 
         public virtual int Count(ChocolateyConfiguration config)

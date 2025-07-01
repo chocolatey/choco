@@ -191,6 +191,7 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
             $Completions | Should -Contain "--exact" -Because $becauseCompletions
             $Completions | Should -Contain "--id-only" -Because $becauseCompletions
             $Completions | Should -Contain "--id-starts-with" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-pinned" -Because $becauseCompletions
             $Completions | Should -Contain "--include-programs" -Because $becauseCompletions
             $Completions | Should -Contain "--page=''" -Because $becauseCompletions
             $Completions | Should -Contain "--page-size=''" -Because $becauseCompletions
