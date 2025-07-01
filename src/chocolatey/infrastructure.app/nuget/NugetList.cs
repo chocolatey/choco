@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.app.nuget
             var searchFilter = new SearchFilter(configuration.Prerelease)
             {
                 IncludeDelisted = configuration.ListCommand.LocalOnly,
-                OrderBy = GetSortOrder(configuration.ListCommand.OrderBy, configuration.AllVersions)
+                OrderBy = GetSortOrder(configuration.ListCommand.OrderBy, configuration.AllVersions, configuration.RegularOutput && !configuration.QuietOutput)
             };
 
             var totalCount = 0;
@@ -81,7 +81,7 @@ namespace chocolatey.infrastructure.app.nuget
             var searchFilter = new SearchFilter(configuration.Prerelease)
             {
                 IncludeDelisted = configuration.ListCommand.LocalOnly,
-                OrderBy = GetSortOrder(configuration.ListCommand.OrderBy, configuration.AllVersions || !(version is null))
+                OrderBy = GetSortOrder(configuration.ListCommand.OrderBy, configuration.AllVersions || !(version is null), configuration.RegularOutput && !configuration.QuietOutput)
             };
 
             if (configuration.ListCommand.ByIdOnly)
@@ -492,7 +492,7 @@ namespace chocolatey.infrastructure.app.nuget
             }
         }
 
-        private static SearchOrderBy? GetSortOrder(domain.PackageOrder orderBy, bool useMultiVersionOrdering)
+        private static SearchOrderBy? GetSortOrder(domain.PackageOrder orderBy, bool useMultiVersionOrdering, bool outputWarnings)
         {
             switch (orderBy)
             {
@@ -536,11 +536,13 @@ namespace chocolatey.infrastructure.app.nuget
                         // Ideally, server-side ordering would be supported, but the current
                         // NuGet client libraries do not yet provide this capability.
 
-
-                        "chocolatey".Log().Warn(
-                            @"OrderBy '{0}' is applied on the client side. Because results are paged by the
+                        if (outputWarnings)
+                        {
+                            "chocolatey".Log().Warn(
+                                @"OrderBy '{0}' is applied on the client side. Because results are paged by the
  server, this may lead to inconsistent ordering.",
-                            orderBy);
+                                orderBy);
+                        }
 
                         if (useMultiVersionOrdering)
                         {
