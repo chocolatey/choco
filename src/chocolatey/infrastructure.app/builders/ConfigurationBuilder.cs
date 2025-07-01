@@ -343,6 +343,7 @@ namespace chocolatey.infrastructure.app.builders
             config.PromptForConfirmation = !SetFeatureFlag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
             config.DisableCompatibilityChecks = SetFeatureFlag(ApplicationParameters.Features.DisableCompatibilityChecks, configFileSettings, defaultEnabled: false, description: "Disable Compatibility Checks - Disable showing a warning when there is an incompatibility between Chocolatey CLI and Chocolatey Licensed Extension. Available in 1.1.0+");
             config.IncludeHeaders = SetFeatureFlag(ApplicationParameters.Features.AlwaysIncludeHeaders, configFileSettings, defaultEnabled: false, description: StringResources.OptionDescriptions.IncludeHeaders);
+            config.UseHttpCache = SetFeatureFlag(ApplicationParameters.Features.UseHttpCache, configFileSettings, defaultEnabled: true, description: StringResources.FeatureDescriptions.UseHttpCache);
         }
 
         private static bool SetFeatureFlag(string featureName, ConfigFileSettings configFileSettings, bool defaultEnabled, string description)
@@ -463,13 +464,14 @@ namespace chocolatey.infrastructure.app.builders
                         .Add("skipcompatibilitychecks|skip-compatibility-checks",
                             "SkipCompatibilityChecks - Prevent warnings being shown before and after command execution when a runtime compatibility problem is found between the version of Chocolatey and the Chocolatey Licensed Extension.",
                             option => config.DisableCompatibilityChecks = option != null)
-                        .Add("ignore-http-cache",
-                            "IgnoreHttpCache - Ignore any HTTP caches that have previously been created when querying sources, and create new caches. Available in 2.1.0+",
+                        .Add(StringResources.Options.IgnoreHttpCache,
+                            StringResources.OptionDescriptions.IgnoreHttpCache,
                             option =>
                             {
                                 if (option != null)
                                 {
                                     config.CacheExpirationInMinutes = -1;
+                                    config.UseHttpCache = false;
                                 }
                             });
                     ;

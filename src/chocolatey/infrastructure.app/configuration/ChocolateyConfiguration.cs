@@ -352,6 +352,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ApplyPackageParametersToDependencies { get; set; }
         public bool ApplyInstallArgumentsToDependencies { get; set; }
         public bool IgnoreDependencies { get; set; }
+        public bool UseHttpCache { get; set; }
 
         /// <summary>
         /// Gets or sets the time before the cache is considered to have expired in minutes.

@@ -34,7 +34,7 @@ namespace chocolatey.infrastructure.app.nuget
         {
             _chocolateyCacheLocation = config.CacheLocation;
 
-            if (config.CacheExpirationInMinutes <= 0)
+            if (config.CacheExpirationInMinutes <= 0 || !config.UseHttpCache)
             {
                 MaxAge = DateTime.UtcNow;
                 RefreshMemoryCache = true;
