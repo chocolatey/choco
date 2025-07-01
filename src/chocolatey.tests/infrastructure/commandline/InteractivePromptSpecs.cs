@@ -14,12 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using System;
-using System.Collections.Generic;
 using chocolatey.infrastructure.adapters;
 using chocolatey.infrastructure.commandline;
-using Moq;
 using FluentAssertions;
+using Moq;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace chocolatey.tests.infrastructure.commandline
 {
@@ -688,5 +689,345 @@ namespace chocolatey.tests.infrastructure.commandline
                 result.Should().Be("all scripts");
             }
         }
+
+        public class When_prompting_with_timeout_and_default_choice : InteractivePromptSpecsBase
+        {
+            private Func<string> _prompt;
+            private string _result;
+
+            public override void Because()
+            {
+                Console.Setup(c => c.ReadLine(It.IsAny<int>())).Returns((string)null);
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, Choices[0], requireAnswer: false, timeoutInSeconds: 1);
+                _result = _prompt();
+            }
+
+            [Fact]
+            public void Should_return_default_choice_when_timed_out()
+            {
+                _result.Should().Be(Choices[0]);
+            }
+        }
+
+        public class When_prompting_with_timeout_and_no_default_choice : InteractivePromptSpecsBase
+        {
+            private Func<string> _prompt;
+            private string _result;
+
+            public override void Because()
+            {
+                Console.Setup(c => c.ReadLine(It.IsAny<int>())).Returns((string)null);
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, null, requireAnswer: false, timeoutInSeconds: 1);
+                _result = _prompt();
+            }
+
+            [Fact]
+            public void Should_return_null_when_timed_out_and_no_default()
+            {
+                _result.Should().BeNull();
+            }
+        }
+        public class When_prompting_with_dash_in_choices : InteractivePromptSpecsBase
+        {
+            private Func<string> _prompt;
+            private string _result;
+
+            public override void Context()
+            {
+                base.Context();
+                Choices.Add("all scripts");
+            }
+
+            public override void Because()
+            {
+                Console.Setup(c => c.ReadLine()).Returns("all scripts");
+                _prompt = () => InteractivePrompt.PromptForConfirmation(PromptValue, Choices, null, requireAnswer: true);
+                _result = _prompt();
+            }
+
+            [Fact]
+            public void Should_match_choice_that_contains_space()
+            {
+                _result.Should().Be("all scripts");
+            }
+        }
+        public class When_getting_password_and_only_enter_pressed : TinySpec
+        {
+            private string _result;
+            private Mock<IConsole> _console;
+
+            public override void Context()
+            {
+                _console = new Mock<IConsole>();
+                _console.Setup(c => c.ReadKey(It.IsAny<bool>()))
+                    .Returns(new ConsoleKeyInfo('\r', ConsoleKey.Enter, false, false, false));
+                InteractivePrompt.InitializeWith(new Lazy<IConsole>(() => _console.Object));
+            }
+
+            public override void Because()
+            {
+                _result = InteractivePrompt.GetPassword(interactive: true);
+            }
+
+            [Fact]
+            public void Should_return_empty_string()
+            {
+                _result.Should().BeEmpty();
+            }
+        }
+        public class When_prompting_and_invalid_input_is_followed_by_valid_input : InteractivePromptSpecsBase
+        {
+            private string _result;
+
+            public override void Because()
+            {
+                Console.SetupSequence(c => c.ReadLine())
+                    .Returns("invalid")
+                    .Returns("")
+                    .Returns("2");
+
+                _result = InteractivePrompt.PromptForConfirmation(PromptValue, Choices, null, requireAnswer: true);
+            }
+
+            [Fact]
+            public void Should_return_second_choice_after_retry()
+            {
+                _result.Should().Be("no");
+            }
+
+            [Fact]
+            public void Should_have_retried_on_invalid_input()
+            {
+                Console.Verify(c => c.ReadLine(), Times.Exactly(3));
+            }
+        }
+
+        public class When_prompting_with_case_insensitive_default_choice : InteractivePromptSpecsBase
+        {
+            private string _result;
+
+            public override void Context()
+            {
+                Choices = new List<string> { "Yes", "No" };
+                PromptValue = "continue?";
+                base.Context();
+            }
+
+            public override void Because()
+            {
+                Console.Setup(c => c.ReadLine()).Returns(""); // Enter
+                _result = InteractivePrompt.PromptForConfirmation(PromptValue, Choices, defaultChoice: "yes", requireAnswer: false);
+            }
+
+            [Fact]
+            public void Should_allow_case_mismatched_default_choice()
+            {
+                _result.Should().Be("yes"); // the exact value passed as defaultChoice
+            }
+
+            [Fact]
+            public void Should_be_considered_valid_if_case_mismatch_exists_but_string_present()
+            {
+                Choices.Should().Contain(c => c.Equals("yes", StringComparison.OrdinalIgnoreCase));
+            }
+        }
+
+        public class When_prompting_with_multiple_choices_having_same_first_letter : InteractivePromptSpecsBase
+        {
+            private Exception _thrown;
+
+            public override void Context()
+            {
+                Choices = new List<string> { "yes", "yell" };
+                base.Context();
+            }
+
+            public override void Because()
+            {
+                try
+                {
+                    InteractivePrompt.PromptForConfirmation(PromptValue, Choices, null, requireAnswer: false);
+                }
+                catch (Exception ex)
+                {
+                    _thrown = ex;
+                }
+            }
+
+            [Fact]
+            public void Should_throw_validation_exception_for_non_unique_shortcut_letters()
+            {
+                _thrown.Should().BeOfType<ApplicationException>();
+            }
+
+            [Fact]
+            public void Should_explain_first_letter_conflict()
+            {
+                _thrown.Message.Should().Contain("Multiple choices have the same first letter");
+            }
+        }
+
+        public class When_prompting_with_invalid_default_choice : InteractivePromptSpecsBase
+        {
+            private Exception _thrown;
+
+            public override void Because()
+            {
+                Console.Setup(c => c.ReadLine()).Returns(""); // enter
+                try
+                {
+                    InteractivePrompt.PromptForConfirmation(PromptValue, Choices, "maybe", requireAnswer: false);
+                }
+                catch (Exception ex)
+                {
+                    _thrown = ex;
+                }
+            }
+
+            [Fact]
+            public void Should_throw_application_exception()
+            {
+                _thrown.Should().BeOfType<ApplicationException>();
+            }
+
+            [Fact]
+            public void Should_report_invalid_default_choice()
+            {
+                _thrown.Message.Should().Be("Default choice value must be one of the given choices.");
+            }
+        }
+
+        public class When_prompting_with_default_choice_with_extra_whitespace : InteractivePromptSpecs.InteractivePromptSpecsBase
+        {
+            private Exception _thrown;
+
+            public override void Context()
+            {
+                Choices = new List<string> { "yes", "no" };
+                base.Context();
+            }
+
+            public override void Because()
+            {
+                try
+                {
+                    InteractivePrompt.PromptForConfirmation(PromptValue, Choices, " yes ", requireAnswer: false);
+                }
+                catch (Exception ex)
+                {
+                    _thrown = ex;
+                }
+            }
+
+            [Fact]
+            public void Should_throw_for_invalid_default_choice_with_whitespace()
+            {
+                _thrown.Should().BeOfType<ApplicationException>();
+                _thrown.Message.Should().Be("Default choice value must be one of the given choices.");
+            }
+        }
+
+        public class When_prompting_with_choices_containing_dashes_and_input_is_prefix : InteractivePromptSpecs.InteractivePromptSpecsBase
+        {
+            private string _result;
+
+            public override void Context()
+            {
+                Choices = new List<string> { "1 - all scripts", "2 - cancel" };
+                base.Context();
+            }
+
+            public override void Because()
+            {
+                Console.Setup(c => c.ReadLine()).Returns("1");
+                _result = InteractivePrompt.PromptForConfirmation(PromptValue, Choices, null, requireAnswer: true);
+            }
+
+            [Fact]
+            public void Should_match_choice_using_prefix_before_dash()
+            {
+                _result.Should().Be("1 - all scripts");
+            }
+        }
+
+        public class When_prompting_with_empty_prompt_string : InteractivePromptSpecs.InteractivePromptSpecsBase
+        {
+            private string _result;
+
+            public override void Context()
+            {
+                PromptValue = "";
+                base.Context();
+            }
+
+            public override void Because()
+            {
+                Console.Setup(c => c.ReadLine()).Returns("1");
+                _result = InteractivePrompt.PromptForConfirmation(PromptValue, Choices, null, requireAnswer: false);
+            }
+
+            [Fact]
+            public void Should_allow_empty_prompt_and_return_choice()
+            {
+                _result.Should().Be("yes");
+            }
+        }
+
+        public class When_prompting_multiple_times_in_sequence : InteractivePromptSpecs.InteractivePromptSpecsBase
+        {
+            private string _first;
+            private string _second;
+
+            public override void Because()
+            {
+                Console.SetupSequence(c => c.ReadLine())
+                    .Returns("1")
+                    .Returns("2");
+
+                _first = InteractivePrompt.PromptForConfirmation(PromptValue, Choices, null, requireAnswer: true);
+                _second = InteractivePrompt.PromptForConfirmation(PromptValue, Choices, null, requireAnswer: true);
+            }
+
+            [Fact]
+            public void Should_return_first_choice_for_first_call()
+            {
+                _first.Should().Be("yes");
+            }
+
+            [Fact]
+            public void Should_return_second_choice_for_second_call()
+            {
+                _second.Should().Be("no");
+            }
+        }
+
+        public class When_getting_password_with_typing : TinySpec
+        {
+            private string _result;
+            private Mock<IConsole> _console;
+
+            public override void Context()
+            {
+                _console = new Mock<IConsole>();
+                _console.SetupSequence(c => c.ReadKey(It.IsAny<bool>()))
+                    .Returns(new ConsoleKeyInfo('a', ConsoleKey.A, false, false, false))
+                    .Returns(new ConsoleKeyInfo('b', ConsoleKey.B, false, false, false))
+                    .Returns(new ConsoleKeyInfo('\r', ConsoleKey.Enter, false, false, false));
+
+                InteractivePrompt.InitializeWith(new Lazy<IConsole>(() => _console.Object));
+            }
+
+            public override void Because()
+            {
+                _result = InteractivePrompt.GetPassword(interactive: true);
+            }
+
+            [Fact]
+            public void Should_capture_typed_password_characters()
+            {
+                _result.Should().Be("ab");
+            }
+        }
+
     }
 }

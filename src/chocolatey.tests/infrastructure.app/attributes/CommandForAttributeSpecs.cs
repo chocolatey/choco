@@ -46,5 +46,73 @@ namespace chocolatey.tests.infrastructure.app.attributes
                 _result.Should().Be("bob");
             }
         }
+
+        public class When_CommandForAttribute_is_set_with_description : CommandForAttributeSpecsBase
+        {
+            private string _result;
+
+            public override void Context()
+            {
+                Attribute = new CommandForAttribute("list", "Lists packages");
+            }
+
+            public override void Because()
+            {
+                _result = Attribute.Description;
+            }
+
+            [Fact]
+            public void Should_be_set_to_the_description()
+            {
+                _result.Should().Be("Lists packages");
+            }
+        }
+
+        public class When_CommandForAttribute_has_version_set : CommandForAttributeSpecsBase
+        {
+            private string _result;
+
+            public override void Context()
+            {
+                Attribute = new CommandForAttribute("search", "Search packages");
+                Attribute.Version = "1.2.3";
+            }
+
+            public override void Because()
+            {
+                _result = Attribute.Version;
+            }
+
+            [Fact]
+            public void Should_return_the_set_version()
+            {
+                _result.Should().Be("1.2.3");
+            }
+        }
+
+        public class When_multiple_CommandForAttributes_are_applied : TinySpec
+        {
+            private object[] _attributes;
+
+            public override void Context()
+            {
+                _attributes = typeof(DummyCommand).GetCustomAttributes(typeof(CommandForAttribute), false);
+            }
+
+            public override void Because() { }
+
+            [Fact]
+            public void Should_have_two_command_attributes()
+            {
+                _attributes.Should().HaveCount(2);
+            }
+
+            [CommandFor("install", "Install packages")]
+            [CommandFor("upgrade", "Upgrade packages")]
+            private class DummyCommand
+            {
+            }
+        }
+
     }
 }
