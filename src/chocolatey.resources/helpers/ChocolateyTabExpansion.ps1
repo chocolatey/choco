@@ -126,7 +126,7 @@ function script:chocoCommands($filter) {
         $cmdList += $script:chocoCommands -like "$filter*"
     }
     else {
-        $cmdList += (& $script:choco -h) |
+        $cmdList += (& $script:choco --help) |
             Where-Object { $_ -match '^  \S.*' } |
             ForEach-Object { $_.Split(' ', [StringSplitOptions]::RemoveEmptyEntries) } |
             Where-Object { $_ -like "$filter*" }
@@ -136,46 +136,62 @@ function script:chocoCommands($filter) {
 }
 
 function script:chocoApiKeysList() {
-    @(& $script:choco apikey list --limit-output) | ForEach-Object { $_.Split('|')[0] }
+    @(& $script:choco apikey list --limit-output --include-headers) |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Source
 }
 
 function script:chocoConfigsList() {
-    @(& $script:choco config list --limit-output) | ForEach-Object { $_.Split('|')[0] }
+    @(& $script:choco config list --limit-output --include-headers) |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Name
 }
 
 function script:chocoFeaturesList() {
-    @(& $script:choco feature list --limit-output) | ForEach-Object { $_.Split('|')[0] }
+    @(& $script:choco feature list --limit-output --include-headers) |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Name
 }
 
 function script:chocoLocalNonPinnedPackages() {
-    @(& $script:choco list --limit-output --ignore-pinned) | ForEach-Object { $_.Split('|')[0] }
+    @(& $script:choco list --limit-output --ignore-pinned --include-headers) |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Id
 }
 
 function script:chocoLocalPackages($filter) {
     if ($filter -and $filter.StartsWith(".")) {
         return;
     } #file search
-    @(& $script:choco list $filter -r --id-starts-with) | ForEach-Object { $_.Split('|')[0] }
+    @(& $script:choco list $filter --limit-output --id-starts-with --include-headers) |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Id
 }
 
 function script:chocoLocalPackagesUpgrade($filter) {
     if ($filter -and $filter.StartsWith(".")) {
         return;
     } #file search
-    @('all|') + @(& $script:choco list $filter -r --id-starts-with) |
+    @('all|') + @(& $script:choco list $filter --limit-output --id-starts-with --include-headers) |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Id
         Where-Object { $_ -like "$filter*" } |
         ForEach-Object { $_.Split('|')[0] }
 }
 
 function script:chocoLocalPinnedPackages() {
-    @(& $script:choco pin list --limit-output) | ForEach-Object { $_.Split('|')[0] }
+    @(& $script:choco pin list --limit-output --include-headers) |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Id
 }
 
 function script:chocoRemotePackages($filter) {
     if ($filter -and $filter.StartsWith(".")) {
         return;
     } #file search
-    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' -r --id-starts-with --order-by='popularity') |
+    @('packages.config|') + @(& $script:choco search $filter --page='0' --page-size='30' --limit-output --id-starts-with --include-headers --order-by='popularity') |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Id
         Where-Object { $_ -like "$filter*" } |
         ForEach-Object { $_.Split('|')[0] }
 }
@@ -192,15 +208,21 @@ function script:chocoRemotePackageVersions($Name, $Version) {
 }
 
 function script:chocoRulesList() {
-    @(& $script:choco rule list --limit-output) | ForEach-Object { $_.Split('|')[1] }
+    @(& $script:choco rule list --limit-output --include-headers) |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Id
 }
 
 function script:chocoSourcesList() {
-    @(& $script:choco source list --limit-output) | ForEach-Object { $_.Split('|')[0] }
+    @(& $script:choco source list --limit-output --include-headers) |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Name
 }
 
 function script:chocoTemplatesList() {
-    @(& $script:choco template list --limit-output) | ForEach-Object { $_.Split('|')[0] }
+    @(& $script:choco template list --limit-output --include-headers) |
+        ConvertFrom-Csv -Delimiter '|' |
+        Select-Object -ExpandProperty Name
 }
 
 function Get-AliasPattern($exe) {
