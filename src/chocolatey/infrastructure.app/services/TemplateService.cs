@@ -248,7 +248,7 @@ namespace chocolatey.infrastructure.app.services
 
         public void List(ChocolateyConfiguration configuration)
         {
-            var templateDirList = _fileSystem.GetDirectories(ApplicationParameters.TemplatesLocation).ToList();
+            var templateDirList = _fileSystem.GetDirectories(ApplicationParameters.TemplatesLocation).Select(d => d.ToLowerInvariant()).ToList();
             var isBuiltInTemplateOverridden = templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation, _builtInTemplateOverrideName));
             var isBuiltInOrDefaultTemplateDefault = string.IsNullOrWhiteSpace(configuration.DefaultTemplateName) || !templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation, configuration.DefaultTemplateName));
 
@@ -273,7 +273,7 @@ namespace chocolatey.infrastructure.app.services
             }
             else
             {
-                if (templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation, configuration.TemplateCommand.Name)))
+                if (templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation.ToLowerInvariant(), configuration.TemplateCommand.Name.ToLowerInvariant())))
                 {
                     ListCustomTemplateInformation(configuration);
                     if (configuration.TemplateCommand.Name == _builtInTemplateName || configuration.TemplateCommand.Name == _builtInTemplateOverrideName)
