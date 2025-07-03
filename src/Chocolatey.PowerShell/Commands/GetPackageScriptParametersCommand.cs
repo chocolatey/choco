@@ -44,14 +44,16 @@ namespace Chocolatey.PowerShell.Commands
         protected override void End()
         {
             var packageParameters = PackageParameter.GetParameters(this, Parameters);
+            WriteObject(GetPackageParameterHashtable(ScriptPath, packageParameters));
+        }
+
+        private Hashtable GetPackageParameterHashtable(string scriptPath, Hashtable packageParameters)
+        {
+            
             var splatHash = new Hashtable(StringComparer.OrdinalIgnoreCase);
 
             // Check what parameters the script has
-            Token[] tokensRef = null;
-            ParseError[] errorsRef = null;
-            var parsedAst = Parser.ParseFile(ScriptPath, out tokensRef, out errorsRef);
-            var scriptParameters = parsedAst.ParamBlock != null ? parsedAst.ParamBlock.Parameters.Select(p => p.Name.VariablePath.UserPath.ToString()).ToList() : new List<string>();
-            WriteVerbose($"Found {scriptParameters.Count()} parameter(s) in '{ScriptPath}'");
+            var scriptParameters = GetScriptParameters(scriptPath);
 
             // For each of those in PackageParameters, add it to the splat
             foreach (var parameter in scriptParameters)
@@ -62,8 +64,18 @@ namespace Chocolatey.PowerShell.Commands
                 }
             }
 
-            // Return the splat
-            WriteObject(splatHash);
+            return splatHash;
+        }
+
+        private List<string>  GetScriptParameters(string scriptPath)
+        {
+            Token[] tokensRef = null;
+            ParseError[] errorsRef = null;
+            var parsedAst = Parser.ParseFile(scriptPath, out tokensRef, out errorsRef);
+            var scriptParameters = parsedAst.ParamBlock != null ? parsedAst.ParamBlock.Parameters.Select(p => p.Name.VariablePath.UserPath.ToString()).ToList() : new List<string>();
+            WriteVerbose($"Found {scriptParameters.Count()} parameter(s) in '{scriptPath}'");
+
+            return scriptParameters;
         }
     }
 }

@@ -29,12 +29,11 @@ namespace Chocolatey.PowerShell.Helpers
         
         public static Hashtable GetParameters(PSCmdlet cmdlet, string parameters)
         {
-            var paramStrings = new List<string>();
-            var logParams = true;
+            var paramHash = new Hashtable(StringComparer.OrdinalIgnoreCase);
             
             if (!string.IsNullOrEmpty(parameters))
             {
-                paramStrings.Add(parameters);
+                paramHash = AddParameters(cmdlet, parameters, paramHash);
             }
             else
             {
@@ -44,47 +43,49 @@ namespace Chocolatey.PowerShell.Helpers
                     EnvironmentVariableTarget.Process);
                 if (!string.IsNullOrEmpty(packageParameters))
                 {
-                    paramStrings.Add(packageParameters);
+                    paramHash = AddParameters(cmdlet, packageParameters, paramHash);
                 }
 
-                // This should possibly only be implemented in the CLE codebase
                 var sensitivePackageParameters = EnvironmentHelper.GetVariable(
                     cmdlet,
                     "ChocolateyPackageParametersSensitive",
                     EnvironmentVariableTarget.Process);
                 if (!string.IsNullOrEmpty(sensitivePackageParameters))
                 {
-                    logParams = false;
-                    paramStrings.Add(sensitivePackageParameters);
+                    paramHash = AddParameters(cmdlet, sensitivePackageParameters, paramHash, logParams: false);
                 }
             }
 
-            var paramHash = new Hashtable(StringComparer.OrdinalIgnoreCase);
+            return paramHash;
+        }
 
-            foreach (var param in paramStrings)
+        private static Hashtable AddParameters(PSCmdlet cmdlet, string paramString, Hashtable paramHash, bool logParams = true)
+        {;
+            foreach (Match match in _packageParameterRegex.Matches(paramString))
             {
-                foreach (Match match in _packageParameterRegex.Matches(param))
+                var name = match.Groups["ItemKey"].Value.Trim();
+                var valueGroup = match.Groups["ItemValue"];
+
+                object value;
+                if (valueGroup.Success)
                 {
-                    var name = match.Groups["ItemKey"].Value.Trim();
-                    var valueGroup = match.Groups["ItemValue"];
-
-                    object value;
-                    if (valueGroup.Success)
-                    {
-                        value = valueGroup.Value.Trim();
-                    }
-                    else
-                    {
-                        value = (object)true;
-                    }
-
-                    if (logParams)
-                    {
-                        cmdlet.WriteDebug($"Adding package param '{name}'='{value}'");
-                    }
-
-                    paramHash[name] = value;
+                    value = valueGroup.Value.Trim();
                 }
+                else
+                {
+                    value = (object)true;
+                }
+
+                if (logParams)
+                {
+                    cmdlet.WriteDebug($"Adding package param '{name}'='{value}'");
+                }
+                else
+                {
+                    cmdlet.WriteDebug($"Adding package param '{name}' (value not logged)");
+                }
+
+                paramHash[name] = value;
             }
 
             return paramHash;
