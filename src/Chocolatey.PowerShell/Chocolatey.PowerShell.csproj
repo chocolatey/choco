@@ -50,7 +50,6 @@
     <Compile Include="..\chocolatey\StringResources.cs">
       <Link>Shared\StringResources.cs</Link>
     </Compile>
-    <Compile Include="Commands\GetPackageParameterCommand.cs" />
     <Compile Include="Commands\GetPackageScriptParametersCommand.cs" />
     <Compile Include="Helpers\PackageParameter.cs" />
     <Compile Include="..\SolutionVersion.cs">
