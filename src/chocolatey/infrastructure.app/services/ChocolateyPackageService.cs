@@ -2031,7 +2031,7 @@ ATTENTION: You must take manual action to remove {1} from
                 {
                     this.Log().Debug(@"Logging of values is not turned on by default because it
  could potentially expose sensitive data. If you understand the risk,
- please see `choco feature -h` for information to turn it on.");
+ please see `choco feature --help` for information to turn it on.");
                 }
 
                 if (hasEnvironmentChanges)

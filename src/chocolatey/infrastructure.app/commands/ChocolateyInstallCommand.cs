@@ -319,7 +319,7 @@ NOTE: `all` is a special package keyword that will allow you to install
  public repositories like the Chocolatey Community Repository, and is
  intended to  be used with internal package sources only.
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

@@ -126,7 +126,7 @@ Chocolatey will perform a search for a package local or remote and provide
     choco info googlechrome
     choco info powershell
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

@@ -214,7 +214,7 @@ Chocolatey will perform a search for a package local or remote.
     choco search --page=0 --page-size=25
     choco search 7zip --all-versions --exact
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

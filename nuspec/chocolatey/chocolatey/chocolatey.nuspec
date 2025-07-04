@@ -37,7 +37,7 @@ You can host your own sources and add them to Chocolatey, you can extend Chocola
 
 There are quite a few commands you can call - you should check out the [command reference](https://docs.chocolatey.org/en-us/choco/commands). Here are the most common:
 
-- Help - choco -? or choco command -?
+- Help - choco --help or choco command --help
 - Search - choco search something
 - List - choco list
 - Config - choco config list
@@ -55,7 +55,7 @@ There are quite a few commands you can call - you should check out the [command 
 
 #### More
 
-For more advanced commands and switches, use `choco -?` or `choco command -h`. You can also look at the [command reference](https://docs.chocolatey.org/en-us/choco/commands), including how you can force a package to install the x86 version of a package.
+For more advanced commands and switches, use `choco --help` or `choco command --help`. You can also look at the [command reference](https://docs.chocolatey.org/en-us/choco/commands), including how you can force a package to install the x86 version of a package.
 
 ### Create Packages?
 

@@ -95,7 +95,7 @@ WARNING: {0}", GetCommandVersionWarning(commandForAttribute, configuration));
                 }
 
                 this.Log().Info(@"
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 ");
             }
