@@ -1,7 +1,14 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+$memory = ENV['VM_MEMORY'] ? ENV['VM_MEMORY'].to_i : 16384
+$cpus = ENV['VM_CPU'] ? ENV['VM_CPU'].to_i : 4
+
 Vagrant.configure("2") do |config|
+  # Set preferred order of providers
+  config.vm.provider :hyperv
+  config.vm.provider :virtualbox
+
   config.vm.box = "chocolatey/test-environment"
   # Set Hostname to prevent error messages. https://github.com/hashicorp/vagrant/issues/12644
   config.vm.hostname = 'chocolatey-tests'
@@ -23,21 +30,32 @@ Vagrant.configure("2") do |config|
   config.vm.network :forwarded_port, guest: 5985, host: 14985, id: 'winrm', auto_correct: true
   config.vm.network :forwarded_port, guest: 3389, host: 14389, id: 'rdp', auto_correct: true
 
-  config.vm.provider "virtualbox" do |vb|
+  config.vm.provider :virtualbox do |vb|
     vb.gui = ENV['VM_GUI'] ? ENV['VM_GUI'].to_s.downcase == 'true' : true
-    vb.memory = ENV['VM_MEMORY'] ? ENV['VM_MEMORY'].to_i : 4096
-    vb.cpus = ENV['VM_CPU'] ? ENV['VM_CPU'].to_i : 2
+    vb.memory = $memory
+    vb.cpus = $cpus
     vb.linked_clone = true
     vb.customize ['modifyvm', :id, '--vram', '128']
   end
-  config.vm.provider "hyperv" do |h|
-    h.memory = 4096
-    h.cpus = 2
+
+  config.vm.provider :hyperv do |h, o|
+    # Use dynamic memory. In testing this has not presented any issues. If there are issues believed to be related to dynamic memory, uncomment the h.memory line to disable it.
+    h.maxmemory = $memory
+    # h.memory = $memory
+    h.cpus = $cpus
     h.linked_clone = true
     h.enable_checkpoints = false
+
+    # Set the Virtual Switch to prevent Vagrant prompting.
+    o.vm.network :private_network, bridge: ENV['VM_VSWITCH'].nil? ? "Default Switch" : ENV['VM_VSWITCH'].to_s
   end
 
-  config.vm.synced_folder '../', '/chocoRoot'
+  # Allow passing in the username/password through environment variables.
+  if ENV['VM_SMB_USERNAME'].nil? || ENV['VM_SMB_PASSWORD'].nil?
+    config.vm.synced_folder '../', '/chocoRoot'
+  else
+    config.vm.synced_folder '../', '/chocoRoot', type: "smb", smb_username: ENV['VM_SMB_USERNAME'], smb_password: ENV['VM_SMB_PASSWORD']
+  end
 
   config.vm.provision "shell", name: "prep", inline: <<-SHELL
     cscript c:/windows/system32/slmgr.vbs /rearm | Out-Null
@@ -50,10 +68,10 @@ Vagrant.configure("2") do |config|
     Update-SessionEnvironment
     Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Done installing software, now copying files"
     # If you try to build on macOS, then run this, there are attributes on some files that cause the build to fail inside of the vagrant environment.
-    $null = robocopy c:/chocoRoot c:/code/choco /e /copy:dt
+    $null = robocopy c:/chocoRoot c:/code/choco /e /copy:dt /dcopy:t /xd .vagrant /mt:12 /log:robocopy.txt
   SHELL
   config.vm.provision "shell", name: "build", inline: <<-SHELL
-    $null = robocopy c:/chocoRoot c:/code/choco /e /copy:dt /purge
+    $null = robocopy c:/chocoRoot c:/code/choco /e /copy:dt /dcopy:t /xd .vagrant /mt:12 /log:robocopy.txt /purge
     Push-Location c:/code/choco
     Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Files have been copied, beginning build process."
     $CakeOutput = ./build.bat --verbosity=diagnostic --target=CI --testExecutionType=none --shouldRunalyze=false --shouldRunNuGet=false 2>&1
@@ -73,9 +91,9 @@ Vagrant.configure("2") do |config|
   SHELL
   config.vm.provision "shell", name: "test", inline: <<-SHELL
     # Copy changed files.
-    $null = robocopy c:/chocoRoot c:/code/choco /e /copy:dt
+    $null = robocopy c:/chocoRoot c:/code/choco /e /copy:dt /dcopy:t /xd .vagrant /mt:12 /log:robocopy.txt
     # Purge any tests files that have been removed.
-    $null = robocopy c:/chocoRoot/tests c:/code/choco/tests /e /copy:dt /purge
+    $null = robocopy c:/chocoRoot/tests c:/code/choco/tests /e /copy:dt /dcopy:t /xd .vagrant /mt:12 /log:robocopy.txt /purge
     Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Starting Test Execution"
     Push-Location c:/code/choco
     # $env:TEST_KITCHEN = 1
