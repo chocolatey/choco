@@ -156,7 +156,7 @@ NOTE: Chocolatey for Business can also download and internalize remote
     choco new bob silentargs=""'/S'"" url=""'https://somewhere/out/there.msi'""
     choco new bob --outputdirectory Packages
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

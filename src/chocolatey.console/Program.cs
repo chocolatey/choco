@@ -121,7 +121,7 @@ namespace chocolatey.console
 #endif
                     if (args.Length == 0)
                     {
-                        "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "Please run 'choco -?' or 'choco <command> -?' for help menu.");
+                        "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "Please run 'choco --help' or 'choco <command> --help' for help menu.");
                     }
                 }
 

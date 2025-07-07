@@ -152,7 +152,7 @@ location. If it is a url, it will be a location you can go to in a browser and
 it returns OData with something that says Packages in the browser, similar to
 what you see when you go to https://community.chocolatey.org/api/v2/.
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

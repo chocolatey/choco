@@ -81,7 +81,7 @@ If you are using a [commercial edition of Chocolatey](https://chocolatey.org/com
 
 Please see the [docs](https://docs.chocolatey.org/en-us/)
 
-Give `choco.exe -?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
+Give `choco.exe --help` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install --help`.
 
 ### Requirements
 

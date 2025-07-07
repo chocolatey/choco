@@ -347,7 +347,7 @@ NOTE: Chocolatey Pro / Business automatically synchronizes with
     choco upgrade all
     choco upgrade all --except=""'skype,conemu'""
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

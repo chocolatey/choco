@@ -122,7 +122,7 @@ This is especially helpful when running `choco upgrade` for all
     choco pin add --name=""'git'"" --version=""'1.2.3'"" --reason=""'reasons available in business editions only'""
     choco pin remove --name=""'git'""
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

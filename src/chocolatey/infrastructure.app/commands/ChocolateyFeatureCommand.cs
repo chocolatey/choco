@@ -112,7 +112,7 @@ Chocolatey will allow you to interact with features.
     choco feature disable --name=checksumFiles
     choco feature enable --name=checksumFiles
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

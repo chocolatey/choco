@@ -54,7 +54,7 @@ namespace chocolatey.infrastructure.app.runners
                 if (!string.IsNullOrWhiteSpace(config.CommandName))
                 {
                     throw new Exception(@"Could not find a command registered that meets '{0}'.
- Try choco -? for command reference/help.".FormatWith(config.CommandName));
+ Try choco --help for command reference/help.".FormatWith(config.CommandName));
                 }
 
                 if (isConsole)
@@ -99,7 +99,7 @@ namespace chocolatey.infrastructure.app.runners
                         throw new Exception(@"
 Custom unofficial builds are not allowed by default.
  To override this behavior, explicitly set --allow-unofficial.
- See the help menu (choco -h) for options.");
+ See the help menu (choco --help) for options.");
                     }
                     else
                     {

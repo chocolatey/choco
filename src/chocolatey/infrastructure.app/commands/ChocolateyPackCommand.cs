@@ -99,7 +99,7 @@ NOTE: You can pass arbitrary property value pairs through to nuspecs.
     choco pack path/to/nuspec
     choco pack --outputdirectory build
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

@@ -77,7 +77,7 @@ namespace chocolatey.infrastructure.app.commands
             {
                 container = new Container();
                 "chocolatey".Log().Warn(@"You have encountered a scenario where our container is not available. Please:
- 1. Run `choco -?` for a list of commands available to be run.
+ 1. Run `choco --help` for a list of commands available to be run.
  2. If you're able to reproduce this message, open an issue on GitHub so we can investigate.
 ");
             }
@@ -190,7 +190,7 @@ based on choco not receiving things you think you are passing to it.
  * Always use full option name. If the short option is `-n`, and the
    full option is `--name`, use `--name`. The only acceptable short
    option for use in scripts is `-y`. Find option names in help docs
-   online or through `choco -?` /`choco [Command Name] -?`.
+   online or through `choco --help` /`choco [Command Name] --help`.
  * For scripts that are running automated, always use `-y`. Do note
    that even with `-y` passed, some things / state issues detected will
    temporarily stop for input - the key here is temporarily. They will
