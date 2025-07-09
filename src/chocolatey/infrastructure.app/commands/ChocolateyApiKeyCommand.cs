@@ -144,7 +144,7 @@ user name and password specified as 'user:password' for the API key. Please see
 your repository's documentation (for Nexus, please see
 https://ch0.co/nexus2apikey).
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

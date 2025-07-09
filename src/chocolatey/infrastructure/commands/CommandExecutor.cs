@@ -224,7 +224,7 @@ namespace chocolatey.infrastructure.commands
                         {
                             "chocolatey".Log().Warn(ChocolateyLoggers.Important, () => @"Chocolatey timed out waiting for the command to finish. The timeout
  specified (or the default value) was '{0}' seconds. Perhaps try a
- higher `--execution-timeout`? See `choco -h` for details.".FormatWith(waitForExitInSeconds));
+ higher `--execution-timeout`? See `choco --help` for details.".FormatWith(waitForExitInSeconds));
                         }
                     }
                     else

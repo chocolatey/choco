@@ -369,7 +369,7 @@ namespace chocolatey.infrastructure.app.services
                             () =>
                             @"Only an exit code of non-zero will fail the package by default. Set
  `--failonstderr` if you want error messages to also fail a script. See
- `choco -h` for details.");
+ `choco --help` for details.");
                     }
 
                     if (result.ExitCode != 0)

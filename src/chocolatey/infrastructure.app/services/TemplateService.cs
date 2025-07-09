@@ -249,8 +249,8 @@ namespace chocolatey.infrastructure.app.services
         public void List(ChocolateyConfiguration configuration)
         {
             var templateDirList = _fileSystem.GetDirectories(ApplicationParameters.TemplatesLocation).Select(d => d.ToLowerInvariant()).ToList();
-            var isBuiltInTemplateOverridden = templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation, _builtInTemplateOverrideName));
-            var isBuiltInOrDefaultTemplateDefault = string.IsNullOrWhiteSpace(configuration.DefaultTemplateName) || !templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation, configuration.DefaultTemplateName));
+            var isBuiltInTemplateOverridden = templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation.ToLowerInvariant(), _builtInTemplateOverrideName.ToLowerInvariant()));
+            var isBuiltInOrDefaultTemplateDefault = string.IsNullOrWhiteSpace(configuration.DefaultTemplateName) || !templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation.ToLower(), configuration.DefaultTemplateName.ToLowerInvariant()));
 
             if (string.IsNullOrWhiteSpace(configuration.TemplateCommand.Name))
             {
@@ -276,14 +276,14 @@ namespace chocolatey.infrastructure.app.services
                 if (templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation.ToLowerInvariant(), configuration.TemplateCommand.Name.ToLowerInvariant())))
                 {
                     ListCustomTemplateInformation(configuration);
-                    if (configuration.TemplateCommand.Name == _builtInTemplateName || configuration.TemplateCommand.Name == _builtInTemplateOverrideName)
+                    if (configuration.TemplateCommand.Name.IsEqualTo(_builtInTemplateName) || configuration.TemplateCommand.Name.IsEqualTo(_builtInTemplateOverrideName))
                     {
                         ListBuiltinTemplateInformation(configuration, isBuiltInTemplateOverridden, isBuiltInOrDefaultTemplateDefault);
                     }
                 }
                 else
                 {
-                    if (configuration.TemplateCommand.Name.ToLowerInvariant() == _builtInTemplateName || configuration.TemplateCommand.Name.ToLowerInvariant() == _builtInTemplateOverrideName)
+                    if (configuration.TemplateCommand.Name.IsEqualTo(_builtInTemplateName) || configuration.TemplateCommand.Name.IsEqualTo(_builtInTemplateOverrideName))
                     {
                         // We know that the template is not overridden since the template directory was checked
                         ListBuiltinTemplateInformation(configuration, isBuiltInTemplateOverridden, isBuiltInOrDefaultTemplateDefault);

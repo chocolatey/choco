@@ -51,7 +51,7 @@ exit $command.Count
 
     Context 'Ensure -t removed from push commands help message' -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0')) {
         BeforeAll {
-            $Output = Invoke-Choco push -?
+            $Output = Invoke-Choco push --help
         }
 
         It 'No longer reports the -t flag' {

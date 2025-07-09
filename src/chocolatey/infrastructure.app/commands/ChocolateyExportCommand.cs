@@ -102,7 +102,7 @@ those packages onto new machine using `choco install packages.config`.
     choco export --output-file-path=""'c:\temp\packages.config'""
     choco export --output-file-path=""'c:\temp\packages.config'"" --include-version-numbers
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");
