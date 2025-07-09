@@ -122,7 +122,7 @@ This is especially helpful when running `choco upgrade` for all
     choco pin add --name=""'git'"" --version=""'1.2.3'"" --reason=""'reasons available in business editions only'""
     choco pin remove --name=""'git'""
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");
@@ -178,12 +178,22 @@ If you find other exit codes that we have not yet documented, please
             config.QuietOutput = quiet;
             config.Input = input;
 
+            // This is required, since we only want to show the header if there are any Pinned Packages
+            // to be shown, which will be when we are printing the first Pinned Package
+            var hasHeaderRowBeenOutput = false;
+
             foreach (var pkg in packages.OrEmpty())
             {
                 var pkgInfo = _packageInfoService.Get(pkg.PackageMetadata);
                 if (pkgInfo != null && pkgInfo.IsPinned)
                 {
-                    this.Log().Info(() => "{0}|{1}".FormatWith(pkgInfo.Package.Id, pkgInfo.Package.Version));
+                    if (!config.RegularOutput && config.IncludeHeaders && !hasHeaderRowBeenOutput)
+                    {
+                        OutputHelpers.LimitedOutput("Id", "Version");
+                        hasHeaderRowBeenOutput = true;
+                    }
+
+                    OutputHelpers.LimitedOutput(pkgInfo.Package.Id, pkgInfo.Package.Version.ToNormalizedStringChecked());
                 }
             }
         }

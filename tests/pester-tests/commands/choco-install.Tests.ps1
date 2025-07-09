@@ -1704,8 +1704,8 @@ To install a local, or remote file, you may use:
             }
         }
 
-        It "Ran both installation scripts after selecting [A] Yes to all at the first prompt" {
-            $promptLine = "Do you want to run the script?([Y]es/[A]ll - yes to all/[N]o/[P]rint):"
+        It "Ran both installation scripts after selecting [A]ll scripts at the first prompt" {
+            $promptLine = "Do you want to run the script?([Y]es/[A]ll scripts/[N]o/[P]rint):"
             $prompts = $Output.Lines | Where-Object { $_ -eq $promptLine }
 
             $prompts.Count | Should -Be 1
@@ -2267,6 +2267,31 @@ To install a local, or remote file, you may use:
             foreach ($package in $UnexpectedPackages) {
                 $Packages.Name | Should -Not -Contain $package -Because "Package: $package $($Output.String)"
             }
+        }
+    }
+
+    Context 'Installing a package using a single quote in the parameters' -Tag Arguments {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            
+            $Output = Invoke-Choco install test-params --package-parameters="/Comment:It's great! /SubmittedBy:Kim"
+        }
+        
+        It "Exits successfully (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should output expected package parameters (<Name>=<Value>)" -ForEach @(
+            @{
+                Name = 'Comment'
+                Value = 'It''s great!'
+            }
+            @{
+                Name = 'SubmittedBy'
+                Value = 'Kim'
+            }
+        ) {
+            $Output.Lines | Should -Contain "WARNING:  - $Name = $Value"
         }
     }
 

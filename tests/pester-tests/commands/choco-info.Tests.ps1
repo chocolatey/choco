@@ -259,6 +259,24 @@
         }
     }
 
+    Context 'Listing package information with single quote in parameter shows expected parameters' -Tag Arguments {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+            
+            $null = Invoke-Choco install test-params --package-parameters="/Comment:It's great! /SubmittedBy:Kim"
+
+            $Output = Invoke-Choco info test-params --local-only
+        }
+        
+        It "Exits successfully (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should output package parameter" {
+            $Output.Lines | Should -Contain "--package-parameters='/Comment:It's great! /SubmittedBy:Kim'"
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     Test-NuGetPaths
 }

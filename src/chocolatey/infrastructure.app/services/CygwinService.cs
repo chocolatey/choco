@@ -27,6 +27,7 @@ using chocolatey.infrastructure.commands;
 using chocolatey.infrastructure.logging;
 using chocolatey.infrastructure.results;
 using chocolatey.infrastructure.platforms;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app.services
 {
@@ -182,7 +183,7 @@ namespace chocolatey.infrastructure.app.services
                 return setupKey.GetValue("rootdir", string.Empty).ToStringSafe();
             }
 
-            var binRoot = Environment.GetEnvironmentVariable("ChocolateyBinRoot");
+            var binRoot = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyBinRoot);
             if (string.IsNullOrWhiteSpace(binRoot))
             {
                 binRoot = "c:\\tools";

@@ -139,7 +139,7 @@ NOTE: If there is more than one nupkg file in the folder, the command
     choco push --source ""'{0}'"" --execution-timeout 500
     choco push --source ""'{0}'"" -k=""'123-123123-123'""
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ".FormatWith(ApplicationParameters.ChocolateyCommunityFeedPushSource));
@@ -151,7 +151,7 @@ To use this command, you must have your API key saved for the community
  explicitly pass the apikey to the command. See `apikey` command help
  for instructions on saving your key:
 
-    choco apikey -?
+    choco apikey --help
 
 A common error is `Failed to process request. 'The specified API key
  does not provide the authority to push packages.' The remote server

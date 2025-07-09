@@ -93,21 +93,23 @@ namespace chocolatey.infrastructure.cryptography
 
             try
             {
-                var hash = _hashAlgorithm.ComputeHash(_fileSystem.ReadFileBytes(filePath));
-
-                return BitConverter.ToString(hash).Replace("-", string.Empty);
+                using (var fileStream = _fileSystem.OpenFileReadonly(filePath))
+                {
+                    var hash = _hashAlgorithm.ComputeHash(fileStream);
+                    return BitConverter.ToString(hash).Replace("-", string.Empty);
+                }
             }
             catch (IOException ex)
             {
-                this.Log().Warn(() => "Error computing hash for '{0}'{1} Hash will be special code for locked file or file too big instead.{1} Captured error:{1}  {2}".FormatWith(filePath, Environment.NewLine, ex.Message));
+                this.Log().Warn(() => "Error computing hash for '{0}'{1} Hash will be special code for locked file {1} Captured error:{1}  {2}".FormatWith(filePath, Environment.NewLine, ex.Message));
 
                 if (IsFileLocked(ex))
                 {
                     return ApplicationParameters.HashProviderFileLocked;
                 }
 
-                //IO.IO_FileTooLong2GB (over Int32.MaxValue)
-                return ApplicationParameters.HashProviderFileTooBig;
+                //Rethrow if file is not locked
+                throw;
             }
         }
 

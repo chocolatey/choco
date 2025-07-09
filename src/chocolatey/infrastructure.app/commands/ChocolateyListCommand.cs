@@ -135,7 +135,10 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.ListCommand.IdStartsWith = option != null)
                  .Add("detail|detailed",
                      "Detailed - Alias for verbose.",
-                     option => configuration.Verbose = option != null);
+                     option => configuration.Verbose = option != null)
+                 .Add("ignore-pinned",
+                     "Ignore Pinned - Ignore pinned packages. Defaults to false.",
+                     option => configuration.ListCommand.IgnorePinned = option != null);
         }
 
         public virtual int Count(ChocolateyConfiguration config)
@@ -198,7 +201,7 @@ namespace chocolatey.infrastructure.app.commands
     choco list -i
     choco list --include-programs
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

@@ -46,7 +46,7 @@ namespace chocolatey.infrastructure.app.commands
                 .Add("t=|template=|template-name=",
                      "TemplateName - Use a named template in {0}\\templates\\templatename instead of built-in template.".FormatWith(ApplicationParameters.InstallLocation),
                      option => configuration.NewCommand.TemplateName = option.UnquoteSafe())
-                .Add("name=",
+                .Add("n=|name=",
                      "Name [Required]- the name of the package. Can be passed as first parameter without \"--name=\".",
                      option =>
                          {
@@ -156,7 +156,7 @@ NOTE: Chocolatey for Business can also download and internalize remote
     choco new bob silentargs=""'/S'"" url=""'https://somewhere/out/there.msi'""
     choco new bob --outputdirectory Packages
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

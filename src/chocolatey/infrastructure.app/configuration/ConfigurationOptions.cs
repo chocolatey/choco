@@ -66,15 +66,37 @@ namespace chocolatey.infrastructure.app.configuration
         {
             IList<string> unparsedArguments = new List<string>();
 
-            // add help only once
+            // add help only once.
+            // OptionSet.Count only happens the first time
+            // we set the options, not when we add additional options.
             if (OptionSet.Count == 0)
             {
+                // Before we do any parsing, let us check if the
+                // user has passed -v=value, -v:value, -v value or /v value.
+                // If the user has passed this information, we will assume
+                // that they intended to pass a version to the command, but
+                // -v is a short name for --verbose, and as such we need to
+                // throw an exception to prevent further processing.
+                var joinedArguments = string.Join(" ", args);
+
+                var match = Regex.Match(joinedArguments, @"(^|\s)[-/]v([=:]['""]?(?<value>[^\s'""]+)| ['""]?(?<value>[^\s-'""]+))", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+
+                if (match.Success)
+                {
+                    throw new ApplicationException($@"
+A value was passed to the `-v` option, but this option does not support an
+ explicit value.
+
+Did you mean to use `--version='{match.Groups["value"].Value}'` instead?
+");
+                }
+
                 OptionSet
                     .Add("?|help|h",
                         "Prints out the help menu.",
                         option => configuration.HelpRequested = option != null)
                     .Add("online",
-                        "Online - Open help for specified command in default browser application. This option only works when used in combintation with the -?/--help/-h option.  Available in 2.0.0+",
+                        "Online - Open help for specified command in default browser application. This option only works when used in combination with the -?/--help/-h option.  Available in 2.0.0+",
                         option => configuration.ShowOnlineHelp = option != null);
             }
 

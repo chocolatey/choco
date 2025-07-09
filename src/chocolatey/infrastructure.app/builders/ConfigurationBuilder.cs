@@ -38,6 +38,7 @@ using chocolatey.infrastructure.tolerance;
 using Assembly = chocolatey.infrastructure.adapters.Assembly;
 using Container = SimpleInjector.Container;
 using Environment = chocolatey.infrastructure.adapters.Environment;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app.builders
 {
@@ -224,13 +225,13 @@ namespace chocolatey.infrastructure.app.builders
                     ApplicationParameters.ConfigSettings.CacheLocation,
                     configFileSettings,
                     string.Empty,
-                    "Cache location if not TEMP folder. Replaces `$env:TEMP` value for choco.exe process. It is highly recommended this be set to make Chocolatey more deterministic in cleanup."
+                    "Cache location if not {0} folder. Replaces `$env:{0}` value for choco.exe process. It is highly recommended this be set to make Chocolatey more deterministic in cleanup.".FormatWith(EnvironmentVariables.System.Temp)
                     )
                 );
 
             if (string.IsNullOrWhiteSpace(config.CacheLocation))
             {
-                config.CacheLocation = fileSystem.GetTempPath(); // System.Environment.GetEnvironmentVariable("TEMP");
+                config.CacheLocation = fileSystem.GetTempPath(); // System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.Temp);
                 // TEMP gets set in EnvironmentSettings, so it may already have
                 // chocolatey in the path when it installs the next package from
                 // the API.
@@ -325,7 +326,7 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.FailOnInvalidOrMissingLicense = SetFeatureFlag(ApplicationParameters.Features.FailOnInvalidOrMissingLicense, configFileSettings, defaultEnabled: false, description: "Fail On Invalid Or Missing License - allows knowing when a license is expired or not applied to a machine.");
             config.Features.IgnoreInvalidOptionsSwitches = SetFeatureFlag(ApplicationParameters.Features.IgnoreInvalidOptionsSwitches, configFileSettings, defaultEnabled: true, description: "Ignore Invalid Options/Switches - If a switch or option is passed that is not recognized, should choco fail?");
             config.Features.UsePackageExitCodes = SetFeatureFlag(ApplicationParameters.Features.UsePackageExitCodes, configFileSettings, defaultEnabled: true, description: "Use Package Exit Codes - Package scripts can provide exit codes. With this on, package exit codes will be what choco uses for exit when non-zero (this value can come from a dependency package). Chocolatey defines valid exit codes as 0, 1605, 1614, 1641, 3010. With this feature off, choco will exit with 0, 1, or -1 (matching previous behavior).");
-            config.Features.UseEnhancedExitCodes = SetFeatureFlag(ApplicationParameters.Features.UseEnhancedExitCodes, configFileSettings, defaultEnabled: false, description: "Use Enhanced Exit Codes - Chocolatey is able to provide enhanced exit codes surrounding list, search, info, outdated and other commands that don't deal directly with package operations. To see enhanced exit codes and their meanings, please run `choco [cmdname] -?`. With this feature off, choco will exit with 0, 1, or -1  (matching previous behavior).");
+            config.Features.UseEnhancedExitCodes = SetFeatureFlag(ApplicationParameters.Features.UseEnhancedExitCodes, configFileSettings, defaultEnabled: false, description: "Use Enhanced Exit Codes - Chocolatey is able to provide enhanced exit codes surrounding list, search, info, outdated and other commands that don't deal directly with package operations. To see enhanced exit codes and their meanings, please run `choco [cmdname] --help`. With this feature off, choco will exit with 0, 1, or -1  (matching previous behavior).");
             config.Features.ExitOnRebootDetected = SetFeatureFlag(ApplicationParameters.Features.ExitOnRebootDetected, configFileSettings, defaultEnabled: false, description: "Exit On Reboot Detected - Stop running install, upgrade, or uninstall when a reboot request is detected. Requires '{0}' feature to be turned on. Will exit with either {1} or {2}. When it exits with {1}, it means pending reboot discovered prior to running operation. When it exits with {2}, it means some work completed prior to reboot request being detected.".FormatWith(ApplicationParameters.Features.UsePackageExitCodes, ApplicationParameters.ExitCodes.ErrorFailNoActionReboot, ApplicationParameters.ExitCodes.ErrorInstallSuspend));
             config.Features.UseFipsCompliantChecksums = SetFeatureFlag(ApplicationParameters.Features.UseFipsCompliantChecksums, configFileSettings, defaultEnabled: false, description: "Use FIPS Compliant Checksums - Ensure checksumming done by choco uses FIPS compliant algorithms. Not recommended unless required by FIPS Mode. Enabling on an existing installation could have unintended consequences related to upgrades/uninstalls.");
             config.Features.ShowNonElevatedWarnings = SetFeatureFlag(ApplicationParameters.Features.ShowNonElevatedWarnings, configFileSettings, defaultEnabled: true, description: "Show Non-Elevated Warnings - Display non-elevated warnings.");
@@ -340,7 +341,9 @@ namespace chocolatey.infrastructure.app.builders
             config.Features.UsePackageRepositoryOptimizations = SetFeatureFlag(ApplicationParameters.Features.UsePackageRepositoryOptimizations, configFileSettings, defaultEnabled: true, description: "Use Package Repository Optimizations - Turn on optimizations for reducing bandwidth with repository queries during package install/upgrade/outdated operations. Should generally be left enabled, unless a repository needs to support older methods of query. When disabled, this makes queries similar to the way they were done in earlier versions of Chocolatey.");
             config.Features.UsePackageHashValidation = SetFeatureFlag(ApplicationParameters.Features.UsePackageHashValidation, configFileSettings, defaultEnabled: false, description: "Use Package Hash Validation - Check the hash of the downloaded package file against the source provided hash. Only supports sources that provide SHA512 hashes. Disabled by default. Available in 2.3.0+");
             config.PromptForConfirmation = !SetFeatureFlag(ApplicationParameters.Features.AllowGlobalConfirmation, configFileSettings, defaultEnabled: false, description: "Prompt for confirmation in scripts or bypass.");
-            config.DisableCompatibilityChecks = SetFeatureFlag(ApplicationParameters.Features.DisableCompatibilityChecks, configFileSettings, defaultEnabled: false, description: "Disable Compatibility Checks - Disable showing a warning when there is an incompatibility between Chocolatey CLI and Chocolatey Licensed Extension.");
+            config.DisableCompatibilityChecks = SetFeatureFlag(ApplicationParameters.Features.DisableCompatibilityChecks, configFileSettings, defaultEnabled: false, description: "Disable Compatibility Checks - Disable showing a warning when there is an incompatibility between Chocolatey CLI and Chocolatey Licensed Extension. Available in 1.1.0+");
+            config.IncludeHeaders = SetFeatureFlag(ApplicationParameters.Features.AlwaysIncludeHeaders, configFileSettings, defaultEnabled: false, description: StringResources.OptionDescriptions.IncludeHeaders);
+            config.UseHttpCache = SetFeatureFlag(ApplicationParameters.Features.UseHttpCache, configFileSettings, defaultEnabled: true, description: StringResources.FeatureDescriptions.UseHttpCache);
         }
 
         private static bool SetFeatureFlag(string featureName, ConfigFileSettings configFileSettings, bool defaultEnabled, string description)
@@ -410,6 +413,9 @@ namespace chocolatey.infrastructure.app.builders
                         .Add("r|limitoutput|limit-output",
                              "LimitOutput - Limit the output to essential information",
                              option => config.RegularOutput = option == null)
+                        .Add(StringResources.Options.IncludeHeaders,
+                            StringResources.OptionDescriptions.IncludeHeaders,
+                            option => config.IncludeHeaders = true)
                         .Add("timeout=|execution-timeout=",
                              "CommandExecutionTimeout (in seconds) - The time to allow a command to finish before timing out. Overrides the default execution timeout in the configuration of {0} seconds. Supply '0' to disable the timeout.".FormatWith(config.CommandExecutionTimeoutSeconds.ToStringSafe()),
                             option =>
@@ -423,7 +429,7 @@ namespace chocolatey.infrastructure.app.builders
                                 }
                             })
                         .Add("c=|cache=|cachelocation=|cache-location=",
-                             "CacheLocation - Location for download cache, defaults to %TEMP% or value in chocolatey.config file.",
+                             $"CacheLocation - Location for download cache, defaults to %{EnvironmentVariables.System.Temp}% or value in chocolatey.config file.",
                              option => config.CacheLocation = option.UnquoteSafe())
                         .Add("allowunofficial|allow-unofficial|allowunofficialbuild|allow-unofficial-build",
                              "AllowUnofficialBuild - When not using the official build you must set this flag for choco to continue.",
@@ -452,19 +458,20 @@ namespace chocolatey.infrastructure.app.builders
                         .Add("proxy-bypass-on-local",
                              "Proxy Bypass On Local - Bypass proxy for local connections. Requires explicit proxy (`--proxy` or config setting). Overrides the default proxy bypass on local setting of '{0}'.".FormatWith(config.Proxy.BypassOnLocal),
                              option => config.Proxy.BypassOnLocal = option != null)
-                         .Add("log-file=",
+                        .Add("log-file=",
                              "Log File to output to in addition to regular loggers.",
                              option => config.AdditionalLogFileLocation = option.UnquoteSafe())
                         .Add("skipcompatibilitychecks|skip-compatibility-checks",
                             "SkipCompatibilityChecks - Prevent warnings being shown before and after command execution when a runtime compatibility problem is found between the version of Chocolatey and the Chocolatey Licensed Extension.",
                             option => config.DisableCompatibilityChecks = option != null)
-                        .Add("ignore-http-cache",
-                            "IgnoreHttpCache - Ignore any HTTP caches that have previously been created when querying sources, and create new caches. Available in 2.1.0+",
+                        .Add(StringResources.Options.IgnoreHttpCache,
+                            StringResources.OptionDescriptions.IgnoreHttpCache,
                             option =>
                             {
                                 if (option != null)
                                 {
                                     config.CacheExpirationInMinutes = -1;
+                                    config.UseHttpCache = false;
                                 }
                             });
                     ;
@@ -509,19 +516,19 @@ namespace chocolatey.infrastructure.app.builders
             config.Information.IsUserRemote = ProcessInformation.UserIsRemote();
             config.Information.IsProcessElevated = ProcessInformation.IsElevated();
 
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("https_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpsProxy)) && string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
-                config.Proxy.Location = Environment.GetEnvironmentVariable("https_proxy");
+                config.Proxy.Location = Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpsProxy);
             }
 
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("http_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.Location))
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpProxy)) && string.IsNullOrWhiteSpace(config.Proxy.Location))
             {
-                config.Proxy.Location = Environment.GetEnvironmentVariable("http_proxy");
+                config.Proxy.Location = Environment.GetEnvironmentVariable(EnvironmentVariables.System.HttpProxy);
             }
 
-            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("no_proxy")) && string.IsNullOrWhiteSpace(config.Proxy.BypassList))
+            if (!string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable(EnvironmentVariables.System.NoProxy)) && string.IsNullOrWhiteSpace(config.Proxy.BypassList))
             {
-                config.Proxy.BypassList = Environment.GetEnvironmentVariable("no_proxy");
+                config.Proxy.BypassList = Environment.GetEnvironmentVariable(EnvironmentVariables.System.NoProxy);
             }
         }
 

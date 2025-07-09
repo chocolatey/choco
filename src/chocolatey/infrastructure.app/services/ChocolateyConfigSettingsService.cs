@@ -63,6 +63,11 @@ namespace chocolatey.infrastructure.app.services
         public virtual IEnumerable<ChocolateySource> ListSources(ChocolateyConfiguration configuration)
         {
             var list = new List<ChocolateySource>();
+
+            // This is required, since we only want to show the header if there are any Source
+            // to be shown, which will be when we are printing the first Source
+            var hasHeaderRowBeenOutput = false;
+
             foreach (var source in ConfigFileSettings.Sources.OrEmpty().OrderBy(s => s.Id))
             {
                 if (SkipSource(source, configuration))
@@ -75,29 +80,35 @@ namespace chocolatey.infrastructure.app.services
                     if (configuration.RegularOutput)
                     {
                         this.Log().Info(() => "{0}{1} - {2} {3}| Priority {4}|Bypass Proxy - {5}|Self-Service - {6}|Admin Only - {7}.".FormatWith(
-                        source.Id,
-                        source.Disabled ? " [Disabled]" : string.Empty,
-                        source.Value,
-                        (string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)) ? string.Empty : "(Authenticated)",
-                        source.Priority,
-                        source.BypassProxy.ToStringSafe(),
-                        source.AllowSelfService.ToStringSafe(),
-                        source.VisibleToAdminsOnly.ToStringSafe()
-                        ));
+                            source.Id,
+                            source.Disabled ? " [Disabled]" : string.Empty,
+                            source.Value,
+                            (string.IsNullOrWhiteSpace(source.UserName) && string.IsNullOrWhiteSpace(source.Certificate)) ? string.Empty : "(Authenticated)",
+                            source.Priority,
+                            source.BypassProxy.ToStringSafe(),
+                            source.AllowSelfService.ToStringSafe(),
+                            source.VisibleToAdminsOnly.ToStringSafe()
+                            ));
                     }
                     else
                     {
-                        this.Log().Info(() => "{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}".FormatWith(
-                        source.Id.QuoteIfContainsPipe(),
-                        source.Value,
-                        source.Disabled.ToStringSafe(),
-                        source.UserName.QuoteIfContainsPipe(),
-                        source.Certificate,
-                        source.Priority,
-                        source.BypassProxy.ToStringSafe(),
-                        source.AllowSelfService.ToStringSafe(),
-                        source.VisibleToAdminsOnly.ToStringSafe()
-                        ));
+                        if (configuration.IncludeHeaders && !hasHeaderRowBeenOutput)
+                        {
+                            OutputHelpers.LimitedOutput("Name", "Source", "Disabled", "UserName", "Certificate", "Priority", "BypassProxy", "AllowSelfService", "AdminOnly");
+                            hasHeaderRowBeenOutput = true;
+                        }
+
+                        OutputHelpers.LimitedOutput(
+                            source.Id.QuoteIfContainsPipe(),
+                            source.Value,
+                            source.Disabled.ToStringSafe(),
+                            source.UserName.QuoteIfContainsPipe(),
+                            source.Certificate,
+                            source.Priority.ToStringSafe(),
+                            source.BypassProxy.ToStringSafe(),
+                            source.AllowSelfService.ToStringSafe(),
+                            source.VisibleToAdminsOnly.ToStringSafe()
+                            );
                     }
                 }
                 list.Add(new ChocolateySource
@@ -268,6 +279,10 @@ namespace chocolatey.infrastructure.app.services
 
         public void ListFeatures(ChocolateyConfiguration configuration)
         {
+            // This is required, since we only want to show the header if there are any ApiKeys
+            // to be shown, which will be when we are printing the first ApiKey
+            var hasHeaderRowBeenOutput = false;
+
             foreach (var feature in ConfigFileSettings.Features.OrEmpty().OrderBy(f => f.Name))
             {
                 if (configuration.RegularOutput)
@@ -276,7 +291,13 @@ namespace chocolatey.infrastructure.app.services
                 }
                 else
                 {
-                    this.Log().Info(() => "{0}|{1}|{2}".FormatWith(feature.Name, !feature.Enabled ? "Disabled" : "Enabled", feature.Description));
+                    if (configuration.IncludeHeaders && !hasHeaderRowBeenOutput)
+                    {
+                        OutputHelpers.LimitedOutput("Name", "Enabled", "Description");
+                        hasHeaderRowBeenOutput = true;
+                    }
+
+                    OutputHelpers.LimitedOutput(feature.Name, !feature.Enabled ? "Disabled" : "Enabled", feature.Description);
                 }
             }
         }
@@ -455,6 +476,10 @@ namespace chocolatey.infrastructure.app.services
 
         public void ListConfig(ChocolateyConfiguration configuration)
         {
+            // This is required, since we only want to show the header if there are any Configs
+            // to be shown, which will be when we are printing the first Config
+            var hasHeaderRowBeenOutput = false;
+
             foreach (var config in ConfigFileSettings.ConfigSettings.OrEmpty().OrderBy(c => c.Key))
             {
                 if (configuration.RegularOutput)
@@ -464,7 +489,13 @@ namespace chocolatey.infrastructure.app.services
                 }
                 else
                 {
-                    this.Log().Info(() => "{0}|{1}|{2}".FormatWith(config.Key, config.Value, config.Description));
+                    if (!configuration.RegularOutput && configuration.IncludeHeaders && !hasHeaderRowBeenOutput)
+                    {
+                        OutputHelpers.LimitedOutput("Name", "Value", "Description");
+                        hasHeaderRowBeenOutput = true;
+                    }
+
+                    OutputHelpers.LimitedOutput(config.Key, config.Value, config.Description);
                 }
             }
         }

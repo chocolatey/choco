@@ -53,12 +53,15 @@ namespace chocolatey.infrastructure.app.configuration
             PackCommand = new PackCommandConfiguration();
             PushCommand = new PushCommandConfiguration();
             PinCommand = new PinCommandConfiguration();
+            LicenseCommand = new LicenseCommandConfiguration();
             OutdatedCommand = new OutdatedCommandConfiguration();
             Proxy = new ProxyConfiguration();
             ExportCommand = new ExportCommandConfiguration();
             TemplateCommand = new TemplateCommandConfiguration();
             CacheCommand = new CacheCommandConfiguration();
             RuleCommand = new RuleCommandConfiguration();
+            IncludeHeaders = false;
+
 #if DEBUG
             AllowUnofficialBuild = true;
 #endif
@@ -125,7 +128,7 @@ namespace chocolatey.infrastructure.app.configuration
                     if (property.Name == "PromptForConfirmation")
                     {
                         // We do not overwrite this value between backups as it is intended to be a global setting;
-                        // if a user has selected a "[A] yes to all" prompt interactively, this option is
+                        // if a user has selected a "[A]ll scripts" prompt interactively, this option is
                         // set and should be retained for the duration of the operations.
                         continue;
                     }
@@ -349,6 +352,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ApplyPackageParametersToDependencies { get; set; }
         public bool ApplyInstallArgumentsToDependencies { get; set; }
         public bool IgnoreDependencies { get; set; }
+        public bool UseHttpCache { get; set; }
 
         /// <summary>
         /// Gets or sets the time before the cache is considered to have expired in minutes.
@@ -366,6 +370,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string DownloadChecksumType { get; set; }
         public string DownloadChecksumType64 { get; set; }
         public bool PinPackage { get; set; }
+        public bool IncludeHeaders { get; set; }
 
         /// <summary>
         ///   Configuration values provided by choco.
@@ -472,6 +477,14 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public PinCommandConfiguration PinCommand { get; set; }
 
         /// <summary>
+        /// Configuration related specifically to License command
+        /// </summary>
+        /// <remarks>
+        ///   On .NET 4.0, get error CS0200 when private set - see http://stackoverflow.com/a/23809226/18475
+        /// </remarks>
+        public LicenseCommandConfiguration LicenseCommand { get; set; }
+
+        /// <summary>
         /// Configuration related specifically to Outdated command
         /// </summary>
         /// <remarks>
@@ -521,6 +534,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     [Serializable]
     public sealed class InformationCommandConfiguration
     {
+        public InformationCommandConfiguration()
+        {
+            EnvironmentVariables = new Dictionary<string, string>();
+        }
+
         // application set variables
         public PlatformType PlatformType { get; set; }
 
@@ -543,6 +561,15 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IsLicensedAssemblyLoaded { get; set; }
         public string LicenseType { get; set; }
         public string CurrentDirectory { get; set; }
+
+        /// <summary>
+        /// A collection of values that should be written out as environment variables
+        /// within the PowerShell execution that Chocolatey CLI creates. This allows
+        /// for passing information, such as the previous Chocolatey package version
+        /// during `choco upgrade` through to the method that writes the environment
+        /// variables into the PowerShell session.
+        /// </summary>
+        public Dictionary<string, string> EnvironmentVariables { get; set; }
     }
 
     [Serializable]
@@ -584,6 +611,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public ListCommandConfiguration()
         {
             PageSize = 25;
+            OrderBy = PackageOrder.Id;
         }
 
         // list
@@ -597,7 +625,29 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool ByIdOnly { get; set; }
         public bool ByTagOnly { get; set; }
         public bool IdStartsWith { get; set; }
-        public bool OrderByPopularity { get; set; }
+        public bool IgnorePinned { get; set; }
+        public PackageOrder OrderBy { get; set; }
+
+        [Obsolete("This property is deprecated and will be removed in version 3.0. Use the 'OrderBy' property instead.")]
+        public bool OrderByPopularity
+        {
+            get
+            {
+                return OrderBy == PackageOrder.Popularity;
+            }
+            set
+            {
+                if (value)
+                {
+                    OrderBy = PackageOrder.Popularity;
+                }
+                else
+                {
+                    OrderBy = PackageOrder.Id;
+                }
+            }
+        }
+
         public bool ApprovedOnly { get; set; }
         public bool DownloadCacheAvailable { get; set; }
         public bool NotBroken { get; set; }
@@ -683,6 +733,12 @@ NOTE: Hiding sensitive configuration data! Please double and triple
     {
         public string Name { get; set; }
         public PinCommandType Command { get; set; }
+    }
+
+    [Serializable]
+    public sealed class LicenseCommandConfiguration
+    {
+        public LicenseCommandType Command { get; set; }
     }
 
     [Serializable]

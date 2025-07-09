@@ -208,9 +208,9 @@ You need to restart this machine prior to using choco.
     } else {
         @"
 Chocolatey CLI (choco.exe) is now ready.
-You can call choco from anywhere, command line or powershell by typing choco.
+You can call choco from anywhere, command line or PowerShell by typing choco.
 Run choco /? for a list of functions.
-You may need to shut down and restart powershell and/or consoles
+You may need to shut down and restart PowerShell and/or consoles
  first prior to using choco.
 "@ | Write-Output
     }
@@ -786,8 +786,8 @@ Export-ModuleMember -Function Initialize-Chocolatey
 # SIG # Begin signature block
 # MIInJQYJKoZIhvcNAQcCoIInFjCCJxICAQExDzANBglghkgBZQMEAgEFADB5Bgor
 # BgEEAYI3AgEEoGswaTA0BgorBgEEAYI3AgEeMCYCAwEAAAQQH8w7YFlLCE63JNLG
-# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCAL5XDIHTSoe/0U
-# 1fpADM55u4sth4hYys5hdS4zocysbqCCIKgwggWNMIIEdaADAgECAhAOmxiO+dAt
+# KX7zUQIBAAIBAAIBAAIBAAIBADAxMA0GCWCGSAFlAwQCAQUABCBouJlXeWXDnvZO
+# Jivqdm12UFqwJv5AHFObI0ZLoZF7Y6CCIKgwggWNMIIEdaADAgECAhAOmxiO+dAt
 # 5+/bUOIIQBhaMA0GCSqGSIb3DQEBDAUAMGUxCzAJBgNVBAYTAlVTMRUwEwYDVQQK
 # EwxEaWdpQ2VydCBJbmMxGTAXBgNVBAsTEHd3dy5kaWdpY2VydC5jb20xJDAiBgNV
 # BAMTG0RpZ2lDZXJ0IEFzc3VyZWQgSUQgUm9vdCBDQTAeFw0yMjA4MDEwMDAwMDBa
@@ -967,30 +967,30 @@ Export-ModuleMember -Function Initialize-Chocolatey
 # NCAyMDIxIENBMQIQBNI793flHTneCMtwLiiYFTANBglghkgBZQMEAgEFAKCBhDAY
 # BgorBgEEAYI3AgEMMQowCKACgAChAoAAMBkGCSqGSIb3DQEJAzEMBgorBgEEAYI3
 # AgEEMBwGCisGAQQBgjcCAQsxDjAMBgorBgEEAYI3AgEVMC8GCSqGSIb3DQEJBDEi
-# BCAXdWERxt/icJ3hjd9UiCpI/37QMZsAxrqZ34YtoWP9kDANBgkqhkiG9w0BAQEF
-# AASCAYDs22ymyh45e1cXWkGp5QuqY1EP1JoOcSNjELa5+SE7JITF3N6NrlCX6WM/
-# H2x25toqlabwjrqjzFGI3Z/PTURHDgnKQhtrpm0SXMUvISfVDSrjfyEqo+r49ImP
-# oWOOXphkxNYH+I+beZQs5cJRXkqcnHtuMu5oVzWCoQutgCBcJ+2WoarJMuWvSkSq
-# BL3CP7Sm2CBkPeICocXsXdsZXB5H3uFQRMfyJz8ZS2iFV4DV//VfcyYVqjBJ/W26
-# cdgR4iwllvFQY6rNQTSPHPN9uM5XzEJH5GDPfrMie+jfRTSYVjiznm4KK92FNKg3
-# Qj7fI5A1+FEIsT1ww8V6zDaMiWchb7/EAkpGHN/5Ud8vljfWbeAg6KFQ3CelpgBQ
-# p9cJTz3RGoINN7e1E5nOdOYeSdeoAhBxjaeShs9zUrohppsEgdfypEKHjC820Wz5
-# mEocN9194sk18JLOA31157oY2VVUnKmX5cXuJfrKiTgOebtIEkdnTc0tJcdYsXNz
-# 9lfx0PuhggMgMIIDHAYJKoZIhvcNAQkGMYIDDTCCAwkCAQEwdzBjMQswCQYDVQQG
+# BCAulOXTVNSrX9mcCftHw+GTa1cwKgcbhSkpqvQbuXqVljANBgkqhkiG9w0BAQEF
+# AASCAYCE37jOFd5tjTCmRFjGmz+gtmZ/vy1uxPvB1OfqcSzNDLyjgtc+Jzm92lS4
+# x0jhKey3RIwIDKS7VtjbSikec22jzsIRvVL59OLVTk65y3D36J3mJwbvcfADhGx+
+# rT3iwbDHF/PwuzNyVL559GJiQcsthWF7iGKR9MZCAJ2W2CccPdHlgzTTEqdws5Ns
+# yAapqJ9fGue+tQhpbWD+7wn7eJ9BlOR7alA/i56jOWDUHwmmwYACj8Phz+HxGPUc
+# HA/53n01aMty2XiSzhTOR3ojWTQ5qEjIP0p9tzVwyiLtcfztogHjKRtEefiI8KWt
+# Ai0qUrds2FYaOZY8iQ2Jmw7ttcPzc+9Wtq5rgiAKd0S1W5afOgWEsJLRTHXuyEkU
+# k0YA+dZjCsbhQOGhp2UzdytvwxPUgyvEkA8WBT4PwRqcP5d1O8QtWyBlrt0FTq4Y
+# 8J4wis1KWdPHFLAOdjbDVSIQtTnrimIeyE/+6SMmF/1GsFbDORBWZLh70NPlw0UW
+# /exCqCmhggMgMIIDHAYJKoZIhvcNAQkGMYIDDTCCAwkCAQEwdzBjMQswCQYDVQQG
 # EwJVUzEXMBUGA1UEChMORGlnaUNlcnQsIEluYy4xOzA5BgNVBAMTMkRpZ2lDZXJ0
 # IFRydXN0ZWQgRzQgUlNBNDA5NiBTSEEyNTYgVGltZVN0YW1waW5nIENBAhALrma8
 # Wrp/lYfG+ekE4zMEMA0GCWCGSAFlAwQCAQUAoGkwGAYJKoZIhvcNAQkDMQsGCSqG
-# SIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQxMDI5MjE0NDEwWjAvBgkqhkiG9w0B
-# CQQxIgQg0DDuo+Q/agbHq5fwMcgOhZjC/qkLi3O5EEeOtiFVK3cwDQYJKoZIhvcN
-# AQEBBQAEggIAJi3PKc34pOS57XYbtIwfEH3jGIC1hBwImdAjeiny5XCUzDJ+MCb/
-# kasK1TsiIf5+O4B8SPSPQsi+9nFHmpyxnO+KFiPM6qv0pI2Uy3VUofLd+J0EiL7A
-# IwwR2Q4nZcQwt5sUX47QiW/NM9+95zuSv3isZp0gEqkgRlm0D1oswOl9wbsRQFzl
-# gHyemdiDFdNf4MoEZhAKa5w41uJVAKfm5Q41l6sXDLNTOkw+cggwHKnaBiA74+Hi
-# HgDGtE9fdQWBhn577tuoHL7YP2ta1b/eYIVuchukub38wTps1KX8riaVbYGNt5M2
-# v9AfiT4MbpzOPZXFbgW6oyztxCS/pXQLYESytIY4M4SUtA4MxsD2bFMJjwcA9IZL
-# 7XJklq+q+02kcvzZKLIK6dcfxfBsy714VVZpc7CAlAGT5JjsYYL3HrcQ83fFlENv
-# a8ley6s/fMLtw0nZXC46kZfHBBRO2Um7wSQsf6k9TRDt+/vF+aNo1jpRDu0Jlw8o
-# Q0h4udyE/8BTLl88Sv7cttVk7E//2vA2NjUy74n9UcOMx4DbwlSa7xCP2V/j7+uJ
-# sDFbogq46ONf26yMs5V2PkHObaYovCfWp2qSm6ArwJOqQac0RbpndFCEwWAt4iss
-# oSdMIYFkh0U4BPdavX84Tl9AjmZleEZ9Pw+lqd9JAxe4xVKDXHdG1po=
+# SIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjUwNjA5MDkwNzQ3WjAvBgkqhkiG9w0B
+# CQQxIgQgQh+iiFyevbuC4o9+rTvn5QuyH16GF3SL9keEJdGw41wwDQYJKoZIhvcN
+# AQEBBQAEggIAKLUi2D9FQJa6F9ZRZwRo3SkkJv6a2jA4juYIYlRZk4UOxJYjWULJ
+# XiUaUB+uP9cgdr2fx71JrEFDlJSqSBCUw2cnlRQRRsMWieVHxuI1nLJHfUkbMTOK
+# h05+SHzhkMQLXFADeroS5AXhTQnyz0L4E468QYmffV/DuVfFl2OFHt06QOnO4nA9
+# S0MQ0tTcPF37e5w6nNK9Io4pBkv+GxX7T2CdfPdN+nz5cbMTCCg3xwcB0CaKGeew
+# XQTjgE3Zy2l235aLb+sb1lSUuLPu0XzSWg/fkj7d3zEcG3E5RRS89CQ3F+uTuefH
+# mJgqBxrln6DwgrVMOpDYgHRr6lcAbat3U1urM05tVPHvQ9VE7VlKhUXSqkJ5wMhG
+# gDxLFFZy1aJRq4XQOPDP6L3peOq+s7GczY5D/21ljKgBrlmgnPlT4TXx+Gvv/pyH
+# S/HT+jfgekfrGKWBB2Xd+hgdLzmh+MlJN6nA+Nhg/J3/U+s/Dntwk6uesZqtQdkL
+# 6eNCuMYtyIrt3qlsnbMDc+bWPkOfDE3s61B1BUYRVSUpxEg2EXhaZ5+mWZuroXWd
+# 8c7aCJn9cCiNmkcOkumFdWdDPyokVlVdW+KvPdj8Y0RKu61FtNjxsK+ejaaQA1Zi
+# BqmKxQjJEw9RnHFBkA/yZjFw6/9EYTMhIseP3/TQrAuXCM1vtEVEMZY=
 # SIG # End signature block

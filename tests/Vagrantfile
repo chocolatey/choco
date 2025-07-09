@@ -2,7 +2,7 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "StefanScherer/windows_2022"
+  config.vm.box = "chocolatey/test-environment"
   # Set Hostname to prevent error messages. https://github.com/hashicorp/vagrant/issues/12644
   config.vm.hostname = 'chocolatey-tests'
   config.vm.boot_timeout = 600
@@ -84,5 +84,6 @@ Vagrant.configure("2") do |config|
     # This will allow to rerun tests without packaging each time.
     ./Invoke-Tests.ps1 -SkipPackaging
     Copy-Item $env:ALLUSERSPROFILE/chocolatey/logs/testInvocations.log C:/vagrant
+    Copy-Item ./tests/testResults.xml C:/vagrant
   SHELL
 end

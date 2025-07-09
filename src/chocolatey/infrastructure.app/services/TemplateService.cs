@@ -38,6 +38,9 @@ namespace chocolatey.infrastructure.app.services
         private readonly ILogger _nugetLogger;
         private readonly IXmlService _xmlService;
 
+        // This is required, since we only want to show the header if there are any templates
+        // to be shown, which will be when we are printing the first template
+        private bool _hasHeaderRowBeenOutput = false;
         private readonly IList<string> _templateBinaryExtensions = new List<string> {
             ".exe", ".msi", ".msu", ".msp", ".mst",
             ".7z", ".zip", ".rar", ".gz", ".iso", ".tar", ".sfx",
@@ -245,9 +248,9 @@ namespace chocolatey.infrastructure.app.services
 
         public void List(ChocolateyConfiguration configuration)
         {
-            var templateDirList = _fileSystem.GetDirectories(ApplicationParameters.TemplatesLocation).ToList();
-            var isBuiltInTemplateOverridden = templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation, _builtInTemplateOverrideName));
-            var isBuiltInOrDefaultTemplateDefault = string.IsNullOrWhiteSpace(configuration.DefaultTemplateName) || !templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation, configuration.DefaultTemplateName));
+            var templateDirList = _fileSystem.GetDirectories(ApplicationParameters.TemplatesLocation).Select(d => d.ToLowerInvariant()).ToList();
+            var isBuiltInTemplateOverridden = templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation.ToLowerInvariant(), _builtInTemplateOverrideName.ToLowerInvariant()));
+            var isBuiltInOrDefaultTemplateDefault = string.IsNullOrWhiteSpace(configuration.DefaultTemplateName) || !templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation.ToLower(), configuration.DefaultTemplateName.ToLowerInvariant()));
 
             if (string.IsNullOrWhiteSpace(configuration.TemplateCommand.Name))
             {
@@ -259,28 +262,28 @@ namespace chocolatey.infrastructure.app.services
                         ListCustomTemplateInformation(configuration);
                     }
 
-                    this.Log().Info(configuration.RegularOutput ? "{0} Custom templates found at {1}{2}".FormatWith(templateDirList.Count(), ApplicationParameters.TemplatesLocation, Environment.NewLine) : string.Empty);
+                    this.Log().Info(configuration.RegularOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, "{0} Custom templates found at {1}{2}".FormatWith(templateDirList.Count(), ApplicationParameters.TemplatesLocation, Environment.NewLine));
                 }
                 else
                 {
-                    this.Log().Info(configuration.RegularOutput ? "No custom templates installed in {0}{1}".FormatWith(ApplicationParameters.TemplatesLocation, Environment.NewLine) : string.Empty);
+                    this.Log().Info(configuration.RegularOutput ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly, "No custom templates installed in {0}{1}".FormatWith(ApplicationParameters.TemplatesLocation, Environment.NewLine));
                 }
 
                 ListBuiltinTemplateInformation(configuration, isBuiltInTemplateOverridden, isBuiltInOrDefaultTemplateDefault);
             }
             else
             {
-                if (templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation, configuration.TemplateCommand.Name)))
+                if (templateDirList.Contains(_fileSystem.CombinePaths(ApplicationParameters.TemplatesLocation.ToLowerInvariant(), configuration.TemplateCommand.Name.ToLowerInvariant())))
                 {
                     ListCustomTemplateInformation(configuration);
-                    if (configuration.TemplateCommand.Name == _builtInTemplateName || configuration.TemplateCommand.Name == _builtInTemplateOverrideName)
+                    if (configuration.TemplateCommand.Name.IsEqualTo(_builtInTemplateName) || configuration.TemplateCommand.Name.IsEqualTo(_builtInTemplateOverrideName))
                     {
                         ListBuiltinTemplateInformation(configuration, isBuiltInTemplateOverridden, isBuiltInOrDefaultTemplateDefault);
                     }
                 }
                 else
                 {
-                    if (configuration.TemplateCommand.Name.ToLowerInvariant() == _builtInTemplateName || configuration.TemplateCommand.Name.ToLowerInvariant() == _builtInTemplateOverrideName)
+                    if (configuration.TemplateCommand.Name.IsEqualTo(_builtInTemplateName) || configuration.TemplateCommand.Name.IsEqualTo(_builtInTemplateOverrideName))
                     {
                         // We know that the template is not overridden since the template directory was checked
                         ListBuiltinTemplateInformation(configuration, isBuiltInTemplateOverridden, isBuiltInOrDefaultTemplateDefault);
@@ -348,7 +351,13 @@ List of Parameters:
             }
             else
             {
-                this.Log().Info("{0}|{1}".FormatWith(configuration.TemplateCommand.Name, pkgVersion));
+                if (configuration.IncludeHeaders && !_hasHeaderRowBeenOutput)
+                {
+                    OutputHelpers.LimitedOutput("Name", "Version");
+                    _hasHeaderRowBeenOutput = true;
+                }
+
+                OutputHelpers.LimitedOutput(configuration.TemplateCommand.Name, pkgVersion);
             }
         }
 
@@ -381,7 +390,13 @@ List of Parameters:
                 //If reduced output, only print out the built in template if it is not overridden
                 if (!isOverridden)
                 {
-                    this.Log().Info("built-in|0.0.0");
+                    if (configuration.IncludeHeaders && !_hasHeaderRowBeenOutput)
+                    {
+                        OutputHelpers.LimitedOutput("Name", "Version");
+                        _hasHeaderRowBeenOutput = true;
+                    }
+
+                    OutputHelpers.LimitedOutput("built-in", "0.0.0");
                 }
             }
         }

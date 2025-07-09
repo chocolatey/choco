@@ -39,7 +39,7 @@ You can just call me choco.
 
 | GitHub Action                                                                                                                                                                                                  |
 |----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/chocolatey/choco/Chocolatey%20Builds/develop?logo=github)](https://github.com/chocolatey/choco/actions/workflows/build.yml)  |
+| [![GitHub Workflow Status (branch)](https://img.shields.io/github/actions/workflow/status/chocolatey/choco/build.yml?branch=develop&logo=github)](https://github.com/chocolatey/choco/actions/workflows/build.yml)  |
 
 ## Chat Room
 
@@ -81,7 +81,7 @@ If you are using a [commercial edition of Chocolatey](https://chocolatey.org/com
 
 Please see the [docs](https://docs.chocolatey.org/en-us/)
 
-Give `choco.exe -?` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install -h`.
+Give `choco.exe --help` a shot (or `choco.exe -h`). For specific commands, add the command and then the help switch e.g. `choco.exe install --help`.
 
 ### Requirements
 

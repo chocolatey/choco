@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app.templates
 {
@@ -37,7 +38,7 @@ namespace chocolatey.infrastructure.app.templates
             InstallerType = "EXE_MSI_OR_MSU";
             Url = "";
             Url64 = "";
-            SilentArgs = @"/qn /norestart /l*v `""$($env:TEMP)\$($packageName).$($env:chocolateyPackageVersion).MsiInstall.log`""";
+            SilentArgs = $@"/qn /norestart /l*v `""$($env:{EnvironmentVariables.System.Temp})\$($packageName).$($env:{EnvironmentVariables.Package.ChocolateyPackageVersion}).MsiInstall.log`""";
             AutomaticPackageNotesNuspec = "";
             Checksum = "";
             ChecksumType = "sha256";

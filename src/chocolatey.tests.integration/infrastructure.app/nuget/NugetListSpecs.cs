@@ -26,6 +26,7 @@ using FluentAssertions;
 using Moq;
 using NuGet.Common;
 using NuGet.Protocol.Core.Types;
+using NUnit.Framework;
 using WireMock.FluentAssertions;
 using WireMock.Matchers;
 using WireMock.RequestBuilders;
@@ -1047,6 +1048,691 @@ namespace chocolatey.tests.integration.infrastructure.app.services
                     .HaveReceivedACall()
                     .AtUrl(MockServer.Value.Url + path)
                     .And.UsingMethod("GET");
+            }
+        }
+
+        public class When_Searching_For_A_Package_When_Not_Ignoring_Http_Cache : NugetListSpecsBase
+        {
+            private List<IPackageSearchMetadata> _result;
+
+            public override void Context()
+            {
+                base.Context();
+
+                AddV3OnlyIndexResponse("/endpoints/test-jsons/content/index.json");
+                MockServer.Value.Given(Request.Create()
+                        .WithPath(new ExactMatcher("/nuget/internal-choco/v3/search"))
+                        .UsingMethod("GET")
+                        .WithParam("q", new ExactMatcher("7zip"))
+                        .WithParam("skip", new ExactMatcher("0"))
+                        .WithParam("take", new ExactMatcher("30"))
+                        .WithParam("semVerLevel", new ExactMatcher("2.0.0")))
+                    .RespondWith(Response.Create()
+                        .WithStatusCode(200)
+                        .WithBody(@"{
+      ""totalHits"": 2,
+      ""data"": [
+        {
+          ""id"": ""7zip"",
+          ""version"": ""23.1.0"",
+          ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+          ""versions"": [
+            {
+              ""version"": ""22.1"",
+              ""downloads"": 1
+            },
+            {
+              ""version"": ""23.1.0"",
+              ""downloads"": 0
+            }
+          ],
+          ""authors"": ""Igor Pavlov"",
+          ""packageTypes"": [
+            {
+              ""name"": ""Dependency""
+            }
+          ],
+          ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+          ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+          ""owners"": [
+            ""chocolatey-community"",
+            ""Rob Reynolds""
+          ],
+          ""projectUrl"": ""http://www.7-zip.org/"",
+          ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations/7zip/index.json"",
+          ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+          ""tags"": [
+            ""7zip"",
+            ""zip"",
+            ""archiver"",
+            ""admin"",
+            ""foss""
+          ],
+          ""title"": ""7-Zip"",
+          ""totalDownloads"": 1
+        },
+        {
+          ""id"": ""7zip.install"",
+          ""version"": ""23.1.0"",
+          ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+          ""versions"": [
+            {
+              ""version"": ""22.1.0"",
+              ""downloads"": 1
+            },
+            {
+              ""version"": ""23.1.0"",
+              ""downloads"": 0
+            }
+          ],
+          ""authors"": ""Igor Pavlov"",
+          ""packageTypes"": [
+            {
+              ""name"": ""Dependency""
+            }
+          ],
+          ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+          ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+          ""owners"": [
+            ""chocolatey-community"",
+            ""Rob Reynolds""
+          ],
+          ""projectUrl"": ""http://www.7-zip.org/"",
+          ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations/7zip.install/index.json"",
+          ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+          ""tags"": [
+            ""7zip"",
+            ""zip"",
+            ""archiver"",
+            ""admin"",
+            ""cross-platform"",
+            ""cli"",
+            ""foss""
+          ],
+          ""title"": ""7-Zip (Install)"",
+          ""totalDownloads"": 1
+        }
+      ]
+    }", destination: BodyDestinationFormat.Json));
+                AddSimpleResponse("/nuget/internal-choco/v3/registrations-gz/7zip/index.json", @"{
+      ""count"": 1,
+      ""items"": [
+        {
+          ""count"": 2,
+          ""items"": [
+            {
+              ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip/22.1.json"",
+              ""@type"": ""Package"",
+              ""catalogEntry"": {
+                ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/catalog/7zip/22.1.json"",
+                ""@type"": ""PackageDetails"",
+                ""authors"": ""Igor Pavlov"",
+                ""dependencyGroups"": [
+                  {
+                    ""dependencies"": [
+                      {
+                        ""id"": ""7zip.install"",
+                        ""range"": ""[22.1]""
+                      }
+                    ]
+                  }
+                ],
+                ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+                ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+                ""id"": ""7zip"",
+                ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+                ""projectUrl"": ""http://www.7-zip.org/"",
+                ""published"": ""2023-05-08T15:25:36.157Z"",
+                ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+                ""tags"": [
+                  ""7zip"",
+                  ""zip"",
+                  ""archiver"",
+                  ""admin"",
+                  ""foss""
+                ],
+                ""title"": ""7-Zip"",
+                ""version"": ""22.1""
+              },
+              ""packageContent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/flatcontainer/7zip/22.1/7zip.22.1.nupkg"",
+              ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip/index.json""
+            },
+            {
+              ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip/23.1.0.json"",
+              ""@type"": ""Package"",
+              ""catalogEntry"": {
+                ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/catalog/7zip/23.1.0.json"",
+                ""@type"": ""PackageDetails"",
+                ""authors"": ""Igor Pavlov"",
+                ""dependencyGroups"": [
+                  {
+                    ""dependencies"": [
+                      {
+                        ""id"": ""7zip.install"",
+                        ""range"": ""[23.1.0]""
+                      }
+                    ]
+                  }
+                ],
+                ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+                ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+                ""id"": ""7zip"",
+                ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+                ""projectUrl"": ""http://www.7-zip.org/"",
+                ""published"": ""2024-02-06T14:48:14.26Z"",
+                ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+                ""tags"": [
+                  ""7zip"",
+                  ""zip"",
+                  ""archiver"",
+                  ""admin"",
+                  ""foss""
+                ],
+                ""title"": ""7-Zip"",
+                ""version"": ""23.1.0""
+              },
+              ""packageContent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/flatcontainer/7zip/23.1.0/7zip.23.1.0.nupkg"",
+              ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip/index.json""
+            }
+          ],
+          ""parent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip/index.json"",
+          ""lower"": ""22.1"",
+          ""upper"": ""23.1.0""
+        }
+      ]
+    }");
+                AddSimpleResponse("/nuget/internal-choco/v3/registrations-gz/7zip.install/index.json", @"{
+      ""count"": 1,
+      ""items"": [
+        {
+          ""count"": 2,
+          ""items"": [
+            {
+              ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip.install/22.1.0.json"",
+              ""@type"": ""Package"",
+              ""catalogEntry"": {
+                ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/catalog/7zip.install/22.1.0.json"",
+                ""@type"": ""PackageDetails"",
+                ""authors"": ""Igor Pavlov"",
+                ""dependencyGroups"": [
+                  {
+                    ""dependencies"": [
+                      {
+                        ""id"": ""chocolatey-core.extension"",
+                        ""range"": ""1.3.3""
+                      }
+                    ]
+                  }
+                ],
+                ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+                ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+                ""id"": ""7zip.install"",
+                ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+                ""projectUrl"": ""http://www.7-zip.org/"",
+                ""published"": ""2023-05-08T15:25:39.903Z"",
+                ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+                ""tags"": [
+                  ""7zip"",
+                  ""zip"",
+                  ""archiver"",
+                  ""admin"",
+                  ""cross-platform"",
+                  ""cli"",
+                  ""foss""
+                ],
+                ""title"": ""7-Zip (Install)"",
+                ""version"": ""22.1.0""
+              },
+              ""packageContent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/flatcontainer/7zip.install/22.1.0/7zip.install.22.1.0.nupkg"",
+              ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip.install/index.json""
+            },
+            {
+              ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip.install/23.1.0.json"",
+              ""@type"": ""Package"",
+              ""catalogEntry"": {
+                ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/catalog/7zip.install/23.1.0.json"",
+                ""@type"": ""PackageDetails"",
+                ""authors"": ""Igor Pavlov"",
+                ""dependencyGroups"": [
+                  {
+                    ""dependencies"": [
+                      {
+                        ""id"": ""chocolatey-core.extension"",
+                        ""range"": ""1.3.3""
+                      }
+                    ]
+                  }
+                ],
+                ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+                ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+                ""id"": ""7zip.install"",
+                ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+                ""projectUrl"": ""http://www.7-zip.org/"",
+                ""published"": ""2024-02-06T14:48:19.44Z"",
+                ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+                ""tags"": [
+                  ""7zip"",
+                  ""zip"",
+                  ""archiver"",
+                  ""admin"",
+                  ""cross-platform"",
+                  ""cli"",
+                  ""foss""
+                ],
+                ""title"": ""7-Zip (Install)"",
+                ""version"": ""23.1.0""
+              },
+              ""packageContent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/flatcontainer/7zip.install/23.1.0/7zip.install.23.1.0.nupkg"",
+              ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip.install/index.json""
+            }
+          ],
+          ""parent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip.install/index.json"",
+          ""lower"": ""22.1.0"",
+          ""upper"": ""23.1.0""
+        }
+      ]
+    }");
+
+                Configuration.Sources = $"{MockServer.Value.Url}/endpoints/test-jsons/content/index.json";
+                Configuration.Input = "7zip";
+                Configuration.Version = "22.1.0";
+                Configuration.SourceCommand.Username = "kim";
+                Configuration.SourceCommand.Password = "P@ssword123";
+
+                Configuration.CacheExpirationInMinutes = 30;
+
+                // While there is a LOT of setup in this test, the main focus of this test is
+                // this configuration change.  The assertions below ensure that enabling this
+                // feature results in fewer HTTP requests being made, since the cache will be
+                // being used.
+                Configuration.UseHttpCache = true;
+            }
+
+            public override void Because()
+            {
+                _result = NugetList.GetPackages(Configuration, Logger, FileSystem.Object).ToList();
+
+                // In order to be sure that we are working from a known starting point, let's
+                // make sure that we have done the expected number of call when we get to this
+                // point.  If this assumption is not true, this test will be marked as skipped.
+                Assume.That(MockServer.Value.LogEntries, Has.Count.EqualTo(4));
+
+                // Call a second time, to ensure that HTTP cache is being used, and as a result
+                // there will be fewer HTTP requests made
+                _result = NugetList.GetPackages(Configuration, Logger, FileSystem.Object).ToList();
+            }
+
+            [InlineData("7zip", "22.1.0")]
+            [InlineData("7zip.install", "22.1.0")]
+            public void Should_Contain_Expected_Package(string id, string version)
+            {
+                _result.Should()
+                    .ContainSingle(c => c.Identity.Id == id && c.Identity.Version.ToNormalizedString() == version);
+            }
+
+            [InlineData("/endpoints/test-jsons/content/index.json")]
+            [InlineData("/nuget/internal-choco/v3/search?q=7zip&skip=0&take=30&prerelease=false&semVerLevel=2.0.0")]
+            [InlineData("/nuget/internal-choco/v3/registrations-gz/7zip/index.json")]
+            [InlineData("/nuget/internal-choco/v3/registrations-gz/7zip.install/index.json")]
+            public void Should_Have_Called_Expected_Paths(string path)
+            {
+                MockServer.Value.Should()
+                    .HaveReceivedACall()
+                    .AtUrl(MockServer.Value.Url + path)
+                    .And.UsingMethod("GET");
+            }
+
+            [Fact]
+            public void Should_Have_Resulted_In_Fewer_Http_Requests()
+            {
+                // This tells us that for each call to GetPackages, it used the results
+                // from the previous call, and didn't make additional HTTP requests
+                MockServer.Value.Should()
+                    .HaveReceived(5)
+                    .Calls()
+                    .UsingAnyMethod();
+            }
+        }
+
+        public class When_Searching_For_A_Package_When_Ignoring_Http_Cache : NugetListSpecsBase
+        {
+            private List<IPackageSearchMetadata> _result;
+
+            public override void Context()
+            {
+                base.Context();
+
+                AddV3OnlyIndexResponse("/endpoints/test-jsons/content/index.json");
+                MockServer.Value.Given(Request.Create()
+                        .WithPath(new ExactMatcher("/nuget/internal-choco/v3/search"))
+                        .UsingMethod("GET")
+                        .WithParam("q", new ExactMatcher("7zip"))
+                        .WithParam("skip", new ExactMatcher("0"))
+                        .WithParam("take", new ExactMatcher("30"))
+                        .WithParam("semVerLevel", new ExactMatcher("2.0.0")))
+                    .RespondWith(Response.Create()
+                        .WithStatusCode(200)
+                        .WithBody(@"{
+      ""totalHits"": 2,
+      ""data"": [
+        {
+          ""id"": ""7zip"",
+          ""version"": ""23.1.0"",
+          ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+          ""versions"": [
+            {
+              ""version"": ""22.1"",
+              ""downloads"": 1
+            },
+            {
+              ""version"": ""23.1.0"",
+              ""downloads"": 0
+            }
+          ],
+          ""authors"": ""Igor Pavlov"",
+          ""packageTypes"": [
+            {
+              ""name"": ""Dependency""
+            }
+          ],
+          ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+          ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+          ""owners"": [
+            ""chocolatey-community"",
+            ""Rob Reynolds""
+          ],
+          ""projectUrl"": ""http://www.7-zip.org/"",
+          ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations/7zip/index.json"",
+          ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+          ""tags"": [
+            ""7zip"",
+            ""zip"",
+            ""archiver"",
+            ""admin"",
+            ""foss""
+          ],
+          ""title"": ""7-Zip"",
+          ""totalDownloads"": 1
+        },
+        {
+          ""id"": ""7zip.install"",
+          ""version"": ""23.1.0"",
+          ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+          ""versions"": [
+            {
+              ""version"": ""22.1.0"",
+              ""downloads"": 1
+            },
+            {
+              ""version"": ""23.1.0"",
+              ""downloads"": 0
+            }
+          ],
+          ""authors"": ""Igor Pavlov"",
+          ""packageTypes"": [
+            {
+              ""name"": ""Dependency""
+            }
+          ],
+          ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+          ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+          ""owners"": [
+            ""chocolatey-community"",
+            ""Rob Reynolds""
+          ],
+          ""projectUrl"": ""http://www.7-zip.org/"",
+          ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations/7zip.install/index.json"",
+          ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+          ""tags"": [
+            ""7zip"",
+            ""zip"",
+            ""archiver"",
+            ""admin"",
+            ""cross-platform"",
+            ""cli"",
+            ""foss""
+          ],
+          ""title"": ""7-Zip (Install)"",
+          ""totalDownloads"": 1
+        }
+      ]
+    }", destination: BodyDestinationFormat.Json));
+                AddSimpleResponse("/nuget/internal-choco/v3/registrations-gz/7zip/index.json", @"{
+      ""count"": 1,
+      ""items"": [
+        {
+          ""count"": 2,
+          ""items"": [
+            {
+              ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip/22.1.json"",
+              ""@type"": ""Package"",
+              ""catalogEntry"": {
+                ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/catalog/7zip/22.1.json"",
+                ""@type"": ""PackageDetails"",
+                ""authors"": ""Igor Pavlov"",
+                ""dependencyGroups"": [
+                  {
+                    ""dependencies"": [
+                      {
+                        ""id"": ""7zip.install"",
+                        ""range"": ""[22.1]""
+                      }
+                    ]
+                  }
+                ],
+                ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+                ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+                ""id"": ""7zip"",
+                ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+                ""projectUrl"": ""http://www.7-zip.org/"",
+                ""published"": ""2023-05-08T15:25:36.157Z"",
+                ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+                ""tags"": [
+                  ""7zip"",
+                  ""zip"",
+                  ""archiver"",
+                  ""admin"",
+                  ""foss""
+                ],
+                ""title"": ""7-Zip"",
+                ""version"": ""22.1""
+              },
+              ""packageContent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/flatcontainer/7zip/22.1/7zip.22.1.nupkg"",
+              ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip/index.json""
+            },
+            {
+              ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip/23.1.0.json"",
+              ""@type"": ""Package"",
+              ""catalogEntry"": {
+                ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/catalog/7zip/23.1.0.json"",
+                ""@type"": ""PackageDetails"",
+                ""authors"": ""Igor Pavlov"",
+                ""dependencyGroups"": [
+                  {
+                    ""dependencies"": [
+                      {
+                        ""id"": ""7zip.install"",
+                        ""range"": ""[23.1.0]""
+                      }
+                    ]
+                  }
+                ],
+                ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+                ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+                ""id"": ""7zip"",
+                ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+                ""projectUrl"": ""http://www.7-zip.org/"",
+                ""published"": ""2024-02-06T14:48:14.26Z"",
+                ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+                ""tags"": [
+                  ""7zip"",
+                  ""zip"",
+                  ""archiver"",
+                  ""admin"",
+                  ""foss""
+                ],
+                ""title"": ""7-Zip"",
+                ""version"": ""23.1.0""
+              },
+              ""packageContent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/flatcontainer/7zip/23.1.0/7zip.23.1.0.nupkg"",
+              ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip/index.json""
+            }
+          ],
+          ""parent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip/index.json"",
+          ""lower"": ""22.1"",
+          ""upper"": ""23.1.0""
+        }
+      ]
+    }");
+                AddSimpleResponse("/nuget/internal-choco/v3/registrations-gz/7zip.install/index.json", @"{
+      ""count"": 1,
+      ""items"": [
+        {
+          ""count"": 2,
+          ""items"": [
+            {
+              ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip.install/22.1.0.json"",
+              ""@type"": ""Package"",
+              ""catalogEntry"": {
+                ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/catalog/7zip.install/22.1.0.json"",
+                ""@type"": ""PackageDetails"",
+                ""authors"": ""Igor Pavlov"",
+                ""dependencyGroups"": [
+                  {
+                    ""dependencies"": [
+                      {
+                        ""id"": ""chocolatey-core.extension"",
+                        ""range"": ""1.3.3""
+                      }
+                    ]
+                  }
+                ],
+                ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+                ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+                ""id"": ""7zip.install"",
+                ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+                ""projectUrl"": ""http://www.7-zip.org/"",
+                ""published"": ""2023-05-08T15:25:39.903Z"",
+                ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+                ""tags"": [
+                  ""7zip"",
+                  ""zip"",
+                  ""archiver"",
+                  ""admin"",
+                  ""cross-platform"",
+                  ""cli"",
+                  ""foss""
+                ],
+                ""title"": ""7-Zip (Install)"",
+                ""version"": ""22.1.0""
+              },
+              ""packageContent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/flatcontainer/7zip.install/22.1.0/7zip.install.22.1.0.nupkg"",
+              ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip.install/index.json""
+            },
+            {
+              ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip.install/23.1.0.json"",
+              ""@type"": ""Package"",
+              ""catalogEntry"": {
+                ""@id"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/catalog/7zip.install/23.1.0.json"",
+                ""@type"": ""PackageDetails"",
+                ""authors"": ""Igor Pavlov"",
+                ""dependencyGroups"": [
+                  {
+                    ""dependencies"": [
+                      {
+                        ""id"": ""chocolatey-core.extension"",
+                        ""range"": ""1.3.3""
+                      }
+                    ]
+                  }
+                ],
+                ""description"": ""7-Zip is a file archiver with a high compression ratio.\n\n## Features\n\n- High compression ratio in [7z format](http://www.7-zip.org/7z.html) with **LZMA** and **LZMA2** compression\n- Supported formats:\n- Packing / unpacking: 7z, XZ, BZIP2, GZIP, TAR, ZIP and WIM\n- Unpacking only: AR, ARJ, CAB, CHM, CPIO, CramFS, DMG, EXT, FAT, GPT, HFS, IHEX, ISO, LZH, LZMA, MBR, MSI, NSIS, NTFS, QCOW2, RAR, RPM, SquashFS, UDF, UEFI, VDI, VHD, VMDK, WIM, XAR and Z.\n- For ZIP and GZIP formats, **7-Zip** provides a compression ratio that is 2-10 % better than the ratio provided by PKZip and WinZip\n- Strong AES-256 encryption in 7z and ZIP formats\n- Self-extracting capability for 7z format\n- Integration with Windows Shell\n- Powerful File Manager\n- Powerful command line version\n- Plugin for FAR Manager\n- Localizations for 87 languages\n\n## Notes\n- The installer for 7-Zip is known to close the Explorer process. This means you may lose current work. If it doesn't automatically restart explorer, type `explorer` on the command shell to restart it.\n- **If the package is out of date please check [Version History](#versionhistory) for the latest submitted version. If you have a question, please ask it in [Chocolatey Community Package Discussions](https://github.com/chocolatey-community/chocolatey-packages/discussions) or raise an issue on the [Chocolatey Community Packages Repository](https://github.com/chocolatey-community/chocolatey-packages/issues) if you have problems with the package. Disqus comments will generally not be responded to.**"",
+                ""iconUrl"": ""https://cdn.jsdelivr.net/gh/chocolatey-community/chocolatey-packages@68b91a851cee97e55c748521aa6da6211dd37c98/icons/7zip.svg"",
+                ""id"": ""7zip.install"",
+                ""licenseUrl"": ""http://www.7-zip.org/license.txt"",
+                ""projectUrl"": ""http://www.7-zip.org/"",
+                ""published"": ""2024-02-06T14:48:19.44Z"",
+                ""summary"": ""7-Zip is a file archiver with a high compression ratio."",
+                ""tags"": [
+                  ""7zip"",
+                  ""zip"",
+                  ""archiver"",
+                  ""admin"",
+                  ""cross-platform"",
+                  ""cli"",
+                  ""foss""
+                ],
+                ""title"": ""7-Zip (Install)"",
+                ""version"": ""23.1.0""
+              },
+              ""packageContent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/flatcontainer/7zip.install/23.1.0/7zip.install.23.1.0.nupkg"",
+              ""registration"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip.install/index.json""
+            }
+          ],
+          ""parent"": """ + MockServer.Value.Url + @"/nuget/internal-choco/v3/registrations-gz/7zip.install/index.json"",
+          ""lower"": ""22.1.0"",
+          ""upper"": ""23.1.0""
+        }
+      ]
+    }");
+
+                Configuration.Sources = $"{MockServer.Value.Url}/endpoints/test-jsons/content/index.json";
+                Configuration.Input = "7zip";
+                Configuration.Version = "22.1.0";
+                Configuration.SourceCommand.Username = "kim";
+                Configuration.SourceCommand.Password = "P@ssword123";
+
+                Configuration.CacheExpirationInMinutes = 30;
+
+                // While there is a LOT of setup in this test, the main focus of this test is
+                // this configuration change.  The assertions below ensure that disabling this
+                // feature results in more HTTP requests being made
+                Configuration.UseHttpCache = false;
+            }
+
+            public override void Because()
+            {
+                _result = NugetList.GetPackages(Configuration, Logger, FileSystem.Object).ToList();
+
+                // In order to be sure that we are working from a known starting point, let's
+                // make sure that we have done the expected number of call when we get to this
+                // point.  If this assumption is not true, this test will be marked as skipped.
+                Assume.That(MockServer.Value.LogEntries, Has.Count.EqualTo(4));
+
+                // Call a second time, to ensure that HTTP cache is _not_ being used, and as a result
+                // there will be more HTTP requests made
+                _result = NugetList.GetPackages(Configuration, Logger, FileSystem.Object).ToList();
+            }
+
+            [InlineData("7zip", "22.1.0")]
+            [InlineData("7zip.install", "22.1.0")]
+            public void Should_Contain_Expected_Package(string id, string version)
+            {
+                _result.Should()
+                    .ContainSingle(c => c.Identity.Id == id && c.Identity.Version.ToNormalizedString() == version);
+            }
+
+            [InlineData("/endpoints/test-jsons/content/index.json")]
+            [InlineData("/nuget/internal-choco/v3/search?q=7zip&skip=0&take=30&prerelease=false&semVerLevel=2.0.0")]
+            [InlineData("/nuget/internal-choco/v3/registrations-gz/7zip/index.json")]
+            [InlineData("/nuget/internal-choco/v3/registrations-gz/7zip.install/index.json")]
+            public void Should_Have_Called_Expected_Paths(string path)
+            {
+                MockServer.Value.Should()
+                    .HaveReceivedACall()
+                    .AtUrl(MockServer.Value.Url + path)
+                    .And.UsingMethod("GET");
+            }
+
+            [Fact]
+            public void Should_Have_Resulted_In_More_Http_Requests()
+            {
+                // This tells us that for each call to GetPackages, it did a fresh call, and
+                // did _not_ use the HttpCache
+                MockServer.Value.Should()
+                    .HaveReceived(7)
+                    .Calls()
+                    .UsingAnyMethod();
             }
         }
     }

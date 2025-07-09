@@ -24,6 +24,7 @@ using chocolatey.infrastructure.commands;
 using chocolatey.infrastructure.logging;
 using chocolatey.infrastructure.results;
 using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.app.domain;
 
 namespace chocolatey.infrastructure.app.commands
 {
@@ -104,9 +105,43 @@ namespace chocolatey.infrastructure.app.commands
                  .Add("id-starts-with",
                      "IdStartsWith - Only return packages where the id starts with the search filter.",
                      option => configuration.ListCommand.IdStartsWith = option != null)
+                 .Add("order-by=",
+                     "OrderBy - Sort package results by Id (default), {0}. Available in 2.5.0+.".FormatWith(string.Join(", ", Enum.GetNames(typeof(PackageOrder)).Where(n => !n.IsEqualTo("Id")))),
+                     option =>
+                     {
+                        var validOptions = Enum.GetNames(typeof(PackageOrder));
+                         var formattedOptions = string.Join("', '", validOptions);
+                         var unquotedOption = option.UnquoteSafe();
+
+                         if (string.IsNullOrWhiteSpace(unquotedOption))
+                         {
+                             throw new ApplicationException(
+                                @"No '--order-by' clause was provided. Specify one of the supported clauses:
+ '{0}'.".FormatWith(formattedOptions));
+                         }
+
+                         if (!Enum.TryParse(unquotedOption, ignoreCase: true, out PackageOrder orderBy))
+                         {
+                            throw new ApplicationException(
+                                @"The '--order-by' clause '{0}' is not recognized. Use one of the supported clauses:
+ '{1}'.".FormatWith(unquotedOption, formattedOptions));
+                         }
+
+                         configuration.ListCommand.OrderBy = orderBy;
+                 })
                  .Add("order-by-popularity",
-                     "OrderByPopularity - Sort by package results by popularity.",
-                     option => configuration.ListCommand.OrderByPopularity = option != null)
+                     "(Deprecated) OrderByPopularity - Sort package results by popularity. Use '--order-by='Popularity'' instead.",
+                     option =>
+                     {
+                         if (option != null)
+                         {
+                             configuration.ListCommand.OrderByPopularity = true;
+
+                             this.Log().Warn(
+                                 @"'--order-by-popularity' is deprecated and will be removed in a future release.
+ Use '--order-by='Popularity'' instead.");
+                         }
+                     })
                  .Add("approved-only",
                     "ApprovedOnly - Only return approved packages - this option will filter out results not from the community repository.",
                      option => configuration.ListCommand.ApprovedOnly = option != null)
@@ -179,7 +214,7 @@ Chocolatey will perform a search for a package local or remote.
     choco search --page=0 --page-size=25
     choco search 7zip --all-versions --exact
 
-NOTE: See scripting in the command reference (`choco -?`) for how to
+NOTE: See scripting in the command reference (`choco --help`) for how to
  write proper scripts and integrations.
 
 ");

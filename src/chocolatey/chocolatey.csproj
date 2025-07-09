@@ -178,13 +178,16 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="infrastructure.app\attributes\MultiServiceAttribute.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateyLicenseCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyCacheCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyListCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyRuleCommand.cs" />
+    <Compile Include="infrastructure.app\commands\ChocolateySupportCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyTemplateCommand.cs" />
     <Compile Include="infrastructure.app\commands\ChocolateyCommandBase.cs" />
     <Compile Include="infrastructure.app\domain\ApiKeyCommandType.cs" />
     <Compile Include="infrastructure.app\domain\CacheCommandType.cs" />
+    <Compile Include="infrastructure.app\domain\LicenseCommandType.cs" />
     <Compile Include="infrastructure.app\domain\SourceTypes.cs" />
     <Compile Include="infrastructure.app\domain\ChocolateyPackageMetadata.cs" />
     <Compile Include="infrastructure.app\domain\TemplateCommandType.cs" />
@@ -239,6 +242,7 @@
     <Compile Include="infrastructure.app\domain\installers\SquirrelInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\WindowsUpdateInstaller.cs" />
     <Compile Include="infrastructure.app\domain\installers\WiseInstaller.cs" />
+    <Compile Include="infrastructure.app\domain\PackageOrder.cs" />
     <Compile Include="infrastructure.app\domain\RegistryHiveType.cs" />
     <Compile Include="infrastructure.app\domain\RegistryValueExtensions.cs" />
     <Compile Include="infrastructure.app\domain\RegistryValueKindType.cs" />
@@ -455,6 +459,7 @@
     <Compile Include="LogExtensions.cs" />
     <Compile Include="NuGetVersionExtensions.cs" />
     <Compile Include="ObjectExtensions.cs" />
+    <Compile Include="OutputHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RuleResultExtensions.cs" />
     <Compile Include="StringExtensions.cs" />

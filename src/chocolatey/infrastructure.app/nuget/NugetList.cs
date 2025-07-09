@@ -55,7 +55,7 @@ namespace chocolatey.infrastructure.app.nuget
             var searchFilter = new SearchFilter(configuration.Prerelease)
             {
                 IncludeDelisted = configuration.ListCommand.LocalOnly,
-                OrderBy = SearchOrderBy.DownloadCount
+                OrderBy = GetSortOrder(configuration.ListCommand.OrderBy, configuration.AllVersions, configuration.RegularOutput && !configuration.QuietOutput)
             };
 
             var totalCount = 0;
@@ -76,16 +76,13 @@ namespace chocolatey.infrastructure.app.nuget
             var packageRepositoryResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem, cacheContext);
             var searchTermLower = configuration.Input.ToLowerSafe();
 
+            NuGetVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? NuGetVersion.Parse(configuration.Version) : null;
+
             var searchFilter = new SearchFilter(configuration.Prerelease)
             {
                 IncludeDelisted = configuration.ListCommand.LocalOnly,
-                OrderBy = SearchOrderBy.Id
+                OrderBy = GetSortOrder(configuration.ListCommand.OrderBy, configuration.AllVersions || !(version is null), configuration.RegularOutput && !configuration.QuietOutput)
             };
-
-            if (configuration.ListCommand.OrderByPopularity)
-            {
-                searchFilter.OrderBy = SearchOrderBy.DownloadCount;
-            }
 
             if (configuration.ListCommand.ByIdOnly)
             {
@@ -100,13 +97,6 @@ namespace chocolatey.infrastructure.app.nuget
             if (configuration.ListCommand.IdStartsWith)
             {
                 searchFilter.IdStartsWith = true;
-            }
-
-            NuGetVersion version = !string.IsNullOrWhiteSpace(configuration.Version) ? NuGetVersion.Parse(configuration.Version) : null;
-
-            if (version != null)
-            {
-                searchFilter.OrderBy = SearchOrderBy.Version;
             }
 
             var results = new HashSet<IPackageSearchMetadata>(new ComparePackageSearchMetadata());
@@ -330,9 +320,7 @@ namespace chocolatey.infrastructure.app.nuget
                 results = results.Where(p => (p.IsDownloadCacheAvailable && configuration.Information.IsLicensedVersion) || p.PackageTestResultStatus != "Failing").ToHashSet();
             }
 
-            results = configuration.ListCommand.OrderByPopularity ?
-                 results.OrderByDescending(p => p.DownloadCount).ThenBy(p => p.Identity.Id).ToHashSet()
-                 : results.OrderBy(p => p.Identity.Id).ThenByDescending(p => p.Identity.Version).ToHashSet();
+            results = ApplyPackageSort(results, configuration.ListCommand.OrderBy).ToHashSet();
 
             return results.AsQueryable();
         }
@@ -463,6 +451,114 @@ namespace chocolatey.infrastructure.app.nuget
             }
 
             return packagesList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
+        }
+
+        private static IOrderedEnumerable<IPackageSearchMetadata> ApplyPackageSort(IEnumerable<IPackageSearchMetadata> query, domain.PackageOrder orderBy)
+        {
+            switch (orderBy)
+            {
+                case domain.PackageOrder.LastPublished:
+                    return query
+                        .OrderByDescending(q => q.Published)
+                        .ThenBy(q => q.Identity.Id)
+                        .ThenByDescending(q => q.Identity.Version);
+
+                case domain.PackageOrder.Id:
+                    return query.OrderBy(q => q.Identity.Id)
+                        .ThenBy(q => q.Title)
+                        .ThenByDescending(q => q.Identity.Version);
+
+                case domain.PackageOrder.Popularity:
+                    return query
+                        .OrderByDescending(q => q.DownloadCount)
+                        .ThenByDescending(q => q.VersionDownloadCount)
+                        .ThenBy(q => q.Identity.Id);
+
+                case domain.PackageOrder.Title:
+                    return query
+                        // Fallback to Id if Title is missing
+                        .OrderBy(q => q.Title ?? q.Identity.Id)
+                        .ThenBy(q => q.Identity.Id)
+                        .ThenByDescending(q => q.Identity.Version);
+
+                default:
+                    // Since we return an IOrderedEnumerable, some form of ordering must be applied,
+                    // even when the user has not explicitly requested a sort order.
+                    //
+                    // This fallback also applies when the user has explicitly set the package order to 'Unsorted'.
+                    // In both cases, we apply a default order to satisfy the contract of the return type.
+
+                    return query.OrderBy(_ => 0);
+            }
+        }
+
+        private static SearchOrderBy? GetSortOrder(domain.PackageOrder orderBy, bool useMultiVersionOrdering, bool outputWarnings)
+        {
+            switch (orderBy)
+            {
+                case domain.PackageOrder.Popularity:
+                    if (useMultiVersionOrdering)
+                    {
+                        return SearchOrderBy.DownloadCountAndVersion;
+                    }
+                    else
+                    {
+                        return SearchOrderBy.DownloadCount;
+                    }
+
+                case domain.PackageOrder.Id:
+                // Ideally, we would order by the package title,
+                // but this is not currently supported by the NuGet client libraries.
+                // Since ordering by Id typically produces a similar result,
+                // we explicitly sort by Id here and defer title-based sorting
+                // to the client side later.
+                case domain.PackageOrder.Title:
+                    if (useMultiVersionOrdering)
+                    {
+                        return SearchOrderBy.Version;
+                    }
+                    else
+                    {
+                        return SearchOrderBy.Id;
+                    }
+
+                default:
+                    if (orderBy != domain.PackageOrder.Unsorted)
+                    {
+                        // Inform the user that ordering is performed on the client side,
+                        // which may result in inconsistent ordering due to server-side paging.
+                        //
+                        // Although the user may not explicitly request paging, Chocolatey
+                        // performs paging automatically. Since we only receive a limited
+                        // subset of packages from the server, client-side sorting may not
+                        // produce fully consistent results across pages.
+                        //
+                        // Ideally, server-side ordering would be supported, but the current
+                        // NuGet client libraries do not yet provide this capability.
+
+                        if (outputWarnings)
+                        {
+                            "chocolatey".Log().Warn(
+                                @"OrderBy '{0}' is applied on the client side. Because results are paged by the
+ server, this may lead to inconsistent ordering.",
+                                orderBy);
+                        }
+
+                        if (useMultiVersionOrdering)
+                        {
+                            // We will be explicit about ordering by version
+                            // in this case. This has to do with historical
+                            // reasons to prevent inconsistent results being
+                            // returned when a version is specified.
+                            return SearchOrderBy.Version;
+                        }
+                    }
+
+                    // Anything else, we are currently not able to tell the server
+                    // what sorting method to use, so let us fall back to either
+                    // defaults in the NuGet library, or unsorted on the server side.
+                    return null;
+            }
         }
 
 #pragma warning disable IDE0022, IDE1006

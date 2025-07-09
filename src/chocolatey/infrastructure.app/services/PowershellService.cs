@@ -38,6 +38,7 @@ using chocolatey.infrastructure.app.utility;
 using CryptoHashProvider = chocolatey.infrastructure.cryptography.CryptoHashProvider;
 using Environment = System.Environment;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app.services
 {
@@ -215,7 +216,7 @@ namespace chocolatey.infrastructure.app.services
 
         private string EscapePowerShellArguments(string argument)
         {
-            return argument.ToStringSafe().Replace("\"", "\\\"");
+            return argument.ToStringSafe().Replace("\"", "\\\"").Replace("'", "''");
         }
 
         public bool RunAction(ChocolateyConfiguration configuration, PackageResult packageResult, CommandNameType command)
@@ -279,7 +280,7 @@ namespace chocolatey.infrastructure.app.services
                         this.Log().Info(ChocolateyLoggers.Important, () => @"choco feature enable -n allowGlobalConfirmation");
 
                         var selection = InteractivePrompt.PromptForConfirmation(@"Do you want to run the script?",
-                            new[] { "yes", "all - yes to all", "no", "print" },
+                            new[] { "yes", "all scripts", "no", "print" },
                             defaultChoice: null,
                             requireAnswer: true,
                             allowShortAnswer: true,
@@ -305,7 +306,7 @@ namespace chocolatey.infrastructure.app.services
                             shouldRun = true;
                         }
 
-                        if (selection.IsEqualTo("all - yes to all"))
+                        if (selection.IsEqualTo("all scripts"))
                         {
                             configuration.PromptForConfirmation = false;
                             shouldRun = true;
@@ -368,7 +369,7 @@ namespace chocolatey.infrastructure.app.services
                             () =>
                             @"Only an exit code of non-zero will fail the package by default. Set
  `--failonstderr` if you want error messages to also fail a script. See
- `choco -h` for details.");
+ `choco --help` for details.");
                     }
 
                     if (result.ExitCode != 0)
@@ -460,34 +461,36 @@ namespace chocolatey.infrastructure.app.services
             EnvironmentSettings.UpdateEnvironmentVariables();
             EnvironmentSettings.SetEnvironmentVariables(configuration);
 
-            Environment.SetEnvironmentVariable("chocolateyPackageName", package.Identity.Id);
-            Environment.SetEnvironmentVariable("packageName", package.Identity.Id);
-            Environment.SetEnvironmentVariable("chocolateyPackageTitle", package.Title);
-            Environment.SetEnvironmentVariable("packageTitle", package.Title);
-            Environment.SetEnvironmentVariable("chocolateyPackageVersion", package.Identity.Version.ToNormalizedStringChecked());
-            Environment.SetEnvironmentVariable("packageVersion", package.Identity.Version.ToNormalizedStringChecked());
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageName, package.Identity.Id);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.PackageName, package.Identity.Id);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageId, package.Identity.Id);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageTitle, package.Title);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.PackageTitle, package.Title);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageVersion, package.Identity.Version.ToNormalizedStringChecked());
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.PackageVersion, package.Identity.Version.ToNormalizedStringChecked());
             // We use ToStringSafe on purpose here. There is a need for the version
             // the package specified, not the normalized version we want users to use.
-            Environment.SetEnvironmentVariable(StringResources.EnvironmentVariables.ChocolateyPackageNuspecVersion, package.Identity.Version.ToStringSafe());
-            Environment.SetEnvironmentVariable(StringResources.EnvironmentVariables.PackageNuspecVersion, package.Identity.Version.ToStringSafe());
-            Environment.SetEnvironmentVariable("chocolateyPackageVersionPrerelease", package.Identity.Version.Release.ToStringSafe());
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyNuspecVersion, package.Identity.Version.ToStringSafe());
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.PackageNuspecVersion, package.Identity.Version.ToStringSafe());
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageVersionPrerelease, package.Identity.Version.Release.ToStringSafe());
 
-            Environment.SetEnvironmentVariable("chocolateyPackageFolder", packageDirectory);
-            Environment.SetEnvironmentVariable("packageFolder", packageDirectory);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageFolder, packageDirectory);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.PackageFolder, packageDirectory);
 
             // unset variables that may not be updated so they don't get passed again
-            Environment.SetEnvironmentVariable("installArguments", null);
-            Environment.SetEnvironmentVariable("installerArguments", null);
-            Environment.SetEnvironmentVariable("chocolateyInstallArguments", null);
-            Environment.SetEnvironmentVariable("chocolateyInstallOverride", null);
-            Environment.SetEnvironmentVariable("packageParameters", null);
-            Environment.SetEnvironmentVariable("chocolateyPackageParameters", null);
-            Environment.SetEnvironmentVariable("chocolateyChecksum32", null);
-            Environment.SetEnvironmentVariable("chocolateyChecksum64", null);
-            Environment.SetEnvironmentVariable("chocolateyChecksumType32", null);
-            Environment.SetEnvironmentVariable("chocolateyChecksumType64", null);
-            Environment.SetEnvironmentVariable("chocolateyForceX86", null);
-            Environment.SetEnvironmentVariable("DownloadCacheAvailable", null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.InstallArguments, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.InstallerArguments, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyInstallArguments, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyInstallOverride, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.PackageParameters, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageParameters, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksum32, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksum64, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksumType32, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksumType64, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyForceX86, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.DownloadCacheAvailable, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyNotSilent, null);
 
             // we only want to pass the following args to packages that would apply.
             // like choco install git --params '' should pass those params to git.install,
@@ -495,13 +498,13 @@ namespace chocolatey.infrastructure.app.services
             if (!PackageUtility.PackageIdHasDependencySuffix(configuration, package.Identity.Id) || configuration.ApplyInstallArgumentsToDependencies)
             {
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Setting installer args for {0}".FormatWith(package.Identity.Id));
-                Environment.SetEnvironmentVariable("installArguments", configuration.InstallArguments);
-                Environment.SetEnvironmentVariable("installerArguments", configuration.InstallArguments);
-                Environment.SetEnvironmentVariable("chocolateyInstallArguments", configuration.InstallArguments);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.InstallArguments, configuration.InstallArguments);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.InstallerArguments, configuration.InstallArguments);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyInstallArguments, configuration.InstallArguments);
 
                 if (configuration.OverrideArguments)
                 {
-                    Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyInstallOverride, "true");
                 }
             }
 
@@ -510,40 +513,45 @@ namespace chocolatey.infrastructure.app.services
             if (!PackageUtility.PackageIdHasDependencySuffix(configuration, package.Identity.Id) || configuration.ApplyPackageParametersToDependencies)
             {
                 this.Log().Debug(ChocolateyLoggers.Verbose, "Setting package parameters for {0}".FormatWith(package.Identity.Id));
-                Environment.SetEnvironmentVariable("packageParameters", configuration.PackageParameters);
-                Environment.SetEnvironmentVariable("chocolateyPackageParameters", configuration.PackageParameters);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.PackageParameters, configuration.PackageParameters);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageParameters, configuration.PackageParameters);
             }
 
             if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksum))
             {
-                Environment.SetEnvironmentVariable("chocolateyChecksum32", configuration.DownloadChecksum);
-                Environment.SetEnvironmentVariable("chocolateyChecksum64", configuration.DownloadChecksum);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksum32, configuration.DownloadChecksum);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksum64, configuration.DownloadChecksum);
             }
 
             if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksumType))
             {
-                Environment.SetEnvironmentVariable("chocolateyChecksumType32", configuration.DownloadChecksumType);
-                Environment.SetEnvironmentVariable("chocolateyChecksumType64", configuration.DownloadChecksumType);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksumType32, configuration.DownloadChecksumType);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksumType64, configuration.DownloadChecksumType);
             }
 
             if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksum64))
             {
-                Environment.SetEnvironmentVariable("chocolateyChecksum64", configuration.DownloadChecksum64);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksum64, configuration.DownloadChecksum64);
             }
 
             if (!string.IsNullOrWhiteSpace(configuration.DownloadChecksumType64))
             {
-                Environment.SetEnvironmentVariable("chocolateyChecksumType64", configuration.DownloadChecksumType64);
-            }
-
-            if (configuration.ForceX86)
-            {
-                Environment.SetEnvironmentVariable("chocolateyForceX86", "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyChecksumType64, configuration.DownloadChecksumType64);
             }
 
             if (configuration.NotSilent)
             {
-                Environment.SetEnvironmentVariable("chocolateyInstallOverride", "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyNotSilent, "true");
+            }
+
+            if (configuration.ForceX86)
+            {
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyForceX86, "true");
+            }
+
+            if (configuration.NotSilent)
+            {
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyInstallOverride, "true");
             }
 
             //todo:if (configuration.NoOutput)
@@ -553,14 +561,14 @@ namespace chocolatey.infrastructure.app.services
 
             if (package.IsDownloadCacheAvailable)
             {
-                Environment.SetEnvironmentVariable("DownloadCacheAvailable", "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.DownloadCacheAvailable, "true");
 
                 foreach (var downloadCache in package.DownloadCache.OrEmpty())
                 {
                     var urlKey = CryptoHashProvider.ComputeStringHash(downloadCache.OriginalUrl, CryptoHashProviderType.Sha256).Replace("=", string.Empty);
-                    Environment.SetEnvironmentVariable("CacheFile_{0}".FormatWith(urlKey), downloadCache.FileName);
-                    Environment.SetEnvironmentVariable("CacheChecksum_{0}".FormatWith(urlKey), downloadCache.Checksum);
-                    Environment.SetEnvironmentVariable("CacheChecksumType_{0}".FormatWith(urlKey), "sha512");
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.Package.CacheFileFormat.FormatWith(urlKey), downloadCache.FileName);
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.Package.CacheChecksumFormat.FormatWith(urlKey), downloadCache.Checksum);
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.Package.CacheChecksumTypeFormat.FormatWith(urlKey), "sha512");
                 }
             }
 
@@ -639,8 +647,8 @@ namespace chocolatey.infrastructure.app.services
         public PowerShellExecutionResults RunHost(ChocolateyConfiguration config, string chocoPowerShellScript, Action<Pipeline> additionalActionsBeforeScript, IEnumerable<string> hookPreScriptPathList, IEnumerable<string> hookPostScriptPathList)
         {
             // since we control output in the host, always set these true
-            Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
-            Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyEnvironmentDebug, "true");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyEnvironmentVerbose, "true");
 
             var result = new PowerShellExecutionResults();
 

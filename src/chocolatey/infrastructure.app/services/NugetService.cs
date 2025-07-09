@@ -49,6 +49,7 @@ using NuGet.ProjectManagement;
 using NuGet.Protocol.Core.Types;
 using NuGet.Resolver;
 using NuGet.Versioning;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app.services
 {
@@ -191,8 +192,26 @@ that uses these options.");
 
             var decryptionFailures = new List<ChocolateyPackageInformation>();
 
+            // This is required, since we only want to show the header if there are any Packages
+            // to be shown, which will be when we are printing the first Package
+            var hasHeaderRowBeenOutput = false;
+
             foreach (var pkg in NugetList.GetPackages(config, _nugetLogger, _fileSystem))
             {
+                if (!config.QuietOutput && !config.RegularOutput && config.IncludeHeaders && !hasHeaderRowBeenOutput)
+                {
+                    if (config.ListCommand.IdOnly)
+                    {
+                        OutputHelpers.LimitedOutput("Id");
+                        hasHeaderRowBeenOutput = true;
+                    }
+                    else
+                    {
+                        OutputHelpers.LimitedOutput("Id", "Version");
+                        hasHeaderRowBeenOutput = true;
+                    }
+                }
+
                 var package = pkg; // for lamda access
                 string packageArgumentsUnencrypted = null;
 
@@ -208,9 +227,15 @@ that uses these options.");
                     packageLocalMetadata = null;
                 }
 
+                // We need to grab some more information about the package, so that we can
+                // determine if it is pinned or not, as well as to grab information about
+                // arguments, etc.
+                ChocolateyPackageInformation packageInfo = null;
+
                 if (config.ListCommand.LocalOnly && packageLocalMetadata != null)
                 {
-                    var packageInfo = _packageInfoService.Get(packageLocalMetadata);
+                    packageInfo = _packageInfoService.Get(packageLocalMetadata);
+
                     if (config.ListCommand.IncludeVersionOverrides)
                     {
                         if (packageInfo.VersionOverride != null)
@@ -249,18 +274,20 @@ that uses these options.");
 
                     if (config.RegularOutput)
                     {
-                        this.Log().Info(logger, () => "{0}{1}".FormatWith(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : " {0}{1}{2}{3}".FormatWith(
+                        if (!(packageInfo != null && packageInfo.IsPinned && config.ListCommand.IgnorePinned))
+                        {
+                            this.Log().Info(logger, () => "{0}{1}".FormatWith(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : " {0}{1}{2}{3}".FormatWith(
                                 packageLocalMetadata != null ? packageLocalMetadata.Version.ToFullStringChecked() : package.Identity.Version.ToFullStringChecked(),
                                 package.IsApproved ? " [Approved]" : string.Empty,
                                 package.IsDownloadCacheAvailable ? " Downloads cached for licensed users" : string.Empty,
                                 package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Possibly broken for FOSS users (due to original download location changes by vendor)" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
-                            ))
-                        );
+                                ))
+                            );
 
-                        if (config.Verbose && !config.ListCommand.IdOnly)
-                        {
-                            this.Log().Info(() =>
-                            @" Title: {0} | Published: {1}{2}{3}
+                            if (config.Verbose && !config.ListCommand.IdOnly)
+                            {
+                                this.Log().Info(() =>
+                                @" Title: {0} | Published: {1}{2}{3}
  Number of Downloads: {4} | Downloads for this version: {5}
  Package url{6}
  Chocolatey Package Source: {7}{8}
@@ -269,46 +296,50 @@ that uses these options.");
  Software License: {11}{12}{13}{14}{15}{16}
  Description: {17}{18}{19}
 ".FormatWith(
-                                package.Title.EscapeCurlyBraces(),
-                                package.Published.GetValueOrDefault().UtcDateTime.ToShortDateString(),
-                                package.IsApproved ? "{0} Package approved {1} on {2}.".FormatWith(
-                                        Environment.NewLine,
-                                        string.IsNullOrWhiteSpace(package.PackageReviewer) ? "as a trusted package" : "by " + package.PackageReviewer,
-                                        package.PackageApprovedDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
-                                    ) : string.Empty,
-                                string.IsNullOrWhiteSpace(package.PackageTestResultStatus) || package.PackageTestResultStatus.IsEqualTo("unknown") ? string.Empty : "{0} Package testing status: {1} on {2}.".FormatWith(
-                                        Environment.NewLine,
-                                        package.PackageTestResultStatus,
-                                        package.PackageValidationResultDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
-                                    ),
-                                (package.DownloadCount == null || package.DownloadCount <= 0) ? "n/a" : package.DownloadCount.ToStringSafe(),
-                                (package.VersionDownloadCount == null || package.VersionDownloadCount <= 0) ? "n/a" : package.VersionDownloadCount.ToStringSafe(),
-                                package.PackageDetailsUrl == null || string.IsNullOrWhiteSpace(package.PackageDetailsUrl.AbsoluteUri) ? string.Empty : " " + package.PackageDetailsUrl.AbsoluteUri,
-                                !string.IsNullOrWhiteSpace(package.PackageSourceUrl.ToStringSafe())
-                                    ? package.PackageSourceUrl.ToStringSafe()
-                                    : "n/a",
-                                string.IsNullOrWhiteSpace(package.PackageHash) ? string.Empty : "{0} Package Checksum: '{1}' ({2})".FormatWith(
-                                        Environment.NewLine,
-                                        package.PackageHash,
-                                        package.PackageHashAlgorithm
+                                    package.Title.EscapeCurlyBraces(),
+                                    package.Published.GetValueOrDefault().UtcDateTime.ToShortDateString(),
+                                    package.IsApproved ? "{0} Package approved {1} on {2}.".FormatWith(
+                                            Environment.NewLine,
+                                            string.IsNullOrWhiteSpace(package.PackageReviewer) ? "as a trusted package" : "by " + package.PackageReviewer,
+                                            package.PackageApprovedDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
+                                        ) : string.Empty,
+                                    string.IsNullOrWhiteSpace(package.PackageTestResultStatus) || package.PackageTestResultStatus.IsEqualTo("unknown") ? string.Empty : "{0} Package testing status: {1} on {2}.".FormatWith(
+                                            Environment.NewLine,
+                                            package.PackageTestResultStatus,
+                                            package.PackageValidationResultDate.GetValueOrDefault().ToString("MMM dd yyyy HH:mm:ss")
                                         ),
-                                package.Tags.TrimSafe().EscapeCurlyBraces(),
-                                package.ProjectUrl != null ? package.ProjectUrl.ToStringSafe() : "n/a",
-                                package.LicenseUrl != null && !string.IsNullOrWhiteSpace(package.LicenseUrl.ToStringSafe()) ? package.LicenseUrl.ToStringSafe() : "n/a",
-                                !string.IsNullOrWhiteSpace(package.ProjectSourceUrl.ToStringSafe()) ? "{0} Software Source: {1}".FormatWith(Environment.NewLine, package.ProjectSourceUrl.ToStringSafe()) : string.Empty,
-                                !string.IsNullOrWhiteSpace(package.DocsUrl.ToStringSafe()) ? "{0} Documentation: {1}".FormatWith(Environment.NewLine, package.DocsUrl.ToStringSafe()) : string.Empty,
-                                !string.IsNullOrWhiteSpace(package.MailingListUrl.ToStringSafe()) ? "{0} Mailing List: {1}".FormatWith(Environment.NewLine, package.MailingListUrl.ToStringSafe()) : string.Empty,
-                                !string.IsNullOrWhiteSpace(package.BugTrackerUrl.ToStringSafe()) ? "{0} Issues: {1}".FormatWith(Environment.NewLine, package.BugTrackerUrl.ToStringSafe()) : string.Empty,
-                                package.Summary != null && !string.IsNullOrWhiteSpace(package.Summary.ToStringSafe()) ? "\r\n Summary: {0}".FormatWith(package.Summary.EscapeCurlyBraces().ToStringSafe()) : string.Empty,
-                                package.Description.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  "),
-                                !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty,
-                                packageArgumentsUnencrypted != null ? packageArgumentsUnencrypted : string.Empty
-                            ));
+                                    (package.DownloadCount == null || package.DownloadCount <= 0) ? "n/a" : package.DownloadCount.ToStringSafe(),
+                                    (package.VersionDownloadCount == null || package.VersionDownloadCount <= 0) ? "n/a" : package.VersionDownloadCount.ToStringSafe(),
+                                    package.PackageDetailsUrl == null || string.IsNullOrWhiteSpace(package.PackageDetailsUrl.AbsoluteUri) ? string.Empty : " " + package.PackageDetailsUrl.AbsoluteUri,
+                                    !string.IsNullOrWhiteSpace(package.PackageSourceUrl.ToStringSafe())
+                                        ? package.PackageSourceUrl.ToStringSafe()
+                                        : "n/a",
+                                    string.IsNullOrWhiteSpace(package.PackageHash) ? string.Empty : "{0} Package Checksum: '{1}' ({2})".FormatWith(
+                                            Environment.NewLine,
+                                            package.PackageHash,
+                                            package.PackageHashAlgorithm
+                                            ),
+                                    package.Tags.TrimSafe().EscapeCurlyBraces(),
+                                    package.ProjectUrl != null ? package.ProjectUrl.ToStringSafe() : "n/a",
+                                    package.LicenseUrl != null && !string.IsNullOrWhiteSpace(package.LicenseUrl.ToStringSafe()) ? package.LicenseUrl.ToStringSafe() : "n/a",
+                                    !string.IsNullOrWhiteSpace(package.ProjectSourceUrl.ToStringSafe()) ? "{0} Software Source: {1}".FormatWith(Environment.NewLine, package.ProjectSourceUrl.ToStringSafe()) : string.Empty,
+                                    !string.IsNullOrWhiteSpace(package.DocsUrl.ToStringSafe()) ? "{0} Documentation: {1}".FormatWith(Environment.NewLine, package.DocsUrl.ToStringSafe()) : string.Empty,
+                                    !string.IsNullOrWhiteSpace(package.MailingListUrl.ToStringSafe()) ? "{0} Mailing List: {1}".FormatWith(Environment.NewLine, package.MailingListUrl.ToStringSafe()) : string.Empty,
+                                    !string.IsNullOrWhiteSpace(package.BugTrackerUrl.ToStringSafe()) ? "{0} Issues: {1}".FormatWith(Environment.NewLine, package.BugTrackerUrl.ToStringSafe()) : string.Empty,
+                                    package.Summary != null && !string.IsNullOrWhiteSpace(package.Summary.ToStringSafe()) ? "\r\n Summary: {0}".FormatWith(package.Summary.EscapeCurlyBraces().ToStringSafe()) : string.Empty,
+                                    package.Description.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  "),
+                                    !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty,
+                                    packageArgumentsUnencrypted != null ? packageArgumentsUnencrypted : string.Empty
+                                ));
+                            }
                         }
                     }
                     else
                     {
-                        this.Log().Info(logger, () => "{0}{1}".FormatWith(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : "|{0}".FormatWith(package.Identity.Version.ToFullStringChecked())));
+                        if (!(packageInfo != null && packageInfo.IsPinned && config.ListCommand.IgnorePinned))
+                        {
+                            this.Log().Info(logger, () => "{0}{1}".FormatWith(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : "|{0}".FormatWith(package.Identity.Version.ToFullStringChecked())));
+                        }
                     }
                 }
                 else
@@ -1269,7 +1300,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         else
                         {
                             //last one is whether this package is pinned or not
-                            this.Log().Info("{0}|{1}|{1}|{2}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -1290,7 +1321,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                         else
                         {
-                            this.Log().Info("{0}|{1}|{1}|{2}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -1316,7 +1347,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                             else
                             {
-                                this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe()));
+                                OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe());
                             }
                         }
 
@@ -1335,6 +1366,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     if (availablePackage.Identity.Version > installedPackage.PackageMetadata.Version)
                     {
                         var logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version);
+
                         packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
                         if (config.RegularOutput)
@@ -1343,7 +1375,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                         else
                         {
-                            this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToStringSafe(), isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -1709,6 +1741,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                     BackupAndRunBeforeModify(packageToUninstall, oldPkgInfo, config, beforeUpgradeAction);
 
+                                    // At this point, we know the version of both the new package that is being installed, and the
+                                    // version that was currently installed.  This information was used to perform the backup in
+                                    // the line above, and can therefore be trusted.  Take this information and add an entry in the
+                                    // EnvironmnetVariables collection, which will later be written into the PowerShell sesssion as
+                                    // envrionment variables.
+                                    config.Information.EnvironmentVariables[EnvironmentVariables.Package.ChocolateyPreviousPackageVersion] = oldPkgInfo.Package.Version.ToNormalizedStringChecked();
+
                                     packageToUninstall.InstallLocation = pathResolver.GetInstallPath(packageToUninstall.Identity);
                                     try
                                     {
@@ -1760,7 +1799,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                         downloadResult,
                                         projectContext,
                                         CancellationToken.None).GetAwaiter().GetResult();
-
                                 }
 
                                 var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
@@ -1842,6 +1880,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     continueAction.Invoke(errorResult, config);
                                 }
                             }
+                            finally
+                            {
+                                // To make sure that there is no "pollution" of a previous package version into another package
+                                // operation, such as during a `choco upgrade all` or when upgrading a package that has one or
+                                // more dependencies, we need to make sure to clear the entry in the EnvironmentVariables collection,
+                                // and rely on this being set again when the current and previous package versions are "known" again.
+                                config.Information.EnvironmentVariables[EnvironmentVariables.Package.ChocolateyPreviousPackageVersion] = null;
+                            }
                         }
                     }
                 }
@@ -1869,6 +1915,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             config.CreateBackup();
 
+            // This is required, since we only want to show the header if there are any Outdated packages
+            // to be shown, which will be when we are printing the first Outdated package
+            var hasHeaderRowBeenOutput = false;
             foreach (var packageName in packageNames)
             {
                 // We need to ensure we are using a clean configuration file
@@ -1926,7 +1975,13 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var logMessage = "You have {0} v{1} installed. Version {2} is available based on your source(s).{3} Source(s): \"{4}\"".FormatWith(installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version, Environment.NewLine, config.Sources);
                 packageResult.Messages.Add(new ResultMessage(ResultType.Note, logMessage));
 
-                this.Log().Info("{0}|{1}|{2}|{3}".FormatWith(installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version, isPinned.ToStringSafe().ToLowerSafe()));
+                if (!config.RegularOutput && config.IncludeHeaders && !hasHeaderRowBeenOutput)
+                {
+                    OutputHelpers.LimitedOutput("Id", "Version", "AvailableVersion", "Pinned");
+                    hasHeaderRowBeenOutput = true;
+                }
+
+                OutputHelpers.LimitedOutput(installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe());
             }
 
             // Reset the configuration again once we are completely done with the processing of
@@ -1964,6 +2019,41 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             }
 
             var originalConfig = config.DeepCopy();
+
+            if (CountCharacter(packageArgumentsUnencrypted, '\'') % 2 != 0 || CountCharacter(packageArgumentsUnencrypted, '"') % 2 != 0)
+            {
+                if (config.CommandName.IsEqualTo("install"))
+                {
+                    // Install normally do not have any remembered arguments,
+                    // but we add this for future warnings if it becomes supported.
+                    this.Log().Warn(@"Potentially problematic package or install arguments detected.
+Install failures may be related to this issue.
+");
+                }
+                else if (config.CommandName.IsEqualTo("upgrade"))
+                {
+                    this.Log().Warn(@"Potentially problematic package or install arguments detected.
+Upgrade failures may be related to this issue.
+
+To troubleshoot, run: `choco info {0} --local-only` and review the package
+and argument details.
+",
+                        config.PackageNames);
+                }
+                else if (config.CommandName.IsEqualTo("uninstall"))
+                {
+                    // Remembered arguments are not used during uninstallations,
+                    // but we add it here for future warnings if it becomes added.
+                    this.Log().Warn(@"Potentially problematic package or uninstall arguments detected.
+Uninstall failures may be related to this issue.
+
+To troubleshoot, run: `choco info {0} --local-only` and review the package
+and argument details.
+",
+                        config.PackageNames);
+                }
+            }
+
             // this changes config globally
             ConfigurationOptions.OptionSet.Parse(packageArguments);
 
@@ -1989,6 +2079,26 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             }
 
             return originalConfig;
+        }
+
+        private int CountCharacter(string value, char character)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return 0;
+            }
+
+            var characterCount = 0;
+
+            for (var i = 0; i < value.Length; i++)
+            {
+                if (value[i] == character)
+                {
+                    characterCount++;
+                }
+            }
+
+            return characterCount;
         }
 
         private bool HasMissingDependency(PackageResult package, List<PackageResult> allLocalPackages)

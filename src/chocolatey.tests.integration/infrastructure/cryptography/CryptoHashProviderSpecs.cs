@@ -63,5 +63,63 @@ namespace chocolatey.tests.integration.infrastructure.cryptography
                 _result.Should().Be(expected);
             }
         }
+
+        public class When_HashProvider_is_given_a_large_file_to_hash : CryptoHashProviderSpecsBase
+        {
+            private string _result;
+            private string _filePath;
+
+            public override void Context()
+            {
+                base.Context();
+
+                // We need to create a large, 2.5GB file on disk, so that we can run
+                // the ComputeFileHash method against that file, and then test the
+                // generated hash of the file to make sure that the method is working
+                // as expected. It takes around 15-20 seconds to create the file on
+                // disk, which is "fine", and is better than adding a large 2.5 GB
+                // file directly into the repository.
+                var sizeInMb = 2500;
+                const int blockSize = 1024 * 8;
+                const int blocksPerMb = (1024 * 1024) / blockSize;
+                var data = new byte[blockSize];
+                var rng = new Random(13);
+                _filePath = FileSystem.CombinePaths(ContextDirectory, "large-file.txt");
+
+                using (FileStream stream = File.Create(_filePath))
+                {
+                    for (var i = 0; i < sizeInMb * blocksPerMb; i++)
+                    {
+                        rng.NextBytes(data);
+                        stream.Write(data, 0, data.Length);
+                    }
+                }
+            }
+
+            public override void Because()
+            {
+                _result = Provider.ComputeFileHash(_filePath);
+            }
+
+            [Fact]
+            public void Should_provide_the_correct_hash_based_on_a_checksum()
+            {
+                // This is the pre-calculated file of for the large 2.5GB file.
+                // Since we have used a fixed seed value for the Random above, the
+                // generated file should have the same hash each time, so we can
+                // pin this value here, and assert against it.
+                var expected = "15884E3178F05AF1F25343D528B72E59A93ECACA039E549B2B67207FAD18B01E";
+
+                _result.Should().Be(expected);
+            }
+
+            public override void AfterObservations()
+            {
+                if (File.Exists(_filePath))
+                {
+                    File.Delete(_filePath);
+                }
+            }
+        }
     }
 }

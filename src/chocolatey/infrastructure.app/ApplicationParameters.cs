@@ -22,6 +22,7 @@ using chocolatey.infrastructure.filesystem;
 using Environment = System.Environment;
 using chocolatey.infrastructure.platforms;
 using chocolatey.infrastructure.information;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app
 {
@@ -31,12 +32,13 @@ namespace chocolatey.infrastructure.app
     public static class ApplicationParameters
     {
         private static readonly IFileSystem _fileSystem = new DotNetFileSystem();
-        public static readonly string ChocolateyInstallEnvironmentVariableName = "ChocolateyInstall";
+        [Obsolete("Use StringResources.EnvironmentVariables.System.ChocolateyInstall instead", error: false)]
+        public static readonly string ChocolateyInstallEnvironmentVariableName = EnvironmentVariables.System.ChocolateyInstall;
         public static readonly string Name = "Chocolatey";
 
 #if FORCE_CHOCOLATEY_OFFICIAL_KEY
         // always look at the official location of the machine installation
-        public static readonly string InstallLocation = System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) ?? _fileSystem.GetDirectoryName(_fileSystem.GetCurrentAssemblyPath());
+        public static readonly string InstallLocation = System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall) ?? _fileSystem.GetDirectoryName(_fileSystem.GetCurrentAssemblyPath());
         public static readonly string LicensedAssemblyLocation = _fileSystem.CombinePaths(InstallLocation, "extensions", "chocolatey", "chocolatey.licensed.dll");
 #elif DEBUG
         // Install location is choco.exe or chocolatey.dll
@@ -52,8 +54,8 @@ namespace chocolatey.infrastructure.app
         public static readonly string InstallLocation = _fileSystem.FileExists(_fileSystem.CombinePaths(_fileSystem.GetDirectoryName(_assemblyForLocation.CodeBase.Replace(Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)), "chocolatey.dll")) ||
                                                         _fileSystem.FileExists(_fileSystem.CombinePaths(_fileSystem.GetDirectoryName(_assemblyForLocation.CodeBase.Replace(Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)), "choco.exe")) ?
                 _fileSystem.GetDirectoryName(_assemblyForLocation.CodeBase.Replace(Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)) :
-                !string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName)) ?
-                    System.Environment.GetEnvironmentVariable(ChocolateyInstallEnvironmentVariableName) :
+                !string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall)) ?
+                    System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall) :
                     @"C:\ProgramData\Chocolatey"
             ;
 
@@ -142,26 +144,57 @@ namespace chocolatey.infrastructure.app
 
         public static class Environment
         {
-            public static readonly string Path = "Path";
-            public static readonly string PathExtensions = "PATHEXT";
-            public static readonly string PsModulePath = "PSModulePath";
-            public static readonly string Temp = "TEMP";
             public static readonly string SystemUserName = "SYSTEM";
-            public static readonly string Username = "USERNAME";
-            public static readonly string ProcessorArchitecture = "PROCESSOR_ARCHITECTURE";
             public const string Arm64ProcessorArchitecture = "ARM64";
             public static readonly string EnvironmentSeparator = ";";
 
-            public static readonly string ChocolateyToolsLocation = "ChocolateyToolsLocation";
-            public static readonly string ChocolateyPackageInstallLocation = "ChocolateyPackageInstallLocation";
-            public static readonly string ChocolateyPackageInstallerType = "ChocolateyInstallerType";
-            public static readonly string ChocolateyPackageExitCode = "ChocolateyExitCode";
-            public static readonly string ChocolateyIgnoreChecksums = "ChocolateyIgnoreChecksums";
-            public static readonly string ChocolateyAllowEmptyChecksums = "ChocolateyAllowEmptyChecksums";
-            public static readonly string ChocolateyAllowEmptyChecksumsSecure = "ChocolateyAllowEmptyChecksumsSecure";
-            public static readonly string ChocolateyPowerShellHost = "ChocolateyPowerShellHost";
-            public static readonly string ChocolateyForce = "ChocolateyForce";
-            public static readonly string ChocolateyExitOnRebootDetected = "ChocolateyExitOnRebootDetected";
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.Path instead", error: false)]
+            public static readonly string Path = EnvironmentVariables.System.Path;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.PathExtensions instead", error: false)]
+            public static readonly string PathExtensions = EnvironmentVariables.System.PathExtensions;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.PSModulePath instead", error: false)]
+            public static readonly string PsModulePath = EnvironmentVariables.System.PSModulePath;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.Temp instead", error: false)]
+            public static readonly string Temp = EnvironmentVariables.System.Temp;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.Username instead", error: false)]
+            public static readonly string Username = EnvironmentVariables.System.Username;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.ProcessorArchitecture instead", error: false)]
+            public static readonly string ProcessorArchitecture = EnvironmentVariables.System.ProcessorArchitecture;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.ChocolateyToolsLocation instead", error: false)]
+            public static readonly string ChocolateyToolsLocation = EnvironmentVariables.System.ChocolateyToolsLocation;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyPackageInstallLocation instead", error: false)]
+            public static readonly string ChocolateyPackageInstallLocation = EnvironmentVariables.Package.ChocolateyPackageInstallLocation;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyInstallerType instead", error: false)]
+            public static readonly string ChocolateyPackageInstallerType = EnvironmentVariables.Package.ChocolateyInstallerType;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyExitCode instead", error: false)]
+            public static readonly string ChocolateyPackageExitCode = EnvironmentVariables.Package.ChocolateyExitCode;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyIgnoreChecksums instead", error: false)]
+            public static readonly string ChocolateyIgnoreChecksums = EnvironmentVariables.Package.ChocolateyIgnoreChecksums;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyAllowEmptyChecksums instead", error: false)]
+            public static readonly string ChocolateyAllowEmptyChecksums = EnvironmentVariables.Package.ChocolateyAllowEmptyChecksums;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyAllowEmptyChecksumsSecure instead", error: false)]
+            public static readonly string ChocolateyAllowEmptyChecksumsSecure = EnvironmentVariables.Package.ChocolateyAllowEmptyChecksumsSecure;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyPowerShellHost instead", error: false)]
+            public static readonly string ChocolateyPowerShellHost = EnvironmentVariables.Package.ChocolateyPowerShellHost;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyForce instead", error: false)]
+            public static readonly string ChocolateyForce = EnvironmentVariables.Package.ChocolateyForce;
+
+            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyExitOnRebootDetected instead", error: false)]
+            public static readonly string ChocolateyExitOnRebootDetected = EnvironmentVariables.Package.ChocolateyExitOnRebootDetected;
         }
 
         /// <summary>
@@ -173,7 +206,6 @@ namespace chocolatey.infrastructure.app
         public static readonly string ConfigFileTransformExtension = ".install.xdt";
         public static readonly string[] ShimDirectorFileExtensions = new string[] { ".gui", ".ignore" };
 
-        public static readonly string HashProviderFileTooBig = "UnableToDetectChanges_FileTooBig";
         public static readonly string HashProviderFileLocked = "UnableToDetectChanges_FileLocked";
 
         /// <summary>
@@ -243,6 +275,8 @@ namespace chocolatey.infrastructure.app
             public static readonly string UsePackageRepositoryOptimizations = "usePackageRepositoryOptimizations";
             public static readonly string DisableCompatibilityChecks = "disableCompatibilityChecks";
             public static readonly string UsePackageHashValidation = "usePackageHashValidation";
+            public static readonly string AlwaysIncludeHeaders = "alwaysIncludeHeaders";
+            public static readonly string UseHttpCache = "useHttpCache";
         }
 
         public static class Messages

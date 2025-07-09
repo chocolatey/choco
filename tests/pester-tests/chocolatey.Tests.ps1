@@ -104,7 +104,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             $LastExitCode | Should -Be 1
 
             $Output | Should -Contain "Chocolatey v$($script:CurrentVersion)"
-            $Output | Should -Contain "Please run 'choco -?' or 'choco <command> -?' for help menu."
+            $Output | Should -Contain "Please run 'choco --help' or 'choco <command> --help' for help menu."
         }
     }
 

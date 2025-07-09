@@ -185,6 +185,10 @@ namespace chocolatey.infrastructure.app.commands
                 }
             }
 
+            // This is required, since we only want to show the header if there are any Rules
+            // to be shown, which will be when we are printing the first Rule
+            var hasHeaderRowBeenOutput = false;
+
             foreach (var rule in rules)
             {
                 if (config.RegularOutput)
@@ -193,7 +197,13 @@ namespace chocolatey.infrastructure.app.commands
                 }
                 else
                 {
-                    this.Log().Info("{0}|{1}|{2}|{3}", rule.Severity, rule.Id, rule.Summary, rule.HelpUrl);
+                    if (config.IncludeHeaders && !hasHeaderRowBeenOutput)
+                    {
+                        OutputHelpers.LimitedOutput("Severity", "Id", "Summary", "HelpUrl");
+                        hasHeaderRowBeenOutput = true;
+                    }
+
+                    OutputHelpers.LimitedOutput(rule.Severity.ToString(), rule.Id, rule.Summary, rule.HelpUrl);
                 }
             }
         }

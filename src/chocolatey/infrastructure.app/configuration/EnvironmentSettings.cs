@@ -26,6 +26,7 @@ using chocolatey.infrastructure.adapters;
 using chocolatey.infrastructure.logging;
 using chocolatey.infrastructure.app.nuget;
 using Environment = chocolatey.infrastructure.adapters.Environment;
+using static chocolatey.StringResources;
 
 namespace chocolatey.infrastructure.app.configuration
 {
@@ -49,75 +50,85 @@ namespace chocolatey.infrastructure.app.configuration
         public static void ResetEnvironmentVariables(ChocolateyConfiguration config)
 #pragma warning restore IDE0060 // Unused method parameter
         {
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallLocation, null);
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageInstallerType, null);
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPackageExitCode, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageInstallLocation, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyInstallerType, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyExitCode, null);
 
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyIgnoreChecksums, null);
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksums, null);
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, null);
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, null);
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, null);
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyExitOnRebootDetected, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyIgnoreChecksums, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyAllowEmptyChecksums, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyAllowEmptyChecksumsSecure, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPowerShellHost, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyForce, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyExitOnRebootDetected, null);
 
-            Environment.SetEnvironmentVariable("chocolateyProxyLocation", null);
-            Environment.SetEnvironmentVariable("chocolateyProxyBypassList", null);
-            Environment.SetEnvironmentVariable("chocolateyProxyBypassOnLocal", null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyProxyLocation, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyProxyBypassList, null);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyProxyBypassOnLocal, null);
         }
 
         public static void SetEnvironmentVariables(ChocolateyConfiguration config)
         {
             ResetEnvironmentVariables(config);
 
-            Environment.SetEnvironmentVariable(ApplicationParameters.ChocolateyInstallEnvironmentVariableName, ApplicationParameters.InstallLocation);
-            Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION", config.Information.ChocolateyVersion);
-            Environment.SetEnvironmentVariable("CHOCOLATEY_VERSION_PRODUCT", config.Information.ChocolateyProductVersion);
-            Environment.SetEnvironmentVariable("OS_PLATFORM", config.Information.PlatformType.DescriptionOrValue());
-            Environment.SetEnvironmentVariable("OS_VERSION", config.Information.PlatformVersion.ToStringSafe());
-            Environment.SetEnvironmentVariable("OS_NAME", config.Information.PlatformName.ToStringSafe());
+            // During the Chocolatey execution, it is possible that the EnvironmentVariables property of
+            // the ChocolateyConfiguration object has been updated to include values that should be written
+            // out as environment variables into the current PowerShell session.  As example of this would
+            // be the previous package version during the exection of a `choco upgrade` command.  We need
+            // to loop through this collection, and write them out as environment variables.
+            foreach (var environmentVariable in config.Information.EnvironmentVariables)
+            {
+                Environment.SetEnvironmentVariable(environmentVariable.Key, environmentVariable.Value);
+            }
+
+            Environment.SetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall, ApplicationParameters.InstallLocation);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyVersion, config.Information.ChocolateyVersion);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyProductVersion, config.Information.ChocolateyProductVersion);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.OsPlatform, config.Information.PlatformType.DescriptionOrValue());
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.OsVersion, config.Information.PlatformVersion.ToStringSafe());
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.OsName, config.Information.PlatformName.ToStringSafe());
             // experimental until we know if this value returns correctly based on the OS and not the current process.
-            Environment.SetEnvironmentVariable("OS_IS64BIT", config.Information.Is64BitOperatingSystem ? "true" : "false");
-            Environment.SetEnvironmentVariable("PROCESS_IS64BIT", config.Information.Is64BitProcess ? "true" : "false");
-            Environment.SetEnvironmentVariable("USER_NAME", config.Information.UserName);
-            Environment.SetEnvironmentVariable("USER_DOMAIN", config.Information.UserDomainName);
-            Environment.SetEnvironmentVariable("IS_ADMIN", config.Information.IsUserAdministrator ? "true" : "false");
-            Environment.SetEnvironmentVariable("IS_SYSTEM", config.Information.IsUserSystemAccount ? "true" : "false");
-            Environment.SetEnvironmentVariable("IS_REMOTEDESKTOP", config.Information.IsUserRemoteDesktop ? "true" : "false");
-            Environment.SetEnvironmentVariable("IS_REMOTE", config.Information.IsUserRemote ? "true" : "false");
-            Environment.SetEnvironmentVariable("IS_PROCESSELEVATED", config.Information.IsProcessElevated ? "true" : "false");
-            Environment.SetEnvironmentVariable("TEMP", config.CacheLocation);
-            Environment.SetEnvironmentVariable("TMP", config.CacheLocation);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.OsIs64Bit, config.Information.Is64BitOperatingSystem ? "true" : "false");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ProcessIs64Bit, config.Information.Is64BitProcess ? "true" : "false");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.Username, config.Information.UserName);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.UserDomainName, config.Information.UserDomainName);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.IsAdmin, config.Information.IsUserAdministrator ? "true" : "false");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.IsUserSystemAccount, config.Information.IsUserSystemAccount ? "true" : "false");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.IsRemoteDesktop, config.Information.IsUserRemoteDesktop ? "true" : "false");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.IsRemote, config.Information.IsUserRemote ? "true" : "false");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.IsProcessElevated, config.Information.IsProcessElevated ? "true" : "false");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.System.Temp, config.CacheLocation);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.Tmp, config.CacheLocation);
 
             if (config.Debug)
             {
-                Environment.SetEnvironmentVariable("ChocolateyEnvironmentDebug", "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyEnvironmentDebug, "true");
             }
 
             if (config.Verbose)
             {
-                Environment.SetEnvironmentVariable("ChocolateyEnvironmentVerbose", "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyEnvironmentVerbose, "true");
             }
 
             if (!config.Features.ChecksumFiles)
             {
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyIgnoreChecksums, "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyIgnoreChecksums, "true");
             }
 
             if (config.Features.AllowEmptyChecksums)
             {
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksums, "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyAllowEmptyChecksums, "true");
             }
 
             if (config.Features.AllowEmptyChecksumsSecure)
             {
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyAllowEmptyChecksumsSecure, "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyAllowEmptyChecksumsSecure, "true");
             }
 
-            Environment.SetEnvironmentVariable("chocolateyRequestTimeout", config.WebRequestTimeoutSeconds.ToStringSafe() + "000");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyRequestTimeout, config.WebRequestTimeoutSeconds.ToStringSafe() + "000");
 
             if (config.CommandExecutionTimeoutSeconds != 0)
             {
-                Environment.SetEnvironmentVariable("chocolateyResponseTimeout", config.CommandExecutionTimeoutSeconds.ToStringSafe() + "000");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyResponseTimeout, config.CommandExecutionTimeoutSeconds.ToStringSafe() + "000");
             }
 
             if (!string.IsNullOrWhiteSpace(config.Proxy.Location))
@@ -129,40 +140,40 @@ namespace chocolatey.infrastructure.app.configuration
                 {
                     proxyCreds = "{0}:{1}@".FormatWith(config.Proxy.User, NugetEncryptionUtility.DecryptString(config.Proxy.EncryptedPassword));
 
-                    Environment.SetEnvironmentVariable("chocolateyProxyUser", config.Proxy.User);
-                    Environment.SetEnvironmentVariable("chocolateyProxyPassword", NugetEncryptionUtility.DecryptString(config.Proxy.EncryptedPassword));
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyProxyUser, config.Proxy.User);
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyProxyPassword, NugetEncryptionUtility.DecryptString(config.Proxy.EncryptedPassword));
                 }
 
-                Environment.SetEnvironmentVariable("http_proxy", "{0}{1}".FormatWith(proxyCreds, config.Proxy.Location));
-                Environment.SetEnvironmentVariable("https_proxy", "{0}{1}".FormatWith(proxyCreds, config.Proxy.Location));
-                Environment.SetEnvironmentVariable("chocolateyProxyLocation", config.Proxy.Location);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.System.HttpProxy, "{0}{1}".FormatWith(proxyCreds, config.Proxy.Location));
+                Environment.SetEnvironmentVariable(EnvironmentVariables.System.HttpsProxy, "{0}{1}".FormatWith(proxyCreds, config.Proxy.Location));
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyProxyLocation, config.Proxy.Location);
 
                 if (!string.IsNullOrWhiteSpace(config.Proxy.BypassList))
                 {
-                    Environment.SetEnvironmentVariable("chocolateyProxyBypassList", config.Proxy.BypassList);
-                    Environment.SetEnvironmentVariable("no_proxy", config.Proxy.BypassList);
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyProxyBypassList, config.Proxy.BypassList);
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.System.NoProxy  , config.Proxy.BypassList);
 
                 }
 
                 if (config.Proxy.BypassOnLocal)
                 {
-                    Environment.SetEnvironmentVariable("chocolateyProxyBypassOnLocal", "true");
+                    Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyProxyBypassOnLocal, "true");
                 }
             }
 
             if (config.Features.UsePowerShellHost)
             {
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyPowerShellHost, "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPowerShellHost, "true");
             }
 
             if (config.Force)
             {
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyForce, "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyForce, "true");
             }
 
             if (config.Features.ExitOnRebootDetected)
             {
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ChocolateyExitOnRebootDetected, "true");
+                Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyExitOnRebootDetected, "true");
             }
 
             SetLicensedEnvironment(config);
@@ -170,7 +181,7 @@ namespace chocolatey.infrastructure.app.configuration
 
         private static void SetLicensedEnvironment(ChocolateyConfiguration config)
         {
-            Environment.SetEnvironmentVariable("ChocolateyLicenseType", config.Information.LicenseType);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyLicenseType, config.Information.LicenseType);
 
             if (!(config.Information.IsLicensedVersion && config.Information.IsLicensedAssemblyLoaded))
             {
@@ -244,15 +255,15 @@ namespace chocolatey.infrastructure.app.configuration
         {
             // grab original values
             var originalEnvironmentVariables = ConvertToCaseInsensitiveDictionary(Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Process));
-            var userName = originalEnvironmentVariables[ApplicationParameters.Environment.Username].ToStringSafe();
-            var architecture = originalEnvironmentVariables[ApplicationParameters.Environment.ProcessorArchitecture].ToStringSafe();
-            var originalPath = originalEnvironmentVariables[ApplicationParameters.Environment.Path]
+            var userName = originalEnvironmentVariables[EnvironmentVariables.System.Username].ToStringSafe();
+            var architecture = originalEnvironmentVariables[EnvironmentVariables.System.ProcessorArchitecture].ToStringSafe();
+            var originalPath = originalEnvironmentVariables[EnvironmentVariables.System.Path]
                 .ToStringSafe()
                 .Split(new[] { ApplicationParameters.Environment.EnvironmentSeparator }, StringSplitOptions.RemoveEmptyEntries);
-            var originalPathExt = originalEnvironmentVariables[ApplicationParameters.Environment.PathExtensions]
+            var originalPathExt = originalEnvironmentVariables[EnvironmentVariables.System.PathExtensions]
                 .ToStringSafe()
                 .Split(new[] { ApplicationParameters.Environment.EnvironmentSeparator }, StringSplitOptions.RemoveEmptyEntries);
-            var originalPsModulePath = originalEnvironmentVariables[ApplicationParameters.Environment.PsModulePath]
+            var originalPsModulePath = originalEnvironmentVariables[EnvironmentVariables.System.PSModulePath]
                 .ToStringSafe()
                 .Split(new[] { ApplicationParameters.Environment.EnvironmentSeparator }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -284,28 +295,32 @@ namespace chocolatey.infrastructure.app.configuration
             }
 
             // restore process overridden variables
-            if (originalEnvironmentVariables.Contains(ApplicationParameters.Environment.Username))
+            if (originalEnvironmentVariables.Contains(EnvironmentVariables.System.Username))
             {
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.Username, userName);
+               
+            {
+                Environment.SetEnvironmentVariable(EnvironmentVariables.System.Username, userName);
             }
 
-            if (originalEnvironmentVariables.Contains(ApplicationParameters.Environment.ProcessorArchitecture))
+            }
+
+            if (originalEnvironmentVariables.Contains(EnvironmentVariables.System.ProcessorArchitecture))
             {
-                Environment.SetEnvironmentVariable(ApplicationParameters.Environment.ProcessorArchitecture, architecture);
+                Environment.SetEnvironmentVariable(EnvironmentVariables.System.ProcessorArchitecture, architecture);
             }
 
             // combine environment values that append together
             var updatedPath = "{0};{1};".FormatWith(
-                machineVariables[ApplicationParameters.Environment.Path].ToStringSafe(),
-                userVariables[ApplicationParameters.Environment.Path].ToStringSafe()
+                machineVariables[EnvironmentVariables.System.Path].ToStringSafe(),
+                userVariables[EnvironmentVariables.System.Path].ToStringSafe()
                 ).Replace(";;", ";");
             var updatedPathExt = "{0};{1};".FormatWith(
-                machineVariables[ApplicationParameters.Environment.PathExtensions].ToStringSafe(),
-                userVariables[ApplicationParameters.Environment.PathExtensions].ToStringSafe()
+                machineVariables[EnvironmentVariables.System.PathExtensions].ToStringSafe(),
+                userVariables[EnvironmentVariables.System.PathExtensions].ToStringSafe()
                 ).Replace(";;", ";");
             var updatedPsModulePath = "{0};{1};".FormatWith(
-                userVariables[ApplicationParameters.Environment.PsModulePath].ToStringSafe(),
-                machineVariables[ApplicationParameters.Environment.PsModulePath].ToStringSafe()
+                userVariables[EnvironmentVariables.System.PSModulePath].ToStringSafe(),
+                machineVariables[EnvironmentVariables.System.PSModulePath].ToStringSafe()
                 ).Replace(";;", ";");
 
             // add back in process items
@@ -328,9 +343,9 @@ namespace chocolatey.infrastructure.app.configuration
                 updatedPsModulePath = updatedPsModulePath.Remove(0, 1);
             }
 
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.Path, updatedPath);
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions, updatedPathExt);
-            Environment.SetEnvironmentVariable(ApplicationParameters.Environment.PsModulePath, updatedPsModulePath);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.System.Path, updatedPath);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.System.PathExtensions, updatedPathExt);
+            Environment.SetEnvironmentVariable(EnvironmentVariables.System.PSModulePath, updatedPsModulePath);
         }
 
         private static IDictionary ConvertToCaseInsensitiveDictionary(IDictionary originalDictionary)

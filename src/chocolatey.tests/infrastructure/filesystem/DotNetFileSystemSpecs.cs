@@ -23,6 +23,7 @@ using chocolatey.infrastructure.platforms;
 using Moq;
 using NUnit.Framework;
 using FluentAssertions;
+using static chocolatey.StringResources;
 
 namespace chocolatey.tests.infrastructure.filesystem
 {
@@ -135,8 +136,8 @@ namespace chocolatey.tests.infrastructure.filesystem
             public override void Context()
             {
                 base.Context();
-                Environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions)).Returns(".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL");
-                Environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.Path)).Returns(
+                Environment.Setup(x => x.GetEnvironmentVariable(EnvironmentVariables.System.PathExtensions)).Returns(".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC;.CPL");
+                Environment.Setup(x => x.GetEnvironmentVariable(EnvironmentVariables.System.Path)).Returns(
                     @"C:\ProgramData\Chocolatey\bin{0}C:\Program Files\Microsoft\Web Platform Installer\{0}C:\Users\yes\AppData\Roaming\Boxstarter{0}C:\tools\ChocolateyPackageUpdater{0}C:\Windows\system32{0}C:\Windows{0}C:\Windows\System32\Wbem{0}C:\Windows\System32\WindowsPowerShell\v1.0\{0}"
                         .FormatWith(Path.PathSeparator)
                 );
@@ -192,8 +193,8 @@ namespace chocolatey.tests.infrastructure.filesystem
             public override void Context()
             {
                 base.Context();
-                Environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.PathExtensions)).Returns(string.Empty);
-                Environment.Setup(x => x.GetEnvironmentVariable(ApplicationParameters.Environment.Path)).Returns(
+                Environment.Setup(x => x.GetEnvironmentVariable(EnvironmentVariables.System.PathExtensions)).Returns(string.Empty);
+                Environment.Setup(x => x.GetEnvironmentVariable(EnvironmentVariables.System.Path)).Returns(
                     "/usr/local/bin{0}/usr/bin/{0}/bin{0}/usr/sbin{0}/sbin"
                         .FormatWith(Path.PathSeparator)
                 );

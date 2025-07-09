@@ -51,7 +51,9 @@ Describe 'Ensuring credentials do not bleed from configured sources' -Tag Creden
             $PackageUnderTest = 'chocolatey-compatibility.extension'
             Restore-ChocolateyInstallSnapshot
             # Chocolatey will prompt for credentials, we need to force something in there, and this will do that.
-            $Output = 'n' | Invoke-Choco $Command $PackageUnderTest --confirm --source="'$($SetupSource.Url)'"
+            # We also ignore the HTTP Cache as if the package has previously been found under different credentials,
+            # the result will sometimes be re-used when it is found.
+            $Output = 'n' | Invoke-Choco $Command $PackageUnderTest --confirm --source="'$($SetupSource.Url)'" --ignore-http-cache
         }
 
         AfterAll {

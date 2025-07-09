@@ -18,9 +18,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
-using Chocolatey.PowerShell.Shared;
 using Chocolatey.PowerShell.Win32;
 using Microsoft.Win32;
+using static chocolatey.StringResources;
 
 namespace Chocolatey.PowerShell.Helpers
 {
@@ -163,7 +163,7 @@ namespace Chocolatey.PowerShell.Helpers
                     // The value doesn't exist yet, suppress the error.
                 }
 
-                if (name.ToUpper() == EnvironmentVariables.Path)
+                if (name.ToUpper() == EnvironmentVariables.System.Path)
                 {
                     registryType = RegistryValueKind.ExpandString;
                 }
@@ -199,8 +199,8 @@ namespace Chocolatey.PowerShell.Helpers
                         out UIntPtr result);
 
                     // 2. Set a user environment variable making the system refresh
-                    var setxPath = string.Format(@"{0}\System32\setx.exe", GetVariable(cmdlet, EnvironmentVariables.SystemRoot, EnvironmentVariableTarget.Process));
-                    cmdlet.InvokeCommand.InvokeScript($"& \"{setxPath}\" {EnvironmentVariables.ChocolateyLastPathUpdate} \"{DateTime.Now.ToFileTime()}\"");
+                    var setxPath = string.Format(@"{0}\System32\setx.exe", GetVariable(cmdlet, EnvironmentVariables.System.SystemRoot, EnvironmentVariableTarget.Process));
+                    cmdlet.InvokeCommand.InvokeScript($"& \"{setxPath}\" {EnvironmentVariables.Package.ChocolateyLastPathUpdate} \"{DateTime.Now.ToFileTime()}\"");
                 }
             }
             catch (Exception error)
@@ -217,16 +217,16 @@ namespace Chocolatey.PowerShell.Helpers
         /// <param name="cmdlet">The cmdlet calling the method.</param>
         public static void UpdateSession(PSCmdlet cmdlet)
         {
-            var userName = GetVariable(cmdlet, EnvironmentVariables.Username, EnvironmentVariableTarget.Process);
-            var architecture = GetVariable(cmdlet, EnvironmentVariables.ProcessorArchitecture, EnvironmentVariableTarget.Process);
-            var psModulePath = GetVariable(cmdlet, EnvironmentVariables.PSModulePath, EnvironmentVariableTarget.Process);
+            var userName = GetVariable(cmdlet, EnvironmentVariables.System.Username, EnvironmentVariableTarget.Process);
+            var architecture = GetVariable(cmdlet, EnvironmentVariables.System.ProcessorArchitecture, EnvironmentVariableTarget.Process);
+            var psModulePath = GetVariable(cmdlet, EnvironmentVariables.System.PSModulePath, EnvironmentVariableTarget.Process);
 
             var scopeList = new List<EnvironmentVariableTarget>() { EnvironmentVariableTarget.Process, EnvironmentVariableTarget.Machine };
 
-            var computerName = GetVariable(cmdlet, EnvironmentVariables.ComputerName, EnvironmentVariableTarget.Process);
+            var computerName = GetVariable(cmdlet, EnvironmentVariables.System.ComputerName, EnvironmentVariableTarget.Process);
 
             // User scope should override (be checked after) machine scope, but only if we're not running as SYSTEM
-            if (userName != computerName && userName != EnvironmentVariables.System)
+            if (userName != computerName && userName != Shared.EnvironmentNames.System)
             {
                 scopeList.Add(EnvironmentVariableTarget.User);
             }
@@ -247,23 +247,23 @@ namespace Chocolatey.PowerShell.Helpers
 
                 // Update PATH, combining both scopes' values.
                 var paths = new string[2];
-                paths[0] = GetVariable(cmdlet, EnvironmentVariables.Path, EnvironmentVariableTarget.Machine);
-                paths[1] = GetVariable(cmdlet, EnvironmentVariables.Path, EnvironmentVariableTarget.User);
+                paths[0] = GetVariable(cmdlet, EnvironmentVariables.System.Path, EnvironmentVariableTarget.Machine);
+                paths[1] = GetVariable(cmdlet, EnvironmentVariables.System.Path, EnvironmentVariableTarget.User);
 
-                SetVariable(cmdlet, EnvironmentVariables.Path, EnvironmentVariableTarget.Process, string.Join(";", paths));
+                SetVariable(cmdlet, EnvironmentVariables.System.Path, EnvironmentVariableTarget.Process, string.Join(";", paths));
 
                 // Preserve PSModulePath as it's almost always updated by process, preserve it
-                SetVariable(cmdlet, EnvironmentVariables.PSModulePath, EnvironmentVariableTarget.Process, psModulePath);
+                SetVariable(cmdlet, EnvironmentVariables.System.PSModulePath, EnvironmentVariableTarget.Process, psModulePath);
 
                 // Preserve user and architecture
                 if (!string.IsNullOrEmpty(userName))
                 {
-                    SetVariable(cmdlet, EnvironmentVariables.Username, EnvironmentVariableTarget.Process, userName);
+                    SetVariable(cmdlet, EnvironmentVariables.System.Username, EnvironmentVariableTarget.Process, userName);
                 }
 
                 if (!string.IsNullOrEmpty(architecture))
                 {
-                    SetVariable(cmdlet, EnvironmentVariables.ProcessorArchitecture, EnvironmentVariableTarget.Process, architecture);
+                    SetVariable(cmdlet, EnvironmentVariables.System.ProcessorArchitecture, EnvironmentVariableTarget.Process, architecture);
                 }
             }
         }
