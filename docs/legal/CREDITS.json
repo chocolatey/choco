@@ -3,8 +3,8 @@
     "isPrivate": false,
     "link": "https://github.com/chocolatey/choco",
     "licenseName": "LICENSE",
-    "licenseLink": "https://github.com/chocolatey/choco/blob/38b5e5ce3b083acf591f988243e9d8e8ccbfb832/LICENSE",
-    "version": "2.0.0",
+    "licenseLink": "https://github.com/chocolatey/choco/blob/a500fc573954494893dad503317ad676759d186a/LICENSE",
+    "version": "2.1.0",
     "dependencies": [
         {
             "name": "7-Zip",

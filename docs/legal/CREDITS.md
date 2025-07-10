@@ -287,7 +287,7 @@ Chocolatey Open Source components fall under the [Apache v2.0 license](https://w
 https://www.apache.org/licenses/LICENSE-2.0
 ```
 
-* [Chocolatey CLI / Chocolatey.Lib](https://github.com/chocolatey/choco) - [License terms](https://github.com/chocolatey/choco/blob/38b5e5ce3b083acf591f988243e9d8e8ccbfb832/LICENSE)
+* [Chocolatey CLI / Chocolatey.Lib](https://github.com/chocolatey/choco) - [License terms](https://github.com/chocolatey/choco/blob/a500fc573954494893dad503317ad676759d186a/LICENSE)
 
 ## Chocolatey CLI / Chocolatey.Lib
 
