@@ -1,4 +1,4 @@
-﻿Import-Module helpers/common-helpers
+Import-Module helpers/common-helpers
 Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 
 Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
@@ -12,7 +12,7 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
         }
     }
 
-    Context "Tab Completion" {
+    Context "Tab Completion" -Tag TabCompletions {
         BeforeAll {
             Initialize-ChocolateyTestInstall
 
@@ -449,216 +449,219 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
             $Completions | Should -Contain "--version=''" -Because $becauseCompletions
         }
 
-        It "Should list completions for apikey remove" {
-            $Command = "choco apikey remove --source='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+        # This is marked Internal as all the tests run `choco.exe` to determine the tab expansion and unofficial builds will not provide the tab completion.
+        Context "Requires Official Build" -Tag Internal {
+            It "Should list completions for apikey remove" {
+                $Command = "choco apikey remove --source='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $becauseCompletions = ($Completions -Join ", ")
+                $becauseCompletions = ($Completions -Join ", ")
 
-            $Completions | Should -Contain "--source='https://test.com/api/add/'" -Because $becauseCompletions
-        }
-
-        It "Should list completions for feature enable" {
-            $Command = "choco feature enable --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
-
-            $becauseCompletions = ($Completions -Join ", ")
-
-            $Completions | Should -Contain "--name='allowEmptyChecksums'" -Because $becauseCompletions
-            $Completions | Should -Contain "--name='useRememberedArgumentsForUpgrades'" -Because $becauseCompletions
-
-            if ($isLicensed) {
-                $Completions | Should -Contain "--name='adminOnlyExecutionForAllChocolateyCommands'" -Because $becauseCompletions
+                $Completions | Should -Contain "--source='https://test.com/api/add/'" -Because $becauseCompletions
             }
-        }
 
-        It "Should list completions for feature disable" {
-            $Command = "choco feature disable --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+            It "Should list completions for feature enable" {
+                $Command = "choco feature enable --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $becauseCompletions = ($Completions -Join ", ")
+                $becauseCompletions = ($Completions -Join ", ")
 
-            $Completions | Should -Contain "--name='allowEmptyChecksums'" -Because $becauseCompletions
-            $Completions | Should -Contain "--name='useRememberedArgumentsForUpgrades'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='allowEmptyChecksums'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='useRememberedArgumentsForUpgrades'" -Because $becauseCompletions
 
-            if ($isLicensed) {
-                $Completions | Should -Contain "--name='adminOnlyExecutionForAllChocolateyCommands'" -Because $becauseCompletions
+                if ($isLicensed) {
+                    $Completions | Should -Contain "--name='adminOnlyExecutionForAllChocolateyCommands'" -Because $becauseCompletions
+                }
             }
-        }
 
-        It "Should list completions for feature get" {
-            $Command = "choco feature get --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+            It "Should list completions for feature disable" {
+                $Command = "choco feature disable --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $becauseCompletions = ($Completions -Join ", ")
+                $becauseCompletions = ($Completions -Join ", ")
 
-            $Completions | Should -Contain "--name='allowEmptyChecksums'" -Because $becauseCompletions
-            $Completions | Should -Contain "--name='useRememberedArgumentsForUpgrades'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='allowEmptyChecksums'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='useRememberedArgumentsForUpgrades'" -Because $becauseCompletions
 
-            if ($isLicensed) {
-                $Completions | Should -Contain "--name='adminOnlyExecutionForAllChocolateyCommands'" -Because $becauseCompletions
+                if ($isLicensed) {
+                    $Completions | Should -Contain "--name='adminOnlyExecutionForAllChocolateyCommands'" -Because $becauseCompletions
+                }
             }
-        }
 
-        It "Should list completions for config get" {
-            $Command = "choco config get --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+            It "Should list completions for feature get" {
+                $Command = "choco feature get --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $becauseCompletions = ($Completions -Join ", ")
+                $becauseCompletions = ($Completions -Join ", ")
 
-            $Completions | Should -Contain "--name='cacheLocation'" -Because $becauseCompletions
-            $Completions | Should -Contain "--name='webRequestTimeoutSeconds'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='allowEmptyChecksums'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='useRememberedArgumentsForUpgrades'" -Because $becauseCompletions
 
-            if ($isLicensed) {
-                $Completions | Should -Contain "--name='virusScannerType'" -Because $becauseCompletions
+                if ($isLicensed) {
+                    $Completions | Should -Contain "--name='adminOnlyExecutionForAllChocolateyCommands'" -Because $becauseCompletions
+                }
             }
-        }
 
-        It "Should list completions for config set" {
-            $Command = "choco config set --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+            It "Should list completions for config get" {
+                $Command = "choco config get --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $becauseCompletions = ($Completions -Join ", ")
+                $becauseCompletions = ($Completions -Join ", ")
 
-            $Completions | Should -Contain "--name='cacheLocation'" -Because $becauseCompletions
-            $Completions | Should -Contain "--name='webRequestTimeoutSeconds'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='cacheLocation'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='webRequestTimeoutSeconds'" -Because $becauseCompletions
 
-            if ($isLicensed) {
-                $Completions | Should -Contain "--name='virusScannerType'" -Because $becauseCompletions
+                if ($isLicensed) {
+                    $Completions | Should -Contain "--name='virusScannerType'" -Because $becauseCompletions
+                }
             }
-        }
 
-        It "Should list completions for config unset" {
-            $Command = "choco config unset --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+            It "Should list completions for config set" {
+                $Command = "choco config set --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $becauseCompletions = ($Completions -Join ", ")
+                $becauseCompletions = ($Completions -Join ", ")
 
-            $Completions | Should -Contain "--name='cacheLocation'" -Because $becauseCompletions
-            $Completions | Should -Contain "--name='webRequestTimeoutSeconds'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='cacheLocation'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='webRequestTimeoutSeconds'" -Because $becauseCompletions
 
-            if ($isLicensed) {
-                $Completions | Should -Contain "--name='virusScannerType'" -Because $becauseCompletions
+                if ($isLicensed) {
+                    $Completions | Should -Contain "--name='virusScannerType'" -Because $becauseCompletions
+                }
             }
-        }
 
-        It "Should list completions for pin add" {
-            $Command = "choco pin add --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+            It "Should list completions for config unset" {
+                $Command = "choco config unset --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $becauseCompletions = ($Completions -Join ", ")
+                $becauseCompletions = ($Completions -Join ", ")
 
-            $Completions | Should -Contain "--name='upgradepackage'" -Because $becauseCompletions
-        }
+                $Completions | Should -Contain "--name='cacheLocation'" -Because $becauseCompletions
+                $Completions | Should -Contain "--name='webRequestTimeoutSeconds'" -Because $becauseCompletions
 
-        It "Should list completions for pin remove" {
-            $Command = "choco pin remove --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+                if ($isLicensed) {
+                    $Completions | Should -Contain "--name='virusScannerType'" -Because $becauseCompletions
+                }
+            }
 
-            $becauseCompletions = ($Completions -Join ", ")
+            It "Should list completions for pin add" {
+                $Command = "choco pin add --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions | Should -Contain "--name='chocolatey'" -Because $becauseCompletions
-        }
+                $becauseCompletions = ($Completions -Join ", ")
 
-        It "Should list completions for rule get" {
-            $Command = "choco rule get --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+                $Completions | Should -Contain "--name='upgradepackage'" -Because $becauseCompletions
+            }
 
-            $becauseCompletions = ($Completions -Join ", ")
+            It "Should list completions for pin remove" {
+                $Command = "choco pin remove --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions | Should -Contain "--name='CHCU0001'" -Because $becauseCompletions
-        }
+                $becauseCompletions = ($Completions -Join ", ")
 
-        It "Should list completions for source disable" {
-            $Command = "choco source disable --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+                $Completions | Should -Contain "--name='chocolatey'" -Because $becauseCompletions
+            }
 
-            $becauseCompletions = ($Completions -Join ", ")
+            It "Should list completions for rule get" {
+                $Command = "choco rule get --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions | Should -Contain "--name='chocolatey'" -Because $becauseCompletions
-        }
+                $becauseCompletions = ($Completions -Join ", ")
 
-        It "Should list completions for source enable" {
-            $Command = "choco source enable --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+                $Completions | Should -Contain "--name='CHCU0001'" -Because $becauseCompletions
+            }
 
-            $becauseCompletions = ($Completions -Join ", ")
+            It "Should list completions for source disable" {
+                $Command = "choco source disable --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions | Should -Contain "--name='chocolatey'" -Because $becauseCompletions
-        }
+                $becauseCompletions = ($Completions -Join ", ")
 
-        It "Should list completions for source remove" {
-            $Command = "choco source remove --name='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+                $Completions | Should -Contain "--name='chocolatey'" -Because $becauseCompletions
+            }
 
-            $becauseCompletions = ($Completions -Join ", ")
+            It "Should list completions for source enable" {
+                $Command = "choco source enable --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions | Should -Contain "--name='chocolatey'" -Because $becauseCompletions
-        }
+                $becauseCompletions = ($Completions -Join ", ")
 
-        It "Should list versions for <_> isdependency --version=" -ForEach @('install', 'upgrade') {
-            $Command = "choco $_ isdependency --version="
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+                $Completions | Should -Contain "--name='chocolatey'" -Because $becauseCompletions
+            }
 
-            $becauseCompletions = ($Completions -Join ", ")
+            It "Should list completions for source remove" {
+                $Command = "choco source remove --name='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
-        }
+                $becauseCompletions = ($Completions -Join ", ")
 
-        It "Should list versions for <_> isdependency --version='" -ForEach @('install', 'upgrade') {
-            $Command = "choco $_ isdependency --version='"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+                $Completions | Should -Contain "--name='chocolatey'" -Because $becauseCompletions
+            }
 
-            $becauseCompletions = ($Completions -Join ", ")
+            It "Should list versions for <_> isdependency --version=" -ForEach @('install', 'upgrade') {
+                $Command = "choco $_ isdependency --version="
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
-        }
+                $becauseCompletions = ($Completions -Join ", ")
 
-        It "Should list versions for <_> isdependency --version=''" -ForEach @('install', 'upgrade') {
-            $Command = "choco $_ isdependency --version=''"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn ($Command.Length - 1)).CompletionMatches.CompletionText
+                $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
+            }
 
-            $becauseCompletions = ($Completions -Join ", ")
+            It "Should list versions for <_> isdependency --version='" -ForEach @('install', 'upgrade') {
+                $Command = "choco $_ isdependency --version='"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
 
-            $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
-        }
+                $becauseCompletions = ($Completions -Join ", ")
 
-        It "Should list versions for <_> isdependency --version='' without moving cursor" -ForEach @('install', 'upgrade') {
-            $Command = "choco $_ isdependency --version=''"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn ($Command.Length)).CompletionMatches.CompletionText
+                $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
+            }
 
-            $becauseCompletions = ($Completions -Join ", ")
+            It "Should list versions for <_> isdependency --version=''" -ForEach @('install', 'upgrade') {
+                $Command = "choco $_ isdependency --version=''"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn ($Command.Length - 1)).CompletionMatches.CompletionText
 
-            $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
-        }
+                $becauseCompletions = ($Completions -Join ", ")
 
-        It "Should list 2.x versions for <_> isdependency --version='2" -ForEach @('install', 'upgrade') {
-            $Command = "choco $_ isdependency --version='2"
-            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn ($Command.Length)).CompletionMatches.CompletionText
+                $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
+            }
 
-            $becauseCompletions = ($Completions -Join ", ")
+            It "Should list versions for <_> isdependency --version='' without moving cursor" -ForEach @('install', 'upgrade') {
+                $Command = "choco $_ isdependency --version=''"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn ($Command.Length)).CompletionMatches.CompletionText
 
-            $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
-            $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
-            $Completions | Should -Not -Contain "--version='1.1.0'" -Because $becauseCompletions
-            $Completions | Should -Not -Contain "--version='1.0.1'" -Because $becauseCompletions
-            $Completions | Should -Not -Contain "--version='1.0.0'" -Because $becauseCompletions
+                $becauseCompletions = ($Completions -Join ", ")
+
+                $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.1.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.0.1'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='1.0.0'" -Because $becauseCompletions
+            }
+
+            It "Should list 2.x versions for <_> isdependency --version='2" -ForEach @('install', 'upgrade') {
+                $Command = "choco $_ isdependency --version='2"
+                $Completions = (TabExpansion2 -inputScript $Command -cursorColumn ($Command.Length)).CompletionMatches.CompletionText
+
+                $becauseCompletions = ($Completions -Join ", ")
+
+                $Completions | Should -Contain "--version='2.1.0'" -Because $becauseCompletions
+                $Completions | Should -Contain "--version='2.0.0'" -Because $becauseCompletions
+                $Completions | Should -Not -Contain "--version='1.1.0'" -Because $becauseCompletions
+                $Completions | Should -Not -Contain "--version='1.0.1'" -Because $becauseCompletions
+                $Completions | Should -Not -Contain "--version='1.0.0'" -Because $becauseCompletions
+            }
         }
     }
 }
