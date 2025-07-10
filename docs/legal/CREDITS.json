@@ -3,13 +3,13 @@
     "isPrivate": false,
     "link": "https://github.com/chocolatey/choco",
     "licenseName": "LICENSE",
-    "licenseLink": "https://github.com/chocolatey/choco/blob/a500fc573954494893dad503317ad676759d186a/LICENSE",
-    "version": "2.1.0",
+    "licenseLink": "https://github.com/chocolatey/choco/blob/5d67083ec904e952811c6425b5a5594f8e3cc0b8/LICENSE",
+    "version": "2.4.3",
     "dependencies": [
         {
             "name": "7-Zip",
             "link": "https://www.7-zip.org/",
-            "version": "21.07",
+            "version": "24.09",
             "licenses": [
                 {
                     "type": "OTHER",
@@ -32,11 +32,11 @@
         {
             "name": "Checksum",
             "link": "https://github.com/chocolatey/checksum",
-            "version": "0.2.0",
+            "version": "0.3.1",
             "licenses": [
                 {
                     "type": "Apache-2.0",
-                    "link": "https://github.com/chocolatey/checksum/blob/e6f5645610c7bc15084b48f69d4cdb056106f956/LICENSE",
+                    "link": "https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENSE",
                     "name": "LICENSE"
                 }
             ]
@@ -67,7 +67,7 @@
         {
             "name": "Microsoft.Web.Xdt",
             "link": "https://www.nuget.org/packages/Microsoft.Web.Xdt/3.1.0",
-            "version": "2.1.1",
+            "version": "3.1.0",
             "licenses": [
                 {
                     "type": "Apache-2.0",
@@ -91,11 +91,11 @@
             "name": "Chocolatey.NuGet.Client",
             "link": "https://github.com/NuGet/NuGet.Client",
             "modifiedLink": "https://github.com/chocolatey/NuGet.Client",
-            "version": "3.1.0",
+            "version": "3.4.3",
             "licenses": [
                 {
                     "type": "Apache-2.0",
-                    "link": "https://github.com/NuGet/NuGet.Client/blob/72f9f2b2eab28c9d91a22065c55aa7702abf7e01/LICENSE.txt",
+                    "link": "https://github.com/NuGet/NuGet.Client/blob/366c811e2a998523ba9ab1098d362de14f3e9af0/LICENSE.txt",
                     "name": "LICENSE.txt"
                 }
             ]
@@ -116,11 +116,11 @@
         {
             "name": "Shim Generator (shimgen)",
             "link": "https://github.com/chocolatey/shimgen",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "licenses": [
                 {
                     "type": "OTHER",
-                    "link": "https://github.com/chocolatey/choco/blob/d25f993696b4d665ee2dc94ceb0937a2ed5698eb/src/chocolatey.resources/tools/shimgen.license.txt"
+                    "link": "https://github.com/chocolatey/choco/blob/5d67083ec904e952811c6425b5a5594f8e3cc0b8/src/chocolatey.resources/tools/shimgen.license.txt"
                 }
             ]
         },
