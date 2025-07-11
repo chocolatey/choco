@@ -188,6 +188,8 @@ Task("Prepare-NuGet-Packages")
 
     // Copy legal documents
     CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.md", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/CREDITS.txt");
+    CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.json", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/CREDITS.json");
+    CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.pdf", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/CREDITS.pdf");
 
     CopyFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey_merged/*", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/net48");
     CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.xml", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/net48/chocolatey.xml");
