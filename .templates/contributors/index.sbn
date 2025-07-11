@@ -1,6 +1,6 @@
 {{-
     include 'release-info'
-    if milestone.target.description
+    if milestone.target.description != ""
         include 'milestone'
     end
     include 'issues' | string.rstrip
