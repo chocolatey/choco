@@ -1,0 +1,177 @@
+{
+    "name": "Chocolatey CLI / Chocolatey.Lib",
+    "isPrivate": false,
+    "link": "https://github.com/chocolatey/choco",
+    "licenseName": "LICENSE",
+    "licenseLink": "https://github.com/chocolatey/choco/blob/master/LICENSE",
+    "version": "2.5.0",
+    "dependencies": [
+        {
+            "name": "7-Zip",
+            "link": "https://www.7-zip.org/",
+            "version": "24.09",
+            "licenses": [
+                {
+                    "type": "OTHER",
+                    "link": "https://www.7-zip.org/license.txt"
+                }
+            ]
+        },
+        {
+            "name": "AlphaFS",
+            "link": "https://github.com/alphaleonis/AlphaFS",
+            "version": "2.1.3",
+            "licenses": [
+                {
+                    "type": "MIT",
+                    "link": "https://github.com/alphaleonis/AlphaFS/blob/c63d46894e08d5a4e993b35131051f13203c3321/LICENSE.md",
+                    "name": "LICENSE.md"
+                }
+            ]
+        },
+        {
+            "name": "Checksum",
+            "link": "https://github.com/chocolatey/checksum",
+            "version": "0.3.1",
+            "licenses": [
+                {
+                    "type": "Apache-2.0",
+                    "link": "https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENS",
+                    "name": "LICENSE"
+                }
+            ]
+        },
+        {
+            "name": "Chocolatey.NuGet.Client",
+            "link": "https://github.com/NuGet/NuGet.Client",
+            "modifiedLink": "https://github.com/chocolatey/NuGet.Client",
+            "version": "3.4.3",
+            "licenses": [
+                {
+                    "type": "Apache-2.0",
+                    "link": "https://github.com/NuGet/NuGet.Client/blob/72f9f2b2eab28c9d91a22065c55aa7702abf7e01/LICENSE.txt",
+                    "name": "LICENSE.txt"
+                }
+            ]
+        },
+        {
+            "name": "log4net",
+            "link": "https://github.com/apache/logging-log4net",
+            "version": "rel/2.0.12",
+            "licenses": [
+                {
+                    "type": "Apache-2.0",
+                    "link": "https://github.com/apache/logging-log4net/blob/dbad144815221ffe4ed85efa73134583253dc75b/LICENSE",
+                    "name": "LICENSE"
+                }
+            ]
+        },
+        {
+            "name": "Microsoft.Bcl.HashCode",
+            "link": "https://github.com/dotnet/corefx",
+            "version": "1.1.1",
+            "licenses": [
+                {
+                    "type": "MIT",
+                    "link": "https://github.com/dotnet/corefx/blob/bdaf5f50f035df0aa98bd69b400b5d1dcff6a7b0/LICENSE",
+                    "name": "LICENSE"
+                }
+            ]
+        },
+        {
+            "name": "Microsoft.Web.Xdt",
+            "link": "https://www.nuget.org/packages/Microsoft.Web.Xdt/3.1.0",
+            "version": "3.1.0",
+            "licenses": [
+                {
+                    "type": "Apache-2.0",
+                    "link": "https://licenses.nuget.org/Apache-2.0"
+                }
+            ]
+        },
+        {
+            "name": "Newtonsoft.Json",
+            "link": "https://github.com/JamesNK/Newtonsoft.Json",
+            "version": "13.0.1",
+            "licenses": [
+                {
+                    "type": "MIT",
+                    "link": "https://github.com/JamesNK/Newtonsoft.Json/blob/ae9fe44e1323e91bcbd185ca1a14099fba7c021f/LICENSE.md",
+                    "name": "LICENSE.md"
+                }
+            ]
+        },
+        {
+            "name": "Rhino.Licensing",
+            "link": "https://github.com/ayende/rhino-licensing",
+            "modifiedLink": "https://github.com/chocolatey/rhino-licensing",
+            "version": "1.4.1",
+            "licenses": [
+                {
+                    "type": "BSD-3-Clause",
+                    "link": "https://github.com/ayende/rhino-licensing/blob/1fc90c984b0c3012465a73afae0a53492c969eb5/license.txt",
+                    "name": "license.txt"
+                }
+            ]
+        },
+        {
+            "name": "Shim Generator (shimgen)",
+            "link": "https://github.com/chocolatey/shimgen",
+            "version": "2.0.0",
+            "licenses": [
+                {
+                    "type": "OTHER",
+                    "link": "https://github.com/chocolatey/choco/blob/d25f993696b4d665ee2dc94ceb0937a2ed5698eb/src/chocolatey.resources/tools/shimgen.license.txt"
+                }
+            ]
+        },
+        {
+            "name": "SimpleInjector",
+            "link": "https://simpleinjector.org/",
+            "version": "2.8.3",
+            "licenses": [
+                {
+                    "type": "MIT",
+                    "link": "https://github.com/simpleinjector/SimpleInjector/blob/0687195a7691363d4b4918e36b5e4d708e88253c/licence.txt",
+                    "name": "licence.txt"
+                }
+            ]
+        },
+        {
+            "name": "System.Reactive",
+            "link": "https://github.com/dotnet/reactive",
+            "version": "rxnet-v5.0.0",
+            "licenses": [
+                {
+                    "type": "MIT",
+                    "link": "https://github.com/dotnet/reactive/blob/8a2df0b7850a373b3bad68b43b3839d1cb47eb2e/LICENSE",
+                    "name": "LICENSE"
+                }
+            ]
+        },
+        {
+            "name": "System.Runtime.CompilerServices.Unsafe",
+            "link": "https://www.nuget.org/packages/System.Runtime.CompilerServices.Unsafe/4.5.3",
+            "version": "4.5.3",
+            "licenses": [
+                {
+                    "type": "MIT",
+                    "link": "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT",
+                    "name": "LICENSE.TXT"
+                }
+            ]
+        },
+        {
+            "name": "System.Threading.Tasks.Extensions",
+            "link": "https://www.nuget.org/packages/System.Threading.Tasks.Extensions/4.5.4",
+            "version": "4.5.4",
+            "licenses": [
+                {
+                    "type": "MIT",
+                    "link": "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT",
+                    "name": "LICENSE.TXT"
+                }
+            ]
+        }
+    ]
+}
