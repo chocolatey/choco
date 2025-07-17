@@ -36,7 +36,7 @@
             "licenses": [
                 {
                     "type": "Apache-2.0",
-                    "link": "https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENS",
+                    "link": "https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENSE",
                     "name": "LICENSE"
                 }
             ]
@@ -144,7 +144,7 @@
             "licenses": [
                 {
                     "type": "MIT",
-                    "link": "https://github.com/dotnet/reactive/blob/8a2df0b7850a373b3bad68b43b3839d1cb47eb2e/LICENSE",
+                    "link": "https://github.com/dotnet/reactive/blob/103c252a0ec94eac753f353131ad95cc0be1b390/LICENSE",
                     "name": "LICENSE"
                 }
             ]
