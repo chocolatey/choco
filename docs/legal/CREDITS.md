@@ -15,7 +15,7 @@ Chocolatey uses a number of 3rd party components. Their details are below.
 * [Chocolatey CLI / Chocolatey.Lib](#chocolatey-cli--chocolateylib)
   * [Apache v2.0 License](#apache-v20-license-1)
     * [Checksum@0.3.1](#checksum031)
-    * [Chocolatey.NuGet.Client@3.4.2](#chocolateynugetclient342)
+    * [Chocolatey.NuGet.Client@3.4.3](#chocolateynugetclient343)
     * [log4net@rel/2.0.12](#log4netrel2012)
     * [Microsoft.Web.Xdt@3.1.0](#microsoftwebxdt310)
   * [BSD-3-Clause](#bsd-3-clause-1)
@@ -29,7 +29,7 @@ Chocolatey uses a number of 3rd party components. Their details are below.
     * [System.Runtime.CompilerServices.Unsafe@4.5.3](#systemruntimecompilerservicesunsafe453)
     * [System.Threading.Tasks.Extensions@4.5.4](#systemthreadingtasksextensions454)
   * [Other](#other)
-    * [7-Zip@24.08](#7-zip2408)
+    * [7-Zip@24.09](#7-zip2409)
     * [Shim Generator (shimgen)@2.0.0](#shim-generator-\(shimgen\)200)
 
 ## Open Source License Types (Reference)
@@ -297,7 +297,7 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 [Checksum](https://github.com/chocolatey/checksum) - [License terms.](https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENSE)
 
-#### Chocolatey.NuGet.Client@3.4.2
+#### Chocolatey.NuGet.Client@3.4.3
 
 [Chocolatey.NuGet.Client](https://github.com/NuGet/NuGet.Client) [(modified)](https://github.com/chocolatey/NuGet.Client) - [License terms.](https://github.com/NuGet/NuGet.Client/blob/72f9f2b2eab28c9d91a22065c55aa7702abf7e01/LICENSE.txt)
 
@@ -347,7 +347,7 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 ### Other
 
-#### 7-Zip@24.08
+#### 7-Zip@24.09
 
 [7-Zip](https://www.7-zip.org/) - [License terms.](https://www.7-zip.org/license.txt)
 
