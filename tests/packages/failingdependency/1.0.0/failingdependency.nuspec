@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>failingdependency</id>
+    <version>1.0.0</version>
+    <title>dependencyfailure (Install)</title>
+    <authors>Chocolatey Software</authors>
+    <projectUrl>https://chocolatey.org</projectUrl>
+    <tags>dependencyfailure admin</tags>
+    <summary>Package that fails to install by setting `ChocolateyExitCode` to `15608`. Used as part of dependency tree.</summary>
+    <description>Package that fails to install by setting `ChocolateyExitCode` to `15608`. Used as part of dependency tree.</description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
