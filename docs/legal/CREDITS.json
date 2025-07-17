@@ -4,12 +4,12 @@
     "link": "https://github.com/chocolatey/choco",
     "licenseName": "LICENSE",
     "licenseLink": "https://github.com/chocolatey/choco/blob/master/LICENSE",
-    "version": "2.5.0",
+    "version": "2.0.0",
     "dependencies": [
         {
             "name": "7-Zip",
             "link": "https://www.7-zip.org/",
-            "version": "24.09",
+            "version": "21.07",
             "licenses": [
                 {
                     "type": "OTHER",
@@ -32,11 +32,11 @@
         {
             "name": "Checksum",
             "link": "https://github.com/chocolatey/checksum",
-            "version": "0.3.1",
+            "version": "0.2.0",
             "licenses": [
                 {
                     "type": "Apache-2.0",
-                    "link": "https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENS",
+                    "link": "https://github.com/chocolatey/checksum/blob/e6f5645610c7bc15084b48f69d4cdb056106f956/LICENSE",
                     "name": "LICENSE"
                 }
             ]
@@ -45,7 +45,7 @@
             "name": "Chocolatey.NuGet.Client",
             "link": "https://github.com/NuGet/NuGet.Client",
             "modifiedLink": "https://github.com/chocolatey/NuGet.Client",
-            "version": "3.4.3",
+            "version": "3.1.0",
             "licenses": [
                 {
                     "type": "Apache-2.0",
@@ -80,8 +80,8 @@
         },
         {
             "name": "Microsoft.Web.Xdt",
-            "link": "https://www.nuget.org/packages/Microsoft.Web.Xdt/3.1.0",
-            "version": "3.1.0",
+            "link": "https://www.nuget.org/packages/Microsoft.Web.Xdt/2.1.1",
+            "version": "2.1.1",
             "licenses": [
                 {
                     "type": "Apache-2.0",
@@ -117,7 +117,7 @@
         {
             "name": "Shim Generator (shimgen)",
             "link": "https://github.com/chocolatey/shimgen",
-            "version": "2.0.0",
+            "version": "1.0.0",
             "licenses": [
                 {
                     "type": "OTHER",
@@ -144,7 +144,7 @@
             "licenses": [
                 {
                     "type": "MIT",
-                    "link": "https://github.com/dotnet/reactive/blob/8a2df0b7850a373b3bad68b43b3839d1cb47eb2e/LICENSE",
+                    "link": "https://github.com/dotnet/reactive/blob/103c252a0ec94eac753f353131ad95cc0be1b390/LICENSE",
                     "name": "LICENSE"
                 }
             ]

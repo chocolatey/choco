@@ -14,10 +14,10 @@ Chocolatey uses a number of 3rd party components. Their details are below.
   * [Chocolatey Open Source](#chocolatey-open-source)
 * [Chocolatey CLI / Chocolatey.Lib](#chocolatey-cli--chocolateylib)
   * [Apache v2.0 License](#apache-v20-license-1)
-    * [Checksum@0.3.1](#checksum031)
-    * [Chocolatey.NuGet.Client@3.4.3](#chocolateynugetclient343)
+    * [Checksum@0.2.0](#checksum020)
+    * [Chocolatey.NuGet.Client@3.1.0](#chocolateynugetclient310)
     * [log4net@rel/2.0.12](#log4netrel2012)
-    * [Microsoft.Web.Xdt@3.1.0](#microsoftwebxdt310)
+    * [Microsoft.Web.Xdt@2.1.1](#microsoftwebxdt211)
   * [BSD-3-Clause](#bsd-3-clause-1)
     * [Rhino.Licensing@1.4.1](#rhinolicensing141)
   * [MIT License](#mit-license-1)
@@ -29,8 +29,8 @@ Chocolatey uses a number of 3rd party components. Their details are below.
     * [System.Runtime.CompilerServices.Unsafe@4.5.3](#systemruntimecompilerservicesunsafe453)
     * [System.Threading.Tasks.Extensions@4.5.4](#systemthreadingtasksextensions454)
   * [Other](#other)
-    * [7-Zip@24.09](#7-zip2409)
-    * [Shim Generator (shimgen)@2.0.0](#shim-generator-\(shimgen\)200)
+    * [7-Zip@21.07](#7-zip2107)
+    * [Shim Generator (shimgen)@1.0.0](#shim-generator-\(shimgen\)100)
 
 ## Open Source License Types (Reference)
 
@@ -287,17 +287,17 @@ Chocolatey Open Source components fall under the [Apache v2.0 license](https://w
 https://www.apache.org/licenses/LICENSE-2.0
 ```
 
-* [Chocolatey CLI / Chocolatey.Lib](https://github.com/chocolatey/choco) - [License terms](https://github.com/chocolatey/choco/blob/master/LICENSE)
+* [Chocolatey CLI / Chocolatey.Lib](https://github.com/chocolatey/choco) - [License terms.](https://github.com/chocolatey/choco/blob/master/LICENSE)
 
 ## Chocolatey CLI / Chocolatey.Lib
 
 ### Apache v2.0 License
 
-#### Checksum@0.3.1
+#### Checksum@0.2.0
 
-[Checksum](https://github.com/chocolatey/checksum) - [License terms.](https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENS)
+[Checksum](https://github.com/chocolatey/checksum) - [License terms.](https://github.com/chocolatey/checksum/blob/e6f5645610c7bc15084b48f69d4cdb056106f956/LICENSE)
 
-#### Chocolatey.NuGet.Client@3.4.3
+#### Chocolatey.NuGet.Client@3.1.0
 
 [Chocolatey.NuGet.Client](https://github.com/NuGet/NuGet.Client) [(modified)](https://github.com/chocolatey/NuGet.Client) - [License terms.](https://github.com/NuGet/NuGet.Client/blob/72f9f2b2eab28c9d91a22065c55aa7702abf7e01/LICENSE.txt)
 
@@ -305,9 +305,9 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 [log4net](https://github.com/apache/logging-log4net) - [License terms.](https://github.com/apache/logging-log4net/blob/dbad144815221ffe4ed85efa73134583253dc75b/LICENSE)
 
-#### Microsoft.Web.Xdt@3.1.0
+#### Microsoft.Web.Xdt@2.1.1
 
-[Microsoft.Web.Xdt](https://www.nuget.org/packages/Microsoft.Web.Xdt/3.1.0) - [License terms.](https://licenses.nuget.org/Apache-2.0)
+[Microsoft.Web.Xdt](https://www.nuget.org/packages/Microsoft.Web.Xdt/2.1.1) - [License terms.](https://licenses.nuget.org/Apache-2.0)
 
 ### BSD-3-Clause
 
@@ -335,7 +335,7 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 #### System.Reactive@rxnet-v5.0.0
 
-[System.Reactive](https://github.com/dotnet/reactive) - [License terms.](https://github.com/dotnet/reactive/blob/8a2df0b7850a373b3bad68b43b3839d1cb47eb2e/LICENSE)
+[System.Reactive](https://github.com/dotnet/reactive) - [License terms.](https://github.com/dotnet/reactive/blob/103c252a0ec94eac753f353131ad95cc0be1b390/LICENSE)
 
 #### System.Runtime.CompilerServices.Unsafe@4.5.3
 
@@ -347,7 +347,7 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 ### Other
 
-#### 7-Zip@24.09
+#### 7-Zip@21.07
 
 [7-Zip](https://www.7-zip.org/) - [License terms.](https://www.7-zip.org/license.txt)
 
@@ -495,7 +495,7 @@ The license for original unRAR code has the following restriction:
 --
 ```
 
-#### Shim Generator (shimgen)@2.0.0
+#### Shim Generator (shimgen)@1.0.0
 
 [Shim Generator (shimgen)](https://github.com/chocolatey/shimgen) - [License terms.](https://github.com/chocolatey/choco/blob/d25f993696b4d665ee2dc94ceb0937a2ed5698eb/src/chocolatey.resources/tools/shimgen.license.txt)
 
