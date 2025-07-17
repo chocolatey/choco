@@ -63,6 +63,7 @@
     </Compile>
     <Compile Include="Commands\GetEnvironmentVariableCommand.cs" />
     <Compile Include="Commands\GetEnvironmentVariableNamesCommand.cs" />
+    <Compile Include="Commands\GetPackageScriptParametersCommand.cs" />
     <Compile Include="Commands\InstallChocolateyPathCommand.cs" />
     <Compile Include="Commands\SetEnvironmentVariableCommand.cs" />
     <Compile Include="Commands\TestProcessAdminRightsCommand.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="Commands\UpdateSessionEnvironmentCommand.cs" />
     <Compile Include="Helpers\Elevation.cs" />
     <Compile Include="Helpers\EnvironmentHelper.cs" />
+    <Compile Include="Helpers\PackageParameter.cs" />
     <Compile Include="Helpers\Paths.cs" />
     <Compile Include="Helpers\ProcessInformation.cs" />
     <Compile Include="Helpers\PSHelper.cs" />
