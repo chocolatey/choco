@@ -4,12 +4,12 @@
     "link": "https://github.com/chocolatey/choco",
     "licenseName": "LICENSE",
     "licenseLink": "https://github.com/chocolatey/choco/blob/master/LICENSE",
-    "version": "2.1.0",
+    "version": "2.4.0",
     "dependencies": [
         {
             "name": "7-Zip",
             "link": "https://www.7-zip.org/",
-            "version": "21.07",
+            "version": "24.08",
             "licenses": [
                 {
                     "type": "OTHER",
@@ -32,11 +32,11 @@
         {
             "name": "Checksum",
             "link": "https://github.com/chocolatey/checksum",
-            "version": "0.2.0",
+            "version": "0.3.1",
             "licenses": [
                 {
                     "type": "Apache-2.0",
-                    "link": "https://github.com/chocolatey/checksum/blob/e6f5645610c7bc15084b48f69d4cdb056106f956/LICENSE",
+                    "link": "https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENSE",
                     "name": "LICENSE"
                 }
             ]
@@ -45,7 +45,7 @@
             "name": "Chocolatey.NuGet.Client",
             "link": "https://github.com/NuGet/NuGet.Client",
             "modifiedLink": "https://github.com/chocolatey/NuGet.Client",
-            "version": "3.1.0",
+            "version": "3.4.2",
             "licenses": [
                 {
                     "type": "Apache-2.0",
@@ -80,8 +80,8 @@
         },
         {
             "name": "Microsoft.Web.Xdt",
-            "link": "https://www.nuget.org/packages/Microsoft.Web.Xdt/2.1.1",
-            "version": "2.1.1",
+            "link": "https://www.nuget.org/packages/Microsoft.Web.Xdt/3.1.0",
+            "version": "3.1.0",
             "licenses": [
                 {
                     "type": "Apache-2.0",
@@ -117,7 +117,7 @@
         {
             "name": "Shim Generator (shimgen)",
             "link": "https://github.com/chocolatey/shimgen",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "licenses": [
                 {
                     "type": "OTHER",
