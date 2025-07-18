@@ -287,7 +287,7 @@ Chocolatey Open Source components fall under the [Apache v2.0 license](https://w
 https://www.apache.org/licenses/LICENSE-2.0
 ```
 
-* [Chocolatey CLI / Chocolatey.Lib](https://github.com/chocolatey/choco) - [License terms](https://github.com/chocolatey/choco/blob/master/LICENSE)
+* [Chocolatey CLI / Chocolatey.Lib](https://github.com/chocolatey/choco) - [License terms.](https://github.com/chocolatey/choco/blob/master/LICENSE)
 
 ## Chocolatey CLI / Chocolatey.Lib
 
@@ -295,7 +295,7 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 #### Checksum@0.3.1
 
-[Checksum](https://github.com/chocolatey/checksum) - [License terms.](https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENS)
+[Checksum](https://github.com/chocolatey/checksum) - [License terms.](https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENSE)
 
 #### Chocolatey.NuGet.Client@3.4.3
 
@@ -335,7 +335,7 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 #### System.Reactive@rxnet-v5.0.0
 
-[System.Reactive](https://github.com/dotnet/reactive) - [License terms.](https://github.com/dotnet/reactive/blob/8a2df0b7850a373b3bad68b43b3839d1cb47eb2e/LICENSE)
+[System.Reactive](https://github.com/dotnet/reactive) - [License terms.](https://github.com/dotnet/reactive/blob/103c252a0ec94eac753f353131ad95cc0be1b390/LICENSE)
 
 #### System.Runtime.CompilerServices.Unsafe@4.5.3
 
