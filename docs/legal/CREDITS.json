@@ -156,7 +156,8 @@
             "licenses": [
                 {
                     "type": "MIT",
-                    "link": "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT",
+                    "link": "https://github.com/dotnet/corefx/blob/b8b81a66738bb10ef0790023598396861d92b2c4/LICENSE.TXT",
+                    "info": "No tag present for this specific release point; falling back to the current permalink of the latest license file from the default branch.",
                     "name": "LICENSE.TXT"
                 }
             ]
@@ -168,7 +169,8 @@
             "licenses": [
                 {
                     "type": "MIT",
-                    "link": "https://github.com/dotnet/corefx/blob/master/LICENSE.TXT",
+                    "link": "https://github.com/dotnet/corefx/blob/b8b81a66738bb10ef0790023598396861d92b2c4/LICENSE.TXT",
+                    "info": "No tag present for this specific release point; falling back to the current permalink of the latest license file from the default branch.",
                     "name": "LICENSE.TXT"
                 }
             ]
