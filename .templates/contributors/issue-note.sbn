@@ -1,13 +1,13 @@
 {{
 func IssueDescription
     if $0.is_pull_request
-        $description = "[__!" + $0.public_number + "__]"
+        $description = "[!" + $0.public_number + "]"
     else
-        $description = "[__#" + $0.public_number + "__]"
+        $description = "[#" + $0.public_number + "]"
     end
     $description = $description + "(" + $0.html_url + ")"
     if $1
-        $description = $0.title + " - see " + $description
+        $description = $0.title + "." + "\n  - See " + $description
     end
     if $0.user
         $description = $description + " by [" + $0.user.login + "](" + $0.user.html_url + ")"
@@ -23,7 +23,7 @@ func LinkedIssuesDescription
     for linkedIssue in $0
         if linkedIssue.is_pull_request
             if $countPRs == 0
-                $resolvedBy = " resolved in "
+                $resolvedBy = ", resolved in "
             else
                 $resolvedBy = $resolvedBy + ", "
             end
