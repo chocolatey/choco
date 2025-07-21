@@ -182,6 +182,69 @@ namespace chocolatey.tests.infrastructure.app.nuget
             }
         }
 
+        public class When_A_Password_Using_Non_ASCII_Characters_With_Explicit_Username_and_Password : ChocolateyNugetCredentialProviderSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Sources = Configuration.ExplicitSources = TargetSourceUrl;
+                Configuration.SourceCommand.Username = "user";
+                Configuration.SourceCommand.Password = "tøtally_sæcure_påssword!!!";
+            }
+
+            [Fact]
+            public void Should_Find_The_Saved_Source_And_Return_The_Credential()
+            {
+                Result.Should().NotBeNull();
+            }
+
+            [Fact]
+            public void Should_Provide_The_Correct_Username()
+            {
+                Result.UserName.Should().Be(Username);
+            }
+
+            [Fact]
+            public void Should_Provide_Password_Using_1252_Codepage()
+            {
+                // The following looks odd, but this is a workaround to
+                // allow passwords using non-ascii characters to be used
+                // against sources.
+                Result.Password.Should().Be("tÃ¸tally_sÃ¦cure_pÃ¥ssword!!!");
+            }
+        }
+
+        public class When_A_Password_Using_Non_ASCII_Characters_With_Implicit_Usernam_And_Password : ChocolateyNugetCredentialProviderSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Sources = Configuration.ExplicitSources = TargetSourceName;
+                Configuration.MachineSources[1].EncryptedPassword = NugetEncryptionUtility.EncryptString("tøtally_sæcure_påssword!!!");
+            }
+
+            [Fact]
+            public void Should_Find_The_Saved_Source_And_Return_The_Credential()
+            {
+                Result.Should().NotBeNull();
+            }
+
+            [Fact]
+            public void Should_Provide_The_Correct_Username()
+            {
+                Result.UserName.Should().Be(Username);
+            }
+
+            [Fact]
+            public void Should_Provide_Password_Using_1252_Codepage()
+            {
+                // The following looks odd, but this is a workaround to
+                // allow passwords using non-ascii characters to be used
+                // against sources.
+                Result.Password.Should().Be("tÃ¸tally_sÃ¦cure_pÃ¥ssword!!!");
+            }
+        }
+
         public class Looks_Up_Source_Url_When_Name_And_Credentials_Is_Provided : ChocolateyNugetCredentialProviderSpecsBase
         {
             public override void Context()
