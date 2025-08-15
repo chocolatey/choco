@@ -1,4 +1,4 @@
-name: Top Issues Action
+name: Top Votes Action
 on:
   workflow_dispatch:
   schedule:
@@ -6,11 +6,11 @@ on:
 
 jobs:
   ShowTopIssues:
-    name: Display top issues
+    name: Display top votes
     runs-on: ubuntu-latest
     steps:
-      - name: Run top issues action
-        uses: rickstaa/top-issues-action@v1.3.101
+      - name: Run top votes action
+        uses: pauby/top-votes-action@v1
         env:
           github_token: ${{ secrets.GITHUB_TOKEN }}
         with:
