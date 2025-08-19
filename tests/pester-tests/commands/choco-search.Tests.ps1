@@ -499,7 +499,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain packages and version with a space between them" {
-                $Output.Lines | Should -Contain "package13 11.11.11" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 11.11.11 Downloads cached for licensed users" -Because $Output.String
             }
 
             It "Should contain a summary with 11 package versions" {
@@ -517,12 +517,12 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain the following package versions" {
-                $Output.Lines | Should -Contain "package13 11.11.11" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 9.9.9" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 7.7.7" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 5.5.5" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 3.3.3" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 1.1.1" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 11.11.11 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 9.9.9 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 7.7.7 [Approved] Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 5.5.5 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 3.3.3 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 1.1.1 Downloads cached for licensed users" -Because $Output.String
             }
 
             It "Should contain a summary with 6 package versions" {
@@ -540,12 +540,12 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain the following package versions" {
-                $Output.Lines | Should -Contain "package13 11.11.11" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 9.9.9" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 7.7.7" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 5.5.5" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 3.3.3" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 1.1.1" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 11.11.11 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 9.9.9 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 7.7.7 [Approved] Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 5.5.5 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 3.3.3 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 1.1.1 Downloads cached for licensed users" -Because $Output.String
             }
 
             It "Should contain a summary with 6 package versions" {
@@ -563,12 +563,12 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain the following package versions" {
-                $Output.Lines | Should -Contain "package13 10.10.10" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 8.8.8" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 7.7.7" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 6.6.6" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 4.4.4" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 2.2.2" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 10.10.10 [Approved] - Possibly Broken" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 8.8.8 [Approved] - Possibly Broken" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 7.7.7 [Approved] Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 6.6.6 [Approved] - Possibly Broken" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 4.4.4 [Approved] - Possibly Broken" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 2.2.2 [Approved] - Possibly Broken" -Because $Output.String
             }
 
             It "Should contain a summary with 6 package versions" {
@@ -586,7 +586,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain the following package versions" {
-                $Output.Lines | Should -Contain "package13 7.7.7" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 7.7.7 [Approved] Downloads cached for licensed users" -Because $Output.String
             }
 
             It "Should contain a summary with 1 package versions" {
@@ -604,7 +604,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain the following package versions" {
-                $Output.Lines | Should -Contain "package13 7.7.7" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 7.7.7 [Approved] Downloads cached for licensed users" -Because $Output.String
             }
 
             It "Should contain a summary with 1 package versions" {
@@ -612,9 +612,9 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
         }
 
-        Context "Searching of all package versions of Package13 where packages are approved, have a download cache, and are approved" {
+        Context "Searching of all package versions of Package13 where packages are approved, have a download cache" {
             BeforeAll {
-                $Output = Invoke-Choco $_ Package13 --exact --all-versions --approved-only --download-cache --approved-only
+                $Output = Invoke-Choco $_ Package13 --exact --all-versions --approved-only --download-cache
             }
 
             It "Exits with Success (0)" {
@@ -622,7 +622,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain the following package versions" {
-                $Output.Lines | Should -Contain "package13 7.7.7" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 7.7.7 [Approved] Downloads cached for licensed users" -Because $Output.String
             }
 
             It "Should contain a summary with 1 package versions" {
@@ -640,12 +640,12 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain the following package versions" {
-                $Output.Lines | Should -Contain "package13 11.11.11" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 9.9.9" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 7.7.7" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 5.5.5" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 3.3.3" -Because $Output.String
-                $Output.Lines | Should -Contain "package13 1.1.1" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 11.11.11 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 9.9.9 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 7.7.7 [Approved] Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 5.5.5 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 3.3.3 Downloads cached for licensed users" -Because $Output.String
+                $Output.Lines | Should -Contain "Package13 1.1.1 Downloads cached for licensed users" -Because $Output.String
             }
 
             It "Should contain a summary with 6 package versions" {
@@ -666,13 +666,13 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             # the number of packages may change over
             # time, but it is fine for now.
             It "Should contain a summary with 13 package versions" {
-                $Output.Lines | Should -Contain "13 packages found." -Because $Output.String
+                $Output.Lines | Should -Contain "44 packages found." -Because $Output.String
             }
         }
 
         Context "Searching for the word 'test' with --id-starts-with" {
             BeforeAll {
-                $Output = Invoke-Choco $_ test --id-stats-with
+                $Output = Invoke-Choco $_ test --id-starts-with
             }
 
             It "Exits with Success (0)" {
@@ -680,7 +680,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain the following packages" {
-                $Output.Lines | Should -Contain "test-chocolateypath 0.1.0" -Because $Output.String
+                $Output.Lines | Should -Contain "test-chocolateypath 0.1.0 [Approved]" -Because $Output.String
             }
 
             It "Should contain a summary with 1 package versions" {
@@ -698,9 +698,9 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain the following packages" {
-                $Output.Lines | Should -Contain "get-chocolateyunzip-test 0.0.2" -Because $Output.String
-                $Output.Lines | Should -Contain "install-chocolateyinstallpackage-tests 1.0.0" -Because $Output.String
-                $Output.Lines | Should -Contain "test-chocolateypath 0.1.0" -Because $Output.String
+                $Output.Lines | Should -Contain "get-chocolateyunzip-test 0.0.2 [Approved]" -Because $Output.String
+                $Output.Lines | Should -Contain "install-chocolateyinstallpackage-tests 1.0.0 [Approved]" -Because $Output.String
+                $Output.Lines | Should -Contain "test-chocolateypath 0.1.0 [Approved]" -Because $Output.String
             }
 
             It "Should contain a summary with 3 package versions" {
@@ -718,8 +718,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             It "Should contain the following packages" {
-                $Output.Lines | Should -Contain "msi.template 1.0.2" -Because $Output.String
-                $Output.Lines | Should -Contain "zip.template 1.0.0" -Because $Output.String
+                $Output.Lines | Should -Contain "msi.template 1.0.2 [Approved]" -Because $Output.String
+                $Output.Lines | Should -Contain "zip.template 1.0.0 [Approved]" -Because $Output.String
             }
 
             It "Should contain a summary with 2 package versions" {
@@ -740,8 +740,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "add-path|1.0.0" -Because $Output.String
             }
 
-            It "Should contain a summary with 71 package versions" {
-                $Output.Lines | Should -Contain "71 packages found." -Because $Output.String
+            It "Should contain 71 package versions" {
+                $Output.Lines | Should -HaveCount 71 -Because $Output.String
             }
         }
 
@@ -760,18 +760,18 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 # --order-by-popularity so we need to
                 # actually grab the 3rd line
                 $Output.Lines[0] | Should -Contain "'--order-by-popularity' is deprecated and will be removed in a future release." -Because $Output.String
-                $Output.Lines[1] | Should -Contain " Use '--order-by='Popularity'' instead." -Because $Output.String
+                $Output.Lines[1] | Should -Contain "Use '--order-by='Popularity'' instead." -Because $Output.String
                 $Output.Lines[2] | Should -Contain "package13|10.10.10" -Because $Output.String
             }
 
-            It "Should contain a summary with 71 package versions" {
-                $Output.Lines | Should -Contain "71 packages found." -Because $Output.String
+            It "Should contain 71 package versions (73 lines)" {
+                $Output.Lines | Should -HaveCount 73 -Because $Output.String
             }
         }
 
-        Context "Doing an open-ended search with --order-by=popularity and limit-output" {
+        Context "Doing an open-ended search with --order-by='popularity' and limit-output" {
             BeforeAll {
-                $Output = Invoke-Choco $_ --limit-output --order-by=popularity
+                $Output = Invoke-Choco $_ --limit-output --order-by='popularity'
             }
 
             It "Exits with Success (0)" {
@@ -782,14 +782,14 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "package13|10.10.10" -Because $Output.String
             }
 
-            It "Should contain a summary with 71 package versions" {
-                $Output.Lines | Should -Contain "71 packages found." -Because $Output.String
+            It "Should contain 71 package versions" {
+                $Output.Lines | Should -HaveCount 71 -Because $Output.String
             }
         }
 
-        Context "Doing an open-ended search with --order-by=title and limit-output" {
+        Context "Doing an open-ended search with --order-by='title' and limit-output" {
             BeforeAll {
-                $Output = Invoke-Choco $_ --limit-output --order-by=title
+                $Output = Invoke-Choco $_ --limit-output --order-by='title'
             }
 
             It "Exits with Success (0)" {
@@ -800,14 +800,14 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "business-only-license|19.0.0" -Because $Output.String
             }
 
-            It "Should contain a summary with 71 package versions" {
-                $Output.Lines | Should -Contain "71 packages found." -Because $Output.String
+            It "Should contain 71 package versions" {
+                $Output.Lines | Should -HaveCount 71 -Because $Output.String
             }
         }
 
-        Context "Doing an open-ended search with --order-by=id and limit-output" {
+        Context "Doing an open-ended search with --order-by='id' and limit-output" {
             BeforeAll {
-                $Output = Invoke-Choco $_ --limit-output --order-by=id
+                $Output = Invoke-Choco $_ --limit-output --order-by='id'
             }
 
             It "Exits with Success (0)" {
@@ -818,14 +818,14 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "add-path|1.0.0" -Because $Output.String
             }
 
-            It "Should contain a summary with 71 package versions" {
-                $Output.Lines | Should -Contain "71 packages found." -Because $Output.String
+            It "Should contain 71 package versions" {
+                $Output.Lines | Should -HaveCount 71 -Because $Output.String
             }
         }
 
-        Context "Doing an open-ended search with --order-by=lastpublished and limit-output" {
+        Context "Doing an open-ended search with --order-by='lastpublished' and limit-output" {
             BeforeAll {
-                $Output = Invoke-Choco $_ --limit-output --order-by=lastpublished
+                $Output = Invoke-Choco $_ --limit-output --order-by='lastpublished'
             }
 
             It "Exits with Success (0)" {
@@ -836,14 +836,14 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "package12|10.10.10" -Because $Output.String
             }
 
-            It "Should contain a summary with 71 package versions" {
-                $Output.Lines | Should -Contain "71 packages found." -Because $Output.String
+            It "Should contain 71 package versions" {
+                $Output.Lines | Should -HaveCount 71 -Because $Output.String
             }
         }
 
-        Context "Doing an open-ended search with --order-by=unsorted and limit-output" {
+        Context "Doing an open-ended search with --order-by='unsorted' and limit-output" {
             BeforeAll {
-                $Output = Invoke-Choco $_ --limit-output --order-by=popularity
+                $Output = Invoke-Choco $_ --limit-output --order-by='unsorted'
             }
 
             It "Exits with Success (0)" {
@@ -856,8 +856,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "package13|10.10.10" -Because $Output.String
             }
 
-            It "Should contain a summary with 71 package versions" {
-                $Output.Lines | Should -Contain "71 packages found." -Because $Output.String
+            It "Should contain 71 package versions" {
+                $Output.Lines | Should -HaveCount 71 -Because $Output.String
             }
         }
     }
