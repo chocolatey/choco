@@ -276,11 +276,12 @@ that uses these options.");
                     {
                         if (!(packageInfo != null && packageInfo.IsPinned && config.ListCommand.IgnorePinned))
                         {
-                            this.Log().Info(logger, () => "{0}{1}".FormatWith(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : " {0}{1}{2}{3}".FormatWith(
+                            this.Log().Info(logger, () => "{0}{1}".FormatWith(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : " {0}{1}{2}{3} {4}".FormatWith(
                                 packageLocalMetadata != null ? packageLocalMetadata.Version.ToFullStringChecked() : package.Identity.Version.ToFullStringChecked(),
                                 package.IsApproved ? " [Approved]" : string.Empty,
                                 package.IsDownloadCacheAvailable ? " Downloads cached for licensed users" : string.Empty,
-                                package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Possibly broken for FOSS users (due to original download location changes by vendor)" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
+                                package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Possibly broken for FOSS users (due to original download location changes by vendor)" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty,
+                                config.ListCommand.ShowLastUpdatedDate ? package.Published?.ToString("yyyy-MM-dd HH:mm:ss") ?? "Last updated not available" : string.Empty
                                 ))
                             );
 
