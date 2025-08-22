@@ -138,7 +138,10 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.Verbose = option != null)
                  .Add("ignore-pinned",
                      "Ignore Pinned - Ignore pinned packages. Defaults to false.",
-                     option => configuration.ListCommand.IgnorePinned = option != null);
+                     option => configuration.ListCommand.IgnorePinned = option != null)
+                 .Add("show-last-updated-date",
+                     "Show Date - Shows the last date the package was installed/updated.",
+                     option => configuration.ListCommand.ShowLastUpdatedDate = option != null);
         }
 
         public virtual int Count(ChocolateyConfiguration config)
