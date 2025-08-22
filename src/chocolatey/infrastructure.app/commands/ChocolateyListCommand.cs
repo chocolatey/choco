@@ -141,7 +141,10 @@ namespace chocolatey.infrastructure.app.commands
                      option => configuration.ListCommand.IgnorePinned = option != null)
                  .Add("show-last-updated-date",
                      "Show Date - Shows the last date the package was installed/updated.",
-                     option => configuration.ListCommand.ShowLastUpdatedDate = option != null);
+                     option => configuration.ListCommand.ShowLastUpdatedDate = option != null)
+                .Add("order-by-last-updated-date",
+                     "Order by Last Updated Date - Orders packages by date the package was installed/updated.",
+                     option => configuration.ListCommand.OrderBy = PackageOrder.LastPublished);
         }
 
         public virtual int Count(ChocolateyConfiguration config)
