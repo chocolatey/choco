@@ -6,6 +6,14 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip, CCR -Skip:($null 
         Remove-NuGetPaths
         $ApiKey = $env:API_KEY
         $RepositoryToUse = $env:PUSH_REPO
+        $CcrApiKey = 'c:\elasticsearch-setup\ccr-apikey.txt'
+
+        # Check if we're in a CCR Test Kitchen. If we are, utilize the local details.
+        if (Test-Path $CcrApiKey) {
+            $ApiKey = (Get-Content $CcrApiKey -Raw).Trim()
+            $RepositoryToUse = 'http://localhost/api/v2/'
+        }
+
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
