@@ -858,7 +858,8 @@
         It "Installs the expected version of the package" {
             "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec" | Should -Exist
             [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$PackageUnderTest\$PackageUnderTest.nuspec"
-            $XML.package.metadata.version | Should -Be "1.0"
+            # If the package was packaged with CLI 2.x it'll be 1.0.0, otherwise it will be 1.0.
+            '1.0', '1.0.0' | Should -Contain $XML.package.metadata.version -Because $Output.String
         }
 
         It "Outputs a message showing that installation was successful" {

@@ -173,7 +173,7 @@
         }
 
         It "Displays the package mvcmusicstore-db 1.2.0" {
-            $Output.Lines | Should -Contain "mvcmusicstore-db 1.2.0"
+            ($Output.Lines -match "^mvcmusicstore-db 1\.2\.0.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Displays <Title> with value <Value>" -ForEach $infoItems {
@@ -209,7 +209,7 @@
         }
 
         It "Displays the package mvcmusicstore-db 1.2.0" {
-            $Output.Lines | Should -Contain "mvcmusicstore-db 1.2.0"
+            ($Output.Lines -match "^mvcmusicstore-db 1\.2\.0.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Displays <Title> with value <Value>" -ForEach $infoItems {

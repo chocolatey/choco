@@ -692,7 +692,7 @@ To upgrade a local, or remote file, you may use:
         }
 
         It "Should report successful upgrade" {
-            $Output.Lines | Should -Contain "isdependency v2.0.0" -Because $Output.String
+            ($Output.Lines -match "^isdependency v2\.0\.0.*").Count | Should -Be 1 -Because $Output.String
             $Output.Lines | Should -Contain "Chocolatey upgraded 1/1 packages." -Because $Output.String
         }
 
