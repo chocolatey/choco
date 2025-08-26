@@ -1,4 +1,4 @@
-﻿Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand {
+﻿Describe "choco upgrade" -Tag Chocolatey, UpgradeCommand, CCR {
     BeforeAll {
         Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
@@ -249,7 +249,6 @@
         }
     }
 
-
     Context "Upgrading multiple packages at once" {
 
         BeforeAll {
@@ -316,7 +315,8 @@ To upgrade a local, or remote file, you may use:
     # We are marking this test as internal, as the package we need to make use
     # of downloads a zip archive from a internal server, and the package is also
     # only located on an internal feed.
-    Context "Upgrading non-existing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
+    # Exclude from CCR testing as `install-chocolateyzip` is not seeded, and this test validates CLI internals.
+    Context "Upgrading non-existing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation, CCRExcluded {
         BeforeAll {
             $paths = Restore-ChocolateyInstallSnapshot
 
@@ -466,7 +466,8 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    Context "Upgrading a package when installer is locked" {
+    # Exclude from CCR testing as `hasinnoinstaller` is not seeded, and this test validates CLI internals.
+    Context "Upgrading a package when installer is locked" -Tag CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -513,7 +514,8 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    Context "Upgrading a package when non-package file is locked before initial installation" {
+    # Exclude from CCR testing as `hasinnoinstaller` is not seeded, and this test validates CLI internals.
+    Context "Upgrading a package when non-package file is locked before initial installation" -Tag CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -566,7 +568,8 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    Context "Upgrading a package when non-package file is locked after initial installation" {
+    # Exclude from CCR testing as `hasinnoinstaller` is not seeded, and this test validates CLI internals.
+    Context "Upgrading a package when non-package file is locked after initial installation" -Tag CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -650,7 +653,8 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    Context "Upgrading a package with a non-normalized version number" -Tag VersionNormalization {
+    # Exclude from CCR testing as `nonnormalizedversions` is not seeded to CCR.
+    Context "Upgrading a package with a non-normalized version number" -Tag VersionNormalization, CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $PackageUnderTest = 'nonnormalizedversions'
@@ -842,7 +846,8 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    Context 'Upgrading a package using a single quote in the parameters and remembering arguments' -Tag Arguments {
+    # Exclude from CCR testing as `test-environment` is not seeded to CCR, and this test is testing CLI internals
+    Context 'Upgrading a package using a single quote in the parameters and remembering arguments' -Tag Arguments, CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -865,7 +870,8 @@ To upgrade a local, or remote file, you may use:
         }
     }
 
-    Context 'Upgrading a package using double-dash arguments in package arguments' -Tag Arguments {
+    # Exclude from CCR testing as `test-environment` is not seeded to CCR, and this test is testing CLI internals
+    Context 'Upgrading a package using double-dash arguments in package arguments' -Tag Arguments, CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -893,7 +899,8 @@ To upgrade a local, or remote file, you may use:
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths
 
-    Context 'Upgrading a package with unsupported nuspec elements shows a warning' {
+    # Exclude from CCR testing as this test validates CLI internals only.
+    Context 'Upgrading a package with unsupported nuspec elements shows a warning' -Tag CCRExcluded {
 
         BeforeDiscovery {
             $testCases = @(

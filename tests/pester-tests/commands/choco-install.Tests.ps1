@@ -1,4 +1,4 @@
-﻿Describe "choco install" -Tag Chocolatey, InstallCommand {
+﻿Describe "choco install" -Tag Chocolatey, InstallCommand, CCR {
     BeforeDiscovery {
         $isLicensed30OrMissingVersion = Test-PackageIsEqualOrHigher 'chocolatey.extension' '3.0.0-beta' -AllowMissingPackage
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
@@ -735,7 +735,8 @@
         }
     }
 
-    Context "Installing a failing package created backup in lib-bad" {
+    # Exclude from CCR testing as `failingdependency` is not seeded, and this test validates CLI internals.
+    Context "Installing a failing package created backup in lib-bad" -Tag CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -1640,7 +1641,8 @@ To install a local, or remote file, you may use:
         }
     }
 
-    Context "Installing package that extracts local zip archive while disabling logging" {
+    # Exclude from CCR testing as `zip-log-disable-test` is not seeded, and this test validates CLI internals.
+    Context "Installing package that extracts local zip archive while disabling logging" -Tag CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -1656,7 +1658,8 @@ To install a local, or remote file, you may use:
         }
     }
 
-    Context "Installing package that extracts external zip archive while disabling logging" -Tag Internal {
+    # Exclude from CCR testing as `zip-log-disable-test-external` is not seeded, and this test validates CLI internals.
+    Context "Installing package that extracts external zip archive while disabling logging" -Tag Internal, CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -1724,7 +1727,8 @@ To install a local, or remote file, you may use:
     # We are marking this test as internal, as the package we need to make use
     # of downloads a zip archive from a internal server, and the package is also
     # only located on an internal feed.
-    Context "Installing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation {
+    # Exclude from CCR testing as `install-chocolateyzip` is not seeded, and this test validates CLI internals.
+    Context "Installing package while specifying a cache location (Arg: <_>)" -ForEach '-c', '--cache', '--cachelocation', '--cache-location' -Tag Internal, LongPaths, CacheLocation, CCRExcluded {
         BeforeAll {
             $paths = Restore-ChocolateyInstallSnapshot
 
@@ -1940,6 +1944,7 @@ To install a local, or remote file, you may use:
         }
     }
 
+    # Exclude from CCR testing as `nonnormalizedversions` is not seeded to CCR.
     Context "Installing a package with a non-normalized version number" -ForEach @(
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1' ; NuspecVersion = '01.0.0.0' }
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0' ; NuspecVersion = '01.0.0.0' }
@@ -1948,7 +1953,7 @@ To install a local, or remote file, you may use:
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' ; NuspecVersion = '01.0.0.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '004.0.01.0' ; NuspecVersion = '004.0.01.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '0000004.00000.00001.0000' ; NuspecVersion = '004.0.01.0' }
-    ) -Tag VersionNormalization {
+    ) -Tag VersionNormalization, CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $PackageUnderTest = 'nonnormalizedversions'
@@ -2031,7 +2036,8 @@ To install a local, or remote file, you may use:
 
     # Tagged as Internal as this package needs to be packaged by an older version of Chocolatey CLI to have the nuspec version
     # not be normalized.
-    Context 'Installing non-normalized package outputting all environment variables' -Tag Internal {
+    # Exclude from CCR testing as `test-environment` is not seeded to CCR, and this test is testing CLI internals
+    Context 'Installing non-normalized package outputting all environment variables' -Tag Internal, CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -2192,6 +2198,7 @@ To install a local, or remote file, you may use:
         }
     }
 
+    # Exclude from CCR testing as this tests the `choco install all` functionality which is not expected to work with CCR.
     Context 'Installing a package (<PackageName>) with a failing nested dependency should not install the package with failing dependencies' -ForEach @(
         @{
             PackageName = 'dependencyfailure;downgradesdependency;failingdependency;hasdependency;hasfailingnesteddependency;hasnesteddependency;isdependency;isexactversiondependency'.Split(';')
@@ -2202,7 +2209,7 @@ To install a local, or remote file, you may use:
         @{
             PackageName = @('all')
         }
-    ) {
+    ) -Tag CCRExcluded {
         BeforeAll {
 
             Restore-ChocolateyInstallSnapshot -SetWorkingDirectory
@@ -2283,7 +2290,8 @@ To install a local, or remote file, you may use:
         }
     }
 
-    Context 'Installing a package using a single quote in the parameters' -Tag Arguments {
+    # Exclude from CCR testing as `test-params` is not seeded, and this test validates CLI internals.
+    Context 'Installing a package using a single quote in the parameters' -Tag Arguments, CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -2312,7 +2320,8 @@ To install a local, or remote file, you may use:
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths
 
-    Context 'Installing a package with unsupported nuspec elements shows a warning' {
+    # Exclude from CCR testing as this test validates CLI internals only.
+    Context 'Installing a package with unsupported nuspec elements shows a warning' -Tag CCRExcluded {
 
         BeforeDiscovery {
             $testCases = @(

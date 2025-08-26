@@ -15,7 +15,7 @@ param(
 
 Import-Module helpers/common-helpers
 
-Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindCommand {
+Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindCommand, CCR {
     BeforeDiscovery {
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
         $hasEnabledV3Feed = Test-HasNuGetV3Source
@@ -101,7 +101,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
     }
 
     # Skip when searching against a v3 source as our current source is not returning consistent results.
-    Context "Searching all available packages" -Skip:$hasEnabledV3Feed {
+    # Exclude from CCR testing as CCR purposely does not return any results when doing an open ended search with `--AllVersions`
+    Context "Searching all available packages" -Skip:$hasEnabledV3Feed -Tag CCRExcluded {
         BeforeAll {
             $Output = Invoke-Choco $_ --AllVersions
         }
@@ -127,7 +128,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
     }
 
-    Context "Searching all available packages (allowing prerelease)" {
+    # Exclude from CCR testing as CCR purposely does not return any results when doing an open ended search with `--AllVersions`
+    Context "Searching all available packages (allowing prerelease)" -Tag CCRExcluded {
         BeforeAll {
             $Output = Invoke-Choco $_ --AllVersions --PreRelease
         }
@@ -425,6 +427,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
 
     # This test is non-functional in v1, as it can not actually find any of the packages.
     # It seems to exit out of the results too early to find them.
+    # Exclude from CCR as we don't seed CCR with `chocolatey` or `chocolatey-agent`.
     Context "Search for chocolatey on Page <Page>" -ForEach @(
         @{
             Page = 0
@@ -436,7 +439,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             Name = 'chocolatey-agent'
             NotExpected = 'chocolatey'
         }
-    ) {
+    ) -Tag CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot -Quick
 
