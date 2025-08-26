@@ -135,7 +135,7 @@ exit $command.Count
         }
     }
 
-    Context 'Ensure --allow-multiple removed from Chocolatey <Command> command' -Tag InstallCommand, UpgradeCommand, UninstallCommand, AllowMultiple, cory -Foreach @(
+    Context 'Ensure --allow-multiple removed from Chocolatey <Command> command' -Tag InstallCommand, UpgradeCommand, UninstallCommand, AllowMultiple -Foreach @(
         @{ Command = 'install' }
         @{ Command = 'upgrade' }
         @{ Command = 'uninstall' }

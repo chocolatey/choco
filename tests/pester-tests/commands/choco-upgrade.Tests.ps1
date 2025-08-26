@@ -391,6 +391,10 @@ To upgrade a local, or remote file, you may use:
             $Output = Invoke-Choco upgrade upgradepackage --confirm
         }
 
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
 
         # `upgradepackage` contains a beforeModify that throws, which triggers an incorrect -1 exit code.
         # See https://app.clickup.com/t/20540031/PROJ-615
@@ -418,6 +422,10 @@ To upgrade a local, or remote file, you may use:
             $Output = Invoke-Choco upgrade hasdependency
             $Packages = (Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List
             $DependentPackage = $Packages | Where-Object Name -EQ $DependentPackageName
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It 'Exits with Success (0)' {

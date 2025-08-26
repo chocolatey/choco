@@ -278,6 +278,10 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             $Output = Invoke-Choco $_ mvc
         }
 
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
         It "Exits with Success (0)" {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
@@ -299,6 +303,10 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
 
             $Output = Invoke-Choco $_ mvc "--proxy-bypass-list=hermes.chocolatey.org"
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It "Exits with Success (0)" {
@@ -473,6 +481,10 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             $null = Invoke-Choco source add -n "invalid" -s $InvalidSource
 
             $Output = Invoke-Choco search dependency
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It 'Exits with Success (0)' {

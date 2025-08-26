@@ -1426,6 +1426,10 @@ To install a local, or remote file, you may use:
             $Output = Invoke-Choco install installpackage --confirm
         }
 
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
         It "Exits with Success (0)" {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
@@ -1443,6 +1447,10 @@ To install a local, or remote file, you may use:
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
 
             $Output = Invoke-Choco install installpackage --confirm "--proxy-bypass-list=hermes.chocolatey.org"
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It "Exits with Success (0)" {
@@ -1892,6 +1900,10 @@ To install a local, or remote file, you may use:
             $null = Invoke-Choco source add -n "invalid" -s $InvalidSource
 
             $Output = Invoke-Choco install installpackage --confirm
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It 'Exits with Success (0)' {

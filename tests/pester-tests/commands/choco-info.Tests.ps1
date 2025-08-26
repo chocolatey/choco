@@ -62,7 +62,6 @@
 
         BeforeAll {
             $Output = Invoke-Choco info mvcmusicstore-web
-            $Output.Lines = $Output.Lines
         }
 
         It "Exits with Success (0)" {
@@ -163,7 +162,10 @@
             $null = Invoke-Choco config set --name=proxyBypassList --value="hermes.chocolatey.org"
 
             $Output = Invoke-Choco info mvcmusicstore-db
-            $Output.Lines = $Output.Lines
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It "Exits with Success (0)" {
@@ -196,7 +198,10 @@
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
 
             $Output = Invoke-Choco info mvcmusicstore-db "--proxy-bypass-list=hermes.chocolatey.org"
-            $Output.Lines = $Output.Lines
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It "Exits with Success (0)" {
@@ -219,6 +224,10 @@
             $null = Invoke-Choco source add -n "invalid" -s $InvalidSource
 
             $Output = Invoke-Choco info chocolatey
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It 'Exits with Success (0)' {
