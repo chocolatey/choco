@@ -505,10 +505,17 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
     }
 
     Context "CCR Only Tests" -Tag CCR, CCROnly {
+        BeforeDiscovery {
+            $TotalSeededPackages = 74
+        }
+
+        BeforeAll {
+            $TotalSeededPackages = 74
+        }
+
         Context "Searching of all package versions of Package13" {
             BeforeAll {
                 $Output = Invoke-Choco $_ Package13 --exact --all-versions
-                $TotalExpectedPackages = 74
             }
 
             It "Exits with Success (0)" {
@@ -757,8 +764,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "add-path|1.0.0" -Because $Output.String
             }
 
-            It "Should contain $TotalExpectedPackages package versions" {
-                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
+            It "Should contain $TotalSeededPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalSeededPackages -Because $Output.String
             }
         }
 
@@ -782,8 +789,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             }
 
             # This is two more lines due to the warning tested above.
-            It "Should contain $TotalExpectedPackages package versions ($($TotalExpectedPackages + 2) lines)" {
-                $Output.Lines | Should -HaveCount $($TotalExpectedPackages + 2) -Because $Output.String
+            It "Should contain $TotalSeededPackages package versions ($($TotalSeededPackages + 2) lines)" {
+                $Output.Lines | Should -HaveCount $($TotalSeededPackages + 2) -Because $Output.String
             }
         }
 
@@ -800,8 +807,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "package13|10.10.10" -Because $Output.String
             }
 
-            It "Should contain $TotalExpectedPackages package versions" {
-                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
+            It "Should contain $TotalSeededPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalSeededPackages -Because $Output.String
             }
         }
 
@@ -818,8 +825,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "business-only-license|19.0.0" -Because $Output.String
             }
 
-            It "Should contain $TotalExpectedPackages package versions" {
-                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
+            It "Should contain $TotalSeededPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalSeededPackages -Because $Output.String
             }
         }
 
@@ -836,8 +843,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "add-path|1.0.0" -Because $Output.String
             }
 
-            It "Should contain $TotalExpectedPackages package versions" {
-                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
+            It "Should contain $TotalSeededPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalSeededPackages -Because $Output.String
             }
         }
 
@@ -854,8 +861,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "package12|10.10.10" -Because $Output.String
             }
 
-            It "Should contain $TotalExpectedPackages package versions" {
-                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
+            It "Should contain $TotalSeededPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalSeededPackages -Because $Output.String
             }
         }
 
@@ -874,8 +881,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "package13|10.10.10" -Because $Output.String
             }
 
-            It "Should contain $TotalExpectedPackages package versions" {
-                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
+            It "Should contain $TotalSeededPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalSeededPackages -Because $Output.String
             }
         }
     }
