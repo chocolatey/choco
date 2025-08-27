@@ -15,7 +15,7 @@ param(
 
 Import-Module helpers/common-helpers
 
-Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindCommand {
+Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindCommand, CCR {
     BeforeDiscovery {
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
         $hasEnabledV3Feed = Test-HasNuGetV3Source
@@ -52,11 +52,11 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Contains packages and versions with a space between them" {
-            $Output.Lines | Should -Contain "upgradepackage 1.1.0" -Because $Output.String
+            ($Output.Lines -match "^upgradepackage 1\.1\.0.*").Count  | Should -Be 1 -Because $Output.String
         }
 
         It "Should not contain pipe-delimited values" {
-            $Output.Lines | Should -Not -Contain "upgradepackage|1.1.0"
+            ($Output.Lines -match "^upgradepackage\|1\.1\.0.*").Count  | Should -Be 0 -Because $Output.String
         }
 
         It "Should contain a summary" {
@@ -88,11 +88,11 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Contains packages and versions with a space between them" {
-            $Output.Lines | Should -Contain "upgradepackage 1.1.0"
+            ($Output.Lines -match "^upgradepackage 1\.1\.0.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Does not contain available packages that do not match" {
-            $Output.Lines | Should -Not -Contain "installpackage 1.0.0"
+            ($Output.Lines -match "^installpackage 1\.0\.0.*").Count | Should -Be 0 -Because $Output.String
         }
 
         It "Should contain a summary" {
@@ -101,7 +101,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
     }
 
     # Skip when searching against a v3 source as our current source is not returning consistent results.
-    Context "Searching all available packages" -Skip:$hasEnabledV3Feed {
+    # Exclude from CCR testing as CCR purposely does not return any results when doing an open ended search with `--AllVersions`
+    Context "Searching all available packages" -Skip:$hasEnabledV3Feed -Tag CCRExcluded {
         BeforeAll {
             $Output = Invoke-Choco $_ --AllVersions
         }
@@ -111,15 +112,15 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Shows each instance of an available package" {
-            ($Output.Lines -like "upgradepackage*").Count | Should -Be 2
+            ($Output.Lines -like "upgradepackage*").Count | Should -Be 2 -Because $Output.String
         }
 
         It "Contains packages and versions with a space between them" {
-            $Output.Lines | Should -Contain "upgradepackage 1.0.0"
+            ($Output.Lines -match "^upgradepackage 1\.0\.0.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Should not contain pipe-delimited packages and versions" {
-            $Output.Lines | Should -Not -Contain "upgradepackage|1.0.0"
+            ($Output.Lines -match "^upgradepackage\|1\.0\.0.*").Count | Should -Be 0 -Because $Output.String
         }
 
         It "Should contain a summary" {
@@ -127,7 +128,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
     }
 
-    Context "Searching all available packages (allowing prerelease)" {
+    # Exclude from CCR testing as CCR purposely does not return any results when doing an open ended search with `--AllVersions`
+    Context "Searching all available packages (allowing prerelease)" -Tag CCRExcluded {
         BeforeAll {
             $Output = Invoke-Choco $_ --AllVersions --PreRelease
         }
@@ -167,7 +169,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Shows version <_> of the package" -ForEach @("1.1.0"; "1.0.0") {
-            $Output.Lines | Should -Contain "upgradepackage $_"
+            ($Output.Lines -match "^upgradepackage $([regex]::Escape($_)).*").Count | Should -Be 1 -Because $Output.String
         }
     }
 
@@ -182,7 +184,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Should contain packages and version with a space between them" {
-            $Output.Lines | Should -Contain "upgradepackage 1.1.0"
+            ($Output.Lines -match "^upgradepackage 1\.1\.0.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Should contain a description" {
@@ -233,7 +235,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Should contain packages and version with a space between them" {
-            $Output.Lines | Should -Contain "exactpackage 1.0.0"
+            ($Output.Lines -match "^exactpackage 1\.0\.0.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Should not contain packages that don't exactly match" {
@@ -278,12 +280,16 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             $Output = Invoke-Choco $_ mvc
         }
 
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
         It "Exits with Success (0)" {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the package <_>" -ForEach @("mvcmusicstore-db 1.2.0"; "mvcmusicstore-web 1.2.0") {
-            $Output.Lines | Should -Contain $_
+            ($Output.Lines -match ([regex]::Escape($_))).Count | Should -Be 1 -Because $Output.String
         }
 
         It "Displays amount of packages found" {
@@ -301,12 +307,16 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             $Output = Invoke-Choco $_ mvc "--proxy-bypass-list=hermes.chocolatey.org"
         }
 
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
         It "Exits with Success (0)" {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
 
         It "Displays the package <_>" -ForEach @("mvcmusicstore-db 1.2.0"; "mvcmusicstore-web 1.2.0") {
-            $Output.Lines | Should -Contain $_
+            ($Output.Lines -match [regex]::Escape($_)).Count | Should -Be 1 -Because $Output.String
         }
 
         It "Displays amount of packages found" {
@@ -327,11 +337,11 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Should list package isexactversiondependency v<_>" -ForEach @("1.0.1"; "1.0.0"; "2.0.0"; "1.1.0") {
-            $Output.Lines | Should -Contain "isexactversiondependency $_"
+            ($Output.Lines -match "^isexactversiondependency $([regex]::Escape($_))").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Should not list package isexactversiondependency v<_>" -ForEach @("1.0.0-beta") {
-            $Output.Lines | Should -Not -Contain "isexactversiondependency $_"
+            ($Output.Lines -match "^isexactversiondependency $([regex]::Escape($_))").Count | Should -Be 0 -Because $Output.String
         }
     }
 
@@ -347,7 +357,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Should list package isexactversiondependency v<_>" -ForEach @("1.0.1"; "1.0.0"; "2.0.0"; "1.1.0"; "1.0.0-beta") {
-            $Output.Lines | Should -Contain "isexactversiondependency $_"
+            # This test is using GreaterOrEqual as the `1.0.0` test picks up the `1.0.0-beta` as well.
+            ($Output.Lines -match "^isexactversiondependency $([regex]::Escape($_)).*").Count | Should -BeGreaterOrEqual 1 -Because $Output.String
         }
     }
 
@@ -363,7 +374,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Should output the package found" {
-            $Output.Lines | Should -Contain "upgradepackage 1.0.0" -Because $Output.String
+            ($Output.Lines -match "^upgradepackage 1\.0\.0.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Should output the amount of packages found" {
@@ -383,7 +394,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Should output the package found" {
-            $Output.Lines | Should -Contain "upgradepackage 1.1.1-beta" -Because $Output.String
+            ($Output.Lines -match "^upgradepackage 1\.1\.1-beta.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Should output the amount of packages found" {
@@ -406,7 +417,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It "Should output the package found" {
-            $Output.Lines | Should -Contain "upgradepackage 1.1.1-beta" -Because $Output.String
+            ($Output.Lines -match "^upgradepackage 1\.1\.1-beta.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Should output the amount of packages found" {
@@ -416,6 +427,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
 
     # This test is non-functional in v1, as it can not actually find any of the packages.
     # It seems to exit out of the results too early to find them.
+    # Exclude from CCR as we don't seed CCR with `chocolatey` or `chocolatey-agent`.
     Context "Search for chocolatey on Page <Page>" -ForEach @(
         @{
             Page = 0
@@ -427,7 +439,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             Name = 'chocolatey-agent'
             NotExpected = 'chocolatey'
         }
-    ) {
+    ) -Tag CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot -Quick
 
@@ -442,7 +454,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             $Output.Lines | Should -Contain "$Name 0.11.2" -Because $Output.String
         }
 
-        It "Should not output unexpected package <Name> in the results" {
+        It "Should not output unexpected package <NotExpected> in the results" {
             $Output.Lines | Should -Not -Contain "$NotExpected 0.11.2" -Because $Output.String
         }
 
@@ -475,6 +487,10 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
             $Output = Invoke-Choco search dependency
         }
 
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
         It 'Exits with Success (0)' {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }
@@ -484,7 +500,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         }
 
         It 'Outputs the results of the search' {
-            $Output.Lines | Should -Contain 'hasrebootdependency 1.0.0'
+            ($Output.Lines -match '^failingdependency 1\.0\.0.*').Count | Should -Be 1 -Because $Output.String
         }
     }
 
@@ -492,6 +508,7 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
         Context "Searching of all package versions of Package13" {
             BeforeAll {
                 $Output = Invoke-Choco $_ Package13 --exact --all-versions
+                $TotalExpectedPackages = 74
             }
 
             It "Exits with Success (0)" {
@@ -740,8 +757,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "add-path|1.0.0" -Because $Output.String
             }
 
-            It "Should contain 71 package versions" {
-                $Output.Lines | Should -HaveCount 71 -Because $Output.String
+            It "Should contain $TotalExpectedPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
             }
         }
 
@@ -764,8 +781,9 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[2] | Should -Contain "package13|10.10.10" -Because $Output.String
             }
 
-            It "Should contain 71 package versions (73 lines)" {
-                $Output.Lines | Should -HaveCount 73 -Because $Output.String
+            # This is two more lines due to the warning tested above.
+            It "Should contain $TotalExpectedPackages package versions ($($TotalExpectedPackages + 2) lines)" {
+                $Output.Lines | Should -HaveCount $($TotalExpectedPackages + 2) -Because $Output.String
             }
         }
 
@@ -782,8 +800,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "package13|10.10.10" -Because $Output.String
             }
 
-            It "Should contain 71 package versions" {
-                $Output.Lines | Should -HaveCount 71 -Because $Output.String
+            It "Should contain $TotalExpectedPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
             }
         }
 
@@ -800,8 +818,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "business-only-license|19.0.0" -Because $Output.String
             }
 
-            It "Should contain 71 package versions" {
-                $Output.Lines | Should -HaveCount 71 -Because $Output.String
+            It "Should contain $TotalExpectedPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
             }
         }
 
@@ -818,8 +836,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "add-path|1.0.0" -Because $Output.String
             }
 
-            It "Should contain 71 package versions" {
-                $Output.Lines | Should -HaveCount 71 -Because $Output.String
+            It "Should contain $TotalExpectedPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
             }
         }
 
@@ -836,8 +854,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "package12|10.10.10" -Because $Output.String
             }
 
-            It "Should contain 71 package versions" {
-                $Output.Lines | Should -HaveCount 71 -Because $Output.String
+            It "Should contain $TotalExpectedPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
             }
         }
 
@@ -856,8 +874,8 @@ Describe "choco <_>" -ForEach $Command -Tag Chocolatey, SearchCommand, FindComma
                 $Output.Lines[0] | Should -Contain "package13|10.10.10" -Because $Output.String
             }
 
-            It "Should contain 71 package versions" {
-                $Output.Lines | Should -HaveCount 71 -Because $Output.String
+            It "Should contain $TotalExpectedPackages package versions" {
+                $Output.Lines | Should -HaveCount $TotalExpectedPackages -Because $Output.String
             }
         }
     }

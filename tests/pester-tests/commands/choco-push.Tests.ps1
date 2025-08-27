@@ -1,11 +1,19 @@
 ﻿Import-Module helpers/common-helpers
 
 # These are skipped in the Proxy Test environment because they push to a port outside of 8443 which is not allowed by our proxy.
-Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $env:API_KEY -or $null -eq $env:PUSH_REPO) {
+Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip, CCR -Skip:($null -eq $env:API_KEY -or $null -eq $env:PUSH_REPO) {
     BeforeAll {
         Remove-NuGetPaths
         $ApiKey = $env:API_KEY
         $RepositoryToUse = $env:PUSH_REPO
+        $CcrApiKey = 'c:\elasticsearch-setup\ccr-apikey.txt'
+
+        # Check if we're in a CCR Test Kitchen. If we are, utilize the local details.
+        if (Test-Path $CcrApiKey) {
+            $ApiKey = (Get-Content $CcrApiKey -Raw).Trim()
+            $RepositoryToUse = 'http://localhost/api/v2/'
+        }
+
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
