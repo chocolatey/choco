@@ -11,7 +11,7 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip, CCR -Skip:($null 
         # Check if we're in a CCR Test Kitchen. If we are, utilize the local details.
         if (Test-Path $CcrApiKey) {
             $ApiKey = (Get-Content $CcrApiKey -Raw).Trim()
-            $RepositoryToUse = 'http://localhost/api/v2/'
+            $RepositoryToUse = 'http://localhost/'
         }
 
         Initialize-ChocolateyTestInstall
@@ -48,8 +48,9 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip, CCR -Skip:($null 
 
         It "Should Report the actual cause of the error" {
             $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse" -Because $Output.String
-            $Output.Lines | Should -Contain "An error has occurred. This package version already exists on the repository and cannot be modified." -Because $Output.String
-            $Output.Lines | Should -Contain "Package versions that are approved, rejected, or exempted cannot be modified." -Because $Output.String
+            # The output of this differs depending on where you're running from. The following phrases appear on 1 or more line in every permutation that I've seen.
+            ($Output.Lines -match 'already exists on the repository').Count | Should -BeGreaterOrEqual 1 -Because $Output.String
+            ($Output.Lines -match 'cannot be modified').Count | Should -BeGreaterOrEqual 1 -Because $Output.String
         }
     }
 
