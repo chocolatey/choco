@@ -13,7 +13,7 @@ RUN curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/de
     apt-get update; \
     apt-get install -y dotnet-sdk-6.0
 
-RUN apt-get install libc6 libc6-dev libc6-dbg
+RUN apt-get install libc6 libc6-dev libc6-dbg -y
 
 COPY . /usr/local/src/choco/
 
