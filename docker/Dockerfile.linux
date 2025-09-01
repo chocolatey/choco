@@ -1,4 +1,4 @@
-FROM debian:bookworm as build
+FROM debian:bookworm AS build
 
 ARG github_actions="false"
 ARG github_ref
@@ -16,7 +16,7 @@ ENV GITHUB_RUN_NUMBER=$github_run_number
 RUN apt update; \
     apt install gnupg dirmngr apt-transport-https ca-certificates -y; \
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF; \
-    sh -c 'echo "deb https://download.mono-project.com/repo/debian stable-buster main" > /etc/apt/sources.list.d/mono-official-stable.list'; \
+    sh -c 'echo "deb https://download.mono-project.com/repo/debian stable-buster main" > /etc/apt/sources.list.d/mono-official-stable.list'
 
 RUN apt update; \
     apt install git mono-complete curl -y
@@ -46,7 +46,7 @@ RUN if [ "$github_actions" = "true" ]; then \
   fi;
 
 
-FROM debian:bookworm as install
+FROM debian:bookworm AS install
 
 RUN apt update; \
     apt install gnupg dirmngr apt-transport-https ca-certificates -y; \
@@ -66,7 +66,7 @@ LABEL org.opencontainers.image.description="Chocolatey Client running on Mono"
 LABEL org.opencontainers.image.authors="https://chocolatey.org/support"
 LABEL org.opencontainers.image.base.name="index.docker.io/library/debian:bookworm"
 
-ENV ChocolateyInstall /opt/chocolatey
+ENV ChocolateyInstall=/opt/chocolatey
 
 COPY --from=build /usr/local/src/choco/code_drop/temp/_PublishedApps/choco /opt/chocolatey
 
