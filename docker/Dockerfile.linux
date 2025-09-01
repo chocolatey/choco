@@ -37,8 +37,8 @@ RUN mono --version; \
     git --version; \
     dotnet --info;
 
-RUN dotnet tool install -g gitversion.tool; /
-    dotnet-gitversion /version; /
+RUN dotnet tool install -g gitversion.tool; \
+    dotnet-gitversion /version; \
     dotnet-gitversion
 
 RUN if [ "$buildscript" = "build.official.sh" ]; then \
