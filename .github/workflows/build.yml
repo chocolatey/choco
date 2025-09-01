@@ -85,7 +85,7 @@ jobs:
   #      parallel: true
   # Build using mono on MacOS
   macos-build:
-    runs-on: macos-latest
+    runs-on: macos-13
     steps:
     - uses: actions/checkout@v3
       with:
@@ -95,8 +95,6 @@ jobs:
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
-    - name: Install mono
-      run: brew install mono
     - name: Build with Mono
       run: |
         chmod +x build.sh
