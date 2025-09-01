@@ -37,10 +37,7 @@ RUN mono --version; \
     git --version; \
     dotnet --info;
 
-RUN if [ "$github_actions" = "true" ]; then \
-    export GITHUB_ACTIONS=$github_actions; \
-  fi; \
-  if [ "$buildscript" = "build.official.sh" ]; then \
+RUN if [ "$buildscript" = "build.official.sh" ]; then \
     export CHOCOLATEY_OFFICIAL_KEY="/usr/local/src/choco/chocolatey.official.snk"; \
     ./$buildscript; \
     cp docker/choco_official_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
