@@ -37,7 +37,7 @@ RUN mono --version; \
     git --version; \
     dotnet --info;
 
-RUN dotnet tool install -g gitversion.tool; \
+RUN dotnet tool install -g gitversion.tool --version 5.10.1; \
     dotnet-gitversion /version; \
     dotnet-gitversion
 
