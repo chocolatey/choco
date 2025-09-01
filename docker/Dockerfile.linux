@@ -13,18 +13,12 @@ RUN curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/de
     apt-get update; \
     apt-get install -y dotnet-sdk-6.0
 
-RUN apt-get install libc6 libc6-dev libc6-dbg -y
-
 COPY . /usr/local/src/choco/
 
 WORKDIR /usr/local/src/choco
 RUN chmod +x *.sh
 
 ARG buildscript="build.sh"
-
-RUN mono --version; \
-    git --version; \
-    dotnet --info;
 
 RUN if [ "$buildscript" = "build.official.sh" ]; then \
     export CHOCOLATEY_OFFICIAL_KEY="/usr/local/src/choco/chocolatey.official.snk"; \
