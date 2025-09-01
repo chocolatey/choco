@@ -1,5 +1,4 @@
-ARG monoversion="6.12"
-FROM mono:${monoversion} as build
+FROM debian:bookworm as build
 
 ARG github_actions="false"
 ARG github_ref
@@ -13,6 +12,12 @@ ENV GITHUB_REPOSITORY=$github_repository
 ENV GITHUB_BASE_REF=$github_base_ref
 ENV GITHUB_HEAD_REF=$github_head_ref
 ENV GITHUB_RUN_NUMBER=$github_run_number
+
+RUN apt install gnupg dirmngr apt-transport-https ca-certificates -y; \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF; \
+    sh -c 'echo "deb https://download.mono-project.com/repo/debian stable-buster main" > /etc/apt/sources.list.d/mono-official-stable.list'; \
+    apt update; \
+    apt install git mono-complete curl -y
 
 RUN curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb; \
     dpkg -i packages-microsoft-prod.deb; \
@@ -39,10 +44,8 @@ RUN if [ "$github_actions" = "true" ]; then \
   fi;
 
 
-ARG monoversion="6.12"
-FROM mono:${monoversion} as install
+FROM debian:bookworm as install
 
-ARG monoversion="6.12"
 LABEL org.opencontainers.image.url="https://chocolatey.org/"
 LABEL org.opencontainers.image.documentation="https://docs.chocolatey.org/"
 LABEL org.opencontainers.image.source="https://github.com/chocolatey/choco"
@@ -51,7 +54,7 @@ LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.title="Chocolatey"
 LABEL org.opencontainers.image.description="Chocolatey Client running on Mono"
 LABEL org.opencontainers.image.authors="https://chocolatey.org/support"
-LABEL org.opencontainers.image.base.name="index.docker.io/library/mono:${monoversion}"
+LABEL org.opencontainers.image.base.name="index.docker.io/library/debian:bookworm"
 
 ENV ChocolateyInstall /opt/chocolatey
 
