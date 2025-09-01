@@ -33,6 +33,10 @@ RUN chmod +x *.sh
 
 ARG buildscript="build.sh"
 
+RUN mono --version; \
+    git --version; \
+    dotnet --info;
+
 RUN if [ "$github_actions" = "true" ]; then \
     export GITHUB_ACTIONS=$github_actions; \
   fi; \
@@ -51,7 +55,7 @@ FROM debian:bookworm AS install
 RUN apt update; \
     apt install gnupg dirmngr apt-transport-https ca-certificates -y; \
     apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF; \
-    sh -c 'echo "deb https://download.mono-project.com/repo/debian stable-buster main" > /etc/apt/sources.list.d/mono-official-stable.list'; \
+    sh -c 'echo "deb https://download.mono-project.com/repo/debian stable-buster main" > /etc/apt/sources.list.d/mono-official-stable.list'
 
 RUN apt update; \
     apt install mono-complete -y
