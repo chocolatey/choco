@@ -95,6 +95,8 @@ jobs:
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+    - name: Install mono
+      run: brew install mono
     - name: Build with Mono
       run: |
         chmod +x build.sh
