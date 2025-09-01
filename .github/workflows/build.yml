@@ -76,13 +76,6 @@ jobs:
           code_drop\Packages\Chocolatey\*.nupkg
           code_drop\MsBuild.log
           code_drop\MSIs\en-US\chocolatey-*.msi
-  #  - uses: coverallsapp/github-action@master
-  #    with:
-  #      github-token: ${{ secrets.GITHUB_TOKEN }}
-  #      path-to-lcov: |
-  #        code_drop\TestCoverage\lcov.info
-  #      flag-name: run-${{ matrix.os }}
-  #      parallel: true
   # Build using mono on MacOS
   macos-build:
     runs-on: macos-14
@@ -112,17 +105,12 @@ jobs:
           code_drop/MsBuild.log
   # Build using Mono in Docker on Ubuntu
   docker-build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: Cache Tools
-        uses: actions/cache@v4
-        with:
-          path: tools
-          key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -134,12 +122,3 @@ jobs:
           file: docker/Dockerfile.linux
           push: false
           tags: chocolatey/choco:latest
-  #upload-code-coverage-results:
-  #  needs: [ubuntu-build, windows-build, macos-build]
-  #  runs-on: ubuntu-latest
-  #  steps:
-  #  - name: Coveralls Finished
-  #    uses: coverallsapp/github-action@master
-  #    with:
-  #      github-token: ${{ secrets.GITHUB_TOKEN }}
-  #      parallel-finished: true
