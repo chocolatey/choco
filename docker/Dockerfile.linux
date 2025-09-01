@@ -37,6 +37,10 @@ RUN mono --version; \
     git --version; \
     dotnet --info;
 
+RUN dotnet tool install -g gitversion.tool; /
+    dotnet-gitversion /version; /
+    dotnet-gitversion
+
 RUN if [ "$buildscript" = "build.official.sh" ]; then \
     export CHOCOLATEY_OFFICIAL_KEY="/usr/local/src/choco/chocolatey.official.snk"; \
     ./$buildscript; \
@@ -45,7 +49,6 @@ RUN if [ "$buildscript" = "build.official.sh" ]; then \
     ./$buildscript --verbosity=diagnostic; \
     cp docker/choco_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
   fi;
-
 
 FROM debian:bookworm AS install
 
