@@ -394,6 +394,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Ignore("This test is known to be flaky in some environments, see comments within the test itself.")]
         [NotWorking("This test is known to be flaky in some environments, see comments within the test itself.")]
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
