@@ -391,6 +391,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             }
         }
 
+        [WindowsOnly]
         public class When_Searching_For_A_Package_With_Version_On_A_V3_Only_Feed : NugetListSpecsBase
         {
             private List<IPackageSearchMetadata> _result;
@@ -712,6 +713,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
             }
         }
 
+        [WindowsOnly]
         public class When_Searching_For_A_Package_With_Version_On_A_Combined_Feed : NugetListSpecsBase
         {
             private List<IPackageSearchMetadata> _result;

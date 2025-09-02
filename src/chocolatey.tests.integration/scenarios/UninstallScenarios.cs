@@ -394,6 +394,7 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [NotWorking("This test is known to be flaky in some environments, see comments within the test itself.")]
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
         public class When_uninstalling_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
