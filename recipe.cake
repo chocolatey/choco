@@ -16,7 +16,8 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
 {
     var mergeConfigs = new List<ILMergeConfig>();
 
-    var targetPlatform = "v4,C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.0";
+    var referenceAssembliesNuGetPackagePath = MakeAbsolute(new DirectoryPath("./src/packages/Microsoft.NETFramework.ReferenceAssemblies.net40.1.0.3/build/.NETFramework/v4.0"));
+    var targetPlatform = string.Format("v4,{0}", referenceAssembliesNuGetPackagePath);
     var assembliesToILMerge = GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/*.{exe|dll}")
                             - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/choco.exe")
                             - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/System.Management.Automation.dll");
