@@ -1,21 +1,12 @@
-ARG monoversion="6.12"
-FROM mono:${monoversion} as build
+FROM debian:bookworm AS build
 
-ARG github_actions="false"
-ARG github_ref
-ARG github_repository
-ARG github_base_ref
-ARG github_head_ref
-ARG github_run_number
+RUN apt update; \
+    apt install gnupg dirmngr apt-transport-https ca-certificates -y; \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF; \
+    sh -c 'echo "deb https://download.mono-project.com/repo/debian stable-buster main" > /etc/apt/sources.list.d/mono-official-stable.list'
 
-ENV GITHUB_REF=$github_ref
-ENV GITHUB_REPOSITORY=$github_repository
-ENV GITHUB_BASE_REF=$github_base_ref
-ENV GITHUB_HEAD_REF=$github_head_ref
-ENV GITHUB_RUN_NUMBER=$github_run_number
-
-RUN echo deb http://archive.debian.org/debian buster-backports main | tee /etc/apt/sources.list.d/buster-backports.list; \
-    apt-get update && apt-get install -t buster-backports git -y
+RUN apt update; \
+    apt install git mono-complete curl -y
 
 RUN curl -o packages-microsoft-prod.deb https://packages.microsoft.com/config/debian/10/packages-microsoft-prod.deb; \
     dpkg -i packages-microsoft-prod.deb; \
@@ -29,10 +20,7 @@ RUN chmod +x *.sh
 
 ARG buildscript="build.sh"
 
-RUN if [ "$github_actions" = "true" ]; then \
-    export GITHUB_ACTIONS=$github_actions; \
-  fi; \
-  if [ "$buildscript" = "build.official.sh" ]; then \
+RUN if [ "$buildscript" = "build.official.sh" ]; then \
     export CHOCOLATEY_OFFICIAL_KEY="/usr/local/src/choco/chocolatey.official.snk"; \
     ./$buildscript; \
     cp docker/choco_official_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
@@ -41,11 +29,16 @@ RUN if [ "$github_actions" = "true" ]; then \
     cp docker/choco_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
   fi;
 
+FROM debian:bookworm AS install
 
-ARG monoversion="6.12"
-FROM mono:${monoversion} as install
+RUN apt update; \
+    apt install gnupg dirmngr apt-transport-https ca-certificates -y; \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF; \
+    sh -c 'echo "deb https://download.mono-project.com/repo/debian stable-buster main" > /etc/apt/sources.list.d/mono-official-stable.list'
 
-ARG monoversion="6.12"
+RUN apt update; \
+    apt install mono-complete -y
+
 LABEL org.opencontainers.image.url="https://chocolatey.org/"
 LABEL org.opencontainers.image.documentation="https://docs.chocolatey.org/"
 LABEL org.opencontainers.image.source="https://github.com/chocolatey/choco"
@@ -54,9 +47,9 @@ LABEL org.opencontainers.image.licenses="Apache-2.0"
 LABEL org.opencontainers.image.title="Chocolatey"
 LABEL org.opencontainers.image.description="Chocolatey Client running on Mono"
 LABEL org.opencontainers.image.authors="https://chocolatey.org/support"
-LABEL org.opencontainers.image.base.name="index.docker.io/library/mono:${monoversion}"
+LABEL org.opencontainers.image.base.name="index.docker.io/library/debian:bookworm"
 
-ENV ChocolateyInstall /opt/chocolatey
+ENV ChocolateyInstall=/opt/chocolatey
 
 COPY --from=build /usr/local/src/choco/code_drop/temp/_PublishedApps/choco /opt/chocolatey
 
