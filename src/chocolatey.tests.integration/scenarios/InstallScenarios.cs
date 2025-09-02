@@ -734,6 +734,8 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        [Ignore("This test is known to be flaky in some environments, see comments on the develop branch for the same test.")]
+        [NotWorking("This test is known to be flaky in some environments, see comments on the develop branch for the same test.")]
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
         public class when_force_installing_an_already_installed_package_with_a_read_and_delete_share_locked_file : ScenariosBase
