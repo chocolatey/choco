@@ -46,7 +46,7 @@ jobs:
           code_drop/MsBuild.log
   # Build on Windows
   windows-build:
-    runs-on: windows-2019
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
       with:
