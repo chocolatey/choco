@@ -29,7 +29,7 @@ Chocolatey uses a number of 3rd party components. Their details are below.
     * [System.Runtime.CompilerServices.Unsafe@4.5.3](#systemruntimecompilerservicesunsafe453)
     * [System.Threading.Tasks.Extensions@4.5.4](#systemthreadingtasksextensions454)
   * [Other](#other)
-    * [7-Zip@24.09](#7-zip2409)
+    * [7-Zip@25.01](#7-zip2501)
     * [Shim Generator (shimgen)@2.0.0](#shim-generator-\(shimgen\)200)
 
 ## Open Source License Types (Reference)
@@ -339,15 +339,15 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 #### System.Runtime.CompilerServices.Unsafe@4.5.3
 
-[System.Runtime.CompilerServices.Unsafe](https://www.nuget.org/packages/System.Runtime.CompilerServices.Unsafe/4.5.3) - [License terms.](https://github.com/dotnet/corefx/blob/master/LICENSE.TXT)
+[System.Runtime.CompilerServices.Unsafe](https://www.nuget.org/packages/System.Runtime.CompilerServices.Unsafe/4.5.3) - [License terms.](https://github.com/dotnet/corefx/blob/b8b81a66738bb10ef0790023598396861d92b2c4/LICENSE.TXT)
 
 #### System.Threading.Tasks.Extensions@4.5.4
 
-[System.Threading.Tasks.Extensions](https://www.nuget.org/packages/System.Threading.Tasks.Extensions/4.5.4) - [License terms.](https://github.com/dotnet/corefx/blob/master/LICENSE.TXT)
+[System.Threading.Tasks.Extensions](https://www.nuget.org/packages/System.Threading.Tasks.Extensions/4.5.4) - [License terms.](https://github.com/dotnet/corefx/blob/b8b81a66738bb10ef0790023598396861d92b2c4/LICENSE.TXT)
 
 ### Other
 
-#### 7-Zip@24.09
+#### 7-Zip@25.01
 
 [7-Zip](https://www.7-zip.org/) - [License terms.](https://www.7-zip.org/license.txt)
 

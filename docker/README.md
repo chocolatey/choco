@@ -22,7 +22,6 @@ To build the Linux image yourself, follow these steps:
 1. Run the docker build command. `docker build -t choco:latest-linux -f docker/Dockerfile.linux .` (the trailing . is important)
     * To build a official version, use this command: `docker build -t chocolatey/choco:latest-linux -f docker/Dockerfile.linux . --build-arg buildscript=build.official.sh`
     * To build a debug version, add the argument `--build-arg buildscript=build.debug.sh`
-    * To change the version of mono used, add the argument `--build-arg monoversion=mono-tag`
 1. Run your new image using the command `docker run -ti --rm choco:latest-linux /bin/bash`
 1. Test choco by running `choco -h`. You should see the help message from choco.exe.
 
