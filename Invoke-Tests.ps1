@@ -160,6 +160,7 @@ try {
                 'WIP'
                 'NonAdmin'
                 'Internal'
+                'CCROnly'
                 if (-not $env:VM_RUNNING -and -not $env:TEST_KITCHEN) {
                     'VMOnly'
                 }

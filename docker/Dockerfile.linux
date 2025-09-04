@@ -29,7 +29,6 @@ RUN if [ "$buildscript" = "build.official.sh" ]; then \
     cp docker/choco_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
   fi;
 
-
 FROM debian:bookworm AS install
 
 RUN apt update; \

@@ -59,6 +59,9 @@
         $null = Push-Location $env:CHOCOLATEY_TEST_PACKAGES_PATH -StackName 'snapshots'
     }
 
+    # Clear any existing Chocolatey cache. This is to prevent previous HTTP queries from affecting current tests.
+    $null = Invoke-Choco cache remove
+
     [PSCustomObject]@{
         InstallPath  = $env:ChocolateyInstall
         PackagesPath = $env:CHOCOLATEY_TEST_PACKAGES_PATH

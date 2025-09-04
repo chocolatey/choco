@@ -1,4 +1,4 @@
-﻿Describe "choco info" -Tag Chocolatey, InfoCommand {
+﻿Describe "choco info" -Tag Chocolatey, InfoCommand, CCR {
     BeforeDiscovery {
         $licensedProxyFixed = Test-PackageIsEqualOrHigher 'chocolatey.extension' 2.2.0-beta -AllowMissingPackage
     }
@@ -62,7 +62,6 @@
 
         BeforeAll {
             $Output = Invoke-Choco info mvcmusicstore-web
-            $Output.Lines = $Output.Lines
         }
 
         It "Exits with Success (0)" {
@@ -163,7 +162,10 @@
             $null = Invoke-Choco config set --name=proxyBypassList --value="hermes.chocolatey.org"
 
             $Output = Invoke-Choco info mvcmusicstore-db
-            $Output.Lines = $Output.Lines
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It "Exits with Success (0)" {
@@ -171,7 +173,7 @@
         }
 
         It "Displays the package mvcmusicstore-db 1.2.0" {
-            $Output.Lines | Should -Contain "mvcmusicstore-db 1.2.0"
+            ($Output.Lines -match "^mvcmusicstore-db 1\.2\.0.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Displays <Title> with value <Value>" -ForEach $infoItems {
@@ -196,7 +198,10 @@
             $null = Invoke-Choco config set --name=proxy --value="https://invalid.chocolatey.org/"
 
             $Output = Invoke-Choco info mvcmusicstore-db "--proxy-bypass-list=hermes.chocolatey.org"
-            $Output.Lines = $Output.Lines
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It "Exits with Success (0)" {
@@ -204,7 +209,7 @@
         }
 
         It "Displays the package mvcmusicstore-db 1.2.0" {
-            $Output.Lines | Should -Contain "mvcmusicstore-db 1.2.0"
+            ($Output.Lines -match "^mvcmusicstore-db 1\.2\.0.*").Count | Should -Be 1 -Because $Output.String
         }
 
         It "Displays <Title> with value <Value>" -ForEach $infoItems {
@@ -212,13 +217,18 @@
         }
     }
 
-    Context "Listing package information when invalid package source is being used" {
+    # Exclude from CCR as we don't seed CCR with `chocolatey`
+    Context "Listing package information when invalid package source is being used" -Tag CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $InvalidSource = "https://invalid.chocolatey.org/api/v2/"
             $null = Invoke-Choco source add -n "invalid" -s $InvalidSource
 
             $Output = Invoke-Choco info chocolatey
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
         }
 
         It 'Exits with Success (0)' {
@@ -234,6 +244,7 @@
         }
     }
 
+    # Exclude from CCR testing as `nonnormalizedversions` is not seeded to CCR.
     Context "Listing package information for non-normalized exact package version" -ForEach @(
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1' }
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '1.0' }
@@ -242,7 +253,7 @@
         @{ ExpectedPackageVersion = '1.0.0' ; SearchVersion = '01.0.0.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '004.0.01.0' }
         @{ ExpectedPackageVersion = '4.0.1' ; SearchVersion = '0000004.00000.00001.0000' }
-    ) -Tag VersionNormalization {
+    ) -Tag VersionNormalization, CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
             $PackageUnderTest = 'nonnormalizedversions'
@@ -259,15 +270,16 @@
         }
     }
 
-    Context 'Listing package information with single quote in parameter shows expected parameters' -Tag Arguments {
+    # Exclude from CCR testing as `test-params` package is not seeded to CCR and this tests CLI internals.
+    Context 'Listing package information with single quote in parameter shows expected parameters' -Tag Arguments, CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
-            
+
             $null = Invoke-Choco install test-params --package-parameters="/Comment:It's great! /SubmittedBy:Kim"
 
             $Output = Invoke-Choco info test-params --local-only
         }
-        
+
         It "Exits successfully (0)" {
             $Output.ExitCode | Should -Be 0 -Because $Output.String
         }

@@ -49,10 +49,10 @@ Describe "Chocolatey User Agent" -Tag Chocolatey, UserAgent {
         $logLine = $Output.Lines | Where-Object { $_ -match '^Process Tree' } | Select-Object -Last 1
 
         $logLine | Should -Not -BeNullOrEmpty -Because 'choco.exe should log the process tree to debug'
-        
+
         Write-Host "================== PROCESS TREE =================="
         Write-Host $logLine
-        
+
         $parentProcesses = [string[]]@($logLine -replace '^Process Tree: ' -split ' => ' | Select-Object -Skip 1)
         if ($parentProcesses.Count -gt 0) {
             $Processes.AddRange($parentProcesses)
@@ -61,7 +61,7 @@ Describe "Chocolatey User Agent" -Tag Chocolatey, UserAgent {
 
     It 'Logs the final user agent to debug' {
         $logLine = $Output.Lines | Where-Object { $_ -match '^Updating User Agent' } | Select-Object -Last 1
-        
+
         $logLine | Should -Not -BeNullOrEmpty -Because "choco.exe should log the user agent string to debug`n$($Output.Lines)"
 
         Write-Host "================== USER AGENT =================="
@@ -84,7 +84,7 @@ Describe "Chocolatey User Agent" -Tag Chocolatey, UserAgent {
         }
 
         $filteredProcesses = @($Processes | Where-Object { $_ -notin $ExcludedProcesses })
-        
+
         if ($filteredProcesses.Count -gt 1) {
             $rootProcess = $filteredProcesses[-1]
             $matches['RootProcess'] | Should -Be $rootProcess -Because "the user agent string should show the root calling process '$rootProcess'. $logLine"

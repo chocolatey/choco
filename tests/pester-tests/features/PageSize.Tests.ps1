@@ -2,7 +2,7 @@
     @{
         Command = 'search'
     }
-) -Tag PageSize {
+) -Tag PageSize, CCR {
     BeforeAll {
         Initialize-ChocolateyTestInstall
     }

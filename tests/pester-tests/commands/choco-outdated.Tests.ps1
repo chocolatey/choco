@@ -1,6 +1,6 @@
 ﻿Import-Module helpers/common-helpers
 
-Describe "choco outdated" -Tag Chocolatey, OutdatedCommand {
+Describe "choco outdated" -Tag Chocolatey, OutdatedCommand, CCR {
     BeforeAll {
         Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
