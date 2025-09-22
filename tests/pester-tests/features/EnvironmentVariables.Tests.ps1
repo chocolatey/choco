@@ -87,3 +87,32 @@ Describe "Ensuring Chocolatey Environment variables are not present (<_>)" -Tag 
         $Output.Lines | Should -Not -Contain $ExpectedLine -Because $Output.String
     }
 }
+
+Describe "Ensuring variables are not incorrectly set for the SYSTEM account" -Tag EnvironmentVariables, Chocolatey, SystemAccount {
+    BeforeAll {
+        Initialize-ChocolateyTestInstall
+        New-ChocolateyInstallSnapshot
+        Invoke-Choco install psexec -s https://community.chocolatey.org/api/v2/
+
+        # We execute this as an encoded command as it doesn't seem to like the strings unless it's encoded.
+        $encodedCommand = @'
+            "Temp: $($env:TEMP)" > {1}/before.txt
+            "Tmp: $($env:TMP)" >> {1}/before.txt
+            Import-Module {0}/helpers/chocolateyProfile.psm1 -Verbose *>&1
+            refreshenv
+            "Temp: $($env:TEMP)" > {1}/after.txt
+            "Tmp: $($env:TMP)" >> {1}/after.txt
+'@ -f (Get-ChocolateyTestLocation), $PSScriptRoot | ConvertTo-Base64String
+        $Output = psexec /accepteula /s powershell.exe -NoProfile -EncodedCommand $encodedCommand 2>$null
+    }
+
+    AfterAll {
+        Remove-ChocolateyTestInstall
+    }
+
+    It 'Should not change the temp environment variables' {
+        $Before = Get-Content $PSScriptRoot/before.txt
+        $After = Get-Content $PSScriptRoot/after.txt
+        $Before | Should -Be $After -Because $Output
+    }
+}

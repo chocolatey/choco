@@ -226,7 +226,7 @@ namespace Chocolatey.PowerShell.Helpers
             var computerName = GetVariable(cmdlet, EnvironmentVariables.System.ComputerName, EnvironmentVariableTarget.Process);
 
             // User scope should override (be checked after) machine scope, but only if we're not running as SYSTEM
-            if (userName != computerName && userName != Shared.EnvironmentNames.System)
+            if (userName != $"{computerName}$" && userName != Shared.EnvironmentNames.System)
             {
                 scopeList.Add(EnvironmentVariableTarget.User);
             }
