@@ -7,7 +7,7 @@
     <title>Chocolatey Core [PREVIEW]</title>
     <authors>Chocolatey Software, Inc</authors>
     <projectUrl>https://github.com/chocolatey/choco</projectUrl>
-    <iconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</iconUrl>
+    <iconUrl>https://img.chocolatey.org/nupkg/chocolateyicon.png</iconUrl>
     <licenseUrl>https://raw.githubusercontent.com/chocolatey/choco/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <copyright>2017-2023 Chocolatey Software, Inc, 2011-2017 RealDimensions Software, LLC</copyright>
