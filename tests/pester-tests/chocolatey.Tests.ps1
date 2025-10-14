@@ -257,6 +257,58 @@ exit $error.count
         }
     }
 
+    # This is skipped when not run in CI because it requires a valid license
+    Context 'Adding or removing a valid license' -Tag License -Skip:(-not $env:TEST_KITCHEN) {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateySource -Name hermes
+
+            Invoke-Choco install chocolatey-license-business
+        }
+
+        It 'adds the chocolatey.licensed source'  {
+            $source = Get-ChocolateySource -Name chocolatey.licensed
+            $source | Should -Not -BeNullOrEmpty
+        }
+
+        It 'removes the chocolatey.licensed source when the license is removed' {
+            $result = Invoke-Choco uninstall chocolatey-license-business
+            $result.ExitCode | Should -Be 0 -Because $result.String
+            $source = Get-ChocolateySource -Name chocolatey.licensed
+            $source | Should -BeNullOrEmpty
+        }
+    }
+
+    # This is skipped when not run in CI because it requires a valid license
+    Context 'Changing licenses after modifying the Chocolatey Licensed repository' -Tag License -Skip:(-not $env:TEST_KITCHEN) {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateySource -Name hermes
+
+            $result = Invoke-Choco install chocolatey-license-business
+            $LicenseFolder = "$env:ChocolateyInstall\lib\chocolatey-license-business\tools"
+        }
+
+        It 'successfully installs the license package' {
+            $result.ExitCode | Should -Be 0 -Because $result.String
+        }
+
+        It 'does not re-enable the licensed feed after it has been explicitly disabled' {
+            Disable-ChocolateySource -Name chocolatey.licensed
+
+            $source = Get-ChocolateySource -Name chocolatey.licensed
+            $source.Disabled | Should -BeTrue
+
+            Rename-Item -Path "$env:ChocolateyInstall\license\chocolatey.license.xml" -NewName 'license.old'
+            Copy-Item -Path "$LicenseFolder\100.chocolatey.license.xml" -Destination "$env:ChocolateyInstall\license\chocolatey.license.xml"
+
+            $source = Get-ChocolateySource -Name chocolatey.licensed
+            $source.Disabled | Should -BeTrue
+        }
+    }
+
     # This is skipped when not run in CI because it modifies the local system.
     Context 'PowerShell Profile comments updated correctly' -Tag ListCommand, Profile -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan '1.0.0'))) {
         BeforeAll {
