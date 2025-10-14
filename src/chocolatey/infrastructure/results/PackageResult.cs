@@ -103,7 +103,12 @@ namespace chocolatey.infrastructure.results
             */
         }
 
-        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageMetadata, packageSearch, installLocation, source, null)
+        {
+        }
+
+        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source, string sourceUri) : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
         {
             SearchMetadata = packageSearch;
             PackageMetadata = packageMetadata;
@@ -123,6 +128,7 @@ namespace chocolatey.infrastructure.results
             }
 
             Source = sources.FirstOrDefault(uri => uri.IsFile || uri.IsUnc).ToStringSafe();
+            SourceUri = sourceUri;
         }
 
         public PackageResult(string name, string version, string installLocation, string source = null)
