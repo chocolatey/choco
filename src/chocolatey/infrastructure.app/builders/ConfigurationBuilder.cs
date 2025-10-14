@@ -120,40 +120,49 @@ namespace chocolatey.infrastructure.app.builders
                 isSilent: shouldLogSilently);
         }
 
+        /// <summary>
+        /// Ensures that Chocolatey CLI adds or removes the <c>chocolatey.licensed</c> source appropriately.
+        /// When a valid license file is not present, removes the <c>chocolatey.licensed</c> source.
+        /// When a valid license file is present, adds or updates the <c>chocolatey.licensed</c> source as
+        /// necessary; updates will only inherit whether the source is disabled or not. All other settings
+        /// will be overwritten with the canonical settings for this source.
+        /// </summary>
+        /// <param name="license">The license information for the currently running Chocolatey CLI instance.</param>
+        /// <param name="configFileSettings">The current set of configuration settings. Its <see cref="ConfigFileSettings.Sources"/> may be updated accordingly.</param>
         private static void AddOrRemoveLicensedSource(ChocolateyLicense license, ConfigFileSettings configFileSettings)
         {
-            // do not enable or disable the source, in case the user has disabled it
             var addOrUpdate = license.IsValid;
-            var sources = configFileSettings.Sources.OrEmpty().ToList();
 
-            var configSource = new ConfigFileSourceSetting
+            if (addOrUpdate)
             {
-                Id = ApplicationParameters.ChocolateyLicensedFeedSourceName,
-                Value = ApplicationParameters.ChocolateyLicensedFeedSource,
-                UserName = "customer",
-                Password = NugetEncryptionUtility.EncryptString(license.Id),
-                Priority = 10,
-                BypassProxy = false,
-                AllowSelfService = false,
-                VisibleToAdminsOnly = false,
-            };
+                var configSource = new ConfigFileSourceSetting
+                {
+                    Id = ApplicationParameters.ChocolateyLicensedFeedSourceName,
+                    Value = ApplicationParameters.ChocolateyLicensedFeedSource,
+                    UserName = "customer",
+                    Password = NugetEncryptionUtility.EncryptString(license.Id),
+                    Priority = 10,
+                    BypassProxy = false,
+                    AllowSelfService = false,
+                    VisibleToAdminsOnly = false,
+                };
 
-            if (addOrUpdate && !sources.Any(s =>
-                    s.Id.IsEqualTo(ApplicationParameters.ChocolateyLicensedFeedSourceName)
-                    && NugetEncryptionUtility.DecryptString(s.Password).IsEqualTo(license.Id)
-                    )
-                )
-            {
+                var existingSource = configFileSettings.Sources?.FirstOrDefault(s => s.Id.IsEqualTo(ApplicationParameters.ChocolateyLicensedFeedSourceName));
+                if (existingSource != null)
+                {
+                    // Ensure we retain whether the licensed source is disabled.
+                    configSource.Disabled = existingSource.Disabled;
+
+                    // Remove the old source so we ensure the source we're adding is the only licensed feed source.
+                    configFileSettings.Sources.Remove(existingSource);
+                }
+
                 configFileSettings.Sources.Add(configSource);
             }
-
-            if (!addOrUpdate)
+            else
             {
-                configFileSettings.Sources.RemoveWhere(s => s.Id.IsEqualTo(configSource.Id));
+                configFileSettings.Sources.RemoveWhere(s => s.Id.IsEqualTo(ApplicationParameters.ChocolateyLicensedFeedSourceName));
             }
-
-            // ensure only one licensed source - helpful when moving between licenses
-            configFileSettings.Sources.RemoveWhere(s => s.Id.IsEqualTo(configSource.Id) && !NugetEncryptionUtility.DecryptString(s.Password).IsEqualTo(license.Id));
         }
 
         private static void SetFileConfiguration(ChocolateyConfiguration config, ConfigFileSettings configFileSettings, IFileSystem fileSystem)
