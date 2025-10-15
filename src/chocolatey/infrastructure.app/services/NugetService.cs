@@ -217,6 +217,7 @@ that uses these options.");
 
                 ChocolateyPackageMetadata packageLocalMetadata;
                 string packageInstallLocation = null;
+                string deploymentlocation = null;
                 string packageInstalledFrom = null;
 
                 if (package.PackagePath != null && !string.IsNullOrWhiteSpace(package.PackagePath))
@@ -237,6 +238,7 @@ that uses these options.");
                 if (config.ListCommand.LocalOnly && packageLocalMetadata != null)
                 {
                     packageInfo = _packageInfoService.Get(packageLocalMetadata);
+                    deploymentlocation = packageInfo.DeploymentLocation;
                     packageInstalledFrom = packageInfo.PackageInstalledFrom;
 
                     if (config.ListCommand.IncludeVersionOverrides)
@@ -297,7 +299,7 @@ that uses these options.");
  Tags: {9}
  Software Site: {10}
  Software License: {11}{12}{13}{14}{15}{16}
- Description: {17}{18}{19}{20}
+ Description: {17}{18}{19}{20}{21}
 ".FormatWith(
                                     package.Title.EscapeCurlyBraces(),
                                     package.Published.GetValueOrDefault().UtcDateTime.ToShortDateString(),
@@ -332,6 +334,7 @@ that uses these options.");
                                     package.Summary != null && !string.IsNullOrWhiteSpace(package.Summary.ToStringSafe()) ? "\r\n Summary: {0}".FormatWith(package.Summary.EscapeCurlyBraces().ToStringSafe()) : string.Empty,
                                     package.Description.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  "),
                                     !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty,
+                                    !string.IsNullOrWhiteSpace(deploymentlocation) ? "{0} Deployed to: '{1}'".FormatWith(Environment.NewLine, deploymentlocation) :string.Empty,
                                     !string.IsNullOrWhiteSpace(packageInstalledFrom) ? "{0} Package Installed From: '{1}'".FormatWith(Environment.NewLine, packageInstalledFrom) : string.Empty,
                                     packageArgumentsUnencrypted != null ? packageArgumentsUnencrypted : string.Empty
                                 ));
