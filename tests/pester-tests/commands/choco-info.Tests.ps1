@@ -34,6 +34,27 @@
         }
     }
 
+    Context "Should display source and deployment locations when using --local-only" {
+        BeforeAll {
+            Initialize-ChocolateyTestInstall -Source $PSScriptRoot\testpackages
+
+            $Setup = Invoke-Choco install installpackage
+
+            $Setup.ExitCode | Should -Be 0 -Because $Setup.String
+
+            $Output = Invoke-Choco info installpackage --local-only
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should contain source and deployment location summary" {
+            $Output.Lines | Should -Contain "Package installed from: $PSScriptRoot\testpackages" -Because $Output.String
+            $Output.String | Should -Match "Deployed to:"
+        }
+    }
+
     Context "Should include configured sources" {
         BeforeAll {
             Initialize-ChocolateyTestInstall -Source $PSScriptRoot\testpackages
