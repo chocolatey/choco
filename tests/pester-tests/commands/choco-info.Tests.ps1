@@ -50,7 +50,7 @@
         }
 
         It "Should contain source and deployment location summary" {
-            $Output.Lines | Should -Contain "Package installed from: $PSScriptRoot\testpackages" -Because $Output.String
+            $Output.Lines | Should -Contain "Source package was installed from: $PSScriptRoot\testpackages" -Because $Output.String
             $Output.String | Should -Match "Deployed to:"
         }
     }

@@ -48,6 +48,7 @@ namespace chocolatey.infrastructure.results
         public string InstallLocation { get; set; }
         public string Source { get; set; }
         public string SourceUri { get; set; }
+        public string SourceInstalledFrom { get; set; }
         public int ExitCode { get; set; }
 
         public void ResetMetadata(IPackageMetadata metadata, IPackageSearchMetadata search)
@@ -108,7 +109,15 @@ namespace chocolatey.infrastructure.results
         {
         }
 
-        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source, string sourceUri) : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackageResult"/> class.
+        /// </summary>
+        /// <param name="packageMetadata"></param>
+        /// <param name="packageSearch"></param>
+        /// <param name="installLocation"></param>
+        /// <param name="source">The sources configured at the time of package installation.</param>
+        /// <param name="sourceInstalledFrom">The package source used to install the package.</param>
+        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source, string sourceInstalledFrom) : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
         {
             SearchMetadata = packageSearch;
             PackageMetadata = packageMetadata;
@@ -128,7 +137,7 @@ namespace chocolatey.infrastructure.results
             }
 
             Source = sources.FirstOrDefault(uri => uri.IsFile || uri.IsUnc).ToStringSafe();
-            SourceUri = sourceUri;
+            SourceInstalledFrom = sourceInstalledFrom;
         }
 
         public PackageResult(string name, string version, string installLocation, string source = null)

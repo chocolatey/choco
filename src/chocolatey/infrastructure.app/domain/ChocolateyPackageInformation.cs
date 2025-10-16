@@ -37,6 +37,6 @@ namespace chocolatey.infrastructure.app.domain
         public bool IsPinned { get; set; }
         public string ExtraInformation { get; set; }
         public string DeploymentLocation { get; set; }
-        public string PackageInstalledFrom {  get; set; }
+        public string SourceInstalledFrom {  get; set; }
     }
 }

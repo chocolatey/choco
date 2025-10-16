@@ -45,7 +45,7 @@ namespace chocolatey.infrastructure.app.services
         private const string ExtraFile = ".extra";
         private const string VersionOverrideFile = ".version";
         private const string DeploymentLocationFile = ".deploymentLocation";
-        private const string PackageInstalledFromFile = ".packageInstalledFrom";
+        private const string SourceInstalledFromFile = ".sourceInstalledFrom";
 
         // We need to store the package identifiers we have warned about
         // to prevent duplicated outputs.
@@ -195,13 +195,13 @@ A corrupt .registry file exists at {0}.
                 );
             }
 
-            var packageInstalledFromFile = _fileSystem.CombinePaths(pkgStorePath, PackageInstalledFromFile);
-            if (_fileSystem.FileExists(packageInstalledFromFile))
+            var sourceInstalledFromFile = _fileSystem.CombinePaths(pkgStorePath, SourceInstalledFromFile);
+            if (_fileSystem.FileExists(sourceInstalledFromFile))
             {
                 FaultTolerance.TryCatchWithLoggingException(
                     () =>
                     {
-                        packageInformation.PackageInstalledFrom = _fileSystem.ReadFile(packageInstalledFromFile);
+                        packageInformation.SourceInstalledFrom = _fileSystem.ReadFile(sourceInstalledFromFile);
                     },
                     "Unable to read package installed from file",
                     throwError: false,
@@ -326,19 +326,19 @@ A corrupt .registry file exists at {0}.
                 _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, DeploymentLocationFile));
             }
 
-            if (!string.IsNullOrWhiteSpace(packageInformation.PackageInstalledFrom))
+            if (!string.IsNullOrWhiteSpace(packageInformation.SourceInstalledFrom))
             {
-                var packageInstallFromFile = _fileSystem.CombinePaths(pkgStorePath, PackageInstalledFromFile);
-                if (_fileSystem.FileExists(packageInstallFromFile))
+                var sourceInstalledFromFile = _fileSystem.CombinePaths(pkgStorePath, SourceInstalledFromFile);
+                if (_fileSystem.FileExists(sourceInstalledFromFile))
                 {
-                    _fileSystem.DeleteFile(packageInstallFromFile);
+                    _fileSystem.DeleteFile(sourceInstalledFromFile);
                 }
 
-                _fileSystem.WriteFile(packageInstallFromFile, packageInformation.PackageInstalledFrom);
+                _fileSystem.WriteFile(sourceInstalledFromFile, packageInformation.SourceInstalledFrom);
             }
             else
             {
-                _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, PackageInstalledFromFile));
+                _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, SourceInstalledFromFile));
             }
         }
 

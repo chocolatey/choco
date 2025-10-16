@@ -218,7 +218,7 @@ that uses these options.");
                 ChocolateyPackageMetadata packageLocalMetadata;
                 string packageInstallLocation = null;
                 string deploymentlocation = null;
-                string packageInstalledFrom = null;
+                string sourceInstalledFrom = null;
 
                 if (package.PackagePath != null && !string.IsNullOrWhiteSpace(package.PackagePath))
                 {
@@ -239,7 +239,7 @@ that uses these options.");
                 {
                     packageInfo = _packageInfoService.Get(packageLocalMetadata);
                     deploymentlocation = packageInfo.DeploymentLocation;
-                    packageInstalledFrom = packageInfo.PackageInstalledFrom;
+                    sourceInstalledFrom = packageInfo.SourceInstalledFrom;
 
                     if (config.ListCommand.IncludeVersionOverrides)
                     {
@@ -335,7 +335,7 @@ that uses these options.");
                                     package.Description.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  "),
                                     !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty,
                                     !string.IsNullOrWhiteSpace(deploymentlocation) ? "{0} Deployed to: '{1}'".FormatWith(Environment.NewLine, deploymentlocation) :string.Empty,
-                                    !string.IsNullOrWhiteSpace(packageInstalledFrom) ? "{0} Package Installed From: '{1}'".FormatWith(Environment.NewLine, packageInstalledFrom) : string.Empty,
+                                    !string.IsNullOrWhiteSpace(sourceInstalledFrom) ? "{0} Source package was installed from: '{1}'".FormatWith(Environment.NewLine, sourceInstalledFrom) : string.Empty,
                                     packageArgumentsUnencrypted != null ? packageArgumentsUnencrypted : string.Empty
                                 ));
                             }
@@ -361,7 +361,7 @@ that uses these options.");
                 }
                 else
                 {
-                    yield return new PackageResult(packageLocalMetadata, package, config.ListCommand.LocalOnly ? packageInstallLocation : null, config.Sources);
+                    yield return new PackageResult(packageLocalMetadata, package, config.ListCommand.LocalOnly ? packageInstallLocation : null, config.Sources, null);
                 }
             }
 
@@ -2902,7 +2902,7 @@ and argument details.
                     {
                         "chocolatey".Log().Debug("Running beforeModify step for '{0}'", packageResult.PackageMetadata.Id);
 
-                        var packageResultCopy = new PackageResult(packageResult.PackageMetadata, packageResult.SearchMetadata, packageResult.InstallLocation, packageResult.Source);
+                        var packageResultCopy = new PackageResult(packageResult.PackageMetadata, packageResult.SearchMetadata, packageResult.InstallLocation, packageResult.Source, null);
 
                         beforeModifyAction(packageResultCopy, config);
 
