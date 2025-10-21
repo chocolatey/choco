@@ -22,5 +22,5 @@
     )
 
     Remove-ChocolateyInstallSnapshot
-    return New-ChocolateyInstallSnapshot -SnapshotPath $SnapshotPath -SetWorkingDirectory:$SetWorkingDirectory -NoSnapshotCopy:$NoSnapshotCopy
+    New-ChocolateyInstallSnapshot -SnapshotPath $SnapshotPath -SetWorkingDirectory:$SetWorkingDirectory -NoSnapshotCopy:$NoSnapshotCopy
 }
