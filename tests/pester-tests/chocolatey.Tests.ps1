@@ -262,7 +262,7 @@ exit $error.count
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
-            Enable-ChocolateySource -Name hermes
+            Enable-ChocolateySource -Name hermes-setup
 
             Invoke-Choco install chocolatey-license-business
         }
@@ -285,7 +285,7 @@ exit $error.count
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
-            Enable-ChocolateySource -Name hermes
+            Enable-ChocolateySource -Name hermes-setup
 
             $result = Invoke-Choco install chocolatey-license-business
             $LicenseFolder = "$env:ChocolateyInstall\lib\chocolatey-license-business\tools"
