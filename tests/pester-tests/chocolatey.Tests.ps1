@@ -281,6 +281,30 @@ exit $error.count
     }
 
     # This is skipped when not run in CI because it requires a valid license
+    Context 'Config file updates when a valid license is present' -Tag License -Skip:(-not $env:TEST_KITCHEN) {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateySource -Name hermes-setup
+
+            Invoke-Choco install chocolatey-license-business
+
+            # Run once post-license-install to ensure the config file is updated with the licensed source
+            $null = Invoke-Choco list
+        }
+
+        It 'does not overwrite the config file when nothing has changed' {
+            $originalHash = Get-FileHash -Path "$env:ChocolateyInstall/config/chocolatey.config"
+
+            $null = Invoke-Choco list
+
+            $newHash = Get-FileHash -Path "$env:ChocolateyInstall/config/chocolatey.config"
+
+            $originalHash.Hash | Should -BeExactly $newHash.Hash -Because 'the configuration file should not have changed between runs'
+        }
+    }
+
+    # This is skipped when not run in CI because it requires a valid license
     Context 'Changing licenses after modifying the Chocolatey Licensed repository' -Tag License -Skip:(-not $env:TEST_KITCHEN) {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
