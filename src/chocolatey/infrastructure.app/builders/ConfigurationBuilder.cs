@@ -150,6 +150,23 @@ namespace chocolatey.infrastructure.app.builders
                 var existingSource = configFileSettings.Sources?.FirstOrDefault(s => s.Id.IsEqualTo(ApplicationParameters.ChocolateyLicensedFeedSourceName));
                 if (existingSource != null)
                 {
+                    // Avoid making any changes since everything is correct and return.
+                    // This avoids making unnecessary updates to the chocolatey.config file.
+                    // A direct Equals isn't possible because we do want to allow users to change it being
+                    // Disabled or not, and we do have to check the decrypted password value, as the
+                    // encrypted strings are not the same every time they're generated.
+                    if (existingSource.Id == configSource.Id
+                        && existingSource.Value == configSource.Value
+                        && existingSource.UserName == configSource.UserName
+                        && NugetEncryptionUtility.DecryptString(existingSource.Password) == license.Id
+                        && existingSource.Priority == configSource.Priority
+                        && existingSource.BypassProxy == configSource.BypassProxy
+                        && existingSource.AllowSelfService == configSource.AllowSelfService
+                        && existingSource.VisibleToAdminsOnly == configSource.VisibleToAdminsOnly)
+                    {
+                        return;
+                    }
+
                     // Ensure we retain whether the licensed source is disabled.
                     configSource.Disabled = existingSource.Disabled;
 
