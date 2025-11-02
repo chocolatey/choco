@@ -41,13 +41,36 @@ namespace chocolatey.infrastructure.results
             get { return Messages.Any(x => x.MessageType == ResultType.Warn); }
         }
 
+        /// <summary>
+        /// Name of the package installed.
+        /// </summary>
         public string Name { get; private set; }
+        /// <summary>
+        /// Version of the package installed.
+        /// </summary>
         public string Version { get; private set; }
+        /// <summary>
+        /// Instance of <see cref="IPackageMetadata"/> representing the nuspec file in memory.
+        /// </summary>
         public IPackageMetadata PackageMetadata { get; private set; }
+        /// <summary>
+        /// Instance of <see cref="IPackageSearchMetadata"/> representing the package data returned from a repository.
+        /// </summary>
         public IPackageSearchMetadata SearchMetadata { get; private set; }
+        /// <summary>
+        /// Location on disk that the package has been installed to.
+        /// </summary>
         public string InstallLocation { get; set; }
+        /// <summary>
+        /// Sources available during package installation.
+        /// </summary>
         public string Source { get; set; }
+        [Obsolete("This property is deprecated and will be removed in v3.")]
         public string SourceUri { get; set; }
+        /// <summary>
+        /// The package source used to install the package.
+        /// </summary>
+        public string SourceInstalledFrom { get; set; }
         public int ExitCode { get; set; }
 
         public void ResetMetadata(IPackageMetadata metadata, IPackageSearchMetadata search)
@@ -58,13 +81,27 @@ namespace chocolatey.infrastructure.results
             Version = metadata.Version.ToNormalizedStringChecked();
         }
 
-        public PackageResult(IPackageMetadata packageMetadata, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackageResult"/> class.
+        /// </summary>
+        /// <param name="packageMetadata">Instance of <see cref="IPackageMetadata"/> representing the nuspec file in memory. Assigned to <see cref="PackageMetadata"/></param>
+        /// <param name="installLocation">Assigned to <see cref="InstallLocation"/></param>
+        /// <param name="source">Sources available during package installation. Assigned to <see cref="Source"/></param>
+        public PackageResult(IPackageMetadata packageMetadata, string installLocation, string source = null) 
+            : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
         {
             PackageMetadata = packageMetadata;
             Source = source;
         }
 
-        public PackageResult(IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageSearch.Identity.Id, packageSearch.Identity.Version.ToNormalizedStringChecked(), installLocation)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackageResult"/> class.
+        /// </summary>
+        /// <param name="packageSearch">Instance of <see cref="IPackageSearchMetadata"/> representing the package data returned from a repository. Assigned to <see cref="SearchMetadata"/></param>
+        /// <param name="installLocation">Assigned to <see cref="InstallLocation"/></param>
+        /// <param name="source">Sources available during package installation. Assigned to <see cref="Source"/></param>
+        public PackageResult(IPackageSearchMetadata packageSearch, string installLocation, string source = null) 
+            : this(packageSearch.Identity.Id, packageSearch.Identity.Version.ToNormalizedStringChecked(), installLocation)
         {
             SearchMetadata = packageSearch;
             Source = source;
@@ -103,10 +140,24 @@ namespace chocolatey.infrastructure.results
             */
         }
 
-        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null) : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
+        [Obsolete("This overload is deprecated and will be removed in v3.")]
+        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null)
+            : this(packageMetadata, packageSearch, installLocation, source, null) {  }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackageResult"/> class.
+        /// </summary>
+        /// <param name="packageMetadata">Instance of <see cref="IPackageMetadata"/> representing the nuspec file in memory. Assigned to <see cref="PackageMetadata"/></param>
+        /// <param name="packageSearch">Instance of <see cref="IPackageSearchMetadata"/> representing the package data returned from a repository. Assigned to <see cref="SearchMetadata"/></param>
+        /// <param name="installLocation">Assigned to <see cref="InstallLocation"/></param>
+        /// <param name="source">Sources available during package installation. Assigned to <see cref="Source"/></param>
+        /// <param name="sourceInstalledFrom">The package source used to install the package. Assigned to <see cref="SourceInstalledFrom"/></param>
+        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source, string sourceInstalledFrom)
+            : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
         {
             SearchMetadata = packageSearch;
             PackageMetadata = packageMetadata;
+            SourceInstalledFrom = sourceInstalledFrom;
             var sources = new List<Uri>();
             if (!string.IsNullOrEmpty(source))
             {
@@ -118,6 +169,8 @@ namespace chocolatey.infrastructure.results
                 {
                     this.Log().Debug("Unable to determine sources from '{0}'. Using value as is.{1} {2}".FormatWith(source, Environment.NewLine, ex.ToStringSafe()));
                     // source is already set above
+                    // Note: Where above? This seems to be copied/pasted from the overload above, but forgot to actually set the source.
+                    // While this seems like it may be incorrect, we do not currently know if this is an issue at all.
                     return;
                 }
             }
@@ -125,6 +178,13 @@ namespace chocolatey.infrastructure.results
             Source = sources.FirstOrDefault(uri => uri.IsFile || uri.IsUnc).ToStringSafe();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PackageResult"/> class.
+        /// </summary>
+        /// <param name="name">Name of the package installed. Assigned to <see cref="Name"/></param>
+        /// <param name="version">Version of the package installed. Assigned to <see cref="Version"/></param>
+        /// <param name="installLocation">Location on disk the package was installed to. Assigned to <see cref="InstallLocation"/></param>
+        /// <param name="source">Sources available during package installation. Assigned to <see cref="Source"/></param>
         public PackageResult(string name, string version, string installLocation, string source = null)
         {
             Name = name;

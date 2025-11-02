@@ -7,7 +7,7 @@
     <title>chocolatey-dummy-package</title>
     <authors>Chocolatey Software</authors>
     <projectUrl>https://github.com/chocolatey</projectUrl>
-    <iconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</iconUrl>
+    <iconUrl>https://img.chocolatey.org/nupkg/chocolateyicon.png</iconUrl>
     <tags>chocolatey-dummy-package</tags>
     <summary>This is a purposely empty dummy package for testing choco push functionality</summary>
     <description>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nunc eget lorem dolor sed viverra ipsum nunc aliquet. Integer vitae justo eget magna fermentum iaculis. Non curabitur gravida arcu ac tortor dignissim convallis. Rhoncus dolor purus non enim praesent. Curabitur vitae nunc sed velit dignissim. Sapien pellentesque habitant morbi tristique senectus et netus. Purus gravida quis blandit turpis cursus. Ut tortor pretium viverra suspendisse potenti nullam. Amet est placerat in egestas erat. Senectus et netus et malesuada fames. Amet consectetur adipiscing elit pellentesque habitant morbi. Elementum nisi quis eleifend quam adipiscing. Arcu ac tortor dignissim convallis aenean et tortor at.

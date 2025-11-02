@@ -34,6 +34,33 @@
         }
     }
 
+    Context "Should display source and deployment locations when using --local-only" {
+        BeforeAll {
+            New-ChocolateyInstallSnapshot
+            $PackageUnderTest = 'pureportable'
+            Enable-ChocolateySource -Name hermes-setup
+
+            $Setup = Invoke-Choco install $PackageUnderTest
+            $Setup.ExitCode | Should -Be 0 -Because $Setup.String
+
+            $Output = Invoke-Choco info $PackageUnderTest --local-only
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Should contain source and deployment location summary" {
+            # We do not necessarily know what source will be used, so we match on the leading string.
+            $Output.String | Should -Match "Source package was installed from: '"
+            $Output.String | Should -Match "Deployed to: '"
+        }
+    }
+
     Context "Should include configured sources" {
         BeforeAll {
             Initialize-ChocolateyTestInstall -Source $PSScriptRoot\testpackages
