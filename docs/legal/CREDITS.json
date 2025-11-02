@@ -4,12 +4,12 @@
     "link": "https://github.com/chocolatey/choco",
     "licenseName": "LICENSE",
     "licenseLink": "https://github.com/chocolatey/choco/blob/master/LICENSE",
-    "version": "2.5.0",
+    "version": "2.5.1",
     "dependencies": [
         {
             "name": "7-Zip",
             "link": "https://www.7-zip.org/",
-            "version": "24.09",
+            "version": "25.01",
             "licenses": [
                 {
                     "type": "OTHER",

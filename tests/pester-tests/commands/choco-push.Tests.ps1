@@ -1,11 +1,19 @@
 ﻿Import-Module helpers/common-helpers
 
 # These are skipped in the Proxy Test environment because they push to a port outside of 8443 which is not allowed by our proxy.
-Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $env:API_KEY -or $null -eq $env:PUSH_REPO) {
+Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip, CCR -Skip:($null -eq $env:API_KEY -or $null -eq $env:PUSH_REPO) {
     BeforeAll {
         Remove-NuGetPaths
         $ApiKey = $env:API_KEY
         $RepositoryToUse = $env:PUSH_REPO
+        $CcrApiKey = 'c:\elasticsearch-setup\ccr-apikey.txt'
+
+        # Check if we're in a CCR Test Kitchen. If we are, utilize the local details.
+        if (Test-Path $CcrApiKey) {
+            $ApiKey = (Get-Content $CcrApiKey -Raw).Trim()
+            $RepositoryToUse = 'http://localhost/'
+        }
+
         Initialize-ChocolateyTestInstall
 
         New-ChocolateyInstallSnapshot
@@ -40,8 +48,9 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip -Skip:($null -eq $
 
         It "Should Report the actual cause of the error" {
             $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse" -Because $Output.String
-            $Output.Lines | Should -Contain "An error has occurred. This package version already exists on the repository and cannot be modified." -Because $Output.String
-            $Output.Lines | Should -Contain "Package versions that are approved, rejected, or exempted cannot be modified." -Because $Output.String
+            # The output of this differs depending on where you're running from. The following phrases appear on 1 or more line in every permutation that I've seen.
+            ($Output.Lines -match 'already exists on the repository').Count | Should -BeGreaterOrEqual 1 -Because $Output.String
+            ($Output.Lines -match 'cannot be modified').Count | Should -BeGreaterOrEqual 1 -Because $Output.String
         }
     }
 
@@ -149,12 +158,12 @@ Describe 'choco push nuget <_> repository' -Tag Chocolatey, PushCommand -Skip:($
                 AddedVersion = $AddedVersion
             }
             $PackagePath = New-ChocolateyTestPackage @NewChocolateyTestPackage
+            # Add the Nuget source so that the push doesn't prompt for credentials.
+            # See https://github.com/chocolatey/choco/issues/2026#issuecomment-2423828013
+            $null = Invoke-Choco source add --name temporary-nuget --source $RepositoryToUse$RepositoryEndpoint --user $env:NUGET_SOURCE_USERNAME --password $env:NUGET_SOURCE_PASSWORD
 
             if ($UseConfig) {
                 $null = Invoke-Choco apikey add --source $RepositoryToUse$RepositoryEndpoint --api-key $ApiKey
-                # Add the Nuget source so that the push doesn't prompt for credentials.
-                # See https://github.com/chocolatey/choco/issues/2026#issuecomment-2423828013
-                $null = Invoke-Choco source add --name temporary-nuget --source $RepositoryToUse$RepositoryEndpoint --user $env:NUGET_SOURCE_USERNAME --password $env:NUGET_SOURCE_PASSWORD
                 # Ensure the key is null (should always be, but scoping can be wonky)
                 $KeyParameter = $null
             } else {
