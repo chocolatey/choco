@@ -2068,7 +2068,8 @@ To install a local, or remote file, you may use:
         }
     }
 
-    Context 'Installing package with large number of dependency versions' {
+    # Excluded from CCR testing as this is not testing remote repositories in any way.
+    Context 'Installing package with large number of dependency versions' -Tag CCRExcluded {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot -SetWorkDir
 

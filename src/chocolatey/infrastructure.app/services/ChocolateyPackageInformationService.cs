@@ -45,6 +45,7 @@ namespace chocolatey.infrastructure.app.services
         private const string ExtraFile = ".extra";
         private const string VersionOverrideFile = ".version";
         private const string DeploymentLocationFile = ".deploymentLocation";
+        private const string SourceInstalledFromFile = ".sourceInstalledFrom";
 
         // We need to store the package identifiers we have warned about
         // to prevent duplicated outputs.
@@ -194,6 +195,20 @@ A corrupt .registry file exists at {0}.
                 );
             }
 
+            var sourceInstalledFromFile = _fileSystem.CombinePaths(pkgStorePath, SourceInstalledFromFile);
+            if (_fileSystem.FileExists(sourceInstalledFromFile))
+            {
+                FaultTolerance.TryCatchWithLoggingException(
+                    () =>
+                    {
+                        packageInformation.SourceInstalledFrom = _fileSystem.ReadFile(sourceInstalledFromFile);
+                    },
+                    "Unable to read package installed from file",
+                    throwError: false,
+                    logWarningInsteadOfError: true
+                );
+            }
+
             return packageInformation;
         }
 
@@ -309,6 +324,21 @@ A corrupt .registry file exists at {0}.
             else
             {
                 _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, DeploymentLocationFile));
+            }
+
+            if (!string.IsNullOrWhiteSpace(packageInformation.SourceInstalledFrom))
+            {
+                var sourceInstalledFromFile = _fileSystem.CombinePaths(pkgStorePath, SourceInstalledFromFile);
+                if (_fileSystem.FileExists(sourceInstalledFromFile))
+                {
+                    _fileSystem.DeleteFile(sourceInstalledFromFile);
+                }
+
+                _fileSystem.WriteFile(sourceInstalledFromFile, packageInformation.SourceInstalledFrom);
+            }
+            else
+            {
+                _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, SourceInstalledFromFile));
             }
         }
 

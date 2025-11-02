@@ -7,7 +7,7 @@
     <title>chocolatey-dummy-packagechocolatey-dummy-packagechocolatey-dummy-packagechocolatey-dummy-packagechocolatey-dummy-packagechocolatey-dummy-packagechocolatey-dummy-packagechocolatey-dummy-packagechocolatey-dummy-packagechocolatey-dummy-packagechocolatey-dummy-packagechocolatey-dummy-package</title>
     <authors>Chocolatey Software</authors>
     <projectUrl>https://github.com/chocolatey</projectUrl>
-    <iconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</iconUrl>
+    <iconUrl>https://img.chocolatey.org/nupkg/chocolateyicon.png</iconUrl>
     <tags>chocolatey-dummy-package</tags>
     <summary>This is a purposely empty dummy package for testing choco push functionality</summary>
     <description>This is a purposely empty dummy package for testing choco push functionality</description>

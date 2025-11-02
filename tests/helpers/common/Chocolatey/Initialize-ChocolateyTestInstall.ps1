@@ -28,6 +28,9 @@
         $null = robocopy $env:ChocolateyInstall/lib/chocolatey $Directory/lib/chocolatey /MIR
         $null = robocopy $env:ChocolateyInstall/lib/chocolatey.extension $Directory/lib/chocolatey.extension /MIR
         $null = robocopy $env:ChocolateyInstall/lib/chocolatey-agent $Directory/lib/chocolatey-agent /MIR
+        Get-ChildItem $env:ChocolateyInstall/lib -Filter chocolatey-license-* | ForEach-Object {
+            $null = robocopy "$($_.FullName)" "$Directory/lib/$($_.Name)" /MIR
+        }
 
         $env:ChocolateyInstall = $Directory
         Set-ChocolateyTestLocation -Directory $Directory
