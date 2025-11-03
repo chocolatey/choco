@@ -1,0 +1,24 @@
+name: Sync labels
+on:
+  workflow_dispatch:
+  schedule:
+    # Run at the end of the day (most likely UTC)
+    - cron: "0 0 * * *"
+
+jobs:
+  labels:
+    # We use ubuntu as the image, as it is typically faster and cheaper (on private repos).
+    runs-on: ubuntu-latest
+
+    steps:
+      # uncomment the uses line if additional configuration in the current
+      # repository is used.
+      #- uses: actions/checkout@v3.0.2
+      - uses: EndBug/label-sync@v2.3.2
+        with:
+          config-file: |
+            https://raw.githubusercontent.com/chocolatey/.github/main/.github/labels.yml
+          request-token: ${{ secrets.SYNC_TOKEN }} # Used when getting the config files.
+          delete-other-labels: false # After initial run, and verification change this to true
+          dry-run: false
+          token: ${{ secrets.SYNC_TOKEN }} # Used when updating the labels on the repository.
