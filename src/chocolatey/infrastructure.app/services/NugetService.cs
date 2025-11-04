@@ -219,6 +219,7 @@ that uses these options.");
                 string packageInstallLocation = null;
                 string deploymentlocation = null;
                 string sourceInstalledFrom = null;
+                string lastUpdated = null;
 
                 if (package.PackagePath != null && !string.IsNullOrWhiteSpace(package.PackagePath))
                 {
@@ -240,7 +241,7 @@ that uses these options.");
                     packageInfo = _packageInfoService.Get(packageLocalMetadata);
                     deploymentlocation = packageInfo.DeploymentLocation;
                     sourceInstalledFrom = packageInfo.SourceInstalledFrom;
-
+                    lastUpdated = packageInfo.LastUpdated;
                     if (config.ListCommand.IncludeVersionOverrides)
                     {
                         if (packageInfo.VersionOverride != null)
@@ -286,7 +287,7 @@ that uses these options.");
                                 package.IsApproved ? " [Approved]" : string.Empty,
                                 package.IsDownloadCacheAvailable ? " Downloads cached for licensed users" : string.Empty,
                                 package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Possibly broken for FOSS users (due to original download location changes by vendor)" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty,
-                                config.ListCommand.ShowLastUpdatedDate ? package.Published?.ToString(" yyyy-MM-dd HH:mm:ss") ?? " Last updated not available" : string.Empty
+                                config.ListCommand.ShowLastUpdatedDate ? " {0}".FormatWith(packageInfo.LastUpdated) ?? " Last updated not available" : string.Empty
                                 ))
                             );
 
@@ -300,7 +301,7 @@ that uses these options.");
  Tags: {9}
  Software Site: {10}
  Software License: {11}{12}{13}{14}{15}{16}
- Description: {17}{18}{19}{20}{21}
+ Description: {17}{18}{19}{20}{21}{22}
 ".FormatWith(
                                     package.Title.EscapeCurlyBraces(),
                                     package.Published.GetValueOrDefault().UtcDateTime.ToShortDateString(),
@@ -337,6 +338,7 @@ that uses these options.");
                                     !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty,
                                     !string.IsNullOrWhiteSpace(deploymentlocation) ? "{0} Deployed to: '{1}'".FormatWith(Environment.NewLine, deploymentlocation) :string.Empty,
                                     !string.IsNullOrWhiteSpace(sourceInstalledFrom) ? "{0} Source package was installed from: '{1}'".FormatWith(Environment.NewLine, sourceInstalledFrom) : string.Empty,
+                                    !string.IsNullOrWhiteSpace(lastUpdated) ? "{0} Last updated: {1}".FormatWith(Environment.NewLine, lastUpdated) : string.Empty,
                                     packageArgumentsUnencrypted != null ? packageArgumentsUnencrypted : string.Empty
                                 ));
                             }

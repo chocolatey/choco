@@ -46,6 +46,7 @@ namespace chocolatey.infrastructure.app.services
         private const string VersionOverrideFile = ".version";
         private const string DeploymentLocationFile = ".deploymentLocation";
         private const string SourceInstalledFromFile = ".sourceInstalledFrom";
+        private const string LastUpdated = ".lastUpdated";
 
         // We need to store the package identifiers we have warned about
         // to prevent duplicated outputs.
@@ -208,6 +209,20 @@ A corrupt .registry file exists at {0}.
                     logWarningInsteadOfError: true
                 );
             }
+ 
+            var lastUpdated = _fileSystem.CombinePaths(pkgStorePath, LastUpdated);
+            if (_fileSystem.FileExists(lastUpdated))
+            {
+                FaultTolerance.TryCatchWithLoggingException(
+                    () =>
+                    {
+                        packageInformation.LastUpdated = _fileSystem.ReadFile(lastUpdated);
+                    },
+                    "Unable to read last updated from file",
+                    throwError: false,
+                    logWarningInsteadOfError: true
+                );
+            }
 
             return packageInformation;
         }
@@ -340,6 +355,23 @@ A corrupt .registry file exists at {0}.
             {
                 _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, SourceInstalledFromFile));
             }
+
+            if (!string.IsNullOrWhiteSpace(packageInformation.LastUpdated))
+            {
+                var lastUpdatedDate = _fileSystem.CombinePaths(pkgStorePath, LastUpdated);
+                if (_fileSystem.FileExists(lastUpdatedDate))
+                {
+                    _fileSystem.DeleteFile(lastUpdatedDate);
+                }
+
+                _fileSystem.WriteFile(lastUpdatedDate, packageInformation.LastUpdated);
+            }
+            else
+            {
+                _fileSystem.DeleteFile(_fileSystem.CombinePaths(pkgStorePath, LastUpdated));
+            }
+
+            
         }
 
         public void Remove(IPackageMetadata package)
