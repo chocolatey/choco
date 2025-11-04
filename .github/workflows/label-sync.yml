@@ -4,6 +4,10 @@ on:
   schedule:
     # Run at the end of the day (most likely UTC)
     - cron: "0 0 * * *"
+  push:
+    paths:
+      - '.github/workflows/label-sync.yml'
+      - '.github/labels.yml'
 
 jobs:
   labels:
@@ -23,6 +27,5 @@ jobs:
             .github/labels.yml
           request-token: ${{ secrets.SYNC_TOKEN }} # Used when getting the config files.
           delete-other-labels: true # After initial run, and verification change this to true
-          dry-run: true
+          dry-run: false
           token: ${{ secrets.SYNC_TOKEN }} # Used when updating the labels on the repository.
-
