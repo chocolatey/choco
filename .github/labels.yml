@@ -3,7 +3,7 @@
   description: "Issues that are related directly to packages, and no changes to Chocolatey CLI is required."
 - name: "PowerShell Internal Host"
   color: "D4C5F9"
-  description: "Issues that are related to how Chocolatey CLI spawns an internal PowerShell Host in order to execute the Chocolatey packaging scripts."
+  description: "Issues related to how Chocolatey CLI spawns a PowerShell Host to execute the packaging scripts."
 - name: "Dependency - Chocolatey.NuGet.Client"
   color: "E10D60"
   description: "Issues that require a modification to something in the referenced NuGet.Client libraries."
