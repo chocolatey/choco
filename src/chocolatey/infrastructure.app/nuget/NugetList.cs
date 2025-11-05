@@ -481,6 +481,13 @@ namespace chocolatey.infrastructure.app.nuget
                         .ThenBy(q => q.Identity.Id)
                         .ThenByDescending(q => q.Identity.Version);
 
+                case domain.PackageOrder.LastUpdated:
+                    return query
+                        .OrderByDescending(q => q.Published)
+                        .ThenBy(q => q.Identity.Id)
+                        .ThenByDescending(q => q.Identity.Version);
+
+
                 default:
                     // Since we return an IOrderedEnumerable, some form of ordering must be applied,
                     // even when the user has not explicitly requested a sort order.

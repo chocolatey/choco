@@ -242,9 +242,9 @@ function Get-ChocoOrderByOptions {
         manually when the enum changes.
 
         .OUTPUTS
-        A string in the format "Id|LastPublished|Popularity|Title|Unsorted"
+        A string in the format "Id|LastPublished|Popularity|Title|Unsorted|LastUpdated"
     #>
-    return @("Id", "LastPublished", "Popularity", "Title", "Unsorted")
+    return @("Id", "LastPublished", "Popularity", "Title", "Unsorted", "LastUpdated")
 }
 
 function ChocolateyTabExpansion($lastBlock) {

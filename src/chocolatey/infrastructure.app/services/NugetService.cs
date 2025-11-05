@@ -364,7 +364,7 @@ that uses these options.");
                 }
                 else
                 {
-                    yield return new PackageResult(packageLocalMetadata, package, config.ListCommand.LocalOnly ? packageInstallLocation : null, config.Sources, null);
+                    yield return new PackageResult(packageLocalMetadata, package, config.ListCommand.LocalOnly ? packageInstallLocation : null, config.Sources, null, lastUpdated);
                 }
             }
 
@@ -1004,7 +1004,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             packageRemoteMetadata.PackageTestResultStatus == "Failing" && packageRemoteMetadata.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : packageRemoteMetadata.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
                         ));
 
-                        var packageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe()));
+                        var packageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe(), null));
                         if (shouldAddForcedResultMessage)
                         {
                             packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
@@ -1829,7 +1829,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     packageRemoteMetadata.PackageTestResultStatus == "Failing" && packageRemoteMetadata.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : packageRemoteMetadata.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
                                 ));
 
-                                var upgradePackageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe()));
+                                var upgradePackageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe(), null));
                                 upgradePackageResult.ResetMetadata(packageMetadata, packageRemoteMetadata);
                                 upgradePackageResult.InstallLocation = installedPath;
 
@@ -2905,7 +2905,7 @@ and argument details.
                     {
                         "chocolatey".Log().Debug("Running beforeModify step for '{0}'", packageResult.PackageMetadata.Id);
 
-                        var packageResultCopy = new PackageResult(packageResult.PackageMetadata, packageResult.SearchMetadata, packageResult.InstallLocation, packageResult.Source, null);
+                        var packageResultCopy = new PackageResult(packageResult.PackageMetadata, packageResult.SearchMetadata, packageResult.InstallLocation, packageResult.Source, null, null);
 
                         beforeModifyAction(packageResultCopy, config);
 
