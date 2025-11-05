@@ -79,7 +79,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 _because = () => Command.ParseAdditionalArguments(_unparsedArgs, Configuration);
             }
 
-            public new void Reset()
+            public void Reset()
             {
                 _unparsedArgs.Clear();
             }
