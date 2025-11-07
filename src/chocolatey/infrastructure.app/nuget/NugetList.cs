@@ -486,12 +486,6 @@ namespace chocolatey.infrastructure.app.nuget
 
                 case domain.PackageOrder.LastUpdated:
                     return query
-                        .OrderByDescending(q => q.Published)
-                        .ThenBy(q => q.Identity.Id)
-                        .ThenByDescending(q => q.Identity.Version);
-
-                case domain.PackageOrder.LastUpdatedDate:
-                    return query
                         .OrderByDescending(q =>
                         {
                             string lastUpdatedContent = null;

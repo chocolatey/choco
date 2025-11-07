@@ -242,6 +242,7 @@ that uses these options.");
                     deploymentlocation = packageInfo.DeploymentLocation;
                     sourceInstalledFrom = packageInfo.SourceInstalledFrom;
                     lastUpdated = packageInfo.LastUpdated;
+
                     if (config.ListCommand.IncludeVersionOverrides)
                     {
                         if (packageInfo.VersionOverride != null)

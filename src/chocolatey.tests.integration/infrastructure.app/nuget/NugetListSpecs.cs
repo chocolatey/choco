@@ -347,7 +347,6 @@ namespace chocolatey.tests.integration.infrastructure.app.services
 <Property Name=""GalleryDetailsUrl"" Type=""Edm.String"" Nullable=""true""/>
 <Property Name=""DownloadCount"" Type=""Edm.Int32"" Nullable=""false""/>
 <Property Name=""VersionDownloadCount"" Type=""Edm.Int32"" Nullable=""false""/>
-<Property Name=""LastUpdated"" Type=""Edm.String"" Nullable=""true""/>
 <Property Name=""RequireLicenseAcceptance"" Type=""Edm.Boolean"" Nullable=""false""/>
 <Property Name=""Description"" Type=""Edm.String"" Nullable=""true""/>
 <Property Name=""Language"" Type=""Edm.String"" Nullable=""true""/>

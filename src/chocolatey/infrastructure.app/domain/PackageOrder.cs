@@ -44,11 +44,6 @@ namespace chocolatey.infrastructure.app.domain
         LastUpdated,
 
         /// <summary>
-        /// Sort by last updated date, from newest to oldest, fetched from the .lastUpdated file if available.
-        /// </summary>
-        LastUpdatedDate,
-
-        /// <summary>
         /// Do not sort; return packages in the order received from the source.
         /// </summary>
         Unsorted
