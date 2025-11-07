@@ -501,10 +501,18 @@ exit $error.count
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context '.Net Registry is not set' -Skip:(-not $env:TEST_KITCHEN) {
+    Context '.Net Registry is not present' -Skip:(-not $env:TEST_KITCHEN) {
         BeforeAll {
-            $RegistryPath = 'SOFTWARE\Wow6432Node\Microsoft\NET Framework Setup\NDP\v4\Full\'
-            Set-RegistryKeyOwner -Key $RegistryPath
+            $RegistryPath = 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\'
+
+            # Sometimes this is failing. This allows it to try a second time before completely failing.
+            try {
+                Set-RegistryKeyOwner -Key $RegistryPath
+            } catch {
+                Write-Warning "Failed to set the registry key ownership. Attempting again."
+                Set-RegistryKeyOwner -Key $RegistryPath
+            }
+
             $OriginalRelease = Get-ItemPropertyValue -Path "HKLM:\$RegistryPath" -Name Release
             Remove-ItemProperty -Path "HKLM:\$RegistryPath" -Name Release
             $Output = Invoke-Choco help
@@ -519,10 +527,42 @@ exit $error.count
         }
 
         It "Reports .NET Framework 4.8 is required" {
-            $Output.Lines | Should -Contain '.NET 4.8 is not installed or may need a reboot to complete installation.'
+            $Output.Lines | Should -Contain '.NET 4.8 is not installed or may need a reboot to complete installation.' -Because $Output.String
         }
     }
 
+
+    # This is skipped when not run in CI because it modifies the local system.
+    Context '.Net Registry is not valid' -Skip:(-not $env:TEST_KITCHEN) {
+        BeforeAll {
+            $RegistryPath = 'SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\'
+
+            # Sometimes this is failing. This allows it to try a second time before completely failing.
+            try {
+                Set-RegistryKeyOwner -Key $RegistryPath
+            } catch {
+                Write-Warning "Failed to set the registry key ownership. Attempting again."
+                Set-RegistryKeyOwner -Key $RegistryPath
+            }
+
+            $OriginalRelease = Get-ItemPropertyValue -Path "HKLM:\$RegistryPath" -Name Release
+            Set-ItemProperty -Path "HKLM:\$RegistryPath" -Name Release -Value 10
+            $Output = Invoke-Choco help
+        }
+
+        AfterAll {
+            Set-ItemProperty -Path "HKLM:\$RegistryPath" -Name Release -Value $OriginalRelease
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because $Output.String
+        }
+
+        It "Reports container registration failed" {
+            $Output.Lines | Should -Contain 'Container registration encountered an irrecoverable error.' -Because $Output.String
+            $Output.Lines | Should -Contain 'It could be that .NET 4.8 may be corrupted, or may be a really old version.' -Because $Output.String
+        }
+    }
 
     Context 'Chocolatey lib directory missing' {
         BeforeAll {

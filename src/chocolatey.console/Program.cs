@@ -44,11 +44,17 @@ using Assembly = chocolatey.infrastructure.adapters.Assembly;
 using Console = System.Console;
 using Environment = System.Environment;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
+using System.Runtime.CompilerServices;
 
 namespace chocolatey.console
 {
     public sealed class Program
     {
+        // We can't use chocolatey.StringResources as it is in both Chocolatey.PowerShell and chocolatey. This message is only reused within this class, so we're setting it here.
+        private const string DotNetDownload = @"
+Please install .NET Framework 4.8 manually and reboot the system.
+Download at 'https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe'";
+
         private static void Main(string[] args)
         {
             ChocolateyConfiguration config = null;
@@ -69,7 +75,27 @@ namespace chocolatey.console
                 Bootstrap.Initialize();
                 Bootstrap.Startup();
                 license = License.ValidateLicense();
-                var container = SimpleInjectorContainer.Container;
+                Container container = null;
+
+                try
+                {
+                    container = SimpleInjectorContainer.Container;
+                }
+                catch
+                {
+                    // We have encountered an irrecoverable error before program information would be displayed. So we're going to display it as best we can. Regardless of if they wanted regular output or not, they're getting it.
+                    DisplayProgramInformation(
+                        true,
+                        args,
+                        VersionInformation.GetCurrentInformationalVersion(), // We don't have a configuration object yet. This is the same way that ConfigurationBuilder generates this version.
+                        license
+                        );
+                    "chocolatey".Log().Error(ChocolateyLoggers.Important, @"Container registration encountered an irrecoverable error.
+It could be that .NET 4.8 may be corrupted, or may be a really old version.{0}".FormatWith(DotNetDownload));
+                    
+                    // rethrow the original exception.
+                    throw;
+                }
 
                 "LogFileOnly".Log().Info(() => "".PadRight(60, '='));
 
@@ -112,18 +138,12 @@ namespace chocolatey.console
 
                 TrapExitScenarios();
 
-                if (config.RegularOutput)
-                {
-#if DEBUG
-                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2} (DEBUG BUILD)".FormatWith(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.IsLicensedVersion() ? " {0}".FormatWith(license.LicenseType) : string.Empty));
-#else
-                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2}".FormatWith(ApplicationParameters.Name, config.Information.ChocolateyProductVersion, license.IsLicensedVersion() ? " {0}".FormatWith(license.LicenseType) : string.Empty));
-#endif
-                    if (args.Length == 0)
-                    {
-                        "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "Please run 'choco --help' or 'choco <command> --help' for help menu.");
-                    }
-                }
+                DisplayProgramInformation(
+                    config.RegularOutput,
+                    args,
+                    config.Information.ChocolateyProductVersion,
+                    license
+                    );
 
                 ThrowIfNotDotNet48();
 
@@ -328,16 +348,30 @@ command.");
                 const int net48ReleaseBuild = 528040;
                 const string regKey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
 
-                using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(regKey))
+                // Use 64 bit hive as it will read the 32 bit hive on 32 bit system: https://learn.microsoft.com/en-us/dotnet/api/microsoft.win32.registryview
+                using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry64).OpenSubKey(regKey))
                 {
                     if (ndpKey == null || ndpKey.GetValue("Release") == null || (int)ndpKey.GetValue("Release") < net48ReleaseBuild)
                     {
-                        throw new ApplicationException(
-                            @".NET 4.8 is not installed or may need a reboot to complete installation.
-Please install .NET Framework 4.8 manually and reboot the system.
-Download at 'https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe'"
-                                .FormatWith(Environment.NewLine));
+                        throw new ApplicationException(".NET 4.8 is not installed or may need a reboot to complete installation.{0}".FormatWith(DotNetDownload));
                     }
+                }
+            }
+        }
+
+        private static void DisplayProgramInformation(bool configRegularOutput, string[] args, string chocolateyVersion, ChocolateyLicense license)
+        {
+            if (configRegularOutput)
+            {
+                var buildType = string.Empty;
+#if DEBUG
+                buildType = " (DEBUG BUILD)";
+#endif
+                "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} v{1}{2}{3}".FormatWith(ApplicationParameters.Name, chocolateyVersion, license.IsLicensedVersion() ? " {0}".FormatWith(license.LicenseType) : string.Empty, buildType));
+
+                if (args.Length == 0)
+                {
+                    "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "Please run 'choco --help' or 'choco <command> --help' for help menu.");
                 }
             }
         }
