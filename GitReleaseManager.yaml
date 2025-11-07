@@ -1,15 +1,12 @@
 issue-labels-include:
   - Breaking Change
   - Deprecate
-  - Feature
-  - C4B Feature
+  - Enhancement
   - Bug
-  - Improvement
   - Documentation
   - Dependency Change
 issue-labels-exclude:
-  - Internal Refactoring
-  - BuildAutomation
+  - Build Automation
   - NO RELEASE NOTES
 issue-labels-alias:
   - name:    Documentation
