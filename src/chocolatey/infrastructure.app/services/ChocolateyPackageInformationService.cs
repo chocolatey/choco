@@ -385,7 +385,7 @@ A corrupt .registry file exists at {0}.
             _fileSystem.DeleteDirectoryChecked(pkgStorePath, recursive: true);
         }
 
-        private static string GetStorePath(IFileSystem fileSystem, string id, NuGetVersion version)
+        public static string GetStorePath(IFileSystem fileSystem, string id, NuGetVersion version)
         {
             var preferredStorePath = fileSystem.CombinePaths(ApplicationParameters.ChocolateyPackageInfoStoreLocation, "{0}.{1}".FormatWith(id, version.ToNormalizedStringChecked()));
 

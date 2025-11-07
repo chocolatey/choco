@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using chocolatey.infrastructure.tolerance;
 using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.filesystem;
+using chocolatey.infrastructure.app.services;
 using NuGet.Common;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
@@ -35,6 +36,8 @@ namespace chocolatey.infrastructure.app.nuget
         public static int LastPackageLimitUsed { get; private set; }
         public static bool ThresholdHit { get; private set; }
         public static bool LowerThresholdHit { get; private set; }
+
+        private const string LastUpdated = ".lastUpdated";
 
         public static IEnumerable<IPackageSearchMetadata> GetPackages(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
         {
@@ -320,7 +323,7 @@ namespace chocolatey.infrastructure.app.nuget
                 results = results.Where(p => (p.IsDownloadCacheAvailable && configuration.Information.IsLicensedVersion) || p.PackageTestResultStatus != "Failing").ToHashSet();
             }
 
-            results = ApplyPackageSort(results, configuration.ListCommand.OrderBy).ToHashSet();
+            results = ApplyPackageSort(results, configuration.ListCommand.OrderBy, filesystem).ToHashSet();
 
             return results.AsQueryable();
         }
@@ -453,7 +456,7 @@ namespace chocolatey.infrastructure.app.nuget
             return packagesList.OrderByDescending(p => p.Identity.Version).FirstOrDefault();
         }
 
-        private static IOrderedEnumerable<IPackageSearchMetadata> ApplyPackageSort(IEnumerable<IPackageSearchMetadata> query, domain.PackageOrder orderBy)
+        private static IOrderedEnumerable<IPackageSearchMetadata> ApplyPackageSort(IEnumerable<IPackageSearchMetadata> query, domain.PackageOrder orderBy, IFileSystem filesystem)
         {
             switch (orderBy)
             {
@@ -484,6 +487,30 @@ namespace chocolatey.infrastructure.app.nuget
                 case domain.PackageOrder.LastUpdated:
                     return query
                         .OrderByDescending(q => q.Published)
+                        .ThenBy(q => q.Identity.Id)
+                        .ThenByDescending(q => q.Identity.Version);
+
+                case domain.PackageOrder.LastUpdatedDate:
+                    return query
+                        .OrderByDescending(q =>
+                        {
+                            string lastUpdatedContent = null;
+                            var pkgStorePath = ChocolateyPackageInformationService.GetStorePath(filesystem, q.Identity.Id, q.Identity.Version);
+                            var lastUpdated = filesystem.CombinePaths(pkgStorePath, LastUpdated);
+                            if (filesystem.FileExists(lastUpdated))
+                            {
+                                FaultTolerance.TryCatchWithLoggingException(
+                                    () =>
+                                    {
+                                        lastUpdatedContent = filesystem.ReadFile(lastUpdated);
+                                    },
+                                    "Unable to read last updated from file",
+                                    throwError: false,
+                                    logWarningInsteadOfError: true
+                                );
+                            }
+                            return lastUpdatedContent;
+                        })
                         .ThenBy(q => q.Identity.Id)
                         .ThenByDescending(q => q.Identity.Version);
 
