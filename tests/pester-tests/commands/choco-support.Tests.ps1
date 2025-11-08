@@ -24,7 +24,7 @@ Describe "choco support" -Tag Chocolatey, SupportCommand {
 
         It "Reports support options" {
             $ExpectedOutput = if($HasLicensedExtension) {
-                "Howdy, you have access to private support channels."
+                "If you're experiencing a technical issue with Chocolatey or a related"
             } else {
                 "Unfortunately, we are unable to provide private support for"
             }

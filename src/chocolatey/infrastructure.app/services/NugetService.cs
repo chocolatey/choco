@@ -1391,30 +1391,30 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                     if (isPinned)
                     {
-                        if (!config.UpgradeCommand.IgnorePinned)
+                        var logMessage = GetPinnedPackageMessage(config, installedPackage);
+
+                        if (config.UpgradeCommand.IgnorePinned)
                         {
-                            var logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
-                            packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
-                            packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
-
-                            if (config.RegularOutput)
-                            {
-                                this.Log().Warn(ChocolateyLoggers.Important, logMessage);
-                            }
-
-                            continue;
+                            logMessage += " Upgrading pinned package anyway as ignore pin is specified.";
+                            config.PinPackage = true;
                         }
                         else
                         {
-                            var logMessage = "{0} is pinned. Upgrading pinned package anyway as ignore pin is specified".FormatWith(packageName);
-                            packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
+                            logMessage += " Skipping pinned package.";
+                        }
 
-                            if (config.RegularOutput)
-                            {
-                                this.Log().Warn(ChocolateyLoggers.Important, logMessage);
-                            }
+                        packageResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
 
-                            config.PinPackage = true;
+                        if (config.RegularOutput)
+                        {
+                            this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                        }
+
+                        if (!config.UpgradeCommand.IgnorePinned)
+                        {
+                            packageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
+
+                            continue;
                         }
                     }
 
@@ -1943,7 +1943,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 // move on quickly
                 if (isPinned && config.OutdatedCommand.IgnorePinned)
                 {
-                    var pinnedLogMessage = "{0} is pinned. Skipping pinned package.".FormatWith(packageName);
+                    var pinnedLogMessage = GetPinnedPackageMessage(config, installedPackage) + " Skipping pinned package.";
                     var pinnedPackageResult = outdatedPackages.GetOrAdd(packageName, new PackageResult(installedPackage.PackageMetadata, pathResolver.GetInstallPath(installedPackage.PackageMetadata.Id)));
                     pinnedPackageResult.Messages.Add(new ResultMessage(ResultType.Debug, pinnedLogMessage));
                     pinnedPackageResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, pinnedLogMessage));
@@ -2671,7 +2671,7 @@ and argument details.
                 var pkgInfo = _packageInfoService.Get(installedPackage.PackageMetadata);
                 if (pkgInfo != null && pkgInfo.IsPinned)
                 {
-                    var logMessage = "{0} is pinned. Skipping pinned package.".FormatWith(installedPackage.Name);
+                    var logMessage = GetPinnedPackageMessage(config, installedPackage) + " Skipping pinned package.";
                     var pinnedResult = packageResultsToReturn.GetOrAdd(installedPackage.Name, new PackageResult(installedPackage.Name, null, null));
                     pinnedResult.Messages.Add(new ResultMessage(ResultType.Warn, logMessage));
                     pinnedResult.Messages.Add(new ResultMessage(ResultType.Inconclusive, logMessage));
@@ -3146,6 +3146,11 @@ and argument details.
             config.Version = version;
 
             return installedPackages;
+        }
+
+        protected virtual string GetPinnedPackageMessage(ChocolateyConfiguration config, PackageResult package)
+        {
+            return "{0} is pinned.".FormatWith(package.Identity.Id);
         }
 
         private IEnumerable<PackageResult> SetLocalPackageNamesIfAllSpecified(ChocolateyConfiguration config, Action customAction)
