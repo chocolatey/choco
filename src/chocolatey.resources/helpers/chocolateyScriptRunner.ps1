@@ -59,8 +59,10 @@ if ($preRunHookScripts) {
 }
 
 if ($packageScript) {
+    Write-Debug "Finding Parameters for package script '$packageScript'";
+    $scriptParameters = Get-PackageScriptParameters -PackageParameters $packageParameters -Script $packageScript
     Write-Debug "Running package script '$packageScript'";
-    & "$packageScript"
+    & "$packageScript" @scriptParameters
 }
 $scriptSuccess = $?
 $lastExecutableExitCode = $LASTEXITCODE
