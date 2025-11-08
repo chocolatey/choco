@@ -49,7 +49,7 @@ $commandOptions = @{
     info      = "--cert='' --certpassword='' --disable-repository-optimizations --include-configured-sources --local-only --password='' --prerelease --source='' --user='' --version=''"
     install   = "--allow-downgrade --allow-empty-checksums --allow-empty-checksums-secure --apply-args-to-dependencies --apply-package-parameters-to-dependencies --cert='' --certpassword='' --disable-repository-optimizations --download-checksum='' --download-checksum-x64='' --download-checksum-type='' --download-checksum-type-x64='' --exit-when-reboot-detected --force-dependencies --forcex86 --ignore-checksum --ignore-dependencies --ignore-detected-reboot --ignore-package-exit-codes --include-configured-sources --install-arguments='' --not-silent --override-arguments --package-parameters='' --password='' --pin --prerelease --require-checksums --skip-hooks --skip-scripts --source='' --stop-on-first-failure --use-package-exit-codes --user='' --version=''"
     license   = ""
-    list      = "--by-id-only --by-tag-only --detail --exact --id-only --id-starts-with --ignore-pinned --include-programs --page='' --page-size='' --prerelease --source='' --version=''"
+    list      = "--by-id-only --by-tag-only --detail --exact --id-only --id-starts-with --ignore-pinned --include-programs --order-by-last-updated-date --page='' --page-size='' --prerelease --show-last-updated-date --source='' --version=''"
     new       = "--automaticpackage --download-checksum='' --download-checksum-x64='' --download-checksum-type='' --maintainer='' --name='' --output-directory='' --template='' --use-built-in-template --version=''"
     outdated  = "--cert='' --certpassword='' --disable-repository-optimizations --ignore-pinned --ignore-unfound --include-configured-sources --password='' --prerelease --source='' --user=''"
     pack      = "--output-directory='' --version=''"
@@ -242,9 +242,9 @@ function Get-ChocoOrderByOptions {
         manually when the enum changes.
 
         .OUTPUTS
-        A string in the format "Id|LastPublished|Popularity|Title|Unsorted"
+        A string in the format "Id|LastPublished|Popularity|Title|Unsorted|LastUpdated"
     #>
-    return @("Id", "LastPublished", "Popularity", "Title", "Unsorted")
+    return @("Id", "LastPublished", "Popularity", "Title", "Unsorted", "LastUpdated")
 }
 
 function ChocolateyTabExpansion($lastBlock) {

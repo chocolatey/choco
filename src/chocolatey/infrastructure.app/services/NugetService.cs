@@ -219,6 +219,7 @@ that uses these options.");
                 string packageInstallLocation = null;
                 string deploymentlocation = null;
                 string sourceInstalledFrom = null;
+                string lastUpdated = null;
 
                 if (package.PackagePath != null && !string.IsNullOrWhiteSpace(package.PackagePath))
                 {
@@ -240,7 +241,7 @@ that uses these options.");
                     packageInfo = _packageInfoService.Get(packageLocalMetadata);
                     deploymentlocation = packageInfo.DeploymentLocation;
                     sourceInstalledFrom = packageInfo.SourceInstalledFrom;
-
+                    lastUpdated = packageInfo.LastUpdated;
                     if (config.ListCommand.IncludeVersionOverrides)
                     {
                         if (packageInfo.VersionOverride != null)
@@ -281,11 +282,12 @@ that uses these options.");
                     {
                         if (!(packageInfo != null && packageInfo.IsPinned && config.ListCommand.IgnorePinned))
                         {
-                            this.Log().Info(logger, () => "{0}{1}".FormatWith(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : " {0}{1}{2}{3}".FormatWith(
+                            this.Log().Info(logger, () => "{0}{1}".FormatWith(package.Identity.Id, config.ListCommand.IdOnly ? string.Empty : " {0}{1}{2}{3}{4}".FormatWith(
                                 packageLocalMetadata != null ? packageLocalMetadata.Version.ToFullStringChecked() : package.Identity.Version.ToFullStringChecked(),
                                 package.IsApproved ? " [Approved]" : string.Empty,
                                 package.IsDownloadCacheAvailable ? " Downloads cached for licensed users" : string.Empty,
-                                package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Possibly broken for FOSS users (due to original download location changes by vendor)" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
+                                package.PackageTestResultStatus == "Failing" && package.IsDownloadCacheAvailable ? " - Possibly broken for FOSS users (due to original download location changes by vendor)" : package.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty,
+                                config.ListCommand.ShowLastUpdatedDate ? " {0}".FormatWith(packageInfo.LastUpdated) ?? " Last updated not available" : string.Empty
                                 ))
                             );
 
@@ -299,7 +301,7 @@ that uses these options.");
  Tags: {9}
  Software Site: {10}
  Software License: {11}{12}{13}{14}{15}{16}
- Description: {17}{18}{19}{20}{21}
+ Description: {17}{18}{19}{20}{21}{22}
 ".FormatWith(
                                     package.Title.EscapeCurlyBraces(),
                                     package.Published.GetValueOrDefault().UtcDateTime.ToShortDateString(),
@@ -336,6 +338,7 @@ that uses these options.");
                                     !string.IsNullOrWhiteSpace(package.ReleaseNotes.ToStringSafe()) ? "{0} Release Notes: {1}".FormatWith(Environment.NewLine, package.ReleaseNotes.EscapeCurlyBraces().Replace("\n    ", "\n").Replace("\n", "\n  ")) : string.Empty,
                                     !string.IsNullOrWhiteSpace(deploymentlocation) ? "{0} Deployed to: '{1}'".FormatWith(Environment.NewLine, deploymentlocation) :string.Empty,
                                     !string.IsNullOrWhiteSpace(sourceInstalledFrom) ? "{0} Source package was installed from: '{1}'".FormatWith(Environment.NewLine, sourceInstalledFrom) : string.Empty,
+                                    !string.IsNullOrWhiteSpace(lastUpdated) ? "{0} Last updated: {1}".FormatWith(Environment.NewLine, lastUpdated) : string.Empty,
                                     packageArgumentsUnencrypted != null ? packageArgumentsUnencrypted : string.Empty
                                 ));
                             }
@@ -361,7 +364,7 @@ that uses these options.");
                 }
                 else
                 {
-                    yield return new PackageResult(packageLocalMetadata, package, config.ListCommand.LocalOnly ? packageInstallLocation : null, config.Sources, null);
+                    yield return new PackageResult(packageLocalMetadata, package, config.ListCommand.LocalOnly ? packageInstallLocation : null, config.Sources, null, lastUpdated);
                 }
             }
 
@@ -1001,7 +1004,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             packageRemoteMetadata.PackageTestResultStatus == "Failing" && packageRemoteMetadata.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : packageRemoteMetadata.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
                         ));
 
-                        var packageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe()));
+                        var packageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe(), null));
                         if (shouldAddForcedResultMessage)
                         {
                             packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Backing up and removing old version"));
@@ -1826,7 +1829,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     packageRemoteMetadata.PackageTestResultStatus == "Failing" && packageRemoteMetadata.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : packageRemoteMetadata.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
                                 ));
 
-                                var upgradePackageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe()));
+                                var upgradePackageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe(), null));
                                 upgradePackageResult.ResetMetadata(packageMetadata, packageRemoteMetadata);
                                 upgradePackageResult.InstallLocation = installedPath;
 
@@ -2902,7 +2905,7 @@ and argument details.
                     {
                         "chocolatey".Log().Debug("Running beforeModify step for '{0}'", packageResult.PackageMetadata.Id);
 
-                        var packageResultCopy = new PackageResult(packageResult.PackageMetadata, packageResult.SearchMetadata, packageResult.InstallLocation, packageResult.Source, null);
+                        var packageResultCopy = new PackageResult(packageResult.PackageMetadata, packageResult.SearchMetadata, packageResult.InstallLocation, packageResult.Source, null, null);
 
                         beforeModifyAction(packageResultCopy, config);
 
