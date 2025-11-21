@@ -74,7 +74,7 @@ if (Test-Path $licenseFile) {
         'optimize'
     )
 
-    $commandOptions.download = "--append-use-original-location --cert='' --certpassword='' --disable-repository-optimizations --download-location='' --ignore-dependencies --ignore-unfound --installed-packages --internalize --internalize-all-urls --output-directory='' --password='' --prerelease --resources-location='' --skip-download-cache --skip-virus-check --source='' --use-download-cache --user='' --version='' --virus-check --virus-positives-minimum=''"
+    $commandOptions.download = "--allow-empty-checksums --allow-empty-checksums-secure --append-use-original-location --cert='' --certpassword='' --disable-repository-optimizations --download-location='' --ignore-checksum --ignore-dependencies --ignore-dependencies-from-source='' --ignore-unfound --installed-packages --internalize --internalize-all-urls --output-directory='' --password='' --prerelease --require-checksums --resources-location='' --skip-download-cache --skip-virus-check --source='' --use-download-cache --user='' --version='' --virus-check --virus-positives-minimum=''"
     $commandOptions.optimize = "--id='' --reduce-nupkg-only"
 
     # Add pro switches to commands that have additional switches on Pro
