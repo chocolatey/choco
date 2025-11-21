@@ -100,6 +100,41 @@ Describe "Chocolatey Profile" -Tag Chocolatey, Profile, Environment {
             $Completions | Should -Contain "--value=''" -Because $becauseCompletions
         }
 
+        It "Should list completions for download (Licensed)" -Skip:(!$isLicensed) {
+            $Command = "choco download "
+            $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
+
+            $becauseCompletions = ($Completions -Join ", ")
+
+            $Completions | Should -Contain "--allow-empty-checksums" -Because $becauseCompletions
+            $Completions | Should -Contain "--allow-empty-checksums-secure" -Because $becauseCompletions
+            $Completions | Should -Contain "--append-use-original-location" -Because $becauseCompletions
+            $Completions | Should -Contain "--cert=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--certpassword=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--disable-repository-optimizations" -Because $becauseCompletions
+            $Completions | Should -Contain "--download-location=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-checksum" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-dependencies" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-dependencies-from-source=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--ignore-unfound" -Because $becauseCompletions
+            $Completions | Should -Contain "--installed-packages" -Because $becauseCompletions
+            $Completions | Should -Contain "--internalize" -Because $becauseCompletions
+            $Completions | Should -Contain "--internalize-all-urls" -Because $becauseCompletions
+            $Completions | Should -Contain "--output-directory=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--password=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--prerelease" -Because $becauseCompletions
+            $Completions | Should -Contain "--require-checksums" -Because $becauseCompletions
+            $Completions | Should -Contain "--resources-location=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--skip-download-cache" -Because $becauseCompletions
+            $Completions | Should -Contain "--skip-virus-check" -Because $becauseCompletions
+            $Completions | Should -Contain "--source=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--use-download-cache" -Because $becauseCompletions
+            $Completions | Should -Contain "--user=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--version=''" -Because $becauseCompletions
+            $Completions | Should -Contain "--virus-check" -Because $becauseCompletions
+            $Completions | Should -Contain "--virus-positives-minimum=''" -Because $becauseCompletions
+        }
+
         It "Should list completions for export" -Skip:$ExportNotPresent {
             $Command = "choco export "
             $Completions = (TabExpansion2 -inputScript $Command -cursorColumn $Command.Length).CompletionMatches.CompletionText
