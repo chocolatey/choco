@@ -23,7 +23,14 @@
         }
 
         # TODO: If this will be used cross-platform, it should not use robocopy
-        $null = robocopy $env:ChocolateyInstall $Directory /MIR
+        # Exclude the lib directory, we don't want all the files in all the test kitchens.
+        $null = robocopy $env:ChocolateyInstall $Directory /MIR /XD lib
+        $null = robocopy $env:ChocolateyInstall/lib/chocolatey $Directory/lib/chocolatey /MIR
+        $null = robocopy $env:ChocolateyInstall/lib/chocolatey.extension $Directory/lib/chocolatey.extension /MIR
+        $null = robocopy $env:ChocolateyInstall/lib/chocolatey-agent $Directory/lib/chocolatey-agent /MIR
+        Get-ChildItem $env:ChocolateyInstall/lib -Filter chocolatey-license-* | ForEach-Object {
+            $null = robocopy "$($_.FullName)" "$Directory/lib/$($_.Name)" /MIR
+        }
 
         $env:ChocolateyInstall = $Directory
         Set-ChocolateyTestLocation -Directory $Directory

@@ -1811,8 +1811,8 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
-        [Ignore("This test is known to be flaky in some environments, see comments on the develop branch for the same test.")]
-        [NotWorking("This test is known to be flaky in some environments, see comments on the develop branch for the same test.")]
+        [Ignore("This test is known to be flaky in some environments, see comments within the test itself.")]
+        [NotWorking("This test is known to be flaky in some environments, see comments within the test itself.")]
         [WindowsOnly]
         [Platform(Exclude = "Mono")]
         public class When_upgrading_a_package_with_a_read_and_delete_share_locked_file : ScenariosBase
@@ -5147,7 +5147,7 @@ namespace chocolatey.tests.integration.scenarios
       <d:VersionDownloadCount m:type=""Edm.Int32"">63</d:VersionDownloadCount>
       <d:GalleryDetailsUrl>{0}/packages/upgradepackage/2.0.0</d:GalleryDetailsUrl>
       <d:ReportAbuseUrl>{0}/package/ReportAbuse/upgradepackage/2.0.0</d:ReportAbuseUrl>
-      <d:IconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</d:IconUrl>
+      <d:IconUrl>https://img.chocolatey.org/nupkg/chocolateyicon.png</d:IconUrl>
       <d:IsLatestVersion m:type=""Edm.Boolean"">true</d:IsLatestVersion>
       <d:IsAbsoluteLatestVersion m:type=""Edm.Boolean"">false</d:IsAbsoluteLatestVersion>
       <d:IsPrerelease m:type=""Edm.Boolean"">false</d:IsPrerelease>
@@ -5224,7 +5224,7 @@ namespace chocolatey.tests.integration.scenarios
     <d:VersionDownloadCount m:type=""Edm.Int32"">63</d:VersionDownloadCount>
     <d:GalleryDetailsUrl>{0}/packages/upgradepackage/2.0.0</d:GalleryDetailsUrl>
     <d:ReportAbuseUrl>{0}/package/ReportAbuse/upgradepackage/2.0.0</d:ReportAbuseUrl>
-    <d:IconUrl>https://chocolatey.org/assets/images/nupkg/chocolateyicon.png</d:IconUrl>
+    <d:IconUrl>https://img.chocolatey.org/nupkg/chocolateyicon.png</d:IconUrl>
     <d:IsLatestVersion m:type=""Edm.Boolean"">true</d:IsLatestVersion>
     <d:IsAbsoluteLatestVersion m:type=""Edm.Boolean"">false</d:IsAbsoluteLatestVersion>
     <d:IsPrerelease m:type=""Edm.Boolean"">false</d:IsPrerelease>

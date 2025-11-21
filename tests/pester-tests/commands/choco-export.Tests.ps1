@@ -72,7 +72,6 @@ Describe "choco export" -Tag Chocolatey, ExportCommand {
         BeforeAll {
             # No need to create a new snapshot here
             $Output = Invoke-Choco export --help
-            $Output.Lines = $Output.Lines
         }
 
         It "Exits with Success (0)" {
