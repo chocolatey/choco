@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <helpItems schema="maml" xmlns="http://msh">
   <command:command xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" xmlns:MSHelp="http://msdn.microsoft.com/mshelp">
     <command:details>
@@ -23,7 +23,7 @@
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -40,9 +40,9 @@
           <command:parameterValue required="true" variableLength="false">EnvironmentVariableTarget</command:parameterValue>
           <dev:type>
             <maml:name>EnvironmentVariableTarget</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
+          <dev:defaultValue>Process</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>IgnoredArguments</maml:name>
@@ -52,7 +52,7 @@
           <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
           <dev:type>
             <maml:name>Object[]</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -63,7 +63,7 @@
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
@@ -78,7 +78,7 @@
         <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
         <dev:type>
           <maml:name>Object[]</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -90,7 +90,7 @@
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
           <maml:name>String</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -102,7 +102,7 @@
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
           <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
@@ -114,12 +114,12 @@
         <command:parameterValue required="true" variableLength="false">EnvironmentVariableTarget</command:parameterValue>
         <dev:type>
           <maml:name>EnvironmentVariableTarget</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
-        <dev:defaultValue>None</dev:defaultValue>
+        <dev:defaultValue>Process</dev:defaultValue>
       </command:parameter>
     </command:parameters>
-    <command:inputTypes />
+    <command:inputTypes/>
     <command:returnValues>
       <command:returnValue>
         <dev:type>
@@ -202,9 +202,9 @@
           <command:parameterValue required="true" variableLength="false">EnvironmentVariableTarget</command:parameterValue>
           <dev:type>
             <maml:name>EnvironmentVariableTarget</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
+          <dev:defaultValue>Process</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>IgnoredArguments</maml:name>
@@ -214,7 +214,7 @@
           <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
           <dev:type>
             <maml:name>Object[]</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -229,7 +229,7 @@
         <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
         <dev:type>
           <maml:name>Object[]</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -241,12 +241,12 @@
         <command:parameterValue required="true" variableLength="false">EnvironmentVariableTarget</command:parameterValue>
         <dev:type>
           <maml:name>EnvironmentVariableTarget</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
-        <dev:defaultValue>None</dev:defaultValue>
+        <dev:defaultValue>Process</dev:defaultValue>
       </command:parameter>
     </command:parameters>
-    <command:inputTypes />
+    <command:inputTypes/>
     <command:returnValues>
       <command:returnValue>
         <dev:type>
@@ -317,7 +317,7 @@
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -334,9 +334,9 @@
           <command:parameterValue required="true" variableLength="false">EnvironmentVariableTarget</command:parameterValue>
           <dev:type>
             <maml:name>EnvironmentVariableTarget</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
+          <dev:defaultValue>User</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>IgnoredArguments</maml:name>
@@ -346,7 +346,7 @@
           <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
           <dev:type>
             <maml:name>Object[]</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -357,7 +357,7 @@
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
@@ -368,7 +368,7 @@
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
@@ -383,7 +383,7 @@
         <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
         <dev:type>
           <maml:name>Object[]</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -395,7 +395,7 @@
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
           <maml:name>String</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -407,9 +407,9 @@
         <command:parameterValue required="true" variableLength="false">EnvironmentVariableTarget</command:parameterValue>
         <dev:type>
           <maml:name>EnvironmentVariableTarget</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
-        <dev:defaultValue>None</dev:defaultValue>
+        <dev:defaultValue>User</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
         <maml:name>Confirm</maml:name>
@@ -419,7 +419,7 @@
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
           <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
@@ -431,13 +431,13 @@
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
           <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
     </command:parameters>
-    <command:inputTypes />
-    <command:returnValues />
+    <command:inputTypes/>
+    <command:returnValues/>
     <maml:alertSet>
       <maml:alert>
         <maml:para>This command will assert UAC/Admin privileges on the machine if `-PathType 'Machine'`.</maml:para>
@@ -518,7 +518,7 @@
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -530,7 +530,7 @@
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -547,9 +547,9 @@
           <command:parameterValue required="true" variableLength="false">EnvironmentVariableTarget</command:parameterValue>
           <dev:type>
             <maml:name>EnvironmentVariableTarget</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
+          <dev:defaultValue>Process</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>IgnoredArguments</maml:name>
@@ -559,7 +559,7 @@
           <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
           <dev:type>
             <maml:name>Object[]</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -570,7 +570,7 @@
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
@@ -581,7 +581,7 @@
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
@@ -596,7 +596,7 @@
         <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
         <dev:type>
           <maml:name>Object[]</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -608,7 +608,7 @@
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
           <maml:name>String</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -620,9 +620,9 @@
         <command:parameterValue required="true" variableLength="false">EnvironmentVariableTarget</command:parameterValue>
         <dev:type>
           <maml:name>EnvironmentVariableTarget</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
-        <dev:defaultValue>None</dev:defaultValue>
+        <dev:defaultValue>Process</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="1" aliases="none">
         <maml:name>Value</maml:name>
@@ -632,7 +632,7 @@
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
           <maml:name>String</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -644,7 +644,7 @@
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
           <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
@@ -656,13 +656,13 @@
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
           <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
     </command:parameters>
-    <command:inputTypes />
-    <command:returnValues />
+    <command:inputTypes/>
+    <command:returnValues/>
     <maml:alertSet>
       <maml:alert>
         <maml:para>This command will assert UAC/Admin privileges on the machine if `-Scope 'Machine'`.</maml:para>
@@ -732,7 +732,7 @@
           <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
           <dev:type>
             <maml:name>Object[]</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -747,12 +747,12 @@
         <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
         <dev:type>
           <maml:name>Object[]</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
     </command:parameters>
-    <command:inputTypes />
+    <command:inputTypes/>
     <command:returnValues>
       <command:returnValue>
         <dev:type>
@@ -765,7 +765,7 @@
     </command:returnValues>
     <maml:alertSet>
       <maml:alert>
-        <maml:para></maml:para>
+        <maml:para/>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
@@ -815,7 +815,7 @@
           <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
           <dev:type>
             <maml:name>String</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -832,9 +832,9 @@
           <command:parameterValue required="true" variableLength="false">EnvironmentVariableTarget</command:parameterValue>
           <dev:type>
             <maml:name>EnvironmentVariableTarget</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
-          <dev:defaultValue>None</dev:defaultValue>
+          <dev:defaultValue>User</dev:defaultValue>
         </command:parameter>
         <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="none">
           <maml:name>IgnoredArguments</maml:name>
@@ -844,7 +844,7 @@
           <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
           <dev:type>
             <maml:name>Object[]</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -855,7 +855,7 @@
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
@@ -866,7 +866,7 @@
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
@@ -881,7 +881,7 @@
         <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
         <dev:type>
           <maml:name>Object[]</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -893,7 +893,7 @@
         <command:parameterValue required="true" variableLength="false">String</command:parameterValue>
         <dev:type>
           <maml:name>String</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -905,9 +905,9 @@
         <command:parameterValue required="true" variableLength="false">EnvironmentVariableTarget</command:parameterValue>
         <dev:type>
           <maml:name>EnvironmentVariableTarget</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
-        <dev:defaultValue>None</dev:defaultValue>
+        <dev:defaultValue>User</dev:defaultValue>
       </command:parameter>
       <command:parameter required="false" variableLength="true" globbing="false" pipelineInput="False" position="named" aliases="cf">
         <maml:name>Confirm</maml:name>
@@ -917,7 +917,7 @@
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
           <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
@@ -929,13 +929,13 @@
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
           <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
     </command:parameters>
-    <command:inputTypes />
-    <command:returnValues />
+    <command:inputTypes/>
+    <command:returnValues/>
     <maml:alertSet>
       <maml:alert>
         <maml:para>This command will assert UAC/Admin privileges on the machine if `-PathType 'Machine'`. This is used when the application/tool is not being linked by Chocolatey (not in the lib folder).</maml:para>
@@ -944,7 +944,7 @@
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; Uninstall-ChocolateyPath -PathToUninstall "$($env:SystemDrive)\tools\gittfs"</dev:code>
+        <dev:code>PS C:\&gt; Uninstall-ChocolateyPath -Path "$($env:SystemDrive)\tools\gittfs"</dev:code>
         <dev:remarks>
           <maml:para>Removes the target path from the current user's PATH environment variable.</maml:para>
         </dev:remarks>
@@ -1016,7 +1016,7 @@
           <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
           <dev:type>
             <maml:name>Object[]</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>None</dev:defaultValue>
         </command:parameter>
@@ -1027,7 +1027,7 @@
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
@@ -1038,7 +1038,7 @@
           </maml:description>
           <dev:type>
             <maml:name>SwitchParameter</maml:name>
-            <maml:uri />
+            <maml:uri/>
           </dev:type>
           <dev:defaultValue>False</dev:defaultValue>
         </command:parameter>
@@ -1053,7 +1053,7 @@
         <command:parameterValue required="true" variableLength="false">Object[]</command:parameterValue>
         <dev:type>
           <maml:name>Object[]</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>None</dev:defaultValue>
       </command:parameter>
@@ -1065,7 +1065,7 @@
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
           <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
@@ -1077,13 +1077,13 @@
         <command:parameterValue required="false" variableLength="false">SwitchParameter</command:parameterValue>
         <dev:type>
           <maml:name>SwitchParameter</maml:name>
-          <maml:uri />
+          <maml:uri/>
         </dev:type>
         <dev:defaultValue>False</dev:defaultValue>
       </command:parameter>
     </command:parameters>
-    <command:inputTypes />
-    <command:returnValues />
+    <command:inputTypes/>
+    <command:returnValues/>
     <maml:alertSet>
       <maml:alert>
         <maml:para>This method is also added to the user's PowerShell profile as `refreshenv`. When called as `refreshenv`, the method will provide additional output.</maml:para>
