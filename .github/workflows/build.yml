@@ -89,6 +89,7 @@ jobs:
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Build with Mono
       run: |
+        export DOTNET_ROOT=$HOME/.dotnet
         chmod +x build.sh
         $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=unit
     - name: Upload MacOS build results
