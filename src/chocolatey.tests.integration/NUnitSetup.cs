@@ -21,9 +21,11 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using chocolatey.infrastructure.app;
+using chocolatey.infrastructure.app.attributes;
 using chocolatey.infrastructure.app.builders;
 using chocolatey.infrastructure.app.commands;
 using chocolatey.infrastructure.app.configuration;
+using chocolatey.infrastructure.commands;
 using chocolatey.infrastructure.filesystem;
 using chocolatey.infrastructure.licensing;
 using chocolatey.infrastructure.platforms;
@@ -122,7 +124,13 @@ namespace chocolatey.tests.integration
 
         private void UnpackSelf(Container container, ChocolateyConfiguration config)
         {
-            var unpackCommand = container.GetInstance<ChocolateyUnpackSelfCommand>();
+            IEnumerable<ICommand> commands = container.GetAllInstances<ICommand>();
+            var unpackCommand = commands.Where((c) =>
+            {
+                var attributes = c.GetType().GetCustomAttributes(typeof(CommandForAttribute), false);
+                return attributes.Cast<CommandForAttribute>().Any(attribute => attribute.CommandName.IsEqualTo("unpackself"));
+            }).FirstOrDefault();
+
             unpackCommand.Run(config);
         }
 
