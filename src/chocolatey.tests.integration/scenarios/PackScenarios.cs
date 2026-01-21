@@ -169,7 +169,7 @@ namespace chocolatey.tests.integration.scenarios
                     infos.Should().HaveElementAt(1, string.Concat("Successfully created package '", PackagePath, "'"));
                 }
 
-                FileAssert.Exists(PackagePath);
+                Assert.That(PackagePath, Does.Exist);
             }
 
             [Fact]

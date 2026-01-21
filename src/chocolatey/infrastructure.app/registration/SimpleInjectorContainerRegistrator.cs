@@ -281,14 +281,14 @@ namespace chocolatey.infrastructure.app.registration
 
         internal Container BuildContainer(Container container)
         {
-            container.RegisterAll<ICommand>(_registeredCommands.Values);
+            container.Collection.Register<ICommand>(_registeredCommands.Values);
 
             AddServicesToContainer(container, _singletonServices, Lifestyle.Singleton);
             AddServicesToContainer(container, _transientServices, Lifestyle.Transient);
 
             foreach (var multiService in _multiServices)
             {
-                container.RegisterAll(multiService.Key, multiService.Value.AsEnumerable());
+                container.Collection.Register(multiService.Key, multiService.Value.AsEnumerable());
             }
 
             foreach (var instanceAction in _instanceActionRegistrations)
@@ -306,7 +306,7 @@ namespace chocolatey.infrastructure.app.registration
             _multiServices.Clear();
             _allCommands.Clear();
 
-            container.RegisterSingle<IContainerResolver, SimpleInjectorContainerResolver>();
+            container.RegisterSingleton<IContainerResolver, SimpleInjectorContainerResolver>();
 
             EventManager.InitializeWith(container.GetInstance<IEventSubscriptionManagerService>);
 

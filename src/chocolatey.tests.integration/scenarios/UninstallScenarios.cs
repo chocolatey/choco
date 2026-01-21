@@ -77,7 +77,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.Exists(packageDir);
+                Assert.That(packageDir, Does.Exist);
             }
 
             [Fact]
@@ -141,7 +141,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -149,7 +149,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -159,7 +159,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "console.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -169,7 +169,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "graphical.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -177,7 +177,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var generatedFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "simplefile.txt");
 
-                FileAssert.DoesNotExist(generatedFile);
+                Assert.That(generatedFile, Does.Not.Exist);
             }
 
             [Fact]
@@ -251,7 +251,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -259,7 +259,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -267,7 +267,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "console.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -275,7 +275,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "graphical.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -357,7 +357,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -365,7 +365,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -429,7 +429,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             // Locking is inconsistent between client and server operating systems in .NET 4.8.
@@ -439,7 +439,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             // Locking is inconsistent between client and server operating systems in .NET 4.8.
@@ -449,7 +449,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.Exists(packageDir);
+                Assert.That(packageDir, Does.Exist);
             }
 
             [Fact]
@@ -511,7 +511,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.Exists(packageDir);
+                Assert.That(packageDir, Does.Exist);
             }
 
             [Fact]
@@ -519,7 +519,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -527,7 +527,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "console.exe");
 
-                FileAssert.DoesNotExist(shimFile);
+                Assert.That(shimFile, Does.Not.Exist);
             }
 
             [Fact]
@@ -535,7 +535,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var lockedFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "chocolateyInstall.ps1");
 
-                FileAssert.Exists(lockedFile);
+                Assert.That(lockedFile, Does.Exist);
             }
 
             [Fact]
@@ -593,7 +593,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var fileAdded = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "dude.txt");
 
-                FileAssert.Exists(fileAdded);
+                Assert.That(fileAdded, Does.Exist);
             }
 
             [Fact]
@@ -612,7 +612,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -622,7 +622,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "console.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -632,7 +632,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "graphical.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -689,7 +689,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var fileChanged = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
-                FileAssert.Exists(fileChanged);
+                Assert.That(fileChanged, Does.Exist);
             }
 
             [Fact]
@@ -708,7 +708,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -718,7 +718,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "console.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -728,7 +728,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "graphical.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -788,7 +788,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -796,7 +796,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var fileChanged = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "dude.txt");
 
-                FileAssert.DoesNotExist(fileChanged);
+                Assert.That(fileChanged, Does.Not.Exist);
             }
 
             [Fact]
@@ -804,7 +804,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var fileChanged = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "tools", "chocolateyinstall.ps1");
 
-                FileAssert.DoesNotExist(fileChanged);
+                Assert.That(fileChanged, Does.Not.Exist);
             }
 
             [Fact]
@@ -812,7 +812,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -822,7 +822,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "console.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -832,7 +832,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "graphical.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -945,14 +945,14 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.Exists(packageDir);
+                Assert.That(packageDir, Does.Exist);
             }
 
             [Fact]
             public void Should_still_have_the_package_file_in_the_directory()
             {
                 var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, Configuration.PackageNames + NuGetConstants.PackageExtension);
-                FileAssert.Exists(packageFile);
+                Assert.That(packageFile, Does.Exist);
             }
 
             [Fact]
@@ -960,7 +960,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bad", Configuration.PackageNames);
 
-                DirectoryAssert.Exists(packageDir);
+                Assert.That(packageDir, Does.Exist);
             }
 
             [Fact]
@@ -968,7 +968,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -1036,7 +1036,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -1044,7 +1044,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -1083,7 +1083,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var hooksDirectory = Path.Combine(Scenario.GetTopLevel(), "hooks", Configuration.PackageNames.Replace(".hook", string.Empty));
 
-                DirectoryAssert.DoesNotExist(hooksDirectory);
+                Assert.That(hooksDirectory, Does.Not.Exist);
             }
         }
 
@@ -1109,7 +1109,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -1117,7 +1117,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -1127,7 +1127,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "console.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -1137,7 +1137,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "graphical.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -1145,7 +1145,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var generatedFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "simplefile.txt");
 
-                FileAssert.DoesNotExist(generatedFile);
+                Assert.That(generatedFile, Does.Not.Exist);
             }
 
             [Fact]
@@ -1285,7 +1285,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -1293,7 +1293,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -1373,7 +1373,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -1381,7 +1381,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bkp", Configuration.PackageNames);
 
-                DirectoryAssert.DoesNotExist(packageDir);
+                Assert.That(packageDir, Does.Not.Exist);
             }
 
             [Fact]
@@ -1391,7 +1391,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "console.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -1401,7 +1401,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var shimfile = Path.Combine(Scenario.GetTopLevel(), "bin", "graphical.exe");
 
-                FileAssert.DoesNotExist(shimfile);
+                Assert.That(shimfile, Does.Not.Exist);
             }
 
             [Fact]
@@ -1409,7 +1409,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 var generatedFile = Path.Combine(Scenario.GetTopLevel(), "lib", Configuration.PackageNames, "simplefile.txt");
 
-                FileAssert.DoesNotExist(generatedFile);
+                Assert.That(generatedFile, Does.Not.Exist);
             }
 
             [Fact]
@@ -1489,14 +1489,14 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_uninstall_the_package()
             {
                 var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", TargetPackageName, "{0}.nupkg".FormatWith(TargetPackageName));
-                FileAssert.DoesNotExist(packageFile);
+                Assert.That(packageFile, Does.Not.Exist);
             }
 
             [Fact]
             public void Should_uninstall_the_dependency()
             {
                 var packageFile = Path.Combine(Scenario.GetTopLevel(), "lib", DependencyName, "{0}.nupkg".FormatWith(DependencyName));
-                FileAssert.DoesNotExist(packageFile);
+                Assert.That(packageFile, Does.Not.Exist);
             }
 
             [Fact]
