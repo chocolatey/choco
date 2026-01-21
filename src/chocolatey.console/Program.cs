@@ -33,13 +33,7 @@ using chocolatey.infrastructure.platforms;
 using chocolatey.infrastructure.registration;
 using chocolatey.infrastructure.tolerance;
 using SimpleInjector;
-
-#if !NoResources
-
 using chocolatey.resources;
-
-#endif
-
 using Assembly = chocolatey.infrastructure.adapters.Assembly;
 using Console = System.Console;
 using Environment = System.Environment;
@@ -176,9 +170,7 @@ namespace chocolatey.console
                         "redirects",
                         "tools"
                     };
-#if !NoResources
                 AssemblyFileExtractor.ExtractAssemblyResourcesToRelativeDirectory(fileSystem, Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)), ApplicationParameters.InstallLocation, folders, ApplicationParameters.ChocolateyFileResources, throwError: false);
-#endif
                 var application = new ConsoleApplication();
                 application.Run(args, config, container);
             }
