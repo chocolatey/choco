@@ -99,7 +99,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\chocolatey\chocolatey.csproj" />
-    <ProjectReference Include="..\Chocolatey.PowerShell\Chocolatey.PowerShell.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\docs\logo\chocolatey.ico">
