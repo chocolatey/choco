@@ -81,6 +81,11 @@ jobs:
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+    - name: Install dotnet #needed for GitVersion
+      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
+      with:
+        dotnet-version: |
+          5.0.x
     - name: Report installed dotnet versions
       run: |
           dotnet --info
