@@ -81,6 +81,9 @@ jobs:
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+    - name: Report installed dotnet versions
+      run: |
+          dotnet --info
     - name: Test with NUnit on Mono
       run: |
           chmod +x build.sh
