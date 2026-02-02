@@ -1,0 +1,14 @@
+- name: "Package Issue"
+  color: "EB6420"
+  description: "Issues that are related directly to packages, and no changes to Chocolatey CLI is required."
+- name: "PowerShell Internal Host"
+  color: "D4C5F9"
+  description: "Issues related to how Chocolatey CLI spawns a PowerShell Host to execute the packaging scripts."
+- name: "Dependency - Chocolatey.NuGet.Client"
+  color: "E10D60"
+  description: "Issues that require a modification to something in the referenced NuGet.Client libraries."
+  aliases: ["Requires NuGet.Client Change"]
+- name: "Dependency - shimgen"
+  color: "FBCA04"
+  description: "Issues related to the Shim Generator (shimgen) dependency which Chocolatey CLI makes use of."
+  aliases: ["shimgen"]

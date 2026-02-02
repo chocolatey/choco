@@ -24,4 +24,3 @@ jobs:
           bug_label: "Bug"
           top_features: true
           feature_label: "Enhancement"
-          custom_label: "Improvement"
