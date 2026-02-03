@@ -153,7 +153,12 @@ object ChocolateySchd : BuildType({
                 +:<default>
             """.trimIndent()
             triggerBuild = always()
-			withPendingChangesOnly = false
+            withPendingChangesOnly = false
+        }
+        vcs {
+          branchFilter = """
+            +:*
+          """.trimIndent()
         }
     }
 
