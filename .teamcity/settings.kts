@@ -153,12 +153,17 @@ object ChocolateySchd : BuildType({
                 +:<default>
             """.trimIndent()
             triggerBuild = always()
-            withPendingChangesOnly = false
+			withPendingChangesOnly = false
         }
-        vcs {
-          branchFilter = """
-            +:*
-          """.trimIndent()
+    }
+
+    features {
+        pullRequests {
+            provider = github {
+                authType = token {
+                    token = "%system.GitHubPAT%"
+                }
+            }
         }
     }
 
