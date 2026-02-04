@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <OutputType>Exe</OutputType>
     <AssemblyName>choco</AssemblyName>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
@@ -10,19 +9,6 @@
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugType>none</DebugType>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE;</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficial|x86'">
-    <OutputPath>bin\x86\ReleaseOfficial\</OutputPath>
-    <DefineConstants>TRACE;FORCE_CHOCOLATEY_OFFICIAL_KEY</DefineConstants>
-    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
-    <Optimize>true</Optimize>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <CodeAnalysisLogFile>bin\Debug\choco.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
@@ -59,7 +45,7 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>..\..\docs\logo\chocolatey.ico</ApplicationIcon>
+    <ApplicationIcon>$(SolutionDir)\..\docs\logo\chocolatey.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject>chocolatey.console.Program</StartupObject>
@@ -81,11 +67,11 @@
     <!-- packages, and then switch to PackageReferences -->
     <Reference Include="System.Management.Automation">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
+      <HintPath>$(SolutionDir)\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SolutionVersion.cs">
+    <Compile Include="$(SolutionDir)\SolutionVersion.cs">
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
   </ItemGroup>
@@ -105,7 +91,7 @@
     <ProjectReference Include="..\chocolatey\chocolatey.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\docs\logo\chocolatey.ico">
+    <None Include="$(SolutionDir)\..\docs\logo\chocolatey.ico">
       <Link>Properties\chocolatey.ico</Link>
     </None>
   </ItemGroup>

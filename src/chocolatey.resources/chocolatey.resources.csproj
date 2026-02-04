@@ -19,6 +19,7 @@
     <DefineConstants>TRACE;</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ReleaseOfficial|AnyCPU'">
+    <DebugType>none</DebugType>
     <OutputPath>bin\ReleaseOfficial\</OutputPath>
     <DefineConstants>TRACE;FORCE_CHOCOLATEY_OFFICIAL_KEY</DefineConstants>
     <Optimize>true</Optimize>

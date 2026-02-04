@@ -1,8 +1,7 @@
 {
   "profiles": {
-    "Profile 1": {
-      "commandName": "Executable",
-      "executablePath": "C:\\code\\choco\\src\\chocolatey.console\\bin\\Debug\\net48\\choco.exe",
+    "Launch CLI": {
+      "commandName": "Project",
       "commandLineArgs": "source list"
     }
   }

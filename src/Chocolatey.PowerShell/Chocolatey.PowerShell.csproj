@@ -43,7 +43,7 @@
     <!-- packages, and then switch to PackageReferences -->
     <Reference Include="System.Management.Automation">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
+      <HintPath>$(SolutionDir)\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

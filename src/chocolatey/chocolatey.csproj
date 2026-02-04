@@ -5,8 +5,6 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <Configurations>Debug;Release;ReleaseOfficial</Configurations>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
@@ -33,7 +31,7 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>..\..\docs\logo\chocolatey.ico</ApplicationIcon>
+    <ApplicationIcon>$(SolutionDir)\..\docs\logo\chocolatey.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup Condition="'$(CHOCOLATEY_OFFICIAL_KEY)' == ''">
     <SignAssembly>true</SignAssembly>
@@ -48,11 +46,11 @@
     <!-- We need to look to move that ones that we can, to their own NuGet -->
     <!-- packages, and then switch to PackageReferences -->
     <Reference Include="Rhino.Licensing">
-      <HintPath>..\..\lib\Rhino.Licensing.1.4.1\lib\net40\Rhino.Licensing.dll</HintPath>
+      <HintPath>$(SolutionDir)\..\lib\Rhino.Licensing.1.4.1\lib\net40\Rhino.Licensing.dll</HintPath>
     </Reference>
     <Reference Include="System.Management.Automation">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
+      <HintPath>$(SolutionDir)\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -71,7 +69,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\docs\logo\chocolatey.ico">
+    <None Include="$(SolutionDir)\..\docs\logo\chocolatey.ico">
       <Link>Properties\chocolatey.ico</Link>
     </None>
   </ItemGroup>

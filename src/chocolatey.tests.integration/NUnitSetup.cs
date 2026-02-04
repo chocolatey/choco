@@ -124,7 +124,7 @@ namespace chocolatey.tests.integration
 
         private void UnpackSelf(Container container, ChocolateyConfiguration config)
         {
-            IEnumerable<ICommand> commands = container.GetAllInstances<ICommand>();
+            var commands = container.GetAllInstances<ICommand>();
             var unpackCommand = commands.Where((c) =>
             {
                 var attributes = c.GetType().GetCustomAttributes(typeof(CommandForAttribute), false);
