@@ -28,7 +28,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\chocolatey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(CHOCOLATEY_OFFICIAL_KEY)' != ''">
+  <PropertyGroup Condition="'$(CHOCOLATEY_OFFICIAL_KEY)' != '' AND Exists('$(CHOCOLATEY_OFFICIAL_KEY)')">
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>$(CHOCOLATEY_OFFICIAL_KEY)</AssemblyOriginatorKeyFile>
   </PropertyGroup>
