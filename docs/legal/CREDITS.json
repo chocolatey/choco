@@ -24,7 +24,7 @@
             "licenses": [
                 {
                     "type": "MIT",
-                    "link": "",
+                    "link": "https://github.com/alphaleonis/AlphaFS/blob/d76d1f9f02e6869dc23dcfc6ea9163a8c1b69064/LICENSE.md",
                     "name": "LICENSE.md"
                 }
             ]
@@ -61,7 +61,7 @@
             "licenses": [
                 {
                     "type": "Apache-2.0",
-                    "link": "",
+                    "link": "https://github.com/apache/logging-log4net/blob/5e9e2b0ea8a57a441e779d23429f6759a06d93ce/LICENSE",
                     "name": "LICENSE"
                 }
             ]
@@ -73,7 +73,7 @@
             "licenses": [
                 {
                     "type": "MIT",
-                    "link": "",
+                    "link": "https://github.com/dotnet/runtime/blob/4822e3c3aa77eb82b2fb33c9321f923cf11ddde6/LICENSE.TXT",
                     "name": "LICENSE.TXT"
                 }
             ]
@@ -109,8 +109,8 @@
             "licenses": [
                 {
                     "type": "MIT",
-                    "link": "",
-                    "name": "licence.txt"
+                    "link": "https://github.com/simpleinjector/SimpleInjector/blob/eb27d31d1fdf055bed8bcfe5c22b2a1580bbb2a9/LICENSE",
+                    "name": "LICENSE"
                 }
             ]
         },
@@ -121,7 +121,7 @@
             "licenses": [
                 {
                     "type": "MIT",
-                    "link": "",
+                    "link": "https://github.com/dotnet/reactive/blob/f4da16f15a3cde97f178396ea6e3489cc893651f/LICENSE",
                     "name": "LICENSE"
                 }
             ]
