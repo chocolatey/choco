@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2025 Chocolatey Software, Inc
+// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,6 +23,8 @@ using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Security;
 using System.Security.Principal;
+using System.Threading;
+using System.Threading.Tasks;
 using chocolatey.infrastructure.platforms;
 using Microsoft.Win32.SafeHandles;
 using static chocolatey.StringResources;
@@ -166,6 +168,10 @@ namespace chocolatey.infrastructure.information
             return isSystem;
         }
 
+        // Timeout for process tree enumeration to prevent hangs from Windows API calls
+        // (e.g., NtQuerySystemInformation can hang indefinitely in certain system states)
+        private static readonly TimeSpan ProcessTreeTimeout = TimeSpan.FromSeconds(5);
+
         public static ProcessTree GetProcessTree()
         {
             return GetProcessTree(null);
@@ -185,6 +191,42 @@ namespace chocolatey.infrastructure.information
                 return tree;
             }
 
+            // Run process tree enumeration with a timeout to prevent hangs
+            // from Windows API calls (NtQuerySystemInformation can hang in CI environments)
+            try
+            {
+                var task = Task.Run(() => PopulateProcessTreeWithFallback(tree, process));
+                if (task.Wait(ProcessTreeTimeout))
+                {
+                    tree = task.Result;
+                }
+                else
+                {
+                    "chocolatey".Log().Warn(logging.ChocolateyLoggers.LogFileOnly,
+                        "Process tree enumeration timed out after {0} seconds. Using partial tree.",
+                        ProcessTreeTimeout.TotalSeconds);
+                }
+            }
+            catch (AggregateException ex)
+            {
+                // Unwrap and log the inner exception
+                var innerEx = ex.InnerException ?? ex;
+                "chocolatey".Log().Warn(logging.ChocolateyLoggers.LogFileOnly,
+                    "Exception during process tree enumeration: {0}. Using partial tree.",
+                    innerEx.Message);
+            }
+            catch (Exception ex)
+            {
+                "chocolatey".Log().Warn(logging.ChocolateyLoggers.LogFileOnly,
+                    "Unexpected exception during process tree enumeration: {0}. Using partial tree.",
+                    ex.Message);
+            }
+
+            return tree;
+        }
+
+        private static ProcessTree PopulateProcessTreeWithFallback(ProcessTree tree, Process process)
+        {
             try
             {
                 try
@@ -213,14 +255,30 @@ namespace chocolatey.infrastructure.information
             return tree;
         }
 
+        // Maximum number of parent processes to traverse to prevent infinite loops
+        // and potential hangs from Windows API calls (NtQuerySystemInformation)
+        private const int MaxProcessTreeDepth = 50;
+
         private static ProcessTree PopulateProcessTreeInternal(ProcessTree tree, Process currentProcess)
         {
             Process nextProcess = null;
+            var depth = 0;
             try
             {
-                while (true)
+                while (depth < MaxProcessTreeDepth)
                 {
-                    var parentProcess = ParentProcessHelperInternal.GetParentProcess(nextProcess ?? currentProcess);
+                    depth++;
+                    Process parentProcess;
+                    try
+                    {
+                        parentProcess = ParentProcessHelperInternal.GetParentProcess(nextProcess ?? currentProcess);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // Process may have exited between query and access
+                        "chocolatey".Log().Debug(logging.ChocolateyLoggers.LogFileOnly, "Process exited during tree enumeration. Stopping traversal.");
+                        break;
+                    }
 
                     if (parentProcess is null)
                     {
@@ -229,6 +287,11 @@ namespace chocolatey.infrastructure.information
 
                     nextProcess = parentProcess;
                     tree.Processes.AddLast(nextProcess.ProcessName);
+                }
+
+                if (depth >= MaxProcessTreeDepth)
+                {
+                    "chocolatey".Log().Debug(logging.ChocolateyLoggers.LogFileOnly, "Process tree depth limit ({0}) reached. Stopping traversal.", MaxProcessTreeDepth);
                 }
             }
             catch (Win32Exception ex)
@@ -254,11 +317,23 @@ namespace chocolatey.infrastructure.information
         private static ProcessTree PopulateProcessTreeStable(ProcessTree tree, Process currentProcess)
         {
             Process nextProcess = null;
+            var depth = 0;
             try
             {
-                while (true)
+                while (depth < MaxProcessTreeDepth)
                 {
-                    var parentProcess = ParentProcessHelperStable.GetParentProcess(nextProcess ?? currentProcess);
+                    depth++;
+                    Process parentProcess;
+                    try
+                    {
+                        parentProcess = ParentProcessHelperStable.GetParentProcess(nextProcess ?? currentProcess);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        // Process may have exited between query and access
+                        "chocolatey".Log().Debug(logging.ChocolateyLoggers.LogFileOnly, "Process exited during tree enumeration. Stopping traversal.");
+                        break;
+                    }
 
                     if (parentProcess is null)
                     {
@@ -267,6 +342,11 @@ namespace chocolatey.infrastructure.information
 
                     nextProcess = parentProcess;
                     tree.Processes.AddLast(nextProcess.ProcessName);
+                }
+
+                if (depth >= MaxProcessTreeDepth)
+                {
+                    "chocolatey".Log().Debug(logging.ChocolateyLoggers.LogFileOnly, "Process tree depth limit ({0}) reached. Stopping traversal.", MaxProcessTreeDepth);
                 }
             }
             catch (Win32Exception ex)
