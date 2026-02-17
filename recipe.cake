@@ -14,10 +14,10 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
     var mergeConfigs = new List<ILMergeConfig>();
 
     var targetPlatform = "v4,C:\\Program Files (x86)\\Reference Assemblies\\Microsoft\\Framework\\.NETFramework\\v4.8";
-    var assembliesToILMerge = GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/*.{exe|dll}")
-                            - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/choco.exe")
-                            - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/System.Management.Automation.dll")
-                            - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/Chocolatey.PowerShell.dll");
+    var assembliesToILMerge = GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/net48/*.{exe|dll}")
+                            - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/net48/choco.exe")
+                            - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/net48/System.Management.Automation.dll")
+                            - GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/net48/Chocolatey.PowerShell.dll");
 
     Information("The following assemblies have been selected to be ILMerged for choco.exe...");
     foreach (var assemblyToILMerge in assembliesToILMerge)
@@ -32,15 +32,15 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
         Target = "exe",
         Internalize = BuildParameters.RootDirectoryPath + "/src/chocolatey.console/ilmerge.internalize.ignore.txt",
         Output = BuildParameters.Paths.Directories.PublishedApplications + "/choco_merged/choco.exe",
-        PrimaryAssemblyName = BuildParameters.Paths.Directories.PublishedApplications + "/choco/choco.exe",
+        PrimaryAssemblyName = BuildParameters.Paths.Directories.PublishedApplications + "/choco/net48/choco.exe",
         AssemblyPaths = assembliesToILMerge });
 
-    assembliesToILMerge = GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/*.{exe|dll}")
-                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/choco.exe")
-                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.dll")
-                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/log4net.dll")
-                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/System.Management.Automation.dll")
-                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/Chocolatey.PowerShell.dll");
+    assembliesToILMerge = GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/net48/*.{exe|dll}")
+                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/net48/choco.exe")
+                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/net48/chocolatey.dll")
+                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/net48/log4net.dll")
+                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/net48/System.Management.Automation.dll")
+                        - GetFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/net48/Chocolatey.PowerShell.dll");
 
     Information("The following assemblies have been selected to be ILMerged for chocolatey.dll...");
     foreach (var assemblyToILMerge in assembliesToILMerge)
@@ -55,7 +55,7 @@ Func<List<ILMergeConfig>> getILMergeConfigs = () =>
         Target = "dll",
         Internalize = BuildParameters.RootDirectoryPath + "/src/chocolatey/ilmerge.internalize.ignore.dll.txt",
         Output = BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey_merged/chocolatey.dll",
-        PrimaryAssemblyName = BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.dll",
+        PrimaryAssemblyName = BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/net48/chocolatey.dll",
         AssemblyPaths = assembliesToILMerge });
 
     return mergeConfigs;
@@ -137,25 +137,25 @@ Task("Prepare-Chocolatey-Packages")
     CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.md", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/CREDITS.txt");
     CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.json", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/CREDITS.json");
     CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.pdf", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/CREDITS.pdf");
-    CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco/LICENSE.txt", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/LICENSE.txt");
+    CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco/net48/LICENSE.txt", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/LICENSE.txt");
 
     // Copy choco.exe.manifest
-    CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco/choco.exe.manifest", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe.manifest");
+    CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco/net48/choco.exe.manifest", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe.manifest");
 
     // Copy external file resources
     EnsureDirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers");
-    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/helpers/**/*"), BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers", true);
+    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/net48/helpers/**/*"), BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers", true);
     EnsureDirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/redirects");
-    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/redirects/**/*"), BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/redirects", true);
+    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/net48/redirects/**/*"), BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/redirects", true);
     EnsureDirectoryExists(BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/tools");
-    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/tools/**/*"), BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/tools", true);
+    CopyFiles(GetFiles(BuildParameters.Paths.Directories.PublishedApplications + "/choco/net48/tools/**/*"), BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/tools", true);
 
     // Copy merged choco.exe
     CopyFile(BuildParameters.Paths.Directories.PublishedApplications + "/choco_merged/choco.exe", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/choco.exe");
 
     // Copy Chocolatey.PowerShell.dll and its help.xml file
-    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/Chocolatey.PowerShell/Chocolatey.PowerShell.dll", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll");
-    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/Chocolatey.PowerShell/Chocolatey.PowerShell.dll-help.xml", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll-help.xml");
+    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/Chocolatey.PowerShell/net48/Chocolatey.PowerShell.dll", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll");
+    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/Chocolatey.PowerShell/net48/Chocolatey.PowerShell.dll-help.xml", BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/helpers/Chocolatey.PowerShell.dll-help.xml");
 
     // Tidy up logs and config folder which are not required
     var logsDirectory = BuildParameters.Paths.Directories.ChocolateyNuspecDirectory + "/tools/chocolateyInstall/logs";
@@ -194,7 +194,7 @@ Task("Prepare-NuGet-Packages")
     CopyFile(BuildParameters.RootDirectoryPath + "/docs/legal/CREDITS.pdf", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/CREDITS.pdf");
 
     CopyFiles(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey_merged/*", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/net48");
-    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/chocolatey.xml", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/net48/chocolatey.xml");
+    CopyFile(BuildParameters.Paths.Directories.PublishedLibraries + "/chocolatey/net48/chocolatey.xml", BuildParameters.Paths.Directories.NuGetNuspecDirectory + "/chocolatey.lib/lib/net48/chocolatey.xml");
 });
 
 Task("Prepare-MSI")
@@ -214,7 +214,7 @@ Task("Prepare-MSI")
 });
 
 Task("Create-TarGz-Packages")
-    .IsDependentOn("Build")
+    .IsDependentOn("DotNetBuild")
     .IsDependeeOf("Package")
     .WithCriteria(!IsRunningOnWindows(), "Skipping because this is a Windows build")
     .Does(() =>
@@ -276,10 +276,11 @@ BuildParameters.SetParameters(context: Context,
                             shouldRunNuGet: IsRunningOnWindows(),
                             shouldAuthenticodeSignPowerShellScripts: IsRunningOnWindows(),
                             shouldPublishAwsLambdas: false,
-                            chocolateyNupkgGlobbingPattern: "/**/chocolatey*.nupkg");
+                            chocolateyNupkgGlobbingPattern: "/**/chocolatey*.nupkg",
+                            shouldRunInspectCode: false);
 
 ToolSettings.SetToolSettings(context: Context);
 
 BuildParameters.PrintParameters(Context);
 
-Build.Run();
+Build.RunDotNet();
