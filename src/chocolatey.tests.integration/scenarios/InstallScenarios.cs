@@ -262,8 +262,8 @@ namespace chocolatey.tests.integration.scenarios
                     shimfile,
                     "--shimgen-noop",
                     10,
-                    stdOutAction: (s, e) => messages.Add(e.Data),
-                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    stdOutAction: (s, e) => messages.Add(e.Data ?? string.Empty),
+                    stdErrAction: (s, e) => messages.Add(e.Data ?? string.Empty)
                 );
 
                 messages.Should()
@@ -283,8 +283,8 @@ namespace chocolatey.tests.integration.scenarios
                     shimfile,
                     "--shimgen-noop",
                     10,
-                    stdOutAction: (s, e) => messages.Add(e.Data),
-                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    stdOutAction: (s, e) => messages.Add(e.Data ?? string.Empty),
+                    stdErrAction: (s, e) => messages.Add(e.Data ?? string.Empty)
                 );
 
                 messages.Should()
@@ -3208,8 +3208,8 @@ namespace chocolatey.tests.integration.scenarios
                     shimfile,
                     "--shimgen-noop",
                     10,
-                    stdOutAction: (s, e) => messages.Add(e.Data),
-                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    stdOutAction: (s, e) => messages.Add(e.Data ?? string.Empty),
+                    stdErrAction: (s, e) => messages.Add(e.Data ?? string.Empty)
                 );
 
                 messages.Should()
@@ -3229,8 +3229,8 @@ namespace chocolatey.tests.integration.scenarios
                     shimfile,
                     "--shimgen-noop",
                     10,
-                    stdOutAction: (s, e) => messages.Add(e.Data),
-                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    stdOutAction: (s, e) => messages.Add(e.Data ?? string.Empty),
+                    stdErrAction: (s, e) => messages.Add(e.Data ?? string.Empty)
                 );
 
                 messages.Should()
@@ -3455,8 +3455,8 @@ namespace chocolatey.tests.integration.scenarios
                     shimfile,
                     "--shimgen-noop",
                     10,
-                    stdOutAction: (s, e) => messages.Add(e.Data),
-                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    stdOutAction: (s, e) => messages.Add(e.Data ?? string.Empty),
+                    stdErrAction: (s, e) => messages.Add(e.Data ?? string.Empty)
                 );
 
                 messages.Should()
@@ -3476,8 +3476,8 @@ namespace chocolatey.tests.integration.scenarios
                     shimfile,
                     "--shimgen-noop",
                     10,
-                    stdOutAction: (s, e) => messages.Add(e.Data),
-                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    stdOutAction: (s, e) => messages.Add(e.Data ?? string.Empty),
+                    stdErrAction: (s, e) => messages.Add(e.Data ?? string.Empty)
                 );
 
                 messages.Should()
@@ -4377,8 +4377,8 @@ namespace chocolatey.tests.integration.scenarios
                     shimfile,
                     "--shimgen-noop",
                     10,
-                    stdOutAction: (s, e) => messages.Add(e.Data),
-                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    stdOutAction: (s, e) => messages.Add(e.Data ?? string.Empty),
+                    stdErrAction: (s, e) => messages.Add(e.Data ?? string.Empty)
                 );
 
                 messages.Should()
@@ -4398,8 +4398,8 @@ namespace chocolatey.tests.integration.scenarios
                     shimfile,
                     "--shimgen-noop",
                     10,
-                    stdOutAction: (s, e) => messages.Add(e.Data),
-                    stdErrAction: (s, e) => messages.Add(e.Data)
+                    stdOutAction: (s, e) => messages.Add(e.Data ?? string.Empty),
+                    stdErrAction: (s, e) => messages.Add(e.Data ?? string.Empty)
                 );
 
                 messages.Should()
