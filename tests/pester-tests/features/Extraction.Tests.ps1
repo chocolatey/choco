@@ -43,7 +43,7 @@ Describe "Extraction tests <_> command" -Skip:(-not $env:TEST_KITCHEN) -ForEach 
         }
 
         It 'Should output correctly' {
-            $Output.String | Should -Match "The package contains an entry '.*' which is unsafe for extraction."
+            $Output.String | Should -Match "The package '$_.1.0.0' contains an entry '.*' which is unsafe for extraction."
         }
 
         It 'Should not create the file.' {
