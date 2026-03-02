@@ -32,9 +32,12 @@ if ($build -or !(Test-Path "$sourceLocation\artifacts")) {
 }
 
 Get-ChildItem "$thisLocation\src\packages\Chocolatey.NuGet.*" | ForEach-Object {
-    $name = $_.Name -replace "^Chocolatey\.NuGet([^\d]+)(\.\d.*)$", "NuGet`$1"
+    $name = $_.Name -replace "^Chocolatey\.NuGet([^\d]+)$", "NuGet`$1"
 
-    $destination = "$($_.FullName)\lib"
+    $packageDirectory = $_.FullName
+    $versionDirectory = Get-ChildItem -Path $packageDirectory -Directory | Sort-Object Name -Descending | Select-Object -First 1
+    $destination = Join-Path $versionDirectory.FullName 'lib'
+
     Remove-Item "$destination\*\*"
 
     Get-ChildItem "$sourceLocation\artifacts\$name\bin\Debug" -Directory | ForEach-Object {
