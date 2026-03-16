@@ -3,7 +3,7 @@
   License for use and distribution
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  7-Zip Copyright (C) 1999-2025 Igor Pavlov.
+  7-Zip Copyright (C) 1999-2026 Igor Pavlov.
 
   The licenses for files are:
 
@@ -54,7 +54,7 @@ BSD 3-clause License in 7-Zip code
 
   Copyright (c) 2015-2016, Apple Inc. All rights reserved.
   Copyright (c) Facebook, Inc. All rights reserved.
-  Copyright (c) 2023-2025 Igor Pavlov.
+  Copyright (c) 2023-2026 Igor Pavlov.
 
 Text of the "BSD 3-clause License"
 ----------------------------------
@@ -97,7 +97,7 @@ BSD 2-clause License in 7-Zip code
   XXH64 code in 7-Zip was derived from the original XXH64 code developed by Yann Collet.
 
   Copyright (c) 2012-2021 Yann Collet.
-  Copyright (c) 2023-2025 Igor Pavlov.
+  Copyright (c) 2023-2026 Igor Pavlov.
 
 Text of the "BSD 2-clause License"
 ----------------------------------
