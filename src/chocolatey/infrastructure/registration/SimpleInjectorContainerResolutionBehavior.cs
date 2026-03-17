@@ -14,10 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using SimpleInjector;
+using SimpleInjector.Advanced;
 using System;
 using System.Linq;
 using System.Reflection;
-using SimpleInjector.Advanced;
 
 namespace chocolatey.infrastructure.registration
 {
@@ -30,41 +31,32 @@ namespace chocolatey.infrastructure.registration
     {
         private readonly IConstructorResolutionBehavior _originalBehavior;
 
-        /// <summary>
-        ///   Initializes a new instance of the <see cref="SimpleInjectorContainerResolutionBehavior" /> class.
-        /// </summary>
-        /// <param name="originalBehavior">The original behavior.</param>
         public SimpleInjectorContainerResolutionBehavior(IConstructorResolutionBehavior originalBehavior)
         {
-            _originalBehavior = originalBehavior;
+            _originalBehavior = originalBehavior ?? throw new ArgumentNullException(nameof(originalBehavior));
         }
 
-        /// <summary>
-        ///   Gets the given <paramref name="implementationType" />'s constructor that can be used by the
-        ///   container to create that instance.
-        /// </summary>
-        /// <param name="serviceType">Type of the abstraction that is requested.</param>
-        /// <param name="implementationType">Type of the implementation to find a suitable constructor for.</param>
-        /// <returns>
-        ///   The <see cref="T:System.Reflection.ConstructorInfo" />.
-        /// </returns>
-        /// <exception cref="T:SimpleInjector.ActivationException">Thrown when no suitable constructor could be found.</exception>
-        public ConstructorInfo GetConstructor(Type serviceType, Type implementationType)
+        public ConstructorInfo TryGetConstructor(Type implementationType, out string errorMessage)
         {
-            if (serviceType.IsAssignableFrom(implementationType))
+            if (implementationType == null)
             {
-                var longestConstructor = (from constructor in implementationType.GetConstructors()
-                                          orderby constructor.GetParameters().Count() descending
-                                          select constructor).Take(1);
-
-                if (longestConstructor.Any())
-                {
-                    return longestConstructor.First();
-                }
+                throw new ArgumentNullException(nameof(implementationType));
             }
 
-            // fall back to the container's default behavior.
-            return _originalBehavior.GetConstructor(serviceType, implementationType);
+            // Prefer the public constructor with the most parameters
+            var longest = implementationType
+                .GetConstructors()
+                .OrderByDescending(c => c.GetParameters().Length)
+                .FirstOrDefault();
+
+            if (longest != null)
+            {
+                errorMessage = null;
+                return longest;
+            }
+
+            // Fall back to the container's default behavior (propagates its error message)
+            return _originalBehavior.TryGetConstructor(implementationType, out errorMessage);
         }
     }
 }

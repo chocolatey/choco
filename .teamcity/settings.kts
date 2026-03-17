@@ -157,6 +157,16 @@ object ChocolateySchd : BuildType({
         }
     }
 
+    features {
+        pullRequests {
+            provider = github {
+                authType = token {
+                    token = "%system.GitHubPAT%"
+                }
+            }
+        }
+    }
+
     requirements {
         doesNotExist("docker.server.version")
         doesNotContain("teamcity.agent.name", "Docker")

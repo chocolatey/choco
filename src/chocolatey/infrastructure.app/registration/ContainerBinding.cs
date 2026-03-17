@@ -95,7 +95,7 @@ namespace chocolatey.infrastructure.app.registration
                     extension.Status);
             }
 
-            container.RegisterAll(availableExtensionsArray.AsEnumerable());
+            container.Collection.Register(availableExtensionsArray.AsEnumerable());
 
             return availableExtensionsArray;
         }

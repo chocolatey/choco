@@ -38,7 +38,12 @@ namespace chocolatey.infrastructure.registration
         private const string RegisterComponentsMethod = "RegisterComponents";
 
 #if DEBUG
-        public static bool VerifyContainer { get; set; } = true;
+        // With the latest version of SimpleInjector, 5.5.0, the way that registration verification is done
+        // has changed. Rather than having to specifically call .Verify(), verification is enabled by default.
+        // This causes a problem for Chocolatey CLI, since we _want_ to be able to verify when in Debug
+        // configuration, but this is not possible.  For now, let's simply _never_ verify the container, 
+        // and we can run this manually if/when required.
+        public static bool VerifyContainer { get; set; } = false;
 #else
         public static bool VerifyContainer { get; set; } = false;
 #endif
@@ -65,6 +70,16 @@ namespace chocolatey.infrastructure.registration
         private static Container Initialize()
         {
             var container = new Container();
+            // Due to the changes in how SimpleInjector works, in v5.5.0, we have to change some of the
+            // default values for its configuration values.  This essentially puts SimpleInjector back
+            // to how it used to work, before v5.5.0.
+            // Don't really like doing this, but until we overhaul how all the registrations are done,
+            // both here, and in CLE and Agent, this is the best path forward.
+            container.Options.EnableAutoVerification = false;
+            container.Options.SuppressLifestyleMismatchVerification = true;
+            container.Options.ResolveUnregisteredConcreteTypes = true;
+            container.Options.UseStrictLifestyleMismatchBehavior = false;
+
             container.Options.AllowOverridingRegistrations = true;
             var originalConstructorResolutionBehavior = container.Options.ConstructorResolutionBehavior;
             container.Options.ConstructorResolutionBehavior = new SimpleInjectorContainerResolutionBehavior(originalConstructorResolutionBehavior);

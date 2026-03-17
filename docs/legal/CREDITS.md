@@ -15,21 +15,17 @@ Chocolatey uses a number of 3rd party components. Their details are below.
 * [Chocolatey CLI / Chocolatey.Lib](#chocolatey-cli--chocolateylib)
   * [Apache v2.0 License](#apache-v20-license-1)
     * [Checksum@0.3.1](#checksum031)
-    * [Chocolatey.NuGet.Client@3.4.3](#chocolateynugetclient343)
-    * [log4net@rel/2.0.12](#log4netrel2012)
-    * [Microsoft.Web.Xdt@3.1.0](#microsoftwebxdt310)
+    * [Chocolatey.NuGet.Client@3.5.0](#chocolateynugetclient350)
+    * [log4net@rel/3.2.0](#log4netrel320)
   * [BSD-3-Clause](#bsd-3-clause-1)
     * [Rhino.Licensing@1.4.1](#rhinolicensing141)
   * [MIT License](#mit-license-1)
-    * [AlphaFS@2.1.3](#alphafs213)
-    * [Microsoft.Bcl.HashCode@1.1.1](#microsoftbclhashcode111)
-    * [Newtonsoft.Json@13.0.1](#newtonsoftjson1301)
-    * [SimpleInjector@2.8.3](#simpleinjector283)
-    * [System.Reactive@rxnet-v5.0.0](#systemreactiverxnet-v500)
-    * [System.Runtime.CompilerServices.Unsafe@4.5.3](#systemruntimecompilerservicesunsafe453)
-    * [System.Threading.Tasks.Extensions@4.5.4](#systemthreadingtasksextensions454)
+    * [AlphaFS@v2.2.6](#alphafsv226)
+    * [Microsoft.Bcl.HashCode@v6.0.0](#microsoftbclhashcodev600)
+    * [SimpleInjector@v5.5.0](#simpleinjectorv550)
+    * [System.Reactive@rxnet-v6.1.0](#systemreactiverxnet-v610)
   * [Other](#other)
-    * [7-Zip@25.01](#7-zip2501)
+    * [7-Zip@26.00](#7-zip2600)
     * [Shim Generator (shimgen)@2.0.0](#shim-generator-\(shimgen\)200)
 
 ## Open Source License Types (Reference)
@@ -297,17 +293,13 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 [Checksum](https://github.com/chocolatey/checksum) - [License terms.](https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENSE)
 
-#### Chocolatey.NuGet.Client@3.4.3
+#### Chocolatey.NuGet.Client@3.5.0
 
-[Chocolatey.NuGet.Client](https://github.com/NuGet/NuGet.Client) [(modified)](https://github.com/chocolatey/NuGet.Client) - [License terms.](https://github.com/NuGet/NuGet.Client/blob/72f9f2b2eab28c9d91a22065c55aa7702abf7e01/LICENSE.txt)
+[Chocolatey.NuGet.Client](https://github.com/NuGet/NuGet.Client) [(modified)](https://github.com/chocolatey/NuGet.Client) - [License terms.](https://github.com/chocolatey/NuGet.Client/blob/d08e5cc246b384fd424e99371168d7cf4534723e/LICENSE.txt)
 
-#### log4net@rel/2.0.12
+#### log4net@rel/3.2.0
 
-[log4net](https://github.com/apache/logging-log4net) - [License terms.](https://github.com/apache/logging-log4net/blob/dbad144815221ffe4ed85efa73134583253dc75b/LICENSE)
-
-#### Microsoft.Web.Xdt@3.1.0
-
-[Microsoft.Web.Xdt](https://www.nuget.org/packages/Microsoft.Web.Xdt/3.1.0) - [License terms.](https://licenses.nuget.org/Apache-2.0)
+[log4net](https://github.com/apache/logging-log4net) - [License terms.](https://github.com/apache/logging-log4net/blob/5e9e2b0ea8a57a441e779d23429f6759a06d93ce/LICENSE)
 
 ### BSD-3-Clause
 
@@ -317,37 +309,25 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 ### MIT License
 
-#### AlphaFS@2.1.3
+#### AlphaFS@v2.2.6
 
-[AlphaFS](https://github.com/alphaleonis/AlphaFS) - [License terms.](https://github.com/alphaleonis/AlphaFS/blob/c63d46894e08d5a4e993b35131051f13203c3321/LICENSE.md)
+[AlphaFS](https://github.com/alphaleonis/AlphaFS) - [License terms.](https://github.com/alphaleonis/AlphaFS/blob/d76d1f9f02e6869dc23dcfc6ea9163a8c1b69064/LICENSE.md)
 
-#### Microsoft.Bcl.HashCode@1.1.1
+#### Microsoft.Bcl.HashCode@v6.0.0
 
-[Microsoft.Bcl.HashCode](https://github.com/dotnet/corefx) - [License terms.](https://github.com/dotnet/corefx/blob/bdaf5f50f035df0aa98bd69b400b5d1dcff6a7b0/LICENSE)
+[Microsoft.Bcl.HashCode](https://github.com/dotnet/runtime) - [License terms.](https://github.com/dotnet/runtime/blob/4822e3c3aa77eb82b2fb33c9321f923cf11ddde6/LICENSE.TXT)
 
-#### Newtonsoft.Json@13.0.1
+#### SimpleInjector@v5.5.0
 
-[Newtonsoft.Json](https://github.com/JamesNK/Newtonsoft.Json) - [License terms.](https://github.com/JamesNK/Newtonsoft.Json/blob/ae9fe44e1323e91bcbd185ca1a14099fba7c021f/LICENSE.md)
+[SimpleInjector](https://github.com/simpleinjector/SimpleInjector) - [License terms.](https://github.com/simpleinjector/SimpleInjector/blob/eb27d31d1fdf055bed8bcfe5c22b2a1580bbb2a9/LICENSE)
 
-#### SimpleInjector@2.8.3
+#### System.Reactive@rxnet-v6.1.0
 
-[SimpleInjector](https://simpleinjector.org/) - [License terms.](https://github.com/simpleinjector/SimpleInjector/blob/0687195a7691363d4b4918e36b5e4d708e88253c/licence.txt)
-
-#### System.Reactive@rxnet-v5.0.0
-
-[System.Reactive](https://github.com/dotnet/reactive) - [License terms.](https://github.com/dotnet/reactive/blob/103c252a0ec94eac753f353131ad95cc0be1b390/LICENSE)
-
-#### System.Runtime.CompilerServices.Unsafe@4.5.3
-
-[System.Runtime.CompilerServices.Unsafe](https://www.nuget.org/packages/System.Runtime.CompilerServices.Unsafe/4.5.3) - [License terms.](https://github.com/dotnet/corefx/blob/b8b81a66738bb10ef0790023598396861d92b2c4/LICENSE.TXT)
-
-#### System.Threading.Tasks.Extensions@4.5.4
-
-[System.Threading.Tasks.Extensions](https://www.nuget.org/packages/System.Threading.Tasks.Extensions/4.5.4) - [License terms.](https://github.com/dotnet/corefx/blob/b8b81a66738bb10ef0790023598396861d92b2c4/LICENSE.TXT)
+[System.Reactive](https://github.com/dotnet/reactive) - [License terms.](https://github.com/dotnet/reactive/blob/f4da16f15a3cde97f178396ea6e3489cc893651f/LICENSE)
 
 ### Other
 
-#### 7-Zip@25.01
+#### 7-Zip@26.00
 
 [7-Zip](https://www.7-zip.org/) - [License terms.](https://www.7-zip.org/license.txt)
 

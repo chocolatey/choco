@@ -25,23 +25,17 @@ using chocolatey.infrastructure.extractors;
 using chocolatey.infrastructure.filesystem;
 using chocolatey.infrastructure.commands;
 using chocolatey.infrastructure.logging;
-#if !NoResources
 using chocolatey.resources;
 
 namespace chocolatey.infrastructure.app.commands
 {
-#endif
 
     [CommandFor("unpackself", "[DEPRECATED] will be removed in v3.0.0 - re-installs Chocolatey base files")]
     public class ChocolateyUnpackSelfCommand : ICommand
     {
         private readonly IFileSystem _fileSystem;
 
-#if !NoResources
         private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>(() => adapters.Assembly.GetAssembly(typeof(ChocolateyResourcesAssembly)));
-#else
-        private Lazy<IAssembly> _assemblyInitializer = new Lazy<IAssembly>();
-#endif
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public void InitializeWith(Lazy<IAssembly> assembly_initializer)

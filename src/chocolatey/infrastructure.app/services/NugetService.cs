@@ -171,7 +171,7 @@ install them.
                 // has been added here: https://github.com/chocolatey/choco/issues/3139 to address the actual
                 // issue that causes this warning to be required.
                 this.Log().Warn(@"
-Starting vith Chocolatey CLI v2.0.0, changes have been made to the
+Starting with Chocolatey CLI v2.0.0, changes have been made to the
 `choco search` command which means that filtering of packages using the
 `--approved-only`, `--download-cache`, and `--not-broken` options are
 now performed within Chocolatey CLI. Previously, this filtering would
@@ -1636,7 +1636,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 }
                                 catch (NuGetResolverConstraintException nestedEx)
                                 {
-                                    // If we get here, both the inital attempt to resolve a solution didn't work, as well as a second
+                                    // If we get here, both the initial attempt to resolve a solution didn't work, as well as a second
                                     // attempt using all available package versions didn't work, so this time around we hard fail, and
                                     // provide information to the user about the conflicts for the package resolution.
                                     var logMessage = GetDependencyResolutionErrorMessage(nestedEx);
@@ -1751,8 +1751,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     // At this point, we know the version of both the new package that is being installed, and the
                                     // version that was currently installed.  This information was used to perform the backup in
                                     // the line above, and can therefore be trusted.  Take this information and add an entry in the
-                                    // EnvironmnetVariables collection, which will later be written into the PowerShell sesssion as
-                                    // envrionment variables.
+                                    // EnvironmentVariables collection, which will later be written into the PowerShell session as
+                                    // environment variables.
                                     config.Information.EnvironmentVariables[EnvironmentVariables.Package.ChocolateyPreviousPackageVersion] = oldPkgInfo.Package.Version.ToNormalizedStringChecked();
 
                                     packageToUninstall.InstallLocation = pathResolver.GetInstallPath(packageToUninstall.Identity);

@@ -82,7 +82,7 @@ namespace chocolatey.infrastructure.app.commands
 ");
             }
 
-            IEnumerable<ICommand> commands = container.GetAllInstances<ICommand>();
+            var commands = container.GetAllInstances<ICommand>();
 
             foreach (var command in commands.OrEmpty().SelectMany(c =>
             {
