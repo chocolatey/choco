@@ -6,7 +6,7 @@
   - [Contributors](#contributors)
 - [Third Party Licenses - Development](#third-party-licenses---development)
 - [Third Party Licenses - Runtime](#third-party-licenses---runtime)
-  - [7-Zip @ 25.01](#7-zip--2501)
+  - [7-Zip @ 26.00](#7-zip--2600)
   - [AlphaFS @ 2.1.3](#alphafs--213)
   - [Checksum @ 0.2.0](#checksum--020)
   - [log4net @ 2.0.12](#log4net--2012)
@@ -70,7 +70,7 @@ We would like to credit other super sweet tools/frameworks that aid in the devel
 Chocolatey CLI (choco) uses a number of 3rd-party components.
 Their details are below.
 
-- [7-Zip @ 25.01](#7-zip--2501)
+- [7-Zip @ 26.00](#7-zip--2600)
 - [AlphaFS @ 2.1.3](#alphafs--213)
 - [Checksum @ 0.2.0](#checksum--020)
 - [log4net @ 2.0.12](#log4net--2012)
@@ -81,7 +81,7 @@ Their details are below.
 - [Shim Generator (shimgen) @ 1.0.0](#shim-generator-shimgen--100)
 - [SimpleInjector @ 2.8.3](#simpleinjector--283)
 
-### 7-Zip @ 25.01
+### 7-Zip @ 26.00
 
 Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives.
 [License terms](http://www.7-zip.org/license.txt):
@@ -92,7 +92,7 @@ Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives.
   License for use and distribution
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  7-Zip Copyright (C) 1999-2025 Igor Pavlov.
+  7-Zip Copyright (C) 1999-2026 Igor Pavlov.
 
   The licenses for files are:
 
@@ -143,7 +143,7 @@ BSD 3-clause License in 7-Zip code
 
   Copyright (c) 2015-2016, Apple Inc. All rights reserved.
   Copyright (c) Facebook, Inc. All rights reserved.
-  Copyright (c) 2023-2025 Igor Pavlov.
+  Copyright (c) 2023-2026 Igor Pavlov.
 
 Text of the "BSD 3-clause License"
 ----------------------------------
@@ -186,7 +186,7 @@ BSD 2-clause License in 7-Zip code
   XXH64 code in 7-Zip was derived from the original XXH64 code developed by Yann Collet.
 
   Copyright (c) 2012-2021 Yann Collet.
-  Copyright (c) 2023-2025 Igor Pavlov.
+  Copyright (c) 2023-2026 Igor Pavlov.
 
 Text of the "BSD 2-clause License"
 ----------------------------------
