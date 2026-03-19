@@ -4,12 +4,12 @@
     "link": "https://github.com/chocolatey/choco",
     "licenseName": "LICENSE",
     "licenseLink": "https://github.com/chocolatey/choco/blob/master/LICENSE",
-    "version": "",
+    "version": "2.7.0",
     "dependencies": [
         {
             "name": "7-Zip",
             "link": "https://www.7-zip.org/",
-            "version": "25.01",
+            "version": "26.00",
             "licenses": [
                 {
                     "type": "OTHER",
@@ -45,11 +45,11 @@
             "name": "Chocolatey.NuGet.Client",
             "link": "https://github.com/NuGet/NuGet.Client",
             "modifiedLink": "https://github.com/chocolatey/NuGet.Client",
-            "version": "3.4.3",
+            "version": "3.5.0",
             "licenses": [
                 {
                     "type": "Apache-2.0",
-                    "link": "https://github.com/NuGet/NuGet.Client/blob/72f9f2b2eab28c9d91a22065c55aa7702abf7e01/LICENSE.txt",
+                    "link": "https://github.com/chocolatey/NuGet.Client/blob/d08e5cc246b384fd424e99371168d7cf4534723e/LICENSE.txt",
                     "name": "LICENSE.txt"
                 }
             ]
