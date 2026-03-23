@@ -23,10 +23,10 @@ ARG buildscript="build.sh"
 RUN if [ "$buildscript" = "build.official.sh" ]; then \
     export CHOCOLATEY_OFFICIAL_KEY="/usr/local/src/choco/chocolatey.official.snk"; \
     ./$buildscript; \
-    cp docker/choco_official_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
+    cp docker/choco_official_wrapper code_drop/temp/_PublishedApps/choco/net48/choco_wrapper; \
   else \
     ./$buildscript --verbosity=diagnostic; \
-    cp docker/choco_wrapper code_drop/temp/_PublishedApps/choco/choco_wrapper; \
+    cp docker/choco_wrapper code_drop/temp/_PublishedApps/choco/net48/choco_wrapper; \
   fi;
 
 FROM debian:bookworm AS install
@@ -51,7 +51,7 @@ LABEL org.opencontainers.image.base.name="index.docker.io/library/debian:bookwor
 
 ENV ChocolateyInstall=/opt/chocolatey
 
-COPY --from=build /usr/local/src/choco/code_drop/temp/_PublishedApps/choco /opt/chocolatey
+COPY --from=build /usr/local/src/choco/code_drop/temp/_PublishedApps/choco/net48 /opt/chocolatey
 
 RUN mkdir /opt/chocolatey/lib; \
   cp /opt/chocolatey/choco_wrapper usr/local/bin/choco; \
