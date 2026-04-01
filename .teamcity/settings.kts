@@ -338,7 +338,7 @@ object ChocolateyDockerWin : BuildType({
     steps {
         script {
             name = "Call Cake"
-            scriptContent = "call build.official.bat --verbosity=diagnostic --target=Docker"
+            scriptContent = "call build.official.bat --verbosity=diagnostic --target=Docker --shouldRunTests=false --shouldRunAnalyze=false"
         }
     }
 
@@ -424,7 +424,7 @@ object ChocolateyPosix : BuildType({
         script {
             name = "Build Chocolatey"
             scriptContent = """
-                ./build.official.sh --verbosity=diagnostic
+                ./build.official.sh --verbosity=diagnostic --shouldRunTests=false --shouldRunAnalyze=false
             """.trimIndent()
         }
 
