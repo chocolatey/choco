@@ -29,7 +29,7 @@
     <Optimize>true</Optimize>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(CHOCOLATEY_OFFICIAL_KEY)' == ''">
+	<PropertyGroup Condition="'$(CHOCOLATEY_OFFICIAL_KEY)' == '' OR !Exists('$(CHOCOLATEY_OFFICIAL_KEY')">
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\..\chocolatey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
