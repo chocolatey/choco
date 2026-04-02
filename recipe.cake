@@ -234,7 +234,7 @@ Task("Create-TarGz-Packages")
                 "-czvf {0} .",
                 outputFile
             ),
-            WorkingDirectory = BuildParameters.Paths.Directories.PublishedApplications.FullPath + "/choco/"
+            WorkingDirectory = BuildParameters.Paths.Directories.PublishedApplications.FullPath + "/choco/net48/"
         }
     );
 
