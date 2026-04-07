@@ -381,6 +381,7 @@ object ChocolateyPosix : BuildType({
     params {
         param("env.CAKE_NUGET_SOURCE", "") // The Cake version we use has issues with authing to our private source on Linux
         param("env.PRIMARY_NUGET_SOURCE", "") // As above there are issues with authing to our private source on Linux
+        param("env:NUGETDEVRESTORE_SOURCE", "") // As above there are issues with authing to our private source on Linux
         param("env.CHOCOLATEY_VERSION", "%dep.Chocolatey.build.number%")
         param("env.CHOCOLATEY_OFFICIAL_KEY", "%system.teamcity.build.checkoutDir%/chocolatey.official.snk")
         password("env.GITHUB_PAT", "%system.GitHubPAT%", display = ParameterDisplay.HIDDEN, readOnly = true)
