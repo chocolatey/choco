@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Launch CLI": {
+      "commandName": "Project",
+      "commandLineArgs": "source list"
+    }
+  }
+}

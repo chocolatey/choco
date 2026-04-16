@@ -7,6 +7,12 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             "$env:ChocolateyInstall\extensions\chocolatey"
             "$env:ChocolateyInstall\bin"
         )
+        $ChocolateyPackageDirectoriesToCheck = @(
+            "$env:ChocolateyInstall\lib\chocolatey"
+            "$env:ChocolateyInstall\lib\chocolatey.extension"
+            "$env:ChocolateyInstall\lib\chocolatey-agent"
+            "$env:ChocolateyInstall\lib\chocolatey-management-*"
+        )
         $StrongNamingKeyFilesToCheck = @(
             "$env:ChocolateyInstall\choco.exe"
             "$env:ChocolateyInstall\extensions\chocolatey\chocolatey.licensed.dll"
@@ -21,7 +27,7 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
             "\bin\cuninst.exe"
             "\bin\cup.exe"
         )
-        $PowerShellFiles = Get-ChildItem -Path $ChocolateyDirectoriesToCheck -Include "*.ps1", "*.psm1" -Recurse -ErrorAction Ignore
+        $PowerShellFiles = Get-ChildItem -Path @($ChocolateyDirectoriesToCheck; $ChocolateyPackageDirectoriesToCheck) -Include "*.ps1", "*.psm1" -Recurse -ErrorAction Ignore
         # For certain test scenarios we run, there are additional files available in the bin directory.
         # These files should not be tested as part of the signing check.
         $ExecutableFiles = Get-ChildItem -Path $ChocolateyDirectoriesToCheck -Include "*.exe", "*.dll" -Recurse -ErrorAction Ignore | Where-Object Name -NotMatch 'driver\.exe$'
@@ -114,8 +120,9 @@ Describe "Ensuring Chocolatey is correctly installed" -Tag Environment, Chocolat
         $path | Should -Not -Exist
     }
 
+    # This is tagged CCM as we require it to also run on the CCM suite that only runs the CCM tags.
     # This is skipped when not run in CI because it requires signed executables.
-    Context "File signing (<_.FullName>)" -ForEach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0"))) {
+    Context "File signing (<_.FullName>)" -ForEach @($PowerShellFiles; $ExecutableFiles; $StrongNamingKeyFiles) -Tag CCM -Skip:((-not $env:TEST_KITCHEN) -or (-not (Test-ChocolateyVersionEqualOrHigherThan "1.0.0"))) {
         BeforeAll {
             # Due to changes in the signing setup, the certificate used to sign PS1 files and the Chocolatey CLI executable MIGHT be different. This ensures that the both certificates are trusted.
             $FileUnderTest = $_

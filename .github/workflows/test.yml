@@ -29,6 +29,14 @@ jobs:
         sudo apt update
         sudo apt install -y mono-complete
         mono --version
+    - name: Install dotnet #needed for GitVersion
+      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
+      with:
+        dotnet-version: |
+          5.0.x
+    - name: Report installed dotnet versions
+      run: |
+          dotnet --info
     - name: Test with NUnit on Mono
       run: |
         chmod +x build.sh
@@ -55,6 +63,14 @@ jobs:
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+    - name: Install dotnet #needed for GitVersion
+      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
+      with:
+        dotnet-version: |
+          5.0.x
+    - name: Report installed dotnet versions
+      run: |
+          dotnet --info
     - name: Test with NUnit on .Net Framework
       run: .\build.bat  --verbosity=diagnostic --target=test --testExecutionType=all --shouldRunOpenCover=false
     - name: Upload Windows build results
@@ -81,6 +97,14 @@ jobs:
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+    - name: Install dotnet #needed for GitVersion
+      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
+      with:
+        dotnet-version: |
+          5.0.x
+    - name: Report installed dotnet versions
+      run: |
+          dotnet --info
     - name: Test with NUnit on Mono
       run: |
           chmod +x build.sh

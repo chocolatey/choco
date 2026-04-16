@@ -421,6 +421,7 @@ namespace chocolatey.infrastructure.app.nuget
 
                         if (!(package is null))
                         {
+                            package.AvailableVersionSource = resource.Source.PackageSource.Source;
                             packagesList.Add(package);
                         }
                     }
@@ -431,6 +432,11 @@ namespace chocolatey.infrastructure.app.nuget
                             errorMessage: "Unable to connect to source '{0}'".FormatWith(resource.Source.PackageSource.Source),
                             throwError: false,
                             logWarningInsteadOfError: true).OrEmpty();
+
+                        foreach (var package in packages)
+                        {
+                            package.AvailableVersionSource = resource.Source.PackageSource.Source;
+                        }
 
                         packagesList.AddRange(packages);
                     }
@@ -445,6 +451,7 @@ namespace chocolatey.infrastructure.app.nuget
 
                     if (!(package is null))
                     {
+                        package.AvailableVersionSource = resource.Source.PackageSource.Source;
                         packagesList.Add(package);
                     }
                 }

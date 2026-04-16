@@ -157,6 +157,16 @@ object ChocolateySchd : BuildType({
         }
     }
 
+    features {
+        pullRequests {
+            provider = github {
+                authType = token {
+                    token = "%system.GitHubPAT%"
+                }
+            }
+        }
+    }
+
     requirements {
         doesNotExist("docker.server.version")
         doesNotContain("teamcity.agent.name", "Docker")
@@ -328,7 +338,7 @@ object ChocolateyDockerWin : BuildType({
     steps {
         script {
             name = "Call Cake"
-            scriptContent = "call build.official.bat --verbosity=diagnostic --target=Docker"
+            scriptContent = "call build.official.bat --verbosity=diagnostic --target=Docker --shouldRunTests=false --shouldRunAnalyze=false"
         }
     }
 
@@ -371,6 +381,7 @@ object ChocolateyPosix : BuildType({
     params {
         param("env.CAKE_NUGET_SOURCE", "") // The Cake version we use has issues with authing to our private source on Linux
         param("env.PRIMARY_NUGET_SOURCE", "") // As above there are issues with authing to our private source on Linux
+        param("env:NUGETDEVRESTORE_SOURCE", "") // As above there are issues with authing to our private source on Linux
         param("env.CHOCOLATEY_VERSION", "%dep.Chocolatey.build.number%")
         param("env.CHOCOLATEY_OFFICIAL_KEY", "%system.teamcity.build.checkoutDir%/chocolatey.official.snk")
         password("env.GITHUB_PAT", "%system.GitHubPAT%", display = ParameterDisplay.HIDDEN, readOnly = true)
@@ -414,7 +425,7 @@ object ChocolateyPosix : BuildType({
         script {
             name = "Build Chocolatey"
             scriptContent = """
-                ./build.official.sh --verbosity=diagnostic
+                ./build.official.sh --verbosity=diagnostic --shouldRunTests=false --shouldRunAnalyze=false
             """.trimIndent()
         }
 

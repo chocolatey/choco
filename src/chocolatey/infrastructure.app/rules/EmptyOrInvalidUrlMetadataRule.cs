@@ -56,7 +56,7 @@ namespace chocolatey.infrastructure.app.rules
 
         protected override IEnumerable<ImmutableRule> GetRules()
         {
-            yield return new ImmutableRule(RuleType.Error, RuleIdentifiers.EmptyRequiredElement, "A required element does not contain any content.");
+            yield return new ImmutableRule(RuleType.Error, RuleIdentifiers.EmptyRequiredElement, "A required element is missing or has no content in the package nuspec file.");
             yield return new ImmutableRule(RuleType.Error, RuleIdentifiers.InvalidTypeElement, "The specified content of the element is not of the expected type and can not be accepted.");
         }
     }
