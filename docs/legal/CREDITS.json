@@ -57,11 +57,11 @@
         {
             "name": "log4net",
             "link": "https://github.com/apache/logging-log4net",
-            "version": "rel/3.2.0",
+            "version": "rel/3.3.1",
             "licenses": [
                 {
                     "type": "Apache-2.0",
-                    "link": "https://github.com/apache/logging-log4net/blob/5e9e2b0ea8a57a441e779d23429f6759a06d93ce/LICENSE",
+                    "link": "",
                     "name": "LICENSE"
                 }
             ]
