@@ -25,7 +25,7 @@ Chocolatey uses a number of 3rd party components. Their details are below.
     * [SimpleInjector@v5.5.0](#simpleinjectorv550)
     * [System.Reactive@rxnet-v6.1.0](#systemreactiverxnet-v610)
   * [Other](#other)
-    * [7-Zip@26.00](#7-zip2600)
+    * [7-Zip@26.01](#7-zip2601)
     * [Shim Generator (shimgen)@2.0.0](#shim-generator-\(shimgen\)200)
 
 ## Open Source License Types (Reference)
@@ -327,7 +327,7 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 ### Other
 
-#### 7-Zip@26.00
+#### 7-Zip@26.01
 
 [7-Zip](https://www.7-zip.org/) - [License terms.](https://www.7-zip.org/license.txt)
 
