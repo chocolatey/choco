@@ -30,4 +30,21 @@ if (-not $7zipDependency) {
     "$json`n" | Out-File -LiteralPath $creditsFile -Encoding utf8NoBOM -NoNewline
 }
 
-Write-Host -ForegroundColor Green "The 7-zip components have been updated. Be sure to update the BundledApplications.Tests.ps1 file that exist on this branch."
+$bundleTestFile = "$PSScriptRoot\tests\pester-tests\BundledApplications.Tests.ps1"
+
+if (!(Test-Path $bundleTestFile)) {
+    Write-Warning "Unable to find the 'BundleApplications.Tests.ps1' file. Please update the test with new 7zip version manually."
+} else {
+    $updateRe = "(Name\s*=\s*'7z'.*Version\s*=\s*)'[^']*'"
+    $bundleTestContent = Get-Content -Encoding utf8 -LiteralPath $bundleTestFile | % {
+        if ($_ -match $updateRe) {
+            $_ -replace $updateRe,"`$1'$Version'"
+        } else {
+            $_
+        }
+    }
+
+    $bundleTestContent | Out-File -Encoding utf8BOM -LiteralPath $bundleTestFile
+}
+
+Write-Host -ForegroundColor Green "The 7-zip components have been updated to Version $Version."
