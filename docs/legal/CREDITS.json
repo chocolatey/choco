@@ -1,129 +1,129 @@
 {
-    "name": "Chocolatey CLI / Chocolatey.Lib",
-    "isPrivate": false,
-    "link": "https://github.com/chocolatey/choco",
-    "licenseName": "LICENSE",
-    "licenseLink": "https://github.com/chocolatey/choco/blob/master/LICENSE",
-    "dependencies": [
+  "name": "Chocolatey CLI / Chocolatey.Lib",
+  "isPrivate": false,
+  "link": "https://github.com/chocolatey/choco",
+  "licenseName": "LICENSE",
+  "licenseLink": "https://github.com/chocolatey/choco/blob/master/LICENSE",
+  "dependencies": [
+    {
+      "name": "7-Zip",
+      "link": "https://www.7-zip.org/",
+      "version": "26.01",
+      "licenses": [
         {
-            "name": "7-Zip",
-            "link": "https://www.7-zip.org/",
-            "version": "26.01",
-            "licenses": [
-                {
-                    "type": "OTHER",
-                    "link": "https://www.7-zip.org/license.txt"
-                }
-            ]
-        },
-        {
-            "name": "AlphaFS",
-            "link": "https://github.com/alphaleonis/AlphaFS",
-            "version": "v2.2.6",
-            "licenses": [
-                {
-                    "type": "MIT",
-                    "link": "https://github.com/alphaleonis/AlphaFS/blob/d76d1f9f02e6869dc23dcfc6ea9163a8c1b69064/LICENSE.md",
-                    "name": "LICENSE.md"
-                }
-            ]
-        },
-        {
-            "name": "Checksum",
-            "link": "https://github.com/chocolatey/checksum",
-            "version": "0.3.1",
-            "licenses": [
-                {
-                    "type": "Apache-2.0",
-                    "link": "https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENSE",
-                    "name": "LICENSE"
-                }
-            ]
-        },
-        {
-            "name": "Chocolatey.NuGet.Client",
-            "link": "https://github.com/NuGet/NuGet.Client",
-            "modifiedLink": "https://github.com/chocolatey/NuGet.Client",
-            "version": "3.5.0",
-            "licenses": [
-                {
-                    "type": "Apache-2.0",
-                    "link": "https://github.com/chocolatey/NuGet.Client/blob/d08e5cc246b384fd424e99371168d7cf4534723e/LICENSE.txt",
-                    "name": "LICENSE.txt"
-                }
-            ]
-        },
-        {
-            "name": "log4net",
-            "link": "https://github.com/apache/logging-log4net",
-            "version": "rel/3.3.1",
-            "licenses": [
-                {
-                    "type": "Apache-2.0",
-                    "link": "https://github.com/apache/logging-log4net/blob/7fcc7f425b81b9df7c8a8719ed90953b938cd10e/LICENSE",
-                    "name": "LICENSE"
-                }
-            ]
-        },
-        {
-            "name": "Microsoft.Bcl.HashCode",
-            "link": "https://github.com/dotnet/runtime",
-            "version": "v6.0.0",
-            "licenses": [
-                {
-                    "type": "MIT",
-                    "link": "https://github.com/dotnet/runtime/blob/4822e3c3aa77eb82b2fb33c9321f923cf11ddde6/LICENSE.TXT",
-                    "name": "LICENSE.TXT"
-                }
-            ]
-        },
-        {
-            "name": "Rhino.Licensing",
-            "link": "https://github.com/ayende/rhino-licensing",
-            "modifiedLink": "https://github.com/chocolatey/rhino-licensing",
-            "version": "1.4.1",
-            "licenses": [
-                {
-                    "type": "BSD-3-Clause",
-                    "link": "https://github.com/ayende/rhino-licensing/blob/1fc90c984b0c3012465a73afae0a53492c969eb5/license.txt",
-                    "name": "license.txt"
-                }
-            ]
-        },
-        {
-            "name": "Shim Generator (shimgen)",
-            "link": "https://github.com/chocolatey/shimgen",
-            "version": "2.0.0",
-            "licenses": [
-                {
-                    "type": "OTHER",
-                    "link": "https://github.com/chocolatey/choco/blob/d25f993696b4d665ee2dc94ceb0937a2ed5698eb/src/chocolatey.resources/tools/shimgen.license.txt"
-                }
-            ]
-        },
-        {
-            "name": "SimpleInjector",
-            "link": "https://github.com/simpleinjector/SimpleInjector",
-            "version": "v5.5.0",
-            "licenses": [
-                {
-                    "type": "MIT",
-                    "link": "https://github.com/simpleinjector/SimpleInjector/blob/eb27d31d1fdf055bed8bcfe5c22b2a1580bbb2a9/LICENSE",
-                    "name": "LICENSE"
-                }
-            ]
-        },
-        {
-            "name": "System.Reactive",
-            "link": "https://github.com/dotnet/reactive",
-            "version": "rxnet-v6.1.0",
-            "licenses": [
-                {
-                    "type": "MIT",
-                    "link": "https://github.com/dotnet/reactive/blob/f4da16f15a3cde97f178396ea6e3489cc893651f/LICENSE",
-                    "name": "LICENSE"
-                }
-            ]
+          "type": "OTHER",
+          "link": "https://www.7-zip.org/license.txt"
         }
-    ]
+      ]
+    },
+    {
+      "name": "AlphaFS",
+      "link": "https://github.com/alphaleonis/AlphaFS",
+      "version": "v2.2.6",
+      "licenses": [
+        {
+          "type": "MIT",
+          "link": "https://github.com/alphaleonis/AlphaFS/blob/d76d1f9f02e6869dc23dcfc6ea9163a8c1b69064/LICENSE.md",
+          "name": "LICENSE.md"
+        }
+      ]
+    },
+    {
+      "name": "Checksum",
+      "link": "https://github.com/chocolatey/checksum",
+      "version": "0.3.1",
+      "licenses": [
+        {
+          "type": "Apache-2.0",
+          "link": "https://github.com/chocolatey/checksum/blob/89a1b39cbc05624aacefae416b3e954475838ecb/LICENSE",
+          "name": "LICENSE"
+        }
+      ]
+    },
+    {
+      "name": "Chocolatey.NuGet.Client",
+      "link": "https://github.com/NuGet/NuGet.Client",
+      "modifiedLink": "https://github.com/chocolatey/NuGet.Client",
+      "version": "3.5.0",
+      "licenses": [
+        {
+          "type": "Apache-2.0",
+          "link": "https://github.com/chocolatey/NuGet.Client/blob/d08e5cc246b384fd424e99371168d7cf4534723e/LICENSE.txt",
+          "name": "LICENSE.txt"
+        }
+      ]
+    },
+    {
+      "name": "log4net",
+      "link": "https://github.com/apache/logging-log4net",
+      "version": "rel/3.3.1",
+      "licenses": [
+        {
+          "type": "Apache-2.0",
+          "link": "https://github.com/apache/logging-log4net/blob/7fcc7f425b81b9df7c8a8719ed90953b938cd10e/LICENSE",
+          "name": "LICENSE"
+        }
+      ]
+    },
+    {
+      "name": "Microsoft.Bcl.HashCode",
+      "link": "https://github.com/dotnet/runtime",
+      "version": "v6.0.0",
+      "licenses": [
+        {
+          "type": "MIT",
+          "link": "https://github.com/dotnet/runtime/blob/4822e3c3aa77eb82b2fb33c9321f923cf11ddde6/LICENSE.TXT",
+          "name": "LICENSE.TXT"
+        }
+      ]
+    },
+    {
+      "name": "Rhino.Licensing",
+      "link": "https://github.com/ayende/rhino-licensing",
+      "modifiedLink": "https://github.com/chocolatey/rhino-licensing",
+      "version": "1.4.1",
+      "licenses": [
+        {
+          "type": "BSD-3-Clause",
+          "link": "https://github.com/ayende/rhino-licensing/blob/1fc90c984b0c3012465a73afae0a53492c969eb5/license.txt",
+          "name": "license.txt"
+        }
+      ]
+    },
+    {
+      "name": "Shim Generator (shimgen)",
+      "link": "https://github.com/chocolatey/shimgen",
+      "version": "2.0.0",
+      "licenses": [
+        {
+          "type": "OTHER",
+          "link": "https://github.com/chocolatey/choco/blob/d25f993696b4d665ee2dc94ceb0937a2ed5698eb/src/chocolatey.resources/tools/shimgen.license.txt"
+        }
+      ]
+    },
+    {
+      "name": "SimpleInjector",
+      "link": "https://github.com/simpleinjector/SimpleInjector",
+      "version": "v5.5.0",
+      "licenses": [
+        {
+          "type": "MIT",
+          "link": "https://github.com/simpleinjector/SimpleInjector/blob/eb27d31d1fdf055bed8bcfe5c22b2a1580bbb2a9/LICENSE",
+          "name": "LICENSE"
+        }
+      ]
+    },
+    {
+      "name": "System.Reactive",
+      "link": "https://github.com/dotnet/reactive",
+      "version": "rxnet-v6.1.0",
+      "licenses": [
+        {
+          "type": "MIT",
+          "link": "https://github.com/dotnet/reactive/blob/f4da16f15a3cde97f178396ea6e3489cc893651f/LICENSE",
+          "name": "LICENSE"
+        }
+      ]
+    }
+  ]
 }
