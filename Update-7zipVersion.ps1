@@ -1,14 +1,33 @@
+#Requires -PSEdition Core
+
 param(
     [Parameter(Mandatory)]
-    $Version
+    [string] $Version
 )
 
-$Version = $Version -replace '\.'
+$ErrorActionPreference = 'Stop'
 
-Invoke-WebRequest "https://7-zip.org/a/7z$Version.exe" -OutFile 7zipInstaller.exe
+$VersionWithoutDots = $Version -replace '\.'
+
+Invoke-WebRequest "https://7-zip.org/a/7z$VersionWithoutDots.exe" -OutFile 7zipInstaller.exe
 7z x 7zipInstaller.exe License.txt 7z.exe 7z.dll -o'src/chocolatey.resources/tools' -aoa
 Remove-Item $PSScriptRoot/src/chocolatey.resources/tools/7zip.license.txt
 Rename-Item $PSScriptRoot/src/chocolatey.resources/tools/License.txt 7zip.license.txt
 Remove-Item 7zipInstaller.exe
 
-Write-Host -ForegroundColor Green "The 7-zip components have been updated. Be sure to update the BundledApplications.Tests.ps1 file, and the CREDITS files that exist on this branch."
+$creditsFile = "$PSScriptRoot\docs\legal\CREDITS.json"
+
+$creditsContent = Get-Content -Encoding utf8 -LiteralPath $creditsFile | ConvertFrom-Json
+
+$7zipDependency = $creditsContent.dependencies | Where-Object name -eq '7-Zip'
+
+if (-not $7zipDependency) {
+    Write-Warning "The 7-Zip entry in '$creditsFile' could not be found. Please update the entry manually."
+} else {
+    $7zipDependency.version = $Version
+    
+    $json = ($creditsContent | ConvertTo-Json -Depth 4) -replace "`r`n","`n"
+    "$json`n" | Out-File -LiteralPath $creditsFile -Encoding utf8NoBOM -NoNewline
+}
+
+Write-Host -ForegroundColor Green "The 7-zip components have been updated. Be sure to update the BundledApplications.Tests.ps1 file that exist on this branch."
