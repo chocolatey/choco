@@ -16,7 +16,7 @@ Chocolatey uses a number of 3rd party components. Their details are below.
   * [Apache v2.0 License](#apache-v20-license-1)
     * [Checksum@0.3.1](#checksum031)
     * [Chocolatey.NuGet.Client@3.5.0](#chocolateynugetclient350)
-    * [log4net@rel/3.2.0](#log4netrel320)
+    * [log4net@rel/3.3.1](#log4netrel331)
   * [BSD-3-Clause](#bsd-3-clause-1)
     * [Rhino.Licensing@1.4.1](#rhinolicensing141)
   * [MIT License](#mit-license-1)
@@ -25,7 +25,7 @@ Chocolatey uses a number of 3rd party components. Their details are below.
     * [SimpleInjector@v5.5.0](#simpleinjectorv550)
     * [System.Reactive@rxnet-v6.1.0](#systemreactiverxnet-v610)
   * [Other](#other)
-    * [7-Zip@26.00](#7-zip2600)
+    * [7-Zip@26.01](#7-zip2601)
     * [Shim Generator (shimgen)@2.0.0](#shim-generator-\(shimgen\)200)
 
 ## Open Source License Types (Reference)
@@ -297,9 +297,9 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 [Chocolatey.NuGet.Client](https://github.com/NuGet/NuGet.Client) [(modified)](https://github.com/chocolatey/NuGet.Client) - [License terms.](https://github.com/chocolatey/NuGet.Client/blob/d08e5cc246b384fd424e99371168d7cf4534723e/LICENSE.txt)
 
-#### log4net@rel/3.2.0
+#### log4net@rel/3.3.1
 
-[log4net](https://github.com/apache/logging-log4net) - [License terms.](https://github.com/apache/logging-log4net/blob/5e9e2b0ea8a57a441e779d23429f6759a06d93ce/LICENSE)
+[log4net](https://github.com/apache/logging-log4net) - [License terms.](https://github.com/apache/logging-log4net/blob/7fcc7f425b81b9df7c8a8719ed90953b938cd10e/LICENSE)
 
 ### BSD-3-Clause
 
@@ -327,7 +327,7 @@ https://www.apache.org/licenses/LICENSE-2.0
 
 ### Other
 
-#### 7-Zip@26.00
+#### 7-Zip@26.01
 
 [7-Zip](https://www.7-zip.org/) - [License terms.](https://www.7-zip.org/license.txt)
 

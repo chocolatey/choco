@@ -4,12 +4,11 @@
     "link": "https://github.com/chocolatey/choco",
     "licenseName": "LICENSE",
     "licenseLink": "https://github.com/chocolatey/choco/blob/master/LICENSE",
-    "version": "2.7.0",
     "dependencies": [
         {
             "name": "7-Zip",
             "link": "https://www.7-zip.org/",
-            "version": "26.00",
+            "version": "26.01",
             "licenses": [
                 {
                     "type": "OTHER",
@@ -57,11 +56,11 @@
         {
             "name": "log4net",
             "link": "https://github.com/apache/logging-log4net",
-            "version": "rel/3.2.0",
+            "version": "rel/3.3.1",
             "licenses": [
                 {
                     "type": "Apache-2.0",
-                    "link": "https://github.com/apache/logging-log4net/blob/5e9e2b0ea8a57a441e779d23429f6759a06d93ce/LICENSE",
+                    "link": "https://github.com/apache/logging-log4net/blob/7fcc7f425b81b9df7c8a8719ed90953b938cd10e/LICENSE",
                     "name": "LICENSE"
                 }
             ]
