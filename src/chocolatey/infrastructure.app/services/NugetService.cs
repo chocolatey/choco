@@ -50,6 +50,7 @@ using NuGet.Protocol.Core.Types;
 using NuGet.Resolver;
 using NuGet.Versioning;
 using static chocolatey.StringResources;
+using System.Xml;
 
 namespace chocolatey.infrastructure.app.services
 {
@@ -954,7 +955,6 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                     }
 
-
                     try
                     {
                         //TODO, do sanity check here.
@@ -975,13 +975,18 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                    _nugetLogger, CancellationToken.None).GetAwaiter().GetResult())
                         {
                             ValidatePackageHash(config, packageDependencyInfo, downloadResult);
-
-                            nugetProject.InstallPackageAsync(
-                                packageDependencyInfo,
-                                downloadResult,
-                                projectContext,
-                                CancellationToken.None).GetAwaiter().GetResult();
-
+                            try
+                            {
+                                nugetProject.InstallPackageAsync(
+                                    packageDependencyInfo,
+                                    downloadResult,
+                                    projectContext,
+                                    CancellationToken.None).GetAwaiter().GetResult();
+                            }
+                            catch (XmlException)
+                            {
+                                throw new ApplicationException("An unexpected error was encountered parsing a malformed nuspec file. This may occur if corrupt files are present in the package's install directory.");
+                            }
                         }
 
                         var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
@@ -1042,7 +1047,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         var logMessage = "{0} not installed. An error occurred during installation:{1} {2}".FormatWith(packageDependencyInfo.Id, Environment.NewLine, message);
                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
-                        var errorResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, new PackageResult(packageDependencyInfo.Id, version.ToFullStringChecked(), null));
+
+                        // Set this install path if the folder does exist, to ensure otherwise unrecoverable scenarios still move corrupt files
+                        // to lib-bad if they happen to be present, when the continueAction is set up to do so.
+                        var packageInstallPath = _fileSystem.CombinePaths(nugetProject.Root, pathResolver.GetPackageDirectoryName(packageDependencyInfo));
+                        if (!_fileSystem.DirectoryExists(packageInstallPath))
+                        {
+                            packageInstallPath = null;
+                        }
+
+                        var errorResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id, new PackageResult(packageDependencyInfo.Id, version.ToFullStringChecked(), packageInstallPath));
                         errorResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
                         if (errorResult.ExitCode == 0)
                         {
@@ -1801,11 +1815,18 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 {
                                     ValidatePackageHash(config, packageDependencyInfo, downloadResult);
 
-                                    nugetProject.InstallPackageAsync(
-                                        packageDependencyInfo,
-                                        downloadResult,
-                                        projectContext,
-                                        CancellationToken.None).GetAwaiter().GetResult();
+                                    try
+                                    {
+                                        nugetProject.InstallPackageAsync(
+                                            packageDependencyInfo,
+                                            downloadResult,
+                                            projectContext,
+                                            CancellationToken.None).GetAwaiter().GetResult();
+                                    }
+                                    catch (XmlException)
+                                    {
+                                        throw new ApplicationException("An unexpected error was encountered parsing a malformed nuspec file. This may occur if corrupt files are present in the package's install directory.");
+                                    }
                                 }
 
                                 var installedPath = nugetProject.GetInstalledPath(packageDependencyInfo);
