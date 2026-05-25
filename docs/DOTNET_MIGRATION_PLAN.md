@@ -72,19 +72,19 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 | DM-00 | Create feature branch `feature/net10-migration` off `develop` | ✅ DONE | |
 | DM-01 | Add this migration plan (`docs/DOTNET_MIGRATION_PLAN.md`) to the repo | ✅ DONE | 4a942f91 |
 | DM-02 | Open the PR to **upstream** `chocolatey/choco` — deferred until the migration is complete (CI already runs on every push, so no fork-internal PR is needed) | ⏯️ DEFERRED | |
-| DM-03 | Add `actions/setup-dotnet` `10.0.x` to `.github/workflows/build.yml` and `test.yml` | 🔧 IN PROGRESS | 47ba9420 |
-| DM-04 | Trim CI to Windows-only — remove/disable the Mono Ubuntu/macOS/Docker jobs | 🔧 IN PROGRESS | 059768c7 |
-| DM-05 | Run NUnit unit **and** integration on every PR push (not just nightly); upload all result artifacts | 🔧 IN PROGRESS | 94140374 |
+| DM-03 | Add `actions/setup-dotnet` `10.0.x` to `.github/workflows/build.yml` and `test.yml` | ✅ DONE | 47ba9420 |
+| DM-04 | Trim CI to Windows-only — remove/disable the Mono Ubuntu/macOS/Docker jobs | ✅ DONE | 059768c7 |
+| DM-05 | Run NUnit unit **and** integration on every PR push (not just nightly); upload all result artifacts | ✅ DONE | 94140374 |
 
 ### Phase 1 — Solution compiles on .NET 10
 
 | ID | Task | Status | Commit |
 |---|---|---|---|
-| DM-10 | Flip every `*.csproj` `TargetFramework` `net48` → `net10.0-windows` (Windows Desktop SDK) | 🔧 IN PROGRESS | 7e031458 |
-| DM-11 | Replace the `lib\PowerShell\System.Management.Automation.dll` references with `Microsoft.PowerShell.SDK` (in `chocolatey.csproj` and `Chocolatey.PowerShell.csproj`) | 🔧 IN PROGRESS | 379453ea |
-| DM-12 | Remove binding-redirect props; move `choco.exe.manifest` to `<ApplicationManifest>`; drop `Microsoft.Bcl.HashCode`; set modern `<LangVersion>` | 🔧 IN PROGRESS | 36d395e9 |
-| DM-13 | Dependency audit: confirm net-compatible builds of `Chocolatey.NuGet.PackageManagement`, `Rhino.Licensing`, `log4net`, `SimpleInjector`, `System.Reactive` | 🔧 IN PROGRESS | 60650026 |
-| DM-14 | Resolve remaining compile errors until `build.bat --target=CI` builds the solution. **Gate: solution builds** | 🔧 IN PROGRESS | a2f6227d |
+| DM-10 | Flip every `*.csproj` `TargetFramework` `net48` → `net10.0-windows` (Windows Desktop SDK) | ✅ DONE | 7e031458 |
+| DM-11 | Replace the `lib\PowerShell\System.Management.Automation.dll` references with `Microsoft.PowerShell.SDK` (in `chocolatey.csproj` and `Chocolatey.PowerShell.csproj`) | ✅ DONE | 379453ea |
+| DM-12 | Remove binding-redirect props; move `choco.exe.manifest` to `<ApplicationManifest>`; drop `Microsoft.Bcl.HashCode`; set modern `<LangVersion>` | ✅ DONE | 36d395e9 |
+| DM-13 | Dependency audit: confirm net-compatible builds of `Chocolatey.NuGet.PackageManagement`, `Rhino.Licensing`, `log4net`, `SimpleInjector`, `System.Reactive` | ✅ DONE | 60650026 |
+| DM-14 | Resolve remaining compile errors until `build.bat --target=CI` builds the solution. **Gate: solution builds** | ✅ DONE | a2f6227d |
 
 #### Phase 0–1 implementation notes
 
@@ -103,6 +103,13 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 - **Deferred-but-compiling.** `ObjectExtensions.DeepCopy` still uses `BinaryFormatter` with
   `SYSLIB0011` suppressed — it **compiles but throws at runtime**; real fix is **DM-20**.
   `AlphaFS` is still referenced via its net48 assembly (NU1701 warning); replaced in **DM-21**.
+- **First CI result (run `26418337603`, `workflow_dispatch` on the fork).** `DotNetBuild`
+  reported **`Build succeeded. 324 Warning(s) 0 Error(s)`** on `windows-latest` — the Phase 1
+  gate is **green**. The job is red only in `DotNetTest` (Phase 2/3 content): unit run was
+  986 passed / 64 failed before the **test host crashed** (DM-25). Failure buckets:
+  `FieldAccessException` (DM-24), `PlatformNotSupportedException` (DM-20 BinaryFormatter +
+  `Thread.Abort`), `InvalidOperationException` (DM-25). Note: the fork needed a one-time
+  manual **Actions enable** before `push`/`workflow_dispatch` would run.
 
 ### Phase 2 — NUnit unit tests green
 
@@ -112,6 +119,8 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 | DM-21 | Replace `AlphaFS` with `System.IO` (+ targeted P/Invoke for junctions/hardlinks/ADS if used) | ❌ OPEN | |
 | DM-22 | Migrate `AppDomain.AssemblyResolve` → `AssemblyLoadContext.Default.Resolving` (`AssemblyResolution.cs`, `GetChocolatey.cs`, `PowershellService.cs`) | ❌ OPEN | |
 | DM-23 | Migrate `chocolatey.tests` to `net10.0-windows`; fix unit failures. **Gate: NUnit unit suite green** | ❌ OPEN | |
+| DM-24 | Replace reflection writes to `initonly` static fields in unit-test setup (e.g. `ApplicationParameters.AllowPrompts`) — .NET throws `FieldAccessException` (74 failures in the first CI run) | ❌ OPEN | |
+| DM-25 | Make `ReadKeyTimeout`/`ReadLineTimeout` safe under a headless/redirected console — `Console.ReadKey` throws `InvalidOperationException` and **crashes the test host**, aborting the run | ❌ OPEN | |
 
 ### Phase 3 — NUnit integration tests green
 
