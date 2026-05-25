@@ -87,7 +87,6 @@
     <AdditionalFiles Include="BannedSymbols.txt" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="AlphaFS" Version="2.2.6" />
     <PackageReference Include="Chocolatey.NuGet.PackageManagement" Version="3.5.0" />
     <PackageReference Include="log4net" Version="3.3.1" />
     <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.6.2" />
