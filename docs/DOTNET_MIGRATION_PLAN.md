@@ -72,19 +72,37 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 | DM-00 | Create feature branch `feature/net10-migration` off `develop` | ✅ DONE | |
 | DM-01 | Add this migration plan (`docs/DOTNET_MIGRATION_PLAN.md`) to the repo | ✅ DONE | 4a942f91 |
 | DM-02 | Open the PR to **upstream** `chocolatey/choco` — deferred until the migration is complete (CI already runs on every push, so no fork-internal PR is needed) | ⏯️ DEFERRED | |
-| DM-03 | Add `actions/setup-dotnet` `10.0.x` to `.github/workflows/build.yml` and `test.yml` | ❌ OPEN | |
-| DM-04 | Trim CI to Windows-only — remove/disable the Mono Ubuntu/macOS/Docker jobs | ❌ OPEN | |
-| DM-05 | Run NUnit unit **and** integration on every PR push (not just nightly); upload all result artifacts | ❌ OPEN | |
+| DM-03 | Add `actions/setup-dotnet` `10.0.x` to `.github/workflows/build.yml` and `test.yml` | 🔧 IN PROGRESS | 47ba9420 |
+| DM-04 | Trim CI to Windows-only — remove/disable the Mono Ubuntu/macOS/Docker jobs | 🔧 IN PROGRESS | 059768c7 |
+| DM-05 | Run NUnit unit **and** integration on every PR push (not just nightly); upload all result artifacts | 🔧 IN PROGRESS | 94140374 |
 
 ### Phase 1 — Solution compiles on .NET 10
 
 | ID | Task | Status | Commit |
 |---|---|---|---|
-| DM-10 | Flip every `*.csproj` `TargetFramework` `net48` → `net10.0-windows` (Windows Desktop SDK) | ❌ OPEN | |
-| DM-11 | Replace the `lib\PowerShell\System.Management.Automation.dll` references with `Microsoft.PowerShell.SDK` (in `chocolatey.csproj` and `Chocolatey.PowerShell.csproj`) | ❌ OPEN | |
-| DM-12 | Remove binding-redirect props; move `choco.exe.manifest` to `<ApplicationManifest>`; drop `Microsoft.Bcl.HashCode`; set modern `<LangVersion>` | ❌ OPEN | |
-| DM-13 | Dependency audit: confirm net-compatible builds of `Chocolatey.NuGet.PackageManagement`, `Rhino.Licensing`, `log4net`, `SimpleInjector`, `System.Reactive` | ❌ OPEN | |
-| DM-14 | Resolve remaining compile errors until `build.bat --target=CI` builds the solution. **Gate: solution builds** | ❌ OPEN | |
+| DM-10 | Flip every `*.csproj` `TargetFramework` `net48` → `net10.0-windows` (Windows Desktop SDK) | 🔧 IN PROGRESS | 7e031458 |
+| DM-11 | Replace the `lib\PowerShell\System.Management.Automation.dll` references with `Microsoft.PowerShell.SDK` (in `chocolatey.csproj` and `Chocolatey.PowerShell.csproj`) | 🔧 IN PROGRESS | 379453ea |
+| DM-12 | Remove binding-redirect props; move `choco.exe.manifest` to `<ApplicationManifest>`; drop `Microsoft.Bcl.HashCode`; set modern `<LangVersion>` | 🔧 IN PROGRESS | 36d395e9 |
+| DM-13 | Dependency audit: confirm net-compatible builds of `Chocolatey.NuGet.PackageManagement`, `Rhino.Licensing`, `log4net`, `SimpleInjector`, `System.Reactive` | 🔧 IN PROGRESS | 60650026 |
+| DM-14 | Resolve remaining compile errors until `build.bat --target=CI` builds the solution. **Gate: solution builds** | 🔧 IN PROGRESS | a2f6227d |
+
+#### Phase 0–1 implementation notes
+
+- **Per-push CI target.** The `CI` Cake target runs the net48-specific ILMerge + MSI
+  packaging (Phases 5 & 8). Until that is reworked, the per-push job (`build.yml`) runs
+  `--target=test` (build + unit + integration) so the Phase 1–4 gates can be **green**.
+  `--target=CI` is restored with the self-contained publish in **DM-50**.
+- **DM-11 module reference.** The `Chocolatey.PowerShell` binary module references the
+  compile-only `PowerShellStandard.Library` (not the full SDK) so it binds to whatever
+  `System.Management.Automation` the host loads it into (PS7 in-process, or WinPS 5.1 for
+  the Phase 7 fallback). The full `Microsoft.PowerShell.SDK` is on the host `chocolatey.dll`.
+- **DM-14 net10 API fixes.** Removed a stray `using System.Web.UI`; replaced FIPS-only
+  `SHA*Cng` with `SHA*.Create()` (OS/CNG-backed and FIPS-compliant on .NET); switched the
+  static `Directory.Get/SetAccessControl` to `DirectoryInfo` (`FileSystemAclExtensions`);
+  removed obsolete CAS attributes (`HostProtection`/`SecurityPermission`) from the benchmark.
+- **Deferred-but-compiling.** `ObjectExtensions.DeepCopy` still uses `BinaryFormatter` with
+  `SYSLIB0011` suppressed — it **compiles but throws at runtime**; real fix is **DM-20**.
+  `AlphaFS` is still referenced via its net48 assembly (NU1701 warning); replaced in **DM-21**.
 
 ### Phase 2 — NUnit unit tests green
 
