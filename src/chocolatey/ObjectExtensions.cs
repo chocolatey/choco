@@ -1,4 +1,4 @@
-﻿// Copyright © 2017 - 2025 Chocolatey Software, Inc
+// Copyright © 2017 - 2025 Chocolatey Software, Inc
 // Copyright © 2011 - 2017 RealDimensions Software, LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +15,9 @@
 // limitations under the License.
 
 using System;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace chocolatey
 {
@@ -40,20 +41,85 @@ namespace chocolatey
             return input.ToString();
         }
 
+        /// <summary>
+        ///   Creates a deep copy of <paramref name="other"/> and the object graph it references.
+        /// </summary>
+        /// <remarks>
+        ///   This used to round-trip through <c>BinaryFormatter</c>, which has been removed from
+        ///   .NET. It now copies the serializable instance fields recursively (mirroring the
+        ///   formatter's behaviour: private/inherited fields are copied, <c>[NonSerialized]</c>
+        ///   fields are skipped, and object cycles are preserved). Intended for the in-process
+        ///   configuration graph; it is not a general-purpose serializer.
+        /// </remarks>
         public static T DeepCopy<T>(this T other)
         {
-            // TODO (DM-20, Phase 2): BinaryFormatter is obsolete and throws at
-            // runtime on .NET 10. Suppressed here only so the solution compiles
-            // during the framework migration; a real replacement lands in Phase 2.
-#pragma warning disable SYSLIB0011
-            using (var ms = new MemoryStream())
+            return (T)DeepCopyInternal(other, new Dictionary<object, object>(ReferenceEqualityComparer.Instance));
+        }
+
+        private static object DeepCopyInternal(object original, Dictionary<object, object> visited)
+        {
+            if (original is null)
             {
-                var formatter = new BinaryFormatter();
-                formatter.Serialize(ms, other);
-                ms.Position = 0;
-                return (T)formatter.Deserialize(ms);
+                return null;
             }
-#pragma warning restore SYSLIB0011
+
+            var type = original.GetType();
+
+            // Copy-by-value: primitives, enums, strings and common immutable types are
+            // safe to share. Type instances are runtime singletons and must be shared.
+            if (type.IsPrimitive || type.IsEnum
+                || original is string || original is decimal
+                || original is DateTime || original is DateTimeOffset || original is TimeSpan
+                || original is Guid || original is Type)
+            {
+                return original;
+            }
+
+            if (visited.TryGetValue(original, out var alreadyCopied))
+            {
+                return alreadyCopied;
+            }
+
+            if (type.IsArray)
+            {
+                var elementType = type.GetElementType();
+                var source = (Array)original;
+                var copiedArray = Array.CreateInstance(elementType, source.Length);
+                visited[original] = copiedArray;
+
+                for (var i = 0; i < source.Length; i++)
+                {
+                    copiedArray.SetValue(DeepCopyInternal(source.GetValue(i), visited), i);
+                }
+
+                return copiedArray;
+            }
+
+            // Build the clone without running constructors, then copy each field. This
+            // reproduces collection internals (e.g. List<T>) as well as plain objects.
+            var clone = RuntimeHelpers.GetUninitializedObject(type);
+
+            // Boxed value types must be re-boxed after their fields are set.
+            if (!type.IsValueType)
+            {
+                visited[original] = clone;
+            }
+
+            for (var current = type; current != null && current != typeof(object); current = current.BaseType)
+            {
+                foreach (var field in current.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
+                {
+                    if (field.IsNotSerialized)
+                    {
+                        continue;
+                    }
+
+                    var value = field.GetValue(original);
+                    field.SetValue(clone, DeepCopyInternal(value, visited));
+                }
+            }
+
+            return clone;
         }
 
 #pragma warning disable IDE0022, IDE1006
