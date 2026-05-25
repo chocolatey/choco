@@ -804,7 +804,7 @@ namespace chocolatey.infrastructure.filesystem
         {
             try
             {
-                var permissions = Directory.GetAccessControl(directoryPath);
+                var permissions = new DirectoryInfo(directoryPath).GetAccessControl();
 
                 var rules = permissions.GetAccessRules(includeExplicit: true, includeInherited: true, typeof(NTAccount));
                 var builtinAdmins = new SecurityIdentifier(WellKnownSidType.BuiltinAdministratorsSid, null).Translate(typeof(NTAccount));
@@ -839,7 +839,7 @@ namespace chocolatey.infrastructure.filesystem
 
                 this.Log().Debug(" - Folder Created = Success");
 
-                var permissions = Directory.GetAccessControl(directoryPath);
+                var permissions = new DirectoryInfo(directoryPath).GetAccessControl();
 
                 var rules = permissions.GetAccessRules(includeExplicit: true, includeInherited: true, typeof(NTAccount));
 
@@ -868,7 +868,7 @@ namespace chocolatey.infrastructure.filesystem
                 permissions.SetAccessRuleProtection(isProtected: true, preserveInheritance: false);
                 this.Log().Debug(" - Pending removing inheritance with no copy = Checked");
 
-                Directory.SetAccessControl(directoryPath, permissions);
+                new DirectoryInfo(directoryPath).SetAccessControl(permissions);
                 this.Log().Debug(" - Access Permissions updated = Success");
 
                 return true;

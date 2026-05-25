@@ -42,6 +42,10 @@ namespace chocolatey
 
         public static T DeepCopy<T>(this T other)
         {
+            // TODO (DM-20, Phase 2): BinaryFormatter is obsolete and throws at
+            // runtime on .NET 10. Suppressed here only so the solution compiles
+            // during the framework migration; a real replacement lands in Phase 2.
+#pragma warning disable SYSLIB0011
             using (var ms = new MemoryStream())
             {
                 var formatter = new BinaryFormatter();
@@ -49,6 +53,7 @@ namespace chocolatey
                 ms.Position = 0;
                 return (T)formatter.Deserialize(ms);
             }
+#pragma warning restore SYSLIB0011
         }
 
 #pragma warning disable IDE0022, IDE1006
