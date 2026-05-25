@@ -127,9 +127,9 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 
 | ID | Task | Status | Commit |
 |---|---|---|---|
-| DM-30 | Migrate `chocolatey.tests.integration` to `net10.0-windows`; update `*.exe.config` `supportedRuntime` fixtures. **First blocker:** `NUnitSetup.FixApplicationParameterVariables` writes ~12 `initonly` `ApplicationParameters.*` location fields by reflection → `FieldAccessException` fails **all 1567** integration tests (the integration analog of DM-24) | ❌ OPEN | |
-| DM-31 | Validate the PS7 in-process host: rewrite/remove the private-field output-redirection hack (`PowershellService.cs`); fix the `WindowsPowerShell\` profile-path assumption | ❌ OPEN | |
-| DM-32 | Fix integration scenario failures. **Gate: `--testExecutionType=all --shouldRunOpenCover=false` green** | ❌ OPEN | |
+| DM-30 | Migrate `chocolatey.tests.integration` to `net10.0-windows`; update `*.exe.config` `supportedRuntime` fixtures. Unblocked the suite: `NUnitSetup.FixApplicationParameterVariables` wrote ~12 `initonly` `ApplicationParameters.*` location fields by reflection → `FieldAccessException` failed **all 1567** tests; made the fields settable + direct-assign (integration analog of DM-24) | ✅ DONE | a3848e5b |
+| DM-31 | Validate the PS7 in-process host: rewrite/remove the private-field output-redirection hack (`PowershellService.cs`); fix the `WindowsPowerShell\` profile-path assumption — *Install/Upgrade scenarios pass on PS7, so this isn't blocking the suite; revisit as cleanup* | ❌ OPEN | |
+| DM-32 | Fix integration scenario failures. **Gate: `--testExecutionType=all` green**. After DM-30: **1429 pass / 20 fail**, identical on clean CI (run `26422177962`) and locally. All 20 are in the two WireMock fixtures (`NugetListSpecs` ~13, the one `UpgradeScenarios` download-exception class ~7). They **pass in isolation** (NugetListSpecs 28/28 alone) **and pass together as a pair** (39/39) — so the polluter is some *other* earlier fixture leaking shared state (NuGet static / HTTP). This is **pre-existing test-isolation debt acknowledged in-code** (`UpgradeScenarios.cs` ~L4987: "could be set to true elsewhere … Configuration should have been reset"). **Not a product bug.** A `NoCache`-when-disabled fix regressed (20→319) and was reverted. Remaining work = bisect the polluting fixture / harden per-test isolation | 🔧 IN PROGRESS | |
 
 ### Phase 4 — Pester E2E suite green under PowerShell 7
 
