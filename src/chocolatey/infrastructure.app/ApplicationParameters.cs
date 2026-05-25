@@ -215,9 +215,10 @@ namespace chocolatey.infrastructure.app
         public static readonly string PackagePendingFileName = ".chocolateyPending";
 
         /// <summary>
-        /// This is a readonly bool set to true. It is only shifted for specs.
+        /// Defaults to true. It is only shifted for specs. Not <c>readonly</c> so specs
+        /// can toggle it directly — .NET no longer allows reflection to write initonly fields.
         /// </summary>
-        public static readonly bool AllowPrompts = true;
+        public static bool AllowPrompts = true;
 
         public static class ExitCodes
         {
