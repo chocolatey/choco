@@ -9,49 +9,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Build using mono on Ubuntu
-  ubuntu-build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Cache Tools
-      uses: actions/cache@v4
-      with:
-        path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
-    - name: Install Mono
-      run: |
-        sudo apt install ca-certificates gnupg
-        sudo gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-        echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-        sudo apt update
-        sudo apt install -y mono-complete
-        mono --version
-    - name: Install dotnet #needed for GitVersion
-      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
-      with:
-        dotnet-version: |
-          5.0.x
-    - name: Report installed dotnet versions
-      run: |
-          dotnet --info
-    - name: Build with Mono
-      run: |
-        chmod +x build.sh
-        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=unit
-    - name: Upload Ubuntu build results
-      uses: actions/upload-artifact@v4
-      # Always upload build results
-      if: ${{ always() }}
-      with:
-        name: ubuntu-build-results
-        path: |
-          code_drop/TestResults/issues-report.html
-          code_drop/TestResults/NUnit/TestResult.xml
-          code_drop/Packages/NuGet/*.nupkg
-          code_drop/MsBuild.log
   # Build on Windows
   windows-build:
     runs-on: windows-latest
@@ -92,58 +49,3 @@ jobs:
           code_drop\Packages\Chocolatey\*.nupkg
           code_drop\MsBuild.log
           code_drop\MSIs\en-US\chocolatey-*.msi
-  # Build using mono on MacOS
-  macos-build:
-    runs-on: macos-14
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Cache Tools
-      uses: actions/cache@v4
-      with:
-        path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
-    - name: Install dotnet #needed for GitVersion
-      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
-      with:
-        dotnet-version: |
-          5.0.x
-    - name: Report installed dotnet versions
-      run: |
-          dotnet --info
-    - name: Build with Mono
-      run: |
-        export DOTNET_ROOT=$HOME/.dotnet
-        chmod +x build.sh
-        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=unit
-    - name: Upload MacOS build results
-      uses: actions/upload-artifact@v4
-      # Always upload build results
-      if: ${{ always() }}
-      with:
-        name: macos-build-results
-        path: |
-          code_drop/TestResults/issues-report.html
-          code_drop/TestResults/NUnit/TestResult.xml
-          code_drop/Packages/NuGet/*.nupkg
-          code_drop/MsBuild.log
-  # Build using Mono in Docker on Ubuntu
-  docker-build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: docker/Dockerfile.linux
-          push: false
-          tags: chocolatey/choco:latest
