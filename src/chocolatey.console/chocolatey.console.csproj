@@ -11,8 +11,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Configurations>Debug;Release;ReleaseOfficial</Configurations>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <CodeAnalysisLogFile>bin\Debug\choco.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
@@ -55,7 +54,8 @@
     <StartupObject>chocolatey.console.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <NoWin32Manifest>true</NoWin32Manifest>
+    <!-- Embed the app manifest into choco.exe (was a side-by-side file under net48). -->
+    <ApplicationManifest>choco.exe.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(CHOCOLATEY_OFFICIAL_KEY)' == '' OR !Exists('$(CHOCOLATEY_OFFICIAL_KEY')">
     <SignAssembly>true</SignAssembly>
@@ -69,12 +69,6 @@
     <Compile Include="$(SolutionDir)\SolutionVersion.cs">
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="choco.exe.manifest">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\chocolatey.resources\chocolatey.resources.csproj">
