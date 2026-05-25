@@ -70,8 +70,8 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 | ID | Task | Status | Commit |
 |---|---|---|---|
 | DM-00 | Create feature branch `feature/net10-migration` off `develop` | ✅ DONE | |
-| DM-01 | Add this migration plan (`docs/DOTNET_MIGRATION_PLAN.md`) to the repo | 🔧 IN PROGRESS | |
-| DM-02 | Open a **draft PR** within the fork (`fdcastel/choco`, base `develop`) so push-triggered CI runs on every commit | ❌ OPEN | |
+| DM-01 | Add this migration plan (`docs/DOTNET_MIGRATION_PLAN.md`) to the repo | ✅ DONE | 4a942f91 |
+| DM-02 | Open a **draft PR** within the fork (`fdcastel/choco`, base `develop`) so push-triggered CI runs on every commit — [PR #1](https://github.com/fdcastel/choco/pull/1) | ✅ DONE | |
 | DM-03 | Add `actions/setup-dotnet` `10.0.x` to `.github/workflows/build.yml` and `test.yml` | ❌ OPEN | |
 | DM-04 | Trim CI to Windows-only — remove/disable the Mono Ubuntu/macOS/Docker jobs | ❌ OPEN | |
 | DM-05 | Run NUnit unit **and** integration on every PR push (not just nightly); upload all result artifacts | ❌ OPEN | |
