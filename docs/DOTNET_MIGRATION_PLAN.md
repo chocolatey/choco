@@ -115,12 +115,13 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 
 | ID | Task | Status | Commit |
 |---|---|---|---|
-| DM-20 | Replace `BinaryFormatter` in `ObjectExtensions.DeepCopy` (`src/chocolatey/ObjectExtensions.cs`); audit all `DeepCopy()` callers | ❌ OPEN | |
-| DM-21 | Replace `AlphaFS` with `System.IO` (+ targeted P/Invoke for junctions/hardlinks/ADS if used) | ❌ OPEN | |
-| DM-22 | Migrate `AppDomain.AssemblyResolve` → `AssemblyLoadContext.Default.Resolving` (`AssemblyResolution.cs`, `GetChocolatey.cs`, `PowershellService.cs`) | ❌ OPEN | |
-| DM-23 | Migrate `chocolatey.tests` to `net10.0-windows`; fix unit failures. **Gate: NUnit unit suite green** | ❌ OPEN | |
-| DM-24 | Replace reflection writes to `initonly` static fields in unit-test setup (e.g. `ApplicationParameters.AllowPrompts`) — .NET throws `FieldAccessException` (74 failures in the first CI run) | ❌ OPEN | |
-| DM-25 | Make `ReadKeyTimeout`/`ReadLineTimeout` safe under a headless/redirected console — `Console.ReadKey` throws `InvalidOperationException` and **crashes the test host**, aborting the run | ❌ OPEN | |
+| DM-20 | Replace `BinaryFormatter` in `ObjectExtensions.DeepCopy` (`src/chocolatey/ObjectExtensions.cs`); audit all `DeepCopy()` callers | ✅ DONE | 7d9b0eb9 |
+| DM-21 | Replace `AlphaFS` with `System.IO` (+ targeted P/Invoke for junctions/hardlinks/ADS if used) — *not required for the unit gate; driven by Phase 3 integration* | ❌ OPEN | |
+| DM-22 | Migrate `AppDomain.AssemblyResolve` → `AssemblyLoadContext.Default.Resolving` (`AssemblyResolution.cs`, `GetChocolatey.cs`, `PowershellService.cs`) — *not required for the unit gate; driven by Phase 3* | ❌ OPEN | |
+| DM-23 | Migrate `chocolatey.tests` to `net10.0-windows`; fix unit failures. **Gate: NUnit unit suite green** | 🔧 IN PROGRESS | |
+| DM-24 | Replace reflection writes to `initonly` static fields in unit-test setup (e.g. `ApplicationParameters.AllowPrompts`) — .NET throws `FieldAccessException` (74 failures in the first CI run) | ✅ DONE | 25cf334c |
+| DM-25 | Make `ReadKeyTimeout`/`ReadLineTimeout` safe under a headless/redirected console — `Console.ReadKey` throws `InvalidOperationException` and **crashes the test host**, aborting the run | ✅ DONE | e701686e |
+| DM-26 | Register `CodePagesEncodingProvider` so `Encoding.GetEncoding(1252)` works (the non-ASCII password workaround in `ChocolateyNugetCredentialProvider` fell back to UTF-8 on .NET) | ✅ DONE | 7ca709ac |
 
 ### Phase 3 — NUnit integration tests green
 
