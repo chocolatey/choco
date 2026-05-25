@@ -40,6 +40,14 @@ namespace chocolatey.infrastructure.app.nuget
         /// </summary>
         public string Id { get; }
 
+        static ChocolateyNugetCredentialProvider()
+        {
+            // .NET only ships the Unicode/UTF encodings out of the box; legacy single-byte
+            // code pages (e.g. 1252, used by the non-ASCII password workaround in
+            // ToNetworkCredentials) require registering the CodePagesEncodingProvider.
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        }
+
         public ChocolateyNugetCredentialProvider(ChocolateyConfiguration config)
         {
             _config = config;
