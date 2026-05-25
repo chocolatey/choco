@@ -71,7 +71,7 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 |---|---|---|---|
 | DM-00 | Create feature branch `feature/net10-migration` off `develop` | ✅ DONE | |
 | DM-01 | Add this migration plan (`docs/DOTNET_MIGRATION_PLAN.md`) to the repo | ✅ DONE | 4a942f91 |
-| DM-02 | Open a **draft PR** within the fork (`fdcastel/choco`, base `develop`) so push-triggered CI runs on every commit — [PR #1](https://github.com/fdcastel/choco/pull/1) | ✅ DONE | |
+| DM-02 | Open the PR to **upstream** `chocolatey/choco` — deferred until the migration is complete (CI already runs on every push, so no fork-internal PR is needed) | ⏯️ DEFERRED | |
 | DM-03 | Add `actions/setup-dotnet` `10.0.x` to `.github/workflows/build.yml` and `test.yml` | ❌ OPEN | |
 | DM-04 | Trim CI to Windows-only — remove/disable the Mono Ubuntu/macOS/Docker jobs | ❌ OPEN | |
 | DM-05 | Run NUnit unit **and** integration on every PR push (not just nightly); upload all result artifacts | ❌ OPEN | |
@@ -177,8 +177,8 @@ new jobs are added only for gaps.
 ## Branch / PR workflow
 
 - All work lands on **`feature/net10-migration`** (off `develop`).
-- A **draft PR within the fork** (`fdcastel/choco`, base `develop`) is opened early so
-  push-triggered CI validates every commit.
+- **No fork-internal PR** — CI runs automatically on every push (`build.yml` triggers on `push`),
+  so the branch alone gets full validation.
 - Each phase's **Gate** task must be **green on `windows-latest`** before advancing. Never merge red.
-- The eventual PR to upstream `chocolatey/choco` is a **separate, explicit step** once everything
-  is complete — not part of this fork-internal workflow.
+- A PR to upstream `chocolatey/choco` is a **separate, explicit step** to take only once everything
+  is complete and only when the user asks for it.
