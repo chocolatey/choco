@@ -48,10 +48,6 @@
     <Reference Include="Rhino.Licensing">
       <HintPath>$(SolutionDir)\..\lib\Rhino.Licensing.1.4.1\lib\net40\Rhino.Licensing.dll</HintPath>
     </Reference>
-    <Reference Include="System.Management.Automation">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionVersion.cs">
@@ -95,6 +91,7 @@
     <PackageReference Include="AlphaFS" Version="2.2.6" />
     <PackageReference Include="Chocolatey.NuGet.PackageManagement" Version="3.5.0" />
     <PackageReference Include="log4net" Version="3.3.1" />
+    <PackageReference Include="Microsoft.PowerShell.SDK" Version="7.6.2" />
     <PackageReference Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.BannedApiAnalyzers">
       <Version>3.3.4</Version>

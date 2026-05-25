@@ -66,15 +66,6 @@
     <AssemblyOriginatorKeyFile>$(CHOCOLATEY_OFFICIAL_KEY)</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <!-- The following reference come directly from the lib folder -->
-    <!-- We need to look to move that ones that we can, to their own NuGet -->
-    <!-- packages, and then switch to PackageReferences -->
-    <Reference Include="System.Management.Automation">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="$(SolutionDir)\SolutionVersion.cs">
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>

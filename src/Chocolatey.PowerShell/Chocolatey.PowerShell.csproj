@@ -38,13 +38,13 @@
     <AssemblyOriginatorKeyFile>$(CHOCOLATEY_OFFICIAL_KEY)</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <!-- The following reference come directly from the lib folder -->
-    <!-- We need to look to move that ones that we can, to their own NuGet -->
-    <!-- packages, and then switch to PackageReferences -->
-    <Reference Include="System.Management.Automation">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
-    </Reference>
+    <!-- Compile-only reference: this is a PowerShell binary module, so it binds
+         against whatever System.Management.Automation the host loads it into
+         (PowerShell 7 in-process, or Windows PowerShell 5.1 for the fallback).
+         PrivateAssets=all keeps it out of the output and off consumers. -->
+    <PackageReference Include="PowerShellStandard.Library" Version="5.1.1">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\chocolatey\StringResources.cs">
