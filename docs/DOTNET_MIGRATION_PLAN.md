@@ -198,10 +198,10 @@ same code that NUnit integration already proves correct.
 
 | ID | Task | Status | Commit |
 |---|---|---|---|
-| DM-80 | Delete `Install-DotNet48IfMissing` + the reboot path in `chocolateysetup.psm1`; update `chocolateyInstall.ps1`, `init.ps1`, community `install.ps1` | ❌ OPEN | |
-| DM-81 | Remove WiX `src/chocolatey.install/NetFx48.wxs` and the `WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED` condition in `chocolatey.wxs` | ❌ OPEN | |
-| DM-82 | Update `README.md` requirements (.NET FX 4.8 → none / self-contained) and build prerequisites (.NET 10 SDK) | ❌ OPEN | |
-| DM-83 | Full pipeline green end-to-end; bootstrap no longer references `ndp48`; mark PR ready for review. **Gate: all green** | ❌ OPEN | |
+| DM-80 | Delete `Install-DotNet48IfMissing` + the reboot path in `chocolateysetup.psm1`; also drop `Program.cs`'s NDP4-registry-probe `ThrowIfNotDotNet48()` — the self-contained choco.exe needs no runtime check | ✅ DONE | a28fb00c |
+| DM-81 | Remove WiX `src/chocolatey.install/NetFx48.wxs` and the `WIX_IS_NETFRAMEWORK_48_OR_LATER_INSTALLED` condition — **deliberately deferred** for the upstream PR conversation (MSI packaging decision belongs to maintainers) | ⏯ DEFERRED | |
+| DM-82 | Update `README.md` requirements (.NET FX 4.8 → none / self-contained) and build prerequisites (.NET 10 SDK; VS 2022 17.14+) | ✅ DONE | 9e5cee2b |
+| DM-83 | Full pipeline green end-to-end; bootstrap no longer references `ndp48`. **Open the upstream draft PR** with the migration report as the description; pause for maintainer input before Phase 6/7 | 🔧 IN PROGRESS | |
 
 ### Deferred / out of current scope
 
