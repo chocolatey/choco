@@ -145,11 +145,11 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 
 | ID | Task | Status | Commit |
 |---|---|---|---|
-| DM-50 | Replace the ILMerge step in `recipe.cake` with `dotnet publish` self-contained single-file (`-r win-x64 --self-contained -p:PublishSingleFile=true`, Desktop runtime) | ❌ OPEN | |
-| DM-51 | Rework the "ILMerged into chocolatey" branch in `AssemblyResolution.cs` (nothing is merged now) | ❌ OPEN | |
+| DM-50 | Replace the ILMerge step in `recipe.cake` with `dotnet publish` self-contained single-file (`-r win-x64 --self-contained -p:PublishSingleFile=true`, Desktop runtime). Publish settings validated (`PublishSingleFile` + `IncludeAllContentForSelfExtract` — plain single-file fails because PowerShell SDK needs files on disk); `InstallLocation` rewritten to `Environment.ProcessPath` so single-file resolves correctly (`e1b0adae`). **Remaining: rewire `recipe.cake` packaging from ILMerge to publish** | 🔧 IN PROGRESS | e1b0adae |
+| DM-51 | Rework the "ILMerged into chocolatey" branch in `AssemblyResolution.cs` (nothing is merged now) | ✅ DONE | 09aa1bf8 |
 | DM-52 | Update all hardcoded `/net48/` paths in `recipe.cake`; `chocolatey.lib` `lib/net48` → `lib/net10.0` | ❌ OPEN | |
-| DM-53 | Add a **clean-container smoke CI job**: run the self-contained `choco.exe` in a `servercore` Windows container with **no .NET 10 runtime installed** (`choco --version`/`list`/`source list`) | ❌ OPEN | |
-| DM-54 | Assert no `net48` artifacts remain. **Gate: smoke green — choco runs with nothing installed** | ❌ OPEN | |
+| DM-53 | Add a **clean-container smoke CI job**: run the self-contained `choco.exe` in a `servercore` Windows container with **no .NET 10 runtime installed** (`choco --version`/`list`/`source list`) | ✅ DONE | bdaea5f2 |
+| DM-54 | Assert no `net48` artifacts remain. **Gate: smoke green — choco runs with nothing installed** — **PROVEN: CI run `26425869255` ran `choco --version => 2.0.0-smoke` inside a Server Core container with no .NET runtime.** (net48-artifact assertion still to add) | 🔧 IN PROGRESS | bdaea5f2 |
 
 ### Phase 6 — Real-world package compatibility (≥80% bar)
 
