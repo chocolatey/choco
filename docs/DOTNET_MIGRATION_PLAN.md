@@ -136,10 +136,10 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 | ID | Task | Status | Commit |
 |---|---|---|---|
 | DM-40 | Port the Chocolatey helper module (`chocolateyInstaller.psm1` & helpers) to be PS7-clean. **Partial:** fixed `Test-ByteOrderMark.ps1` (was using `Get-Content -Encoding Byte`, removed in PS6+) — cleared 41 BOM-related failures. Rest of the helper-module PS7 cleanup is part of the long tail | 🔧 IN PROGRESS | 9802a4fa |
-| DM-41 | Seed in-repo `tests/pester-tests/commands/testpackages/*` into the `hermes` source via `Invoke-Tests.ps1` (parity with Test Kitchen). Verified locally: `choco install zip-log-disable-test` exits 0 against the seeded source on the migrated net10 choco.exe. Clears ~10 "package was not found" failures with no source-code change. *(Old DM-41 — `wget`/`curl` alias shims — folded into DM-44.)* | ✅ DONE | 7b69c686 |
+| DM-41 | Seed in-repo `tests/pester-tests/commands/testpackages/*` into the `hermes` source via `Invoke-Tests.ps1` (parity with Test Kitchen). **CI run `26457532325` confirms:** total grew 3966 → 4126 (+160 newly-runnable test cases that used to be skipped with "package not found"), failures 154 → 148 (net −6). The seeded contexts now exercise real install/uninstall paths on the migrated net10 choco.exe. *(Old DM-41 — `wget`/`curl` alias shims — folded into DM-44.)* | ✅ DONE | 7b69c686 |
 | DM-42 | Provide the `Import-Module -UseWindowsPowerShell` / `Import-WinModule` path for WinPS-only modules | ❌ OPEN | |
 | DM-43 | Add a **Pester E2E CI job**: `pwsh -File Invoke-Tests.ps1` against the built `chocolatey.*.nupkg` (excluding `Licensed`/`CCM`/`VMOnly` tags as today). Run under PowerShell **7.6.2** (.NET 10) — matches the host's `Microsoft.PowerShell.SDK 7.6.2`; the runner's pre-installed PS 7.4 (.NET 8) cannot load `Chocolatey.PowerShell.dll`. Runner parses `testResults.xml` and exits non-zero on Pester failures | ✅ DONE | e2e31e8e |
-| DM-44 | Make the full Pester suite pass under PS7. **Gate: Pester E2E green under PS7**. **Local baseline (PS 7.6.1 / .NET 10.0.6, run `2026-05-26`): 3371 passed / 154 failed / 441 not-run of 3966 (~96% pass)**, no test files broken (`FailedContainers: 0`). Refined categorization below | 🔧 IN PROGRESS | |
+| DM-44 | Make the full Pester suite pass under PS7. **Gate: Pester E2E green under PS7**. **CI baseline after DM-41 (run `26457532325`, PS 7.6.2 / .NET 10): 3170 passed / 148 failed / 367 skipped / 441 not-run of 4126** (effective pass rate excluding skipped/not-run: 95.5%). No test files broken (`FailedContainers: 0`). Refined categorization below | 🔧 IN PROGRESS | |
 
 #### Phase 4 remaining clusters (local baseline run, 2026-05-26)
 
@@ -147,17 +147,17 @@ Failures (115 logged `[-]` lines, 154 in `testResults.xml`) break down as:
 
 | Bucket | Approx. count | Root cause | Resolution path |
 |---:|---:|---|---|
-| **Source seeding (in-repo)** | ~10 | `zip-log-disable-test`, `packagewithscript`, `chocolatey-dummy-package`, `too-long-*` had nuspecs in the repo but were never packed by `Invoke-Tests.ps1` outside Test Kitchen | **Cleared by DM-41** (`7b69c686`) |
-| **Source seeding (external)** | ~30 | `test-environment`, `test-params`, `wget`, `uninstallfailure` are *not* in the repo — supplied by the Test Kitchen `chocolatey-test-environment` provisioning. Tests are tagged `CCRExcluded` (and sometimes `Internal`) but neither tag excludes them in `Invoke-Tests.ps1` | Either (a) seed those packages into `tests/packages` for local/CI runs, or (b) add `VMOnly`/equivalent tag so they're excluded outside the kitchen |
+| **Source seeding (in-repo)** | ~10 | `zip-log-disable-test`, `packagewithscript`, `chocolatey-dummy-package`, `too-long-*` had nuspecs in the repo but were never packed by `Invoke-Tests.ps1` outside Test Kitchen | **Cleared by DM-41** (`7b69c686`) — also unlocked +160 new test cases |
+| **Source seeding (external)** | ~30–40 | `test-environment`, `test-params`, `wget`, `uninstallfailure` are *not* in the repo — supplied by the Test Kitchen `chocolatey-test-environment` provisioning. Tag audit: **9 Describe/Context blocks** in `choco-info`, `choco-install`, `choco-uninstall`, `choco-upgrade`, `EnvironmentVariables.Tests.ps1` install these packages but are tagged `CCRExcluded` / `Arguments, CCRExcluded` / untagged — none are `Internal` (which `Invoke-Tests.ps1` excludes). 5 sibling blocks *are* tagged `Internal` for the same packages, so this is upstream tagging inconsistency | Either (a) seed those packages into `tests/packages` for local/CI runs, or (b) add `Internal` tag to the 9 blocks — defer pending upstream-policy decision |
 | `Should be appropriately signed` | 3 | Unsigned dev build — pre-existing; not a PS7 bug | Skip or scenario-gate on `IsOfficialBuild` |
 | `Should not have been able to delete the rollback` | 3 | File-lock semantics during rollback | Real PS7/.NET 10 investigation |
-| **Long tail** | ~67 | Mix of install/upgrade scenario behaviors (output shape, exit code, env-var visibility, path resolution) — most likely PS7 helper-module fixes (DM-40 follow-up) | Pattern-by-pattern locally — the iteration loop is now ~minutes per fix, not ~30 min per CI cycle |
+| **Long tail** | ~65–95 | Mix of install/upgrade scenario behaviors (output shape, exit code, env-var visibility, path resolution) — most likely PS7 helper-module fixes (DM-40 follow-up) | Pattern-by-pattern locally — the iteration loop is now ~minutes per fix, not ~30 min per CI cycle |
 
-The biggest single insight from the local run: ~40 of the 154 failures (~26%) are
-**test-corpus seeding gaps**, not product bugs. DM-41 closes the in-repo half; the
-external half is a deliberate Test Kitchen dependency that the migration shouldn't
-own. The remaining ~67 "real" failures are the actual Phase 4 work — each ≤4
-instances, no single dominant root cause.
+The biggest single insight: ~40 of the ~148 failures (~27%) are **test-corpus
+seeding gaps**, not product bugs. DM-41 closes the in-repo half (proven by CI);
+the external half is a deliberate Test Kitchen dependency that the migration
+shouldn't own. The remaining "real" failures are the actual Phase 4 work — no
+single dominant root cause, so each fix is its own per-pattern investigation.
 
 ### Phase 5 — Self-contained publish + clean-environment smoke
 
