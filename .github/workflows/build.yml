@@ -50,3 +50,37 @@ jobs:
           code_drop\Packages\NuGet\*.nupkg
           code_drop\Packages\Chocolatey\*.nupkg
           code_drop\MsBuild.log
+
+  # Phase 4: Pester E2E under PowerShell 7. Installs the built chocolatey nupkg and
+  # runs the real package/helper tests (tests/pester-tests) via Invoke-Tests.ps1 under
+  # pwsh. Runs after windows-build and reuses its packaged nupkg.
+  pester-e2e:
+    needs: windows-build
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Download built packages
+      uses: actions/download-artifact@v4
+      with:
+        name: windows-build-results
+        path: code_drop
+    - name: Install Pester 5.3.1
+      shell: pwsh
+      run: Install-Module -Name Pester -RequiredVersion 5.3.1 -Force -SkipPublisherCheck -Scope CurrentUser
+    - name: Run Pester E2E (PowerShell 7)
+      shell: pwsh
+      run: |
+        $pkg = Get-ChildItem -Path code_drop -Recurse -Filter '*.nupkg' | Where-Object Name -Match 'chocolatey\.\d' | Select-Object -First 1
+        if (-not $pkg) { throw "Could not find the built chocolatey nupkg under code_drop" }
+        Write-Host "Testing package: $($pkg.FullName)"
+        & "$PWD/Invoke-Tests.ps1" -TestPackage $pkg.FullName
+    - name: Upload Pester results
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: pester-results
+        path: |
+          testResults.xml
+          **/testResults.xml
