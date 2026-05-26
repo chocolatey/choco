@@ -102,7 +102,7 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
   removed obsolete CAS attributes (`HostProtection`/`SecurityPermission`) from the benchmark.
 - **Deferred-but-compiling.** `ObjectExtensions.DeepCopy` still uses `BinaryFormatter` with
   `SYSLIB0011` suppressed — it **compiles but throws at runtime**; real fix is **DM-20**.
-  `AlphaFS` is still referenced via its net48 assembly (NU1701 warning); replaced in **DM-21**.
+  (`AlphaFS` was the last net48 NU1701 dependency; removed in **DM-21** — now resolved.)
 - **First CI result (run `26418337603`, `workflow_dispatch` on the fork).** `DotNetBuild`
   reported **`Build succeeded. 324 Warning(s) 0 Error(s)`** on `windows-latest` — the Phase 1
   gate is **green**. The job is red only in `DotNetTest` (Phase 2/3 content): unit run was
@@ -116,7 +116,7 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 | ID | Task | Status | Commit |
 |---|---|---|---|
 | DM-20 | Replace `BinaryFormatter` in `ObjectExtensions.DeepCopy` (`src/chocolatey/ObjectExtensions.cs`); audit all `DeepCopy()` callers | ✅ DONE | 7d9b0eb9 |
-| DM-21 | Replace `AlphaFS` with `System.IO` (+ targeted P/Invoke for junctions/hardlinks/ADS if used) — *not required for the unit gate; driven by Phase 3 integration* | ❌ OPEN | |
+| DM-21 | Replace `AlphaFS` with `System.IO` (+ targeted P/Invoke for junctions/hardlinks/ADS if used) — AlphaFS was only a net48 long-path fallback; .NET 10 System.IO + `longPathAware` manifest cover it, so all 16 sites collapsed to System.IO and the package was dropped. No junctions/hardlinks/ADS were used, so no P/Invoke needed. Validated: unit 1188/0, integration 1463/0 | ✅ DONE | 8d9a7657 |
 | DM-22 | Migrate `AppDomain.AssemblyResolve` → `AssemblyLoadContext.Default.Resolving` (`AssemblyResolution.cs`, `GetChocolatey.cs`, `PowershellService.cs`) — *not required for the unit gate; driven by Phase 3* | ❌ OPEN | |
 | DM-23 | Migrate `chocolatey.tests` to `net10.0-windows`; fix unit failures. **Gate: NUnit unit suite green** | ✅ DONE | 23616cb8 |
 | DM-24 | Replace reflection writes to `initonly` static fields in unit-test setup (e.g. `ApplicationParameters.AllowPrompts`) — .NET throws `FieldAccessException` (74 failures in the first CI run) | ✅ DONE | 25cf334c |
