@@ -50,10 +50,17 @@ namespace chocolatey.infrastructure.app
         // we might be testing on a server or in the local debugger. Either way,
         // start from the assembly location and if unfound, head to the machine
         // locations instead. This is a merge of official and Debug modes.
-        private static IAssembly _assemblyForLocation = Assembly.GetEntryAssembly().UnderlyingType != null ? Assembly.GetEntryAssembly() : Assembly.GetExecutingAssembly();
-        public static string InstallLocation = _fileSystem.FileExists(_fileSystem.CombinePaths(_fileSystem.GetDirectoryName(_assemblyForLocation.CodeBase.Replace(Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)), "chocolatey.dll")) ||
-                                                        _fileSystem.FileExists(_fileSystem.CombinePaths(_fileSystem.GetDirectoryName(_assemblyForLocation.CodeBase.Replace(Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)), "choco.exe")) ?
-                _fileSystem.GetDirectoryName(_assemblyForLocation.CodeBase.Replace(Platform.GetPlatform() == PlatformType.Windows ? "file:///" : "file://", string.Empty)) :
+        // The directory of the running executable. Environment.ProcessPath resolves to the
+        // real choco.exe even for a self-contained single-file publish, where
+        // Assembly.Location/CodeBase are empty or point at the bundle extraction directory.
+        private static readonly string _processDirectory = string.IsNullOrWhiteSpace(System.Environment.ProcessPath)
+            ? string.Empty
+            : _fileSystem.GetDirectoryName(System.Environment.ProcessPath);
+        public static string InstallLocation =
+            !string.IsNullOrWhiteSpace(_processDirectory) &&
+            (_fileSystem.FileExists(_fileSystem.CombinePaths(_processDirectory, "chocolatey.dll")) ||
+             _fileSystem.FileExists(_fileSystem.CombinePaths(_processDirectory, "choco.exe"))) ?
+                _processDirectory :
                 !string.IsNullOrWhiteSpace(System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall)) ?
                     System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyInstall) :
                     @"C:\ProgramData\Chocolatey"
