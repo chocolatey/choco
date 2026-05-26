@@ -136,29 +136,28 @@ stepping stone (PR #2739). PowerShell-Core hosting is tracked upstream in
 | ID | Task | Status | Commit |
 |---|---|---|---|
 | DM-40 | Port the Chocolatey helper module (`chocolateyInstaller.psm1` & helpers) to be PS7-clean. **Partial:** fixed `Test-ByteOrderMark.ps1` (was using `Get-Content -Encoding Byte`, removed in PS6+) — cleared 41 BOM-related failures. Rest of the helper-module PS7 cleanup is part of the long tail | 🔧 IN PROGRESS | 9802a4fa |
-| DM-41 | Add compat shims in the choco module: `Get-WmiObject`→`Get-CimInstance` proxy; restore `curl`/`wget` aliases; 5.1-style default encoding within choco's execution scope | ❌ OPEN | |
+| DM-41 | Seed in-repo `tests/pester-tests/commands/testpackages/*` into the `hermes` source via `Invoke-Tests.ps1` (parity with Test Kitchen). Verified locally: `choco install zip-log-disable-test` exits 0 against the seeded source on the migrated net10 choco.exe. Clears ~10 "package was not found" failures with no source-code change. *(Old DM-41 — `wget`/`curl` alias shims — folded into DM-44.)* | ✅ DONE | 7b69c686 |
 | DM-42 | Provide the `Import-Module -UseWindowsPowerShell` / `Import-WinModule` path for WinPS-only modules | ❌ OPEN | |
 | DM-43 | Add a **Pester E2E CI job**: `pwsh -File Invoke-Tests.ps1` against the built `chocolatey.*.nupkg` (excluding `Licensed`/`CCM`/`VMOnly` tags as today). Run under PowerShell **7.6.2** (.NET 10) — matches the host's `Microsoft.PowerShell.SDK 7.6.2`; the runner's pre-installed PS 7.4 (.NET 8) cannot load `Chocolatey.PowerShell.dll`. Runner parses `testResults.xml` and exits non-zero on Pester failures | ✅ DONE | e2e31e8e |
-| DM-44 | Make the full Pester suite pass under PS7. **Gate: Pester E2E green under PS7**. **Baseline run (`26432619751`): 3606 passed / 153 failed / 367 skipped / 441 not-run (79% pass)** — no test files broke (`FailedContainers: 0`). Remaining 153 are a long tail across many distinct PS7-behavior categories (1–4 each) — see "Phase 4 remaining clusters" below | 🔧 IN PROGRESS | |
+| DM-44 | Make the full Pester suite pass under PS7. **Gate: Pester E2E green under PS7**. **Local baseline (PS 7.6.1 / .NET 10.0.6, run `2026-05-26`): 3371 passed / 154 failed / 441 not-run of 3966 (~96% pass)**, no test files broken (`FailedContainers: 0`). Refined categorization below | 🔧 IN PROGRESS | |
 
-#### Phase 4 remaining clusters (after DM-40 BOM helper fix)
+#### Phase 4 remaining clusters (local baseline run, 2026-05-26)
 
-Top clusters from CI run `26432619751` (Pester 5.x under PS 7.6/.NET 10). Each is a
-**separate per-pattern investigation** — the runner now exits non-zero, so any future
-push reflects the real Pester gate honestly.
+Failures (115 logged `[-]` lines, 154 in `testResults.xml`) break down as:
 
-| Count | Assertion / cluster | Suspected root cause |
-|---:|---|---|
-| 7 | `Should Output the expected value for <X> environment variable` (`features/EnvironmentVariables.Tests.ps1`) | The underlying `choco install` already exits non-zero — install-scenario behavior change on PS7, not a quoting issue |
-| 4 | `Should output the amount of packages found` | Output-shape change in list/search under PS7 |
-| 4 | `Should be in Chocolatey tools directory` | Path resolution / `$env:ChocolateyInstall` |
-| 3 | `Should not have been able to delete the rollback` | File-lock semantics during rollback |
-| 3 | `Should exit with success` | Various install/upgrade scenarios |
-| 3 | `Should be appropriately signed` | Expected to fail on unsigned/non-official builds — likely just needs the `CCM` tag exclusion to apply or scenario skip |
-| ~130 | long tail of 1–2-instance failures | Mostly install/upgrade scenario behaviors that need PS7 helper-module fixes (DM-40/41) |
+| Bucket | Approx. count | Root cause | Resolution path |
+|---:|---:|---|---|
+| **Source seeding (in-repo)** | ~10 | `zip-log-disable-test`, `packagewithscript`, `chocolatey-dummy-package`, `too-long-*` had nuspecs in the repo but were never packed by `Invoke-Tests.ps1` outside Test Kitchen | **Cleared by DM-41** (`7b69c686`) |
+| **Source seeding (external)** | ~30 | `test-environment`, `test-params`, `wget`, `uninstallfailure` are *not* in the repo — supplied by the Test Kitchen `chocolatey-test-environment` provisioning. Tests are tagged `CCRExcluded` (and sometimes `Internal`) but neither tag excludes them in `Invoke-Tests.ps1` | Either (a) seed those packages into `tests/packages` for local/CI runs, or (b) add `VMOnly`/equivalent tag so they're excluded outside the kitchen |
+| `Should be appropriately signed` | 3 | Unsigned dev build — pre-existing; not a PS7 bug | Skip or scenario-gate on `IsOfficialBuild` |
+| `Should not have been able to delete the rollback` | 3 | File-lock semantics during rollback | Real PS7/.NET 10 investigation |
+| **Long tail** | ~67 | Mix of install/upgrade scenario behaviors (output shape, exit code, env-var visibility, path resolution) — most likely PS7 helper-module fixes (DM-40 follow-up) | Pattern-by-pattern locally — the iteration loop is now ~minutes per fix, not ~30 min per CI cycle |
 
-DM-44 is the gate ("Pester E2E green under PS 7"). The next session can pick these up
-pattern-by-pattern; each fix is ~30–40 min per CI cycle to validate.
+The biggest single insight from the local run: ~40 of the 154 failures (~26%) are
+**test-corpus seeding gaps**, not product bugs. DM-41 closes the in-repo half; the
+external half is a deliberate Test Kitchen dependency that the migration shouldn't
+own. The remaining ~67 "real" failures are the actual Phase 4 work — each ≤4
+instances, no single dominant root cause.
 
 ### Phase 5 — Self-contained publish + clean-environment smoke
 
