@@ -95,8 +95,25 @@ jobs:
         if (-not $pkg) { throw "Could not find the built chocolatey nupkg under code_drop" }
         Write-Host "Testing package: $($pkg.FullName)"
         & "$env:GITHUB_WORKSPACE\Invoke-Tests.ps1" -TestPackage $pkg.FullName
+        # Make CI faithfully reflect Pester pass/fail: Invoke-Tests.ps1 doesn't propagate
+        # Pester results, so parse the NUnit-format testResults.xml and exit non-zero
+        # when any test failed or errored.
         $results = Get-ChildItem -Path . -Recurse -Filter 'testResults.xml' -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($results) { Write-Host "Pester results: $($results.FullName)" } else { Write-Warning "No testResults.xml produced (Invoke-Tests.ps1 may not have reached Pester)" }
+        if (-not $results) {
+            Write-Error "No testResults.xml produced - Pester did not complete"
+            exit 1
+        }
+        Write-Host "Pester results: $($results.FullName)"
+        [xml]$xml = Get-Content -LiteralPath $results.FullName
+        $root = $xml.'test-results'
+        $total = [int]$root.total
+        $failed = [int]$root.failures + [int]$root.errors
+        $notRun = [int]$root.'not-run'
+        Write-Host ("Pester totals: total={0} failures+errors={1} not-run={2}" -f $total, $failed, $notRun)
+        if ($failed -gt 0) {
+            Write-Error "$failed Pester test(s) failed/errored"
+            exit 1
+        }
         '@
         Set-Content -Path pester-runner.ps1 -Value $script -Encoding utf8
         & $pwsh76 -NoLogo -NoProfile -File pester-runner.ps1
