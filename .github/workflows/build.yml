@@ -66,27 +66,40 @@ jobs:
       with:
         name: windows-build-results
         path: code_drop
-    - name: Install Pester 5.3.1
-      shell: pwsh
-      run: Install-Module -Name Pester -RequiredVersion 5.3.1 -Force -SkipPublisherCheck -Scope CurrentUser
-    - name: Run Pester E2E (PowerShell 7)
+    # GH windows-latest ships PowerShell 7.4 LTS (on .NET 8), which can't load
+    # Chocolatey.PowerShell.dll (net10.0-windows). PS 7.6 runs on .NET 10 and matches
+    # the Microsoft.PowerShell.SDK 7.6.2 host the migration uses, so install it.
+    - name: Install PowerShell 7.6 (matches choco's net10 runtime)
       shell: pwsh
       run: |
-        # GH Actions pwsh defaults $ErrorActionPreference=Stop, but Invoke-Tests.ps1
-        # uses Write-Error for two nuspecs that are *intentionally* expected to fail
-        # to pack (per its own comment). Switch to Continue so those expected
-        # non-terminating errors don't abort the run before Pester even starts.
+        $version = '7.6.2'
+        $url = "https://github.com/PowerShell/PowerShell/releases/download/v$version/PowerShell-$version-win-x64.zip"
+        Write-Host "Downloading PowerShell $version from $url"
+        Invoke-WebRequest -Uri $url -OutFile pwsh76.zip
+        Expand-Archive -Path pwsh76.zip -DestinationPath pwsh76 -Force
+        & "$PWD\pwsh76\pwsh.exe" --version
+    - name: Install Pester 5.3.1 (current-user; visible to PS 7.4 and 7.6)
+      shell: pwsh
+      run: Install-Module -Name Pester -RequiredVersion 5.3.1 -Force -SkipPublisherCheck -Scope CurrentUser
+    - name: Run Pester E2E (PowerShell 7.6 / .NET 10)
+      shell: powershell
+      run: |
+        $pwsh76 = "$env:GITHUB_WORKSPACE\pwsh76\pwsh.exe"
+        $script = @'
+        # ErrorActionPreference=Continue so that Invoke-Tests.ps1's expected Write-Error
+        # on two intentionally-broken-pack nuspecs doesn't abort before Pester starts.
         $ErrorActionPreference = 'Continue'
+        Set-Location $env:GITHUB_WORKSPACE
+        Write-Host "PowerShell version: $($PSVersionTable.PSVersion); .NET: $([System.Runtime.InteropServices.RuntimeInformation]::FrameworkDescription)"
         $pkg = Get-ChildItem -Path code_drop -Recurse -Filter '*.nupkg' | Where-Object Name -Match 'chocolatey\.\d' | Select-Object -First 1
         if (-not $pkg) { throw "Could not find the built chocolatey nupkg under code_drop" }
         Write-Host "Testing package: $($pkg.FullName)"
-        & "$PWD/Invoke-Tests.ps1" -TestPackage $pkg.FullName
+        & "$env:GITHUB_WORKSPACE\Invoke-Tests.ps1" -TestPackage $pkg.FullName
         $results = Get-ChildItem -Path . -Recurse -Filter 'testResults.xml' -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($results) {
-            Write-Host "Pester results: $($results.FullName)"
-        } else {
-            Write-Warning "No testResults.xml produced (Invoke-Tests.ps1 may not have reached Pester)"
-        }
+        if ($results) { Write-Host "Pester results: $($results.FullName)" } else { Write-Warning "No testResults.xml produced (Invoke-Tests.ps1 may not have reached Pester)" }
+        '@
+        Set-Content -Path pester-runner.ps1 -Value $script -Encoding utf8
+        & $pwsh76 -NoLogo -NoProfile -File pester-runner.ps1
     - name: Upload Pester results
       if: ${{ always() }}
       uses: actions/upload-artifact@v4
