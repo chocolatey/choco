@@ -72,10 +72,21 @@ jobs:
     - name: Run Pester E2E (PowerShell 7)
       shell: pwsh
       run: |
+        # GH Actions pwsh defaults $ErrorActionPreference=Stop, but Invoke-Tests.ps1
+        # uses Write-Error for two nuspecs that are *intentionally* expected to fail
+        # to pack (per its own comment). Switch to Continue so those expected
+        # non-terminating errors don't abort the run before Pester even starts.
+        $ErrorActionPreference = 'Continue'
         $pkg = Get-ChildItem -Path code_drop -Recurse -Filter '*.nupkg' | Where-Object Name -Match 'chocolatey\.\d' | Select-Object -First 1
         if (-not $pkg) { throw "Could not find the built chocolatey nupkg under code_drop" }
         Write-Host "Testing package: $($pkg.FullName)"
         & "$PWD/Invoke-Tests.ps1" -TestPackage $pkg.FullName
+        $results = Get-ChildItem -Path . -Recurse -Filter 'testResults.xml' -ErrorAction SilentlyContinue | Select-Object -First 1
+        if ($results) {
+            Write-Host "Pester results: $($results.FullName)"
+        } else {
+            Write-Warning "No testResults.xml produced (Invoke-Tests.ps1 may not have reached Pester)"
+        }
     - name: Upload Pester results
       if: ${{ always() }}
       uses: actions/upload-artifact@v4
