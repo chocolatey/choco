@@ -2,6 +2,8 @@
     BeforeAll {
         Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
+        Disable-ChocolateySource -All
+        Enable-ChocolateySource -Name hermes
 
         New-ChocolateyInstallSnapshot
         $features = Get-ChocolateyFeatures
