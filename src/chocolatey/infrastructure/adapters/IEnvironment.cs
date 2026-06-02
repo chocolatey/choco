@@ -21,6 +21,32 @@ namespace chocolatey.infrastructure.adapters
 {
     // ReSharper disable InconsistentNaming
 
+    /// <summary>
+    ///   The native architecture of the processor that the operating system is running on.
+    /// </summary>
+    public enum ProcessorArchitectureType
+    {
+        /// <summary>
+        ///   The architecture could not be determined (for example, on non-Windows platforms).
+        /// </summary>
+        Unknown = 0,
+
+        /// <summary>
+        ///   32-bit x86 (i386).
+        /// </summary>
+        X86,
+
+        /// <summary>
+        ///   64-bit x86 (AMD64 / Intel 64).
+        /// </summary>
+        X64,
+
+        /// <summary>
+        ///   64-bit ARM (AArch64).
+        /// </summary>
+        Arm64,
+    }
+
     public interface IEnvironment
     {
         /// <summary>
@@ -52,6 +78,20 @@ namespace chocolatey.infrastructure.adapters
         ///   <c>true</c> if [is64 bit process]; otherwise, <c>false</c>.
         /// </value>
         bool Is64BitProcess { get; }
+
+        /// <summary>
+        ///   Gets the native architecture of the processor that the operating system is running
+        ///   on, determined reliably even when the current process is running under emulation
+        ///   (for example, an x86/x64 Chocolatey CLI process on Windows on ARM). Returns
+        ///   <see cref="ProcessorArchitectureType.Unknown"/> on non-Windows platforms.
+        /// </summary>
+        ProcessorArchitectureType NativeProcessorArchitecture { get; }
+
+        /// <summary>
+        ///   Gets a value indicating whether the operating system's native architecture is
+        ///   ARM64, regardless of any process emulation in effect.
+        /// </summary>
+        bool IsArm64OperatingSystem { get; }
 
         /// <summary>
         ///   Gets a value indicating whether the current process is running in user interactive mode.

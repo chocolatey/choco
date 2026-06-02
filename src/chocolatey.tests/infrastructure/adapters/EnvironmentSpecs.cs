@@ -20,33 +20,60 @@ namespace chocolatey.tests.infrastructure.adapters
             }
         }
 
-        [NonParallelizable]
-        public class When_checking_is64bitprocess_on_arm64 : EnvironmentSpecsBase
+        public class When_checking_is64bitprocess : EnvironmentSpecsBase
         {
             private bool _is64Bit;
-            private string _originalValue;
-
-            public override void Context()
-            {
-                base.Context();
-                _originalValue = System.Environment.GetEnvironmentVariable("PROCESSOR_ARCHITECTURE");
-                System.Environment.SetEnvironmentVariable("PROCESSOR_ARCHITECTURE", "ARM64");
-            }
 
             public override void Because()
             {
                 _is64Bit = Environment.Is64BitProcess;
             }
 
-            public override void AfterObservations()
+            [Fact]
+            public void Should_match_the_process_bitness_unless_running_on_arm64()
             {
-                System.Environment.SetEnvironmentVariable("PROCESSOR_ARCHITECTURE", _originalValue);
+                // On Windows on ARM the process runs emulated but is reported as 64-bit
+                // capable (x64 emulation); everywhere else it matches the pointer size.
+                if (Environment.IsArm64OperatingSystem)
+                {
+                    _is64Bit.Should().BeTrue();
+                }
+                else
+                {
+                    _is64Bit.Should().Be(IntPtr.Size == 8);
+                }
+            }
+        }
+
+        public class When_getting_the_native_processor_architecture : EnvironmentSpecsBase
+        {
+            private ProcessorArchitectureType _architecture;
+
+            public override void Because()
+            {
+                _architecture = Environment.NativeProcessorArchitecture;
             }
 
             [Fact]
-            public void Should_return_false_due_to_arm64_logic()
+            public void Should_return_a_known_architecture_on_windows_and_unknown_elsewhere()
             {
-                _is64Bit.Should().BeFalse();
+                if (System.Environment.OSVersion.Platform == PlatformID.Win32NT)
+                {
+                    _architecture.Should().BeOneOf(
+                        ProcessorArchitectureType.X86,
+                        ProcessorArchitectureType.X64,
+                        ProcessorArchitectureType.Arm64);
+                }
+                else
+                {
+                    _architecture.Should().Be(ProcessorArchitectureType.Unknown);
+                }
+            }
+
+            [Fact]
+            public void Should_report_the_arm64_flag_consistently()
+            {
+                Environment.IsArm64OperatingSystem.Should().Be(_architecture == ProcessorArchitectureType.Arm64);
             }
         }
 

@@ -16,8 +16,7 @@
 
 using System;
 using System.Collections;
-using chocolatey.infrastructure.app;
-using static chocolatey.StringResources;
+using System.Runtime.InteropServices;
 
 namespace chocolatey.infrastructure.adapters
 {
@@ -37,14 +36,65 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                // ARM64 bit architecture has a x86-32 emulator, so return false
-                if (System.Environment.GetEnvironmentVariable(EnvironmentVariables.System.ProcessorArchitecture).ToStringSafe().IsEqualTo(ApplicationParameters.Environment.Arm64ProcessorArchitecture))
+                // On Windows on ARM, the Chocolatey CLI runs as an emulated x86/x64 process.
+                // Windows 11 ships 64-bit (x64) emulation, so ARM64 hosts are treated as 64-bit
+                // capable rather than being forced to 32-bit as they were historically. See
+                // https://github.com/chocolatey/choco/issues/1803 and #2172.
+                if (IsArm64OperatingSystem)
                 {
-                    return false;
+                    return true;
                 }
 
                 return (IntPtr.Size == 8);
             }
+        }
+
+        public ProcessorArchitectureType NativeProcessorArchitecture
+        {
+            get
+            {
+                // IsWow64Process2 is the only reliable way to determine the operating system's
+                // native architecture from a process that may be running under emulation;
+                // GetNativeSystemInfo and RuntimeInformation.OSArchitecture report the emulated
+                // architecture on Windows on ARM. The API is Windows-only and is available on
+                // Windows 10 1709+ / Windows Server 2019+.
+                if (System.Environment.OSVersion.Platform != PlatformID.Win32NT)
+                {
+                    return ProcessorArchitectureType.Unknown;
+                }
+
+                try
+                {
+                    if (IsWow64Process2(GetCurrentProcess(), out _, out var nativeMachine))
+                    {
+                        switch (nativeMachine)
+                        {
+                            case ImageFileMachineArm64:
+                                return ProcessorArchitectureType.Arm64;
+                            case ImageFileMachineAmd64:
+                                return ProcessorArchitectureType.X64;
+                            case ImageFileMachineI386:
+                                return ProcessorArchitectureType.X86;
+                        }
+                    }
+                }
+                catch (EntryPointNotFoundException)
+                {
+                    // IsWow64Process2 does not exist before Windows 10 1709. ARM64 Windows
+                    // post-dates it, so a missing entry point means the host is not ARM64.
+                }
+                catch (DllNotFoundException)
+                {
+                    // kernel32.dll is unavailable (non-Windows runtime); fall through.
+                }
+
+                return Is64BitOperatingSystem ? ProcessorArchitectureType.X64 : ProcessorArchitectureType.X86;
+            }
+        }
+
+        public bool IsArm64OperatingSystem
+        {
+            get { return NativeProcessorArchitecture == ProcessorArchitectureType.Arm64; }
         }
 
         public bool UserInteractive
@@ -91,5 +141,18 @@ namespace chocolatey.infrastructure.adapters
         {
             System.Environment.SetEnvironmentVariable(variable, value);
         }
+
+        // ReSharper disable InconsistentNaming
+        private const ushort ImageFileMachineI386 = 0x014C;
+        private const ushort ImageFileMachineAmd64 = 0x8664;
+        private const ushort ImageFileMachineArm64 = 0xAA64;
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool IsWow64Process2(IntPtr process, out ushort processMachine, out ushort nativeMachine);
+
+        [DllImport("kernel32.dll")]
+        private static extern IntPtr GetCurrentProcess();
+        // ReSharper restore InconsistentNaming
     }
 }
