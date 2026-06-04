@@ -1,4 +1,4 @@
-﻿# Copyright © 2017 - 2021 Chocolatey Software, Inc.
+# Copyright © 2017 - 2021 Chocolatey Software, Inc.
 # Copyright © 2015 - 2017 RealDimensions Software, LLC
 # Copyright © 2011 - 2015 RealDimensions Software, LLC & original authors/contributors from https://github.com/chocolatey/chocolatey
 #
@@ -57,20 +57,16 @@ $functionsToExport = @(Get-Command -CommandType Function | Where-Object { $funct
 $aliasesToExport = @(Get-Alias | Where-Object { $aliasesBeforeImport -notcontains $_.Name } | Select-Object -ExpandProperty Name)
 $cmdletsToExport = @(Get-Command -CommandType Cmdlet | Where-Object { $cmdletsBeforeImport -notcontains $_.Name } | Select-Object -ExpandProperty Name)
 
-$currentAssemblies = [System.AppDomain]::CurrentDomain.GetAssemblies()
-
 # Import commands from Chocolatey.PowerShell.dll
 $chocolateyCmdlets = @{}
 
 $dllPath = "$helpersPath\Chocolatey.PowerShell.dll"
 if (Test-Path $dllPath) { 
-    # Try to import from already-loaded assembly, otherwise fallback to importing from dll
-    $cmdletsAssembly = $currentAssemblies |
-        Where-Object { $_.GetName().Name -eq 'Chocolatey.PowerShell' } |
-        Select-Object -First 1
+    # Try to import from already-loaded module, otherwise fallback to importing from dll
+    $cmdletsModule = Get-Module -Name Chocolatey.PowerShell | Select-Object -First 1
 
-    if ($cmdletsAssembly) {
-        Import-Module $cmdletsAssembly.Location -Force
+    if ($cmdletsModule -and $cmdletsModule.Path) {
+        Import-Module $cmdletsModule.Path -Force
     }
     else {
         Import-Module $dllPath
@@ -113,18 +109,11 @@ if (Test-Path $extensionsPath) {
         Write-Debug "Loading 'chocolatey.licensed' extension"
 
         try {
-            # Attempt to import module via already-loaded assembly
-            $licensedAssembly = $currentAssemblies |
-                Where-Object { $_.GetName().Name -eq 'chocolatey.licensed' } |
-                Select-Object -First 1
+            # Attempt to import module via already-loaded module
+            $licensedModule = Get-Module -Name chocolatey.licensed | Select-Object -First 1
 
-            if ($licensedAssembly) {
-                # Import-Module -Assembly doesn't work if the parent module is reimported, so force the import by path.
-                if ($licensedAssembly.Location) {
-                    Import-Module $licensedAssembly.Location -Force
-                } else {
-                    Import-Module $licensedAssembly
-                }
+            if ($licensedModule -and $licensedModule.Path) {
+                Import-Module $licensedModule.Path -Force
             }
             else {
                 # Fallback: load the extension DLL from the path directly.
@@ -208,4 +197,3 @@ $cmdletsToExport = @(Get-Command -CommandType Cmdlet | Where-Object { $cmdletsBe
 
 # todo: explore removing this for a future version
 Export-ModuleMember -Function $functionsToExport -Alias $aliasesToExport -Cmdlet $cmdletsToExport
-
