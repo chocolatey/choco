@@ -32,8 +32,9 @@ namespace chocolatey.tests.infrastructure.adapters
             [Fact]
             public void Should_match_the_process_bitness_unless_running_on_arm64()
             {
-                // On Windows on ARM the process runs emulated but is reported as 64-bit
-                // capable (x64 emulation); everywhere else it matches the pointer size.
+                // On Windows on ARM the CLI runs either natively as ARM64 or as emulated x64;
+                // either way the host is reported as 64-bit. Everywhere else it matches the
+                // pointer size.
                 if (Environment.IsArm64OperatingSystem)
                 {
                     _is64Bit.Should().BeTrue();

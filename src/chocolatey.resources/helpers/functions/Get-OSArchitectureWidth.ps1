@@ -28,9 +28,10 @@ of {`32`|`64`}.
 When your installation script has to know what architecture it is run
 on, this simple function comes in handy.
 
-On Windows on ARM, the returned width reflects the emulation the process is
-running under (Windows 11 provides 64-bit x64 emulation). To detect the
-native processor architecture - including arm64 - use Get-OSArchitecture.
+On Windows on ARM, the returned width reflects the bit-width of the current
+process, which is 64 whether Chocolatey is running natively as ARM64 or under
+x64 emulation. To detect the native processor architecture - including arm64 -
+use Get-OSArchitecture.
 
 .INPUTS
 None

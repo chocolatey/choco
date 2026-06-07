@@ -36,9 +36,12 @@ namespace chocolatey.infrastructure.adapters
         {
             get
             {
-                // On Windows on ARM, the Chocolatey CLI runs as an emulated x86/x64 process.
-                // Windows 11 ships 64-bit (x64) emulation, so ARM64 hosts are treated as 64-bit
-                // capable rather than being forced to 32-bit as they were historically. See
+                // On Windows on ARM the Chocolatey CLI runs either natively as ARM64 (Windows 11
+                // 24H2+, opted into via the <supportedArchitectures> element in choco.exe.manifest)
+                // or as an emulated x64 process on older hosts. Both are 64-bit, so ARM64 operating
+                // systems are reported as 64-bit rather than being forced to 32-bit as they were
+                // historically. The explicit check also covers the (unusual) case of the CLI running
+                // 32-bit-emulated, where IntPtr.Size would otherwise report 4. See
                 // https://github.com/chocolatey/choco/issues/1803 and #2172.
                 if (IsArm64OperatingSystem)
                 {
