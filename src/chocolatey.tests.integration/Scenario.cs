@@ -192,16 +192,22 @@ namespace chocolatey.tests.integration
             NUnitSetup.MockLogger.Messages.Clear();
         }
 
-        public static void AddFiles(IEnumerable<Tuple<string, string>> files)
+        public static void AddFiles(IEnumerable<(string name, string content)> files)
         {
             foreach (var file in files)
             {
-                if (_fileSystem.FileExists(file.Item1))
-                {
-                    _fileSystem.DeleteFile(file.Item1);
-                }
-                _fileSystem.WriteFile(file.Item1, file.Item2);
+                AddFile(file.name, file.content);
             }
+        }
+
+        public static void AddFile(string name, string content)
+        {
+            if (_fileSystem.FileExists(name))
+            {
+                _fileSystem.DeleteFile(name);
+            }
+
+            _fileSystem.WriteFile(name, content);
         }
 
         public static void CreateDirectory(string directoryPath)

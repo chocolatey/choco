@@ -1823,7 +1823,11 @@ ATTENTION: You must take manual action to remove {1} from
 
             if (!string.IsNullOrWhiteSpace(packageResult.InstallLocation) && _fileSystem.DirectoryExists(packageResult.InstallLocation))
             {
-                var normalizedVersion = new NuGetVersion(packageResult.Version).ToNormalizedStringChecked();
+                // If there's no version information (certain edge cases on package install errors), fallback to an unknown version with a timestamp
+                // so this can't fail out unexpectedly.
+                var normalizedVersion = string.IsNullOrEmpty(packageResult.Version)
+                    ? "unknown-{0}".FormatWith(DateTime.UtcNow.ToString("yyyy-MM-dd-HH-mm-ss"))
+                    : new NuGetVersion(packageResult.Version).ToNormalizedStringChecked();
                 var failuresFolder = _fileSystem.CombinePaths(ApplicationParameters.PackageFailuresLocation, packageResult.Name, normalizedVersion);
 
                 if (_filesService.MovePackageUsingBackupStrategy(packageResult.InstallLocation, failuresFolder, restoreSource: false))
@@ -1835,7 +1839,7 @@ ATTENTION: You must take manual action to remove {1} from
 
         private void RestorePreviousPackageVersion(ChocolateyConfiguration config, PackageResult packageResult)
         {
-            if (packageResult.InstallLocation == null)
+            if (string.IsNullOrEmpty(packageResult.InstallLocation) || string.IsNullOrEmpty(packageResult.Version))
             {
                 return;
             }
