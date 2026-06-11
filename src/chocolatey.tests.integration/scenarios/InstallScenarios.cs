@@ -4208,6 +4208,79 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        public class When_installing_a_package_with_corrupt_local_package_already_on_disk : ScenariosBase
+        {
+            private PackageResult _packageResult;
+
+            public override void Context()
+            {
+                base.Context();
+
+                var corruptPackageFolder = Path.Combine(Scenario.GetPackageInstallPath(), Configuration.PackageNames);
+                Scenario.CreateDirectory(corruptPackageFolder);
+
+                // Add a corrupt nuspec (full of null bytes) as an "already installed, but corrupted" package.
+                // The nupkg is intentionally missing here, since NuGet doesn't recognise the package as being "installed"
+                // even if files are present at the target install location, so it will blindly attempt to install a package.
+                var corruptNuspec = Path.Combine(corruptPackageFolder, Configuration.PackageNames + ".nuspec");
+                Scenario.AddFile(corruptNuspec, new string((char)0, 1024));
+            }
+
+            public override void Because()
+            {
+                Results = Service.Install(Configuration);
+                _packageResult = Results.FirstOrDefault().Value;
+            }
+
+            [Fact]
+            public void Should_not_install_where_install_location_reports()
+            {
+                Assert.That(_packageResult.InstallLocation ?? string.Empty, Is.Not.EqualTo(string.Empty));
+                Assert.That(_packageResult.InstallLocation, Does.Not.Exist);
+            }
+
+            [Fact]
+            public void Should_move_the_package_to_lib_bad_directory()
+            {
+                var packageDir = Path.Combine(Scenario.GetTopLevel(), "lib-bad", Configuration.PackageNames);
+
+                Assert.That(packageDir, Does.Exist);
+            }
+
+
+            [Fact]
+            public void Should_contain_a_warning_message_that_it_did_not_install_successfully()
+            {
+                MockLogger.Messages.Should().ContainKey(LogLevel.Warn.ToStringSafe())
+                    .WhoseValue.Should().Contain(m => m.Contains("0/1"));
+            }
+
+
+            [Fact]
+            public void Should_not_have_a_successful_package_result()
+            {
+                _packageResult.Success.Should().BeFalse();
+            }
+
+            [Fact]
+            public void Should_not_have_inconclusive_package_result()
+            {
+                _packageResult.Inconclusive.Should().BeFalse();
+            }
+
+            [Fact]
+            public void Config_should_match_package_result_name()
+            {
+                _packageResult.Name.Should().Be(Configuration.PackageNames);
+            }
+
+            [Fact]
+            public void Should_have_an_empty_version_string()
+            {
+                _packageResult.Version.Should().Be(string.Empty);
+            }
+        }
+
         public class When_installing_a_package_with_non_normalized_version : ScenariosBase
         {
             private PackageResult _packageResult;
