@@ -60,7 +60,7 @@ namespace chocolatey.tests.integration.scenarios
 
             protected void AddFile(string fileName, string fileContent)
             {
-                Scenario.AddFiles(new[] { new Tuple<string, string>(fileName, fileContent) });
+                Scenario.AddFile(fileName, fileContent);
             }
         }
 
@@ -136,7 +136,7 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Configuration = Scenario.Pack();
                 Scenario.Reset(Configuration);
-                Scenario.AddFiles(new[] { new Tuple<string, string>("myPackage.nuspec", GetNuspecContent()) });
+                Scenario.AddFile("myPackage.nuspec", GetNuspecContent());
 
                 if (!string.IsNullOrEmpty(ExpectedSubDirectory))
                 {
@@ -600,7 +600,7 @@ namespace chocolatey.tests.integration.scenarios
                 Scenario.Reset(Configuration);
                 Configuration.Version = "0.1.0";
                 Configuration.PackCommand.Properties.Add("commitId", "1234abcd");
-                Scenario.AddFiles(new[] { new Tuple<string, string>("myPackage.nuspec", NuspecContentWithVariables) });
+                Scenario.AddFile("myPackage.nuspec", NuspecContentWithVariables);
             }
 
             public override void Because()
