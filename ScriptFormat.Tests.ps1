@@ -1,4 +1,4 @@
-﻿#Requires -Module @{ ModuleName = 'pester'; ModuleVersion = '5.3.1' }
+﻿#Requires -Module @{ ModuleName = 'pester'; ModuleVersion = '6.0.0' }
 
 Describe "Verifying integrity of module files" {
     BeforeDiscovery {

@@ -63,7 +63,9 @@ Vagrant.configure("2") do |config|
     iex (irm https://community.chocolatey.org/install.ps1)
 
     Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) We are going to install some prerequisites now. This could take some time"
-    $null = choco install git pester visualstudio2022community visualstudio2022-workload-manageddesktop netfx-4.8-devpack -y
+    $null = choco install git visualstudio2022community visualstudio2022-workload-manageddesktop netfx-4.8-devpack -y
+    $null = Install-PackageProvider -Name NuGet -Force
+    Install-Module -Name Pester -RequiredVersion '6.0.0-rc1' -AllowPrerelease -Force -SkipPublisherCheck
     Import-Module $env:ChocolateyInstall/helpers/chocolateyProfile.psm1
     Update-SessionEnvironment
     Write-Host "($(Get-Date -Format "dddd MM/dd/yyyy HH:mm:ss K")) Done installing software, now copying files"
