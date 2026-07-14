@@ -53,6 +53,9 @@ from the url response.
 The user agent to use as part of the request. Defaults to 'chocolatey
 command line'.
 
+.PARAMETER Options
+OPTIONAL - Specify custom headers.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -69,6 +72,7 @@ Get-ChocolateyWebFile
         [parameter(Mandatory = $false, Position = 0)][string] $url = '',
         [parameter(Mandatory = $true, Position = 1)][string] $defaultName,
         [parameter(Mandatory = $false)][string] $userAgent = 'chocolatey command line',
+        [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
         [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
     )
 
@@ -173,6 +177,30 @@ Get-ChocolateyWebFile
     #http://stackoverflow.com/questions/518181/too-many-automatic-redirections-were-attempted-error-message-when-using-a-httpw
     $request.CookieContainer = New-Object System.Net.CookieContainer
     $request.UserAgent = $userAgent
+
+    if ($options.Headers.Count -gt 0) {
+        Write-Debug "Setting custom headers"
+        foreach ($key in $options.Headers.Keys) {
+            $uri = New-Object -TypeName System.Uri $url
+            switch ($key) {
+                'Accept' {
+                    $request.Accept = $options.Headers[$key]
+                }
+                'Cookie' {
+                    $request.CookieContainer.SetCookies($uri, $options.Headers[$key])
+                }
+                'Referer' {
+                    $request.Referer = $options.Headers[$key]
+                }
+                'User-Agent' {
+                    $request.UserAgent = $options.Headers[$key]
+                }
+                Default {
+                    $request.Headers.Add($key, $options.Headers[$key])
+                }
+            }
+        }
+    }
 
     [System.Text.RegularExpressions.Regex]$containsABadCharacter = New-Object Regex("[" + [System.Text.RegularExpressions.Regex]::Escape([System.IO.Path]::GetInvalidFileNameChars() -join '') + "\=\;]");
 
