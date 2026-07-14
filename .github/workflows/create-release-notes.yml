@@ -1,0 +1,51 @@
+name: Create Release Notes
+
+on:
+  # Only ever run this workflow when manually triggered from the Actions tab.
+  # The branch/ref selected in the "Use workflow from" dropdown determines which
+  # branch is checked out and used by GitVersion to calculate the milestone.
+  workflow_dispatch:
+    inputs:
+      target-branch:
+        description: 'Optional target branch (commitish) for the created release. Leave blank to use the branch the workflow is run from / the configured master branch.'
+        required: false
+        default: ''
+
+jobs:
+  create-release-notes:
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Cache Tools
+      uses: actions/cache@v4
+      with:
+        path: tools
+        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+    - name: Install Mono
+      run: |
+        sudo apt install ca-certificates gnupg
+        sudo gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
+        echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+        sudo apt update
+        sudo apt install -y mono-complete
+        mono --version
+    - name: Install dotnet #needed for GitVersion
+      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
+      with:
+        dotnet-version: |
+          5.0.x
+    - name: Report installed dotnet versions
+      run: |
+          dotnet --info
+    - name: Create Release Notes with Mono
+      env:
+        GITRELEASEMANAGER_PAT: ${{ secrets.GITRELEASEMANAGER_PAT }}
+      run: |
+        chmod +x build.sh
+        ARGS="--verbosity=diagnostic --target=Create-Release-Notes"
+        if [ -n "${{ inputs.target-branch }}" ]; then
+          ARGS="$ARGS --target-branch=${{ inputs.target-branch }}"
+        fi
+        $GITHUB_WORKSPACE//build.sh $ARGS
