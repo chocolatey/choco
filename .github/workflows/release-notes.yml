@@ -1,18 +1,23 @@
-name: Create Release Notes
-
+name: Manage Release
 on:
-  # Only ever run this workflow when manually triggered from the Actions tab.
-  # The branch/ref selected in the "Use workflow from" dropdown determines which
-  # branch is checked out and used by GitVersion to calculate the milestone.
   workflow_dispatch:
     inputs:
+      task:
+        description: 'Which release-notes task to run'
+        required: true
+        type: choice
+        default: create
+        options:
+          - create
+          - publish
       target-branch:
-        description: 'Optional target branch (commitish) for the created release. Leave blank to use the branch the workflow is run from / the configured master branch.'
+        description: 'create only: optional target branch (commitish) for the release. Leave blank to use the configured master branch.'
         required: false
         default: ''
 
 jobs:
-  create-release-notes:
+  # Run the selected release-notes task using mono on Ubuntu
+  release-notes:
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@v3
@@ -39,13 +44,18 @@ jobs:
     - name: Report installed dotnet versions
       run: |
           dotnet --info
-    - name: Create Release Notes with Mono
+    - name: Run Release Notes task with Mono
       env:
+        # GitReleaseManager reads its token from this environment variable.
         GITRELEASEMANAGER_PAT: ${{ secrets.GITRELEASEMANAGER_PAT }}
       run: |
         chmod +x build.sh
-        ARGS="--verbosity=diagnostic --target=Create-Release-Notes"
-        if [ -n "${{ inputs.target-branch }}" ]; then
-          ARGS="$ARGS --target-branch=${{ inputs.target-branch }}"
+        if [ "${{ inputs.task }}" = "publish" ]; then
+          $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=Publish-Release-Notes
+        else
+          ARGS="--verbosity=diagnostic --target=Create-Release-Notes"
+          if [ -n "${{ inputs.target-branch }}" ]; then
+            ARGS="$ARGS --target-branch=${{ inputs.target-branch }}"
+          fi
+          $GITHUB_WORKSPACE//build.sh $ARGS
         fi
-        $GITHUB_WORKSPACE//build.sh $ARGS
