@@ -9,49 +9,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Build using mono on Ubuntu
-  ubuntu-build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Cache Tools
-      uses: actions/cache@v4
-      with:
-        path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
-    - name: Install Mono
-      run: |
-        sudo apt install ca-certificates gnupg
-        sudo gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-        echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-        sudo apt update
-        sudo apt install -y mono-complete
-        mono --version
-    - name: Install dotnet #needed for GitVersion
-      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
-      with:
-        dotnet-version: |
-          5.0.x
-    - name: Report installed dotnet versions
-      run: |
-          dotnet --info
-    - name: Build with Mono
-      run: |
-        chmod +x build.sh
-        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=unit
-    - name: Upload Ubuntu build results
-      uses: actions/upload-artifact@v4
-      # Always upload build results
-      if: ${{ always() }}
-      with:
-        name: ubuntu-build-results
-        path: |
-          code_drop/TestResults/issues-report.html
-          code_drop/TestResults/NUnit/TestResult.xml
-          code_drop/Packages/NuGet/*.nupkg
-          code_drop/MsBuild.log
   # Build on Windows
   windows-build:
     runs-on: windows-latest
@@ -64,17 +21,21 @@ jobs:
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
-    - name: Install dotnet #needed for GitVersion
+    - name: Install dotnet # 5.0.x for GitVersion, 10.0.x for the build
       uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
       with:
         dotnet-version: |
           5.0.x
+          10.0.x
     - name: Report installed dotnet versions
       run: |
           dotnet --info
-    - name: Build with .Net Framework
+    # Full CI on every push/PR: build, run BOTH NUnit suites, and package. Phase 5
+    # replaced ILMerge with a self-contained single-file publish, so --target=CI now
+    # produces the real net10 chocolatey nupkg (no MSI; that is Phase 8).
+    - name: Build, test and package
       shell: powershell
-      run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=unit --shouldRunOpenCover=false --shouldBuildMsi=true
+      run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=all --shouldRunOpenCover=false
     - name: Upload Windows build results
       uses: actions/upload-artifact@v4
       # Always upload build results
@@ -86,64 +47,81 @@ jobs:
           code_drop\TestResults\NUnit\TestResult.xml
           code_drop\TestCoverage\lcov.info
           code_drop\TestCoverage\OpenCover.xml
-          code_drop\ilmerge-chocoexe.log
-          code_drop\ilmerge-chocolateydll.log
           code_drop\Packages\NuGet\*.nupkg
           code_drop\Packages\Chocolatey\*.nupkg
           code_drop\MsBuild.log
-          code_drop\MSIs\en-US\chocolatey-*.msi
-  # Build using mono on MacOS
-  macos-build:
-    runs-on: macos-14
+
+  # Phase 4: Pester E2E under PowerShell 7. Installs the built chocolatey nupkg and
+  # runs the real package/helper tests (tests/pester-tests) via Invoke-Tests.ps1 under
+  # pwsh. Runs after windows-build and reuses its packaged nupkg.
+  pester-e2e:
+    needs: windows-build
+    runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Cache Tools
-      uses: actions/cache@v4
+    - name: Download built packages
+      uses: actions/download-artifact@v4
       with:
-        path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
-    - name: Install dotnet #needed for GitVersion
-      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
-      with:
-        dotnet-version: |
-          5.0.x
-    - name: Report installed dotnet versions
+        name: windows-build-results
+        path: code_drop
+    # GH windows-latest ships PowerShell 7.4 LTS (on .NET 8), which can't load
+    # Chocolatey.PowerShell.dll (net10.0-windows). PS 7.6 runs on .NET 10 and matches
+    # the Microsoft.PowerShell.SDK 7.6.2 host the migration uses, so install it.
+    - name: Install PowerShell 7.6 (matches choco's net10 runtime)
+      shell: pwsh
       run: |
-          dotnet --info
-    - name: Build with Mono
+        $version = '7.6.2'
+        $url = "https://github.com/PowerShell/PowerShell/releases/download/v$version/PowerShell-$version-win-x64.zip"
+        Write-Host "Downloading PowerShell $version from $url"
+        Invoke-WebRequest -Uri $url -OutFile pwsh76.zip
+        Expand-Archive -Path pwsh76.zip -DestinationPath pwsh76 -Force
+        & "$PWD\pwsh76\pwsh.exe" --version
+    - name: Install Pester 5.3.1 (current-user; visible to PS 7.4 and 7.6)
+      shell: pwsh
+      run: Install-Module -Name Pester -RequiredVersion 5.3.1 -Force -SkipPublisherCheck -Scope CurrentUser
+    - name: Run Pester E2E (PowerShell 7.6 / .NET 10)
+      shell: powershell
       run: |
-        export DOTNET_ROOT=$HOME/.dotnet
-        chmod +x build.sh
-        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=CI --testExecutionType=unit
-    - name: Upload MacOS build results
-      uses: actions/upload-artifact@v4
-      # Always upload build results
+        $pwsh76 = "$env:GITHUB_WORKSPACE\pwsh76\pwsh.exe"
+        $script = @'
+        # ErrorActionPreference=Continue so that Invoke-Tests.ps1's expected Write-Error
+        # on two intentionally-broken-pack nuspecs doesn't abort before Pester starts.
+        $ErrorActionPreference = 'Continue'
+        Set-Location $env:GITHUB_WORKSPACE
+        Write-Host "PowerShell version: $($PSVersionTable.PSVersion); .NET: $([System.Runtime.InteropServices.RuntimeInformation]::FrameworkDescription)"
+        $pkg = Get-ChildItem -Path code_drop -Recurse -Filter '*.nupkg' | Where-Object Name -Match 'chocolatey\.\d' | Select-Object -First 1
+        if (-not $pkg) { throw "Could not find the built chocolatey nupkg under code_drop" }
+        Write-Host "Testing package: $($pkg.FullName)"
+        & "$env:GITHUB_WORKSPACE\Invoke-Tests.ps1" -TestPackage $pkg.FullName
+        # Make CI faithfully reflect Pester pass/fail: Invoke-Tests.ps1 doesn't propagate
+        # Pester results, so parse the NUnit-format testResults.xml and exit non-zero
+        # when any test failed or errored.
+        $results = Get-ChildItem -Path . -Recurse -Filter 'testResults.xml' -ErrorAction SilentlyContinue | Select-Object -First 1
+        if (-not $results) {
+            Write-Error "No testResults.xml produced - Pester did not complete"
+            exit 1
+        }
+        Write-Host "Pester results: $($results.FullName)"
+        [xml]$xml = Get-Content -LiteralPath $results.FullName
+        $root = $xml.'test-results'
+        $total = [int]$root.total
+        $failed = [int]$root.failures + [int]$root.errors
+        $notRun = [int]$root.'not-run'
+        Write-Host ("Pester totals: total={0} failures+errors={1} not-run={2}" -f $total, $failed, $notRun)
+        if ($failed -gt 0) {
+            Write-Error "$failed Pester test(s) failed/errored"
+            exit 1
+        }
+        '@
+        Set-Content -Path pester-runner.ps1 -Value $script -Encoding utf8
+        & $pwsh76 -NoLogo -NoProfile -File pester-runner.ps1
+    - name: Upload Pester results
       if: ${{ always() }}
+      uses: actions/upload-artifact@v4
       with:
-        name: macos-build-results
+        name: pester-results
         path: |
-          code_drop/TestResults/issues-report.html
-          code_drop/TestResults/NUnit/TestResult.xml
-          code_drop/Packages/NuGet/*.nupkg
-          code_drop/MsBuild.log
-  # Build using Mono in Docker on Ubuntu
-  docker-build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-      - name: Build and push
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          file: docker/Dockerfile.linux
-          push: false
-          tags: chocolatey/choco:latest
+          testResults.xml
+          **/testResults.xml

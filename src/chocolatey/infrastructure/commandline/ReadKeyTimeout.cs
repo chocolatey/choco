@@ -49,9 +49,20 @@ namespace chocolatey.infrastructure.commandline
         {
             while (true)
             {
-                _backgroundResponseReset.WaitOne();
-                _input = Console.ReadKey(intercept: true);
-                _foregroundResponseReset.Set();
+                try
+                {
+                    _backgroundResponseReset.WaitOne();
+                    _input = Console.ReadKey(intercept: true);
+                    _foregroundResponseReset.Set();
+                }
+                catch (Exception)
+                {
+                    // Either there is no interactive console (input redirected /
+                    // headless), or the caller already timed out and disposed the
+                    // reset events. Swallow on this background thread so we never
+                    // crash the process; the foreground caller returns its default.
+                    return;
+                }
             }
         }
 
@@ -75,7 +86,9 @@ namespace chocolatey.infrastructure.commandline
             }
 
             _isDisposing = true;
-            _responseThread.Abort();
+            // Thread.Abort is unsupported on .NET; the response thread is a
+            // background thread, so it is reclaimed at process exit. Its body is
+            // exception-guarded so it won't fault when the resets are disposed.
             _backgroundResponseReset.Close();
             _backgroundResponseReset.Dispose();
             _foregroundResponseReset.Close();

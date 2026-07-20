@@ -22,7 +22,6 @@ using System.Reflection;
 using System.Threading;
 using chocolatey.infrastructure.adapters;
 using chocolatey.infrastructure.app;
-using chocolatey.infrastructure.app.runners;
 using chocolatey.infrastructure.filesystem;
 using Assembly = chocolatey.infrastructure.adapters.Assembly;
 
@@ -375,15 +374,10 @@ namespace chocolatey.infrastructure.registration
                 }
             }
 
-            // There are things that are ILMerged into Chocolatey. Anything with
-            // the right public key except extensions should use the choco/chocolatey assembly
-            if (!requestedAssembly.Name.EndsWith(".resources", StringComparison.OrdinalIgnoreCase)
-                && !requestedAssembly.Name.IsEqualTo(ApplicationParameters.LicensedChocolateyAssemblySimpleName)
-                && !requestedAssembly.Name.IsEqualTo(ApplicationParameters.ChocolateyPowerShellAssemblySimpleName))
-            {
-                return typeof(ConsoleApplication).Assembly;
-            }
-
+            // Nothing is ILMerged into Chocolatey any more (the self-contained publish ships
+            // choco.exe + chocolatey.dll as real, separately-loaded assemblies). Anything not
+            // resolved as an extension above is left to the normal runtime resolution; returning
+            // the choco assembly here would hand back the wrong assembly for choco-keyed requests.
             return null;
         }
 

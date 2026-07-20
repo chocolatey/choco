@@ -9,48 +9,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Build and test using mono on Ubuntu
-  ubuntu-build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Cache Tools
-      uses: actions/cache@v4
-      with:
-        path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
-    - name: Install Mono
-      run: |
-        sudo apt install ca-certificates gnupg
-        sudo gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-        echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
-        sudo apt update
-        sudo apt install -y mono-complete
-        mono --version
-    - name: Install dotnet #needed for GitVersion
-      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
-      with:
-        dotnet-version: |
-          5.0.x
-    - name: Report installed dotnet versions
-      run: |
-          dotnet --info
-    - name: Test with NUnit on Mono
-      run: |
-        chmod +x build.sh
-        $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=test --testExecutionType=all
-    - name: Upload Ubuntu build results
-      uses: actions/upload-artifact@v4
-      # Always upload build results
-      if: ${{ always() }}
-      with:
-        name: ubuntu-build-results
-        path: |
-          code_drop/TestResults/issues-report.html
-          code_drop/TestResults/NUnit/TestResult.xml
-          code_drop/MsBuild.log
   # Build and test on Windows
   windows-build:
     runs-on: windows-latest
@@ -63,11 +21,12 @@ jobs:
       with:
         path: tools
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
-    - name: Install dotnet #needed for GitVersion
+    - name: Install dotnet # 5.0.x for GitVersion, 10.0.x for the build
       uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
       with:
         dotnet-version: |
           5.0.x
+          10.0.x
     - name: Report installed dotnet versions
       run: |
           dotnet --info
@@ -85,37 +44,3 @@ jobs:
           code_drop\TestCoverage\lcov.info
           code_drop\TestCoverage\OpenCover.xml
           code_drop\MsBuild.log
-  # Build and test using mono on MacOS
-  macos-build:
-    runs-on: macos-14
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - name: Cache Tools
-      uses: actions/cache@v4
-      with:
-        path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
-    - name: Install dotnet #needed for GitVersion
-      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
-      with:
-        dotnet-version: |
-          5.0.x
-    - name: Report installed dotnet versions
-      run: |
-          dotnet --info
-    - name: Test with NUnit on Mono
-      run: |
-          chmod +x build.sh
-          $GITHUB_WORKSPACE//build.sh --verbosity=diagnostic --target=test --testExecutionType=all
-    - name: Upload MacOS build results
-      uses: actions/upload-artifact@v4
-      # Always upload build results
-      if: ${{ always() }}
-      with:
-        name: macos-build-results
-        path: |
-          code_drop/TestResults/issues-report.html
-          code_drop/TestResults/NUnit/TestResult.xml
-          code_drop/MsBuild.log

@@ -13,7 +13,11 @@ function Test-ByteOrderMark {
         [Parameter(Mandatory)]
         [string]$Path
     )
-    [byte[]]$bom = Get-Content -Encoding Byte -ReadCount 4 -TotalCount 4 -Path $Path
+    # Read the first 4 bytes via System.IO so this works on both Windows PowerShell 5.1
+    # and PowerShell 7+. The 5.1-only `-Encoding Byte` switch was removed in PowerShell 6
+    # (it's `-AsByteStream` there), so the previous form silently broke the BOM check on PS7.
+    $bytes = [System.IO.File]::ReadAllBytes($Path)
+    [byte[]]$bom = if ($bytes.Length -ge 4) { $bytes[0..3] } else { $bytes }
 
     $encoding_found = $false
 

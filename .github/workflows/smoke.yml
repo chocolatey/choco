@@ -1,0 +1,60 @@
+name: Self-Contained Smoke Test
+
+# Proves the migration's core goal: a self-contained choco.exe that runs on a
+# clean Windows box with NO .NET runtime installed and no framework/reboot.
+# It publishes the single-file self-contained choco.exe and runs it inside a
+# Windows Server Core container that has no .NET runtime.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  clean-container-smoke:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - name: Install .NET 10 SDK
+      uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
+      with:
+        dotnet-version: |
+          10.0.x
+    - name: Generate placeholder SolutionVersion.cs
+      shell: pwsh
+      run: |
+        @'
+        using System.Reflection;
+        [assembly: AssemblyVersion("2.0.0.0")]
+        [assembly: AssemblyFileVersion("2.0.0.0")]
+        [assembly: AssemblyInformationalVersion("2.0.0-smoke")]
+        [assembly: AssemblyCompany("Chocolatey Software, Inc.")]
+        [assembly: AssemblyProduct("Chocolatey")]
+        [assembly: AssemblyCopyright("Copyright (c) 2017 - 2026 Chocolatey Software, Inc.")]
+        '@ | Set-Content -Path src/SolutionVersion.cs -Encoding utf8
+    - name: Publish self-contained single-file choco.exe
+      shell: pwsh
+      run: >
+        dotnet publish src/chocolatey.console/chocolatey.console.csproj
+        -c Release -r win-x64 --self-contained
+        -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true
+        -o pub
+    - name: Run choco.exe in a clean Server Core container (no .NET runtime)
+      shell: pwsh
+      run: |
+        $image = "mcr.microsoft.com/windows/servercore:ltsc2022"
+        Write-Host "Pulling $image ..."
+        docker pull $image
+        Write-Host "Running 'choco --version' inside the container (no .NET installed)..."
+        $version = docker run --rm -v "${{ github.workspace }}\pub:C:\choco" $image C:\choco\choco.exe --version
+        if ($LASTEXITCODE -ne 0) { throw "choco.exe exited with code $LASTEXITCODE inside the clean container" }
+        Write-Host "choco --version => $version"
+        if ([string]::IsNullOrWhiteSpace($version)) { throw "choco.exe produced no version output" }
+    - name: Run choco list / source list in the clean container (informational)
+      shell: pwsh
+      continue-on-error: true
+      run: |
+        $image = "mcr.microsoft.com/windows/servercore:ltsc2022"
+        docker run --rm -v "${{ github.workspace }}\pub:C:\choco" $image cmd /c "C:\choco\choco.exe source list & C:\choco\choco.exe list"
