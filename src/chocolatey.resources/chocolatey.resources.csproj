@@ -62,6 +62,9 @@
     <EmbeddedResource Include="helpers\functions\Get-FtpFile.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="helpers\functions\Get-OSArchitecture.ps1">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="helpers\functions\Get-OSArchitectureWidth.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>

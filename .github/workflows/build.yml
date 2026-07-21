@@ -52,9 +52,21 @@ jobs:
           code_drop/TestResults/NUnit/TestResult.xml
           code_drop/Packages/NuGet/*.nupkg
           code_drop/MsBuild.log
-  # Build on Windows
+  # Build on Windows (x64 and native Windows on ARM)
   windows-build:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            os: windows-latest
+            shouldBuildMsi: 'true'
+          - arch: arm64
+            os: windows-11-arm
+            # MSI building is disabled on Windows on ARM for now (WiX 3.11.2
+            # predates arm64 support); it will be enabled in a later phase.
+            shouldBuildMsi: 'false'
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
       with:
@@ -63,7 +75,8 @@ jobs:
       uses: actions/cache@v4
       with:
         path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+        # runner.arch keeps the x64 and arm64 tool caches separate
+        key: ${{ runner.os }}-${{ runner.arch }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Install dotnet #needed for GitVersion
       uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
       with:
@@ -74,13 +87,13 @@ jobs:
           dotnet --info
     - name: Build with .Net Framework
       shell: powershell
-      run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=unit --shouldRunOpenCover=false --shouldBuildMsi=true
+      run: ./build.ps1 --verbosity=diagnostic --target=CI --testExecutionType=unit --shouldRunOpenCover=false --shouldBuildMsi=${{ matrix.shouldBuildMsi }}
     - name: Upload Windows build results
       uses: actions/upload-artifact@v4
       # Always upload build results
       if: ${{ always() }}
       with:
-        name: windows-build-results
+        name: windows-${{ matrix.arch }}-build-results
         path: |
           code_drop\TestResults\issues-report.html
           code_drop\TestResults\NUnit\TestResult.xml
