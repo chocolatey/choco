@@ -127,7 +127,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             {
                 Context();
                 var source = "choco";
-                var fullsource = "C:\\packages\\choco";
+                var fullsource = "C:\\packages\\choco\\";
                 _configuration.Sources = source;
 
                 _because();
