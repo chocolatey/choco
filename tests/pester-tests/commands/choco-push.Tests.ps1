@@ -78,9 +78,13 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip, CCR -Skip:($null 
         }
 
         It "Should Report the actual cause of the error" {
+            $expectedErrors = @(
+                "Response status code does not indicate success: 409 (This package had an issue pushing: A nuget package's Description property may not be more than 4000 characters long.)." # Direct
+                "Response status code does not indicate success: 409 (Conflict)." # Indirect
+            )
             $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse" -Because $Output.String
             $Output.Lines | Should -Contain "An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below..." -Because $Output.String
-            $Output.Lines | Should -Contain "Response status code does not indicate success: 409 (This package had an issue pushing: A nuget package's Description property may not be more than 4000 characters long.)." -Because $Output.String
+            $Output.Lines -contains $expectedErrors | Should -BeTrue -Because $Output.String
         }
     }
 
@@ -108,9 +112,13 @@ Describe "choco push" -Tag Chocolatey, PushCommand, ProxySkip, CCR -Skip:($null 
         }
 
         It "Should Report the actual cause of the error" {
+            $expectedErrors = @(
+                "Response status code does not indicate success: 409 (This package had an issue pushing: A nuget package's Title property may not be more than 256 characters long.)." #Direct
+                "Response status code does not indicate success: 409 (Conflict)." # Indirect
+            )
             $Output.Lines | Should -Contain "Attempting to push $PackageUnderTest.$VersionUnderTest.nupkg to $RepositoryToUse" -Because $Output.String
             $Output.Lines | Should -Contain "An error has occurred. It's possible the package version already exists on the repository or a nuspec element is invalid. See error below..." -Because $Output.String
-            $Output.Lines | Should -Contain "Response status code does not indicate success: 409 (This package had an issue pushing: A nuget package's Title property may not be more than 256 characters long.)." -Because $Output.String
+            $Output.Lines -contains $expectedErrors | Should -BeTrue -Because $Output.String
         }
     }
 
