@@ -226,10 +226,27 @@ namespace chocolatey.infrastructure.information
 
         internal static ProcessTree PopulateProcessTree(ProcessTree tree, Process currentProcess, Func<Process, Process> getParentProcess)
         {
+            Func<IProcessInfo, IProcessInfo> getParentProcessAdapter = null;
+            if (getParentProcess != null)
+            {
+                // Bridge real Process objects to the IProcessInfo (which allows it to be tested)
+                //  - unwrap to call the actual OS lookup, then wrap the result back up.
+                getParentProcessAdapter = node =>
+                {
+                    var parent = getParentProcess(((ProcessInfo)node).Process);
+                    return parent != null ? new ProcessInfo(parent) : null;
+                };
+            }
+
+            return PopulateProcessTree(tree, new ProcessInfo(currentProcess), getParentProcessAdapter);
+        }
+
+        internal static ProcessTree PopulateProcessTree(ProcessTree tree, IProcessInfo currentProcess, Func<IProcessInfo, IProcessInfo> getParentProcess)
+        {
             // Track visited PIDs to guard against rare infinite loops
             // (could happen if a lot of processes are created and PIDs are reused)
             var knownPIDs = new HashSet<int> { currentProcess.Id };
-            Process nextProcess = null;
+            IProcessInfo nextProcess = null;
             try
             {
                 while (true)

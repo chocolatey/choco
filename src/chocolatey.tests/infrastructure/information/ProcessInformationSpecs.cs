@@ -16,9 +16,6 @@
 
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
 using chocolatey.infrastructure.information;
 using FluentAssertions;
 
@@ -32,31 +29,19 @@ namespace chocolatey.tests.infrastructure.information
             {
             }
 
-            protected static Process CreateProcessWithId(int id, string name)
+            protected class FakeProcess : IProcessInfo
             {
-                // The Process class caches its id/name in private fields that are only populated
-                // by EnsureState() when unset. On .NET Framework, ProcessName is read from an
-                // internal System.Diagnostics.ProcessInfo object rather than a field on Process itself,
-                // so that object has to be faked too in order to avoid a real OS lookup.
-                var process = new Process();
+                public int Id { get; set; }
 
-                var processInfoType = typeof(Process).Assembly.GetType("System.Diagnostics.ProcessInfo");
-                var processInfo = Activator.CreateInstance(processInfoType, nonPublic: true);
-                processInfoType.GetField("processName", BindingFlags.Public | BindingFlags.Instance)
-                    .SetValue(processInfo, name);
+                public string ProcessName { get; set; }
+            }
 
-                typeof(Process).GetField("processInfo", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .SetValue(process, processInfo);
-                typeof(Process).GetField("processId", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .SetValue(process, id);
-                typeof(Process).GetField("haveProcessId", BindingFlags.NonPublic | BindingFlags.Instance)
-                    .SetValue(process, true);
-
-                return process;
+            protected static FakeProcess CreateProcessWithId(int id, string name)
+            {
+                return new FakeProcess { Id = id, ProcessName = name };
             }
         }
 
-        [WindowsOnly]
         public class When_populating_process_tree_with_no_cycle : ProcessInformationSpecsBase
         {
             public ProcessTree Result;
@@ -71,7 +56,7 @@ namespace chocolatey.tests.infrastructure.information
                 var processB = CreateProcessWithId(2, "processB");
                 var processC = CreateProcessWithId(3, "processC");
 
-                Func<Process, Process> getParent = p =>
+                Func<IProcessInfo, IProcessInfo> getParent = p =>
                 {
                     if (p.Id == 1) return processB;
                     if (p.Id == 2) return processC;
@@ -101,7 +86,6 @@ namespace chocolatey.tests.infrastructure.information
             }
         }
 
-        [WindowsOnly]
         public class When_populating_process_tree_with_a_cycle : ProcessInformationSpecsBase
         {
             public ProcessTree Result;
@@ -116,7 +100,7 @@ namespace chocolatey.tests.infrastructure.information
                 var processB = CreateProcessWithId(2, "processB");
                 var processC = CreateProcessWithId(3, "processC");
 
-                Func<Process, Process> getParent = p =>
+                Func<IProcessInfo, IProcessInfo> getParent = p =>
                 {
                     if (p.Id == 1) return processB;
                     if (p.Id == 2) return processC;
@@ -141,7 +125,6 @@ namespace chocolatey.tests.infrastructure.information
             }
         }
 
-        [WindowsOnly]
         public class When_populating_process_tree_with_access_denied : ProcessInformationSpecsBase
         {
             public ProcessTree Result;
@@ -155,7 +138,7 @@ namespace chocolatey.tests.infrastructure.information
                 var processA = CreateProcessWithId(1, "processA");
                 var processB = CreateProcessWithId(2, "processB");
 
-                Func<Process, Process> getParent = p =>
+                Func<IProcessInfo, IProcessInfo> getParent = p =>
                 {
                     if (p.Id == 1) return processB;
                     if (p.Id == 2) throw new Win32Exception(5);
@@ -179,7 +162,6 @@ namespace chocolatey.tests.infrastructure.information
             }
         }
 
-        [WindowsOnly]
         public class When_populating_process_tree_with_win32_exception : ProcessInformationSpecsBase
         {
             public Win32Exception ResultException;
@@ -193,7 +175,7 @@ namespace chocolatey.tests.infrastructure.information
                 var processA = CreateProcessWithId(1, "processA");
                 var processB = CreateProcessWithId(2, "processB");
 
-                Func<Process, Process> getParent = p =>
+                Func<IProcessInfo, IProcessInfo> getParent = p =>
                 {
                     if (p.Id == 1) return processB;
                     if (p.Id == 2) throw new Win32Exception(42);
