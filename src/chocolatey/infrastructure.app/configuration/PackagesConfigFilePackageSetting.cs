@@ -35,6 +35,9 @@ namespace chocolatey.infrastructure.app.configuration
         [XmlAttribute(AttributeName = "version")]
         public string Version { get; set; }
 
+        [XmlAttribute(AttributeName = "instance")]
+        public string Instance { get; set; }
+
         [XmlAttribute(AttributeName = "installArguments")]
         public string InstallArguments { get; set; }
 
