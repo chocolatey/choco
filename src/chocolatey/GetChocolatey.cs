@@ -16,19 +16,20 @@
 
 using System;
 using System.Collections.Generic;
-using chocolatey.infrastructure.licensing;
-using SimpleInjector;
 using chocolatey.infrastructure.app;
 using chocolatey.infrastructure.app.builders;
 using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.app.runners;
+using chocolatey.infrastructure.app.validations;
 using chocolatey.infrastructure.configuration;
 using chocolatey.infrastructure.extractors;
+using chocolatey.infrastructure.licensing;
 using chocolatey.infrastructure.logging;
 using chocolatey.infrastructure.registration;
 using chocolatey.infrastructure.synchronization;
-using log4net;
 using chocolatey.resources;
+using log4net;
+using SimpleInjector;
 using Assembly = chocolatey.infrastructure.adapters.Assembly;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 using ILog = chocolatey.infrastructure.logging.ILog;
@@ -293,15 +294,23 @@ namespace chocolatey
             EnsureEnvironment();
             ExtractResources();
 
-            EnsureOriginalConfiguration(new List<string>(),
-                (config) =>
-                {
-                    var runner = new GenericRunner();
-                    runner.Run(config, _container, isConsole: false, parseArgs: command =>
+            try
+            {
+                EnsureOriginalConfiguration(new List<string>(),
+                    (config) =>
                     {
-                        command.Validate(config);
+                        var runner = new GenericRunner();
+                        runner.Run(config, _container, isConsole: false, parseArgs: command =>
+                        {
+                            PreRunValidationChecks.Validate(command, config, _container);
+                        });
                     });
-                });
+            }
+            catch (Exception error)
+            {
+                "chocolatey".Log().Error(error.Message);
+                throw;
+            }
         }
 
         /// <summary>
@@ -345,12 +354,23 @@ namespace chocolatey
             EnsureEnvironment();
             ExtractResources();
 
-            return EnsureOriginalConfiguration(new List<string>(),
-                (config) =>
-                {
-                    var runner = new GenericRunner();
-                    return runner.List<T>(config, _container, isConsole: false, parseArgs: null);
-                });
+            try
+            {
+                return EnsureOriginalConfiguration(new List<string>(),
+                    (config) =>
+                    {
+                        var runner = new GenericRunner();
+                        return runner.List<T>(config, _container, isConsole: false, command =>
+                        {
+                            PreRunValidationChecks.Validate(command, config, _container);
+                        });
+                    });
+            }
+            catch (Exception error)
+            {
+                "chocolatey".Log().Error(error.Message);
+                throw;
+            }
         }
 
         /// <summary>
@@ -373,12 +393,23 @@ namespace chocolatey
             EnsureEnvironment();
             ExtractResources();
 
-            return EnsureOriginalConfiguration(new List<string>(),
-               (config) =>
-               {
-                   var runner = new GenericRunner();
-                   return runner.Count(config, _container, isConsole: false, parseArgs: null);
-               });
+            try
+            {
+                return EnsureOriginalConfiguration(new List<string>(),
+                   (config) =>
+                   {
+                       var runner = new GenericRunner();
+                       return runner.Count(config, _container, isConsole: false, command =>
+                       {
+                           PreRunValidationChecks.Validate(command, config, _container);
+                       });
+                   });
+            }
+            catch (Exception error)
+            {
+                "chocolatey".Log().Error(error.Message);
+                throw;
+            }
         }
 
         /// <summary>
