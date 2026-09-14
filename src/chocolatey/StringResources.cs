@@ -102,6 +102,14 @@ namespace chocolatey
                 public const string ChocolateyPackageInstallLocation = nameof(ChocolateyPackageInstallLocation);
 
                 /// <summary>
+                /// The instance name supplied with --instance when installing, upgrading
+                /// or uninstalling a package instance; empty for a default (non-instanced)
+                /// package. Lets package scripts derive per-instance state.
+                /// </summary>
+                /// <remarks>Available in licensed editions only.</remarks>
+                public const string ChocolateyPackageInstance = nameof(ChocolateyPackageInstance);
+
+                /// <summary>
                 /// The name or identifier of the package that is being handled.
                 /// </summary>
                 /// <seealso cref="PackageName" />
