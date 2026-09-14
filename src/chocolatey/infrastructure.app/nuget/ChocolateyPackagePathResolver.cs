@@ -28,13 +28,45 @@ namespace chocolatey.infrastructure.app.nuget
     public sealed class ChocolateyPackagePathResolver : PackagePathResolver
     {
         public string RootDirectory { get; set; }
+
+        /// <summary>
+        ///   The package instance name, or null/empty for a default
+        ///   (non-instanced) package. When set, install paths gain an extra
+        ///   segment: &lt;root&gt;\&lt;id&gt;\&lt;instance&gt;.
+        /// </summary>
+        public string Instance { get; }
+
+        /// <summary>
+        ///   The user-requested (parent) package id for an instanced install.
+        ///   When set, the parent resolves under &lt;root&gt;\&lt;parentId&gt;\&lt;instance&gt;
+        ///   and every other id in the dependency closure is a normal package that
+        ///   resolves under the dependencies root at &lt;depsRoot&gt;\&lt;depId&gt;.
+        ///   Settable because one resolver is reused across a multi-package install loop.
+        ///   Left null/empty, every id resolves as the parent path.
+        /// </summary>
+        public string ParentId { get; set; }
+
+        /// <summary>
+        ///   Root the dependencies of an instanced package are installed under (the
+        ///   regular lib folder, as dependencies are never instanced). Set for
+        ///   instanced resolvers; null for default ones. Only consulted when
+        ///   ParentId is set and the requested id is a dependency.
+        /// </summary>
+        public string DependenciesRootDirectory { get; set; }
+
         private IFileSystem _filesystem;
 
         public ChocolateyPackagePathResolver(string rootDirectory, IFileSystem filesystem)
+            : this(rootDirectory, filesystem, instance: null)
+        {
+        }
+
+        public ChocolateyPackagePathResolver(string rootDirectory, IFileSystem filesystem, string instance)
              : base(rootDirectory, useSideBySidePaths: false)
         {
             RootDirectory = rootDirectory;
             _filesystem = filesystem;
+            Instance = instance;
         }
 
         public override string GetInstallPath(PackageIdentity packageIdentity)
@@ -44,7 +76,22 @@ namespace chocolatey.infrastructure.app.nuget
 
         public string GetInstallPath(string packageId)
         {
-            return _filesystem.CombinePaths(RootDirectory, packageId);
+            // Default packages stay at <root>\<id> (one folder per id, as before).
+            if (string.IsNullOrWhiteSpace(Instance))
+            {
+                return _filesystem.CombinePaths(RootDirectory, packageId);
+            }
+
+            // Instanced install. The user-requested (parent) package lives at
+            // <root>\<id>\<instance>. Any other id in the closure is a dependency,
+            // which is a normal package and lives at <depsRoot>\<depId>.
+            var isDependency = !string.IsNullOrWhiteSpace(ParentId)
+                && !string.IsNullOrWhiteSpace(DependenciesRootDirectory)
+                && !string.Equals(packageId, ParentId, StringComparison.OrdinalIgnoreCase);
+
+            return isDependency
+                ? _filesystem.CombinePaths(DependenciesRootDirectory, packageId)
+                : _filesystem.CombinePaths(RootDirectory, packageId, Instance);
         }
 
         [Obsolete("This overload will be removed in a future version.")]
