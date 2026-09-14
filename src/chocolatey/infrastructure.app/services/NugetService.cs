@@ -602,8 +602,10 @@ folder.");
 
             var remoteEndpoints = NugetCommon.GetRepositoryResources(remoteRepositories, sourceCacheContext);
             var localRepositorySource = NugetCommon.GetLocalRepository();
-            var pathResolver = NugetCommon.GetPathResolver(_fileSystem);
-            var nugetProject = new FolderNuGetProject(ApplicationParameters.PackagesLocation, pathResolver, NuGetFramework.AnyFramework);
+            var pathResolver = GetInstallPathResolver(config);
+            var packagesLocation = GetInstallPackagesLocation(config);
+            _fileSystem.EnsureDirectoryExists(packagesLocation);
+            var nugetProject = new FolderNuGetProject(packagesLocation, pathResolver, NuGetFramework.AnyFramework);
             var projectContext = new ChocolateyNuGetProjectContext(config, _nugetLogger);
 
             IList<string> packageNames = config.PackageNames.Split(new[] { ApplicationParameters.PackageNamesSeparator }, StringSplitOptions.RemoveEmptyEntries).OrEmpty().ToList();
@@ -662,7 +664,10 @@ folder.");
                 // before we start reading it.
                 config.RevertChanges();
 
+                PrepareInstallPathResolver(config, packageName, pathResolver);
+
                 var allLocalPackages = GetInstalledPackages(config).ToList();
+                var externalDependencyInfos = GetExternalInstalledDependencyInfos(config).OrEmpty().ToList();
                 var packagesToInstall = new List<IPackageSearchMetadata>();
                 var packagesToUninstall = new HashSet<PackageResult>();
                 var sourcePackageDependencyInfos = new HashSet<SourcePackageDependencyInfo>(PackageIdentityComparer.Default);
@@ -674,6 +679,11 @@ folder.");
                 {
                     var logMessage = "{0} is not a supported package on non-Windows systems.{1}Only template packages are currently supported.".FormatWith(packageName, Environment.NewLine);
                     this.Log().Warn(ChocolateyLoggers.Important, logMessage);
+                }
+
+                if (ShouldSkipInstall(config, packageName, installedPackage, pathResolver, packageResultsToReturn))
+                {
+                    continue;
                 }
 
                 if (installedPackage != null && (version == null || version == installedPackage.PackageMetadata.Version) && !config.Force)
@@ -774,6 +784,14 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var removedSources = RemovePinnedSourceDependencies(sourcePackageDependencyInfos, allLocalPackages);
                 sourcePackageDependencyInfos.AddRange(localPackagesDependencyInfos);
 
+                // Packages installed outside lib constrain the resolution as the ones under lib do, but the resolver must
+                // never install or remove them. One whose own dependencies are not installed is left out: asking for it
+                // would have the resolver install what is missing.
+                externalDependencyInfos = externalDependencyInfos
+                    .Where(e => e.Dependencies.All(d => allLocalPackages.Any(p => p.Name.IsEqualTo(d.Id)) || targetIdsToInstall.Contains(d.Id, StringComparer.OrdinalIgnoreCase)))
+                    .ToList();
+                sourcePackageDependencyInfos.AddRange(externalDependencyInfos);
+
                 if (removedSources.Count > 0 && version == null)
                 {
                     RemoveInvalidDependenciesAndParents(availablePackage, removedSources, sourcePackageDependencyInfos, localPackagesDependencyInfos);
@@ -783,7 +801,9 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 var allPackagesIdentities = Enumerable.Empty<PackageIdentity>();
 
-                if (availablePackage.DependencySets.Any() || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
+                if (availablePackage.DependencySets.Any()
+                    || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id))
+                    || externalDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
                 {
                     allPackagesIdentities = allLocalPackages
                         // We exclude any installed package that does have a dependency that is missing,
@@ -795,6 +815,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         .Where(p => config.ForceDependencies
                             ? sourcePackageDependencyInfos.Any(s => s.Id == p.Id)
                             : !targetIdsToInstall.Contains(p.Id, StringComparer.OrdinalIgnoreCase)).ToList();
+
+                    // The packages installed outside lib are required as well, so what they need is kept.
+                    allPackagesIdentities = allPackagesIdentities
+                        .Concat(externalDependencyInfos.Select(e => new PackageIdentity(e.Id, e.Version)))
+                        .ToList();
                 }
 
                 var allPackagesReferences = allPackagesIdentities.Select(p => new PackageReference(p, NuGetFramework.AnyFramework));
@@ -841,6 +866,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     try
                     {
                         resolvedPackages = dependencyResolver.Resolve(resolverContext, CancellationToken.None)
+                            // The packages installed outside lib were only there to constrain the resolution.
+                            .Where(p => !externalDependencyInfos.Any(e => PackageIdentityComparer.Default.Equals(e, p)))
                             .Select(p => sourcePackageDependencyInfos.Single(x => PackageIdentityComparer.Default.Equals(x, p)));
 
                         if (!config.ForceDependencies)
@@ -1003,14 +1030,31 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         var manifestPath = nugetProject.GetInstalledManifestFilePath(packageDependencyInfo);
                         var packageMetadata = new ChocolateyPackageMetadata(manifestPath, _fileSystem);
 
-                        this.Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".FormatWith(
-                            System.Environment.NewLine,
-                            packageMetadata.Id,
-                            packageMetadata.Version.ToFullStringChecked(),
-                            config.Force ? " (forced)" : string.Empty,
-                            packageRemoteMetadata.IsApproved ? " [Approved]" : string.Empty,
-                            packageRemoteMetadata.PackageTestResultStatus == "Failing" && packageRemoteMetadata.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : packageRemoteMetadata.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
-                        ));
+                        var refusalReason = GetInstallRefusalReason(config, packageMetadata, pathResolver);
+                        if (!string.IsNullOrWhiteSpace(refusalReason))
+                        {
+                            // The files are extracted but no scripts have run yet, so a refusal
+                            // removes what was just laid down and leaves nothing behind.
+                            this.Log().Error(ChocolateyLoggers.Important, refusalReason);
+
+                            nugetProject.DeletePackage(packageDependencyInfo, projectContext, CancellationToken.None, shouldDeleteDirectory: false).GetAwaiter().GetResult();
+                            RemoveRefusedPackageFiles(config, installedPath);
+                            RemovePackageFromCache(config, packageMetadata);
+
+                            var refusedResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe()));
+                            refusedResult.Messages.Add(new ResultMessage(ResultType.Error, refusalReason));
+                            if (refusedResult.ExitCode == 0)
+                            {
+                                refusedResult.ExitCode = 1;
+                            }
+
+                            if (config.Features.StopOnFirstPackageFailure)
+                            {
+                                throw new ApplicationException("Stopping further execution as {0} has failed install.".FormatWith(packageDependencyInfo.Id));
+                            }
+
+                            continue;
+                        }
 
                         var packageResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe()));
                         if (shouldAddForcedResultMessage)
@@ -1019,6 +1063,19 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
 
                         packageResult.InstallLocation = installedPath;
+                        OnPackageExtracted(config, packageResult, pathResolver, packageDependencyInfo);
+
+                        // Logged after OnPackageExtracted so an extension's annotations are
+                        // available to GetPackageDisplayName.
+                        this.Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".FormatWith(
+                            System.Environment.NewLine,
+                            GetPackageDisplayName(packageResult),
+                            packageMetadata.Version.ToFullStringChecked(),
+                            config.Force ? " (forced)" : string.Empty,
+                            packageRemoteMetadata.IsApproved ? " [Approved]" : string.Empty,
+                            packageRemoteMetadata.PackageTestResultStatus == "Failing" && packageRemoteMetadata.IsDownloadCacheAvailable ? " - Likely broken for FOSS users (due to download location changes)" : packageRemoteMetadata.PackageTestResultStatus == "Failing" ? " - Possibly broken" : string.Empty
+                        ));
+
                         packageResult.Messages.Add(new ResultMessage(ResultType.Debug, ApplicationParameters.Messages.ContinueChocolateyAction));
 
                         var elementsList = _ruleService.ValidateRules(manifestPath)
@@ -1083,6 +1140,131 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
             config.RevertChanges(removeBackup: true);
 
             return packageResultsToReturn;
+        }
+
+        /// <summary>
+        ///   Returns the path resolver used to lay packages down during an install.
+        ///   The default resolves under <c>lib\&lt;id&gt;</c>. Extensions override it to
+        ///   route an install elsewhere (for example a licensed package-instance tree).
+        /// </summary>
+        /// <param name="config">The install configuration.</param>
+        protected virtual ChocolateyPackagePathResolver GetInstallPathResolver(ChocolateyConfiguration config)
+        {
+            return NugetCommon.GetPathResolver(_fileSystem);
+        }
+
+        /// <summary>
+        ///   Returns the root folder the install project extracts packages into. It must
+        ///   agree with <see cref="GetInstallPathResolver"/>. The default is <c>lib</c>.
+        /// </summary>
+        /// <param name="config">The install configuration.</param>
+        protected virtual string GetInstallPackagesLocation(ChocolateyConfiguration config)
+        {
+            return ApplicationParameters.PackagesLocation;
+        }
+
+        /// <summary>
+        ///   Returns the dependencies of packages that are installed outside the <c>lib</c>
+        ///   folder, and that an install must not break (for example package instances).
+        ///   Each entry is one installed package, under an identity that is unique to it,
+        ///   with the dependency ranges it needs. They are added to the dependency resolution
+        ///   of an install, upgrade or uninstall as the packages under <c>lib</c> are, so one
+        ///   that would change or remove a dependency they need is refused, as it is for a
+        ///   package under <c>lib</c>. They are never installed or removed by it.
+        ///   The default is none.
+        /// </summary>
+        /// <param name="config">The install configuration.</param>
+        protected virtual IEnumerable<SourcePackageDependencyInfo> GetExternalInstalledDependencyInfos(ChocolateyConfiguration config)
+        {
+            return Enumerable.Empty<SourcePackageDependencyInfo>();
+        }
+
+        /// <summary>
+        ///   Called once per user-requested package, before its dependency closure is
+        ///   resolved, so an extension can point the shared <paramref name="pathResolver"/>
+        ///   at that package (for example by setting a parent id). The default does nothing.
+        /// </summary>
+        /// <param name="config">The install configuration.</param>
+        /// <param name="packageName">The id of the package about to be installed.</param>
+        /// <param name="pathResolver">The resolver shared across the whole install.</param>
+        protected virtual void PrepareInstallPathResolver(ChocolateyConfiguration config, string packageName, ChocolateyPackagePathResolver pathResolver)
+        {
+        }
+
+        /// <summary>
+        ///   Lets an extension refuse, or short-circuit, the install of a requested package
+        ///   before anything is resolved or downloaded, recording its own messages in
+        ///   <paramref name="packageResults"/>. Return <c>true</c> to skip the package.
+        ///   The default never skips.
+        /// </summary>
+        /// <param name="config">The install configuration.</param>
+        /// <param name="packageName">The id of the package about to be installed.</param>
+        /// <param name="installedPackage">The package already installed under <c>lib</c> with this id, or <c>null</c>.</param>
+        /// <param name="pathResolver">The resolver for this install.</param>
+        /// <param name="packageResults">The results collected so far.</param>
+        protected virtual bool ShouldSkipInstall(ChocolateyConfiguration config, string packageName, PackageResult installedPackage, ChocolateyPackagePathResolver pathResolver, ConcurrentDictionary<string, PackageResult> packageResults)
+        {
+            return false;
+        }
+
+        /// <summary>
+        ///   Called after a package (requested or dependency) has been extracted but before
+        ///   any of its scripts run. Return a non-empty reason to refuse it: the extracted
+        ///   files are removed again (see <see cref="RemoveRefusedPackageFiles"/>), the
+        ///   package is recorded as failed and, when configured, execution stops. The
+        ///   default never refuses.
+        /// </summary>
+        /// <param name="config">The install configuration.</param>
+        /// <param name="packageMetadata">The metadata of the package just extracted.</param>
+        /// <param name="pathResolver">The resolver for this install, which knows which package was requested.</param>
+        protected virtual string GetInstallRefusalReason(ChocolateyConfiguration config, ChocolateyPackageMetadata packageMetadata, ChocolateyPackagePathResolver pathResolver)
+        {
+            return null;
+        }
+
+        /// <summary>
+        ///   Removes the files of a package refused by <see cref="GetInstallRefusalReason"/>.
+        ///   The default deletes the install folder.
+        /// </summary>
+        /// <param name="config">The install configuration.</param>
+        /// <param name="installedPath">The folder the package was extracted to.</param>
+        protected virtual void RemoveRefusedPackageFiles(ChocolateyConfiguration config, string installedPath)
+        {
+            _fileSystem.DeleteDirectoryChecked(installedPath, recursive: true, overrideAttributes: true, isSilent: true);
+        }
+
+        /// <summary>
+        ///   Called once a package's files are in place and its <see cref="PackageResult"/>
+        ///   exists, before the continue action runs. Lets an extension annotate the result.
+        ///   The default does nothing.
+        /// </summary>
+        /// <param name="config">The install configuration.</param>
+        /// <param name="packageResult">The result for the extracted package.</param>
+        /// <param name="pathResolver">The resolver for this install.</param>
+        /// <param name="packageDependencyInfo">The resolved package that was extracted.</param>
+        protected virtual void OnPackageExtracted(ChocolateyConfiguration config, PackageResult packageResult, ChocolateyPackagePathResolver pathResolver, SourcePackageDependencyInfo packageDependencyInfo)
+        {
+        }
+
+        /// <summary>
+        ///   The name a package is shown under in install output. The default is the
+        ///   package id; extensions override it to tell apart results that share an id.
+        /// </summary>
+        /// <param name="packageResult">The result being reported.</param>
+        protected virtual string GetPackageDisplayName(PackageResult packageResult)
+        {
+            return packageResult.Name;
+        }
+
+        /// <summary>
+        ///   The error reported when an uninstall targets a package id that is not
+        ///   installed. Extensions override it to give a more specific explanation.
+        /// </summary>
+        /// <param name="config">The uninstall configuration.</param>
+        /// <param name="packageName">The id that was requested.</param>
+        protected virtual string GetPackageNotInstalledMessage(ChocolateyConfiguration config, string packageName)
+        {
+            return "{0} is not installed. Cannot uninstall a non-existent package.".FormatWith(packageName);
         }
 
         protected virtual string GetDependencyResolutionErrorMessage(NuGetResolverConstraintException exception)
@@ -1458,6 +1640,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         packagesToInstall.Add(availablePackage);
 
+                        var externalDependencyInfos = GetExternalInstalledDependencyInfos(config).OrEmpty().ToList();
+
                         var localPackagesDependencyInfos = allLocalPackages
                             .Where(p => !p.Name.Equals(availablePackage.Identity.Id, StringComparison.OrdinalIgnoreCase))
                             .Select(
@@ -1525,6 +1709,16 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         sourcePackageDependencyInfos.AddRange(localPackagesDependencyInfos);
 
+                        var targetIdsToInstall = packagesToInstall.Select(p => p.Identity.Id);
+
+                        // Packages installed outside lib constrain the resolution as the ones under lib do, but they are not
+                        // parents to upgrade along with it, and the resolver must never install or remove them. One whose
+                        // own dependencies are not installed is left out: asking for it would have the resolver install them.
+                        externalDependencyInfos = externalDependencyInfos
+                            .Where(e => e.Dependencies.All(d => allLocalPackages.Any(p => p.Name.IsEqualTo(d.Id)) || targetIdsToInstall.Contains(d.Id, StringComparer.OrdinalIgnoreCase)))
+                            .ToList();
+                        sourcePackageDependencyInfos.AddRange(externalDependencyInfos);
+
                         if (removedSources.Count > 0 && version == null)
                         {
                             RemoveInvalidDependenciesAndParents(availablePackage, removedSources, sourcePackageDependencyInfos, localPackagesDependencyInfos);
@@ -1532,11 +1726,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         var dependencyResolver = new PackageResolver();
 
-                        var targetIdsToInstall = packagesToInstall.Select(p => p.Identity.Id);
-
                         var allPackagesIdentities = Enumerable.Empty<PackageIdentity>();
 
-                        if (availablePackage.DependencySets.Any() || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
+                        if (availablePackage.DependencySets.Any()
+                            || localPackagesDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id))
+                            || externalDependencyInfos.Any(d => d.Dependencies.Any(dd => dd.Id == availablePackage.Identity.Id)))
                         {
                             allPackagesIdentities = allLocalPackages
                                 // We exclude any installed package that does have a dependency that is missing,
@@ -1545,6 +1739,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 .Where(p => IsDependentOnTargetPackages(p, targetIdsToInstall) || !HasMissingDependency(p, allLocalPackages))
                                 .Select(p => p.SearchMetadata.Identity)
                                 .Where(x => !targetIdsToInstall.Contains(x.Id, StringComparer.OrdinalIgnoreCase)).ToList();
+
+                            // The packages installed outside lib are required as well, so what they need is kept.
+                            allPackagesIdentities = allPackagesIdentities
+                                .Concat(externalDependencyInfos.Select(e => new PackageIdentity(e.Id, e.Version)))
+                                .ToList();
                         }
 
                         //var allPackagesIdentities = allLocalPackages.Select(p => p.SearchMetadata.Identity).ToList();
@@ -1592,6 +1791,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             try
                             {
                                 resolvedPackages = dependencyResolver.Resolve(resolverContext, CancellationToken.None)
+                                    // The packages installed outside lib were only there to constrain the resolution.
+                                    .Where(p => !externalDependencyInfos.Any(e => PackageIdentityComparer.Default.Equals(e, p)))
                                     .Select(p => sourcePackageDependencyInfos.SingleOrDefault(x => PackageIdentityComparer.Default.Equals(x, p)));
 
                                 if (!config.ForceDependencies)
@@ -1642,6 +1843,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     );
 
                                     resolvedPackages = dependencyResolver.Resolve(resolverContext, CancellationToken.None)
+                                        // The packages installed outside lib were only there to constrain the resolution.
+                                        .Where(p => !externalDependencyInfos.Any(e => PackageIdentityComparer.Default.Equals(e, p)))
                                         .Select(p => sourcePackageDependencyInfos.SingleOrDefault(x => PackageIdentityComparer.Default.Equals(x, p)));
 
                                     if (!config.ForceDependencies)
@@ -2496,7 +2699,7 @@ and argument details.
             }
         }
 
-        private void RemovePackageFromCache(ChocolateyConfiguration config, IPackageMetadata installedPackage)
+        protected void RemovePackageFromCache(ChocolateyConfiguration config, IPackageMetadata installedPackage)
         {
             this.Log().Debug(ChocolateyLoggers.Verbose, "Ensuring removal of package cache files.");
             var cacheDirectory = _fileSystem.CombinePaths(config.CacheLocation, installedPackage.Id, installedPackage.Version.ToNormalizedStringChecked());
@@ -2669,7 +2872,7 @@ and argument details.
 
                 if (installedPackageVersions.Count == 0)
                 {
-                    var logMessage = "{0} is not installed. Cannot uninstall a non-existent package.".FormatWith(packageName);
+                    var logMessage = GetPackageNotInstalledMessage(config, packageName);
                     var missingResult = packageResultsToReturn.GetOrAdd(packageName, new PackageResult(packageName, null, null));
                     missingResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
 
@@ -2766,7 +2969,11 @@ and argument details.
 
                 if (performAction)
                 {
-                    var allPackagesIdentities = allLocalPackages.Where(p => !p.Identity.Equals(installedPackage)).Select(p => p.SearchMetadata.Identity).ToList();
+                    // The packages installed outside lib need what they depend on, so it is not removed from under them.
+                    var externalDependencyInfos = GetExternalInstalledDependencyInfos(config).OrEmpty().ToList();
+                    var allPackagesIdentities = allLocalPackages.Where(p => !p.Identity.Equals(installedPackage)).Select(p => p.SearchMetadata.Identity)
+                        .Concat(externalDependencyInfos.Select(e => new PackageIdentity(e.Id, e.Version)))
+                        .ToList();
                     localPackagesDependencyInfos.AddRange(allLocalPackages
                         .Select(
                             p => new SourcePackageDependencyInfo(
@@ -2775,7 +2982,8 @@ and argument details.
                                 true,
                                 localRepositorySource,
                                 null,
-                                null)));
+                                null))
+                        .Concat(externalDependencyInfos));
                     var uninstallationContext = new UninstallationContext(removeDependencies: config.ForceDependencies, forceRemove: config.Force, warnDependencyResolvingFailure: true);
 
                     ICollection<PackageIdentity> resolvedPackages = null;
@@ -3183,7 +3391,7 @@ and argument details.
             }
         }
 
-        public IEnumerable<PackageResult> GetInstalledPackages(ChocolateyConfiguration config)
+        public virtual IEnumerable<PackageResult> GetInstalledPackages(ChocolateyConfiguration config)
         {
             //todo: #2579 move to deep copy for get all installed
             //var listConfig = config.deep_copy();
@@ -3315,7 +3523,7 @@ and argument details.
             }
         }
 
-        private void ValidatePackageHash(ChocolateyConfiguration config, SourcePackageDependencyInfo packageDependencyInfo, DownloadResourceResult downloadResult)
+        protected void ValidatePackageHash(ChocolateyConfiguration config, SourcePackageDependencyInfo packageDependencyInfo, DownloadResourceResult downloadResult)
         {
             if (!config.Features.UsePackageHashValidation)
             {

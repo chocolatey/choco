@@ -455,8 +455,8 @@ Did you know Pro / Business automatically syncs with Programs and
             MarkPackagePending(packageResult, config);
 
             this.Log().Info(packageResult.ExitCode == 0
-                ? "{0} package files {1} completed. Performing other installation steps.".FormatWith(packageResult.Name, commandName.ToStringSafe())
-                : "{0} package files {1} failed with exit code {2}. Performing other installation steps.".FormatWith(packageResult.Name, commandName.ToStringSafe(), packageResult.ExitCode));
+                ? "{0} package files {1} completed. Performing other installation steps.".FormatWith(GetPackageDisplayName(packageResult), commandName.ToStringSafe())
+                : "{0} package files {1} failed with exit code {2}. Performing other installation steps.".FormatWith(GetPackageDisplayName(packageResult), commandName.ToStringSafe(), packageResult.ExitCode));
 
             var pkgInfo = GetPackageInformation(packageResult, config);
 
@@ -490,11 +490,11 @@ Did you know Pro / Business automatically syncs with Programs and
                         if (key != null && key.HasQuietUninstall)
                         {
                             pkgInfo.HasSilentUninstall = true;
-                            this.Log().Info("  {0} can be automatically uninstalled.".FormatWith(packageResult.Name));
+                            this.Log().Info("  {0} can be automatically uninstalled.".FormatWith(GetPackageDisplayName(packageResult)));
                         }
                         else if (key != null)
                         {
-                            this.Log().Info("  {0} may be able to be automatically uninstalled.".FormatWith(packageResult.Name));
+                            this.Log().Info("  {0} may be able to be automatically uninstalled.".FormatWith(GetPackageDisplayName(packageResult)));
                         }
                     }
 
@@ -514,7 +514,7 @@ Did you know Pro / Business automatically syncs with Programs and
 
                 if (packageResult.Success)
                 {
-                    _shimgenService.Install(config, packageResult);
+                    InstallShims(config, packageResult);
                 }
             }
             else
@@ -579,7 +579,7 @@ Did you know Pro / Business automatically syncs with Programs and
                 {
                     Environment.ExitCode = ApplicationParameters.ExitCodes.ErrorInstallSuspend;
                     this.Log().Warn(ChocolateyLoggers.Important, @"Chocolatey has detected a pending reboot after installing/upgrading
-package '{0}' - stopping further execution".FormatWith(packageResult.Name));
+package '{0}' - stopping further execution".FormatWith(GetPackageDisplayName(packageResult)));
 
                     throw new ApplicationException("Reboot required before continuing. Reboot and run the same command again.");
                 }
@@ -587,12 +587,12 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
             if (!packageResult.Success)
             {
-                this.Log().Error(ChocolateyLoggers.Important, "The {0} of {1} was NOT successful.".FormatWith(commandName.ToStringSafe(), packageResult.Name));
+                this.Log().Error(ChocolateyLoggers.Important, "The {0} of {1} was NOT successful.".FormatWith(commandName.ToStringSafe(), GetPackageDisplayName(packageResult)));
                 HandleFailedOperation(config, packageResult, movePackageToFailureLocation: true, attemptRollback: true);
 
                 if (config.Features.StopOnFirstPackageFailure)
                 {
-                    throw new ApplicationException("Stopping further execution as {0} has failed {1}.".FormatWith(packageResult.Name, commandName.ToStringSafe()));
+                    throw new ApplicationException("Stopping further execution as {0} has failed {1}.".FormatWith(GetPackageDisplayName(packageResult), commandName.ToStringSafe()));
                 }
 
                 return;
@@ -600,7 +600,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
             RemoveBackupIfExists(packageResult);
 
-            this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".FormatWith(commandName.ToStringSafe(), packageResult.Name));
+            this.Log().Info(ChocolateyLoggers.Important, " The {0} of {1} was successful.".FormatWith(commandName.ToStringSafe(), GetPackageDisplayName(packageResult)));
 
             var installerDetected = Environment.GetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyInstallerType);
             if (!string.IsNullOrWhiteSpace(pkgInfo.DeploymentLocation))
@@ -648,6 +648,75 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
         protected virtual void UpdatePackageInformation(ChocolateyPackageInformation pkgInfo)
         {
             _packageInfoService.Save(pkgInfo);
+        }
+
+        /// <summary>
+        ///   Creates the shims for a successfully installed package. The default delegates
+        ///   to the shim generation service; extensions override it to skip or alter shimming.
+        /// </summary>
+        /// <param name="config">The install configuration.</param>
+        /// <param name="packageResult">The installed package.</param>
+        protected virtual void InstallShims(ChocolateyConfiguration config, PackageResult packageResult)
+        {
+            _shimgenService.Install(config, packageResult);
+        }
+
+        /// <summary>
+        ///   Removes the shims of a package being uninstalled. The default delegates to the
+        ///   shim generation service.
+        /// </summary>
+        /// <param name="config">The uninstall configuration.</param>
+        /// <param name="packageResult">The package being uninstalled.</param>
+        protected virtual void UninstallShims(ChocolateyConfiguration config, PackageResult packageResult)
+        {
+            _shimgenService.Uninstall(config, packageResult);
+        }
+
+        /// <summary>
+        ///   Removes the stored package information of an uninstalled package. The default
+        ///   removes the default store for the package; extensions override it when the
+        ///   information lives elsewhere.
+        /// </summary>
+        /// <param name="config">The uninstall configuration.</param>
+        /// <param name="packageResult">The package that was uninstalled.</param>
+        protected virtual void RemovePackageInformation(ChocolateyConfiguration config, PackageResult packageResult)
+        {
+            _packageInfoService.Remove(packageResult.PackageMetadata);
+        }
+
+        /// <summary>
+        ///   The name a package is shown under in per-package and summary output. The
+        ///   default is the package id; extensions override it to tell apart results that
+        ///   share an id.
+        /// </summary>
+        /// <param name="packageResult">The result being reported.</param>
+        protected virtual string GetPackageDisplayName(PackageResult packageResult)
+        {
+            return packageResult.Name;
+        }
+
+        /// <summary>
+        ///   The key under which an install result is collected into the overall install
+        ///   summary. The default keeps the key the source runner used; extensions override
+        ///   it to keep apart results that would otherwise collide.
+        /// </summary>
+        /// <param name="key">The key the source runner returned the result under.</param>
+        /// <param name="result">The result being collected.</param>
+        /// <param name="packageInstalls">The results collected so far.</param>
+        protected virtual string GetInstallResultKey(string key, PackageResult result, ConcurrentDictionary<string, PackageResult> packageInstalls)
+        {
+            return key;
+        }
+
+        /// <summary>
+        ///   Applies any additional per-package settings from a packages.config entry to
+        ///   the configuration built for it, after the standard settings have been mapped.
+        ///   The default does nothing.
+        /// </summary>
+        /// <param name="packageConfig">The configuration for this packages.config entry.</param>
+        /// <param name="pkgSettings">The packages.config entry.</param>
+        protected virtual void ApplyAdditionalPackagesConfigSettings(ChocolateyConfiguration packageConfig, PackagesConfigFilePackageSetting pkgSettings)
+        {
         }
 
         private string CaptureArguments(ChocolateyConfiguration config)
@@ -806,7 +875,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
 
                     foreach (var result in results)
                     {
-                        packageInstalls.GetOrAdd(result.Key, result.Value);
+                        packageInstalls.GetOrAdd(GetInstallResultKey(result.Key, result.Value, packageInstalls), result.Value);
                     }
                 }
             }
@@ -1085,6 +1154,8 @@ Would have determined packages that are out of date based on what is
                     {
                         packageConfig.Features.ShowDownloadProgress = false;
                     }
+
+                    ApplyAdditionalPackagesConfigSettings(packageConfig, pkgSettings);
 
                     this.Log().Info(ChocolateyLoggers.Important, @"{0}".FormatWith(packageConfig.PackageNames));
                     packageConfigs.Add(packageConfig);
@@ -1457,7 +1528,7 @@ If a package is failing because it is a dependency of another package
                 this.Log().Warn("{0}{1}:".FormatWith(actionName.Substring(0, 1).ToUpper(), actionName.Substring(1)));
                 foreach (var packageResult in successes.OrEmpty())
                 {
-                    this.Log().Info(" - {0} v{1}".FormatWith(packageResult.Value.Name, packageResult.Value.Version));
+                    this.Log().Info(" - {0} v{1}".FormatWith(GetPackageDisplayName(packageResult.Value), packageResult.Value.Version));
                 }
             }
 
@@ -1468,7 +1539,7 @@ If a package is failing because it is a dependency of another package
                 foreach (var warning in packageResults.Where(p => p.Value.Warning).OrderBy(p => p.Value.Name).OrEmpty())
                 {
                     var warningMessage = warning.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Warn);
-                    this.Log().Warn(" - {0}{1}".FormatWith(warning.Value.Name, warningMessage != null ? " - {0}".FormatWith(warningMessage.Message) : string.Empty));
+                    this.Log().Warn(" - {0}{1}".FormatWith(GetPackageDisplayName(warning.Value), warningMessage != null ? " - {0}".FormatWith(warningMessage.Message) : string.Empty));
                 }
             }
 
@@ -1478,7 +1549,7 @@ If a package is failing because it is a dependency of another package
                 this.Log().Warn("Packages requiring reboot:");
                 foreach (var reboot in packageResults.Where(p => new[] { 1641, 3010 }.Contains(p.Value.ExitCode)).OrderBy(p => p.Value.Name).OrEmpty())
                 {
-                    this.Log().Warn(" - {0}{1}".FormatWith(reboot.Value.Name, reboot.Value.ExitCode != 0 ? " (exit code {0})".FormatWith(reboot.Value.ExitCode) : string.Empty));
+                    this.Log().Warn(" - {0}{1}".FormatWith(GetPackageDisplayName(reboot.Value), reboot.Value.ExitCode != 0 ? " (exit code {0})".FormatWith(reboot.Value.ExitCode) : string.Empty));
                 }
                 this.Log().Warn(ChocolateyLoggers.Important, @"
 The recent package changes indicate a reboot is necessary.
@@ -1494,7 +1565,7 @@ The recent package changes indicate a reboot is necessary.
                     var errorMessage = failure.Value.Messages.FirstOrDefault(m => m.MessageType == ResultType.Error);
                     this.Log().Error(
                         " - {0}{1}{2}".FormatWith(
-                            failure.Value.Name,
+                            GetPackageDisplayName(failure.Value),
                             failure.Value.ExitCode != 0 ? " (exited {0})".FormatWith(failure.Value.ExitCode) : string.Empty,
                             errorMessage != null ? " - {0}".FormatWith(errorMessage.Message) : string.Empty
                             ));
@@ -1509,7 +1580,7 @@ The recent package changes indicate a reboot is necessary.
             //These items only apply to windows systems.
             if (config.Information.PlatformType == PlatformType.Windows)
             {
-                _shimgenService.Uninstall(config, packageResult);
+                UninstallShims(config, packageResult);
 
                 if (!config.SkipPackageInstallProvider)
                 {
@@ -1538,7 +1609,7 @@ The recent package changes indicate a reboot is necessary.
             {
                 var oldPrompt = config.PromptForConfirmation;
 
-                this.Log().Error(ChocolateyLoggers.Important, "{0} {1} not successful.".FormatWith(packageResult.Name, "uninstall"));
+                this.Log().Error(ChocolateyLoggers.Important, "{0} {1} not successful.".FormatWith(GetPackageDisplayName(packageResult), "uninstall"));
                 HandleFailedOperation(config, packageResult, movePackageToFailureLocation: true, attemptRollback: true);
             }
 
@@ -1548,7 +1619,7 @@ The recent package changes indicate a reboot is necessary.
                 {
                     Environment.ExitCode = ApplicationParameters.ExitCodes.ErrorInstallSuspend;
                     this.Log().Warn(ChocolateyLoggers.Important, @"Chocolatey has detected a pending reboot after uninstalling
-package '{0}' - stopping further execution".FormatWith(packageResult.Name));
+package '{0}' - stopping further execution".FormatWith(GetPackageDisplayName(packageResult)));
 
                     throw new ApplicationException("Reboot required before continuing. Reboot and run the same command again.");
                 }
@@ -1557,7 +1628,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             if (!packageResult.Success)
             {
                 // throw an error so that NuGet Service doesn't attempt to continue with package removal
-                throw new ApplicationException("{0} {1} not successful.".FormatWith(packageResult.Name, "uninstall"));
+                throw new ApplicationException("{0} {1} not successful.".FormatWith(GetPackageDisplayName(packageResult), "uninstall"));
             }
         }
 
@@ -1565,7 +1636,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
         {
             if (config.Features.RemovePackageInformationOnUninstall)
             {
-                _packageInfoService.Remove(packageResult.PackageMetadata);
+                RemovePackageInformation(config, packageResult);
             }
 
             EnsureBadPackagesPathIsClean(packageResult);
@@ -1751,7 +1822,7 @@ package '{0}' - stopping further execution".FormatWith(packageResult.Name));
             }
         }
 
-        private void EnsureBadPackagesPathIsClean(PackageResult packageResult)
+        protected virtual void EnsureBadPackagesPathIsClean(PackageResult packageResult)
         {
             if (packageResult.InstallLocation == null)
             {
@@ -1817,7 +1888,7 @@ ATTENTION: You must take manual action to remove {1} from
             return alternativeSourceRunners.Any(s => s.SourceType == sourceType || s.SourceType == sourceType + "s");
         }
 
-        private void MovePackageToFailedPackagesLocation(PackageResult packageResult)
+        protected virtual void MovePackageToFailedPackagesLocation(PackageResult packageResult)
         {
             _fileSystem.EnsureDirectoryExists(ApplicationParameters.PackageFailuresLocation);
 

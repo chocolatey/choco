@@ -671,6 +671,7 @@ namespace chocolatey
         public static class OptionDescriptions
         {
             public const string IncludeHeaders = "Include header names when --limit-output is used. Requires Chocolatey CLI 2.5.0+";
+            public const string IncludeInstances = "Include package instances in the command output. Hidden by default so existing output is unchanged.";
             public const string IgnoreHttpCache = "Ignore any HTTP caches that have previously been created when querying sources, and create new caches. Available in 2.1.0+";
         }
 
@@ -682,6 +683,7 @@ namespace chocolatey
         public static class Options
         {
             public const string IncludeHeaders = "include-headers";
+            public const string IncludeInstances = "include-instances";
             public const string IgnoreHttpCache = "ignore-http-cache";
         }
     }

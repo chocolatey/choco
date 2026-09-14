@@ -27,6 +27,7 @@ using chocolatey.infrastructure.filesystem;
 using chocolatey.infrastructure.commands;
 using chocolatey.infrastructure.logging;
 using chocolatey.infrastructure.app.services;
+using chocolatey.infrastructure.results;
 using chocolatey.infrastructure.tolerance;
 
 namespace chocolatey.infrastructure.app.commands
@@ -43,7 +44,7 @@ namespace chocolatey.infrastructure.app.commands
             _fileSystem = fileSystem;
         }
 
-        public void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
+        public virtual void ConfigureArgumentParser(OptionSet optionSet, ChocolateyConfiguration configuration)
         {
             optionSet
                 .Add("o=|output-file-path=",
@@ -55,7 +56,7 @@ namespace chocolatey.infrastructure.app.commands
                 ;
         }
 
-        public void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
+        public virtual void ParseAdditionalArguments(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
         {
             configuration.Input = string.Join(" ", unparsedArguments);
 
@@ -71,12 +72,12 @@ namespace chocolatey.infrastructure.app.commands
             }
         }
 
-        public void Validate(ChocolateyConfiguration configuration)
+        public virtual void Validate(ChocolateyConfiguration configuration)
         {
             // Currently, no additional validation is required.
         }
 
-        public void HelpMessage(ChocolateyConfiguration configuration)
+        public virtual void HelpMessage(ChocolateyConfiguration configuration)
         {
             this.Log().Info(ChocolateyLoggers.Important, "Export Command");
             this.Log().Info(@"
@@ -129,14 +130,14 @@ If you find other exit codes that we have not yet documented, please
             return false;
         }
 
-        public void DryRun(ChocolateyConfiguration configuration)
+        public virtual void DryRun(ChocolateyConfiguration configuration)
         {
             this.Log().Info("Export would have been with options: {0} Output File Path={1}{0} Include Version Numbers:{2}".FormatWith(Environment.NewLine, configuration.ExportCommand.OutputFilePath, configuration.ExportCommand.IncludeVersionNumbers));
         }
 
-        public void Run(ChocolateyConfiguration configuration)
+        public virtual void Run(ChocolateyConfiguration configuration)
         {
-            var packageResults = _nugetService.GetInstalledPackages(configuration);
+            var packageResults = GetPackagesToExport(configuration);
             var settings = new XmlWriterSettings { Indent = true, Encoding = new UTF8Encoding(false) };
 
             FaultTolerance.TryCatchWithLoggingException(
@@ -153,6 +154,7 @@ If you find other exit codes that we have not yet documented, please
                             {
                                 xw.WriteStartElement("package");
                                 xw.WriteAttributeString("id", packageResult.PackageMetadata.Id);
+                                WriteAdditionalPackageAttributes(xw, packageResult, configuration);
 
                                 if (configuration.ExportCommand.IncludeVersionNumbers)
                                 {
@@ -193,6 +195,28 @@ If you find other exit codes that we have not yet documented, please
                 errorMessage: "Error exporting currently installed packages",
                 throwError: true
             );
+        }
+
+        /// <summary>
+        ///   The packages written to the export file. The default is every package
+        ///   installed under <c>lib</c>; extensions override it to include packages that
+        ///   live elsewhere.
+        /// </summary>
+        /// <param name="configuration">The export configuration.</param>
+        protected virtual IEnumerable<PackageResult> GetPackagesToExport(ChocolateyConfiguration configuration)
+        {
+            return _nugetService.GetInstalledPackages(configuration);
+        }
+
+        /// <summary>
+        ///   Writes any additional attributes for a <c>&lt;package&gt;</c> element, after
+        ///   its id. The default writes nothing.
+        /// </summary>
+        /// <param name="writer">The writer positioned inside the package element.</param>
+        /// <param name="packageResult">The package being written.</param>
+        /// <param name="configuration">The export configuration.</param>
+        protected virtual void WriteAdditionalPackageAttributes(XmlWriter writer, PackageResult packageResult, ChocolateyConfiguration configuration)
+        {
         }
 
 #pragma warning disable IDE0022, IDE1006
