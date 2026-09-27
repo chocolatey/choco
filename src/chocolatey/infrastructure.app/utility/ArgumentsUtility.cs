@@ -291,11 +291,5 @@ namespace chocolatey.infrastructure.app.utility
 
             return value[index] == characterToTest;
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static bool arguments_contain_sensitive_information(string commandArguments)
-            => SensitiveArgumentsProvided(commandArguments);
-#pragma warning restore IDE0022, IDE1006
     }
 }

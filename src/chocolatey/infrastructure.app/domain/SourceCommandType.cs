@@ -26,20 +26,5 @@ namespace chocolatey.infrastructure.app.domain
         Remove,
         Enable,
         Disable,
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        unknown = Unknown,
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        list = List,
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        add = Add,
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        remove = Remove,
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        enable = Enable,
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        disable = Disable,
-#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -21,7 +21,7 @@ namespace chocolatey.infrastructure.app.domain
     /// <summary>
     /// This class contains the default source types that are implemented in
     /// the Chocolatey CLI codebase. This is replacing the enumeration previously
-    /// available through <see cref="SourceType" />.
+    /// available through <c>SourceType</c>.
     /// </summary>
     public static class SourceTypes
     {
@@ -59,20 +59,5 @@ namespace chocolatey.infrastructure.app.domain
         /// alternative source runner.
         /// </summary>
         public const string WindowsFeatures = "windowsfeatures";
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public const string CYGWIN = Cygwin;
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public const string NORMAL = Normal;
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public const string PYTHON = Python;
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public const string RUBY = Ruby;
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public const string WINDOWS_FEATURE = WindowsFeature;
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public const string WINDOWS_FEATURES = WindowsFeatures;
-#pragma warning restore IDE0022, IDE1006
     }
 }

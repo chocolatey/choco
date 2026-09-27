@@ -50,19 +50,5 @@ namespace chocolatey.infrastructure.cryptography
         /// <param name="buffer">The byte array.</param>
         /// <returns>A computed hash of the array, based on the contents.</returns>
         string ComputeByteArrayHash(byte[] buffer);
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void set_hash_algorithm(CryptoHashProviderType algorithmType);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        string hash_file(string filePath);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        string hash_stream(Stream inputStream);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        string hash_byte_array(byte[] buffer);
-#pragma warning restore IDE0022, IDE1006
     }
 }

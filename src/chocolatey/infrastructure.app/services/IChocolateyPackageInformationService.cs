@@ -25,14 +25,5 @@ namespace chocolatey.infrastructure.app.services
         ChocolateyPackageInformation Get(IPackageMetadata package);
         void Save(ChocolateyPackageInformation packageInformation);
         void Remove(IPackageMetadata package);
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        ChocolateyPackageInformation get_package_information(IPackageMetadata package);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void save_package_information(ChocolateyPackageInformation packageInformation);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void remove_package_information(IPackageMetadata package);
-#pragma warning restore IDE0022, IDE1006
     }
 }

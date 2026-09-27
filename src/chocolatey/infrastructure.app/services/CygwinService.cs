@@ -294,32 +294,5 @@ namespace chocolatey.infrastructure.app.services
 
             return string.Empty;
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public const string CYGWIN_PACKAGE = CygwinPackage;
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public const string PACKAGE_NAME_GROUP = PackageNameGroup;
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static readonly Regex PackageNameRegex = _packageNameRegex;
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction)
-            => EnsureSourceAppInstalled(config, ensureAction);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
-            => InstallDryRun(config, continueAction);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction)
-            => Install(config, continueAction);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction)
-            => Install(config, continueAction, beforeModifyAction);
-#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -65,11 +65,5 @@ namespace chocolatey
 
             return result.Distinct();
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        internal static IEnumerable<IAssembly> get_extension_assemblies(this IFileSystem fileSystem)
-            => GetExtensionAssemblies(fileSystem);
-#pragma warning restore IDE0022, IDE1006
     }
 }

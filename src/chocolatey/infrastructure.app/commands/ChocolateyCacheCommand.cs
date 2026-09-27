@@ -266,51 +266,5 @@ However, the System HTTP Cache will only be considered if running in an elevated
             this.Log().Info("We found {0} cached sources.", cachedDirectories.Count());
             this.Log().Info("We found {0} cached items for all sources, where {1} items have expired.", cachedFiles.Count(), expiredFiles.Count());
         }
-
-        #region Obsoleted methods
-
-        [Obsolete("Will be removed in v3. Use ConfigureArgumentParser instead!")]
-        public void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
-        {
-            ConfigureArgumentParser(optionSet, configuration);
-        }
-
-        [Obsolete("Will be removed in v3. Use ParseAdditionalArguments instead!")]
-        public void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
-        {
-            ParseAdditionalArguments(unparsedArguments, configuration);
-        }
-
-        [Obsolete("Will be removed in v3. Use Validate instead!")]
-        public void handle_validation(ChocolateyConfiguration configuration)
-        {
-            Validate(configuration);
-        }
-
-        [Obsolete("Will be removed in v3. Use HelpMessage instead!")]
-        public void help_message(ChocolateyConfiguration configuration)
-        {
-            HelpMessage(configuration);
-        }
-
-        [Obsolete("Will be removed in v3. Use MayRequireAdminAccess instead!")]
-        public bool may_require_admin_access()
-        {
-            return MayRequireAdminAccess();
-        }
-
-        [Obsolete("Will be removed in v3. Use DryRun instead!")]
-        public void noop(ChocolateyConfiguration configuration)
-        {
-            DryRun(configuration);
-        }
-
-        [Obsolete("Will be removed in v3. Use Run instead!")]
-        public void run(ChocolateyConfiguration config)
-        {
-            Run(config);
-        }
-
-        #endregion Obsoleted methods
     }
 }

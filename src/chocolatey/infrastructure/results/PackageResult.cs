@@ -65,8 +65,6 @@ namespace chocolatey.infrastructure.results
         /// Sources available during package installation.
         /// </summary>
         public string Source { get; set; }
-        [Obsolete("This property is deprecated and will be removed in v3.")]
-        public string SourceUri { get; set; }
         /// <summary>
         /// The package source used to install the package.
         /// </summary>
@@ -139,10 +137,6 @@ namespace chocolatey.infrastructure.results
             }
             */
         }
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null)
-            : this(packageMetadata, packageSearch, installLocation, source, null) {  }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageResult"/> class.

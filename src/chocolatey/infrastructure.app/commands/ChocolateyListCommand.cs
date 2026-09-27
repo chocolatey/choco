@@ -33,47 +33,6 @@ namespace chocolatey.infrastructure.app.commands
     {
         private readonly IChocolateyPackageService _packageService;
 
-        [Obsolete("Remove unsupported argument in V3!")]
-        private readonly string[] _unsupportedArguments = new[]
-        {
-            "-l",
-            "-lo",
-            "--lo",
-            "-local",
-            "--local",
-            "-localonly",
-            "--localonly",
-            "-local-only",
-            "--local-only",
-            "-a",
-            "-all",
-            "--all",
-            "-allversions",
-            "--allversions",
-            "-all-versions",
-            "--all-versions",
-            "-order-by-popularity",
-            "--order-by-popularity"
-        };
-
-        /// <summary>
-        /// These options have been chosen since these are the examples that were listed on docs.chocolatey.org
-        /// - choco list -li
-        /// - choco list -lai
-        /// </summary>
-        [Obsolete("Remove unsupported argument in V3!")]
-        private readonly string[] _unsupportedIncludeRegistryProgramsArguments = new[]
-        {
-            "-li",
-            "-il",
-            "-lai",
-            "-lia",
-            "-ali",
-            "-ail",
-            "-ial",
-            "-ila"
-        };
-
         public ChocolateyListCommand(IChocolateyPackageService packageService)
         {
             _packageService = packageService ?? throw new ArgumentNullException(nameof(packageService));
@@ -87,7 +46,6 @@ namespace chocolatey.infrastructure.app.commands
                      option =>
                      {
                          configuration.Sources = configuration.ExplicitSources = option.UnquoteSafe();
-                         configuration.ListCommand.ExplicitSource = true;
                      })
                 .Add("idonly|id-only",
                      "Id Only - Only return Package Ids in the list results.",
@@ -155,27 +113,7 @@ namespace chocolatey.infrastructure.app.commands
 
             foreach (var argument in unparsedArguments)
             {
-                var isUnsupportedArgument = _unsupportedArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
-                var isUnsupportedRegistryProgramsArgument = _unsupportedIncludeRegistryProgramsArguments.Contains(argument, StringComparer.OrdinalIgnoreCase);
-
-                if (isUnsupportedArgument || isUnsupportedRegistryProgramsArgument)
-                {
-                    if (configuration.RegularOutput)
-                    {
-                        throw new ApplicationException("Invalid argument {0}. This argument has been removed from the list command and cannot be used.".FormatWith(argument));
-                    }
-
-                    if (isUnsupportedRegistryProgramsArgument)
-                    {
-                        configuration.ListCommand.IncludeRegistryPrograms = true;
-                    }
-
-                    this.Log().Warn(ChocolateyLoggers.LogFileOnly, "Ignoring the argument {0}. This argument is unsupported for locally installed packages.", argument);
-                }
-                else
-                {
-                    argumentsWithoutLocalOnly.Add(argument);
-                }
+                argumentsWithoutLocalOnly.Add(argument);
             }
 
             configuration.Input = string.Join(" ", argumentsWithoutLocalOnly);
@@ -272,43 +210,5 @@ If you find other exit codes that we have not yet documented, please
                 Environment.ExitCode = 2;
             }
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
-            => ConfigureArgumentParser(optionSet, configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
-            => ParseAdditionalArguments(unparsedArguments, configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
-            => Validate(configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void help_message(ChocolateyConfiguration configuration)
-            => HelpMessage(configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void noop(ChocolateyConfiguration configuration)
-            => DryRun(configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void run(ChocolateyConfiguration configuration)
-            => Run(configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual bool may_require_admin_access()
-            => MayRequireAdminAccess();
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual int count(ChocolateyConfiguration config)
-            => Count(config);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual IEnumerable<PackageResult> list(ChocolateyConfiguration config)
-            => List(config);
-#pragma warning restore IDE0022, IDE1006
     }
 }

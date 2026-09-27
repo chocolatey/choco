@@ -132,11 +132,5 @@ namespace chocolatey.infrastructure.logging
             // SystemStringFormat is used to evaluate the message as late as possible. A filter may discard this message.
             _logger.Logger.Log(_declaringType, level, message.FormatWith(formatting), null);
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public string decorate_message_with_audit_information(string message)
-            => DecorateMessageWithAuditInformation(message);
-#pragma warning restore IDE0022, IDE1006
     }
 }

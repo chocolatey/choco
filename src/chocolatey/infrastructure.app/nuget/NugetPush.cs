@@ -28,12 +28,6 @@ namespace chocolatey.infrastructure.app.nuget
 {
     public class NugetPush
     {
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static void PushPackage(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName, IFileSystem filesystem)
-        {
-            PushPackage(config, nupkgFilePath, nugetLogger, nupkgFileName, filesystem, cacheContext: null);
-        }
-
         public static void PushPackage(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName, IFileSystem filesystem, ChocolateySourceCacheContext cacheContext)
         {
             var timeout = TimeSpan.FromSeconds(Math.Abs(config.CommandExecutionTimeoutSeconds));
@@ -90,11 +84,5 @@ namespace chocolatey.infrastructure.app.nuget
 
             "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "{0} was pushed successfully to {1}".FormatWith(nupkgFileName, config.Sources));
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static void push_package(ChocolateyConfiguration config, string nupkgFilePath, ILogger nugetLogger, string nupkgFileName, IFileSystem filesystem)
-            => PushPackage(config, nupkgFilePath, nugetLogger, nupkgFileName, filesystem);
-#pragma warning restore IDE0022, IDE1006
     }
 }

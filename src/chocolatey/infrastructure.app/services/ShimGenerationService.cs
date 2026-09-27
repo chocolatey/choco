@@ -158,15 +158,5 @@ namespace chocolatey.infrastructure.app.services
                 _fileSystem.DeleteFile(shimLocation);
             }
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void install(ChocolateyConfiguration configuration, PackageResult packageResult)
-            => Install(configuration, packageResult);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void uninstall(ChocolateyConfiguration configuration, PackageResult packageResult)
-            => Uninstall(configuration, packageResult);
-#pragma warning restore IDE0022, IDE1006
     }
 }

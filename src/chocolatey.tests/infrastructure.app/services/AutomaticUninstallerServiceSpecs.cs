@@ -249,7 +249,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                FileSystem.ResetCalls();
+                FileSystem.Invocations.Clear();
                 FileSystem.Setup(f => f.DirectoryExists(RegistryKeys.FirstOrDefault().InstallLocation)).Returns(false);
                 FileSystem.Setup(x => x.FileExists(ExpectedUninstallString)).Returns(true);
             }
@@ -279,7 +279,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                FileSystem.ResetCalls();
+                FileSystem.Invocations.Clear();
                 RegistryKeys.Clear();
                 RegistryKeys.Add(
                     new RegistryApplicationKey
@@ -320,7 +320,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                FileSystem.ResetCalls();
+                FileSystem.Invocations.Clear();
                 RegistryKeys.Clear();
                 RegistryKeys.Add(
                     new RegistryApplicationKey
@@ -360,7 +360,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                RegistryService.ResetCalls();
+                RegistryService.Invocations.Clear();
                 RegistryService.Setup(r => r.InstallerKeyExists(RegistryKeys.FirstOrDefault().KeyPath)).Returns(false);
             }
 
@@ -389,10 +389,10 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                FileSystem.ResetCalls();
+                FileSystem.Invocations.Clear();
                 FileSystem.Setup(f => f.DirectoryExists(RegistryKeys.FirstOrDefault().InstallLocation)).Returns(false);
                 FileSystem.Setup(x => x.FileExists(ExpectedUninstallString)).Returns(true);
-                RegistryService.ResetCalls();
+                RegistryService.Invocations.Clear();
                 RegistryService.Setup(r => r.InstallerKeyExists(RegistryKeys.FirstOrDefault().KeyPath)).Returns(false);
             }
 
@@ -421,7 +421,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public override void Context()
             {
                 base.Context();
-                FileSystem.ResetCalls();
+                FileSystem.Invocations.Clear();
                 FileSystem.Setup(f => f.DirectoryExists(RegistryKeys.FirstOrDefault().InstallLocation)).Returns(true);
                 FileSystem.Setup(f => f.GetFullPath(ExpectedUninstallString)).Returns(ExpectedUninstallString);
                 FileSystem.Setup(x => x.FileExists(ExpectedUninstallString)).Returns(false);
@@ -629,7 +629,7 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 base.Context();
                 RegistryKeys.Clear();
-                CommandExecutor.ResetCalls();
+                CommandExecutor.Invocations.Clear();
                 RegistryKeys.Add(
                     new RegistryApplicationKey
                     {
@@ -785,7 +785,7 @@ namespace chocolatey.tests.infrastructure.app.services
             {
                 Context();
                 RegistryKeys.Clear();
-                CommandExecutor.ResetCalls();
+                CommandExecutor.Invocations.Clear();
             }
 
             private void TestInstallerType(IInstaller installer, bool hasQuietUninstallString)

@@ -49,30 +49,6 @@ namespace chocolatey.infrastructure.app.nuget
     {
         private static readonly ConcurrentDictionary<string, SourceRepository> _repositories = new ConcurrentDictionary<string, SourceRepository>();
 
-        [Obsolete("This member is unused and should probably be removed.")]
-        private static Lazy<IConsole> _console = new Lazy<IConsole>(() => new Console());
-
-#pragma warning disable IDE1006 // Naming
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        [Obsolete("This member is unused and should probably be removed.")]
-        public static void initialize_with(Lazy<IConsole> console)
-        {
-            _console = console;
-        }
-#pragma warning restore IDE1006 // Naming
-
-        [Obsolete("This member is unused and should probably be removed.")]
-        private static IConsole Console
-        {
-            get { return _console.Value; }
-        }
-
-#pragma warning disable IDE0022 // Block body for methods
-        [Obsolete("This overload is obsolete and will be removed in a future version.")]
-        public static ChocolateyPackagePathResolver GetPathResolver(ChocolateyConfiguration configuration, IFileSystem nugetPackagesFileSystem)
-            => GetPathResolver(nugetPackagesFileSystem);
-#pragma warning restore IDE0022 // Block body for methods
-
         public static ChocolateyPackagePathResolver GetPathResolver(IFileSystem nugetPackagesFileSystem)
         {
             return new ChocolateyPackagePathResolver(ApplicationParameters.PackagesLocation, nugetPackagesFileSystem);
@@ -295,22 +271,10 @@ namespace chocolatey.infrastructure.app.nuget
             return repositories;
         }
 
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
-        {
-            return GetRepositoryResources(configuration, nugetLogger, filesystem, new ChocolateySourceCacheContext(configuration));
-        }
-
         public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem, ChocolateySourceCacheContext cacheContext)
         {
             IEnumerable<SourceRepository> remoteRepositories = GetRemoteRepositories(configuration, nugetLogger, filesystem);
             return GetRepositoryResources(remoteRepositories, cacheContext);
-        }
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(IEnumerable<SourceRepository> packageRepositories)
-        {
-            return GetRepositoryResources(packageRepositories, cacheContext: null);
         }
 
         public static IReadOnlyList<NuGetEndpointResources> GetRepositoryResources(IEnumerable<SourceRepository> packageRepositories, ChocolateySourceCacheContext cacheContext)
@@ -464,19 +428,6 @@ namespace chocolatey.infrastructure.app.nuget
                 availablePackages.Add(dependencyInfo);
                 await HandleDependencies(framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration, dependencyInfo.Dependencies);
             }
-        }
-
-        [Obsolete("Use overload requiring a VersionRange being specified. Will be removed in v3.0.0")]
-        public static Task GetPackageDependencies(string packageId,
-            NuGetFramework framework,
-            SourceCacheContext cacheContext,
-            ILogger logger,
-            IEnumerable<NuGetEndpointResources> resources,
-            ISet<SourcePackageDependencyInfo> availablePackages,
-            ISet<PackageDependency> dependencyCache,
-            ChocolateyConfiguration configuration)
-        {
-            return GetPackageDependencies(packageId, framework, cacheContext, logger, resources, availablePackages, dependencyCache, configuration, VersionRange.All);
         }
 
         public static async Task GetPackageDependencies(string packageId,

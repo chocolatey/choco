@@ -37,13 +37,5 @@ namespace chocolatey.infrastructure.app.domain.installers
 
         string BuildInstallCommandArguments(bool logFile, bool customInstallLocation, bool languageRequested);
         string BuildUninstallCommandArguments();
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        string build_install_command_arguments(bool logFile, bool customInstallLocation, bool languageRequested);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        string build_uninstall_command_arguments();
-#pragma warning restore IDE0022, IDE1006
     }
 }

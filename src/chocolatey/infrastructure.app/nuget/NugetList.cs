@@ -41,12 +41,6 @@ namespace chocolatey.infrastructure.app.nuget
             return SearchPackagesAsync(configuration, nugetLogger, filesystem).GetAwaiter().GetResult();
         }
 
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem)
-        {
-            return GetCount(configuration, nugetLogger, filesystem, new ChocolateySourceCacheContext(configuration));
-        }
-
         public static int GetCount(ChocolateyConfiguration configuration, ILogger nugetLogger, IFileSystem filesystem, ChocolateySourceCacheContext cacheContext)
         {
             var packageRepositoriesResources = NugetCommon.GetRepositoryResources(configuration, nugetLogger, filesystem, cacheContext);
@@ -336,17 +330,6 @@ namespace chocolatey.infrastructure.app.nuget
             return 30;
         }
 
-        [Obsolete("Will be removed in v3, use overload with NuGetEndpointResources instead!")]
-        public static ISet<IPackageSearchMetadata> FindAllPackageVersions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
-        {
-            var metadataList = new HashSet<IPackageSearchMetadata>();
-            foreach (var resource in resources)
-            {
-                metadataList.AddRange(resource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
-            }
-            return metadataList;
-        }
-
         public static ISet<IPackageSearchMetadata> FindAllPackageVersions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<NuGetEndpointResources> resources)
         {
             // Currently this method is a duplicate of its overload,
@@ -359,28 +342,6 @@ namespace chocolatey.infrastructure.app.nuget
                 metadataList.AddRange(resource.GetMetadataAsync(packageName, config.Prerelease, false, cacheContext, nugetLogger, CancellationToken.None).GetAwaiter().GetResult());
             }
             return metadataList;
-        }
-
-        /// <summary>
-        ///   Searches for packages that are available based on name and other options
-        /// </summary>
-        /// <param name="packageName">Name of package to search for</param>
-        /// <param name="config">Chocolatey configuration used to help supply the search parameters</param>
-        /// <param name="nugetLogger">The nuget logger</param>
-        /// <param name="resources">The resources that should be queried</param>
-        /// <param name="version">Version to search for</param>
-        /// <param name="cacheContext">Settings for caching of results from sources</param>
-        /// <returns>One result or nothing</returns>
-        [Obsolete("Use the overload that uses the base source cache context instead.")]
-        public static IPackageSearchMetadata FindPackage(
-            string packageName,
-            ChocolateyConfiguration config,
-            ILogger nugetLogger,
-            ChocolateySourceCacheContext cacheContext,
-            IEnumerable<NuGetEndpointResources> resources,
-            NuGetVersion version)
-        {
-            return FindPackage(packageName, config, nugetLogger, (SourceCacheContext)cacheContext, resources, version);
         }
 
         /// <summary>
@@ -567,12 +528,6 @@ namespace chocolatey.infrastructure.app.nuget
                     return null;
             }
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static ISet<IPackageSearchMetadata> find_all_package_versions(string packageName, ChocolateyConfiguration config, ILogger nugetLogger, ChocolateySourceCacheContext cacheContext, IEnumerable<PackageMetadataResource> resources)
-            => FindAllPackageVersions(packageName, config, nugetLogger, cacheContext, resources);
-#pragma warning restore IDE0022, IDE1006
     }
 
     public class ComparePackageSearchMetadataIdOnly : IEqualityComparer<IPackageSearchMetadata>

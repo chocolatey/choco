@@ -104,11 +104,5 @@ namespace chocolatey.infrastructure.app.validations
                 }
             }
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public ICollection<ValidationResult> validate(ChocolateyConfiguration config)
-            => Validate(config);
-#pragma warning restore IDE0022, IDE1006
     }
 }

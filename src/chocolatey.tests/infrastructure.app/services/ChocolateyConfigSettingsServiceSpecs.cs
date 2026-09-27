@@ -37,7 +37,7 @@ namespace chocolatey.tests.integration.infrastructure.app.services
 
             public override void Context()
             {
-                XmlService.ResetCalls();
+                XmlService.Invocations.Clear();
             }
         }
 

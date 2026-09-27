@@ -95,12 +95,6 @@ namespace chocolatey.infrastructure.app.services
             }
         }
 
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public IEnumerable<RuleResult> validate_rules(string filePath)
-            => ValidateRules(filePath);
-#pragma warning restore IDE0022, IDE1006
-
         private class RuleIdEqualityComparer : IEqualityComparer<ImmutableRule>
         {
             public bool Equals(ImmutableRule x, ImmutableRule y)

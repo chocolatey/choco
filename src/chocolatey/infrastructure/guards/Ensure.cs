@@ -60,17 +60,6 @@ namespace chocolatey.infrastructure.guards
 
             throw new Exception("Unable to find member for {0}".FormatWith(e.ToStringSafe()));
         }
-
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static EnsureString that(Expression<Func<string>> expression)
-            => That(expression);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static Ensure<TypeToEnsure> that<TypeToEnsure>(Expression<Func<TypeToEnsure>> expression) where TypeToEnsure : class
-            => That(expression);
-#pragma warning restore IDE0022, IDE1006
     }
 
     public class EnsureString : Ensure<string>
@@ -106,15 +95,6 @@ namespace chocolatey.infrastructure.guards
 
             throw new ArgumentException(Name, "Value for {0} must contain one of the following extensions: {1}".FormatWith(Name, string.Join(", ", extensions)));
         }
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public EnsureString is_not_null_or_whitespace()
-            => NotNullOrWhitespace();
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public EnsureString has_any_extension(params string[] extensions)
-            => HasExtension(extensions);
-#pragma warning restore IDE0022, IDE1006
     }
 
     public class Ensure<EnsurableType> where EnsurableType : class
@@ -146,14 +126,5 @@ namespace chocolatey.infrastructure.guards
                 exceptionAction.Invoke(Name, Value);
             }
         }
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void is_not_null()
-            => NotNull();
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void meets(Func<EnsurableType, bool> ensureFunction, Action<string, EnsurableType> exceptionAction)
-            => Meets(ensureFunction, exceptionAction);
-#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -51,9 +51,9 @@ namespace chocolatey.tests.infrastructure.app.nuget
             public override void Context()
             {
                 _configuration = new ChocolateyConfiguration();
-                _nugetLogger.ResetCalls();
-                _packageDownloader.ResetCalls();
-                _filesystem.ResetCalls();
+                _nugetLogger.Invocations.Clear();
+                _packageDownloader.Invocations.Clear();
+                _filesystem.Invocations.Clear();
 
                 _filesystem.Setup(f => f.GetFullPath(It.IsAny<string>())).Returns((string a) =>
                 {
@@ -206,9 +206,9 @@ namespace chocolatey.tests.infrastructure.app.nuget
             public override void Context()
             {
                 _configuration = new ChocolateyConfiguration();
-                _sourceCacheContext.ResetCalls();
-                _nugetLogger.ResetCalls();
-                _sourceRepository.ResetCalls();
+                _sourceCacheContext.Invocations.Clear();
+                _nugetLogger.Invocations.Clear();
+                _sourceRepository.Invocations.Clear();
                 _nuGetEndpointResources.Clear();
                 _sourcePackageDependencyInfos.Clear();
                 _packageDependencies.Clear();

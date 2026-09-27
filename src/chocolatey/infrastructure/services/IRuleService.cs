@@ -24,10 +24,5 @@ namespace chocolatey.infrastructure.services
     {
         IReadOnlyList<ImmutableRule> GetAllAvailableRules();
         IEnumerable<RuleResult> ValidateRules(string filePath);
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        IEnumerable<RuleResult> validate_rules(string filePath);
-#pragma warning restore IDE0022, IDE1006
     }
 }

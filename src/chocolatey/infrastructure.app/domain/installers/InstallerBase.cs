@@ -64,16 +64,5 @@ namespace chocolatey.infrastructure.app.domain.installers
             //MSI has issues with 1622 - opening a log file location
             return "{0} {1} {2}".FormatWith(SilentUninstall, NoReboot, OtherUninstallOptions).TrimSafe();
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual string build_install_command_arguments(bool logFile, bool customInstallLocation, bool languageRequested)
-            => BuildInstallCommandArguments(logFile, customInstallLocation, languageRequested);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual string build_uninstall_command_arguments()
-            => BuildUninstallCommandArguments();
-#pragma warning restore IDE0022, IDE1006
-
     }
 }

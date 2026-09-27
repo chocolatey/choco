@@ -78,22 +78,5 @@ namespace chocolatey.infrastructure.app.services
         PackageFile GetPackageFile(string file);
 
         bool MovePackageUsingBackupStrategy(string sourceFolder, string destinationFolder, bool restoreSource);
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        PackageFiles read_from_file(string filepath);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void save_to_file(PackageFiles snapshot, string filePath);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void ensure_compatible_file_attributes(PackageResult packageResult, ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void ensure_compatible_file_attributes(string directory, ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        PackageFiles capture_package_files(string directory, ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        PackageFile get_package_file(string file);
-#pragma warning restore IDE0022, IDE1006
     }
 }

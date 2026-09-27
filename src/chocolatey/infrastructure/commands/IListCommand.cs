@@ -23,20 +23,10 @@ namespace chocolatey.infrastructure.commands
     public interface IListCommand : ICommand
     {
         int Count(ChocolateyConfiguration config);
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        int count(ChocolateyConfiguration config);
-#pragma warning restore IDE0022, IDE1006
     }
 
     public interface IListCommand<out T> : IListCommand
     {
         IEnumerable<T> List(ChocolateyConfiguration config);
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        IEnumerable<T> list(ChocolateyConfiguration config);
-#pragma warning restore IDE0022, IDE1006
     }
 }

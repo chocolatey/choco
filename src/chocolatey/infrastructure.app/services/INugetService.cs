@@ -22,7 +22,7 @@ using chocolatey.infrastructure.results;
 
 namespace chocolatey.infrastructure.app.services
 {
-    public interface INugetService : ISourceRunner
+    public interface INugetService : IBootstrappableSourceRunner, ICountSourceRunner, IListSourceRunner, IInstallSourceRunner, IUpgradeSourceRunner, IUninstallSourceRunner
     {
         /// <summary>
         ///   Get outdated packages
@@ -66,22 +66,5 @@ namespace chocolatey.infrastructure.app.services
         /// </summary>
         /// <param name="config">The configuration</param>
         IEnumerable<PackageResult> GetInstalledPackages(ChocolateyConfiguration config);
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        ConcurrentDictionary<string, PackageResult> get_outdated(ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void pack_noop(ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void pack_run(ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void push_noop(ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void push_run(ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void remove_rollback_directory_if_exists(string packageName);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        IEnumerable<PackageResult> get_all_installed_packages(ChocolateyConfiguration config);
-#pragma warning restore IDE0022, IDE1006
     }
 }

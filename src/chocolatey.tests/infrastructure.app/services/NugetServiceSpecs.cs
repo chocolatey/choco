@@ -45,11 +45,11 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Context()
             {
-                FileSystem.ResetCalls();
-                NugetLogger.ResetCalls();
-                PackageInfoService.ResetCalls();
-                FilesService.ResetCalls();
-                Package.ResetCalls();
+                FileSystem.Invocations.Clear();
+                NugetLogger.Invocations.Clear();
+                PackageInfoService.Invocations.Clear();
+                FilesService.Invocations.Clear();
+                Package.Invocations.Clear();
 
                 Service = new NugetService(FileSystem.Object, NugetLogger.Object, PackageInfoService.Object, FilesService.Object, RuleService.Object);
             }
@@ -172,7 +172,7 @@ namespace chocolatey.tests.infrastructure.app.services
             public void Should_do_nothing_if_the_directory_no_longer_exists()
             {
                 Context();
-                FileSystem.ResetCalls();
+                FileSystem.Invocations.Clear();
                 FileSystem.Setup(x => x.DirectoryExists(It.IsAny<string>())).Returns(false);
 
                 var packageFile = new PackageFile
