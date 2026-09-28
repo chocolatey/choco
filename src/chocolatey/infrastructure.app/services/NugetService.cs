@@ -894,6 +894,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         continue;
                     }
 
+                    // Check if the user requested a specific version for this package and dependency resolution changed it
+                    if (HasVersionMismatchError(version, packageName, packageDependencyInfo, config, packageResultsToReturn))
+                    {
+                        continue;
+                    }
+
                     var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                     if (packageRemoteMetadata is null)
@@ -1715,6 +1721,12 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                 continue;
                             }
 
+                            // Check if the user requested a specific version for this package and dependency resolution changed it
+                            if (HasVersionMismatchError(version, packageName, packageDependencyInfo, config, packageResultsToReturn))
+                            {
+                                continue;
+                            }
+
                             var packageRemoteMetadata = packagesToInstall.FirstOrDefault(p => p.Identity.Equals(packageDependencyInfo));
 
                             if (packageRemoteMetadata is null)
@@ -2153,6 +2165,56 @@ and argument details.
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Validates that the resolved package version matches the user-requested version.
+        /// Returns true if there is a version mismatch error that should prevent installation.
+        /// </summary>
+        private bool HasVersionMismatchError(
+            NuGetVersion requestedVersion,
+            string packageName,
+            SourcePackageDependencyInfo packageDependencyInfo,
+            ChocolateyConfiguration config,
+            ConcurrentDictionary<string, PackageResult> packageResultsToReturn)
+        {
+            // Only validate if user explicitly requested a specific version
+            if (requestedVersion == null)
+            {
+                return false;
+            }
+
+            // Only check the main package being installed/upgraded, not dependencies
+            if (!packageDependencyInfo.Id.Equals(packageName, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            // Check if resolved version differs from requested version
+            if (packageDependencyInfo.Version.Equals(requestedVersion))
+            {
+                return false;
+            }
+
+            // Version mismatch detected - log error and add to results
+            var logMessage = StringResources.ErrorMessages.VersionMismatch.FormatWith(
+                packageName,
+                requestedVersion.ToFullStringChecked(),
+                packageDependencyInfo.Version.ToFullStringChecked());
+
+            var versionMismatchResult = packageResultsToReturn.GetOrAdd(
+                packageDependencyInfo.Id,
+                new PackageResult(packageDependencyInfo.Id, requestedVersion.ToFullStringChecked(), string.Empty)
+            );
+            versionMismatchResult.Messages.Add(new ResultMessage(ResultType.Error, logMessage));
+            this.Log().Error(ChocolateyLoggers.Important, logMessage);
+
+            if (config.Features.StopOnFirstPackageFailure)
+            {
+                throw new ApplicationException("Stopping further execution as {0} has failed.".FormatWith(packageDependencyInfo.Id));
+            }
+
+            return true;
         }
 
         private static void RemoveInvalidDependenciesAndParents(

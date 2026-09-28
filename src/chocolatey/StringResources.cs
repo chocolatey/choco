@@ -654,6 +654,8 @@ namespace chocolatey
             [Browsable(false)]
             internal const string UnableToDowngrade = "A newer version of {0} (v{1}) is already installed.{2} Use --allow-downgrade or --force to attempt to install older versions.";
             internal const string DependencyFailedToInstall = "Failed to install {0} because a previous dependency failed.";
+            internal const string VersionMismatch = "Upgrading package {0} to version {1} is not possible, likely due to package dependency version requirements. The latest package version that meets the dependency requirements is {2}. " +
+                "For more information on this issue and guidance in resolving the problem, see https://ch0.co/t/deps";
         }
 
         public static class OptionDescriptions

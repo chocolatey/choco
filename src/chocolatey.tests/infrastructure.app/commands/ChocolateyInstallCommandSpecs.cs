@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using chocolatey.infrastructure.app.attributes;
 using chocolatey.infrastructure.app.commands;
@@ -23,6 +24,7 @@ using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.app.domain;
 using chocolatey.infrastructure.app.services;
 using chocolatey.infrastructure.commandline;
+using chocolatey.infrastructure.results;
 using Moq;
 using FluentAssertions;
 
@@ -346,6 +348,156 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Should_call_service_install_run()
             {
                 PackageService.Verify(c => c.Install(Configuration), Times.Once);
+            }
+        }
+
+        public class When_install_is_called_with_specific_version : ChocolateyInstallCommandSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = "1.0.0";
+                Configuration.PackageNames = "testpackage";
+            }
+
+            public override void Because()
+            {
+                Command.Run(Configuration);
+            }
+
+            [Fact]
+            public void Should_pass_version_to_service()
+            {
+                PackageService.Verify(c => c.Install(It.Is<ChocolateyConfiguration>(
+                    config => config.Version == "1.0.0")), Times.Once);
+            }
+
+            [Fact]
+            public void Should_pass_package_name_to_service()
+            {
+                PackageService.Verify(c => c.Install(It.Is<ChocolateyConfiguration>(
+                    config => config.PackageNames == "testpackage")), Times.Once);
+            }
+        }
+
+        public class When_install_detects_version_mismatch : ChocolateyInstallCommandSpecsBase
+        {
+            private ConcurrentDictionary<string, PackageResult> _installResults;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = "2.0.0";
+                Configuration.PackageNames = "testpackage";
+
+                // Simulate version mismatch scenario - service returns error result
+                _installResults = new ConcurrentDictionary<string, PackageResult>();
+                var packageResult = new PackageResult("testpackage", "2.0.0", null);
+                packageResult.Messages.Add(new ResultMessage(
+                    ResultType.Error,
+                    "Upgrading package testpackage to version 2.0.0 is not possible, likely due to package dependency version requirements. The latest package version that meets the dependency requirements is 1.5.0."));
+                _installResults.TryAdd("testpackage", packageResult);
+
+                PackageService.Setup(s => s.Install(It.IsAny<ChocolateyConfiguration>()))
+                    .Returns(_installResults);
+            }
+
+            public override void Because()
+            {
+                Command.Run(Configuration);
+            }
+
+            [Fact]
+            public void Should_receive_version_mismatch_error_from_service()
+            {
+                PackageService.Verify(c => c.Install(It.Is<ChocolateyConfiguration>(
+                    config => config.Version == "2.0.0")), Times.Once);
+
+                _installResults["testpackage"].Messages
+                    .Should().Contain(m => m.MessageType == ResultType.Error && 
+                                          m.Message.Contains("is not possible"));
+            }
+        }
+
+        public class When_install_with_StopOnFirstPackageFailure_and_version_mismatch : ChocolateyInstallCommandSpecsBase
+        {
+            private Exception _caughtException;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.Version = "2.0.0";
+                Configuration.PackageNames = "testpackage";
+                Configuration.Features.StopOnFirstPackageFailure = true;
+
+                // Simulate service throwing when StopOnFirstPackageFailure is enabled
+                PackageService.Setup(s => s.Install(It.IsAny<ChocolateyConfiguration>()))
+                    .Throws(new ApplicationException("Stopping further execution as testpackage has failed."));
+            }
+
+            public override void Because()
+            {
+                try
+                {
+                    Command.Run(Configuration);
+                }
+                catch (Exception ex)
+                {
+                    _caughtException = ex;
+                }
+            }
+
+            [Fact]
+            public void Should_throw_ApplicationException()
+            {
+                _caughtException.Should().NotBeNull();
+                _caughtException.Should().BeOfType<ApplicationException>();
+            }
+
+            [Fact]
+            public void Should_indicate_package_failure_in_exception_message()
+            {
+                _caughtException.Message.Should().Contain("testpackage");
+                _caughtException.Message.Should().Contain("Stopping further execution");
+            }
+        }
+
+        public class When_install_without_version_specified : ChocolateyInstallCommandSpecsBase
+        {
+            private ConcurrentDictionary<string, PackageResult> _installResults;
+
+            public override void Context()
+            {
+                base.Context();
+                Configuration.PackageNames = "testpackage";
+                // Version is not set - should install latest available
+
+                _installResults = new ConcurrentDictionary<string, PackageResult>();
+                var packageResult = new PackageResult("testpackage", "2.0.0", null);
+                packageResult.Messages.Add(new ResultMessage(ResultType.Note, "Successfully installed"));
+                _installResults.TryAdd("testpackage", packageResult);
+
+                PackageService.Setup(s => s.Install(It.IsAny<ChocolateyConfiguration>()))
+                    .Returns(_installResults);
+            }
+
+            public override void Because()
+            {
+                Command.Run(Configuration);
+            }
+
+            [Fact]
+            public void Should_not_check_version_mismatch()
+            {
+                PackageService.Verify(c => c.Install(It.Is<ChocolateyConfiguration>(
+                    config => string.IsNullOrEmpty(config.Version))), Times.Once);
+            }
+
+            [Fact]
+            public void Should_succeed_without_version_mismatch_errors()
+            {
+                _installResults["testpackage"].Messages
+                    .Should().NotContain(m => m.MessageType == ResultType.Error);
             }
         }
     }
