@@ -51,9 +51,17 @@ jobs:
           code_drop/TestResults/issues-report.html
           code_drop/TestResults/NUnit/TestResult.xml
           code_drop/MsBuild.log
-  # Build and test on Windows
+  # Build and test on Windows (x64 and native Windows on ARM)
   windows-build:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            os: windows-latest
+          - arch: arm64
+            os: windows-11-arm
+    runs-on: ${{ matrix.os }}
     steps:
     - uses: actions/checkout@v3
       with:
@@ -62,7 +70,8 @@ jobs:
       uses: actions/cache@v4
       with:
         path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+        # runner.arch keeps the x64 and arm64 tool caches separate
+        key: ${{ runner.os }}-${{ runner.arch }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Install dotnet #needed for GitVersion
       uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
       with:
@@ -78,7 +87,7 @@ jobs:
       # Always upload build results
       if: ${{ always() }}
       with:
-        name: windows-build-results
+        name: windows-${{ matrix.arch }}-build-results
         path: |
           code_drop\TestResults\issues-report.html
           code_drop\TestResults\NUnit\TestResult.xml

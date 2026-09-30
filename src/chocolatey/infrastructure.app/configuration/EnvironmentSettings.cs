@@ -89,6 +89,7 @@ namespace chocolatey.infrastructure.app.configuration
             // experimental until we know if this value returns correctly based on the OS and not the current process.
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.OsIs64Bit, config.Information.Is64BitOperatingSystem ? "true" : "false");
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ProcessIs64Bit, config.Information.Is64BitProcess ? "true" : "false");
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.OsProcessorArchitecture, config.Information.ProcessorArchitecture);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.Username, config.Information.UserName);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.UserDomainName, config.Information.UserDomainName);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.IsAdmin, config.Information.IsUserAdministrator ? "true" : "false");
