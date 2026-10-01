@@ -61,6 +61,11 @@ Anything encrypted as CurrentUser can only be decrypted by your current user.");
 
         public string DecryptString(string encryptedString)
         {
+            if (string.IsNullOrEmpty(encryptedString))
+            {
+                return null;
+            }
+
             var encryptedByteArray = Convert.FromBase64String(encryptedString);
             byte[] decryptedByteArray;
 
