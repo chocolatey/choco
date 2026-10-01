@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using Microsoft.Win32;
 using chocolatey.infrastructure.information;
 using chocolatey.infrastructure.app;
 using chocolatey.infrastructure.app.builders;
@@ -118,8 +117,6 @@ namespace chocolatey.console
                         "chocolatey".Log().Info(ChocolateyLoggers.Important, () => "Please run 'choco --help' or 'choco <command> --help' for help menu.");
                     }
                 }
-
-                ThrowIfNotDotNet48();
 
                 if (warnings.Count != 0 && config.RegularOutput)
                 {
@@ -312,26 +309,5 @@ Or by passing the --skip-compatibility-checks option when executing a
 command.");
         }
 
-        private static void ThrowIfNotDotNet48()
-        {
-            if (Platform.GetPlatform() == PlatformType.Windows)
-            {
-                // https://learn.microsoft.com/en-us/dotnet/framework/migration-guide/how-to-determine-which-versions-are-installed#minimum-version
-                const int net48ReleaseBuild = 528040;
-                const string regKey = @"SOFTWARE\Microsoft\NET Framework Setup\NDP\v4\Full\";
-
-                using (var ndpKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, RegistryView.Registry32).OpenSubKey(regKey))
-                {
-                    if (ndpKey == null || ndpKey.GetValue("Release") == null || (int)ndpKey.GetValue("Release") < net48ReleaseBuild)
-                    {
-                        throw new ApplicationException(
-                            @".NET 4.8 is not installed or may need a reboot to complete installation.
-Please install .NET Framework 4.8 manually and reboot the system.
-Download at 'https://download.visualstudio.microsoft.com/download/pr/2d6bb6b2-226a-4baa-bdec-798822606ff1/8494001c276a4b96804cde7829c04d7f/ndp48-x86-x64-allos-enu.exe'"
-                                .FormatWith(Environment.NewLine));
-                    }
-                }
-            }
-        }
     }
 }

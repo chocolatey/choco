@@ -56,12 +56,13 @@ namespace chocolatey.infrastructure.app.registration
 
         public bool RegistrationFailed { get; internal set; }
 
-        // We add a specific clone handler due to some fields can not be
-        // serialized through the deep_copy extension helper.
+        // Custom clone handler: these collections hold Type/Func values that must be
+        // shared (Types are runtime singletons, delegates can't be deep-copied), so we
+        // rebuild independent collections with the same entries rather than deep-cloning.
         public object Clone()
         {
             var cloned = (SimpleInjectorContainerRegistrator)MemberwiseClone();
-            cloned._allCommands = _allCommands.DeepCopy();
+            cloned._allCommands = new HashSet<string>(_allCommands);
             cloned._instanceActionRegistrations = new ConcurrentDictionary<Type, Func<IContainerResolver, object>>();
 
             foreach (var instanceRegistration in _instanceActionRegistrations)
@@ -72,10 +73,16 @@ namespace chocolatey.infrastructure.app.registration
                 cloned._instanceActionRegistrations.TryAdd(key, value);
             }
 
-            cloned._multiServices = _multiServices.DeepCopy();
-            cloned._registeredCommands = _registeredCommands.DeepCopy();
-            cloned._singletonServices = _singletonServices.DeepCopy();
-            cloned._transientServices = _transientServices.DeepCopy();
+            cloned._multiServices = new ConcurrentDictionary<Type, List<Type>>();
+
+            foreach (var multiService in _multiServices)
+            {
+                cloned._multiServices.TryAdd(multiService.Key, new List<Type>(multiService.Value));
+            }
+
+            cloned._registeredCommands = new ConcurrentDictionary<string, Type>(_registeredCommands);
+            cloned._singletonServices = new ConcurrentDictionary<Type, Type>(_singletonServices);
+            cloned._transientServices = new ConcurrentDictionary<Type, Type>(_transientServices);
             cloned.ValidationHandlers = new List<Func<Type, bool>>();
 
             return cloned;

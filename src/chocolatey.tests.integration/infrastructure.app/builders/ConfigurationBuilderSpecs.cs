@@ -58,6 +58,25 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
             protected Mock<IEnvironment> Environment;
             protected List<string> ArgumentsList = new List<string>();
 
+            // SetupConfiguration -> EnvironmentSettings.SetEnvironmentVariables writes these
+            // real process environment variables when a proxy is configured. On .NET,
+            // HttpClient.DefaultProxy / NuGet's ProxyCache honor HTTP(S)_PROXY, so a leaked
+            // value (e.g. "EnvironmentVariableSet") would route every later NuGet HTTP
+            // request through a bogus proxy. Save and restore them so these specs don't
+            // poison the rest of the suite.
+            private static readonly string[] _proxyEnvironmentVariables =
+            {
+                EnvironmentVariables.System.HttpProxy,
+                EnvironmentVariables.System.HttpsProxy,
+                EnvironmentVariables.System.NoProxy,
+                EnvironmentVariables.Package.ChocolateyProxyLocation,
+                EnvironmentVariables.Package.ChocolateyProxyUser,
+                EnvironmentVariables.Package.ChocolateyProxyPassword,
+                EnvironmentVariables.Package.ChocolateyProxyBypassList,
+            };
+
+            private readonly Dictionary<string, string> _originalProxyEnvironment = new Dictionary<string, string>();
+
             public ProxyConfigurationBase(bool systemSet, bool environmentVariableSet, bool configSet, bool argumentSet)
             {
                 SystemSet = systemSet;
@@ -78,11 +97,26 @@ namespace chocolatey.tests.integration.infrastructure.app.builders
                 ConfigurationBuilder.InitializeWith(new Lazy<IEnvironment>(() => Environment.Object));
                 Environment.Setup(e => e.GetEnvironmentVariable(It.IsAny<string>())).Returns(string.Empty);
                 ArgumentsList.Clear();
+
+                foreach (var name in _proxyEnvironmentVariables)
+                {
+                    _originalProxyEnvironment[name] = System.Environment.GetEnvironmentVariable(name);
+                }
             }
 
             public override void Because()
             {
                 ConfigurationBuilder.SetupConfiguration(ArgumentsList, Configuration, Container, License, null);
+            }
+
+            public override void AfterObservations()
+            {
+                foreach (var entry in _originalProxyEnvironment)
+                {
+                    System.Environment.SetEnvironmentVariable(entry.Key, entry.Value);
+                }
+
+                base.AfterObservations();
             }
         }
 

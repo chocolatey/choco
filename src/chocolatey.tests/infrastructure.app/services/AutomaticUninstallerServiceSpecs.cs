@@ -91,8 +91,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 FileSystem.Setup(f => f.GetFullPath(ExpectedUninstallString)).Returns(ExpectedUninstallString);
                 FileSystem.Setup(x => x.FileExists(ExpectedUninstallString)).Returns(true);
 
-                var field = typeof(ApplicationParameters).GetField("AllowPrompts");
-                field.SetValue(null, false);
+                ApplicationParameters.AllowPrompts = false;
             }
         }
 

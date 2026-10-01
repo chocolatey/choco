@@ -42,16 +42,9 @@ namespace chocolatey.infrastructure.cryptography
         private static IHashAlgorithm GetHashAlgorithmStatic(CryptoHashProviderType algorithmType)
         {
 
-            var fipsOnly = false;
-            try
-            {
-                fipsOnly = CryptoConfig.AllowOnlyFipsAlgorithms;
-            }
-            catch (Exception ex)
-            {
-                "chocolatey".Log().Debug("Unable to get FipsPolicy from CryptoConfig:{0} {1}".FormatWith(Environment.NewLine, ex.Message));
-            }
-
+            // On .NET (Core/10) the default hash implementations are backed by the OS
+            // (CNG on Windows) and are FIPS-compliant, so the *Cng types and the
+            // CryptoConfig.AllowOnlyFipsAlgorithms special-casing are no longer needed.
             HashAlgorithm hashAlgorithm = null;
             switch (algorithmType)
             {
@@ -59,13 +52,13 @@ namespace chocolatey.infrastructure.cryptography
                     hashAlgorithm = new HashAlgorithm(MD5.Create());
                     break;
                 case CryptoHashProviderType.Sha1:
-                    hashAlgorithm = new HashAlgorithm(fipsOnly ? new SHA1Cng() : SHA1.Create());
+                    hashAlgorithm = new HashAlgorithm(SHA1.Create());
                     break;
                 case CryptoHashProviderType.Sha256:
-                    hashAlgorithm = new HashAlgorithm(fipsOnly ? new SHA256Cng() : SHA256.Create());
+                    hashAlgorithm = new HashAlgorithm(SHA256.Create());
                     break;
                 case CryptoHashProviderType.Sha512:
-                    hashAlgorithm = new HashAlgorithm(fipsOnly ? new SHA512Cng() : SHA512.Create());
+                    hashAlgorithm = new HashAlgorithm(SHA512.Create());
                     break;
             }
 

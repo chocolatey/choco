@@ -21,7 +21,6 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
-using System.Security.Permissions;
 using System.Security;
 using chocolatey.infrastructure.information;
 using chocolatey.infrastructure.platforms;
@@ -342,7 +341,7 @@ namespace chocolatey.benchmark.helpers
 #pragma warning restore IDE1006 // Naming Styles
             }
 
-            [SuppressUnmanagedCodeSecurity, HostProtection(SecurityAction.LinkDemand, MayLeakOnAbort = true)]
+            [SuppressUnmanagedCodeSecurity]
             internal sealed class SafeSnapshotHandle : SafeHandleMinusOneIsInvalid
             {
                 internal SafeSnapshotHandle()
@@ -350,7 +349,6 @@ namespace chocolatey.benchmark.helpers
                 {
                 }
 
-                [SecurityPermission(SecurityAction.LinkDemand, UnmanagedCode = true)]
                 internal SafeSnapshotHandle(IntPtr handle)
                     : base(true)
                 {

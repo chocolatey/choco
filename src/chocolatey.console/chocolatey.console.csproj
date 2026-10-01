@@ -1,14 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <OutputType>Exe</OutputType>
+    <!-- Windows Desktop SDK: keeps WinForms/WPF/System.Drawing available in the
+         self-contained runtime so package Add-Type scripts keep working. -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <UseWPF>true</UseWPF>
     <AssemblyName>choco</AssemblyName>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Configurations>Debug;Release;ReleaseOfficial</Configurations>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <CodeAnalysisLogFile>bin\Debug\choco.exe.CodeAnalysisLog.xml</CodeAnalysisLogFile>
@@ -51,7 +54,8 @@
     <StartupObject>chocolatey.console.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <NoWin32Manifest>true</NoWin32Manifest>
+    <!-- Embed the app manifest into choco.exe (was a side-by-side file under net48). -->
+    <ApplicationManifest>choco.exe.manifest</ApplicationManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(CHOCOLATEY_OFFICIAL_KEY)' == '' OR !Exists('$(CHOCOLATEY_OFFICIAL_KEY')">
     <SignAssembly>true</SignAssembly>
@@ -62,24 +66,9 @@
     <AssemblyOriginatorKeyFile>$(CHOCOLATEY_OFFICIAL_KEY)</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <!-- The following reference come directly from the lib folder -->
-    <!-- We need to look to move that ones that we can, to their own NuGet -->
-    <!-- packages, and then switch to PackageReferences -->
-    <Reference Include="System.Management.Automation">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SolutionDir)\..\lib\PowerShell\System.Management.Automation.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="$(SolutionDir)\SolutionVersion.cs">
       <Link>Properties\SolutionVersion.cs</Link>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="choco.exe.manifest">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\chocolatey.resources\chocolatey.resources.csproj">

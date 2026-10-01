@@ -58,3 +58,7 @@ src/chocolatey.install/assets/Install.ps1
 
 # This project uses an editorconfig file maintained via a nuget package, so do not commit any of these to the repo
 .editorconfig
+
+# Temp
+CLAUDE.md
+/tmp
