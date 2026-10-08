@@ -29,6 +29,8 @@ The Chocolatey team has very explicit information here regarding the process for
   - [Submit Pull Request (PR)](#submit-pull-request-pr)
   - [Respond to Feedback on Pull Request](#respond-to-feedback-on-pull-request)
 - [Other General Information](#other-general-information)
+  - [API and Backwards Compatibility](#api-and-backwards-compatibility)
+  - [Architectural Decision Records (ADRs)](#architecture-decision-records-adrs)
 
 <!-- /TOC -->
 
@@ -276,8 +278,21 @@ The only reasons a pull request should be closed and resubmitted are as follows:
 
 ## Other General Information
 
+### API and Backwards Compatibility
+
 The helpers/utility functions that are available to the packages are what we consider the API. If you are working in the API, please note that you will need to maintain backwards compatibility. If you plan to rename a function or make it more generic, you must provide an alias in the [chocolateyInstaller.psm1](https://github.com/chocolatey/choco/blob/develop/src/chocolatey.resources/helpers/chocolateyInstaller.psm1) as part of what gets exported. You should not remove or reorder parameters, only add optional parameters to the end. They should be named and not positional (we are moving away from positional parameters as much as possible).
 
 If you reformat code or hit core functionality without an approval from a person on the Chocolatey Team, it's likely that no matter how awesome it looks afterwards, it will probably not get accepted. Reformatting code makes it harder for us to evaluate exactly what was changed.
 
 If you do these things, it will be make evaluation and acceptance easy. Now if you stray outside of the guidelines we have above, it doesn't mean we are going to ignore your pull request. It will just make things harder for us.  Harder for us roughly translates to a longer SLA for your pull request.
+
+### Architecture Decision Records (ADRs)
+
+We use Architecture Decision Records (ADRs) internally to document significant
+architectural and technical decisions. ADRs are maintained as internal
+engineering documentation and are not part of the external contribution
+process.
+
+External contributors are not expected to create or maintain ADRs. When an
+architectural decision requires an ADR, the appropriate internal team members
+will handle the documentation.
