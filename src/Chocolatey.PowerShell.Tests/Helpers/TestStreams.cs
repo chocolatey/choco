@@ -15,6 +15,8 @@
 // limitations under the License.
 
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +30,31 @@ namespace Chocolatey.PowerShell.Tests.Helpers
         public override Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
         {
             return new TaskCompletionSource<int>().Task;
+        }
+    }
+
+    /// <summary>
+    /// Content that does not know its own length.
+    /// </summary>
+    public class UnknownLengthContent : HttpContent
+    {
+        private readonly byte[] _bytes;
+
+        public UnknownLengthContent(byte[] bytes)
+        {
+            _bytes = bytes;
+        }
+
+        protected override Task SerializeToStreamAsync(Stream stream, TransportContext context)
+        {
+            return stream.WriteAsync(_bytes, 0, _bytes.Length);
+        }
+
+        protected override bool TryComputeLength(out long length)
+        {
+            length = -1;
+
+            return false;
         }
     }
 
