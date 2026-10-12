@@ -395,7 +395,7 @@ namespace chocolatey.tests.infrastructure.app.commands
                 var packageResult = new PackageResult("testpackage", "2.0.0", null);
                 packageResult.Messages.Add(new ResultMessage(
                     ResultType.Error,
-                    "Upgrading package testpackage to version 2.0.0 is not possible, likely due to package dependency version requirements. The latest package version that meets the dependency requirements is 1.5.0."));
+                    "Installing package testpackage at version 2.0.0 is not possible, likely due to package dependency version requirements. The latest package version that meets the dependency requirements is 1.5.0."));
                 _installResults.TryAdd("testpackage", packageResult);
 
                 PackageService.Setup(s => s.Install(It.IsAny<ChocolateyConfiguration>()))

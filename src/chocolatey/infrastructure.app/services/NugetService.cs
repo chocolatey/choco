@@ -895,7 +895,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
 
                     // Check if the user requested a specific version for this package and dependency resolution changed it
-                    if (HasVersionMismatchError(version, packageName, packageDependencyInfo, config, packageResultsToReturn))
+                    if (HasVersionMismatchError(version, packageName, packageDependencyInfo, config, packageResultsToReturn, StringResources.ErrorMessages.InstallVersionMismatch))
                     {
                         continue;
                     }
@@ -1722,7 +1722,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
 
                             // Check if the user requested a specific version for this package and dependency resolution changed it
-                            if (HasVersionMismatchError(version, packageName, packageDependencyInfo, config, packageResultsToReturn))
+                            if (HasVersionMismatchError(version, packageName, packageDependencyInfo, config, packageResultsToReturn, StringResources.ErrorMessages.UpgradeVersionMismatch))
                             {
                                 continue;
                             }
@@ -2176,7 +2176,8 @@ and argument details.
             string packageName,
             SourcePackageDependencyInfo packageDependencyInfo,
             ChocolateyConfiguration config,
-            ConcurrentDictionary<string, PackageResult> packageResultsToReturn)
+            ConcurrentDictionary<string, PackageResult> packageResultsToReturn,
+            string errorMessage)
         {
             // Only validate if user explicitly requested a specific version
             if (requestedVersion == null)
@@ -2197,7 +2198,7 @@ and argument details.
             }
 
             // Version mismatch detected - log error and add to results
-            var logMessage = StringResources.ErrorMessages.VersionMismatch.FormatWith(
+            var logMessage = errorMessage.FormatWith(
                 packageName,
                 requestedVersion.ToFullStringChecked(),
                 packageDependencyInfo.Version.ToFullStringChecked());
