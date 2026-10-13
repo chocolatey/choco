@@ -32,8 +32,6 @@ namespace chocolatey.infrastructure.app
     public static class ApplicationParameters
     {
         private static readonly IFileSystem _fileSystem = new DotNetFileSystem();
-        [Obsolete("Use StringResources.EnvironmentVariables.System.ChocolateyInstall instead", error: false)]
-        public static readonly string ChocolateyInstallEnvironmentVariableName = EnvironmentVariables.System.ChocolateyInstall;
         public static readonly string Name = "Chocolatey";
 
 #if FORCE_CHOCOLATEY_OFFICIAL_KEY
@@ -147,54 +145,6 @@ namespace chocolatey.infrastructure.app
             public static readonly string SystemUserName = "SYSTEM";
             public const string Arm64ProcessorArchitecture = "ARM64";
             public static readonly string EnvironmentSeparator = ";";
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.Path instead", error: false)]
-            public static readonly string Path = EnvironmentVariables.System.Path;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.PathExtensions instead", error: false)]
-            public static readonly string PathExtensions = EnvironmentVariables.System.PathExtensions;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.PSModulePath instead", error: false)]
-            public static readonly string PsModulePath = EnvironmentVariables.System.PSModulePath;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.Temp instead", error: false)]
-            public static readonly string Temp = EnvironmentVariables.System.Temp;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.Username instead", error: false)]
-            public static readonly string Username = EnvironmentVariables.System.Username;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.ProcessorArchitecture instead", error: false)]
-            public static readonly string ProcessorArchitecture = EnvironmentVariables.System.ProcessorArchitecture;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.ChocolateyToolsLocation instead", error: false)]
-            public static readonly string ChocolateyToolsLocation = EnvironmentVariables.System.ChocolateyToolsLocation;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyPackageInstallLocation instead", error: false)]
-            public static readonly string ChocolateyPackageInstallLocation = EnvironmentVariables.Package.ChocolateyPackageInstallLocation;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyInstallerType instead", error: false)]
-            public static readonly string ChocolateyPackageInstallerType = EnvironmentVariables.Package.ChocolateyInstallerType;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyExitCode instead", error: false)]
-            public static readonly string ChocolateyPackageExitCode = EnvironmentVariables.Package.ChocolateyExitCode;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyIgnoreChecksums instead", error: false)]
-            public static readonly string ChocolateyIgnoreChecksums = EnvironmentVariables.Package.ChocolateyIgnoreChecksums;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyAllowEmptyChecksums instead", error: false)]
-            public static readonly string ChocolateyAllowEmptyChecksums = EnvironmentVariables.Package.ChocolateyAllowEmptyChecksums;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyAllowEmptyChecksumsSecure instead", error: false)]
-            public static readonly string ChocolateyAllowEmptyChecksumsSecure = EnvironmentVariables.Package.ChocolateyAllowEmptyChecksumsSecure;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyPowerShellHost instead", error: false)]
-            public static readonly string ChocolateyPowerShellHost = EnvironmentVariables.Package.ChocolateyPowerShellHost;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyForce instead", error: false)]
-            public static readonly string ChocolateyForce = EnvironmentVariables.Package.ChocolateyForce;
-
-            [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.Package.ChocolateyExitOnRebootDetected instead", error: false)]
-            public static readonly string ChocolateyExitOnRebootDetected = EnvironmentVariables.Package.ChocolateyExitOnRebootDetected;
         }
 
         /// <summary>
@@ -301,11 +251,5 @@ namespace chocolatey.infrastructure.app
 
             return isDebug;
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static bool is_debug_mode_cli_primitive()
-            => IsDebugModeCliPrimitive();
-#pragma warning restore IDE0022, IDE1006
     }
 }

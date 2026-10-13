@@ -143,23 +143,5 @@ namespace chocolatey.infrastructure.commands
 
             return completed;
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static Execute with_timeout(int timeoutInSeconds)
-            => WithTimeout(timeoutInSeconds);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static Execute with_timeout(TimeSpan timeout)
-            => WithTimeout(timeout);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public T command<T>(Func<T> function, T timeoutDefaultValue)
-            => Command(function, timeoutDefaultValue);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public bool command(Action action)
-            => Command(action);
-#pragma warning restore IDE0022, IDE1006
     }
 }

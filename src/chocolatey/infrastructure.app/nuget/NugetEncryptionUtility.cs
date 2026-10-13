@@ -51,12 +51,5 @@ namespace chocolatey.infrastructure.app.nuget
         {
             return EncryptionUtility.GenerateUniqueToken(caseInsensitiveKey);
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public static void initialize_with(Lazy<IEncryptionUtility> encryptionUtility)
-            => InitializeWith(encryptionUtility);
-#pragma warning restore IDE0022, IDE1006
     }
 }

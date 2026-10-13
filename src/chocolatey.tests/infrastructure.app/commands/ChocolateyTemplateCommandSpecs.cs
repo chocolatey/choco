@@ -45,7 +45,7 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public void Reset()
             {
-                TemplateService.ResetCalls();
+                TemplateService.Invocations.Clear();
             }
         }
 

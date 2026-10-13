@@ -25,16 +25,5 @@ namespace chocolatey.infrastructure.app.services
         void Generate(ChocolateyConfiguration configuration);
         void ListDryRun(ChocolateyConfiguration configuration);
         void List(ChocolateyConfiguration configuration);
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void generate_noop(ChocolateyConfiguration configuration);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void generate(ChocolateyConfiguration configuration);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void list_noop(ChocolateyConfiguration configuration);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void list(ChocolateyConfiguration configuration);
-#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -71,9 +71,7 @@ namespace chocolatey.infrastructure.app.registration
             registrator.RegisterSourceRunner<CygwinService>();
             registrator.RegisterSourceRunner<PythonService>();
             registrator.RegisterSourceRunner<RubyGemsService>();
-
-            registrator.RegisterService<ISourceRunner>(
-                typeof(INugetService));
+            registrator.RegisterSourceRunner<NugetService>();
 
             registrator.RegisterService<IEventSubscriptionManagerService, EventSubscriptionManagerService>();
 
@@ -96,11 +94,5 @@ namespace chocolatey.infrastructure.app.registration
             registrator.RegisterService<IMetadataRule>(availableRules);
             registrator.RegisterService<IProcessCollectorService, ProcessCollectorService>();
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void register_dependencies(IContainerRegistrator registrator, ChocolateyConfiguration configuration)
-            => RegisterDependencies(registrator, configuration);
-#pragma warning restore IDE0022, IDE1006
     }
 }

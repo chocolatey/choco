@@ -57,17 +57,17 @@ namespace chocolatey.tests.infrastructure.app.services
 
             public override void Context()
             {
-                NugetService.ResetCalls();
-                PowershellService.ResetCalls();
-                ShimGenerationService.ResetCalls();
-                FileSystem.ResetCalls();
-                RegistryService.ResetCalls();
-                ChocolateyPackageInformationService.ResetCalls();
-                FilesService.ResetCalls();
-                AutomaticUninstallerService.ResetCalls();
-                XmlService.ResetCalls();
-                ConfigTransformService.ResetCalls();
-                ContainerResolver.ResetCalls();
+                NugetService.Invocations.Clear();
+                PowershellService.Invocations.Clear();
+                ShimGenerationService.Invocations.Clear();
+                FileSystem.Invocations.Clear();
+                RegistryService.Invocations.Clear();
+                ChocolateyPackageInformationService.Invocations.Clear();
+                FilesService.Invocations.Clear();
+                AutomaticUninstallerService.Invocations.Clear();
+                XmlService.Invocations.Clear();
+                ConfigTransformService.Invocations.Clear();
+                ContainerResolver.Invocations.Clear();
                 Service = new ChocolateyPackageService(
                     NugetService.Object,
                     PowershellService.Object,

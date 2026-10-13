@@ -96,8 +96,8 @@ namespace chocolatey.tests.infrastructure.app.commands
 
             public void Reset()
             {
-                PackageInfoService.ResetCalls();
-                NugetService.ResetCalls();
+                PackageInfoService.Invocations.Clear();
+                NugetService.Invocations.Clear();
             }
         }
 

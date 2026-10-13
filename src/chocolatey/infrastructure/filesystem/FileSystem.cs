@@ -34,11 +34,5 @@ namespace chocolatey.infrastructure.filesystem
 
             return fileBytes;
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static byte[] read_binary_file_into_byte_array(string filePath)
-            => ReadFileBytes(filePath);
-#pragma warning restore IDE0022, IDE1006
     }
 }

@@ -27,10 +27,5 @@ namespace chocolatey.infrastructure.app.services
     public interface IPendingRebootService
     {
         bool IsRebootPending(ChocolateyConfiguration config);
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        bool is_pending_reboot(ChocolateyConfiguration config);
-#pragma warning restore IDE0022, IDE1006
     }
 }

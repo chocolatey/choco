@@ -276,35 +276,5 @@ namespace chocolatey.infrastructure.app.services
 
             return errored;
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public PackageFiles read_from_file(string filePath)
-            => ReadPackageSnapshot(filePath);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void save_to_file(PackageFiles snapshot, string filePath)
-            => SavePackageSnapshot(snapshot, filePath);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void ensure_compatible_file_attributes(PackageResult packageResult, ChocolateyConfiguration config)
-            => EnsureCompatibleFileAttributes(packageResult, config);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void ensure_compatible_file_attributes(string directory, ChocolateyConfiguration config)
-            => EnsureCompatibleFileAttributes(directory, config);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public PackageFiles capture_package_files(PackageResult packageResult, ChocolateyConfiguration config)
-            => CaptureSnapshot(packageResult, config);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public PackageFiles capture_package_files(string directory, ChocolateyConfiguration config)
-            => CaptureSnapshot(directory, config);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public PackageFile get_package_file(string file)
-            => GetPackageFile(file);
-#pragma warning restore IDE0022, IDE1006
     }
 }

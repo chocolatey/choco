@@ -135,7 +135,7 @@ namespace chocolatey.infrastructure.app.commands
                      {
                          if (option != null)
                          {
-                             configuration.ListCommand.OrderByPopularity = true;
+                             configuration.ListCommand.OrderBy = PackageOrder.Popularity;
 
                              this.Log().Warn(
                                  @"'--order-by-popularity' is deprecated and will be removed in a future release.
@@ -285,43 +285,5 @@ choco {0}: https://raw.githubusercontent.com/wiki/chocolatey/choco/images/gifs/c
         {
             return false;
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void configure_argument_parser(OptionSet optionSet, ChocolateyConfiguration configuration)
-            => ConfigureArgumentParser(optionSet, configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void handle_additional_argument_parsing(IList<string> unparsedArguments, ChocolateyConfiguration configuration)
-            => ParseAdditionalArguments(unparsedArguments, configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void handle_validation(ChocolateyConfiguration configuration)
-            => Validate(configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void help_message(ChocolateyConfiguration configuration)
-            => HelpMessage(configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void noop(ChocolateyConfiguration configuration)
-            => DryRun(configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual void run(ChocolateyConfiguration configuration)
-            => Run(configuration);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual bool may_require_admin_access()
-            => MayRequireAdminAccess();
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual int count(ChocolateyConfiguration config)
-            => Count(config);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public virtual IEnumerable<PackageResult> list(ChocolateyConfiguration config)
-            => List(config);
-#pragma warning restore IDE0022, IDE1006
     }
 }

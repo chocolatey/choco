@@ -24,16 +24,5 @@ namespace chocolatey.infrastructure.app.domain
         Install,
         Upgrade,
         Uninstall,
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        list = List,
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        install = Install,
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        upgrade = Upgrade,
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        uninstall = Uninstall,
-#pragma warning restore IDE0022, IDE1006
     }
 }

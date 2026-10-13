@@ -108,7 +108,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             public void Reset()
             {
                 _unparsedArgs.Clear();
-                ConfigSettingsService.ResetCalls();
+                ConfigSettingsService.Invocations.Clear();
             }
 
             [Fact]

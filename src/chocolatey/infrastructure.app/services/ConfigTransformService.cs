@@ -196,11 +196,5 @@ namespace chocolatey.infrastructure.app.services
             // not found in new backup directories.
             return targetFile.Replace(installDirectory, backupDirectory);
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void run(PackageResult packageResult, ChocolateyConfiguration config)
-            => Run(packageResult, config);
-#pragma warning restore IDE0022, IDE1006
     }
 }

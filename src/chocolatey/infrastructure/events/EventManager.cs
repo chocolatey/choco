@@ -75,19 +75,5 @@ namespace chocolatey.infrastructure.events
 
             return null;
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static void initialize_with(Func<IEventSubscriptionManagerService> messageSubscriptionManager)
-            => InitializeWith(messageSubscriptionManager);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static void publish<Event>(Event message) where Event : class, IMessage
-            => Publish(message);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static IDisposable subscribe<Event>(Action<Event> handleEvent, Action<Exception> handleError, Func<Event, bool> filter) where Event : class, IMessage
-            => Subscribe(handleEvent, handleError, filter);
-#pragma warning restore IDE0022, IDE1006
     }
 }

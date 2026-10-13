@@ -224,11 +224,5 @@ namespace chocolatey.infrastructure.app.services
 
             return versionNumber.Build >= 6001;
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public bool is_pending_reboot(ChocolateyConfiguration config)
-            => IsRebootPending(config);
-#pragma warning restore IDE0022, IDE1006
     }
 }

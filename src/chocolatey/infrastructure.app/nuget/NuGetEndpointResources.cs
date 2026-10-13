@@ -108,12 +108,6 @@ namespace chocolatey.infrastructure.app.nuget
 
         public SourceRepository Source { get; private set; }
 
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static NuGetEndpointResources GetResourcesBySource(SourceRepository source)
-        {
-            return GetResourcesBySource(source, cacheContext: null);
-        }
-
         public static NuGetEndpointResources GetResourcesBySource(SourceRepository source, ChocolateySourceCacheContext cacheContext)
         {
             return _cachedResources.GetOrAdd(source, (key) =>
@@ -122,12 +116,6 @@ namespace chocolatey.infrastructure.app.nuget
 
                 return endpointResource;
             });
-        }
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public static IEnumerable<NuGetEndpointResources> GetResourcesBySource(IEnumerable<SourceRepository> sources)
-        {
-            return GetResourcesBySource(sources, cacheContext: null);
         }
 
         public static IEnumerable<NuGetEndpointResources> GetResourcesBySource(IEnumerable<SourceRepository> sources, ChocolateySourceCacheContext cacheContext)

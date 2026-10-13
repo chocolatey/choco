@@ -118,9 +118,7 @@ namespace chocolatey.tests.infrastructure.adapters
         {
             public override void Because()
             {
-#pragma warning disable 618
-                Subject = Assembly.set_assembly(typeof(AssemblySpecs).Assembly);
-#pragma warning restore 618
+                Subject = Assembly.SetAssembly(typeof(AssemblySpecs).Assembly);
             }
 
             [Fact]

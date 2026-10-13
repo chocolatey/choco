@@ -40,17 +40,5 @@ namespace chocolatey.infrastructure.app.registration
         {
             return _container.GetAllInstances<TService>();
         }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public TService resolve<TService>()
-            where TService : class
-            => Resolve<TService>();
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public IEnumerable<TService> resolve_all<TService>()
-            where TService : class
-            => ResolveAll<TService>();
-#pragma warning restore IDE0022, IDE1006
     }
 }

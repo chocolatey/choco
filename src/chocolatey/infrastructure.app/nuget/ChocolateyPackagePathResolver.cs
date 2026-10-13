@@ -47,12 +47,6 @@ namespace chocolatey.infrastructure.app.nuget
             return _filesystem.CombinePaths(RootDirectory, packageId);
         }
 
-        [Obsolete("This overload will be removed in a future version.")]
-        public string GetInstallPath(string id, NuGetVersion version)
-        {
-            return GetInstallPath(id);
-        }
-
         public override string GetPackageFileName(PackageIdentity packageIdentity)
         {
             return packageIdentity.Id + NuGetConstants.PackageExtension;

@@ -41,7 +41,7 @@ namespace chocolatey.tests
         public void Reset()
         {
             Messages.Clear();
-            this.ResetCalls();
+            this.Invocations.Clear();
             LogMessagesToConsole = false;
             LoggerNames.Clear();
         }

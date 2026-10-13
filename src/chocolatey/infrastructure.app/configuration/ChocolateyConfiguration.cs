@@ -519,16 +519,6 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         /// Gets or sets the configuration related specifically to the Rule command.
         /// </summary>
         public RuleCommandConfiguration RuleCommand { get; set; }
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void start_backup()
-            => CreateBackup();
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public void reset_config(bool removeBackup = false)
-            => RevertChanges(removeBackup);
-#pragma warning restore IDE0022, IDE1006
     }
 
     [Serializable]
@@ -628,33 +618,11 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public bool IgnorePinned { get; set; }
         public PackageOrder OrderBy { get; set; }
 
-        [Obsolete("This property is deprecated and will be removed in version 3.0. Use the 'OrderBy' property instead.")]
-        public bool OrderByPopularity
-        {
-            get
-            {
-                return OrderBy == PackageOrder.Popularity;
-            }
-            set
-            {
-                if (value)
-                {
-                    OrderBy = PackageOrder.Popularity;
-                }
-                else
-                {
-                    OrderBy = PackageOrder.Id;
-                }
-            }
-        }
-
         public bool ApprovedOnly { get; set; }
         public bool DownloadCacheAvailable { get; set; }
         public bool NotBroken { get; set; }
         public bool IncludeVersionOverrides { get; set; }
         public bool ExplicitPageSize { get; set; }
-        [Obsolete("This property is deprecated and will be removed in v3. Check if the top-level ExplicitSources property is set instead.")]
-        public bool ExplicitSource { get; set; }
     }
 
     [Serializable]

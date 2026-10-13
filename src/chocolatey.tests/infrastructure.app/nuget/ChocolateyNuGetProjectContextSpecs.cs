@@ -49,7 +49,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             {
                 base.BeforeEachSpec();
 
-                Logger.ResetCalls();
+                Logger.Invocations.Clear();
             }
 
             [Fact]

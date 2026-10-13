@@ -24,36 +24,6 @@ using chocolatey.infrastructure.results;
 
 namespace chocolatey.infrastructure.app.services
 {
-    [MultiService]
-    [Obsolete("This interface is deprecated and will be removed in v3.")]
-    public interface ISourceRunner : IBootstrappableSourceRunner, ICountSourceRunner, IListSourceRunner, IInstallSourceRunner, IUpgradeSourceRunner, IUninstallSourceRunner
-    {
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void ensure_source_app_installed(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> ensureAction);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        int count_run(ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void list_noop(ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        IEnumerable<PackageResult> list_run(ChocolateyConfiguration config);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void install_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        ConcurrentDictionary<string, PackageResult> install_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeModifyAction);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        ConcurrentDictionary<string, PackageResult> upgrade_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        ConcurrentDictionary<string, PackageResult> upgrade_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUpgradeAction = null);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void uninstall_noop(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction);
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        ConcurrentDictionary<string, PackageResult> uninstall_run(ChocolateyConfiguration config, Action<PackageResult, ChocolateyConfiguration> continueAction, Action<PackageResult, ChocolateyConfiguration> beforeUninstallAction = null);
-#pragma warning restore IDE0022, IDE1006
-    }
-
     public interface IAlternativeSourceRunner
     {
         /// <summary>

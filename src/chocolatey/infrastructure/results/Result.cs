@@ -31,9 +31,6 @@ namespace chocolatey.infrastructure.results
         public Result()
         {
             LazyMessages = new Lazy<List<ResultMessage>>();
-#pragma warning disable CS0618 // Type or member is obsolete
-            _messages = LazyMessages;
-#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         public bool Success
@@ -45,10 +42,5 @@ namespace chocolatey.infrastructure.results
         {
             get { return LazyMessages.Value; }
         }
-
-#pragma warning disable IDE0022, IDE1006 // Naming Styles
-        [Obsolete("This field is deprecated and will be removed in v3. Use LazyMessages or Messages instead.")]
-        protected readonly Lazy<List<ResultMessage>> _messages;
-#pragma warning restore IDE0022, IDE1006 // Naming Styles
     }
 }

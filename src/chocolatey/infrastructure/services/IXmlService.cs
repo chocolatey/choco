@@ -53,19 +53,5 @@ namespace chocolatey.infrastructure.services
         /// <param name="xmlFilePath">The XML file path.</param>
         /// <param name="isSilent">Log messages?</param>
         void Serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent);
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        XmlType deserialize<XmlType>(string xmlFilePath);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        XmlType deserialize<XmlType>(string xmlFilePath, int retryCount);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void serialize<XmlType>(XmlType xmlType, string xmlFilePath);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void serialize<XmlType>(XmlType xmlType, string xmlFilePath, bool isSilent);
-#pragma warning restore IDE0022, IDE1006
     }
 }

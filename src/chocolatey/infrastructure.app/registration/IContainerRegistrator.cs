@@ -42,29 +42,5 @@ namespace chocolatey.infrastructure.app.registration
 
         void RegisterInstance<TService, TImplementation>(Func<IContainerResolver, TImplementation> instance)
             where TImplementation : class, TService;
-
-#pragma warning disable IDE0022, IDE1006
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void register_validator(Func<Type, bool> validation_func);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void register_service<TService, TImplementation>(bool transient = false)
-            where TImplementation : class, TService;
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void register_service<TService>(params Type[] types);
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void register_instance<TImplementation>(Func<TImplementation> instance)
-            where TImplementation : class;
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void register_instance<TService, TImplementation>(Func<TImplementation> instance)
-            where TImplementation : class, TService;
-
-        [Obsolete("This overload is deprecated and will be removed in v3.")]
-        void register_instance<TService, TImplementation>(Func<IContainerResolver, TImplementation> instance)
-            where TImplementation : class, TService;
-#pragma warning restore IDE0022, IDE1006
     }
 }
