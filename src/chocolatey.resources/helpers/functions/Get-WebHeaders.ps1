@@ -37,6 +37,9 @@ This is the url to get a request/response from.
 The user agent to use as part of the request. Defaults to 'chocolatey
 command line'.
 
+.PARAMETER Options
+OPTIONAL - Specify custom headers.
+
 .PARAMETER IgnoredArguments
 Allows splatting with arguments that do not apply. Do not use directly.
 
@@ -52,6 +55,7 @@ Get-WebFile
     param(
         [parameter(Mandatory = $false, Position = 0)][string] $url = '',
         [parameter(Mandatory = $false, Position = 1)][string] $userAgent = 'chocolatey command line',
+        [parameter(Mandatory = $false)][hashtable] $options = @{Headers = @{} },
         [parameter(ValueFromRemainingArguments = $true)][Object[]] $ignoredArguments
     )
 
@@ -131,6 +135,30 @@ Get-WebFile
     if ($userAgent -ne $null) {
         Write-Debug "Setting the UserAgent to `'$userAgent`'"
         $request.UserAgent = $userAgent
+    }
+
+    if ($options.Headers.Count -gt 0) {
+        Write-Debug "Setting custom headers"
+        foreach ($key in $options.Headers.Keys) {
+            $uri = New-Object -TypeName System.Uri $url
+            switch ($key) {
+                'Accept' {
+                    $request.Accept = $options.Headers[$key]
+                }
+                'Cookie' {
+                    $request.CookieContainer.SetCookies($uri, $options.Headers[$key])
+                }
+                'Referer' {
+                    $request.Referer = $options.Headers[$key]
+                }
+                'User-Agent' {
+                    $request.UserAgent = $options.Headers[$key]
+                }
+                Default {
+                    $request.Headers.Add($key, $options.Headers[$key])
+                }
+            }
+        }
     }
 
     Write-Debug "Request Headers:"
