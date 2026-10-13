@@ -2352,6 +2352,104 @@ To install a local, or remote file, you may use:
         }
     }
 
+    # An explicit --version is a hard constraint on the package named on the command
+    # line. Chocolatey CLI must either honour it exactly or fail - it must never
+    # substitute a different version of that package. See issue #3923.
+    Context "Installing a Package at a version an installed parent package forbids" -Tag Working {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            # hasoutofrangedependency 1.0.0 takes an exact dependency on hasdependency 1.0.0.
+            $Setup = Invoke-Choco install hasoutofrangedependency --version 1.0.0 --confirm
+            $PackageUnderTest = "hasdependency"
+
+            $Output = Invoke-Choco install $PackageUnderTest --version 2.0.0 --confirm
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Outputs a message indicating that it failed to install the package(s)" {
+            $Output.Lines | Should -Contain "Chocolatey installed 0/1 packages. 1 packages failed." -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Has not replaced the installed version of the package" {
+            "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+    }
+
+    Context "Installing a Package at a version its dependencies allow" -Tag Working {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            # hasdependency 1.5.0 pins isexactversiondependency to 1.1.0, but takes only a
+            # minimum dependency on isdependency, so the dependencies resolve to different
+            # versions while the requested version is used as-is.
+            $PackageUnderTest = "hasdependency"
+
+            $Output = Invoke-Choco install $PackageUnderTest --version 1.5.0 --confirm
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Outputs a message indicating that it successfully installed the package(s)" {
+            $Output.Lines | Should -Contain "Chocolatey installed 3/3 packages." -Because $Output.String
+        }
+
+        It "Installed the requested version of the package" {
+            "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec"
+            $XML.package.metadata.version | Should -Be "1.5.0"
+        }
+
+        It "Installed the dependency (<Name>) at the resolved version (<Version>)" -ForEach @(
+            @{ Name = 'isdependency' ; Version = '2.1.0' }
+            @{ Name = 'isexactversiondependency' ; Version = '1.1.0' }
+        ) {
+            "$env:ChocolateyInstall\lib\$Name\$Name.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$Name\$Name.nuspec"
+            $XML.package.metadata.version | Should -Be $Version
+        }
+    }
+
+    Context "Force Installing a Package at an older version while forcing dependencies" -Tag Working, Downgrade {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "hasdependency"
+            $Setup = Invoke-Choco install $PackageUnderTest --version 2.1.0 --confirm
+
+            $Output = Invoke-Choco install $PackageUnderTest --version 1.0.0 --allow-downgrade --force --force-dependencies --confirm
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Installed the requested version of the package" {
+            "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+    }
+
     # This needs to be the last test in this block, to ensure NuGet configurations aren't being created.
     # Any tests after this block are expected to generate the configuration as they're explicitly using the NuGet CLI
     Test-NuGetPaths
