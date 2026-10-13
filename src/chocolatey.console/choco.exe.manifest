@@ -52,8 +52,14 @@
   </compatibility>
 
   <asmv3:application>
-    <asmv3:windowsSettings xmlns:ws2="http://schemas.microsoft.com/SMI/2016/WindowsSettings">
+    <asmv3:windowsSettings xmlns:ws2="http://schemas.microsoft.com/SMI/2016/WindowsSettings" xmlns:ws4="http://schemas.microsoft.com/SMI/2024/WindowsSettings">
       <ws2:longPathAware>true</ws2:longPathAware>
+      <!-- By design, an AnyCPU .NET Framework app runs as x64-emulated on Windows on ARM.
+           Declaring arm64 here opts choco into running natively as ARM64 on capable hosts
+           (Windows 11, version 24H2 and later); it falls back to x64 emulation otherwise.
+           amd64 is listed so x64 hosts continue to run natively as x64.
+           https://learn.microsoft.com/windows/win32/sbscs/application-manifests -->
+      <ws4:supportedArchitectures>amd64 arm64</ws4:supportedArchitectures>
     </asmv3:windowsSettings>
   </asmv3:application>
 </asmv1:assembly>
