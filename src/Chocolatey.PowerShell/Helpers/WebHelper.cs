@@ -41,6 +41,7 @@ namespace Chocolatey.PowerShell.Helpers
         private static string _clientKey;
 
         private bool disposedValue;
+        private bool _proxyMessagesAreDebug;
 
         /// <summary>
         /// Initializes a <see cref="WebHelper"/> with a cancellation token, to enable cancelling any download
@@ -111,7 +112,7 @@ namespace Chocolatey.PowerShell.Helpers
 
                 proxy.BypassList = WebProxyConfiguration.BypassList;
 
-                PSHelper.WriteHost(Cmdlet, $"Using explicit proxy server '{proxy.Address}'.");
+                WriteProxyMessage($"Using explicit proxy server '{proxy.Address}'.");
 
                 return proxy;
             }
@@ -134,7 +135,7 @@ namespace Chocolatey.PowerShell.Helpers
                         .GetNetworkCredential();
                 }
 
-                PSHelper.WriteHost(Cmdlet, $"Using system proxy server '{proxyAddress}'.");
+                WriteProxyMessage($"Using system proxy server '{proxyAddress}'.");
 
                 return new WebProxy(proxyAddress)
                 {
@@ -146,11 +147,25 @@ namespace Chocolatey.PowerShell.Helpers
             return null;
         }
 
+        private void WriteProxyMessage(string message)
+        {
+            if (_proxyMessagesAreDebug)
+            {
+                PSHelper.WriteDebug(Cmdlet, message);
+            }
+            else
+            {
+                PSHelper.WriteHost(Cmdlet, message);
+            }
+        }
+
         /// <summary>
         /// Creates the handler that requests are sent through, configured with the Chocolatey defaults,
         /// the default credentials, and the given <paramref name="proxy"/>.
         /// </summary>
-        /// <param name="proxy">The proxy to send requests through, or <c>null</c> to leave the choice to the handler's default.</param>
+        /// <param name="proxy">
+        /// The proxy to send requests through, or <c>null</c> to leave the choice to the handler's default.
+        /// </param>
         /// <returns>The configured handler.</returns>
         protected virtual HttpClientHandler CreateHandler(IWebProxy proxy)
         {
@@ -178,8 +193,7 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
-        /// Gets a key that identifies the configuration of the given <paramref name="proxy"/>. Two proxies that would
-        /// be used in the same way have the same key, and no credentials are held in the clear.
+        /// Gets a key that identifies the configuration of the given <paramref name="proxy"/>.
         /// </summary>
         /// <param name="proxy">The proxy to describe, or <c>null</c> for the handler's default.</param>
         /// <returns>A hash of the proxy's configuration.</returns>
@@ -219,7 +233,9 @@ namespace Chocolatey.PowerShell.Helpers
         /// and is created again only when the proxy to use is not the one it was created for.
         /// Override this to change how requests are sent.
         /// </summary>
-        /// <param name="proxy">The proxy that requests will be sent through, or <c>null</c> for the handler's default.</param>
+        /// <param name="proxy">
+        /// The proxy that requests will be sent through, or <c>null</c> for the handler's default.
+        /// </param>
         /// <returns>The client.</returns>
         protected virtual HttpClient GetHttpClient(IWebProxy proxy)
         {
@@ -227,6 +243,10 @@ namespace Chocolatey.PowerShell.Helpers
 
             lock (_clientLock)
             {
+                // If the proxy key has changed, it means that someone has done something weird to
+                // change the proxy configuration *during* a Chocolatey run. This handles that
+                // edge case, but given we do not expect this to be a typical use case, we do
+                // not want the overhead of maintaining multiple separate HttpClient instances.
                 if (_httpClient is null || _clientKey != key)
                 {
                     // Each request applies its own timeout, so the client itself never times out.
@@ -240,9 +260,9 @@ namespace Chocolatey.PowerShell.Helpers
                 return _httpClient;
             }
         }
-
         /// <summary>
-        /// Gets how long to wait for the response headers to arrive, taking any configured environment variable into account.
+        /// Gets how long to wait for the response headers to arrive, taking any configured environment variable
+        /// into account.
         /// </summary>
         /// <returns>The request timeout.</returns>
         protected TimeSpan GetRequestTimeout()
@@ -267,7 +287,8 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
-        /// Gets how long to wait for each read of the response body, taking any configured environment variable into account.
+        /// Gets how long to wait for each read of the response body, taking any configured environment variable
+        /// into account.
         /// </summary>
         /// <returns>The read timeout, or <c>null</c> if reads should wait indefinitely.</returns>
         protected TimeSpan? GetReadTimeout()
@@ -278,7 +299,8 @@ namespace Chocolatey.PowerShell.Helpers
                 return null;
             }
 
-            // A value that is not positive means reads wait indefinitely, as zero does for Chocolatey's own configuration.
+            // A value that is not positive means reads wait indefinitely, as zero does for Chocolatey's own
+            // configuration.
             var milliseconds = PSHelper.ConvertTo<int>(responseTimeout);
             if (milliseconds <= 0)
             {
@@ -310,6 +332,9 @@ namespace Chocolatey.PowerShell.Helpers
                 PSHelper.WriteDebug(Cmdlet, "Setting custom headers");
                 foreach (var key in options.Headers.Keys)
                 {
+                    // This normalization necessary for the edge case of someone passing in a header
+                    // dictionary that is keyed by the HttpRequestHeader *values* or
+                    // equivalent integer values, rather than by string names.
                     var name = key is string text
                         ? text
                         : GetHeaderName(PSHelper.ConvertTo<HttpRequestHeader>(key));
@@ -339,6 +364,13 @@ namespace Chocolatey.PowerShell.Helpers
             return message;
         }
 
+        /// <summary>
+        /// Add the header to the <paramref name="message"/>.
+        /// </summary>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the requested header has already been set, so that we don't accidentally override
+        /// a header that's already been set via another means.
+        /// </exception>
         private static void SetRequestHeader(HttpRequestMessage message, string name, string value, bool replace)
         {
             if (replace)
@@ -354,8 +386,10 @@ namespace Chocolatey.PowerShell.Helpers
 
         private static string GetHeaderName(HttpRequestHeader header)
         {
-            var headers = new WebHeaderCollection();
-            headers.Add(header, "value");
+            var headers = new WebHeaderCollection
+            {
+                { header, "value" }
+            };
 
             return headers.AllKeys[0];
         }
@@ -366,9 +400,19 @@ namespace Chocolatey.PowerShell.Helpers
         /// <returns>A Dictionary containing the headers and their values.</returns>
         protected Dictionary<string, string> GetResponseHeaders()
         {
+            return ConsolidateHeaders(Response.Headers, Response.Content?.Headers);
+        }
+
+        /// <summary>
+        /// Consolidates the headers from both sources into a single header dictionary.
+        /// </summary>
+        private static Dictionary<string, string> ConsolidateHeaders(params IEnumerable<KeyValuePair<string, IEnumerable<string>>>[] sources)
+        {
             var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            AddHeaders(headers, Response.Headers);
-            AddHeaders(headers, Response.Content?.Headers);
+            foreach (var source in sources)
+            {
+                AddHeaders(headers, source);
+            }
 
             return headers;
         }
@@ -382,8 +426,16 @@ namespace Chocolatey.PowerShell.Helpers
 
             foreach (var header in source)
             {
-                target[header.Key] = string.Join(",", header.Value);
+                // Product headers read as written when their parts are separated by spaces.
+                var separator = IsProductHeader(header.Key) ? " " : ",";
+                target[header.Key] = string.Join(separator, header.Value);
             }
+        }
+
+        private static bool IsProductHeader(string name)
+        {
+            return name.Equals("User-Agent", StringComparison.OrdinalIgnoreCase)
+                || name.Equals("Server", StringComparison.OrdinalIgnoreCase);
         }
 
         private string GetMediaType()
@@ -638,21 +690,11 @@ namespace Chocolatey.PowerShell.Helpers
             bool passthru,
             bool quiet)
         {
-            var client = GetHttpClient(ResolveProxy(Options.Uri));
-            var requestTimeout = GetRequestTimeout();
             ReadTimeout = GetReadTimeout();
 
-            using (var message = CreateRequestMessage(Options))
-            {
-                try
+            Execute(
+                () =>
                 {
-                    Response = SendRequest(client, message, requestTimeout);
-
-                    if (!Response.IsSuccessStatusCode)
-                    {
-                        throw new WebException($"The remote server returned an error: ({(int)Response.StatusCode}) {Response.ReasonPhrase}.");
-                    }
-
                     WriteCheckFileFor(filePath);
 
                     if ((!passthru && string.IsNullOrEmpty(filePath))
@@ -679,6 +721,149 @@ namespace Chocolatey.PowerShell.Helpers
 
                             break;
                     }
+                },
+                isDownload: true);
+        }
+
+        /// <summary>
+        /// Gets the headers that the server responds with for the request described by the options.
+        /// </summary>
+        /// <returns>
+        /// A case-insensitive table of the response headers that have a value, or an empty table if the options
+        /// have no address to request.
+        /// </returns>
+        /// <exception cref="WebException">Thrown if the server could not be reached, or it responded with an error.</exception>
+        /// <exception cref="OperationCanceledException">Thrown if the cancellation token is triggered.</exception>
+        public Hashtable GetWebHeaders()
+        {
+            var headers = new Hashtable(StringComparer.OrdinalIgnoreCase);
+            if (Options.Uri is null)
+            {
+                return headers;
+            }
+
+            Execute(
+                () =>
+                {
+                    PSHelper.WriteDebug(Cmdlet, "Response Headers:");
+                    foreach (var header in GetResponseHeaders())
+                    {
+                        if (!string.IsNullOrEmpty(header.Value))
+                        {
+                            headers[header.Key] = header.Value;
+                            PSHelper.WriteDebug(Cmdlet, $"  '{header.Key}':'{header.Value}'");
+                        }
+                    }
+                },
+                isDownload: false,
+                beforeSend: WriteRequestHeaders);
+
+            return headers;
+        }
+
+        /// <summary>
+        /// Gets the name of the file that the request described by the options would download, using what the
+        /// server responds with, and falling back to the <paramref name="defaultName"/> when a name cannot be determined.
+        /// </summary>
+        /// <param name="defaultName">The name to use when a name cannot be determined.</param>
+        /// <returns>The name of the file.</returns>
+        /// <exception cref="OperationCanceledException">Thrown if the cancellation token is triggered.</exception>
+        public string GetRemoteFileName(string defaultName)
+        {
+            if (Options.Uri is null)
+            {
+                PSHelper.WriteDebug(Cmdlet, "Url was null, using default name.");
+                return defaultName;
+            }
+
+            if (Options.Uri.IsFile)
+            {
+                PSHelper.WriteDebug(Cmdlet, "Url is local file, returning fileName");
+                return Path.GetFileName(Options.Uri.LocalPath);
+            }
+
+            if (Options.Uri.OriginalString.StartsWith("ftp", StringComparison.OrdinalIgnoreCase))
+            {
+                PSHelper.WriteDebug(Cmdlet, "Url is FTP, using default name.");
+                return defaultName;
+            }
+
+            // Working out a file name is a quiet step on the way to a download, so it keeps the proxy
+            // messages out of the host output.
+            _proxyMessagesAreDebug = true;
+
+            var fileName = defaultName;
+            try
+            {
+                Execute(
+                    () =>
+                    {
+                        var headers = GetResponseHeaders();
+                        headers.TryGetValue("Content-Disposition", out var contentDisposition);
+                        headers.TryGetValue("Location", out var location);
+
+                        fileName = RemoteFileNameResolver.Resolve(
+                            defaultName,
+                            Options.Uri.OriginalString,
+                            ResponseUri,
+                            contentDisposition,
+                            location,
+                            message => PSHelper.WriteDebug(Cmdlet, message));
+                    },
+                    isDownload: false);
+            }
+            catch (WebException error)
+            {
+                PSHelper.WriteDebug(Cmdlet, $"Url request/response failed - file name will be '{defaultName}':  {error.InnerException?.Message ?? error.Message}");
+                return defaultName;
+            }
+
+            return fileName;
+        }
+
+        /// <summary>
+        /// Sends the request described by the options, and runs the <paramref name="onResponse"/> action once the
+        /// response headers have arrived and the response is known to be a success.
+        /// </summary>
+        /// <param name="onResponse">The action to run with the successful <see cref="Response"/>.</param>
+        /// <param name="isDownload">
+        /// Whether the request is for a download, in which case a failure also reports an exit code and
+        /// mentions the private CDN when it is available.
+        /// </param>
+        protected void Execute(Action onResponse, bool isDownload)
+        {
+            Execute(onResponse, isDownload, beforeSend: null);
+        }
+
+        /// <summary>
+        /// Sends the request described by the options, and runs the <paramref name="onResponse"/> action once the
+        /// response headers have arrived and the response is known to be a success.
+        /// </summary>
+        /// <param name="onResponse">The action to run with the successful <see cref="Response"/>.</param>
+        /// <param name="isDownload">
+        /// Whether the request is for a download, in which case a failure also reports an exit code and
+        /// mentions the private CDN when it is available.
+        /// </param>
+        /// <param name="beforeSend">An action to run on the request message before it is sent.</param>
+        protected void Execute(Action onResponse, bool isDownload, Action<HttpRequestMessage> beforeSend)
+        {
+            var client = GetHttpClient(ResolveProxy(Options.Uri));
+            var requestTimeout = GetRequestTimeout();
+
+            using (var message = CreateRequestMessage(Options))
+            {
+                beforeSend?.Invoke(message);
+
+                try
+                {
+                    Response = SendHttpRequest(client, message, requestTimeout);
+
+                    if (!Response.IsSuccessStatusCode)
+                    {
+                        throw new WebException($"The remote server returned an error: ({(int)Response.StatusCode}) {Response.ReasonPhrase}.");
+                    }
+
+                    onResponse();
                 }
                 catch (Exception error) when (CancellationToken?.IsCancellationRequested == true)
                 {
@@ -698,10 +883,13 @@ namespace Chocolatey.PowerShell.Helpers
                 {
                     AbortRequest();
 
-                    SetExitCode(404);
+                    if (isDownload)
+                    {
+                        SetExitCode(404);
+                    }
 
                     var errorMessage = $"The remote file either doesn't exist, is unauthorized, or is forbidden for url '{Options.Uri.OriginalString}'. {error.Message}";
-                    if (EnvironmentHelper.GetVariable(Package.DownloadCacheAvailable) == "true")
+                    if (isDownload && EnvironmentHelper.GetVariable(Package.DownloadCacheAvailable) == "true")
                     {
                         errorMessage += "\nThis package is likely not broken for licensed users - see https://docs.chocolatey.org/en-us/features/private-cdn.";
                     }
@@ -711,11 +899,24 @@ namespace Chocolatey.PowerShell.Helpers
             }
         }
 
-        private HttpResponseMessage SendRequest(HttpClient client, HttpRequestMessage message, TimeSpan timeout)
+        private void WriteRequestHeaders(HttpRequestMessage message)
+        {
+            PSHelper.WriteDebug(Cmdlet, "Request Headers:");
+            foreach (var header in ConsolidateHeaders(message.Headers, message.Content?.Headers))
+            {
+                PSHelper.WriteDebug(
+                    Cmdlet,
+                    string.IsNullOrEmpty(header.Value) ? $"  '{header.Key}'" : $"  '{header.Key}':'{header.Value}'");
+            }
+        }
+
+        private HttpResponseMessage SendHttpRequest(HttpClient client, HttpRequestMessage message, TimeSpan timeout)
         {
             var token = CancellationToken.GetValueOrDefault();
             using (var sendSource = CancellationTokenSource.CreateLinkedTokenSource(token))
             {
+                // This mirrors the original behaviour with a default timeout, without binding all
+                // operations to the exact same default timeout.
                 sendSource.CancelAfter(timeout);
 
                 try
@@ -743,6 +944,10 @@ namespace Chocolatey.PowerShell.Helpers
         /// <summary>
         /// Reports the exit code for the host to use when the session ends.
         /// </summary>
+        /// <remarks>
+        /// This is virtual to enable overriding for unit tests; it is unlikely that any other code
+        /// will need to override this method.
+        /// </remarks>
         /// <param name="exitCode">The exit code to report.</param>
         protected virtual void SetExitCode(int exitCode)
         {
@@ -776,9 +981,30 @@ namespace Chocolatey.PowerShell.Helpers
     /// </summary>
     public class WebRequestOptions
     {
+        /// <summary>
+        /// The user agent that requests are made with unless one is given.
+        /// </summary>
+        public const string DefaultUserAgent = "chocolatey command line";
+
         public Uri Uri { get; set; }
-        public string UserAgent { get; set; }
+        public string UserAgent { get; set; } = DefaultUserAgent;
         public IDictionary Headers { get; set; }
+
+        /// <summary>
+        /// Creates options for the given address.
+        /// </summary>
+        /// <param name="url">The address to request. When this is null or empty the options have no address.</param>
+        /// <param name="userAgent">The user agent to make the request with.</param>
+        /// <returns>The options.</returns>
+        /// <exception cref="UriFormatException">Thrown if the <paramref name="url"/> is not a valid address.</exception>
+        public static WebRequestOptions ForUrl(string url, string userAgent)
+        {
+            return new WebRequestOptions
+            {
+                Uri = string.IsNullOrEmpty(url) ? null : new Uri(url),
+                UserAgent = userAgent
+            };
+        }
     }
 
     /// <summary>

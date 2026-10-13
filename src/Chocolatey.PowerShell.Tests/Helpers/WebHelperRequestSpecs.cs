@@ -117,9 +117,9 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
 
             [Fact]
-            public void Should_not_set_a_user_agent()
+            public void Should_use_the_default_user_agent()
             {
-                HeaderValues("User-Agent").Should().BeEmpty();
+                string.Join(" ", HeaderValues("User-Agent")).Should().Be("chocolatey command line");
             }
 
             [Fact]
@@ -167,9 +167,17 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
 
             [Fact]
-            public void Should_not_write_any_messages()
+            public void Should_only_report_the_default_user_agent_being_set()
             {
-                CommandRuntime.Verify(r => r.WriteDebug(It.IsAny<string>()), Times.Never);
+                CommandRuntime.Verify(
+                    r => r.WriteDebug(It.Is<string>(m => m != "Setting the UserAgent to 'chocolatey command line'")),
+                    Times.Never);
+                CommandRuntime.Verify(r => r.WriteDebug("Setting the UserAgent to 'chocolatey command line'"), Times.Once);
+            }
+
+            [Fact]
+            public void Should_not_write_to_the_host()
+            {
                 CommandRuntime.Verify(r => r.WriteVerbose(It.IsAny<string>()), Times.Never);
             }
         }
@@ -230,7 +238,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
 
                 Helper.RequestTimeout();
 
-                CommandRuntime.Verify(r => r.WriteDebug(It.IsAny<string>()), Times.Never);
+                CommandRuntime.Verify(r => r.WriteDebug(It.Is<string>(m => m.StartsWith("Setting request timeout"))), Times.Never);
             }
         }
 
@@ -253,7 +261,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
 
                 Helper.ResponseTimeout();
 
-                CommandRuntime.Verify(r => r.WriteDebug(It.IsAny<string>()), Times.Never);
+                CommandRuntime.Verify(r => r.WriteDebug(It.Is<string>(m => m.StartsWith("Setting read/write timeout"))), Times.Never);
             }
         }
 
