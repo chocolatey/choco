@@ -19,12 +19,11 @@ using Chocolatey.PowerShell.Shared;
 using System;
 using System.Collections;
 using System.Management.Automation;
-using System.Net;
 
 namespace Chocolatey.PowerShell.Commands
 {
     [Cmdlet(VerbsCommon.Get, "WebFile")]
-    public class GetWebFileCommand : ChocolateyCmdlet
+    public class GetWebFileCommand : WebHelperCmdlet
     {
         [Parameter(Position = 0, Mandatory = true)]
         [Alias("Uri")]
@@ -35,7 +34,7 @@ namespace Chocolatey.PowerShell.Commands
         public string Path { get; set; } = string.Empty;
 
         [Parameter(Position = 2)]
-        public string UserAgent { get; set; } = "chocolatey command line";
+        public string UserAgent { get; set; } = WebRequestOptions.DefaultUserAgent;
 
         [Parameter()]
         public SwitchParameter Passthru { get; set; }
@@ -48,63 +47,39 @@ namespace Chocolatey.PowerShell.Commands
             { "Headers", new Hashtable(StringComparer.OrdinalIgnoreCase) }
         };
 
-        private WebHelper _helper;
-
         protected override void End()
         {
             var uri = new Uri(Url);
-            if (uri.IsFile && uri.LocalPath != Path)
+            if (uri.IsFile)
             {
-                WriteDebug("Url is local file, setting destination");
-                PSHelper.CopyFile(this, Url, Path, true);
+                if (uri.LocalPath != Path)
+                {
+                    WriteDebug("Url is local file, setting destination");
+                    CopyLocalFile(uri.LocalPath, Path);
+                }
+
                 return;
             }
 
-            try
-            {
-                var options = new WebRequestOptions
+            InvokeWebHelper(
+                new WebRequestOptions
                 {
                     Uri = uri,
                     UserAgent = UserAgent,
                     Headers = Options["Headers"] as IDictionary
-                };
-
-                using (_helper = new WebHelper(this, options, PipelineStopToken))
-                {
-                    _helper.DownloadHttpFile(Path, Passthru, Quiet);
-                }
-            }
-            catch (WebException error)
-            {
-                ThrowTerminatingError(new ErrorRecord(
-                    error,
-                    errorId: $"{ErrorId}.WebException",
-                    ErrorCategory.ResourceUnavailable,
-                    targetObject: Url));
-            }
-            catch (OperationCanceledException)
-            {
-                // The PipelineStopToken that is passed into the WebHelper to handle cancellation
-                // is designed to trigger only when StopProcessing() is called. As such, the
-                // appropriate behaviour when the task is cancelled is to correctly wrap it
-                // as a PipelineStoppedException.
-                throw new PipelineStoppedException();
-            }
-            catch (Exception error)
-            {
-                ThrowTerminatingError(new ErrorRecord(
-                    error,
-                    errorId: $"{ErrorId}.UnknownError",
-                    ErrorCategory.NotSpecified,
-                    targetObject: Url));
-            }
+                },
+                helper => helper.DownloadHttpFile(Path, Passthru, Quiet));
         }
 
-        protected override void Stop()
+        /// <summary>
+        /// Copies the local file at <paramref name="source"/> to <paramref name="destination"/>.
+        /// </summary>
+        /// <param name="source">The local path of the file to copy.</param>
+        /// <param name="destination">The path to copy the file to.</param>
+        protected virtual void CopyLocalFile(string source, string destination)
         {
-            // Ensure we dispose the helper properly if the operation is stopped,
-            // since calls to Stop() happen on another thread entirely.
-            _helper?.Dispose();
+            PSHelper.EnsureDirectoryExists(this, PSHelper.GetParentDirectory(this, destination));
+            PSHelper.CopyFile(this, source, destination, true);
         }
     }
 }
