@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using chocolatey.infrastructure.app.configuration;
 using chocolatey.infrastructure.filesystem;
 using chocolatey.infrastructure.information;
@@ -38,16 +39,28 @@ namespace chocolatey.infrastructure.app.validations
 
             var result = new List<ValidationResult>();
 
-            if (!ProcessInformation.IsElevated() && !string.IsNullOrEmpty(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile, Environment.SpecialFolderOption.DoNotVerify)))
+            if (!ProcessInformation.IsElevated())
             {
                 this.Log().Debug(" - Elevated State = Failed");
 
-                result.Add(new ValidationResult
+                if (string.IsNullOrEmpty(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile, Environment.SpecialFolderOption.DoNotVerify)))
                 {
-                    ExitCode = 0,
-                    Message = "User Cache directory is valid.",
-                    Status = ValidationStatus.Success
-                });
+                    result.Add(new ValidationResult
+                    {
+                        ExitCode = 0,
+                        Message = "There is no valid user profile directory for the HTTP cache.",
+                        Status = ValidationStatus.Warning,
+                    });
+                }
+                else
+                {
+                    result.Add(new ValidationResult
+                    {
+                        ExitCode = 0,
+                        Message = "User Cache directory is valid.",
+                        Status = ValidationStatus.Success,
+                    });
+                }
 
                 return result;
             }
@@ -68,25 +81,65 @@ namespace chocolatey.infrastructure.app.validations
                     {
                         ExitCode = 0,
                         Message = "System Cache directory is locked down to administrators.",
-                        Status = ValidationStatus.Success
+                        Status = ValidationStatus.Success,
                     });
+
+                    return result;
                 }
                 else
                 {
-                    this.Log().Debug(" - Folder lockdown = Failed");
+                    // The cache folder exists and may have contents that were put there by
+                    // other users who should not have permissions to the cache folder.
+                    // As a result, we need to ensure that we are clearing this directory before
+                    // trying to use it.
+                    // If we cannot delete the directory, we cannot allow Chocolatey to trust
+                    // the files in this cache folder as they may contain corrupted or otherwise
+                    // unsafe data.
+                    this.Log().Debug(" - Folder lockdown = Failed.");
 
-                    result.Add(new ValidationResult
+                    try
                     {
-                        ExitCode = 0,
-                        Message = "System Cache directory is not locked down to administrators.\nRemove the directory '{0}' to have Chocolatey CLI create it with the proper permissions.".FormatWith(cacheFolderPath).SplitOnSpace(linePrefix: "   "),
-                        Status = ValidationStatus.Warning
-                    });
+                        _fileSystem.DeleteDirectory(cacheFolderPath, recursive: true);
+                        result.Add(new ValidationResult
+                        {
+                            ExitCode = 0,
+                            Message = "The HTTP Cache was not correctly locked down, purging the cache before continuing.".SplitOnSpace(linePrefix: "   "),
+                            Status = ValidationStatus.Warning,
+                        });
+                    }
+                    catch (DirectoryNotFoundException)
+                    {
+                        // Unlikely, but fine to ignore; if this kind of race condition occurs despite the prior check,
+                        // we can just create the directory below and not worry about this.
+                    }
+                    catch (Exception error) when (error is IOException || error is UnauthorizedAccessException)
+                    {
+                        result.Add(new ValidationResult
+                        {
+                            ExitCode = 1,
+                            Message = $"System Cache directory exists, but could not be locked down to administrators or deleted: {error.Message.TrimEnd('.')}. Remove the '{cacheFolderPath}' directory and try again.".SplitOnSpace(linePrefix: "   "),
+                            Status = ValidationStatus.Error
+                        });
+
+                        return result;
+                    }
+                    catch (Exception error)
+                    {
+                        result.Add(new ValidationResult
+                        {
+                            ExitCode = 1,
+                            Message = $"Unknown error occurred trying to lock down the HTTP cache directory: {error.Message.TrimEnd('.')}.".SplitOnSpace(linePrefix: "   "),
+                            Status = ValidationStatus.Error
+                        });
+
+                        return result;
+                    }
                 }
-
-                return result;
             }
-
-            this.Log().Debug(" - Folder Exists = Failed");
+            else
+            {
+                this.Log().Debug(" - Folder Exists = Failed");
+            }
 
             if (_fileSystem.LockDirectory(cacheFolderPath))
             {
@@ -95,7 +148,7 @@ namespace chocolatey.infrastructure.app.validations
                 result.Add(new ValidationResult
                 {
                     ExitCode = 0,
-                    Message = "System Cache directory successfullly created and locked down to administrators.",
+                    Message = "System Cache directory successfully created and locked down to administrators.".SplitOnSpace(linePrefix: "   "),
                     Status = ValidationStatus.Success,
                 });
             }
@@ -105,7 +158,7 @@ namespace chocolatey.infrastructure.app.validations
 
                 result.Add(new ValidationResult
                 {
-                    ExitCode = 1, // Should we error?
+                    ExitCode = 1,
                     Message = "System Cache directory was not created, or could not be locked down to administrators.".SplitOnSpace(linePrefix: "   "),
                     Status = ValidationStatus.Error
                 });
