@@ -85,10 +85,12 @@ Give `choco.exe --help` a shot (or `choco.exe -h`). For specific commands, add t
 
 ### Requirements
 
-* .NET Framework 4.8+
-* PowerShell 2.0+
-* Windows Server 2008 R2+ / Windows 10+
-  - See our documentation on the [support lifecycle and supported operating systems](https://docs.chocolatey.org/en-us/information/support-lifecycle) for additional information
+* No prior runtime install required — Chocolatey CLI 3.0+ ships as a self-contained `choco.exe`
+  bundling the .NET 10 Desktop runtime and PowerShell 7.6 SDK.
+* Windows Server 2016+ / Windows 10 1809+
+  - See our documentation on the [support lifecycle and supported operating systems](https://docs.chocolatey.org/en-us/information/support-lifecycle) for additional information.
+* `windowspowershell5` (Windows PowerShell 5.1) is **only** needed when running a package
+  that opts into the 5.1 fallback runner (a Phase 7 deliverable).
 
 ### License / Credits
 
@@ -149,10 +151,11 @@ Prerequisites:
 
 The following are a minimum set of requirements to successfully complete the build process:
 
- * .NET Framework 4.8
- * .NET Framework 4.8 Dev Pack
- * Visual Studio 2019 or Visual Studio 2019 Build Tools
- * .NET SDK (i.e. ability to install .NET Global tools using `dotnet tool install`)
+ * .NET 10 SDK (build target is `net10.0-windows`)
+ * Visual Studio 2022 17.14+ or the Visual Studio 2022 Build Tools (for the C# toolchain
+   matching the .NET 10 SDK and the desktop development workload)
+ * The `dotnet` CLI on PATH (the Cake build script installs its own Global Tools via
+   `dotnet tool install`)
 
 There is a `setup.ps1` file at the root of this repository, which can be used to install all of the above.
 

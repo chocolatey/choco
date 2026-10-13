@@ -53,8 +53,13 @@ else {
 
 if (-not (Test-Path "$TestPath/packages") -or -not $SkipPackaging) {
     $null = New-Item -Path "$TestPath/packages" -ItemType Directory -Force
-    # Get and pack packages
-    $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages -Recurse -Include *.nuspec | Where-Object FullName -NotMatch 'bin'
+    # Get and pack packages.
+    # tests/pester-tests/commands/testpackages is also included so the in-repo Pester
+    # testpackages (zip-log-disable-test, packagewithscript, installpackage, ...) are
+    # seeded into the 'hermes' source the same way Test Kitchen seeds them. Without
+    # this, ~10 Pester Contexts fail with "package was not found with the source(s)
+    # listed" outside Test Kitchen even on a healthy build.
+    $nuspecs = Get-ChildItem -Path $PSScriptRoot/src/chocolatey.tests.integration, $PSScriptRoot/tests/packages, $PSScriptRoot/tests/pester-tests/commands/testpackages -Recurse -Include *.nuspec | Where-Object FullName -NotMatch 'bin'
     Get-ChildItem -Path $PSScriptRoot/tests/packages -Recurse -Include *.nupkg | Copy-Item -Destination "$TestPath/packages"
 
     $packFailures = foreach ($file in $nuspecs) {

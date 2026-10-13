@@ -18,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using chocolatey.infrastructure.app;
 using chocolatey.infrastructure.app.attributes;
@@ -66,8 +65,11 @@ namespace chocolatey.tests.integration
         }
 
         /// <summary>
-        ///   Most of the application parameters are already set by runtime and are readonly values.
-        ///   They need to be updated, so we can do that with reflection.
+        ///   Most of the application parameters are set by the runtime to the machine
+        ///   install location. Tests need them pointed at the test output directory, so
+        ///   we override them here. (These were previously initonly and set via
+        ///   reflection; .NET no longer allows writing initonly fields, so the fields are
+        ///   now settable and assigned directly.)
         /// </summary>
         private static void FixApplicationParameterVariables(Container container)
         {
@@ -75,51 +77,19 @@ namespace chocolatey.tests.integration
 
             var applicationLocation = fileSystem.GetDirectoryName(fileSystem.GetCurrentAssemblyPath());
 
-            var field = typeof(ApplicationParameters).GetField("InstallLocation");
-            field.SetValue(null, applicationLocation);
-
-            field = typeof(ApplicationParameters).GetField("LoggingLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "logs"));
-
-            field = typeof(ApplicationParameters).GetField("GlobalConfigFileLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "config", "chocolatey.config"));
-
-            field = typeof(ApplicationParameters).GetField("LicenseFileLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "license", "chocolatey.license.xml"));
-
-            field = typeof(ApplicationParameters).GetField("PackagesLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "lib"));
-
-            field = typeof(ApplicationParameters).GetField("PackageFailuresLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "lib-bad"));
-
-            field = typeof(ApplicationParameters).GetField("PackageBackupLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "lib-bkp"));
-
-            field = typeof(ApplicationParameters).GetField("ShimsLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "bin"));
-
-            field = typeof(ApplicationParameters).GetField("ChocolateyPackageInfoStoreLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, ".chocolatey"));
-
-            field = typeof(ApplicationParameters).GetField("ExtensionsLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.HooksLocation, "extensions"));
-
-            field = typeof(ApplicationParameters).GetField("TemplatesLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.HooksLocation, "templates"));
-
-            field = typeof(ApplicationParameters).GetField("HooksLocation");
-            field.SetValue(null, fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "hooks"));
-
-            field = typeof(ApplicationParameters).GetField("LockTransactionalInstallFiles");
-            field.SetValue(null, false);
-
-            // we need to speed up specs a bit, so only try filesystem locking operations twice
-            field = fileSystem.GetType().GetField("TIMES_TO_TRY_OPERATION", BindingFlags.Instance | BindingFlags.NonPublic);
-            if (field != null)
-            {
-                field.SetValue(fileSystem, 2);
-            }
+            ApplicationParameters.InstallLocation = applicationLocation;
+            ApplicationParameters.LoggingLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "logs");
+            ApplicationParameters.GlobalConfigFileLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "config", "chocolatey.config");
+            ApplicationParameters.LicenseFileLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "license", "chocolatey.license.xml");
+            ApplicationParameters.PackagesLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "lib");
+            ApplicationParameters.PackageFailuresLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "lib-bad");
+            ApplicationParameters.PackageBackupLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "lib-bkp");
+            ApplicationParameters.ShimsLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "bin");
+            ApplicationParameters.ChocolateyPackageInfoStoreLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, ".chocolatey");
+            ApplicationParameters.ExtensionsLocation = fileSystem.CombinePaths(ApplicationParameters.HooksLocation, "extensions");
+            ApplicationParameters.TemplatesLocation = fileSystem.CombinePaths(ApplicationParameters.HooksLocation, "templates");
+            ApplicationParameters.HooksLocation = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, "hooks");
+            ApplicationParameters.LockTransactionalInstallFiles = false;
         }
 
         private void UnpackSelf(Container container, ChocolateyConfiguration config)
