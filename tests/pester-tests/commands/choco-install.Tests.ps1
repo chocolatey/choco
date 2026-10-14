@@ -1787,13 +1787,7 @@ To install a local, or remote file, you may use:
         }
 
         It 'Outputs download completed' {
-            $testMessage = if ($features.License) {
-                "Download of 'cmake-3.21.2-windows-x86_64.zip' (36.01 MB) completed."
-            }
-            else {
-                "Download of cmake-3.21.2-windows-x86_64.zip (36.01 MB) completed."
-            }
-            $Output.Lines | Should -Contain $testMessage -Because $Output.String
+            $Output.Lines | Should -Contain "Download of 'cmake-3.21.2-windows-x86_64.zip' (36.01 MB) completed." -Because $Output.String
         }
 
         It 'Outputs extracting correct archive' {
@@ -2049,7 +2043,7 @@ To install a local, or remote file, you may use:
         }
 
         It 'Outputs download completed' {
-            $Output.Lines | Should -Contain "Download of ChocolateyGUI.msi (16.23 MB) completed." -Because $Output.String
+            $Output.Lines | Should -Contain "Download of 'ChocolateyGUI.msi' (16.23 MB) completed." -Because $Output.String
         }
 
         It 'Outputs path to msi executable' {

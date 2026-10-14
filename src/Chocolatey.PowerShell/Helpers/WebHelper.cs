@@ -83,7 +83,13 @@ namespace Chocolatey.PowerShell.Helpers
         /// <summary>
         /// Gets the address the <see cref="Response"/> came from, which is the final address if any redirects were followed.
         /// </summary>
-        protected Uri ResponseUri => Response?.RequestMessage?.RequestUri ?? Options.Uri;
+        protected Uri ResponseUri => Response?.RequestMessage?.RequestUri ?? RequestUri ?? Options.Uri;
+
+        /// <summary>
+        /// Gets the address that the current request is being sent to, as chosen by <see cref="GetRequestUri(bool)"/>.
+        /// This is <c>null</c> until a request has been started.
+        /// </summary>
+        protected Uri RequestUri { get; private set; }
 
         /// <summary>
         /// Gets the proxy that the system would use for a request when no explicit proxy is configured.
@@ -533,12 +539,22 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
-        /// Extension point to allow inheritance and adjustments to the stream implementation for the download.
+        /// Gets the download stream from the HTTP response. Override this to wrap the stream if needed.
         /// </summary>
         /// <returns>A <see cref="Stream"/> implementation which retrieves data from the <see cref="Response"/>.</returns>
         protected virtual Stream GetDownloadStream()
         {
             return Response.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+        }
+
+        /// <summary>
+        /// Gets the number of bytes to read from the download stream at a time.
+        /// Override this to change how much is read and written in each step of a download.
+        /// </summary>
+        /// <returns>The size of the buffer, which must be greater than zero.</returns>
+        protected virtual int GetBufferSize()
+        {
+            return 1048576;
         }
 
         /// <summary>
@@ -608,7 +624,7 @@ namespace Chocolatey.PowerShell.Helpers
                     writer = new FileStream(path, FileMode.Create);
                 }
 
-                var buffer = new byte[1048576];
+                var buffer = new byte[GetBufferSize()];
                 long total = 0;
                 int count, iterLoop = 0;
 
@@ -672,7 +688,7 @@ namespace Chocolatey.PowerShell.Helpers
                 }
 
                 PSHelper.WriteHost(Cmdlet, string.Empty);
-                PSHelper.WriteHost(Cmdlet, $"Download of {Path.GetFileName(path)} ({goalFormatted}) completed.");
+                PSHelper.WriteHost(Cmdlet, $"Download of '{Path.GetFileName(path)}' ({goalFormatted}) completed.");
             }
         }
 
@@ -804,7 +820,7 @@ namespace Chocolatey.PowerShell.Helpers
 
                         fileName = RemoteFileNameResolver.Resolve(
                             defaultName,
-                            Options.Uri.OriginalString,
+                            RequestUri.OriginalString,
                             ResponseUri,
                             contentDisposition,
                             location,
@@ -847,10 +863,60 @@ namespace Chocolatey.PowerShell.Helpers
         /// <param name="beforeSend">An action to run on the request message before it is sent.</param>
         protected void Execute(Action onResponse, bool isDownload, Action<HttpRequestMessage> beforeSend)
         {
-            var client = GetHttpClient(ResolveProxy(Options.Uri));
+            // A failure is recovered from at most once, so that a request cannot be retried indefinitely.
+            if (!TryExecute(onResponse, isDownload, beforeSend, allowRecovery: true))
+            {
+                TryExecute(onResponse, isDownload, beforeSend, allowRecovery: false);
+            }
+        }
+
+        /// <summary>
+        /// Gets the address that a request is sent to. By default this is the address from the options.
+        /// Override this to send the request somewhere else, such as a cache of the file.
+        /// </summary>
+        /// <param name="isDownload">Whether the request is for a download.</param>
+        /// <returns>The address to send the request to.</returns>
+        protected virtual Uri GetRequestUri(bool isDownload)
+        {
+            return Options.Uri;
+        }
+
+        /// <summary>
+        /// Gives a chance to recover from a failed request, by returning <c>true</c> to have the request sent again.
+        /// <see cref="GetRequestUri(bool)"/> is called again for the new attempt, so an override that returns
+        /// <c>true</c> should arrange for that to give a different address. A failure is recovered from at most once.
+        /// </summary>
+        /// <remarks>
+        /// The error is whatever the failed request raised: a <see cref="WebException"/> for an error status or a
+        /// timeout, or an <see cref="HttpRequestException"/> when the server could not be reached.
+        /// Cancellation is never passed to this method.
+        /// </remarks>
+        /// <param name="error">The error that the request raised.</param>
+        /// <param name="isDownload">Whether the request is for a download.</param>
+        /// <returns><c>true</c> to send the request again, otherwise <c>false</c>.</returns>
+        protected virtual bool TryRecover(Exception error, bool isDownload)
+        {
+            return false;
+        }
+
+        /// <summary>
+        /// Gets whether the message of a failed download mentions the private CDN. By default it does when the
+        /// download cache is available. Override this to return <c>false</c> where the hint does not apply.
+        /// </summary>
+        protected virtual bool ShowDownloadCacheHint => EnvironmentHelper.GetVariable(Package.DownloadCacheAvailable) == "true";
+
+        /// <summary>
+        /// Sends the request once, and runs the <paramref name="onResponse"/> action if it succeeds.
+        /// </summary>
+        /// <returns><c>false</c> if the request failed and <see cref="TryRecover(Exception, bool)"/> asked for it to be sent again, otherwise <c>true</c>.</returns>
+        private bool TryExecute(Action onResponse, bool isDownload, Action<HttpRequestMessage> beforeSend, bool allowRecovery)
+        {
+            RequestUri = GetRequestUri(isDownload);
+
+            var client = GetHttpClient(ResolveProxy(RequestUri));
             var requestTimeout = GetRequestTimeout();
 
-            using (var message = CreateRequestMessage(Options))
+            using (var message = CreateRequestMessage(Options.WithUri(RequestUri)))
             {
                 beforeSend?.Invoke(message);
 
@@ -864,6 +930,8 @@ namespace Chocolatey.PowerShell.Helpers
                     }
 
                     onResponse();
+
+                    return true;
                 }
                 catch (Exception error) when (CancellationToken?.IsCancellationRequested == true)
                 {
@@ -883,13 +951,18 @@ namespace Chocolatey.PowerShell.Helpers
                 {
                     AbortRequest();
 
+                    if (allowRecovery && TryRecover(error, isDownload))
+                    {
+                        return false;
+                    }
+
                     if (isDownload)
                     {
                         SetExitCode(404);
                     }
 
-                    var errorMessage = $"The remote file either doesn't exist, is unauthorized, or is forbidden for url '{Options.Uri.OriginalString}'. {error.Message}";
-                    if (isDownload && EnvironmentHelper.GetVariable(Package.DownloadCacheAvailable) == "true")
+                    var errorMessage = $"The remote file either doesn't exist, is unauthorized, or is forbidden for url '{RequestUri.OriginalString}'. {error.Message}";
+                    if (isDownload && ShowDownloadCacheHint)
                     {
                         errorMessage += "\nThis package is likely not broken for licensed users - see https://docs.chocolatey.org/en-us/features/private-cdn.";
                     }
@@ -898,7 +971,6 @@ namespace Chocolatey.PowerShell.Helpers
                 }
             }
         }
-
         private void WriteRequestHeaders(HttpRequestMessage message)
         {
             PSHelper.WriteDebug(Cmdlet, "Request Headers:");
@@ -1003,6 +1075,21 @@ namespace Chocolatey.PowerShell.Helpers
             {
                 Uri = string.IsNullOrEmpty(url) ? null : new Uri(url),
                 UserAgent = userAgent
+            };
+        }
+
+        /// <summary>
+        /// Creates a copy of these options that requests a different address.
+        /// </summary>
+        /// <param name="uri">The address to request.</param>
+        /// <returns>The copy of the options.</returns>
+        public WebRequestOptions WithUri(Uri uri)
+        {
+            return new WebRequestOptions
+            {
+                Uri = uri,
+                UserAgent = UserAgent,
+                Headers = Headers
             };
         }
     }
