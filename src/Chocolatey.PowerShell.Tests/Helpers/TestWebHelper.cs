@@ -66,6 +66,75 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             ReportedExitCode = exitCode;
         }
 
+        /// <summary>
+        /// When set, chooses the address that each request is sent to.
+        /// </summary>
+        public Func<bool, Uri> RequestUriChooser { get; set; }
+
+        /// <summary>
+        /// The addresses that requests were sent to, in order.
+        /// </summary>
+        public List<Uri> ChosenUris { get; } = new List<Uri>();
+
+        /// <summary>
+        /// When set, decides whether a failed request is sent again.
+        /// </summary>
+        public Func<Exception, bool, bool> Recovery { get; set; }
+
+        /// <summary>
+        /// The errors that recovery was offered for, in order.
+        /// </summary>
+        public List<Exception> RecoveryErrors { get; } = new List<Exception>();
+
+        /// <summary>
+        /// When set, decides whether the message of a failed download mentions the private CDN, instead of the default.
+        /// </summary>
+        public bool? DownloadCacheHint { get; set; }
+
+        protected override bool ShowDownloadCacheHint => DownloadCacheHint ?? base.ShowDownloadCacheHint;
+
+        /// <summary>
+        /// When set, the size of the buffer that downloads read into.
+        /// </summary>
+        public int? BufferSize { get; set; }
+
+        /// <summary>
+        /// Whether to record the number of bytes that each read of the download stream asks for.
+        /// </summary>
+        public bool RecordReads { get; set; }
+
+        /// <summary>
+        /// The number of bytes that each read of the download stream asked for, when <see cref="RecordReads"/> is set.
+        /// </summary>
+        public List<int> ReadSizes { get; } = new List<int>();
+
+        protected override Uri GetRequestUri(bool isDownload)
+        {
+            var uri = RequestUriChooser?.Invoke(isDownload) ?? base.GetRequestUri(isDownload);
+            ChosenUris.Add(uri);
+
+            return uri;
+        }
+
+        protected override bool TryRecover(Exception error, bool isDownload)
+        {
+            RecoveryErrors.Add(error);
+
+            return Recovery?.Invoke(error, isDownload) ?? false;
+        }
+
+        protected override int GetBufferSize()
+        {
+            return BufferSize ?? base.GetBufferSize();
+        }
+
+        protected override Stream GetDownloadStream()
+        {
+            var stream = base.GetDownloadStream();
+
+            return RecordReads ? new ReadSizeRecordingStream(stream, ReadSizes) : stream;
+        }
+
         public int Read(Stream stream, byte[] buffer)
         {
             return ReadBuffer(stream, buffer);

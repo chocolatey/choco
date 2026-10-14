@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections;
 using Chocolatey.PowerShell.Helpers;
 using FluentAssertions;
 
@@ -100,6 +101,47 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             public void Should_fail_with_a_uri_format_exception()
             {
                 _error.Should().BeOfType<UriFormatException>();
+            }
+        }
+
+        public class When_creating_options_for_a_different_address : TinySpec
+        {
+            private WebRequestOptions _original;
+            private WebRequestOptions _copy;
+            private readonly Hashtable _headers = new Hashtable { { "X-Custom", "value" } };
+
+            public override void Context()
+            {
+                _original = new WebRequestOptions
+                {
+                    Uri = new Uri("http://example.com/file.zip"),
+                    UserAgent = "Test-Agent/1.0",
+                    Headers = _headers
+                };
+            }
+
+            public override void Because()
+            {
+                _copy = _original.WithUri(new Uri("http://cache.example.com/file.zip"));
+            }
+
+            [Fact]
+            public void Should_use_the_new_address()
+            {
+                _copy.Uri.Should().Be(new Uri("http://cache.example.com/file.zip"));
+            }
+
+            [Fact]
+            public void Should_keep_the_user_agent_and_headers()
+            {
+                _copy.UserAgent.Should().Be("Test-Agent/1.0");
+                _copy.Headers.Should().BeSameAs(_headers);
+            }
+
+            [Fact]
+            public void Should_leave_the_original_options_alone()
+            {
+                _original.Uri.Should().Be(new Uri("http://example.com/file.zip"));
             }
         }
     }
