@@ -102,7 +102,12 @@ namespace chocolatey.infrastructure.app.nuget
                 }
             }
 
-            base.Dispose();
+            // We do not call the base.Dispose(disposing) here because the base class only
+            // implements the same disposal that we do, in a more unsafe way. We are overriding the
+            // disposal to ensure that the temp folder is cleaned up properly, and we do not want to
+            // risk any exceptions being thrown from the base class. We also do not call the
+            // base.Dispose() method because it ends up recursively call the Dispose(disposing)
+            // method, which would lead to a stack overflow.
         }
     }
 }
