@@ -123,7 +123,7 @@
             # Text written to the host is not captured from inside this process, so this is run in a separate process.
             $result = Invoke-TestPowerShell -ModulePath $modulePath -Command "Set-Location '$powerShellLocation'; Get-WebFile -Url '$($server.Url)/named' -FileName 'output.bin'"
 
-            $result.Output | Should -Contain 'Download of output.bin (64 KB) completed.'
+            $result.Output | Should -Contain "Download of 'output.bin' (64 KB) completed."
         }
 
         It 'Writes nothing to the output stream when downloading to a file' {
