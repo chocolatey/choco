@@ -307,18 +307,19 @@ catch {
             { Save-ChocolateyWebFile 'package' $target $url32 -Checksum $checksum32 -ChecksumType SHA256 -ErrorAction Stop } | Should -Not -Throw
         }
 
-        It 'Rejects a checksum type that is an empty string' {
+        It 'Uses md5 when the checksum type is an empty string' {
             $target = Join-Path $TestDrive 'empty-type.bin'
+            $md5 = (Get-FileHash -InputStream ([System.IO.MemoryStream]::new($content32)) -Algorithm MD5).Hash.ToLowerInvariant()
 
-            { Save-ChocolateyWebFile 'package' $target $url32 -Checksum $checksum32 -ChecksumType '' -ErrorAction Stop } | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException])
-            $target | Should -Not -Exist
+            { Save-ChocolateyWebFile 'package' $target $url32 -Checksum $md5 -ChecksumType '' -ErrorAction Stop } | Should -Not -Throw
+            [System.IO.File]::ReadAllBytes($target) | Should -Be $content32
         }
 
-        It 'Rejects a 64 bit checksum type that is an empty string' {
+        It 'Accepts a 64 bit checksum type that is an empty string' {
             $target = Join-Path $TestDrive 'empty-type-64.bin'
 
-            { Save-ChocolateyWebFile 'package' $target $url32 -Checksum $checksum32 -ChecksumType sha256 -ChecksumType64 '' -ErrorAction Stop } | Should -Throw -ExceptionType ([System.Management.Automation.ParameterBindingException])
-            $target | Should -Not -Exist
+            { Save-ChocolateyWebFile 'package' $target $url32 -Checksum $checksum32 -ChecksumType sha256 -ChecksumType64 '' -ErrorAction Stop } | Should -Not -Throw
+            [System.IO.File]::ReadAllBytes($target) | Should -Be $content32
         }
 
         It 'Rejects a checksum type that is not one of the supported types' {
@@ -457,6 +458,13 @@ catch {
             $target = Join-Path $TestDrive 'bits-type.bin'
 
             { Save-ChocolateyWebFile 'package' $target $url32 -Url64bit $url64 -Checksum $checksum32 -ChecksumType sha256 -Checksum64 $checksum64 -ErrorAction Stop } | Should -Not -Throw
+        }
+
+        It 'Uses the checksum type of the 32 bit file for the 64 bit file when the 64 bit type is an empty string' -Skip:(-not $is64Bit) {
+            $target = Join-Path $TestDrive 'bits-empty-type.bin'
+
+            { Save-ChocolateyWebFile 'package' $target $url32 -Url64bit $url64 -Checksum $checksum32 -ChecksumType sha256 -Checksum64 $checksum64 -ChecksumType64 '' -ErrorAction Stop } | Should -Not -Throw
+            [System.IO.File]::ReadAllBytes($target) | Should -Be $content64
         }
 
         It 'Downloads the 32 bit file when 32 bit is forced' {
