@@ -109,6 +109,29 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
 
             [Fact]
+            [NUnit.Framework.Platform("Win")]
+            public void Should_move_on_to_the_response_url()
+            {
+                Name.Should().Be("fallback.msi");
+            }
+
+            [Fact]
+            [NUnit.Framework.Platform(Exclude = "Win")]
+            public void Should_use_that_name_where_the_platform_allows_the_character()
+            {
+                Name.Should().Be("a:b.msi");
+            }
+        }
+
+        public class When_the_content_disposition_filename_has_a_null_character : ResolverSpecsBase
+        {
+            public override void Context()
+            {
+                ContentDisposition = "attachment; filename=\"a\0b.msi\"";
+                ResponseUri = new Uri("http://example.com/fallback.msi");
+            }
+
+            [Fact]
             public void Should_move_on_to_the_response_url()
             {
                 Name.Should().Be("fallback.msi");
@@ -144,9 +167,17 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
 
             [Fact]
+            [NUnit.Framework.Platform("Win")]
             public void Should_move_on_to_the_response_url()
             {
                 Name.Should().Be("real.zip");
+            }
+
+            [Fact]
+            [NUnit.Framework.Platform(Exclude = "Win")]
+            public void Should_use_that_name_where_the_platform_allows_the_character()
+            {
+                Name.Should().Be("a?b.zip");
             }
         }
 
@@ -231,9 +262,17 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
 
             [Fact]
+            [NUnit.Framework.Platform("Win")]
             public void Should_use_the_default_name()
             {
                 Name.Should().Be("default.bin");
+            }
+
+            [Fact]
+            [NUnit.Framework.Platform(Exclude = "Win")]
+            public void Should_use_that_name_where_the_platform_allows_the_character()
+            {
+                Name.Should().Be("we*ird.exe");
             }
         }
     }

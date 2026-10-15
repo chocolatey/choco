@@ -209,6 +209,28 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
 
             [Fact]
+            [NUnit.Framework.Platform("Win")]
+            public void Should_use_the_name_of_the_file()
+            {
+                FileName.Should().Be("installer.msi");
+            }
+
+            [Fact]
+            public void Should_not_make_a_request()
+            {
+                Handler.LastRequest.Should().BeNull();
+            }
+        }
+
+        public class When_the_address_for_a_file_name_is_a_local_file_with_a_forward_slash_path : FileNameResponseSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+                Options.Uri = new Uri("file:///tmp/downloads/installer.msi");
+            }
+
+            [Fact]
             public void Should_use_the_name_of_the_file()
             {
                 FileName.Should().Be("installer.msi");
