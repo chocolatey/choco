@@ -16,6 +16,7 @@
 using System;
 using System.Collections;
 using System.Management.Automation;
+using Chocolatey.PowerShell.Attributes;
 using Chocolatey.PowerShell.Helpers;
 using Chocolatey.PowerShell.Shared;
 
@@ -43,12 +44,14 @@ namespace Chocolatey.PowerShell.Commands
         public string Checksum { get; set; } = string.Empty;
 
         [Parameter()]
+        [NormalizeChecksumType(Default = ChecksumType.Md5)]
         public ChecksumType ChecksumType { get; set; } = ChecksumType.Md5;
 
         [Parameter()]
         public string Checksum64 { get; set; } = string.Empty;
 
         [Parameter()]
+        [NormalizeChecksumType(Default = ChecksumType.Md5)]
         public ChecksumType? ChecksumType64 { get; set; }
 
         [Parameter()]
