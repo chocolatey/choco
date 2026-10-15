@@ -33,6 +33,8 @@ namespace Chocolatey.PowerShell.Helpers
 {
     public class WebHelper : IDisposable
     {
+        private const int DefaultRequestTimeoutMilliseconds = 30000;
+
         // One client (and one cookie container) is shared by every (PowerShell) download in the process.
         // The client is created again only when the proxy to use changes, and every client uses the same cookie container.
         private static readonly object _clientLock = new object();
@@ -76,12 +78,8 @@ namespace Chocolatey.PowerShell.Helpers
         protected TimeSpan? ReadTimeout { get; set; }
 
         /// <summary>
-        /// Gets the cookie container that requests made through the shared client use.
-        /// </summary>
-        protected virtual CookieContainer Cookies => _cookieContainer;
-
-        /// <summary>
-        /// Gets the address the <see cref="Response"/> came from, which is the final address if any redirects were followed.
+        /// Gets the address the <see cref="Response"/> came from, which is the final address if any redirects
+        /// were followed.
         /// </summary>
         protected Uri ResponseUri => Response?.RequestMessage?.RequestUri ?? RequestUri ?? Options.Uri;
 
@@ -90,6 +88,27 @@ namespace Chocolatey.PowerShell.Helpers
         /// This is <c>null</c> until a request has been started.
         /// </summary>
         protected Uri RequestUri { get; private set; }
+
+        /// <summary>
+        /// Gets the cookie container that requests made through the shared client use.
+        /// </summary>
+        protected virtual CookieContainer Cookies => _cookieContainer;
+
+        /// <summary>
+        /// Gets whether the message of a failed download mentions the private CDN. By default it does when the
+        /// download cache is available. Override this to return <c>false</c> where the hint does not apply.
+        /// </summary>
+        protected virtual bool ShowDownloadCacheHint => EnvironmentHelper.GetVariable(Package.DownloadCacheAvailable) == "true";
+
+        /// <summary>
+        /// Gets the number of bytes to read from the download stream at a time.
+        /// Override this to change how much is read and written in each step of a download.
+        /// </summary>
+        /// <returns>The size of the buffer, which must be greater than zero.</returns>
+        protected virtual int GetBufferSize()
+        {
+            return 1048576;
+        }
 
         /// <summary>
         /// Gets the proxy that the system would use for a request when no explicit proxy is configured.
@@ -151,18 +170,6 @@ namespace Chocolatey.PowerShell.Helpers
             }
 
             return null;
-        }
-
-        private void WriteProxyMessage(string message)
-        {
-            if (_proxyMessagesAreDebug)
-            {
-                PSHelper.WriteDebug(Cmdlet, message);
-            }
-            else
-            {
-                PSHelper.WriteHost(Cmdlet, message);
-            }
         }
 
         /// <summary>
@@ -266,6 +273,7 @@ namespace Chocolatey.PowerShell.Helpers
                 return _httpClient;
             }
         }
+
         /// <summary>
         /// Gets how long to wait for the response headers to arrive, taking any configured environment variable
         /// into account.
@@ -273,23 +281,15 @@ namespace Chocolatey.PowerShell.Helpers
         /// <returns>The request timeout.</returns>
         protected TimeSpan GetRequestTimeout()
         {
-            var defaultTimeout = TimeSpan.FromMilliseconds(30000);
-
             var requestTimeout = EnvironmentHelper.GetVariable(Package.ChocolateyRequestTimeout);
-            if (string.IsNullOrEmpty(requestTimeout))
+            if (PSHelper.TryConvertTo<int>(requestTimeout, out var milliseconds)
+                && milliseconds > 0)
             {
-                return defaultTimeout;
+                PSHelper.WriteDebug(Cmdlet, $"Setting request timeout to {requestTimeout}");
+                return TimeSpan.FromMilliseconds(milliseconds);
             }
 
-            // A value that is not positive is treated as not set, as Chocolatey does for its own configuration.
-            var milliseconds = PSHelper.ConvertTo<int>(requestTimeout);
-            if (milliseconds <= 0)
-            {
-                return defaultTimeout;
-            }
-
-            PSHelper.WriteDebug(Cmdlet, $"Setting request timeout to {requestTimeout}");
-            return TimeSpan.FromMilliseconds(milliseconds);
+            return TimeSpan.FromMilliseconds(DefaultRequestTimeoutMilliseconds);
         }
 
         /// <summary>
@@ -300,21 +300,14 @@ namespace Chocolatey.PowerShell.Helpers
         protected TimeSpan? GetReadTimeout()
         {
             var responseTimeout = EnvironmentHelper.GetVariable(Package.ChocolateyResponseTimeout);
-            if (string.IsNullOrEmpty(responseTimeout))
+            if (PSHelper.TryConvertTo<int>(responseTimeout, out var milliseconds)
+                && milliseconds > 0)
             {
-                return null;
+                PSHelper.WriteDebug(Cmdlet, $"Setting read/write timeout to {responseTimeout}");
+                return TimeSpan.FromMilliseconds(milliseconds);
             }
 
-            // A value that is not positive means reads wait indefinitely, as zero does for Chocolatey's own
-            // configuration.
-            var milliseconds = PSHelper.ConvertTo<int>(responseTimeout);
-            if (milliseconds <= 0)
-            {
-                return null;
-            }
-
-            PSHelper.WriteDebug(Cmdlet, $"Setting read/write timeout to {responseTimeout}");
-            return TimeSpan.FromMilliseconds(milliseconds);
+            return null;
         }
 
         /// <summary>
@@ -338,9 +331,8 @@ namespace Chocolatey.PowerShell.Helpers
                 PSHelper.WriteDebug(Cmdlet, "Setting custom headers");
                 foreach (var key in options.Headers.Keys)
                 {
-                    // This normalization necessary for the edge case of someone passing in a header
-                    // dictionary that is keyed by the HttpRequestHeader *values* or
-                    // equivalent integer values, rather than by string names.
+                    // Normalise the key into a standardised header name, ensuring raw HttpRequestHeader enum
+                    // values are correctly handled.
                     var name = key is string text
                         ? text
                         : GetHeaderName(PSHelper.ConvertTo<HttpRequestHeader>(key));
@@ -357,10 +349,8 @@ namespace Chocolatey.PowerShell.Helpers
                             SetRequestHeader(message, name, value, replace: true);
                             break;
                         default:
-                            // Avoid replacing headers here; if this was already set beforehand,
-                            // we don't want to replace a header that was set more explicitly
-                            // (for example, by setting the User-Agent header specifically on
-                            // the passed-in WebRequestOptions).
+                            // If this was already set with one of the explicit options,
+                            // that should take precedence over values in the header dictionary.
                             SetRequestHeader(message, name, value, replace: false);
                             break;
                     }
@@ -371,89 +361,12 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
-        /// Add the header to the <paramref name="message"/>.
-        /// </summary>
-        /// <exception cref="ArgumentException">
-        /// Thrown if the requested header has already been set, so that we don't accidentally override
-        /// a header that's already been set via another means.
-        /// </exception>
-        private static void SetRequestHeader(HttpRequestMessage message, string name, string value, bool replace)
-        {
-            if (replace)
-            {
-                message.Headers.Remove(name);
-            }
-
-            if (!message.Headers.TryAddWithoutValidation(name, value))
-            {
-                throw new ArgumentException($"The '{name}' header cannot be set on the request.", nameof(name));
-            }
-        }
-
-        private static string GetHeaderName(HttpRequestHeader header)
-        {
-            var headers = new WebHeaderCollection
-            {
-                { header, "value" }
-            };
-
-            return headers.AllKeys[0];
-        }
-
-        /// <summary>
         /// Retrieves the headers from the <see cref="Response"/>.
         /// </summary>
         /// <returns>A Dictionary containing the headers and their values.</returns>
         protected Dictionary<string, string> GetResponseHeaders()
         {
             return ConsolidateHeaders(Response.Headers, Response.Content?.Headers);
-        }
-
-        /// <summary>
-        /// Consolidates the headers from both sources into a single header dictionary.
-        /// </summary>
-        private static Dictionary<string, string> ConsolidateHeaders(params IEnumerable<KeyValuePair<string, IEnumerable<string>>>[] sources)
-        {
-            var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            foreach (var source in sources)
-            {
-                AddHeaders(headers, source);
-            }
-
-            return headers;
-        }
-
-        private static void AddHeaders(Dictionary<string, string> target, IEnumerable<KeyValuePair<string, IEnumerable<string>>> source)
-        {
-            if (source is null)
-            {
-                return;
-            }
-
-            foreach (var header in source)
-            {
-                // Product headers read as written when their parts are separated by spaces.
-                var separator = IsProductHeader(header.Key) ? " " : ",";
-                target[header.Key] = string.Join(separator, header.Value);
-            }
-        }
-
-        private static bool IsProductHeader(string name)
-        {
-            return name.Equals("User-Agent", StringComparison.OrdinalIgnoreCase)
-                || name.Equals("Server", StringComparison.OrdinalIgnoreCase);
-        }
-
-        private string GetMediaType()
-        {
-            return Response.Content?.Headers.ContentType?.MediaType ?? string.Empty;
-        }
-
-        private Encoding GetResponseEncoding()
-        {
-            var charset = Response.Content?.Headers.ContentType?.CharSet?.Trim('"', '\'');
-
-            return Encoding.GetEncoding(string.IsNullOrEmpty(charset) ? "ISO-8859-1" : charset);
         }
 
         /// <summary>
@@ -486,7 +399,7 @@ namespace Chocolatey.PowerShell.Helpers
                 var responseHeaders = GetResponseHeaders();
                 if (responseHeaders.ContainsKey("Content-Type"))
                 {
-                    var contentType = responseHeaders["Content-Type"].ToLower();
+                    var contentType = responseHeaders["Content-Type"].ToLowerInvariant();
                     if (!(contentType is null))
                     {
                         if (contentType.Contains("text/html") || contentType.Contains("text/plain"))
@@ -545,16 +458,6 @@ namespace Chocolatey.PowerShell.Helpers
         protected virtual Stream GetDownloadStream()
         {
             return Response.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
-        }
-
-        /// <summary>
-        /// Gets the number of bytes to read from the download stream at a time.
-        /// Override this to change how much is read and written in each step of a download.
-        /// </summary>
-        /// <returns>The size of the buffer, which must be greater than zero.</returns>
-        protected virtual int GetBufferSize()
-        {
-            return 1048576;
         }
 
         /// <summary>
@@ -900,10 +803,113 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
-        /// Gets whether the message of a failed download mentions the private CDN. By default it does when the
-        /// download cache is available. Override this to return <c>false</c> where the hint does not apply.
+        /// Reports the exit code for the host to use when the session ends.
         /// </summary>
-        protected virtual bool ShowDownloadCacheHint => EnvironmentHelper.GetVariable(Package.DownloadCacheAvailable) == "true";
+        /// <remarks>
+        /// This is virtual to enable overriding for unit tests; it is unlikely that any other code
+        /// will need to override this method.
+        /// </remarks>
+        /// <param name="exitCode">The exit code to report.</param>
+        protected virtual void SetExitCode(int exitCode)
+        {
+            PSHelper.SetExitCode(Cmdlet, exitCode);
+        }
+
+        private void WriteProxyMessage(string message)
+        {
+            if (_proxyMessagesAreDebug)
+            {
+                PSHelper.WriteDebug(Cmdlet, message);
+            }
+            else
+            {
+                PSHelper.WriteHost(Cmdlet, message);
+            }
+        }
+
+        /// <summary>
+        /// Add the header to the <paramref name="message"/>.
+        /// </summary>
+        /// <exception cref="ArgumentException">
+        /// Thrown if the header cannot be added to the request message.
+        /// </exception>
+        private static void SetRequestHeader(HttpRequestMessage message, string name, string value, bool replace)
+        {
+            if (replace)
+            {
+                message.Headers.Remove(name);
+            }
+
+            if (!message.Headers.TryAddWithoutValidation(name, value))
+            {
+                throw new ArgumentException($"The '{name}' header cannot be set on the request.", nameof(name));
+            }
+        }
+
+        private static string GetHeaderName(HttpRequestHeader header)
+        {
+            var headers = new WebHeaderCollection
+            {
+                { header, "value" }
+            };
+
+            return headers.AllKeys[0];
+        }
+
+        /// <summary>
+        /// Consolidates the headers from all sources into a single header dictionary.
+        /// </summary>
+        private static Dictionary<string, string> ConsolidateHeaders(params IEnumerable<KeyValuePair<string, IEnumerable<string>>>[] sources)
+        {
+            var headers = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var source in sources)
+            {
+                AddHeaders(headers, source);
+            }
+
+            return headers;
+        }
+
+        private static void AddHeaders(Dictionary<string, string> target, IEnumerable<KeyValuePair<string, IEnumerable<string>>> source)
+        {
+            if (source is null)
+            {
+                return;
+            }
+
+            foreach (var header in source)
+            {
+                target[header.Key] = string.Join(GetValueSeparator(header.Key), header.Value);
+            }
+        }
+
+        /// <summary>
+        /// Some header values are handed back in multiple pieces; for some of these it makes sense to normalise
+        /// them by joining on space (such as User-Agent); others tend to be a list of entries.
+        /// </summary>
+        private static string GetValueSeparator(string headerName)
+        {
+            switch (headerName.ToLowerInvariant())
+            {
+                case "user-agent":
+                case "server":
+                    return " ";
+                default:
+                    return ",";
+            }
+        }
+
+        private string GetMediaType()
+        {
+            return Response.Content?.Headers.ContentType?.MediaType ?? string.Empty;
+        }
+
+        private Encoding GetResponseEncoding()
+        {
+            var charset = Response.Content?.Headers.ContentType?.CharSet?.Trim('"', '\'');
+
+            return Encoding.GetEncoding(string.IsNullOrEmpty(charset) ? "ISO-8859-1" : charset);
+        }
 
         /// <summary>
         /// Sends the request once, and runs the <paramref name="onResponse"/> action if it succeeds.
@@ -971,6 +977,7 @@ namespace Chocolatey.PowerShell.Helpers
                 }
             }
         }
+
         private void WriteRequestHeaders(HttpRequestMessage message)
         {
             PSHelper.WriteDebug(Cmdlet, "Request Headers:");
@@ -1011,19 +1018,6 @@ namespace Chocolatey.PowerShell.Helpers
         private void AbortRequest()
         {
             Response?.Dispose();
-        }
-
-        /// <summary>
-        /// Reports the exit code for the host to use when the session ends.
-        /// </summary>
-        /// <remarks>
-        /// This is virtual to enable overriding for unit tests; it is unlikely that any other code
-        /// will need to override this method.
-        /// </remarks>
-        /// <param name="exitCode">The exit code to report.</param>
-        protected virtual void SetExitCode(int exitCode)
-        {
-            PSHelper.SetExitCode(Cmdlet, exitCode);
         }
 
         protected virtual void Dispose(bool disposing)
