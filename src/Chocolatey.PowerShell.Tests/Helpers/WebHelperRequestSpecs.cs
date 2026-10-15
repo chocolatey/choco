@@ -219,10 +219,11 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
         }
 
-        public class When_the_request_timeout_variable_is_not_positive : CreateRequestSpecsBase
+        public class When_the_request_timeout_variable_is_not_a_positive_number : CreateRequestSpecsBase
         {
             [InlineData("0")]
             [InlineData("-1")]
+            [InlineData("abc")]
             public void Should_use_the_default_timeout(string value)
             {
                 Environment.SetEnvironmentVariable(Package.ChocolateyRequestTimeout, value);
@@ -232,6 +233,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
 
             [InlineData("0")]
             [InlineData("-1")]
+            [InlineData("abc")]
             public void Should_not_report_a_timeout_being_set(string value)
             {
                 Environment.SetEnvironmentVariable(Package.ChocolateyRequestTimeout, value);
@@ -242,10 +244,11 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
         }
 
-        public class When_the_response_timeout_variable_is_not_positive : CreateRequestSpecsBase
+        public class When_the_response_timeout_variable_is_not_a_positive_number : CreateRequestSpecsBase
         {
             [InlineData("0")]
             [InlineData("-1")]
+            [InlineData("abc")]
             public void Should_not_apply_a_read_timeout(string value)
             {
                 Environment.SetEnvironmentVariable(Package.ChocolateyResponseTimeout, value);
@@ -255,6 +258,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
 
             [InlineData("0")]
             [InlineData("-1")]
+            [InlineData("abc")]
             public void Should_not_report_a_timeout_being_set(string value)
             {
                 Environment.SetEnvironmentVariable(Package.ChocolateyResponseTimeout, value);
