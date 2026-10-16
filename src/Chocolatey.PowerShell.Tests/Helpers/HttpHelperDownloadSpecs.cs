@@ -29,9 +29,9 @@ namespace Chocolatey.PowerShell.Tests.Helpers
 {
     // ReSharper disable InconsistentNaming
 
-    public partial class WebHelperSpecs
+    public partial class HttpHelperSpecs
     {
-        public abstract class DownloadSpecsBase : WebHelperSpecsBase
+        public abstract class DownloadSpecsBase : HttpHelperSpecsBase
         {
             protected CancellationTokenSource TokenSource;
             protected Exception Error;
@@ -63,7 +63,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
                 if (UseCancellationToken)
                 {
                     Helper.Dispose();
-                    Helper = new TestWebHelper(Cmdlet, Options, TokenSource.Token);
+                    Helper = new TestHttpHelper(Cmdlet, Options, TokenSource.Token);
                 }
 
                 Helper.MessageHandler = new StubMessageHandler(Respond);
@@ -73,7 +73,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             {
                 try
                 {
-                    Helper.DownloadHttpFile(null, true, true);
+                    Helper.DownloadFile(null, true, true);
                 }
                 catch (Exception error)
                 {
@@ -201,9 +201,9 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
         }
 
-        public abstract class SharedClientSpecsBase : WebHelperSpecsBase
+        public abstract class SharedClientSpecsBase : HttpHelperSpecsBase
         {
-            protected TestWebHelper Other;
+            protected TestHttpHelper Other;
             protected HttpClient First;
             protected HttpClient Second;
 
@@ -215,7 +215,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
 
             public override void Because()
             {
-                Other = new TestWebHelper(Cmdlet, Options);
+                Other = new TestHttpHelper(Cmdlet, Options);
 
                 First = Helper.SharedHttpClient(FirstProxy);
                 Second = Other.SharedHttpClient(SecondProxy);
@@ -291,7 +291,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
         }
 
-        public class When_a_proxy_requires_credentials : WebHelperSpecsBase
+        public class When_a_proxy_requires_credentials : HttpHelperSpecsBase
         {
             private string _key;
             private string _keyForAnotherPassword;

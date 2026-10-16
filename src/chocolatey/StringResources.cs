@@ -557,6 +557,18 @@ namespace chocolatey
                 internal const string ProcessorArchitecture = "PROCESSOR_ARCHITECTURE";
 
                 /// <summary>
+                /// The architecture of the operating system, when it differs from the architecture of the process
+                /// that is running.
+                /// </summary>
+                /// <remarks>
+                /// Only set for a 32-bit process on a 64-bit operating system. Expected value if set is: `AMD64`.
+                /// See: https://learn.microsoft.com/en-us/archive/blogs/david.wang/howto-detect-process-bitness
+                /// </remarks>
+                [EditorBrowsable(EditorBrowsableState.Never)]
+                [Browsable(false)]
+                internal const string ProcessorArchitectureW6432 = "PROCESSOR_ARCHITEW6432";
+
+                /// <summary>
                 /// The paths where PowerShell modules are expected to be located.
                 /// </summary>
                 [EditorBrowsable(EditorBrowsableState.Never)]

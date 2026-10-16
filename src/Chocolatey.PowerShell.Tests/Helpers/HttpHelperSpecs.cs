@@ -30,14 +30,14 @@ namespace Chocolatey.PowerShell.Tests.Helpers
 {
     // ReSharper disable InconsistentNaming
 
-    public partial class WebHelperSpecs
+    public partial class HttpHelperSpecs
     {
-        public abstract class WebHelperSpecsBase : EnvironmentSpecsBase
+        public abstract class HttpHelperSpecsBase : EnvironmentSpecsBase
         {
             protected Mock<ICommandRuntime> CommandRuntime;
             protected TestCmdlet Cmdlet;
             protected WebRequestOptions Options;
-            protected TestWebHelper Helper;
+            protected TestHttpHelper Helper;
 
             public override void Context()
             {
@@ -46,7 +46,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
                 CommandRuntime = new Mock<ICommandRuntime>();
                 Cmdlet = new TestCmdlet { CommandRuntime = CommandRuntime.Object };
                 Options = new WebRequestOptions { Uri = new Uri("http://localhost/file.zip") };
-                Helper = new TestWebHelper(Cmdlet, Options);
+                Helper = new TestHttpHelper(Cmdlet, Options);
             }
 
             public override void AfterObservations()
@@ -59,7 +59,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
         public abstract class ReadBufferSpecsBase : TinySpec
         {
             protected CancellationTokenSource TokenSource;
-            protected TestWebHelper Helper;
+            protected TestHttpHelper Helper;
             protected byte[] Target = new byte[10];
             protected int Count;
             protected Exception Error;
@@ -73,8 +73,8 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             {
                 TokenSource = new CancellationTokenSource();
                 Helper = UseCancellationToken
-                    ? new TestWebHelper(new TestCmdlet(), new WebRequestOptions(), TokenSource.Token)
-                    : new TestWebHelper(new TestCmdlet(), new WebRequestOptions());
+                    ? new TestHttpHelper(new TestCmdlet(), new WebRequestOptions(), TokenSource.Token)
+                    : new TestHttpHelper(new TestCmdlet(), new WebRequestOptions());
             }
 
             public override void AfterObservations()

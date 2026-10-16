@@ -25,16 +25,16 @@ using Chocolatey.PowerShell.Helpers;
 
 namespace Chocolatey.PowerShell.Tests.Helpers
 {
-    public class TestWebHelper : WebHelper
+    public class TestHttpHelper : HttpHelper
     {
         private HttpClient _testClient;
 
-        public TestWebHelper(PSCmdlet cmdlet, WebRequestOptions options)
+        public TestHttpHelper(PSCmdlet cmdlet, WebRequestOptions options)
             : base(cmdlet, options)
         {
         }
 
-        public TestWebHelper(PSCmdlet cmdlet, WebRequestOptions options, CancellationToken cancellationToken)
+        public TestHttpHelper(PSCmdlet cmdlet, WebRequestOptions options, CancellationToken cancellationToken)
             : base(cmdlet, options, cancellationToken)
         {
         }
