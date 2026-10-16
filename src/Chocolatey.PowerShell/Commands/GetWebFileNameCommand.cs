@@ -35,7 +35,7 @@ namespace Chocolatey.PowerShell.Commands
 
         protected override void End()
         {
-            InvokeWebHelper(
+            InvokeHttpHelper(
                 WebRequestOptions.ForUrl(Url, UserAgent),
                 helper => WriteObject(helper.GetRemoteFileName(DefaultName)));
         }

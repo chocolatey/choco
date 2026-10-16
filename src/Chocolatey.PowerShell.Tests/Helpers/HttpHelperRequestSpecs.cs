@@ -28,9 +28,9 @@ namespace Chocolatey.PowerShell.Tests.Helpers
 {
     // ReSharper disable InconsistentNaming
 
-    public partial class WebHelperSpecs
+    public partial class HttpHelperSpecs
     {
-        public abstract class CreateRequestSpecsBase : WebHelperSpecsBase
+        public abstract class CreateRequestSpecsBase : HttpHelperSpecsBase
         {
             protected HttpClientHandler Handler;
             protected HttpRequestMessage Message;
@@ -72,7 +72,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
         }
 
-        public abstract class ResolveProxySpecsBase : WebHelperSpecsBase
+        public abstract class ResolveProxySpecsBase : HttpHelperSpecsBase
         {
             protected IWebProxy Proxy;
 

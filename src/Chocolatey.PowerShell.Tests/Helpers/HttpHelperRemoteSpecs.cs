@@ -29,7 +29,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
 {
     // ReSharper disable InconsistentNaming
 
-    public partial class WebHelperSpecs
+    public partial class HttpHelperSpecs
     {
         public abstract class FileNameSpecsBase : DownloadSpecsBase
         {
@@ -411,7 +411,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             {
                 try
                 {
-                    Headers = Helper.GetWebHeaders();
+                    Headers = Helper.GetHeaders();
                 }
                 catch (Exception error)
                 {

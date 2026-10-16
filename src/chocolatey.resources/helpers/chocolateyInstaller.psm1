@@ -135,6 +135,8 @@ if (Test-Path $extensionsPath) {
 }
 
 Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
+Set-Alias -Name 'Get-ProcessorBits' -Value 'Get-OSArchitectureWidth'
+Set-Alias -Name 'Get-OSBitness' -Value 'Get-OSArchitectureWidth'
 
 # Exercise caution and test _thoroughly_ with AND without the licensed extension installed
 # when making any changes here. And make sure to update this comment if needed when any

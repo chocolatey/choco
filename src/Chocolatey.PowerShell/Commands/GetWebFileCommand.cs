@@ -50,36 +50,19 @@ namespace Chocolatey.PowerShell.Commands
         protected override void End()
         {
             var uri = new Uri(Url);
-            if (uri.IsFile)
+            if (TryCopyLocalFile(uri, Path))
             {
-                if (uri.LocalPath != Path)
-                {
-                    WriteDebug("Url is local file, setting destination");
-                    CopyLocalFile(uri.LocalPath, Path);
-                }
-
                 return;
             }
 
-            InvokeWebHelper(
+            InvokeHttpHelper(
                 new WebRequestOptions
                 {
                     Uri = uri,
                     UserAgent = UserAgent,
                     Headers = Options["Headers"] as IDictionary
                 },
-                helper => helper.DownloadHttpFile(Path, Passthru, Quiet));
-        }
-
-        /// <summary>
-        /// Copies the local file at <paramref name="source"/> to <paramref name="destination"/>.
-        /// </summary>
-        /// <param name="source">The local path of the file to copy.</param>
-        /// <param name="destination">The path to copy the file to.</param>
-        protected virtual void CopyLocalFile(string source, string destination)
-        {
-            PSHelper.EnsureDirectoryExists(this, PSHelper.GetParentDirectory(this, destination));
-            PSHelper.CopyFile(this, source, destination, true);
+                helper => helper.DownloadFile(Path, Passthru, Quiet));
         }
     }
 }

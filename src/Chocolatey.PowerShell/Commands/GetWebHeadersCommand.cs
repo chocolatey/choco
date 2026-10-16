@@ -32,9 +32,9 @@ namespace Chocolatey.PowerShell.Commands
 
         protected override void End()
         {
-            InvokeWebHelper(
+            InvokeHttpHelper(
                 WebRequestOptions.ForUrl(Url, UserAgent),
-                helper => WriteObject(helper.GetWebHeaders(), enumerateCollection: false));
+                helper => WriteObject(helper.GetHeaders(), enumerateCollection: false));
         }
     }
 }

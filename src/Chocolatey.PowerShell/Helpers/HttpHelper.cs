@@ -31,7 +31,7 @@ using static chocolatey.StringResources.EnvironmentVariables;
 
 namespace Chocolatey.PowerShell.Helpers
 {
-    public class WebHelper : IDisposable
+    public class HttpHelper : IDisposable
     {
         private const int DefaultRequestTimeoutMilliseconds = 30000;
 
@@ -46,24 +46,24 @@ namespace Chocolatey.PowerShell.Helpers
         private bool _proxyMessagesAreDebug;
 
         /// <summary>
-        /// Initializes a <see cref="WebHelper"/> with a cancellation token, to enable cancelling any download
+        /// Initializes a <see cref="HttpHelper"/> with a cancellation token, to enable cancelling any download
         /// operations if needed.
         /// </summary>
         /// <param name="cmdlet">The cmdlet responsible for the operation.</param>
         /// <param name="options">The options used for the web request.</param>
         /// <param name="cancellationToken">A cancellation token, typically managed by the cmdlet to handle pipeline stops.</param>
-        public WebHelper(PSCmdlet cmdlet, WebRequestOptions options, CancellationToken cancellationToken)
+        public HttpHelper(PSCmdlet cmdlet, WebRequestOptions options, CancellationToken cancellationToken)
             : this(cmdlet, options)
         {
             CancellationToken = cancellationToken;
         }
 
         /// <summary>
-        /// Initializes a <see cref="WebHelper"/>.
+        /// Initializes a <see cref="HttpHelper"/>.
         /// </summary>
         /// <param name="cmdlet">The cmdlet responsible for the operation.</param>
         /// <param name="options">The options used for the web request.</param>
-        public WebHelper(PSCmdlet cmdlet, WebRequestOptions options)
+        public HttpHelper(PSCmdlet cmdlet, WebRequestOptions options)
         {
             Cmdlet = cmdlet;
             Options = options;
@@ -129,13 +129,7 @@ namespace Chocolatey.PowerShell.Helpers
         {
             if (WebProxyConfiguration.IsEnabled)
             {
-                var proxy = new WebProxy(WebProxyConfiguration.Url, WebProxyConfiguration.BypassOnLocal);
-                if (!string.IsNullOrEmpty(WebProxyConfiguration.Password))
-                {
-                    proxy.Credentials = new NetworkCredential(WebProxyConfiguration.Username, WebProxyConfiguration.Password);
-                }
-
-                proxy.BypassList = WebProxyConfiguration.BypassList;
+                var proxy = WebProxyConfiguration.CreateProxy();
 
                 WriteProxyMessage($"Using explicit proxy server '{proxy.Address}'.");
 
@@ -604,7 +598,7 @@ namespace Chocolatey.PowerShell.Helpers
         /// <param name="quiet">Whether to suppress the usual progress display when downloading a file.</param>
         /// <exception cref="WebException">Thrown if the file could not be downloaded for any reason.</exception>
         /// <exception cref="OperationCanceledException">Thrown if the cancellation token is triggered.</exception>
-        public void DownloadHttpFile(
+        public void DownloadFile(
             string filePath,
             bool passthru,
             bool quiet)
@@ -653,7 +647,7 @@ namespace Chocolatey.PowerShell.Helpers
         /// </returns>
         /// <exception cref="WebException">Thrown if the server could not be reached, or it responded with an error.</exception>
         /// <exception cref="OperationCanceledException">Thrown if the cancellation token is triggered.</exception>
-        public Hashtable GetWebHeaders()
+        public Hashtable GetHeaders()
         {
             var headers = new Hashtable(StringComparer.OrdinalIgnoreCase);
             if (Options.Uri is null)
@@ -1123,6 +1117,24 @@ namespace Chocolatey.PowerShell.Helpers
             get => EnvironmentHelper.GetVariable(Package.ChocolateyProxyBypassList)?
                 .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                 ?? Array.Empty<string>();
+        }
+
+        /// <summary>
+        /// Creates the proxy that the configuration describes. This should only be used when the
+        /// configuration <see cref="IsEnabled"/>.
+        /// </summary>
+        /// <returns>The proxy, with its credentials and bypass list.</returns>
+        public static WebProxy CreateProxy()
+        {
+            var proxy = new WebProxy(Url, BypassOnLocal);
+            if (!string.IsNullOrEmpty(Password))
+            {
+                proxy.Credentials = new NetworkCredential(Username, Password);
+            }
+
+            proxy.BypassList = BypassList;
+
+            return proxy;
         }
     }
 }

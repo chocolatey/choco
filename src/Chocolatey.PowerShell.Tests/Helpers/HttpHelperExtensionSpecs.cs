@@ -30,7 +30,7 @@ namespace Chocolatey.PowerShell.Tests.Helpers
 {
     // ReSharper disable InconsistentNaming
 
-    public partial class WebHelperSpecs
+    public partial class HttpHelperSpecs
     {
         public abstract class RequestUriSpecsBase : DownloadSpecsBase
         {

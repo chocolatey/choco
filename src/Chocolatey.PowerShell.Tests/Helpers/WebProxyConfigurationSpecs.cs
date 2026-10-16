@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Net;
 using Chocolatey.PowerShell.Helpers;
 using FluentAssertions;
 using static chocolatey.StringResources.EnvironmentVariables;
@@ -188,6 +189,73 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             public void Should_discard_the_empty_entries()
             {
                 WebProxyConfiguration.BypassList.Should().Equal("a.example.com", "b.example.com");
+            }
+        }
+
+        public class When_creating_the_proxy_from_the_configuration : WebProxyConfigurationSpecsBase
+        {
+            private WebProxy _proxy;
+
+            public override void Because()
+            {
+                Environment.SetEnvironmentVariable(Package.ChocolateyProxyLocation, "http://proxy.example.com:8080");
+                Environment.SetEnvironmentVariable(Package.ChocolateyProxyBypassOnLocal, "true");
+                Environment.SetEnvironmentVariable(Package.ChocolateyProxyBypassList, "example\\.com,internal\\.local");
+                Environment.SetEnvironmentVariable(Package.ChocolateyProxyUser, "someone");
+                Environment.SetEnvironmentVariable(Package.ChocolateyProxyPassword, "hunter2");
+
+                _proxy = WebProxyConfiguration.CreateProxy();
+            }
+
+            [Fact]
+            public void Should_use_the_location_as_the_address()
+            {
+                _proxy.Address.Should().Be(new Uri("http://proxy.example.com:8080"));
+            }
+
+            [Fact]
+            public void Should_bypass_the_proxy_on_local_addresses()
+            {
+                _proxy.BypassProxyOnLocal.Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_use_the_bypass_list()
+            {
+                _proxy.BypassList.Should().Equal(@"example\.com", @"internal\.local");
+            }
+
+            [Fact]
+            public void Should_use_the_user_and_password_as_the_credentials()
+            {
+                var credential = _proxy.Credentials.Should().BeOfType<NetworkCredential>().Subject;
+                credential.UserName.Should().Be("someone");
+                credential.Password.Should().Be("hunter2");
+            }
+        }
+
+        public class When_creating_the_proxy_without_a_password : WebProxyConfigurationSpecsBase
+        {
+            private WebProxy _proxy;
+
+            public override void Because()
+            {
+                Environment.SetEnvironmentVariable(Package.ChocolateyProxyLocation, "http://proxy.example.com:8080");
+                Environment.SetEnvironmentVariable(Package.ChocolateyProxyUser, "someone");
+
+                _proxy = WebProxyConfiguration.CreateProxy();
+            }
+
+            [Fact]
+            public void Should_not_set_credentials()
+            {
+                _proxy.Credentials.Should().BeNull();
+            }
+
+            [Fact]
+            public void Should_not_bypass_the_proxy_on_local_addresses()
+            {
+                _proxy.BypassProxyOnLocal.Should().BeFalse();
             }
         }
     }
