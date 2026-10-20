@@ -270,6 +270,20 @@ namespace chocolatey
                 internal const string ChocolateyChecksumType64 = "chocolateyChecksumType64";
 
                 /// <summary>
+                /// A url that replaces the (32 bit) url that a package gives to download from, when it is set.
+                /// </summary>
+                [EditorBrowsable(EditorBrowsableState.Never)]
+                [Browsable(false)]
+                internal const string ChocolateyUrlOverride = nameof(ChocolateyUrlOverride);
+
+                /// <summary>
+                /// A url that replaces the 64 bit url that a package gives to download from, when it is set.
+                /// </summary>
+                [EditorBrowsable(EditorBrowsableState.Never)]
+                [Browsable(false)]
+                internal const string ChocolateyUrl64bitOverride = nameof(ChocolateyUrl64bitOverride);
+
+                /// <summary>
                 /// The exit code that the installation, upgrade or uninstall ended up reporting.
                 /// </summary>
                 [EditorBrowsable(EditorBrowsableState.Never)]
