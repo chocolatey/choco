@@ -47,9 +47,6 @@
     <EmbeddedResource Include="helpers\functions\Get-ChocolateyUnzip.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="helpers\functions\Get-ChocolateyWebFile.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="helpers\functions\Get-UACEnabled.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>

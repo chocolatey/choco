@@ -135,6 +135,7 @@ if (Test-Path $extensionsPath) {
 }
 
 Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
+Set-Alias -Name 'Get-ChocolateyWebFile' -Value 'Save-ChocolateyWebFile'
 Set-Alias -Name 'Get-ProcessorBits' -Value 'Get-OSArchitectureWidth'
 Set-Alias -Name 'Get-OSBitness' -Value 'Get-OSArchitectureWidth'
 
