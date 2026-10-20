@@ -2115,6 +2115,7 @@ To install a local, or remote file, you may use:
             # remove it from the repository and store it elsewhere that we can retrieve it during CI testing.
             Expand-Archive $PSScriptRoot/demo-projects.zip -DestinationPath $PWD
             $Output = Invoke-Choco install package-a -s 'a,b,c' --confirm
+	    Write-Host "Command took $($Output.Duration) to complete."
         }
 
         It "Exits with Success (0)" {
