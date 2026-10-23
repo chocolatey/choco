@@ -148,6 +148,131 @@
         }
     }
 
+    Context 'Downloading a file from an FTP address' {
+        BeforeAll {
+            $ftpServer = Start-TestFtpServer -Files @{
+                '/ftp32.bin'             = $content32
+                '/folder/ftp-nested.bin' = $content64
+            }
+            $ftpUrl = "$($ftpServer.Url)/ftp32.bin"
+        }
+
+        AfterAll {
+            Stop-TestFtpServer -Server $ftpServer
+        }
+
+        BeforeEach {
+            $ftpServer.Commands.Clear()
+            $server.Requests.Clear()
+        }
+
+        It 'Downloads the file, verifies the checksum and returns the path' {
+            $target = Join-Path $TestDrive 'ftp\download.bin'
+
+            $result = Save-ChocolateyWebFile 'package' $target $ftpUrl -Checksum $checksum32 -ChecksumType sha256
+
+            $result | Should -BeExactly $target
+            [System.IO.File]::ReadAllBytes($target) | Should -Be $content32
+        }
+
+        It 'Downloads a file that is in a folder on the server' {
+            $target = Join-Path $TestDrive 'ftp\nested.bin'
+
+            $null = Save-ChocolateyWebFile 'package' $target "$($ftpServer.Url)/folder/ftp-nested.bin" -Checksum $checksum64 -ChecksumType sha256
+
+            [System.IO.File]::ReadAllBytes($target) | Should -Be $content64
+        }
+
+        It 'Logs in anonymously' {
+            $target = Join-Path $TestDrive 'ftp\anonymous.bin'
+
+            $null = Save-ChocolateyWebFile 'package' $target $ftpUrl -Checksum $checksum32 -ChecksumType sha256
+
+            $ftpServer.Commands | Should -Contain 'USER anonymous'
+        }
+
+        It 'Does not make any web requests' {
+            $target = Join-Path $TestDrive 'ftp\no-web-requests.bin'
+
+            $null = Save-ChocolateyWebFile 'package' $target $ftpUrl -Checksum $checksum32 -ChecksumType sha256
+
+            $server.Requests | Should -BeNullOrEmpty
+        }
+
+        It 'Fails when the checksum is not the checksum of the file' {
+            $target = Join-Path $TestDrive 'ftp\bad-checksum.bin'
+
+            { Save-ChocolateyWebFile 'package' $target $ftpUrl -Checksum ('a' * 64) -ChecksumType sha256 -ErrorAction Stop } | Should -Throw
+        }
+
+        It 'Fails when there is no checksum and empty checksums are not allowed' {
+            $target = Join-Path $TestDrive 'ftp\no-checksum.bin'
+
+            { Save-ChocolateyWebFile 'package' $target $ftpUrl -ErrorAction Stop } | Should -Throw -ExpectedMessage '*Empty checksums are no longer allowed*'
+        }
+
+        Context 'Output' {
+            BeforeAll {
+                $ftpOutputTarget = Join-Path $TestDrive 'ftp-output.bin'
+
+                $ftpResult = Invoke-TestPowerShell -ModulePath $modulePath -Command @"
+Save-ChocolateyWebFile 'my-package' '$ftpOutputTarget' '$ftpUrl' -Checksum '$checksum32' -ChecksumType sha256 | ForEach-Object { "Returned:`$_" }
+"@
+            }
+
+            It 'Says that the file is being downloaded over FTP, and from where' {
+                ($ftpResult.Output -join "`n") | Should -Match '(?m)^Ftp-ing my-package\s*$'
+                $ftpResult.Output | Should -Contain "  from '$ftpUrl'"
+            }
+
+            It 'Says that the file was downloaded' {
+                $ftpResult.Output | Should -Contain "Download of 'ftp-output.bin' (8 KB) completed."
+            }
+
+            It 'Returns the path' {
+                $ftpResult.Output | Should -Contain "Returned:$ftpOutputTarget"
+            }
+        }
+
+        Context 'A file that is not on the server' {
+            BeforeAll {
+                $ftpMissingTarget = Join-Path $TestDrive 'ftp-missing.bin'
+
+                $ftpMissingResult = Invoke-TestPowerShell -ModulePath $modulePath -Command @"
+`$env:chocolateyRequestTimeout = '10000'
+try {
+    Save-ChocolateyWebFile 'package' '$ftpMissingTarget' '$($ftpServer.Url)/missing.bin' -Checksum '$checksum32' -ChecksumType sha256 -ErrorAction Stop
+}
+catch {
+    "ErrorType:`$(`$_.Exception.GetType().FullName)"
+    "ErrorId:`$(`$_.FullyQualifiedErrorId)"
+}
+"ExitCodeVariable:`$env:ChocolateyExitCode"
+"@
+            }
+
+            It 'Throws a terminating WebException' {
+                $ftpMissingResult.Output | Should -Contain 'ErrorType:System.Net.WebException'
+            }
+
+            It 'Uses the error id for a web exception from this command' {
+                ($ftpMissingResult.Output -join "`n") | Should -Match 'ErrorId:SaveChocolateyWebFileCommandError\.WebException,'
+            }
+
+            It 'Sets the Chocolatey exit code variable to 404' {
+                $ftpMissingResult.Output | Should -Contain 'ExitCodeVariable:404'
+            }
+
+            It 'Asks the host to exit with 404' {
+                $ftpMissingResult.ExitCode | Should -Be 404
+            }
+
+            It 'Does not create the file' {
+                $ftpMissingTarget | Should -Not -Exist
+            }
+        }
+    }
+
     Context 'Verifying the checksum' {
         It 'Fails when the checksum is not the checksum of the file' {
             $target = Join-Path $TestDrive 'bad-checksum.bin'
