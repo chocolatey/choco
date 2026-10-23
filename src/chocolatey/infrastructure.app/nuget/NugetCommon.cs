@@ -18,6 +18,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
@@ -253,6 +254,13 @@ namespace chocolatey.infrastructure.app.nuget
                             // If an invalid source was passed in, we don't care here, pass it along
                             fullsource = source;
                         }
+
+                        // filesystem.GetFullPath sometimes resolves to `C:` instead of `C:\` which PackageSource can't handle. This corrects for that edge case.
+                        if ( !fullsource.EndsWith(Path.DirectorySeparatorChar.ToString()) && !fullsource.EndsWith(Path.AltDirectorySeparatorChar.ToString()) )
+                        {
+                            fullsource += Path.DirectorySeparatorChar;
+                        }
+
                         nugetSource = new PackageSource(fullsource);
 
                         if (!nugetSource.IsLocal)
