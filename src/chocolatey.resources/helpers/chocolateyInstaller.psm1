@@ -81,6 +81,9 @@ if (Test-Path $dllPath) {
     }
 }
 
+# This alias ensures that extensions can't accidentally override this core cmdlet.
+Set-Alias -Name 'Get-PackageParameters' -Value 'Get-PackageParametersBuiltIn' -Scope Global
+
 # Export built-in functions prior to loading extensions so that
 # extension-specific loading behavior can be used based on built-in
 # functions. This allows those overrides to be much more deterministic
@@ -134,6 +137,11 @@ if (Test-Path $extensionsPath) {
         }
 }
 
+# This helps ensure that the builtin command is always available, as it is a core command needed for
+# many package installations.
+Set-Alias -Name 'Get-PackageParametersBuiltIn' -Value 'Chocolatey.PowerShell\Get-PackageParameters'
+
+# These aliases will take precedence over extension-provided ones as they are applied after importing extensions.
 Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
 
 # Exercise caution and test _thoroughly_ with AND without the licensed extension installed
