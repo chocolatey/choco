@@ -94,68 +94,10 @@ namespace chocolatey.infrastructure.app.runners
                         },
                         () =>
                         {
-                            this.Log().Debug(() => "Performing validation checks.");
-                            command.Validate(config);
-
-                            var validationResults = new List<ValidationResult>();
-                            var validationChecks = container.GetAllInstances<IValidation>();
-                            foreach (var validationCheck in validationChecks)
-                            {
-                                validationResults.AddRange(validationCheck.Validate(config));
-                            }
-
-                            var validationErrors = ReportValidationSummary(validationResults, config);
-
-                            if (validationErrors != 0)
-                            {
-                                // NOTE: This is intentionally left blank, as the reason for throwing is
-                                // documented in the report_validation_summary above, and a duplication
-                                // is not required in the exception.
-                                throw new ApplicationException("");
-                            }
+                            PreRunValidationChecks.Validate(command, config, container);
                         },
                         () => command.HelpMessage(config));
                 });
-        }
-
-        private int ReportValidationSummary(IList<ValidationResult> validationResults, ChocolateyConfiguration config)
-        {
-            var successes = validationResults.Count(v => v.Status == ValidationStatus.Success);
-            var warnings = validationResults.Count(v => v.Status == ValidationStatus.Warning);
-            var errors = validationResults.Count(v => v.Status == ValidationStatus.Error);
-
-            var logOnWarnings = config.Features.LogValidationResultsOnWarnings;
-            if (config.RegularOutput)
-            {
-                this.Log().Info(errors + (logOnWarnings ? warnings : 0) == 0 ? ChocolateyLoggers.LogFileOnly : ChocolateyLoggers.Important, () => "{0} validations performed. {1} success(es), {2} warning(s), and {3} error(s).".FormatWith(
-                    validationResults.Count,
-                    successes,
-                    warnings,
-                    errors));
-
-                if (warnings != 0)
-                {
-                    var warningLogger = logOnWarnings ? ChocolateyLoggers.Normal : ChocolateyLoggers.LogFileOnly;
-                    this.Log().Info(warningLogger, "");
-                    this.Log().Warn(warningLogger, "Validation Warnings:");
-                    foreach (var warning in validationResults.Where(p => p.Status == ValidationStatus.Warning).OrEmpty())
-                    {
-                        this.Log().Warn(warningLogger, " - {0}".FormatWith(warning.Message));
-                    }
-                }
-            }
-
-            if (errors != 0)
-            {
-                this.Log().Info("");
-                this.Log().Error("Validation Errors:");
-                foreach (var error in validationResults.Where(p => p.Status == ValidationStatus.Error).OrEmpty())
-                {
-                    this.Log().Error(" - {0}".FormatWith(error.Message));
-                }
-            }
-
-            return errors;
         }
 
 #pragma warning disable IDE0022, IDE1006

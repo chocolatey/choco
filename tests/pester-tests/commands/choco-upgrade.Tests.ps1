@@ -2,6 +2,11 @@
     BeforeAll {
         Remove-NuGetPaths
         Initialize-ChocolateyTestInstall
+        Disable-ChocolateySource -All
+        Enable-ChocolateySource -Name hermes
+        # Packages that are on hermes-setup that may have updates not intended to be tested here. Exclude them from
+        # upgrade all so a newer product version on the hermes-setup source doesn't get upgraded.
+        $ExceptPackages = 'chocolatey,chocolatey.extension,chocolatey-agent,pester,chocolatey-license-business'
 
         New-ChocolateyInstallSnapshot
         $features = Get-ChocolateyFeatures
@@ -77,7 +82,7 @@
             $null = Invoke-Choco install curl --package-parameters="'/CurlOnlyParam'" --version="7.77.0" --ia="'/CurlIAParam'" --x86 -y
             $null = Invoke-Choco install wget --version=1.21.1 -y
 
-            $Output = Invoke-Choco upgrade all -y --debug
+            $Output = Invoke-Choco upgrade all -y --debug --except="$ExceptPackages"
         }
 
         It 'Exits with Success (0)' {
@@ -166,7 +171,7 @@
             $null = Invoke-Choco install curl
 
             # Exclude packages not involved in these tests to ensure that they don't report false positives
-            $Output = Invoke-Choco upgrade all --except="chocolatey,chocolatey.extension,chocolatey-agent,pester,chocolatey-license-business"
+            $Output = Invoke-Choco upgrade all --except="$ExceptPackages"
         }
 
         It 'Exits with Success (0)' {
@@ -181,7 +186,7 @@
             BeforeAll {
                 $null = Enable-ChocolateyFeature -Name "useEnhancedExitCodes"
 
-                $Output = Invoke-Choco upgrade all
+                $Output = Invoke-Choco upgrade all --except="$ExceptPackages"
             }
 
             It "Exits with ExitCode 2" {
@@ -206,7 +211,7 @@
             $null = Invoke-Choco install wget --version=1.21.1 -y --forcex86
             $null = Invoke-Choco install firefox --version=99.0.1 --package-parameters="'/l=eu'" -y --ia="'/RemoveDistributionDir=true'"
 
-            $Output = Invoke-Choco upgrade all -y --debug
+            $Output = Invoke-Choco upgrade all -y --debug --except="$ExceptPackages"
         }
 
         AfterAll {
@@ -825,7 +830,7 @@ To upgrade a local, or remote file, you may use:
             $Setup = Invoke-Choco install $DependentPackage.Name --version $DependentPackage.Version --confirm
             $Setup2 = Invoke-Choco install $BasePackage --version 1.0.0 --confirm
             # We need to exclude packages that are in Test Kitchen but not the other environments.
-            $Output = Invoke-Choco upgrade $PackageName --confirm --except="chocolatey,chocolatey.extension,chocolatey-agent,pester,chocolatey-license-business" $Argument
+            $Output = Invoke-Choco upgrade $PackageName --confirm --except="$ExceptPackages" $Argument
         }
 
         It "Exits with expected result (<ExpectedExit>)" {
@@ -892,6 +897,149 @@ To upgrade a local, or remote file, you may use:
 
         It "Should report 1 out of 1 packages upgraded" {
             $Output.Lines | Should -Contain "Chocolatey upgraded 1/1 packages." -Because $Output.String
+        }
+    }
+
+    # Chocolatey must never substitute a different version of the package named on the
+    # command line when --version was used. The parent package here takes an exact
+    # dependency on hasdependency 1.0.0, so the requested 2.0.0 cannot be resolved.
+    Context 'Upgrading a package to a version an installed parent package forbids' -Tag Working {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Setup = Invoke-Choco install hasoutofrangedependency --version 1.0.0 --confirm
+            $Output = Invoke-Choco upgrade hasdependency --version 2.0.0 --confirm
+            $Packages = (Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should report the requested version could not be used" {
+            $message = "Upgrading package hasdependency to version 2.0.0 is not possible, likely due to package dependency version requirements. The latest package version that meets the dependency requirements is 1.0.0. For more information on this issue and guidance in resolving the problem, see https://ch0.co/t/deps"
+            $Output.Lines | Should -Contain $message -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should report no packages were upgraded" {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 0/1 packages. 1 packages failed." -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should leave the package at the version that was already installed" {
+            ($Packages | Where-Object Name -eq 'hasdependency').Version | Should -Be '1.0.0' -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+    }
+
+    # The reported form of the problem: an explicit downgrade that the dependency graph
+    # cannot satisfy used to report success while leaving the newer version in place.
+    Context 'Downgrading a package to a version an installed parent package forbids' -Tag Working, Downgrade {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            # hasnesteddependency brings in hasdependency 2.1.0, which requires isdependency 2.0.0 or newer.
+            $Setup = Invoke-Choco install hasnesteddependency --version 1.0.0 --confirm
+            $Output = Invoke-Choco upgrade isdependency --version 1.0.0 --allow-downgrade --confirm
+            $Packages = (Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should report the requested version could not be used" {
+            $message = "Upgrading package isdependency to version 1.0.0 is not possible, likely due to package dependency version requirements. The latest package version that meets the dependency requirements is 2.1.0. For more information on this issue and guidance in resolving the problem, see https://ch0.co/t/deps"
+            $Output.Lines | Should -Contain $message -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should not have downgraded the package" {
+            ($Packages | Where-Object Name -eq 'isdependency').Version | Should -Be '2.1.0' -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+    }
+
+    Context 'Upgrading a package a parent package constrains without specifying a version' -Tag Working {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Setup = Invoke-Choco install hasoutofrangedependency --version 1.0.0 --confirm
+            $Output = Invoke-Choco upgrade hasdependency --confirm
+            $Packages = (Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should not report a version mismatch" {
+            $Output.String | Should -Not -Match "is not possible, likely due to package dependency version requirements" -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should report the package upgraded" {
+            $Output.Lines | Should -Contain "Chocolatey upgraded 1/1 packages." -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should keep the package at the highest version the dependency graph allows" {
+            ($Packages | Where-Object Name -eq 'hasdependency').Version | Should -Be '1.0.0' -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+    }
+
+    Context 'Upgrading a package to a version a parent package forbids while ignoring dependencies' -Tag Working {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $Setup = Invoke-Choco install hasoutofrangedependency --version 1.0.0 --confirm
+            $Output = Invoke-Choco upgrade hasdependency --version 2.0.0 --ignore-dependencies --confirm
+            $Packages = (Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should upgrade to the requested version" {
+            ($Packages | Where-Object Name -eq 'hasdependency').Version | Should -Be '2.0.0' -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+    }
+
+    Context 'Upgrading a package to a version a parent package forbids with StopOnFirstPackageFailure enabled' -Tag Working, StopOnFirstPackageFailure {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            Enable-ChocolateyFeature -Name StopOnFirstPackageFailure
+            $Setup = Invoke-Choco install hasoutofrangedependency --version 1.0.0 --confirm
+            $Output = Invoke-Choco upgrade hasdependency --version 2.0.0 --confirm
+            $Packages = (Invoke-Choco list -r).Lines | ConvertFrom-ChocolateyOutput -Command List
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should report that execution was stopped" {
+            $Output.Lines | Should -Contain "Stopping further execution as hasdependency has failed." -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Should leave the package at the version that was already installed" {
+            ($Packages | Where-Object Name -eq 'hasdependency').Version | Should -Be '1.0.0' -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
         }
     }
 

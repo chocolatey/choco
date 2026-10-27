@@ -583,7 +583,7 @@
         }
     }
 
-    Context "Force Installing a Package that is already installed (with a delete locked file)" {
+    Context "Force Installing a Package that is already installed (with a delete locked file)" -Tag RollbackBackup {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -619,8 +619,26 @@
             $XML.package.metadata.version | Should -Be "1.0.0"
         }
 
-        It "Should not have been able to delete the rollback" {
+        # Observed behavior: a forced reinstall over a file held open with a
+        # delete-granting share leaves the rollback backup (lib-bkp) in place on
+        # Windows Server 2019 and earlier, but removes it on Windows Server 2022
+        # and newer, and on client Windows 10 (per issue #3144). The last build
+        # we see retain it is Server 2019 / Windows 10 1809 (17763), so the gate
+        # sits at the next release, Windows 10 1903 (10.0.18362): Server 2016/2019
+        # retain the rollback, while Windows 10 1903+ and Windows Server 2022+
+        # remove it. The likely cause is a change in how Windows removes open,
+        # delete-shared files - believed to be POSIX-style deletes becoming the
+        # default, per golang/go#78072 and dotnet/runtime#32737 - but it is not
+        # confirmed by Microsoft docs. Build numbers:
+        #   https://learn.microsoft.com/en-us/windows/release-health/release-information (client)
+        #   https://learn.microsoft.com/en-us/windows-server/get-started/windows-server-release-info (server)
+        # See https://github.com/chocolatey/choco/issues/3144.
+        It "Should not have been able to delete the rollback" -Skip:(Test-WindowsVersionEqualOrHigherThan "10.0.18362") {
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
+        }
+
+        It "Should have been able to delete the rollback" -Skip:(-not (Test-WindowsVersionEqualOrHigherThan "10.0.18362")) {
+            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
         }
 
         It "Outputs a message showing that installation succeeded." {
@@ -628,7 +646,7 @@
         }
     }
 
-    Context "Force Installing a Package that is already installed (with a read/delete locked file)" {
+    Context "Force Installing a Package that is already installed (with a read/delete locked file)" -Tag RollbackBackup {
         BeforeAll {
             Restore-ChocolateyInstallSnapshot
 
@@ -664,9 +682,26 @@
             $XML.package.metadata.version | Should -Be "1.0.0"
         }
 
-        # This behaviour was fixed in 0.10.16
-        It "Should not have been able to delete the rollback" -Skip:(-not (Test-ChocolateyVersionEqualOrHigherThan "0.10.16-beta")) {
+        # Observed behavior: a forced reinstall over a file held open with a
+        # delete-granting share leaves the rollback backup (lib-bkp) in place on
+        # Windows Server 2019 and earlier, but removes it on Windows Server 2022
+        # and newer, and on client Windows 10 (per issue #3144). The last build
+        # we see retain it is Server 2019 / Windows 10 1809 (17763), so the gate
+        # sits at the next release, Windows 10 1903 (10.0.18362): Server 2016/2019
+        # retain the rollback, while Windows 10 1903+ and Windows Server 2022+
+        # remove it. The likely cause is a change in how Windows removes open,
+        # delete-shared files - believed to be POSIX-style deletes becoming the
+        # default, per golang/go#78072 and dotnet/runtime#32737 - but it is not
+        # confirmed by Microsoft docs. Build numbers:
+        #   https://learn.microsoft.com/en-us/windows/release-health/release-information (client)
+        #   https://learn.microsoft.com/en-us/windows-server/get-started/windows-server-release-info (server)
+        # See https://github.com/chocolatey/choco/issues/3144.
+        It "Should not have been able to delete the rollback" -Skip:(Test-WindowsVersionEqualOrHigherThan "10.0.18362") {
             "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Exist
+        }
+
+        It "Should have been able to delete the rollback" -Skip:(-not (Test-WindowsVersionEqualOrHigherThan "10.0.18362")) {
+            "$env:ChocolateyInstall\lib-bkp\$PackageUnderTest" | Should -Not -Exist
         }
 
         It "Outputs a message showing that installation succeeded." {
@@ -674,7 +709,7 @@
         }
     }
 
-    Context "Force Installing a Package that is already installed (with an exclusively locked file)" {
+    Context "Force Installing a Package that is already installed (with an exclusively locked file)" -Tag RollbackBackup {
         BeforeDiscovery {
             $PackageUnderTest = "installpackage"
         }
@@ -2314,6 +2349,104 @@ To install a local, or remote file, you may use:
             }
         ) {
             $Output.Lines | Should -Contain "WARNING:  - $Name = $Value"
+        }
+    }
+
+    # An explicit --version is a hard constraint on the package named on the command
+    # line. Chocolatey CLI must either honour it exactly or fail - it must never
+    # substitute a different version of that package. See issue #3923.
+    Context "Installing a Package at a version an installed parent package forbids" -Tag Working {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            # hasoutofrangedependency 1.0.0 takes an exact dependency on hasdependency 1.0.0.
+            $Setup = Invoke-Choco install hasoutofrangedependency --version 1.0.0 --confirm
+            $PackageUnderTest = "hasdependency"
+
+            $Output = Invoke-Choco install $PackageUnderTest --version 2.0.0 --confirm
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Failure (1)" {
+            $Output.ExitCode | Should -Be 1 -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Outputs a message indicating that it failed to install the package(s)" {
+            $Output.Lines | Should -Contain "Chocolatey installed 0/1 packages. 1 packages failed." -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Has not replaced the installed version of the package" {
+            "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
+        }
+    }
+
+    Context "Installing a Package at a version its dependencies allow" -Tag Working {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            # hasdependency 1.5.0 pins isexactversiondependency to 1.1.0, but takes only a
+            # minimum dependency on isdependency, so the dependencies resolve to different
+            # versions while the requested version is used as-is.
+            $PackageUnderTest = "hasdependency"
+
+            $Output = Invoke-Choco install $PackageUnderTest --version 1.5.0 --confirm
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because $Output.String
+        }
+
+        It "Outputs a message indicating that it successfully installed the package(s)" {
+            $Output.Lines | Should -Contain "Chocolatey installed 3/3 packages." -Because $Output.String
+        }
+
+        It "Installed the requested version of the package" {
+            "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec"
+            $XML.package.metadata.version | Should -Be "1.5.0"
+        }
+
+        It "Installed the dependency (<Name>) at the resolved version (<Version>)" -ForEach @(
+            @{ Name = 'isdependency' ; Version = '2.1.0' }
+            @{ Name = 'isexactversiondependency' ; Version = '1.1.0' }
+        ) {
+            "$env:ChocolateyInstall\lib\$Name\$Name.nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$Name\$Name.nuspec"
+            $XML.package.metadata.version | Should -Be $Version
+        }
+    }
+
+    Context "Force Installing a Package at an older version while forcing dependencies" -Tag Working, Downgrade {
+        BeforeAll {
+            Restore-ChocolateyInstallSnapshot
+
+            $PackageUnderTest = "hasdependency"
+            $Setup = Invoke-Choco install $PackageUnderTest --version 2.1.0 --confirm
+
+            $Output = Invoke-Choco install $PackageUnderTest --version 1.0.0 --allow-downgrade --force --force-dependencies --confirm
+        }
+
+        AfterAll {
+            Remove-ChocolateyInstallSnapshot
+        }
+
+        It "Exits with Success (0)" {
+            $Output.ExitCode | Should -Be 0 -Because (@($Setup.String; $Output.String) -join [System.Environment]::NewLine)
+        }
+
+        It "Installed the requested version of the package" {
+            "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec" | Should -Exist
+            [xml]$XML = Get-Content "$env:ChocolateyInstall\lib\$($PackageUnderTest)\$($PackageUnderTest).nuspec"
+            $XML.package.metadata.version | Should -Be "1.0.0"
         }
     }
 
