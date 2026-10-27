@@ -1,12 +1,12 @@
 <!-- TOC -->
 
-- [Committers & Contributors](#committers--contributors)
+- [Committers \& Contributors](#committers--contributors)
   - [Committers](#committers)
   - [Chocolatey Community Team](#chocolatey-community-team)
   - [Contributors](#contributors)
 - [Third Party Licenses - Development](#third-party-licenses---development)
 - [Third Party Licenses - Runtime](#third-party-licenses---runtime)
-  - [7-Zip @ 26.02](#7-zip--2602)
+  - [7-Zip @ 26.04](#7-zip--2604)
   - [AlphaFS @ 2.1.3](#alphafs--213)
   - [Checksum @ 0.2.0](#checksum--020)
   - [log4net @ 2.0.12](#log4net--2012)
@@ -70,7 +70,7 @@ We would like to credit other super sweet tools/frameworks that aid in the devel
 Chocolatey CLI (choco) uses a number of 3rd-party components.
 Their details are below.
 
-- [7-Zip @ 26.02](#7-zip--2602)
+- [7-Zip @ 26.05](#7-zip--2605)
 - [AlphaFS @ 2.1.3](#alphafs--213)
 - [Checksum @ 0.2.0](#checksum--020)
 - [log4net @ 2.0.12](#log4net--2012)
@@ -81,7 +81,7 @@ Their details are below.
 - [Shim Generator (shimgen) @ 1.0.0](#shim-generator-shimgen--100)
 - [SimpleInjector @ 2.8.3](#simpleinjector--283)
 
-### 7-Zip @ 26.02
+### 7-Zip @ 26.05
 
 Chocolatey uses [7-Zip](http://www.7-zip.org/) for uncompressing archives.
 [License terms](http://www.7-zip.org/license.txt):
