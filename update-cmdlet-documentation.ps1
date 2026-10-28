@@ -1,4 +1,6 @@
-﻿<#
+﻿# PowerShell Core generates additional documentation that may not be correct for running under Windows PowerShell.
+#Requires -PSEdition Desktop
+<#
 .SYNOPSIS
 Generates Markdown documentation for the Chocolatey.PowerShell portion of Chocolatey's installer module commands.
 
@@ -61,13 +63,13 @@ $renamedFiles = Get-ChildItem -Path $documentationPath -Filter '*.md*' |
                     "[${label}](xref:${xref}#${anchor},${classes})"
                 }
                 elseif ($classes) {
-                    "[${label}](xref:${xref},${classes})"     
+                    "[${label}](xref:${xref},${classes})"
                 }
                 elseif ($anchor) {
-                    "[${label}](xref:${xref}#${anchor})"                    
+                    "[${label}](xref:${xref}#${anchor})"
                 }
                 else {
-                    "[${label}](xref:${xref})"      
+                    "[${label}](xref:${xref})"
                 }
 
             }
@@ -85,27 +87,17 @@ if (-not (Get-Module Chocolatey.PowerShell)) {
     throw "The Chocolatey.PowerShell module was not able to be loaded, exiting documentation generation."
 }
 
-$newOrUpdatedFiles = [System.Collections.Generic.HashSet[System.IO.FileSystemInfo]] @(
+$newOrUpdatedFiles = @(
     if ($NewCommand) {
-        New-MarkdownHelp -Command $NewCommand -OutputFolder "$PSScriptRoot\docs" -ExcludeDontShow
+        New-MarkdownHelp -Command $NewCommand -OutputFolder $documentationPath -ExcludeDontShow
     }
 
-    Update-MarkdownHelp -Path $documentationPath -ExcludeDontShow
+    Update-MarkdownHelp -Path $documentationPath -ExcludeDontShow | Where-Object BaseName -ne $NewCommand
 )
 
-$incompleteFiles = $newOrUpdatedFiles | Select-String '\{\{[^}]+}}' | Select-Object -ExpandProperty Path
+$incompleteFiles = $newOrUpdatedFiles | Select-String '\{\{[^}]+}}' | Select-Object -ExpandProperty Path -Unique
 
-if ($incompleteFiles) {
-    Write-Warning "The following files contain {{ template tokens }} from PlatyPS that must be replaced with help content before they are committed to the repository:"
-    $incompleteFiles | Write-Warning
-
-    if ($OpenUnfinished) {
-        $incompleteFiles | Invoke-Item
-    }
-
-    Write-Warning "Run this script again once these files have been updated in order to generate the XML help documentation for the module."
-}
-else {
+if (-not $incompleteFiles) {
     New-ExternalHelp -Path $documentationPath -OutputPath "$PSScriptRoot/src/Chocolatey.PowerShell" -Force
 }
 
@@ -113,10 +105,10 @@ $newOrUpdatedFiles = $newOrUpdatedFiles |
     Rename-Item -NewName { $_.BaseName + ".mdx" } -PassThru |
     ForEach-Object {
         $content = Get-Content -Path $_.FullName
-        
+
         $frontMatterBounds = 0
         $content = $content | ForEach-Object {
-            if ($_ -match '\[(?<name>[^\]]+)\]\(xref:(?<xref>[^#,]+)(#(?<anchor>[^,]+))?,(?<classes>[^)]+)\)') {
+            if ($_ -match '\[(?<name>[^\]]+)\]\(xref:(?<xref>[^#,]+)(#(?<anchor>[^,]+))?(?:,(?<classes>[^)]+))?\)') {
                 # replace any lines that are an xref link with the html/xml format that astro uses <Xref ... />
                 $xml = [xml]::new()
                 $node = $xml.CreateElement('Xref')
@@ -134,9 +126,11 @@ $newOrUpdatedFiles = $newOrUpdatedFiles |
                     $null = $node.Attributes.Append($anchor)
                 }
 
-                $classes = $xml.CreateAttribute('classes')
-                $classes.Value = $matches['classes']
-                $null = $node.Attributes.Append($classes)
+                if ($matches['classes']) {
+                    $classes = $xml.CreateAttribute('classes')
+                    $classes.Value = $matches['classes']
+                    $null = $node.Attributes.Append($classes)
+                }
 
                 $node.OuterXml
             }
@@ -158,6 +152,18 @@ $newOrUpdatedFiles = $newOrUpdatedFiles |
 
         $_
     }
+
+$incompleteFiles = $newOrUpdatedFiles | Where-Object { $incompleteFiles -match "$($_.BaseName).md$" }
+if ($incompleteFiles) {
+    Write-Warning "The following files contain {{ template tokens }} from PlatyPS that must be replaced with help content before they are committed to the repository:"
+    $incompleteFiles | Write-Warning
+
+    if ($OpenUnfinished) {
+       $incompleteFiles | ForEach-Object { code $_.FullName -r }
+    }
+
+    Write-Warning "Run this script again once these files have been updated in order to generate the XML help documentation for the module."
+}
 
 # Output the new/updated files so calling user knows what files the script has touched.
 $newOrUpdatedFiles
