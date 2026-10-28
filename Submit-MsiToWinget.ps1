@@ -5,13 +5,13 @@ param(
     [ValidateNotNullOrEmpty()]
     [string]$GitHubToken
 )
-$syncOutput = gh repo sync choco-bot/winget-pkgs 2>&1
+gh repo sync choco-bot/winget-pkgs
 
 if ($LASTEXITCODE -ne 0) {
     throw "Sync of choco-bot/winget-pkgs failed (exit code $LASTEXITCODE): $syncOutput"
 }
 
-$releaseJson = gh release view --repo chocolatey/choco --json assets, name 2>&1
+$releaseJson = gh release view --repo chocolatey/choco --json assets,name
 
 if ($LASTEXITCODE -ne 0) {
     throw "Failed to query latest release for chocolatey/choco (exit code $LASTEXITCODE): $releaseJson"
@@ -24,7 +24,7 @@ if ($msiUrls.Count -eq 0) {
     throw "No .msi assets found in latest release '$($release.name)'"
 }
 
-$wingetOutput = wingetcreate update --submit --token $GitHubToken --urls $msiUrls --version "$($release.name).0" chocolatey.chocolatey 2>&1
+wingetcreate update --submit --token $GitHubToken --urls $msiUrls --version "$($release.name).0" chocolatey.chocolatey
 
 if ($LASTEXITCODE -ne 0) {
     throw "wingetcreate update failed (exit code $LASTEXITCODE): $wingetOutput"
