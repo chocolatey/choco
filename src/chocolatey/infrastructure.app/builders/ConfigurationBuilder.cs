@@ -532,6 +532,10 @@ namespace chocolatey.infrastructure.app.builders
             config.Information.FullName = Assembly.GetExecutingAssembly().FullName;
             config.Information.Is64BitOperatingSystem = Environment.Is64BitOperatingSystem;
             config.Information.Is64BitProcess = Environment.Is64BitProcess;
+            var processorArchitecture = Environment.NativeProcessorArchitecture;
+            config.Information.ProcessorArchitecture = processorArchitecture == ProcessorArchitectureType.Unknown
+                ? (config.Information.Is64BitOperatingSystem ? "x64" : "x86")
+                : processorArchitecture.ToString().ToLowerInvariant();
             config.Information.IsInteractive = Environment.UserInteractive;
             config.Information.UserName = System.Environment.UserName;
             config.Information.UserDomainName = System.Environment.UserDomainName;

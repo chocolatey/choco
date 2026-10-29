@@ -188,6 +188,15 @@ namespace chocolatey
                 public const string OsVersion = "OS_VERSION";
 
                 /// <summary>
+                /// The native architecture of the processor that the operating system is running
+                /// on, reported reliably even when the Chocolatey CLI process is running under
+                /// emulation (for example, on Windows on ARM). Possible values are `x86`, `x64`
+                /// and `arm64`.
+                /// </summary>
+                /// <remarks>This environment variable is experimental.</remarks>
+                public const string OsProcessorArchitecture = "OS_PROCESSOR_ARCHITECTURE";
+
+                /// <summary>
                 /// The normalized version of the currently installed package version - set during package upgrade.
                 /// </summary>
                 public const string ChocolateyPreviousPackageVersion = nameof(ChocolateyPreviousPackageVersion);
