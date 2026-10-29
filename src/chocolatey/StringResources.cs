@@ -270,6 +270,20 @@ namespace chocolatey
                 internal const string ChocolateyChecksumType64 = "chocolateyChecksumType64";
 
                 /// <summary>
+                /// A url that replaces the (32 bit) url that a package gives to download from, when it is set.
+                /// </summary>
+                [EditorBrowsable(EditorBrowsableState.Never)]
+                [Browsable(false)]
+                internal const string ChocolateyUrlOverride = nameof(ChocolateyUrlOverride);
+
+                /// <summary>
+                /// A url that replaces the 64 bit url that a package gives to download from, when it is set.
+                /// </summary>
+                [EditorBrowsable(EditorBrowsableState.Never)]
+                [Browsable(false)]
+                internal const string ChocolateyUrl64bitOverride = nameof(ChocolateyUrl64bitOverride);
+
+                /// <summary>
                 /// The exit code that the installation, upgrade or uninstall ended up reporting.
                 /// </summary>
                 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -555,6 +569,18 @@ namespace chocolatey
                 [EditorBrowsable(EditorBrowsableState.Never)]
                 [Browsable(false)]
                 internal const string ProcessorArchitecture = "PROCESSOR_ARCHITECTURE";
+
+                /// <summary>
+                /// The architecture of the operating system, when it differs from the architecture of the process
+                /// that is running.
+                /// </summary>
+                /// <remarks>
+                /// Only set for a 32-bit process on a 64-bit operating system. Expected value if set is: `AMD64`.
+                /// See: https://learn.microsoft.com/en-us/archive/blogs/david.wang/howto-detect-process-bitness
+                /// </remarks>
+                [EditorBrowsable(EditorBrowsableState.Never)]
+                [Browsable(false)]
+                internal const string ProcessorArchitectureW6432 = "PROCESSOR_ARCHITEW6432";
 
                 /// <summary>
                 /// The paths where PowerShell modules are expected to be located.
