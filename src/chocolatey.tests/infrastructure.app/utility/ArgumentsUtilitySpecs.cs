@@ -314,6 +314,88 @@ namespace chocolatey.tests.infrastructure.app.utility
             }
         }
 
+        // The overload that takes the arguments file path is for callers that keep a
+        // package's information outside the default .chocolatey\<id>.<version> store.
+        public abstract class ArgumentsUtilityDecryptFromPathSpecsBase : TinySpec
+        {
+            protected string[] Result;
+            protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
+            protected readonly string ArgumentsFile = Path.Combine("C:\\somewhere", "else", "first", ".arguments");
+
+            public override void Context()
+            {
+            }
+
+            public override void Because()
+            {
+                Result = ArgumentsUtility.DecryptPackageArgumentsFile(FileSystem.Object, ArgumentsFile, "test-package", "0.1.0", redactSensitiveArguments: true, throwOnFailure: false).ToArray();
+            }
+
+            protected void AddArgumentsMock(string arguments)
+            {
+                FileSystem.Setup(f => f.FileExists(ArgumentsFile)).Returns(arguments != null);
+
+                if (arguments != null)
+                {
+                    FileSystem.Setup(f => f.ReadFile(ArgumentsFile)).Returns(NugetEncryptionUtility.EncryptString(arguments));
+                }
+            }
+        }
+
+        public class When_ArgumentsUtility_is_parsing_remembered_arguments_from_a_given_path : ArgumentsUtilityDecryptFromPathSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                AddArgumentsMock(" --prerelease --cache-location='C:\\cache'");
+            }
+
+            [Fact]
+            public void Should_Return_The_Arguments_Stored_At_That_Path()
+            {
+                Result.Should().Equal("--prerelease", "--cache-location=C:\\cache");
+            }
+
+            [Fact]
+            public void Should_Not_Build_The_Default_Arguments_Path()
+            {
+                FileSystem.Verify(f => f.CombinePaths(It.IsAny<string>(), It.IsAny<string[]>()), Times.Never);
+            }
+        }
+
+        public class When_ArgumentsUtility_is_parsing_remembered_arguments_from_a_given_path_and_file_does_not_exist : ArgumentsUtilityDecryptFromPathSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                AddArgumentsMock(null);
+            }
+
+            [Fact]
+            public void Should_Have_Returned_An_Empty_Set()
+            {
+                Result.Should().BeEmpty();
+            }
+        }
+
+        public class When_ArgumentsUtility_is_parsing_sensitive_remembered_arguments_from_a_given_path : ArgumentsUtilityDecryptFromPathSpecsBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                AddArgumentsMock(" --prerelease --password=hunter2");
+            }
+
+            [Fact]
+            public void Should_Redact_The_Sensitive_Value()
+            {
+                Result.Should().Equal("--prerelease", "--password=[REDACTED ARGUMENT]");
+            }
+        }
+
         [TestFixture("choco install bob --package-parameters-sensitive=\"/test=bill\"", true)]
         [TestFixture("choco install bob -package-parameters-sensitive=\"/test=bill\"", true)]
         [TestFixture("choco install bob --install-arguments-sensitive=\"/test=bill\"", true)]

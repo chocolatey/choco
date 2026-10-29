@@ -65,9 +65,44 @@ namespace chocolatey.infrastructure.app.utility
             bool redactSensitiveArguments,
             bool throwOnFailure)
         {
-            var argumentsPath = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, ".chocolatey", "{0}.{1}".FormatWith(id, version));
-            var argumentsFile = fileSystem.CombinePaths(argumentsPath, ".arguments");
+            var argumentsFile = GetPackageArgumentsFile(fileSystem, id, version);
 
+            return DecryptPackageArgumentsFile(fileSystem, argumentsFile, id, version, redactSensitiveArguments, throwOnFailure);
+        }
+
+        /// <summary>
+        ///   The full path of the <c>.arguments</c> file of a package, in the default
+        ///   <c>.chocolatey\&lt;id&gt;.&lt;version&gt;</c> information store.
+        /// </summary>
+        /// <param name="fileSystem">The file system used to build the path.</param>
+        /// <param name="id">The package id.</param>
+        /// <param name="version">The package version.</param>
+        public static string GetPackageArgumentsFile(IFileSystem fileSystem, string id, string version)
+        {
+            var argumentsPath = fileSystem.CombinePaths(ApplicationParameters.InstallLocation, ".chocolatey", "{0}.{1}".FormatWith(id, version));
+
+            return fileSystem.CombinePaths(argumentsPath, ".arguments");
+        }
+
+        /// <summary>
+        ///   Decrypts the remembered arguments stored in <paramref name="argumentsFile"/>, for
+        ///   callers that keep a package's information somewhere other than the default
+        ///   <c>.chocolatey\&lt;id&gt;.&lt;version&gt;</c> store.
+        /// </summary>
+        /// <param name="fileSystem">The file system to read the arguments file with.</param>
+        /// <param name="argumentsFile">The full path of the <c>.arguments</c> file.</param>
+        /// <param name="id">The package id, used in messages.</param>
+        /// <param name="version">The package version, used in messages.</param>
+        /// <param name="redactSensitiveArguments">Whether to replace the values of sensitive arguments.</param>
+        /// <param name="throwOnFailure">Whether to throw when the arguments cannot be decrypted.</param>
+        public static IEnumerable<string> DecryptPackageArgumentsFile(
+            IFileSystem fileSystem,
+            string argumentsFile,
+            string id,
+            string version,
+            bool redactSensitiveArguments,
+            bool throwOnFailure)
+        {
             var arguments = string.Empty;
 
             // Get the arguments decrypted in here and return them

@@ -287,6 +287,111 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
+        // An extension that keeps a package somewhere other than the default information store overrides where the
+        // remembered arguments are read from, and the service has to read them from there and nowhere else.
+        public class RememberedArgumentsNugetService : NugetService
+        {
+            public string FileToRead;
+            public ChocolateyPackageInformation InformationAskedAbout;
+
+            public RememberedArgumentsNugetService(IFileSystem fileSystem, ILogger nugetLogger, IChocolateyPackageInformationService packageInfoService, IFilesService filesService, IRuleService ruleService)
+                : base(fileSystem, nugetLogger, packageInfoService, filesService, ruleService)
+            {
+            }
+
+            protected override string GetRememberedArgumentsFile(ChocolateyPackageInformation packageInfo)
+            {
+                InformationAskedAbout = packageInfo;
+                return FileToRead ?? base.GetRememberedArgumentsFile(packageInfo);
+            }
+
+            public void RestoreRememberedArguments(ChocolateyConfiguration config, ChocolateyPackageInformation packageInfo)
+            {
+                SetConfigFromRememberedArguments(config, packageInfo);
+            }
+        }
+
+        public abstract class RememberedArgumentsSpecsBase : TinySpec
+        {
+            protected Mock<IChocolateyPackageInformationService> PackageInfoService = new Mock<IChocolateyPackageInformationService>();
+            protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
+            protected Mock<IPackageMetadata> Package = new Mock<IPackageMetadata>();
+            protected RememberedArgumentsNugetService Service;
+            protected ChocolateyPackageInformation PackageInfo;
+            protected readonly ChocolateyConfiguration Config = new ChocolateyConfiguration();
+
+            public override void Context()
+            {
+                // The path is what is combined, so the files that are asked for can be told apart.
+                FileSystem.Setup(x => x.CombinePaths(It.IsAny<string>(), It.IsAny<string[]>()))
+                    .Returns<string, string[]>((left, right) => string.Join("\\", new[] { left }.Concat(right)));
+                FileSystem.Setup(x => x.FileExists(It.IsAny<string>())).Returns(true);
+                FileSystem.Setup(x => x.ReadFile(It.IsAny<string>())).Returns("--remembered-one=1 --remembered-two=2");
+
+                Package.Setup(x => x.Id).Returns("bob");
+                Package.Setup(x => x.Version).Returns(NuGet.Versioning.NuGetVersion.Parse("1.0.0"));
+
+                Config.Features.UseRememberedArgumentsForUpgrades = true;
+                PackageInfo = new ChocolateyPackageInformation(Package.Object)
+                {
+                    Arguments = "remembered"
+                };
+
+                Service = new RememberedArgumentsNugetService(
+                    FileSystem.Object,
+                    new Mock<ILogger>().Object,
+                    PackageInfoService.Object,
+                    new Mock<IFilesService>().Object,
+                    new Mock<IRuleService>().Object);
+            }
+
+            public override void Because()
+            {
+                Service.RestoreRememberedArguments(Config, PackageInfo);
+            }
+        }
+
+        public class When_NugetService_restores_the_remembered_arguments_of_a_package_in_the_default_store : RememberedArgumentsSpecsBase
+        {
+            [Fact]
+            public void Should_ask_the_service_where_the_arguments_are()
+            {
+                Service.InformationAskedAbout.Should().BeSameAs(PackageInfo);
+            }
+
+            [Fact]
+            public void Should_read_the_arguments_file_of_the_package_in_the_default_information_store()
+            {
+                FileSystem.Verify(x => x.FileExists(It.Is<string>(path => path.EndsWith("\\.chocolatey\\bob.1.0.0\\.arguments"))), Times.Once);
+            }
+        }
+
+        public class When_NugetService_restores_the_remembered_arguments_of_a_package_kept_in_another_store : RememberedArgumentsSpecsBase
+        {
+            private const string OtherStoreFile = "c:\\other\\store\\bob\\.arguments";
+
+            public override void Context()
+            {
+                base.Context();
+
+                Service.FileToRead = OtherStoreFile;
+            }
+
+            [Fact]
+            public void Should_read_the_arguments_file_the_service_gave()
+            {
+                FileSystem.Verify(x => x.FileExists(OtherStoreFile), Times.Once);
+                FileSystem.Verify(x => x.ReadFile(OtherStoreFile), Times.Once);
+            }
+
+            [Fact]
+            public void Should_not_read_any_other_arguments_file()
+            {
+                FileSystem.Verify(x => x.FileExists(It.Is<string>(path => path != OtherStoreFile)), Times.Never);
+                FileSystem.Verify(x => x.ReadFile(It.Is<string>(path => path != OtherStoreFile)), Times.Never);
+            }
+        }
+
         public class When_NugetService_pack_noop : NugetServiceSpecsBase
         {
             private Action _because;

@@ -2250,6 +2250,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
             var packageArguments = ArgumentsUtility.DecryptPackageArgumentsFile(
                 _fileSystem,
+                GetRememberedArgumentsFile(packageInfo),
                 packageInfo.Package.Id,
                 packageInfo.Package.Version.ToNormalizedStringChecked(),
                 redactSensitiveArguments: false,
@@ -2322,6 +2323,19 @@ and argument details.
             }
 
             return originalConfig;
+        }
+
+        /// <summary>
+        /// Gets the full path of the <c>.arguments</c> file that holds the remembered arguments of a package.
+        /// </summary>
+        /// <param name="packageInfo">The information of the package that is upgraded.</param>
+        /// <returns>The path of the file, in the default information store unless overridden.</returns>
+        protected virtual string GetRememberedArgumentsFile(ChocolateyPackageInformation packageInfo)
+        {
+            return ArgumentsUtility.GetPackageArgumentsFile(
+                _fileSystem,
+                packageInfo.Package.Id,
+                packageInfo.Package.Version.ToNormalizedStringChecked());
         }
 
         private int CountCharacter(string value, char character)
