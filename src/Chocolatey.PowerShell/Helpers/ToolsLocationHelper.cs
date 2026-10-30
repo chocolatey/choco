@@ -43,42 +43,14 @@ namespace Chocolatey.PowerShell.Helpers
 
         /// <summary>
         /// Gets the tools location.
-        /// This is <c>ChocolateyToolsLocation</c> when that is set, otherwise the value of the older
-        /// <c>ChocolateyBinRoot</c> (or older still, <c>chocolatey_bin_root</c>), otherwise <c>tools</c>
-        /// on the system drive.
-        /// The older variables are removed from the user's environment when they are used, and the result is
-        /// saved to <c>ChocolateyToolsLocation</c> when that is not already set to it.
+        /// This is <c>ChocolateyToolsLocation</c> when that is set, otherwise <c>tools</c> on the system drive.
+        /// The result is saved to <c>ChocolateyToolsLocation</c> when that is not already set to it.
         /// </summary>
         /// <returns>The full path of the tools location.</returns>
         public string Get()
         {
-            var toolsLocation = EnvironmentHelper.GetVariable(ChocolateyToolsLocation);
-
-            if (toolsLocation is null)
-            {
-                var binRoot = EnvironmentHelper.GetVariable(ChocolateyBinRoot);
-                var legacyRoot = EnvironmentHelper.GetVariable(ChocolateyBinRootLegacy);
-
-                if (binRoot is null && legacyRoot is null)
-                {
-                    toolsLocation = CombinePaths(EnvironmentHelper.GetVariable(SystemDrive), "tools");
-                }
-                else
-                {
-                    if (!(legacyRoot is null))
-                    {
-                        if (binRoot is null)
-                        {
-                            binRoot = legacyRoot;
-                        }
-
-                        ClearVariable(ChocolateyBinRootLegacy);
-                    }
-
-                    toolsLocation = binRoot;
-                    ClearVariable(ChocolateyBinRoot);
-                }
-            }
+            var toolsLocation = EnvironmentHelper.GetVariable(ChocolateyToolsLocation)
+                ?? CombinePaths(EnvironmentHelper.GetVariable(SystemDrive), "tools");
 
             if (!DriveLetterPattern.IsMatch(toolsLocation))
             {
@@ -133,23 +105,6 @@ namespace Chocolatey.PowerShell.Helpers
         protected virtual bool IsElevated()
         {
             return ProcessInformation.IsElevated();
-        }
-
-        /// <summary>
-        /// Removes a variable that is no longer used from the user's environment.
-        /// Failure to clear the value is ignored.
-        /// </summary>
-        private void ClearVariable(string name)
-        {
-            try
-            {
-                SetVariable(name, string.Empty, EnvironmentVariableTarget.User);
-            }
-            catch (Exception error) when (!(error is PipelineStoppedException))
-            {
-                // This is only used to clear out old variables, it's not
-                // critical for anything to work.
-            }
         }
     }
 }

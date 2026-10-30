@@ -7,9 +7,9 @@
 
         $systemDrive = $env:SystemDrive
 
-        # The command reads and writes these in the process and in the user's environment, so what the machine running the tests
+        # The command reads and writes this in the process and in the user's environment, so what the machine running the tests
         # has is put aside, and put back afterwards.
-        $variableNames = 'ChocolateyToolsLocation', 'ChocolateyBinRoot', 'chocolatey_bin_root'
+        $variableNames = 'ChocolateyToolsLocation'
         $originalValues = @{}
         foreach ($name in $variableNames) {
             $originalValues[$name] = @{
@@ -19,7 +19,7 @@
         }
 
         function Set-TestEnvironment {
-            # Clears the three variables, then sets the ones given. A variable is set in the user's environment and the process, as
+            # Clears the variable, then sets it if given. A variable is set in the user's environment and the process, as
             # it would be after a session starts with it set.
             param(
                 [hashtable]$Variables = @{}
@@ -116,27 +116,6 @@
         }
     }
 
-    Context 'When ChocolateyToolsLocation is set along with the older variables' {
-        BeforeAll {
-            Set-TestEnvironment @{
-                ChocolateyToolsLocation = 'D:\tools'
-                ChocolateyBinRoot       = 'E:\bin'
-                chocolatey_bin_root     = 'F:\old'
-            }
-
-            $result = Get-ToolsLocation
-        }
-
-        It 'Returns the tools location' {
-            $result | Should -BeExactly 'D:\tools'
-        }
-
-        It 'Leaves the older variables as they are' {
-            Get-UserVariable 'ChocolateyBinRoot' | Should -BeExactly 'E:\bin'
-            Get-UserVariable 'chocolatey_bin_root' | Should -BeExactly 'F:\old'
-        }
-    }
-
     Context 'When ChocolateyToolsLocation is set to a path without a drive' {
         BeforeAll {
             Set-TestEnvironment @{ ChocolateyToolsLocation = 'sometools' }
@@ -177,98 +156,17 @@
         }
     }
 
-    Context 'When only the older ChocolateyBinRoot is set' {
-        BeforeAll {
-            Set-TestEnvironment @{ ChocolateyBinRoot = 'E:\bin' }
-
-            $result = Get-ToolsLocation
-        }
-
-        It 'Returns the value of ChocolateyBinRoot' {
-            $result | Should -BeExactly 'E:\bin'
-        }
-
-        It 'Saves it as the tools location' {
-            Get-UserVariable 'ChocolateyToolsLocation' | Should -BeExactly 'E:\bin'
-        }
-
-        It 'Removes ChocolateyBinRoot from the user environment' {
-            Get-UserVariable 'ChocolateyBinRoot' | Should -BeNullOrEmpty
-        }
-    }
-
-    Context 'When the older ChocolateyBinRoot has no drive' {
-        BeforeAll {
-            Set-TestEnvironment @{ ChocolateyBinRoot = 'oldbin' }
-
-            $result = Get-ToolsLocation
-        }
-
-        It 'Puts the location on the system drive' {
-            $result | Should -BeExactly "$systemDrive\oldbin"
-        }
-
-        It 'Saves the location with the drive as the tools location' {
-            Get-UserVariable 'ChocolateyToolsLocation' | Should -BeExactly "$systemDrive\oldbin"
-        }
-    }
-
-    Context 'When only the oldest chocolatey_bin_root is set' {
-        BeforeAll {
-            Set-TestEnvironment @{ chocolatey_bin_root = 'F:\old' }
-
-            $result = Get-ToolsLocation
-        }
-
-        It 'Returns the value of chocolatey_bin_root' {
-            $result | Should -BeExactly 'F:\old'
-        }
-
-        It 'Saves it as the tools location' {
-            Get-UserVariable 'ChocolateyToolsLocation' | Should -BeExactly 'F:\old'
-        }
-
-        It 'Removes both older variables from the user environment' {
-            Get-UserVariable 'chocolatey_bin_root' | Should -BeNullOrEmpty
-            Get-UserVariable 'ChocolateyBinRoot' | Should -BeNullOrEmpty
-        }
-    }
-
-    Context 'When both older variables are set' {
-        BeforeAll {
-            Set-TestEnvironment @{
-                ChocolateyBinRoot   = 'E:\bin'
-                chocolatey_bin_root = 'F:\old'
-            }
-
-            $result = Get-ToolsLocation
-        }
-
-        It 'Returns the value of ChocolateyBinRoot' {
-            $result | Should -BeExactly 'E:\bin'
-        }
-
-        It 'Saves it as the tools location' {
-            Get-UserVariable 'ChocolateyToolsLocation' | Should -BeExactly 'E:\bin'
-        }
-
-        It 'Removes both older variables from the user environment' {
-            Get-UserVariable 'chocolatey_bin_root' | Should -BeNullOrEmpty
-            Get-UserVariable 'ChocolateyBinRoot' | Should -BeNullOrEmpty
-        }
-    }
-
     Context 'When it is called again' {
         BeforeAll {
-            Set-TestEnvironment @{ ChocolateyBinRoot = 'E:\bin' }
+            Set-TestEnvironment
 
             $first = Get-ToolsLocation
             $second = Get-ToolsLocation
         }
 
         It 'Returns the same location' {
-            $first | Should -BeExactly 'E:\bin'
-            $second | Should -BeExactly 'E:\bin'
+            $first | Should -BeExactly "$systemDrive\tools"
+            $second | Should -BeExactly "$systemDrive\tools"
         }
     }
 }
