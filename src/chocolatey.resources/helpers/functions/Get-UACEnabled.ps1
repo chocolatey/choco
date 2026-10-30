@@ -33,6 +33,8 @@ None
 .OUTPUTS
 System.Boolean
 #>
+    [Obsolete("This function is no longer used and will be removed in v3.0 of Chocolatey CLI.")]
+    param()
 
     Write-FunctionCallLogMessage -Invocation $MyInvocation -Parameters $PSBoundParameters
 
