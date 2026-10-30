@@ -47,8 +47,6 @@ namespace Chocolatey.PowerShell.Tests.Commands
             protected override string[] ManagedVariables { get; } =
             {
                 SystemVariables.ChocolateyToolsLocation,
-                SystemVariables.ChocolateyBinRoot,
-                SystemVariables.ChocolateyBinRootLegacy,
             };
 
             public override void Context()

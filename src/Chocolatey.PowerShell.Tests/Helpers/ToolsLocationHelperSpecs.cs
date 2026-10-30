@@ -39,8 +39,6 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             protected override string[] ManagedVariables { get; } =
             {
                 SystemVariables.ChocolateyToolsLocation,
-                SystemVariables.ChocolateyBinRoot,
-                SystemVariables.ChocolateyBinRootLegacy,
                 SystemVariables.SystemDrive,
             };
 
@@ -137,30 +135,6 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             }
         }
 
-        public class When_the_tools_location_is_set_and_the_older_variables_are_too : ToolsLocationResultSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-
-                SetVariable(SystemVariables.ChocolateyToolsLocation, @"D:\tools");
-                SetVariable(SystemVariables.ChocolateyBinRoot, @"E:\bin");
-                SetVariable(SystemVariables.ChocolateyBinRootLegacy, @"F:\old");
-            }
-
-            [Fact]
-            public void Should_be_the_tools_location()
-            {
-                Result.Should().Be(@"D:\tools");
-            }
-
-            [Fact]
-            public void Should_leave_the_older_variables_alone()
-            {
-                Helper.Calls.Should().BeEmpty();
-            }
-        }
-
         public class When_the_tools_location_has_a_drive : ToolsLocationSpecsBase
         {
             [InlineData(@"D:\tools")]
@@ -210,105 +184,6 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             public void Should_use_the_system_drive_for_the_default()
             {
                 Result.Should().Be(@"D:\tools");
-            }
-        }
-
-        public class When_only_the_bin_root_is_set : ToolsLocationResultSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-
-                SetVariable(SystemVariables.ChocolateyBinRoot, @"E:\bin");
-            }
-
-            [Fact]
-            public void Should_be_the_bin_root()
-            {
-                Result.Should().Be(@"E:\bin");
-            }
-
-            [Fact]
-            public void Should_remove_the_bin_root_and_then_save_the_tools_location()
-            {
-                Helper.Calls.Should().Equal(
-                    "User ChocolateyBinRoot=",
-                    @"User ChocolateyToolsLocation=E:\bin");
-            }
-        }
-
-        public class When_the_bin_root_has_no_drive : ToolsLocationResultSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-
-                SetVariable(SystemVariables.ChocolateyBinRoot, "bin");
-            }
-
-            [Fact]
-            public void Should_be_put_on_the_system_drive()
-            {
-                Result.Should().Be(@"C:\bin");
-            }
-
-            [Fact]
-            public void Should_remove_the_bin_root_and_then_save_the_tools_location()
-            {
-                Helper.Calls.Should().Equal(
-                    "User ChocolateyBinRoot=",
-                    @"User ChocolateyToolsLocation=C:\bin");
-            }
-        }
-
-        public class When_only_the_oldest_bin_root_is_set : ToolsLocationResultSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-
-                SetVariable(SystemVariables.ChocolateyBinRootLegacy, @"F:\old");
-            }
-
-            [Fact]
-            public void Should_be_the_oldest_bin_root()
-            {
-                Result.Should().Be(@"F:\old");
-            }
-
-            [Fact]
-            public void Should_remove_both_older_variables_and_then_save_the_tools_location()
-            {
-                Helper.Calls.Should().Equal(
-                    "User chocolatey_bin_root=",
-                    "User ChocolateyBinRoot=",
-                    @"User ChocolateyToolsLocation=F:\old");
-            }
-        }
-
-        public class When_the_bin_root_and_the_oldest_bin_root_are_set : ToolsLocationResultSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-
-                SetVariable(SystemVariables.ChocolateyBinRoot, @"E:\bin");
-                SetVariable(SystemVariables.ChocolateyBinRootLegacy, @"F:\old");
-            }
-
-            [Fact]
-            public void Should_be_the_bin_root()
-            {
-                Result.Should().Be(@"E:\bin");
-            }
-
-            [Fact]
-            public void Should_remove_both_older_variables_and_then_save_the_tools_location()
-            {
-                Helper.Calls.Should().Equal(
-                    "User chocolatey_bin_root=",
-                    "User ChocolateyBinRoot=",
-                    @"User ChocolateyToolsLocation=E:\bin");
             }
         }
 
@@ -411,85 +286,6 @@ namespace Chocolatey.PowerShell.Tests.Helpers
             public void Should_not_try_another_environment()
             {
                 Helper.Calls.Should().Equal(@"User ChocolateyToolsLocation=C:\tools");
-            }
-        }
-
-        public class When_an_older_variable_cannot_be_removed : ToolsLocationResultSpecsBase
-        {
-            private readonly Exception _failure = new InvalidOperationException("cannot remove");
-
-            public override void Context()
-            {
-                base.Context();
-
-                SetVariable(SystemVariables.ChocolateyBinRoot, @"E:\bin");
-                SetVariable(SystemVariables.ChocolateyBinRootLegacy, @"F:\old");
-                Helper.Failure = (name, scope) => name == SystemVariables.ChocolateyBinRoot ? _failure : null;
-            }
-
-            [Fact]
-            public void Should_not_fail()
-            {
-                Error.Should().BeNull();
-            }
-
-            [Fact]
-            public void Should_carry_on_and_be_the_bin_root()
-            {
-                Result.Should().Be(@"E:\bin");
-                Helper.Calls.Should().Equal(
-                    "User chocolatey_bin_root=",
-                    "User ChocolateyBinRoot=",
-                    @"User ChocolateyToolsLocation=E:\bin");
-            }
-
-            [Fact]
-            public void Should_not_report_the_failure()
-            {
-                CommandRuntime.Verify(r => r.WriteError(It.IsAny<ErrorRecord>()), Times.Never);
-            }
-        }
-
-        public class When_both_older_variables_cannot_be_removed : ToolsLocationResultSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-
-                SetVariable(SystemVariables.ChocolateyBinRoot, @"E:\bin");
-                SetVariable(SystemVariables.ChocolateyBinRootLegacy, @"F:\old");
-                Helper.Failure = (name, scope) => name == SystemVariables.ChocolateyToolsLocation ? null : new InvalidOperationException("cannot remove");
-            }
-
-            [Fact]
-            public void Should_still_save_the_tools_location()
-            {
-                Result.Should().Be(@"E:\bin");
-                Helper.Calls.Should().EndWith(@"User ChocolateyToolsLocation=E:\bin");
-            }
-
-            [Fact]
-            public void Should_not_report_the_failures()
-            {
-                CommandRuntime.Verify(r => r.WriteError(It.IsAny<ErrorRecord>()), Times.Never);
-            }
-        }
-
-        public class When_the_pipeline_is_stopped_while_removing_an_older_variable : ToolsLocationResultSpecsBase
-        {
-            public override void Context()
-            {
-                base.Context();
-
-                SetVariable(SystemVariables.ChocolateyBinRoot, @"E:\bin");
-                Helper.Failure = (name, scope) => new PipelineStoppedException();
-            }
-
-            [Fact]
-            public void Should_stop_instead_of_reporting_an_error()
-            {
-                Error.Should().BeOfType<PipelineStoppedException>();
-                CommandRuntime.Verify(r => r.WriteError(It.IsAny<ErrorRecord>()), Times.Never);
             }
         }
     }

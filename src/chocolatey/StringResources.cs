@@ -579,27 +579,6 @@ namespace chocolatey
                 internal const string Username = "USERNAME";
 
                 /// <summary>
-                /// The root of the chocolatey bin (legacy name for <see cref="ChocolateyToolsLocation"/>).
-                /// </summary>
-                /// <remarks>
-                /// This environment variable is only used by the alternative sources to determine
-                /// the executable location.
-                /// </remarks>
-                /// <seealso cref="ChocolateyToolsLocation" />
-                [EditorBrowsable(EditorBrowsableState.Never)]
-                [Browsable(false)]
-                internal static string ChocolateyBinRoot = nameof(ChocolateyBinRoot);
-
-                /// <summary>
-                /// The oldest name of the root of the chocolatey bin, which <see cref="ChocolateyBinRoot"/> replaced.
-                /// </summary>
-                /// <seealso cref="ChocolateyBinRoot" />
-                /// <seealso cref="ChocolateyToolsLocation" />
-                [EditorBrowsable(EditorBrowsableState.Never)]
-                [Browsable(false)]
-                internal const string ChocolateyBinRootLegacy = "chocolatey_bin_root";
-
-                /// <summary>
                 /// One of the possible system environment variables available to set a system proxy.
                 /// </summary>
                 /// <remarks>

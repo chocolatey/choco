@@ -103,7 +103,7 @@ The following are more advanced settings:
  * {EnvironmentVariables.Package.IsProcessElevated} = Is the process elevated?
  * {EnvironmentVariables.Package.IsUserSystemAccount} = Is the user the system account?
  * {EnvironmentVariables.Package.IsRemoteDesktop} = Is the user in a terminal services session?
- * {EnvironmentVariables.System.ChocolateyToolsLocation} - formerly '{EnvironmentVariables.System.ChocolateyBinRoot}' ('{EnvironmentVariables.System.ChocolateyBinRoot}' will be removed with Chocolatey v2.0.0), this is where tools being installed outside of Chocolatey packaging will go.
+ * {EnvironmentVariables.System.ChocolateyToolsLocation} - this is where tools being installed outside of Chocolatey packaging will go.
 
 #### Set By Options and Configuration
 Some environment variables are set based on options that are passed, configuration and/or features that are turned on:

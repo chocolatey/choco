@@ -183,13 +183,13 @@ namespace chocolatey.infrastructure.app.services
                 return setupKey.GetValue("rootdir", string.Empty).ToStringSafe();
             }
 
-            var binRoot = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyBinRoot);
-            if (string.IsNullOrWhiteSpace(binRoot))
+            var toolsLocation = Environment.GetEnvironmentVariable(EnvironmentVariables.System.ChocolateyToolsLocation);
+            if (string.IsNullOrWhiteSpace(toolsLocation))
             {
-                binRoot = "c:\\tools";
+                toolsLocation = "c:\\tools";
             }
 
-            return _fileSystem.CombinePaths(binRoot, "cygwin");
+            return _fileSystem.CombinePaths(toolsLocation, "cygwin");
         }
 
         private string GetCygwinPath(string rootpath)
