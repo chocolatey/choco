@@ -305,6 +305,41 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
+        /// Gets child items under the target path.
+        /// </summary>
+        /// <param name="cmdlet">The calling cmdlet.</param>
+        /// <param name="path">The provider path to search for children of.</param>
+        /// <param name="recurse">Whether to search recursively through child containers.</param>
+        /// <returns>A collection of child items as PSObjects.</returns>
+        public static Collection<PSObject> GetChildItem(PSCmdlet cmdlet, string path, bool recurse)
+        {
+            return cmdlet.InvokeProvider.ChildItem.Get(path, recurse);
+        }
+
+        /// <summary>
+        /// Gets the properties of the target item.
+        /// </summary>
+        /// <param name="cmdlet">The calling cmdlet.</param>
+        /// <param name="path">The path to the item to read properties from.</param>
+        /// <returns>The properties as a collection of PSObjects.</returns>
+        public static Collection<PSObject> GetItemProperty(PSCmdlet cmdlet, string path)
+        {
+            return cmdlet.InvokeProvider.Property.Get(path, providerSpecificPickList: null);
+        }
+
+        /// <summary>
+        /// Gets the properties of the target item, specifying whether the path is literal.
+        /// </summary>
+        /// <param name="cmdlet">The calling cmdlet.</param>
+        /// <param name="path">The path to the item to read properties from.</param>
+        /// <param name="literalPath">Whether the path should be treated as literal.</param>
+        /// <returns>The properties as a collection of PSObjects.</returns>
+        public static Collection<PSObject> GetItemProperty(PSCmdlet cmdlet, string path, bool literalPath)
+        {
+            return cmdlet.InvokeProvider.Property.Get(new[] { path }, providerSpecificPickList: null, literalPath);
+        }
+
+        /// <summary>
         /// Gets the current PowerShell version of the running PowerShell assemblies.
         /// Equivalent to <c>$PSVersionTable.PSVersion</c>.
         /// </summary>
