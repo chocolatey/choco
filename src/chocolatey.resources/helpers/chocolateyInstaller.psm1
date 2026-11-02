@@ -144,6 +144,7 @@ Set-Alias -Name 'Get-PackageParametersBuiltIn' -Value 'Chocolatey.PowerShell\Get
 
 # These aliases will take precedence over extension-provided ones as they are applied after importing extensions.
 Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
+Set-Alias -Name 'Get-InstallRegistryKey' -Value 'Get-UninstallRegistryKey'
 
 # Exercise caution and test _thoroughly_ with AND without the licensed extension installed
 # when making any changes here. And make sure to update this comment if needed when any
