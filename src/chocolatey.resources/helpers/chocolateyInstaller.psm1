@@ -136,6 +136,7 @@ if (Test-Path $extensionsPath) {
 }
 
 Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
+Set-Alias -Name 'Get-InstallRegistryKey' -Value 'Get-UninstallRegistryKey'
 
 # This chain works around the fact that PowerShell allows functions to shadow cmdlets;
 # without it, extensions would be able to override the Get-PackageParameters cmdlet.
