@@ -57,6 +57,15 @@
             }
         }
 
+        It 'Defaults to MD5 if the checksum type is an empty string' {
+            if ($ChecksumType -eq 'Md5') {
+                { Assert-ValidChecksum -Path $File.FullName -Checksum $checksum -ChecksumType '' } | Should -Not -Throw -Because "$checksum should be the valid Md5 checksum"
+            }
+            else {
+                { Assert-ValidChecksum -Path $File.FullName -Checksum $checksum -ChecksumType '' } | Should -Throw -Because "$checksum is not an Md5 checksum"
+            }
+        }
+
         Context 'Bypassing Checksum Verification' {
             AfterEach {
                 $env:chocolateyIgnoreChecksums = ''
