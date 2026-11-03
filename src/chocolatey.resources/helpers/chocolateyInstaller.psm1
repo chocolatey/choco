@@ -58,11 +58,12 @@ if (Test-Path $dllPath) {
         Where-Object { $_.GetName().Name -eq 'Chocolatey.PowerShell' } |
         Select-Object -First 1
 
+    # Imported globally so that any module-qualified aliases can be resolved from package scripts.
     if ($cmdletsAssembly) {
-        Import-Module $cmdletsAssembly.Location -Force
+        Import-Module $cmdletsAssembly.Location -Force -Global
     }
     else {
-        Import-Module $dllPath
+        Import-Module $dllPath -Global
     }
 
     # Cache module commands for helping resolve lookups
@@ -135,6 +136,14 @@ if (Test-Path $extensionsPath) {
 }
 
 Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
+Set-Alias -Name 'Get-InstallRegistryKey' -Value 'Get-UninstallRegistryKey'
+
+# Workarounds to avoid extensions overriding these functions. The chocolatey-compatibility extension
+# (and others) may otherwise override cmdlets when we don't want it to.
+Set-Alias -Name 'Get-PackageParametersBuiltIn' -Value 'Chocolatey.PowerShell\Get-PackageParameters'
+Set-Alias -Name 'Get-PackageParameters' -Value 'Get-PackageParametersBuiltIn' -Scope Global
+Set-Alias -Name 'Get-UninstallRegistryKeyBuiltIn' -Value 'Chocolatey.PowerShell\Get-UninstallRegistryKey'
+Set-Alias -Name 'Get-UninstallRegistryKey' -Value 'Get-UninstallRegistryKeyBuiltIn' -Scope Global
 
 # Exercise caution and test _thoroughly_ with AND without the licensed extension installed
 # when making any changes here. And make sure to update this comment if needed when any
