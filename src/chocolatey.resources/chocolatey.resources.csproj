@@ -68,9 +68,6 @@
     <EmbeddedResource Include="helpers\functions\Get-WebHeaders.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="helpers\functions\Install-ChocolateyEnvironmentVariable.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyExplorerMenuItem.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
@@ -182,11 +179,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="helpers\functions\Install-Vsix.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="helpers\functions\Uninstall-ChocolateyEnvironmentVariable.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
