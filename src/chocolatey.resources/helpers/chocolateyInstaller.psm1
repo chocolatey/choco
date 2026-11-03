@@ -58,11 +58,12 @@ if (Test-Path $dllPath) {
         Where-Object { $_.GetName().Name -eq 'Chocolatey.PowerShell' } |
         Select-Object -First 1
 
+    # Imported globally so that any module-qualified aliases can be resolved from package scripts.
     if ($cmdletsAssembly) {
-        Import-Module $cmdletsAssembly.Location -Force
+        Import-Module $cmdletsAssembly.Location -Force -Global
     }
     else {
-        Import-Module $dllPath
+        Import-Module $dllPath -Global
     }
 
     # Cache module commands for helping resolve lookups
