@@ -146,6 +146,11 @@ Set-Alias -Name 'Get-PackageParametersBuiltIn' -Value 'Chocolatey.PowerShell\Get
 Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
 Set-Alias -Name 'Get-InstallRegistryKey' -Value 'Get-UninstallRegistryKey'
 
+# Workarounds to avoid extensions overriding these functions. The chocolatey-compatibility extension
+# (and others) may otherwise override cmdlets when we don't want it to.
+Set-Alias -Name 'Get-UninstallRegistryKeyBuiltIn' -Value 'Chocolatey.PowerShell\Get-UninstallRegistryKey'
+Set-Alias -Name 'Get-UninstallRegistryKey' -Value 'Get-UninstallRegistryKeyBuiltIn' -Scope Global
+
 # Exercise caution and test _thoroughly_ with AND without the licensed extension installed
 # when making any changes here. And make sure to update this comment if needed when any
 # changes are being made.
