@@ -58,11 +58,12 @@ if (Test-Path $dllPath) {
         Where-Object { $_.GetName().Name -eq 'Chocolatey.PowerShell' } |
         Select-Object -First 1
 
+    # Imported globally so that any module-qualified aliases can be resolved from package scripts.
     if ($cmdletsAssembly) {
-        Import-Module $cmdletsAssembly.Location -Force
+        Import-Module $cmdletsAssembly.Location -Force -Global
     }
     else {
-        Import-Module $dllPath
+        Import-Module $dllPath -Global
     }
 
     # Cache module commands for helping resolve lookups
@@ -135,6 +136,11 @@ if (Test-Path $extensionsPath) {
 }
 
 Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
+
+# This chain works around the fact that PowerShell allows functions to shadow cmdlets;
+# without it, extensions would be able to override the Get-PackageParameters cmdlet.
+Set-Alias -Name 'Get-PackageParametersBuiltIn' -Value 'Chocolatey.PowerShell\Get-PackageParameters'
+Set-Alias -Name 'Get-PackageParameters' -Value 'Get-PackageParametersBuiltIn' -Scope Global
 
 # Exercise caution and test _thoroughly_ with AND without the licensed extension installed
 # when making any changes here. And make sure to update this comment if needed when any
