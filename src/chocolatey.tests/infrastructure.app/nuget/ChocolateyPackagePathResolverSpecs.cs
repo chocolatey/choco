@@ -282,5 +282,173 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 _instanceResolver.GetInstallPath("dep").Should().Be(Path.Combine(RootDirectory, "dep", "first"));
             }
         }
+
+        [ConcernFor("nuget")]
+        public class When_a_parent_id_is_set_but_no_dependencies_root : ChocolateyPackagePathResolverSpecsBase
+        {
+            private ChocolateyPackagePathResolver _instanceResolver;
+
+            public override void Context()
+            {
+                base.Context();
+                _instanceResolver = new ChocolateyPackagePathResolver(RootDirectory, FileSystem.Object, "first")
+                {
+                    ParentId = "bob"
+                };
+            }
+
+            [Fact]
+            public void Should_resolve_a_dependency_as_an_instance_when_there_is_no_dependencies_root()
+            {
+                _instanceResolver.GetInstallPath("dep").Should().Be(Path.Combine(RootDirectory, "dep", "first"));
+            }
+
+            [Fact]
+            public void Should_resolve_a_dependency_as_an_instance_when_the_dependencies_root_is_only_whitespace()
+            {
+                _instanceResolver.DependenciesRootDirectory = "   ";
+
+                _instanceResolver.GetInstallPath("dep").Should().Be(Path.Combine(RootDirectory, "dep", "first"));
+            }
+        }
+
+        [ConcernFor("nuget")]
+        public class When_the_instance_name_is_only_whitespace : ChocolateyPackagePathResolverSpecsBase
+        {
+            private string _result;
+
+            public override void Because()
+            {
+                _result = new ChocolateyPackagePathResolver(RootDirectory, FileSystem.Object, "   ").GetInstallPath("bob");
+            }
+
+            [Fact]
+            public void Should_resolve_as_a_default_package_without_an_instance_folder()
+            {
+                _result.Should().Be(Path.Combine(RootDirectory, "bob"));
+            }
+        }
+
+        [ConcernFor("nuget")]
+        public class When_a_parent_id_is_set_on_a_resolver_without_an_instance : ChocolateyPackagePathResolverSpecsBase
+        {
+            private string _parentPath;
+            private string _otherPath;
+
+            public override void Context()
+            {
+                base.Context();
+                Resolver.ParentId = "bob";
+                Resolver.DependenciesRootDirectory = "C:\\somewhere\\else";
+            }
+
+            public override void Because()
+            {
+                _parentPath = Resolver.GetInstallPath("bob");
+                _otherPath = Resolver.GetInstallPath("dep");
+            }
+
+            [Fact]
+            public void Should_ignore_the_parent_id_for_the_parent()
+            {
+                _parentPath.Should().Be(Path.Combine(RootDirectory, "bob"));
+            }
+
+            [Fact]
+            public void Should_ignore_the_dependencies_root_for_every_other_id()
+            {
+                _otherPath.Should().Be(Path.Combine(RootDirectory, "dep"));
+            }
+        }
+
+        [ConcernFor("nuget")]
+        public class When_getting_the_package_file_name_for_an_instanced_package : ChocolateyPackagePathResolverSpecsBase
+        {
+            private string _result;
+
+            public override void Because()
+            {
+                _result = new ChocolateyPackagePathResolver(RootDirectory, FileSystem.Object, "first")
+                    .GetPackageFileName(new PackageIdentity("bob", new NuGetVersion("1.0.0")));
+            }
+
+            [Fact]
+            public void Should_not_include_the_instance_or_the_version()
+            {
+                _result.Should().Be("bob.nupkg");
+            }
+        }
+
+        [ConcernFor("nuget")]
+        public class When_getting_the_install_path_of_an_instanced_package_by_identity : ChocolateyPackagePathResolverSpecsBase
+        {
+            private string _byIdentity;
+            private string _byId;
+
+            public override void Because()
+            {
+                var instanceResolver = new ChocolateyPackagePathResolver(RootDirectory, FileSystem.Object, "first")
+                {
+                    ParentId = "bob",
+                    DependenciesRootDirectory = "C:\\ProgramData\\chocolatey\\lib"
+                };
+
+                _byIdentity = instanceResolver.GetInstallPath(new PackageIdentity("bob", new NuGetVersion("2.0.0")));
+                _byId = instanceResolver.GetInstallPath("bob");
+            }
+
+            [Fact]
+            public void Should_resolve_the_same_path_as_by_id()
+            {
+                _byIdentity.Should().Be(_byId);
+            }
+
+            [Fact]
+            public void Should_not_include_the_version()
+            {
+                _byIdentity.Should().Be(Path.Combine(RootDirectory, "bob", "first"));
+            }
+        }
+
+        // One resolver is shared by a whole install, and the parent is changed for each requested package.
+        [ConcernFor("nuget")]
+        public class When_the_parent_id_changes_between_packages_on_one_resolver : ChocolateyPackagePathResolverSpecsBase
+        {
+            private const string DependenciesRoot = "C:\\ProgramData\\chocolatey\\lib";
+            private string _bobWhenBobIsTheParent;
+            private string _depWhenBobIsTheParent;
+            private string _bobWhenDepIsTheParent;
+            private string _depWhenDepIsTheParent;
+
+            public override void Because()
+            {
+                var instanceResolver = new ChocolateyPackagePathResolver(RootDirectory, FileSystem.Object, "first")
+                {
+                    DependenciesRootDirectory = DependenciesRoot
+                };
+
+                instanceResolver.ParentId = "bob";
+                _bobWhenBobIsTheParent = instanceResolver.GetInstallPath("bob");
+                _depWhenBobIsTheParent = instanceResolver.GetInstallPath("dep");
+
+                instanceResolver.ParentId = "dep";
+                _bobWhenDepIsTheParent = instanceResolver.GetInstallPath("bob");
+                _depWhenDepIsTheParent = instanceResolver.GetInstallPath("dep");
+            }
+
+            [Fact]
+            public void Should_resolve_the_first_parent_as_an_instance_and_the_other_as_a_dependency()
+            {
+                _bobWhenBobIsTheParent.Should().Be(Path.Combine(RootDirectory, "bob", "first"));
+                _depWhenBobIsTheParent.Should().Be(Path.Combine(DependenciesRoot, "dep"));
+            }
+
+            [Fact]
+            public void Should_resolve_the_roles_the_other_way_round_once_the_parent_changes()
+            {
+                _depWhenDepIsTheParent.Should().Be(Path.Combine(RootDirectory, "dep", "first"));
+                _bobWhenDepIsTheParent.Should().Be(Path.Combine(DependenciesRoot, "bob"));
+            }
+        }
     }
 }
