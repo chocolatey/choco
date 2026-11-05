@@ -1,4 +1,4 @@
-﻿Describe "CacheFolderLockdownValidation" -Tag Chocolatey, Validations, HttpCache -Skip:(-not $env:TEST_KITCHEN) {
+﻿Describe "CacheFolderLockdownValidation" -Tag Chocolatey, Validations, HttpCache, FolderPermissions -Skip:(-not $env:TEST_KITCHEN) {
     BeforeDiscovery {
         $installedPackages = Get-ChocolateyInstalledPackages
         $agentInstalled = $installedPackages.Name -contains 'chocolatey-agent'
@@ -11,60 +11,11 @@
         $script:CacheFolder = "$env:ProgramData/ChocolateyHttpCache"
 
         function Assert-HttpCacheLockdown {
-            $observedErrors = @(
-                if (-not (Test-Path $script:CacheFolder)) {
-                    "The cache folder does not exist"
-                }
-
-                $acl = Get-Acl -Path $script:CacheFolder
-                if ($acl.Owner -cne "BUILTIN\Administrators") {
-                    "The cache folder is owned by $($acl.Owner), not Administrators"
-                }
-
-                $rules = $acl.Access
-                if ($rules.Count -ne 3) {
-                    "Unexpected access rules are present on the cache folder:`n$($rules | Format-List | Out-String)"
-                }
-
-                $expectedRules = @(
-                    @{
-                        Identifier = "BUILTIN\Administrators"
-                        AclType = "Allow"
-                        Rights = "FullControl"
-                    }
-                    @{
-                        Identifier = "NT AUTHORITY\SYSTEM"
-                        AclType = "Allow"
-                        Rights = "FullControl"
-                    }
-                    @{
-                        Identifier = "BUILTIN\Users"
-                        AclType = "Allow"
-                        Rights = "ReadAndExecute, Synchronize"
-                    }
-                )
-
-                foreach ($rule in $expectedRules) {
-                    $actual = $rules.Where{$_.IdentityReference.Value -eq $rule.Identifier}
-                    if ($actual) {
-                        if ($actual.AccessControlType -ne $rule.AclType) {
-                            "Access control type for $($rule.Identifier) rule should have '$($rule.AclType)', but has '$($actual.AccessControlType)'"
-                        }
-                        
-                        if ($actual.FileSystemRights -ne $rule.Rights) {
-                            "File system rights for $($rule.Identifier) rule should have '$($rule.Rights)', but has '$($actual.FileSystemRights)'"
-                        }
-                    }
-                    else {
-                        "There is no access rule for $($rule.Identifier)"
-                    }
-                }
-            ) -join "`n"
-
-            $observedErrors = $observedErrors.Trim()
-            if ($observedErrors) {
-                throw $observedErrors
-            }
+            Assert-FolderAccessRules -Path $script:CacheFolder -Owner 'BUILTIN\Administrators' -ExpectedRules @(
+                @{ Identity = 'BUILTIN\Administrators'; Rights = 'FullControl' }
+                @{ Identity = 'NT AUTHORITY\SYSTEM'; Rights = 'FullControl' }
+                @{ Identity = 'BUILTIN\Users'; Rights = 'ReadAndExecute, Synchronize' }
+            )
         }
 
         function Initialize-TestCacheFolder {
