@@ -41,4 +41,20 @@ if (!(Test-Path $creditsFile)) {
     $creditsContent | Out-File -LiteralPath $creditsFile -Encoding utf8NoBOM -NoNewline
 }
 
-Write-Host -ForegroundColor Green "The 7-zip components have been updated. Be sure to update the BundledApplications.Tests.ps1 file on this branch."
+$bundleTestFile = "$PSScriptRoot\tests\pester-tests\BundledApplications.Tests.ps1"
+$bundleTestRe = "(Name\s*=\s*'7z'\s*;\s*Version\s*=\s*)'[^']*'"
+
+if (!(Test-Path $bundleTestFile)) {
+    Write-Warning "Unable to find the '$bundleTestFile' file. Please update the test with the new 7-Zip version manually."
+} else {
+    $bundleTestContent = Get-Content -Raw -Encoding utf8 -LiteralPath $bundleTestFile
+
+    if ($bundleTestContent -notmatch $bundleTestRe) {
+        Write-Warning "Unable to find the 7-Zip entry in '$bundleTestFile'. Please update the test with the new 7-Zip version manually."
+    } else {
+        $bundleTestContent = $bundleTestContent -replace $bundleTestRe, "`${1}'$Version'"
+        $bundleTestContent | Out-File -LiteralPath $bundleTestFile -Encoding utf8BOM -NoNewline
+    }
+}
+
+Write-Host -ForegroundColor Green "The 7-zip components have been updated to Version $Version."
