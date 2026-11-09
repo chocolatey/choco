@@ -23,6 +23,16 @@ if (!(Test-Path $creditsFile)) {
     $creditsContent = Get-Content -Raw -Encoding utf8 -LiteralPath $creditsFile
     $creditsContent = $creditsContent -replace '(7-Zip @ )[\d.]+', "`${1}$Version"
     $creditsContent = $creditsContent -replace '(#7-zip--)\d+', "`${1}$VersionWithoutDots"
+
+    $licenseRe = '(?s)(### 7-Zip @ [^\r\n]*\r?\n(?:(?!###).)*?```txt\r?\n).*?(```)'
+
+    if ($creditsContent -notmatch $licenseRe) {
+        Write-Warning "Unable to find the 7-Zip license terms in '$creditsFile'. Please update them manually."
+    } else {
+        $licenseContent = Get-Content -Raw -Encoding utf8 -LiteralPath $PSScriptRoot/src/chocolatey.resources/tools/7zip.license.txt
+        $creditsContent = $creditsContent -replace $licenseRe, { $_.Groups[1].Value + $licenseContent + $_.Groups[2].Value }
+    }
+
     $creditsContent | Out-File -LiteralPath $creditsFile -Encoding utf8NoBOM -NoNewline
 }
 
