@@ -1,11 +1,16 @@
 #Requires -PSEdition Core
 
 param(
-    [Parameter(Mandatory)]
-    [string] $Version
+    [string] $Version = 'latest'
 )
 
 $ErrorActionPreference = 'Stop'
+
+if ($Version -eq 'latest') {
+    $latestRelease = Invoke-RestMethod 'https://api.github.com/repos/ip7z/7zip/releases/latest'
+    $Version = $latestRelease.tag_name
+    Write-Host "The latest 7-Zip release on GitHub is Version $Version."
+}
 
 $VersionWithoutDots = $Version -replace '\.'
 
