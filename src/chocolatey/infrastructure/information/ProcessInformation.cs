@@ -15,6 +15,7 @@
 // limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -215,53 +216,51 @@ namespace chocolatey.infrastructure.information
 
         private static ProcessTree PopulateProcessTreeInternal(ProcessTree tree, Process currentProcess)
         {
-            Process nextProcess = null;
+            return PopulateProcessTree(tree, currentProcess, ParentProcessHelperInternal.GetParentProcess);
+        }
+
+        private static ProcessTree PopulateProcessTreeStable(ProcessTree tree, Process currentProcess)
+        {
+            return PopulateProcessTree(tree, currentProcess, ParentProcessHelperStable.GetParentProcess);
+        }
+
+        internal static ProcessTree PopulateProcessTree(ProcessTree tree, Process currentProcess, Func<Process, Process> getParentProcess)
+        {
+            Func<IProcessInfo, IProcessInfo> getParentProcessAdapter = null;
+            if (getParentProcess != null)
+            {
+                // Bridge real Process objects to the IProcessInfo (which allows it to be tested)
+                //  - unwrap to call the actual OS lookup, then wrap the result back up.
+                getParentProcessAdapter = node =>
+                {
+                    var parent = getParentProcess(((ProcessInfo)node).Process);
+                    return parent != null ? new ProcessInfo(parent) : null;
+                };
+            }
+
+            return PopulateProcessTree(tree, new ProcessInfo(currentProcess), getParentProcessAdapter);
+        }
+
+        internal static ProcessTree PopulateProcessTree(ProcessTree tree, IProcessInfo currentProcess, Func<IProcessInfo, IProcessInfo> getParentProcess)
+        {
+            // Track visited PIDs to guard against rare infinite loops
+            // (could happen if a lot of processes are created and PIDs are reused)
+            var knownPIDs = new HashSet<int> { currentProcess.Id };
+            IProcessInfo nextProcess = null;
             try
             {
                 while (true)
                 {
-                    var parentProcess = ParentProcessHelperInternal.GetParentProcess(nextProcess ?? currentProcess);
+                    var parentProcess = getParentProcess(nextProcess ?? currentProcess);
 
                     if (parentProcess is null)
                     {
                         break;
                     }
 
-                    nextProcess = parentProcess;
-                    tree.Processes.AddLast(nextProcess.ProcessName);
-                }
-            }
-            catch (Win32Exception ex)
-            {
-                // Native error code 5 is access denied.
-                // This usually happens if the parent executable
-                // is running as a different user, in which case
-                // we are not able to get the necessary handle for
-                // the process.
-                if (ex.NativeErrorCode != 5)
-                {
-                    throw;
-                }
-                else
-                {
-                    "chocolatey".Log().Debug(logging.ChocolateyLoggers.LogFileOnly, "Unable to get parent process for '{0}'. Ignoring...", currentProcess.ProcessName);
-                }
-            }
-
-            return tree;
-        }
-
-        private static ProcessTree PopulateProcessTreeStable(ProcessTree tree, Process currentProcess)
-        {
-            Process nextProcess = null;
-            try
-            {
-                while (true)
-                {
-                    var parentProcess = ParentProcessHelperStable.GetParentProcess(nextProcess ?? currentProcess);
-
-                    if (parentProcess is null)
+                    if (!knownPIDs.Add(parentProcess.Id))
                     {
+                        "chocolatey".Log().Debug(logging.ChocolateyLoggers.LogFileOnly, "Process '{0}' (id {1}) was already visited while walking the process tree. Stopping to avoid an infinite loop.", parentProcess.ProcessName, parentProcess.Id);
                         break;
                     }
 
