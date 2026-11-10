@@ -28,9 +28,8 @@ using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
 namespace chocolatey.tests.infrastructure.app.services
 {
-    // An extension that needs more variables in the environment a package script runs in, such as the name of the
-    // instance of a package, overrides SetAdditionalPackageEnvironmentVariables. It is overridden here by a service
-    // that records what the environment holds when it is called.
+    // SetAdditionalPackageEnvironmentVariables is overridden here by a service that records what the
+    // environment holds when it is called.
     public class PowershellServiceSeamSpecs
     {
         public class PowershellServiceWithExtraVariables : PowershellService

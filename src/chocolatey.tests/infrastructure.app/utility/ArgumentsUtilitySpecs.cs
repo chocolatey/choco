@@ -314,8 +314,7 @@ namespace chocolatey.tests.infrastructure.app.utility
             }
         }
 
-        // The overload that takes the arguments file path is for callers that keep a
-        // package's information outside the default .chocolatey\<id>.<version> store.
+        // Decrypting the remembered arguments from a given file path.
         public abstract class ArgumentsUtilityDecryptFromPathSpecsBase : TinySpec
         {
             protected string[] Result;

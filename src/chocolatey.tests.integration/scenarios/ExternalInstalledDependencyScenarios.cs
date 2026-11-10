@@ -35,12 +35,11 @@ using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
 namespace chocolatey.tests.integration.scenarios
 {
-    // An extension can install packages outside of lib (the licensed extension does, for package instances).
-    // Those packages still need the packages they depend on, so GetExternalInstalledDependencyInfos lets the
-    // service be told about them and the install, upgrade and uninstall resolutions keep them satisfied.
+    // GetExternalInstalledDependencyInfos lets a service report packages installed outside lib, so that the
+    // install, upgrade and uninstall resolutions keep the dependencies they need satisfied.
     public class ExternalInstalledDependencyScenarios
     {
-        // A service that reports packages installed outside lib, as the extension's service does.
+        // A service that reports packages installed outside lib.
         public class NugetServiceWithExternalDependencies : NugetService
         {
             private readonly IEnumerable<SourcePackageDependencyInfo> _externalDependencies;

@@ -32,11 +32,8 @@ using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
 namespace chocolatey.tests.infrastructure.app.services
 {
-    // An extension that installs packages somewhere other than lib, as package instances do, overrides protected
-    // members of the service to change how the packages are shimmed, where their information is kept, what they are
-    // called in the output, which results are told apart, and what a packages.config entry adds to the install.
-    // Each is overridden here by a service that records when it is called, to prove that it is called from the right
-    // place and that what it does or returns is what the service goes on to use.
+    // Each overridable protected member of the service is overridden here by a service that records when it
+    // is called, to prove it is called from the right place and that its result is what the service uses.
     public class ChocolateyPackageServiceSeamSpecs
     {
         public class RecordingPackageService : ChocolateyPackageService
@@ -438,8 +435,8 @@ namespace chocolatey.tests.infrastructure.app.services
             protected bool InstallFails;
             protected bool InstallWarns;
             protected int ExitCodeOfTheInstall;
-
             protected bool KeyResultsByInstance;
+
             protected virtual int EntryCount
             {
                 get { return 2; }

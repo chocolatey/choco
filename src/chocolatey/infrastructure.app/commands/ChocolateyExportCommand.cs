@@ -199,7 +199,7 @@ If you find other exit codes that we have not yet documented, please
 
         /// <summary>
         ///   The packages written to the export file. The default is every package
-        ///   installed under <c>lib</c>; extensions override it to include packages that
+        ///   installed under <c>lib</c>; this may be overridden to include packages that
         ///   live elsewhere.
         /// </summary>
         /// <param name="configuration">The export configuration.</param>

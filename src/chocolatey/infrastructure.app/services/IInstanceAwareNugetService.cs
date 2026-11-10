@@ -24,9 +24,6 @@ namespace chocolatey.infrastructure.app.services
     ///   Enumeration of installed package instances. Kept as a separate interface
     ///   (rather than adding members to <see cref="INugetService"/>) so that
     ///   existing external implementations of that interface are not broken.
-    ///   Implementations that support package instances implement both; callers
-    ///   reach these methods by casting the injected <see cref="INugetService"/>
-    ///   to this interface and only do so on the instance code paths.
     /// </summary>
     public interface IInstanceAwareNugetService
     {
@@ -34,13 +31,13 @@ namespace chocolatey.infrastructure.app.services
         ///   Get a single installed package instance by id and instance name.
         /// </summary>
         /// <param name="id">The package id.</param>
-        /// <param name="instance">The instance name (the leaf folder under lib-instances\&lt;id&gt;).</param>
+        /// <param name="instance">The instance name (the name the instance was installed with).</param>
         /// <param name="config">The configuration.</param>
         /// <returns>The matching installed instance, or <c>null</c> when it is not installed.</returns>
         PackageResult GetInstalledPackageInstance(string id, string instance, ChocolateyConfiguration config);
 
         /// <summary>
-        ///   Get every installed instance of a package id (for <c>--instance all</c>).
+        ///   Get every installed instance of a package id.
         /// </summary>
         /// <param name="id">The package id.</param>
         /// <param name="config">The configuration.</param>
@@ -48,7 +45,7 @@ namespace chocolatey.infrastructure.app.services
         IEnumerable<PackageResult> GetInstalledPackageInstances(string id, ChocolateyConfiguration config);
 
         /// <summary>
-        ///   Get every installed package instance across all ids (for <c>--include-instances</c>).
+        ///   Get every installed package instance across all ids.
         /// </summary>
         /// <param name="config">The configuration.</param>
         /// <returns>All installed instances, ordered by id then instance name; empty when none.</returns>

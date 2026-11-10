@@ -31,10 +31,8 @@ namespace chocolatey.infrastructure.app.domain
         public IPackageMetadata Package { get; set; }
 
         /// <summary>
-        ///   The package instance name this information belongs to, or
-        ///   null/empty for the default (non-instanced) package. Determines
-        ///   where the information is stored (.chocolatey\instances\&lt;id&gt;\&lt;instance&gt;
-        ///   vs the default .chocolatey\&lt;id&gt;.&lt;version&gt; store).
+        ///   The package instance name this information belongs to, or null/empty for the
+        ///   default (non-instanced) package.
         /// </summary>
         public string Instance { get; set; }
 

@@ -23,17 +23,8 @@ using FluentAssertions;
 
 namespace chocolatey.tests.infrastructure.app.configuration
 {
-    // Characterization tests for the packages.config XML contract
-    // (PackagesConfigFileSettings / PackagesConfigFilePackageSetting). The
-    // production XmlService deserializes this with a plain XmlSerializer (see
-    // XmlService.Deserialize), so exercising XmlSerializer directly here pins
-    // the exact attribute->property mapping that `choco install a.config`
-    // relies on.
-    //
-    // This matters for Package Instances: the existing service-level spec
-    // mocks the deserialization, so the attribute mapping itself was
-    // previously untested. The `instance` attribute is read here and consumed
-    // by the licensed extension.
+    // Characterization tests for the packages.config XML contract. XmlService deserializes it with a plain
+    // XmlSerializer, so that is used directly here to pin the attribute-to-property mapping.
     public class PackagesConfigFileSettingsSpecs
     {
         public abstract class PackagesConfigFileSettingsSpecsBase : TinySpec

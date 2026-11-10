@@ -186,11 +186,7 @@ namespace chocolatey.infrastructure.app.domain
         public string Tags { get; }
         public bool Serviceable { get; }
 
-        // Chocolatey-specific nuspec field declaring the package may be installed
-        // more than once as named instances (licensed `--instance` feature), read via
-        // the NuspecReader.GetSupportsInstances() extension in the NuGet.Client fork.
-        // Parsed here (like SoftwareDisplayName / Replaces / ...) so the licensed
-        // extension can consume it; OSS CLI itself never acts on it.
+        // Whether the nuspec declares that the package may be installed more than once.
         public bool SupportsInstances { get; }
 
         public string Copyright { get; }

@@ -24,15 +24,11 @@ namespace chocolatey.infrastructure.app.services
     ///   separate interface (rather than adding members to
     ///   <see cref="IChocolateyPackageInformationService"/>) so that existing
     ///   external implementations of that interface are not broken.
-    ///   Implementations that support package instances implement both; callers
-    ///   reach these overloads by casting the injected service to this interface,
-    ///   and only do so on the instance code paths (the default path keeps using
-    ///   the single-argument overloads).
     /// </summary>
     public interface IInstanceAwarePackageInformationService
     {
         /// <summary>
-        ///   Get the information for a specific package instance (stored under
+        ///   Get the information for a specific package instance (usually stored under
         ///   <c>.chocolatey\instances\&lt;id&gt;\&lt;instance&gt;</c>).
         /// </summary>
         ChocolateyPackageInformation Get(IPackageMetadata package, string instance);

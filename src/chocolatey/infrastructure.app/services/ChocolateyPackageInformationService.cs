@@ -73,10 +73,8 @@ namespace chocolatey.infrastructure.app.services
         }
 
         /// <summary>
-        ///   Populates <paramref name="packageInformation"/> from its store on disk. The
-        ///   store is located through <see cref="GetStorePath(ChocolateyPackageInformation)"/>,
-        ///   so a subclass that keeps some information elsewhere pre-fills the fields that
-        ///   drive that location and calls this to do the reading.
+        ///   Populates <paramref name="packageInformation"/> from the store located through
+        ///   <see cref="GetStorePath(ChocolateyPackageInformation)"/>.
         /// </summary>
         /// <param name="packageInformation">The information to populate; its Package must be set.</param>
         protected ChocolateyPackageInformation Load(ChocolateyPackageInformation packageInformation)
@@ -382,9 +380,8 @@ A corrupt .registry file exists at {0}.
 
         /// <summary>
         ///   Resolves the folder that holds the information for a package. The default is
-        ///   the <c>.chocolatey\&lt;id&gt;.&lt;version&gt;</c> store (with its legacy-name
-        ///   fallbacks); a subclass overrides it to keep some information elsewhere, using
-        ///   the fields on <paramref name="packageInformation"/> to decide.
+        ///   the <c>.chocolatey\&lt;id&gt;.&lt;version&gt;</c> store; this may be overridden
+        ///   to keep some information elsewhere.
         /// </summary>
         /// <param name="packageInformation">The information whose store is wanted; its Package must be set.</param>
         protected virtual string GetStorePath(ChocolateyPackageInformation packageInformation)

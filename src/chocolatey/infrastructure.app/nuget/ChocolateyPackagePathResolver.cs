@@ -37,20 +37,15 @@ namespace chocolatey.infrastructure.app.nuget
         public string Instance { get; }
 
         /// <summary>
-        ///   The user-requested (parent) package id for an instanced install.
-        ///   When set, the parent resolves under &lt;root&gt;\&lt;parentId&gt;\&lt;instance&gt;
-        ///   and every other id in the dependency closure is a normal package that
-        ///   resolves under the dependencies root at &lt;depsRoot&gt;\&lt;depId&gt;.
-        ///   Settable because one resolver is reused across a multi-package install loop.
-        ///   Left null/empty, every id resolves as the parent path.
+        ///   The user-requested (parent) package id for an instanced install. The parent resolves
+        ///   under &lt;root&gt;\&lt;parentId&gt;\&lt;instance&gt;; every other id resolves under the
+        ///   dependencies root. Settable because one resolver is reused across a multi-package install.
         /// </summary>
         public string ParentId { get; set; }
 
         /// <summary>
-        ///   Root the dependencies of an instanced package are installed under (the
-        ///   regular lib folder, as dependencies are never instanced). Set for
-        ///   instanced resolvers; null for default ones. Only consulted when
-        ///   ParentId is set and the requested id is a dependency.
+        ///   Root the dependencies of an instanced package are installed under. Only consulted
+        ///   when ParentId is set and the requested id is a dependency.
         /// </summary>
         public string DependenciesRootDirectory { get; set; }
 
@@ -82,9 +77,8 @@ namespace chocolatey.infrastructure.app.nuget
                 return _filesystem.CombinePaths(RootDirectory, packageId);
             }
 
-            // Instanced install. The user-requested (parent) package lives at
-            // <root>\<id>\<instance>. Any other id in the closure is a dependency,
-            // which is a normal package and lives at <depsRoot>\<depId>.
+            // Instanced install: the requested package lives at <root>\<id>\<instance>,
+            // any other id is a dependency and lives at <depsRoot>\<depId>.
             var isDependency = !string.IsNullOrWhiteSpace(ParentId)
                 && !string.IsNullOrWhiteSpace(DependenciesRootDirectory)
                 && !string.Equals(packageId, ParentId, StringComparison.OrdinalIgnoreCase);

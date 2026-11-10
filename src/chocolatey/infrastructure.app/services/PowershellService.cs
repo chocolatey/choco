@@ -65,15 +65,12 @@ namespace chocolatey.infrastructure.app.services
 
         /// <summary>
         ///   Sets any additional package-level environment variables beyond the standard
-        ///   ones set by the base implementation. Override in a subclass to inject
-        ///   extra variables (e.g. ChocolateyPackageInstance for licensed editions).
+        ///   ones set by the base implementation.
         /// </summary>
         /// <param name="configuration">The current Chocolatey configuration.</param>
         /// <param name="packageDirectory">The resolved package install directory.</param>
         protected virtual void SetAdditionalPackageEnvironmentVariables(ChocolateyConfiguration configuration, string packageDirectory)
         {
-            // Base implementation is intentionally empty.
-            // Override in a subclass to set additional environment variables.
         }
 
         private string GetPackageScriptForAction(PackageResult packageResult, CommandNameType command)

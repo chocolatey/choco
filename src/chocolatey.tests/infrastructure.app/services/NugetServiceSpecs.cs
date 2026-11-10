@@ -287,8 +287,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        // An extension that keeps a package somewhere other than the default information store overrides where the
-        // remembered arguments are read from, and the service has to read them from there and nowhere else.
+        // Where the remembered arguments are read from can be overridden; the service must read them only from there.
         public class RememberedArgumentsNugetService : NugetService
         {
             public string FileToRead;

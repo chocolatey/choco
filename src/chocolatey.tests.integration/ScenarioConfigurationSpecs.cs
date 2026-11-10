@@ -25,25 +25,11 @@ namespace chocolatey.tests.integration
     ///   Guards the shape of the configuration the scenarios are built from.
     /// </summary>
     /// <remarks>
-    ///   This is not testing the product; it is testing the harness, and it exists because
-    ///   getting this wrong is silent and the resulting failure points nowhere near the cause.
-    ///
-    ///   Shim generation calls ExternalCommandArgsBuilder, which reflects over the entire
-    ///   configuration object and, for every property whose type is NOT a built-in system
-    ///   type, recurses using that property's VALUE as the next target. A null nested
-    ///   property therefore blows up with
-    ///   "System.Reflection.TargetException: Non-static method requires a target."
-    ///   The install is then quarantined to lib-bad, and the reported error names neither the
-    ///   property nor the builder.
-    ///
-    ///   In a real run the configuration is populated by the ConfigurationBuilder, so this
-    ///   never happens; the harness constructs the configuration directly, so anything a
-    ///   constructor does not initialise stays null. Any new nested configuration property
-    ///   has to be given a value in Scenario.BaselineConfiguration - this test is what says so.
-    ///
-    ///   This bit the Chocolatey Licensed Extension harness, where two nested properties were
-    ///   left null and every install of a package containing an .exe failed. The same trap is
-    ///   waiting here the moment a nested configuration property is added without a default.
+    ///   Shim generation calls ExternalCommandArgsBuilder, which reflects over the whole configuration and
+    ///   recurses into every property whose type is not a built-in system type. A null nested property
+    ///   fails with "Non-static method requires a target", and the install is quarantined to lib-bad
+    ///   without the error naming the property. The harness builds the configuration directly, so any
+    ///   new nested configuration property must be given a value in Scenario.BaselineConfiguration.
     /// </remarks>
     public class ScenarioConfigurationSpecs
     {

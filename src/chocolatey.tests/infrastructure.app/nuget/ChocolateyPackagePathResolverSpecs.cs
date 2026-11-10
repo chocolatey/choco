@@ -27,15 +27,8 @@ namespace chocolatey.tests.infrastructure.app.nuget
 {
     // Behavior of ChocolateyPackagePathResolver.
     //
-    // Default (non-instanced) packages are version-less / no-side-by-side (the
-    // resolver is constructed with useSideBySidePaths: false), so every version
-    // of a given id resolves to the same lib\<id> folder. This half is a
-    // characterization of long-standing behavior that must not regress.
-    //
-    // A package instance (choco install <id> --instance <name>) adds a trailing
-    // <instance> segment — <root>\<id>\<instance> — so the id stays its own
-    // path segment (ids with dots like 7zip.install are unambiguous) and the
-    // default lib\<id> enumeration is untouched.
+    // Default packages are not side by side, so every version of an id resolves to the same lib\<id> folder.
+    // An instanced package adds a trailing <instance> segment, <root>\<id>\<instance>, leaving lib\<id> untouched.
     public class ChocolateyPackagePathResolverSpecs
     {
         public abstract class ChocolateyPackagePathResolverSpecsBase : TinySpec

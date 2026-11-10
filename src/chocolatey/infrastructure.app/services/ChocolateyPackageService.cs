@@ -652,7 +652,7 @@ package '{0}' - stopping further execution".FormatWith(GetPackageDisplayName(pac
 
         /// <summary>
         ///   Creates the shims for a successfully installed package. The default delegates
-        ///   to the shim generation service; extensions override it to skip or alter shimming.
+        ///   to the shim generation service; this may be overridden to skip or alter shimming.
         /// </summary>
         /// <param name="config">The install configuration.</param>
         /// <param name="packageResult">The installed package.</param>
@@ -674,7 +674,7 @@ package '{0}' - stopping further execution".FormatWith(GetPackageDisplayName(pac
 
         /// <summary>
         ///   Removes the stored package information of an uninstalled package. The default
-        ///   removes the default store for the package; extensions override it when the
+        ///   removes the default store for the package; this may be overridden when the
         ///   information lives elsewhere.
         /// </summary>
         /// <param name="config">The uninstall configuration.</param>
@@ -686,7 +686,7 @@ package '{0}' - stopping further execution".FormatWith(GetPackageDisplayName(pac
 
         /// <summary>
         ///   The name a package is shown under in per-package and summary output. The
-        ///   default is the package id; extensions override it to tell apart results that
+        ///   default is the package id; this may be overridden to tell apart results that
         ///   share an id.
         /// </summary>
         /// <param name="packageResult">The result being reported.</param>

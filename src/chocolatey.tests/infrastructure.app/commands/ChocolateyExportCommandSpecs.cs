@@ -223,8 +223,7 @@ namespace chocolatey.tests.infrastructure.app.commands
             }
         }
 
-        // An extension that installs packages elsewhere than lib overrides which packages are exported and what is
-        // written for each. Both are overridden here by a command that records when it is called.
+        // Both overridable members are overridden here by a command that records when it is called.
         public class RecordingExportCommand : ChocolateyExportCommand
         {
             public readonly List<string> Events = new List<string>();

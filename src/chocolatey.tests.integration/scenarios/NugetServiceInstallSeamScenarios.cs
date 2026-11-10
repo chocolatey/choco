@@ -36,10 +36,8 @@ using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
 
 namespace chocolatey.tests.integration.scenarios
 {
-    // An extension can change where a package is installed, whether it is, whether it is kept once extracted, how it
-    // is shown, and what is said when one that is not installed is uninstalled, by overriding protected members of the
-    // service. Each of them is overridden here by a service that records when it is called, to prove it is called from
-    // the right place and that what it returns is what the install does.
+    // Each overridable protected member of the service is overridden here by a service that records when it
+    // is called, to prove it is called from the right place and that its result is what the install uses.
     public class NugetServiceInstallSeamScenarios
     {
         public class ConfigurableNugetService : NugetService

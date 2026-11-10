@@ -784,9 +784,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                 var removedSources = RemovePinnedSourceDependencies(sourcePackageDependencyInfos, allLocalPackages);
                 sourcePackageDependencyInfos.AddRange(localPackagesDependencyInfos);
 
-                // Packages installed outside lib constrain the resolution as the ones under lib do, but the resolver must
-                // never install or remove them. One whose own dependencies are not installed is left out: asking for it
-                // would have the resolver install what is missing.
+                // Packages from GetExternalInstalledDependencyInfos are only used to constrain the resolution.
+                // As for installed packages (see HasMissingDependency below), leave out any whose own dependencies
+                // are not installed, or the resolver would try to install them.
+                // For example, an external 'bob' needing 'dep' is left out while 'dep' is not installed.
                 externalDependencyInfos = externalDependencyInfos
                     .Where(e => e.Dependencies.All(d => allLocalPackages.Any(p => p.Name.IsEqualTo(d.Id)) || targetIdsToInstall.Contains(d.Id, StringComparer.OrdinalIgnoreCase)))
                     .ToList();
@@ -1047,8 +1048,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         packageResult.InstallLocation = installedPath;
                         OnPackageExtracted(config, packageResult, pathResolver, packageDependencyInfo);
 
-                        // Logged after OnPackageExtracted so an extension's annotations are
-                        // available to GetPackageDisplayName.
+                        // Logged after OnPackageExtracted so any annotations are available to
+                        // GetPackageDisplayName.
                         this.Log().Info(ChocolateyLoggers.Important, "{0}{1} v{2}{3}{4}{5}".FormatWith(
                             System.Environment.NewLine,
                             GetPackageDisplayName(packageResult),
@@ -1126,8 +1127,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         /// <summary>
         ///   Returns the path resolver used to lay packages down during an install.
-        ///   The default resolves under <c>lib\&lt;id&gt;</c>. Extensions override it to
-        ///   route an install elsewhere (for example a licensed package-instance tree).
+        ///   The default resolves under <c>lib\&lt;id&gt;</c>; this may be overridden to
+        ///   route an install elsewhere.
         /// </summary>
         /// <param name="config">The install configuration.</param>
         protected virtual ChocolateyPackagePathResolver GetInstallPathResolver(ChocolateyConfiguration config)
@@ -1146,14 +1147,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         }
 
         /// <summary>
-        ///   Returns the dependencies of packages that are installed outside the <c>lib</c>
-        ///   folder, and that an install must not break (for example package instances).
-        ///   Each entry is one installed package, under an identity that is unique to it,
-        ///   with the dependency ranges it needs. They are added to the dependency resolution
-        ///   of an install, upgrade or uninstall as the packages under <c>lib</c> are, so one
-        ///   that would change or remove a dependency they need is refused, as it is for a
-        ///   package under <c>lib</c>. They are never installed or removed by it.
-        ///   The default is none.
+        ///   Returns the dependencies of packages that are installed outside the <c>lib</c> folder.
+        ///   Each entry is one installed package, under a unique identity, with the dependency
+        ///   ranges it needs. They are added to the dependency resolution of an install, upgrade
+        ///   or uninstall, so a change that would break them is refused. They are never installed
+        ///   or removed. The default is none.
         /// </summary>
         /// <param name="config">The install configuration.</param>
         protected virtual IEnumerable<SourcePackageDependencyInfo> GetExternalInstalledDependencyInfos(ChocolateyConfiguration config)
@@ -1163,8 +1161,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         /// <summary>
         ///   Called once per user-requested package, before its dependency closure is
-        ///   resolved, so an extension can point the shared <paramref name="pathResolver"/>
-        ///   at that package (for example by setting a parent id). The default does nothing.
+        ///   resolved, so the shared <paramref name="pathResolver"/> can be pointed
+        ///   at that package. The default does nothing.
         /// </summary>
         /// <param name="config">The install configuration.</param>
         /// <param name="packageName">The id of the package about to be installed.</param>
@@ -1174,7 +1172,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         }
 
         /// <summary>
-        ///   Lets an extension refuse, or short-circuit, the install of a requested package
+        ///   Allows refusing, or short-circuiting, the install of a requested package
         ///   before anything is resolved or downloaded, recording its own messages in
         ///   <paramref name="packageResults"/>. Return <c>true</c> to skip the package.
         ///   The default never skips.
@@ -1250,7 +1248,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         /// <summary>
         ///   Called once a package's files are in place and its <see cref="PackageResult"/>
-        ///   exists, before the continue action runs. Lets an extension annotate the result.
+        ///   exists, before the continue action runs. Allows annotating the result.
         ///   The default does nothing.
         /// </summary>
         /// <param name="config">The install configuration.</param>
@@ -1263,7 +1261,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         /// <summary>
         ///   The name a package is shown under in install output. The default is the
-        ///   package id; extensions override it to tell apart results that share an id.
+        ///   package id; this may be overridden to tell apart results that share an id.
         /// </summary>
         /// <param name="packageResult">The result being reported.</param>
         protected virtual string GetPackageDisplayName(PackageResult packageResult)
@@ -1273,7 +1271,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         /// <summary>
         ///   The error reported when an uninstall targets a package id that is not
-        ///   installed. Extensions override it to give a more specific explanation.
+        ///   installed. This may be overridden to give a more specific explanation.
         /// </summary>
         /// <param name="config">The uninstall configuration.</param>
         /// <param name="packageName">The id that was requested.</param>
@@ -1781,9 +1779,10 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                         var targetIdsToInstall = packagesToInstall.Select(p => p.Identity.Id);
 
-                        // Packages installed outside lib constrain the resolution as the ones under lib do, but they are not
-                        // parents to upgrade along with it, and the resolver must never install or remove them. One whose
-                        // own dependencies are not installed is left out: asking for it would have the resolver install them.
+                        // Packages from GetExternalInstalledDependencyInfos are only used to constrain the resolution.
+                        // As for installed packages (see HasMissingDependency below), leave out any whose own dependencies
+                        // are not installed, or the resolver would try to install them.
+                        // For example, an external 'bob' needing 'dep' is left out while 'dep' is not installed.
                         externalDependencyInfos = externalDependencyInfos
                             .Where(e => e.Dependencies.All(d => allLocalPackages.Any(p => p.Name.IsEqualTo(d.Id)) || targetIdsToInstall.Contains(d.Id, StringComparer.OrdinalIgnoreCase)))
                             .ToList();

@@ -32,8 +32,7 @@ namespace chocolatey.tests.infrastructure.app.services
 {
     public class ChocolateyPackageInformationServiceSpecs
     {
-        // A service that can be told where it keeps the information of a package, as an extension that keeps some of it
-        // elsewhere does, or left to use the default location.
+        // A service that can be told where it keeps the information of a package, or left to use the default location.
         public class TestablePackageInformationService : ChocolateyPackageInformationService
         {
             private readonly string _storePath;
@@ -220,8 +219,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
         }
 
-        // Reading, saving and removing all go through the location the service reports, so a service that keeps the
-        // information somewhere else has every one of them honour that.
+        // Reading, saving and removing all go through the location the service reports.
         public class When_getting_the_information_of_a_package_from_a_store_the_service_relocates : ChocolateyPackageInformationServiceSpecsBase
         {
             private ChocolateyPackageInformation _information;

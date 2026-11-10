@@ -85,9 +85,7 @@ namespace chocolatey.infrastructure.app.utility
         }
 
         /// <summary>
-        ///   Decrypts the remembered arguments stored in <paramref name="argumentsFile"/>, for
-        ///   callers that keep a package's information somewhere other than the default
-        ///   <c>.chocolatey\&lt;id&gt;.&lt;version&gt;</c> store.
+        ///   Decrypts the remembered arguments stored in <paramref name="argumentsFile"/>.
         /// </summary>
         /// <param name="fileSystem">The file system to read the arguments file with.</param>
         /// <param name="argumentsFile">The full path of the <c>.arguments</c> file.</param>
