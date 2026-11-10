@@ -366,6 +366,11 @@ A corrupt .registry file exists at {0}.
         /// <param name="packageInformation">Identifies the store to remove; its Package must be set.</param>
         protected virtual void Remove(ChocolateyPackageInformation packageInformation)
         {
+            if (packageInformation?.Package == null)
+            {
+                throw new ArgumentException("The package information must have its Package set.", nameof(packageInformation));
+            }
+
             var pkgStorePath = GetStorePath(packageInformation);
             if (_config.RegularOutput)
             {
@@ -384,6 +389,11 @@ A corrupt .registry file exists at {0}.
         /// <param name="packageInformation">The information whose store is wanted; its Package must be set.</param>
         protected virtual string GetStorePath(ChocolateyPackageInformation packageInformation)
         {
+            if (packageInformation?.Package == null)
+            {
+                throw new ArgumentException("The package information must have its Package set.", nameof(packageInformation));
+            }
+
             return GetStorePath(_fileSystem, packageInformation.Package.Id, packageInformation.Package.Version);
         }
 

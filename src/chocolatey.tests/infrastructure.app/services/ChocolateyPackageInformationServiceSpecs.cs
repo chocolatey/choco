@@ -398,5 +398,52 @@ namespace chocolatey.tests.infrastructure.app.services
                 FileSystem.Verify(x => x.DeleteDirectoryChecked(DefaultStore("instancepackage.1.2.3"), true), Times.Once);
             }
         }
+
+        public class When_removing_the_information_of_a_package_that_is_not_set : ChocolateyPackageInformationServiceSpecsBase
+        {
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void Should_throw_an_argument_exception()
+            {
+                Action remove = () => Service().Remove((IPackageMetadata)null);
+
+                remove.Should().Throw<ArgumentException>();
+            }
+
+            [Fact]
+            public void Should_not_remove_anything()
+            {
+                Action remove = () => Service(CustomStore).Remove((IPackageMetadata)null);
+
+                remove.Should().Throw<ArgumentException>();
+                FileSystem.Verify(x => x.DeleteDirectoryChecked(It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
+            }
+        }
+
+        public class When_locating_the_default_store_without_a_package : ChocolateyPackageInformationServiceSpecsBase
+        {
+            public override void Because()
+            {
+            }
+
+            [Fact]
+            public void Should_throw_an_argument_exception_when_the_package_is_not_set()
+            {
+                Action locate = () => Service().DefaultStorePath(new ChocolateyPackageInformation(null));
+
+                locate.Should().Throw<ArgumentException>();
+            }
+
+            [Fact]
+            public void Should_throw_an_argument_exception_when_there_is_no_information()
+            {
+                Action locate = () => Service().DefaultStorePath(null);
+
+                locate.Should().Throw<ArgumentException>();
+            }
+        }
     }
 }
