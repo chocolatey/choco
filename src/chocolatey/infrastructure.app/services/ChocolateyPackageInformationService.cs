@@ -69,14 +69,24 @@ namespace chocolatey.infrastructure.app.services
 
         public ChocolateyPackageInformation Get(IPackageMetadata package)
         {
-            var packageInformation = new ChocolateyPackageInformation(package);
+            return Load(new ChocolateyPackageInformation(package));
+        }
+
+        /// <summary>
+        ///   Populates <paramref name="packageInformation"/> from the store located through
+        ///   <see cref="GetStorePath(ChocolateyPackageInformation)"/>.
+        /// </summary>
+        /// <param name="packageInformation">The information to populate; its Package must be set.</param>
+        protected ChocolateyPackageInformation Load(ChocolateyPackageInformation packageInformation)
+        {
+            var package = packageInformation.Package;
             if (package == null)
             {
                 if (_config.RegularOutput) { this.Log().Debug("No package information as package is null."); }
                 return packageInformation;
             }
 
-            var pkgStorePath = GetStorePath(_fileSystem, package.Id, package.Version);
+            var pkgStorePath = GetStorePath(packageInformation);
 
             if (!_fileSystem.DirectoryExists(pkgStorePath))
             {
@@ -227,7 +237,7 @@ A corrupt .registry file exists at {0}.
                 return;
             }
 
-            var pkgStorePath = GetStorePath(_fileSystem, packageInformation.Package.Id, packageInformation.Package.Version);
+            var pkgStorePath = GetStorePath(packageInformation);
 
             _fileSystem.EnsureDirectoryExists(pkgStorePath);
 
@@ -344,13 +354,44 @@ A corrupt .registry file exists at {0}.
 
         public void Remove(IPackageMetadata package)
         {
-            var pkgStorePath = GetStorePath(_fileSystem, package.Id, package.Version);
+            Remove(new ChocolateyPackageInformation(package));
+        }
+
+        /// <summary>
+        ///   Removes the on-disk store that <paramref name="packageInformation"/> maps to
+        ///   (see <see cref="GetStorePath(ChocolateyPackageInformation)"/>).
+        /// </summary>
+        /// <param name="packageInformation">Identifies the store to remove; its Package must be set.</param>
+        protected virtual void Remove(ChocolateyPackageInformation packageInformation)
+        {
+            if (packageInformation?.Package == null)
+            {
+                throw new ArgumentException("The package information must have its Package set.", nameof(packageInformation));
+            }
+
+            var pkgStorePath = GetStorePath(packageInformation);
             if (_config.RegularOutput)
             {
                 this.Log().Info("Removing Package Information for {0}".FormatWith(pkgStorePath));
             }
 
             _fileSystem.DeleteDirectoryChecked(pkgStorePath, recursive: true);
+        }
+
+        /// <summary>
+        ///   Resolves the folder that holds the information for a package. The default is
+        ///   the <c>.chocolatey\&lt;id&gt;.&lt;version&gt;</c> store; this may be overridden
+        ///   to keep some information elsewhere.
+        /// </summary>
+        /// <param name="packageInformation">The information whose store is wanted; its Package must be set.</param>
+        protected virtual string GetStorePath(ChocolateyPackageInformation packageInformation)
+        {
+            if (packageInformation?.Package == null)
+            {
+                throw new ArgumentException("The package information must have its Package set.", nameof(packageInformation));
+            }
+
+            return GetStorePath(_fileSystem, packageInformation.Package.Id, packageInformation.Package.Version);
         }
 
         private static string GetStorePath(IFileSystem fileSystem, string id, NuGetVersion version)

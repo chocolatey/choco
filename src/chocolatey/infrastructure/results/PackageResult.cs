@@ -58,6 +58,12 @@ namespace chocolatey.infrastructure.results
         /// </summary>
         public IPackageSearchMetadata SearchMetadata { get; private set; }
         /// <summary>
+        /// The package instance name when this result represents an installed package instance;
+        /// null for a regular package.
+        /// </summary>
+        public string Instance { get; set; }
+
+        /// <summary>
         /// Location on disk that the package has been installed to.
         /// </summary>
         public string InstallLocation { get; set; }

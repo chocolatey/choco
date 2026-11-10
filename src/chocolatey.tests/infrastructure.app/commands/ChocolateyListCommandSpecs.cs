@@ -222,6 +222,78 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
             }
 
+            public class When_the_obsolete_paging_options_are_used : ChocolateyListCommandSpecsBase
+            {
+                public override void Context()
+                {
+                    base.Context();
+                    Configuration.RegularOutput = true;
+
+                    var optionSet = new OptionSet();
+                    Command.ConfigureArgumentParser(optionSet, Configuration);
+                    optionSet.Parse(new[] { "--page=2", "--page-size=10", "--page-size=20" });
+                }
+
+                public override void Because()
+                {
+                    Command.Validate(Configuration);
+                }
+
+                [Fact]
+                public void Should_ignore_the_page_option()
+                {
+                    Configuration.ListCommand.Page.Should().BeNull();
+                }
+
+                [Fact]
+                public void Should_ignore_the_page_size_option()
+                {
+                    Configuration.ListCommand.ExplicitPageSize.Should().BeFalse();
+                    Configuration.ListCommand.PageSize.Should().Be(25);
+                }
+
+                [Fact]
+                public void Should_warn_that_the_page_option_is_obsolete()
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn")
+                        .WhoseValue.Should().ContainSingle(m => m.Contains("--page option is obsolete"));
+                }
+
+                [Fact]
+                public void Should_warn_once_that_the_page_size_option_is_obsolete()
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn")
+                        .WhoseValue.Should().ContainSingle(m => m.Contains("--page-size option is obsolete"));
+                }
+            }
+
+            public class When_the_obsolete_paging_options_are_used_with_limit_output : ChocolateyListCommandSpecsBase
+            {
+                public override void Context()
+                {
+                    base.Context();
+                    Configuration.RegularOutput = false;
+
+                    var optionSet = new OptionSet();
+                    Command.ConfigureArgumentParser(optionSet, Configuration);
+                    optionSet.Parse(new[] { "--page=2" });
+                }
+
+                public override void Because()
+                {
+                    Command.Validate(Configuration);
+                }
+
+                [Fact]
+                public void Should_still_warn_about_the_obsolete_option()
+                {
+                    // The mock logger does not separate the log-file-only logger from the
+                    // console logger, so this proves the warning is raised, not where it goes.
+                    MockLogger.Messages.Should().ContainKey("Warn")
+                        .WhoseValue.Should().ContainSingle(m => m.Contains("--page option is obsolete"));
+                }
+            }
+
             public class When_run_is_called_with_search_command_and_local_only : ChocolateyListCommandSpecsBase
             {
                 public override void Context()
@@ -245,6 +317,135 @@ namespace chocolatey.tests.infrastructure.app.commands
                 public void Should_not_report_any_warning_messages()
                 {
                     MockLogger.Messages.Keys.Should().NotContain("Warn");
+                }
+            }
+
+            public class When_no_paging_options_are_used : ChocolateyListCommandSpecsBase
+            {
+                public override void Context()
+                {
+                    base.Context();
+                    Configuration.RegularOutput = true;
+
+                    var optionSet = new OptionSet();
+                    Command.ConfigureArgumentParser(optionSet, Configuration);
+                    optionSet.Parse(new[] { "--exact" });
+                }
+
+                public override void Because()
+                {
+                    Command.Validate(Configuration);
+                }
+
+                [Fact]
+                public void Should_not_warn_about_any_obsolete_option()
+                {
+                    MockLogger.Messages.Keys.Should().NotContain("Warn");
+                }
+            }
+
+            public class When_only_the_page_option_is_used : ChocolateyListCommandSpecsBase
+            {
+                public override void Context()
+                {
+                    base.Context();
+                    Configuration.RegularOutput = true;
+
+                    var optionSet = new OptionSet();
+                    Command.ConfigureArgumentParser(optionSet, Configuration);
+                    optionSet.Parse(new[] { "--page=2" });
+                }
+
+                public override void Because()
+                {
+                    Command.Validate(Configuration);
+                }
+
+                [Fact]
+                public void Should_warn_about_the_page_option()
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn")
+                        .WhoseValue.Should().ContainSingle(m => m.Contains("--page option is obsolete"));
+                }
+
+                [Fact]
+                public void Should_not_warn_about_the_page_size_option()
+                {
+                    MockLogger.Messages["Warn"].Should().NotContain(m => m.Contains("--page-size"));
+                }
+            }
+
+            public class When_a_paging_option_has_a_value_that_is_not_a_number : ChocolateyListCommandSpecsBase
+            {
+                public override void Context()
+                {
+                    base.Context();
+                    Configuration.RegularOutput = true;
+
+                    // The value is ignored with the option, so it is not an error however it is written.
+                    var optionSet = new OptionSet();
+                    Command.ConfigureArgumentParser(optionSet, Configuration);
+                    optionSet.Parse(new[] { "--page=abc", "--page-size=many" });
+                }
+
+                public override void Because()
+                {
+                    Command.Validate(Configuration);
+                }
+
+                [Fact]
+                public void Should_not_apply_either_value()
+                {
+                    Configuration.ListCommand.Page.Should().BeNull();
+                    Configuration.ListCommand.ExplicitPageSize.Should().BeFalse();
+                }
+
+                [Fact]
+                public void Should_warn_about_both_options()
+                {
+                    MockLogger.Messages.Should().ContainKey("Warn");
+                    MockLogger.Messages["Warn"].Should().Contain(m => m.Contains("--page option is obsolete"));
+                    MockLogger.Messages["Warn"].Should().Contain(m => m.Contains("--page-size option is obsolete"));
+                }
+            }
+
+            public class When_configuring_the_argument_parser_for_the_obsolete_paging_options : ChocolateyListCommandSpecsBase
+            {
+                private OptionSet _optionSet;
+
+                public override void Context()
+                {
+                    base.Context();
+                    _optionSet = new OptionSet();
+                }
+
+                public override void Because()
+                {
+                    Command.ConfigureArgumentParser(_optionSet, Configuration);
+                }
+
+                [Fact]
+                public void Should_still_accept_the_page_option_so_that_scripts_do_not_break()
+                {
+                    _optionSet.Contains("page").Should().BeTrue();
+                }
+
+                [Fact]
+                public void Should_still_accept_the_page_size_option_so_that_scripts_do_not_break()
+                {
+                    _optionSet.Contains("page-size").Should().BeTrue();
+                }
+
+                [Fact]
+                public void Should_describe_the_page_option_as_obsolete()
+                {
+                    _optionSet["page"].Description.Should().Contain("OBSOLETE");
+                }
+
+                [Fact]
+                public void Should_describe_the_page_size_option_as_obsolete()
+                {
+                    _optionSet["page-size"].Description.Should().Contain("OBSOLETE");
                 }
             }
         }

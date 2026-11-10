@@ -55,6 +55,7 @@ namespace chocolatey.infrastructure.app.domain
             Language = reader.GetLanguage();
             Tags = reader.GetTags();
             Serviceable = reader.IsServiceable();
+            SupportsInstances = ParseBoolSafe(reader.GetSupportsInstances());
             Copyright = reader.GetCopyright();
             Icon = reader.GetIcon();
             Readme = reader.GetReadme();
@@ -99,6 +100,7 @@ namespace chocolatey.infrastructure.app.domain
                     Language = reader.GetLanguage();
                     Tags = reader.GetTags();
                     Serviceable = reader.IsServiceable();
+                    SupportsInstances = ParseBoolSafe(reader.GetSupportsInstances());
                     Copyright = reader.GetCopyright();
                     Icon = reader.GetIcon();
                     Readme = reader.GetReadme();
@@ -140,6 +142,7 @@ namespace chocolatey.infrastructure.app.domain
                 Language = reader.GetLanguage();
                 Tags = reader.GetTags();
                 Serviceable = reader.IsServiceable();
+                SupportsInstances = ParseBoolSafe(reader.GetSupportsInstances());
                 Copyright = reader.GetCopyright();
                 Icon = reader.GetIcon();
                 Readme = reader.GetReadme();
@@ -182,6 +185,10 @@ namespace chocolatey.infrastructure.app.domain
         public string Language { get; }
         public string Tags { get; }
         public bool Serviceable { get; }
+
+        // Whether the nuspec declares that the package may be installed more than once.
+        public bool SupportsInstances { get; }
+
         public string Copyright { get; }
         public string Icon { get; }
         public string Readme { get; }
@@ -228,6 +235,17 @@ namespace chocolatey.infrastructure.app.domain
             Uri uri = null;
             Uri.TryCreate(url, UriKind.Absolute, out uri);
             return uri;
+        }
+
+        private static bool ParseBoolSafe(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return false;
+            }
+
+            value = value.Trim();
+            return value.Equals("true", StringComparison.OrdinalIgnoreCase) || value == "1";
         }
 
         public void OverrideOriginalVersion(NuGetVersion overrideVersion)

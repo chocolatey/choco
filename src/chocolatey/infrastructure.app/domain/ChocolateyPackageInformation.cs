@@ -29,6 +29,13 @@ namespace chocolatey.infrastructure.app.domain
         }
 
         public IPackageMetadata Package { get; set; }
+
+        /// <summary>
+        ///   The package instance name this information belongs to, or null/empty for the
+        ///   default (non-instanced) package.
+        /// </summary>
+        public string Instance { get; set; }
+
         public Registry RegistrySnapshot { get; set; }
         public PackageFiles FilesSnapshot { get; set; }
         public string Arguments { get; set; }

@@ -44,11 +44,11 @@
       "name": "Chocolatey.NuGet.Client",
       "link": "https://github.com/NuGet/NuGet.Client",
       "modifiedLink": "https://github.com/chocolatey/NuGet.Client",
-      "version": "3.5.0",
+      "version": "3.6.0",
       "licenses": [
         {
           "type": "Apache-2.0",
-          "link": "https://github.com/chocolatey/NuGet.Client/blob/d08e5cc246b384fd424e99371168d7cf4534723e/LICENSE.txt",
+          "link": "https://github.com/chocolatey/NuGet.Client/blob/063e549119e0a2abb43bb756b2c7ba1bbf7a3b31/LICENSE.txt",
           "name": "LICENSE.txt"
         }
       ]

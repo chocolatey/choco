@@ -63,6 +63,16 @@ namespace chocolatey.infrastructure.app.services
             _customImports = customImports;
         }
 
+        /// <summary>
+        ///   Sets any additional package-level environment variables beyond the standard
+        ///   ones set by the base implementation.
+        /// </summary>
+        /// <param name="configuration">The current Chocolatey configuration.</param>
+        /// <param name="packageDirectory">The resolved package install directory.</param>
+        protected virtual void SetAdditionalPackageEnvironmentVariables(ChocolateyConfiguration configuration, string packageDirectory)
+        {
+        }
+
         private string GetPackageScriptForAction(PackageResult packageResult, CommandNameType command)
         {
             var file = "chocolateyInstall.ps1";
@@ -476,6 +486,8 @@ namespace chocolatey.infrastructure.app.services
 
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyPackageFolder, packageDirectory);
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.PackageFolder, packageDirectory);
+
+            SetAdditionalPackageEnvironmentVariables(configuration, packageDirectory);
 
             // unset variables that may not be updated so they don't get passed again
             Environment.SetEnvironmentVariable(EnvironmentVariables.Package.InstallArguments, null);
