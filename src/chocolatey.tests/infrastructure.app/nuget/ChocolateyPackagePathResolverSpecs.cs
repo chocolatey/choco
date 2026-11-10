@@ -42,7 +42,9 @@ namespace chocolatey.tests.infrastructure.app.nuget
         {
             protected ChocolateyPackagePathResolver Resolver;
             protected Mock<IFileSystem> FileSystem = new Mock<IFileSystem>();
-            protected const string RootDirectory = "C:\\ProgramData\\chocolatey\\lib";
+            // Absolute on every platform, as PackagePathResolver requires.
+            protected static readonly string RootDirectory = Path.Combine(Path.GetTempPath(), "choco-test", "lib");
+            protected static readonly string DependenciesRoot = Path.Combine(Path.GetTempPath(), "choco-test", "dependencies");
 
             public override void Context()
             {
@@ -222,7 +224,6 @@ namespace chocolatey.tests.infrastructure.app.nuget
         [ConcernFor("nuget")]
         public class When_getting_the_install_path_for_a_dependency_of_an_instanced_package : ChocolateyPackagePathResolverSpecsBase
         {
-            private const string DependenciesRoot = "C:\\ProgramData\\chocolatey\\lib";
             private ChocolateyPackagePathResolver _instanceResolver;
             private string _parentPath;
             private string _dependencyPath;
@@ -272,7 +273,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 base.Context();
                 _instanceResolver = new ChocolateyPackagePathResolver(RootDirectory, FileSystem.Object, "first")
                 {
-                    DependenciesRootDirectory = "C:\\ProgramData\\chocolatey\\lib"
+                    DependenciesRootDirectory = DependenciesRoot
                 };
             }
 
@@ -339,7 +340,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
             {
                 base.Context();
                 Resolver.ParentId = "bob";
-                Resolver.DependenciesRootDirectory = "C:\\somewhere\\else";
+                Resolver.DependenciesRootDirectory = DependenciesRoot;
             }
 
             public override void Because()
@@ -390,7 +391,7 @@ namespace chocolatey.tests.infrastructure.app.nuget
                 var instanceResolver = new ChocolateyPackagePathResolver(RootDirectory, FileSystem.Object, "first")
                 {
                     ParentId = "bob",
-                    DependenciesRootDirectory = "C:\\ProgramData\\chocolatey\\lib"
+                    DependenciesRootDirectory = DependenciesRoot
                 };
 
                 _byIdentity = instanceResolver.GetInstallPath(new PackageIdentity("bob", new NuGetVersion("2.0.0")));
@@ -414,7 +415,6 @@ namespace chocolatey.tests.infrastructure.app.nuget
         [ConcernFor("nuget")]
         public class When_the_parent_id_changes_between_packages_on_one_resolver : ChocolateyPackagePathResolverSpecsBase
         {
-            private const string DependenciesRoot = "C:\\ProgramData\\chocolatey\\lib";
             private string _bobWhenBobIsTheParent;
             private string _depWhenBobIsTheParent;
             private string _bobWhenDepIsTheParent;
