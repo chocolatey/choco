@@ -145,7 +145,10 @@ namespace chocolatey.infrastructure.app
         public static class Environment
         {
             public static readonly string SystemUserName = "SYSTEM";
+
+            [Obsolete("No longer used by Chocolatey CLI. Use IEnvironment.IsArm64OperatingSystem or IEnvironment.NativeProcessorArchitecture to detect ARM64.", error: false)]
             public const string Arm64ProcessorArchitecture = "ARM64";
+
             public static readonly string EnvironmentSeparator = ";";
 
             [Obsolete("Use alternative variable in StringResources.EnvironmentVariables.System.Path instead", error: false)]

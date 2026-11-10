@@ -549,6 +549,7 @@ NOTE: Hiding sensitive configuration data! Please double and triple
         public string FullName { get; set; }
         public bool Is64BitOperatingSystem { get; set; }
         public bool Is64BitProcess { get; set; }
+        public string ProcessorArchitecture { get; set; }
         public bool IsInteractive { get; set; }
         public string UserName { get; set; }
         public string UserDomainName { get; set; }
