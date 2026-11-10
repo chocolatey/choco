@@ -16,6 +16,7 @@
 
 using System;
 using chocolatey;
+using System.ComponentModel;
 
 namespace Chocolatey.PowerShell.Shared
 {
