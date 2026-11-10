@@ -302,6 +302,32 @@ namespace chocolatey.tests.integration.scenarios
             }
         }
 
+        public class When_installing_a_package_and_a_package_outside_lib_needs_a_dependency_that_is_not_installed : InstallScenariosBase
+        {
+            public override void Because()
+            {
+                Results = ServiceReporting(OutsideLibPackageNeeding("dependencynobodyinstalled", "[1.0.0]")).Install(Configuration, null);
+            }
+
+            [Fact]
+            public void Should_install_the_package()
+            {
+                InstalledVersionOf("hasdependency").Should().Be("1.1.0");
+            }
+
+            [Fact]
+            public void Should_not_report_an_error()
+            {
+                Results.Values.Should().NotContain(r => r.Messages.Any(m => m.MessageType == ResultType.Error));
+            }
+
+            [Fact]
+            public void Should_not_install_the_missing_dependency()
+            {
+                InstalledVersionOf("dependencynobodyinstalled").Should().BeNull();
+            }
+        }
+
         [ConcernFor("upgrade")]
         public abstract class UpgradeScenariosBase : ScenariosBase
         {
@@ -367,6 +393,32 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_leave_the_dependency_at_the_version_the_package_outside_lib_accepts()
             {
                 InstalledVersionOf("isexactversiondependency").Should().Be("1.0.1");
+            }
+        }
+
+        public class When_upgrading_a_package_and_a_package_outside_lib_needs_a_dependency_that_is_not_installed : UpgradeScenariosBase
+        {
+            public override void Because()
+            {
+                Results = ServiceReporting(OutsideLibPackageNeeding("dependencynobodyinstalled", "[1.0.0]")).Upgrade(Configuration, null, performAction: true);
+            }
+
+            [Fact]
+            public void Should_upgrade_the_package()
+            {
+                InstalledVersionOf("hasdependency").Should().Be("1.1.0");
+            }
+
+            [Fact]
+            public void Should_not_report_an_error()
+            {
+                Results.Values.Should().NotContain(r => r.Messages.Any(m => m.MessageType == ResultType.Error));
+            }
+
+            [Fact]
+            public void Should_not_install_the_missing_dependency()
+            {
+                InstalledVersionOf("dependencynobodyinstalled").Should().BeNull();
             }
         }
     }
