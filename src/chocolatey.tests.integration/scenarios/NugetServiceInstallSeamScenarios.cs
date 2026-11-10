@@ -26,7 +26,10 @@ using chocolatey.infrastructure.results;
 using chocolatey.infrastructure.services;
 using NuGet.Common;
 using NuGet.Configuration;
+using NuGet.Packaging.Core;
 using NuGet.Protocol.Core.Types;
+using NuGet.Resolver;
+using NuGet.Versioning;
 using NUnit.Framework;
 using FluentAssertions;
 using IFileSystem = chocolatey.infrastructure.filesystem.IFileSystem;
@@ -43,6 +46,8 @@ namespace chocolatey.tests.integration.scenarios
         {
             public readonly List<string> Events = new List<string>();
             public bool SkipInstall;
+            public IEnumerable<SourcePackageDependencyInfo> ExternalDependencies;
+            public string ResolutionErrorMessage;
             public string RefusalReason;
             public string RefusedId;
             public bool KeepRefusedFiles;
@@ -127,6 +132,17 @@ namespace chocolatey.tests.integration.scenarios
 
                 var annotated = packageResult.Messages.Any(m => m.Message == "annotated by the extension");
                 return DisplayNamePrefix + packageResult.Name + " annotated=" + annotated;
+            }
+
+            protected override IEnumerable<SourcePackageDependencyInfo> GetExternalInstalledDependencyInfos(ChocolateyConfiguration config)
+            {
+                return ExternalDependencies ?? base.GetExternalInstalledDependencyInfos(config);
+            }
+
+            protected override string GetDependencyResolutionErrorMessage(ChocolateyConfiguration config, IEnumerable<IPackageSearchMetadata> packagesToInstall, NuGetResolverConstraintException exception)
+            {
+                Events.Add("GetDependencyResolutionErrorMessage:" + string.Join(",", packagesToInstall.Select(p => p.Identity.Id)));
+                return ResolutionErrorMessage ?? base.GetDependencyResolutionErrorMessage(config, packagesToInstall, exception);
             }
 
             protected override string GetPackageNotInstalledMessage(ChocolateyConfiguration config, string packageName)
@@ -474,6 +490,136 @@ namespace chocolatey.tests.integration.scenarios
                 Results.Values.Should().NotContain(r => r.Messages.Any(m => m.Message.Contains("Cannot uninstall a non-existent package.")));
             }
         }
+
+        // A package outside lib needs isexactversiondependency at exactly 1.0.1, so hasdependency, which needs it at 1.1.0,
+        // cannot be installed or upgraded.
+        public abstract class ResolutionConflictScenariosBase : InstallScenariosBase
+        {
+            protected const string Explanation = "hasdependency cannot be installed here, and this says why.";
+
+            public override void Context()
+            {
+                base.Context();
+
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.1.0.1*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.1.1.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.1.0.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency.1.0.1*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency.1.1.0*" + NuGetConstants.PackageExtension);
+
+                Service.ExternalDependencies = new[]
+                {
+                    new SourcePackageDependencyInfo(
+                        new PackageIdentity("outsidelibpackage", NuGetVersion.Parse("1.0.0")),
+                        new[] { new PackageDependency("isexactversiondependency", VersionRange.Parse("[1.0.1]")) },
+                        true,
+                        NugetCommon.GetLocalRepository(),
+                        null,
+                        null)
+                };
+            }
+
+            protected bool ReportedError(string text)
+            {
+                return Results.Values.Any(r => r.Messages.Any(m => m.MessageType == ResultType.Error && m.Message.Contains(text)));
+            }
+        }
+
+        public class When_installing_a_package_whose_dependencies_cannot_be_resolved_with_a_service_that_overrides_nothing : ResolutionConflictScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Scenario.InstallPackage(Configuration, "isexactversiondependency", "1.0.1");
+                Configuration.PackageNames = Configuration.Input = "hasdependency";
+                Configuration.Version = "1.1.0";
+            }
+
+            public override void Because()
+            {
+                Results = Service.Install(Configuration, null);
+            }
+
+            [Fact]
+            public void Should_report_the_resolver_message()
+            {
+                ReportedError("outsidelibpackage").Should().BeTrue();
+            }
+        }
+
+        public class When_installing_a_package_whose_dependencies_cannot_be_resolved_with_a_service_that_explains_it : ResolutionConflictScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Scenario.InstallPackage(Configuration, "isexactversiondependency", "1.0.1");
+                Configuration.PackageNames = Configuration.Input = "hasdependency";
+                Configuration.Version = "1.1.0";
+                Service.ResolutionErrorMessage = Explanation;
+            }
+
+            public override void Because()
+            {
+                Results = Service.Install(Configuration, null);
+            }
+
+            [Fact]
+            public void Should_ask_the_service_with_the_package_being_installed()
+            {
+                Service.Events.Should().Contain("GetDependencyResolutionErrorMessage:hasdependency");
+            }
+
+            [Fact]
+            public void Should_report_the_message_of_the_service()
+            {
+                ReportedError(Explanation).Should().BeTrue();
+            }
+
+            [Fact]
+            public void Should_not_report_the_resolver_message()
+            {
+                ReportedError("outsidelibpackage").Should().BeFalse();
+            }
+        }
+
+        public class When_upgrading_a_package_whose_dependencies_cannot_be_resolved_with_a_service_that_explains_it : ResolutionConflictScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration = Scenario.Upgrade();
+                Scenario.Reset(Configuration);
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.1.0.1*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.1.1.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.1.0.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency.1.0.1*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency.1.1.0*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "hasdependency", "1.0.1");
+                Configuration.PackageNames = Configuration.Input = "hasdependency";
+                Service.ResolutionErrorMessage = Explanation;
+            }
+
+            public override void Because()
+            {
+                Results = Service.Upgrade(Configuration, null, performAction: true);
+            }
+
+            [Fact]
+            public void Should_ask_the_service_with_the_package_being_upgraded()
+            {
+                Service.Events.Should().Contain("GetDependencyResolutionErrorMessage:hasdependency");
+            }
+
+            [Fact]
+            public void Should_report_the_message_of_the_service()
+            {
+                ReportedError(Explanation).Should().BeTrue();
+            }
+        }
+
         // hasdependency 2.0.1 is installed with isdependency 1.0.0. Version 2.1.0 replaces isdependency and also
         // needs isexactversiondependency, which is new to the machine.
         [ConcernFor("upgrade")]

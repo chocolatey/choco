@@ -882,7 +882,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                     }
                     catch (NuGetResolverConstraintException ex)
                     {
-                        var logMessage = GetDependencyResolutionErrorMessage(ex);
+                        var logMessage = GetDependencyResolutionErrorMessage(config, packagesToInstall, ex);
                         this.Log().Error(ChocolateyLoggers.Important, logMessage);
 
                         foreach (var pkgMetadata in packagesToInstall)
@@ -1280,6 +1280,19 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         protected virtual string GetPackageNotInstalledMessage(ChocolateyConfiguration config, string packageName)
         {
             return "{0} is not installed. Cannot uninstall a non-existent package.".FormatWith(packageName);
+        }
+
+        /// <summary>
+        ///   The error reported when the dependencies of an install or upgrade cannot be resolved.
+        ///   The default is <see cref="GetDependencyResolutionErrorMessage(NuGetResolverConstraintException)"/>.
+        ///   This may be overridden to explain the conflict using the packages being installed.
+        /// </summary>
+        /// <param name="config">The install or upgrade configuration.</param>
+        /// <param name="packagesToInstall">The packages the resolution was for.</param>
+        /// <param name="exception">The exception the resolver threw.</param>
+        protected virtual string GetDependencyResolutionErrorMessage(ChocolateyConfiguration config, IEnumerable<IPackageSearchMetadata> packagesToInstall, NuGetResolverConstraintException exception)
+        {
+            return GetDependencyResolutionErrorMessage(exception);
         }
 
         protected virtual string GetDependencyResolutionErrorMessage(NuGetResolverConstraintException exception)
@@ -1877,7 +1890,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                                     // If we get here, both the initial attempt to resolve a solution didn't work, as well as a second
                                     // attempt using all available package versions didn't work, so this time around we hard fail, and
                                     // provide information to the user about the conflicts for the package resolution.
-                                    var logMessage = GetDependencyResolutionErrorMessage(nestedEx);
+                                    var logMessage = GetDependencyResolutionErrorMessage(config, packagesToInstall, nestedEx);
                                     this.Log().Error(ChocolateyLoggers.Important, logMessage);
 
                                     foreach (var pkgMetadata in packagesToInstall)
