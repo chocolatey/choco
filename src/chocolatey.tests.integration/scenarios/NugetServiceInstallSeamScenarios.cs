@@ -48,6 +48,7 @@ namespace chocolatey.tests.integration.scenarios
             public bool SkipInstall;
             public IEnumerable<SourcePackageDependencyInfo> ExternalDependencies;
             public string ResolutionErrorMessage;
+            public bool WriteUpgradeRowsItself;
             public string RefusalReason;
             public string RefusedId;
             public bool KeepRefusedFiles;
@@ -143,6 +144,19 @@ namespace chocolatey.tests.integration.scenarios
             {
                 Events.Add("GetDependencyResolutionErrorMessage:" + string.Join(",", packagesToInstall.Select(p => p.Identity.Id)));
                 return ResolutionErrorMessage ?? base.GetDependencyResolutionErrorMessage(config, packagesToInstall, exception);
+            }
+
+            protected override void OutputUpgradeRow(ChocolateyConfiguration config, string id, string version, string availableVersion, string pinned)
+            {
+                Events.Add("OutputUpgradeRow:" + id + "|" + version + "|" + (availableVersion ?? "-") + "|" + pinned);
+
+                if (WriteUpgradeRowsItself)
+                {
+                    OutputHelpers.LimitedOutput("custom", id, version, availableVersion ?? "none", pinned);
+                    return;
+                }
+
+                base.OutputUpgradeRow(config, id, version, availableVersion, pinned);
             }
 
             protected override string GetPackageNotInstalledMessage(ChocolateyConfiguration config, string packageName)
@@ -617,6 +631,59 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_report_the_message_of_the_service()
             {
                 ReportedError(Explanation).Should().BeTrue();
+            }
+        }
+
+        // The limited output of an upgrade, which is what scripts read.
+        public abstract class UpgradeRowScenariosBase : UpgradeScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration.RegularOutput = false;
+            }
+
+            public override void Because()
+            {
+                Results = Service.Upgrade(Configuration, null, performAction: false);
+            }
+        }
+
+        public class When_listing_the_rows_of_an_upgrade_with_a_service_that_overrides_nothing : UpgradeRowScenariosBase
+        {
+            [Fact]
+            public void Should_pass_the_row_of_the_package_that_can_be_upgraded_to_the_service()
+            {
+                Service.Events.Should().Contain("OutputUpgradeRow:hasdependency|2.0.1|2.1.0|false");
+            }
+
+            [Fact]
+            public void Should_write_the_row_in_its_usual_shape()
+            {
+                MockLogger.Messages["Info"].Should().Contain("hasdependency|2.0.1|2.1.0|false");
+            }
+        }
+
+        public class When_listing_the_rows_of_an_upgrade_with_a_service_that_writes_them_itself : UpgradeRowScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Service.WriteUpgradeRowsItself = true;
+            }
+
+            [Fact]
+            public void Should_write_the_row_of_the_service()
+            {
+                MockLogger.Messages["Info"].Should().Contain("custom|hasdependency|2.0.1|2.1.0|false");
+            }
+
+            [Fact]
+            public void Should_not_write_the_usual_row()
+            {
+                MockLogger.Messages["Info"].Should().NotContain("hasdependency|2.0.1|2.1.0|false");
             }
         }
 

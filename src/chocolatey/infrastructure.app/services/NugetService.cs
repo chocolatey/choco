@@ -1283,6 +1283,48 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         }
 
         /// <summary>
+        ///   Writes the header row of the limited output of <c>outdated</c>.
+        /// </summary>
+        /// <param name="config">The outdated configuration.</param>
+        protected virtual void OutputOutdatedHeader(ChocolateyConfiguration config)
+        {
+            OutputHelpers.LimitedOutput("Id", "Version", "AvailableVersion", "Pinned");
+        }
+
+        /// <summary>
+        ///   Writes one row of the limited output of <c>outdated</c>.
+        /// </summary>
+        /// <param name="config">The outdated configuration.</param>
+        /// <param name="id">The package id.</param>
+        /// <param name="version">The installed version.</param>
+        /// <param name="availableVersion">The version that is available.</param>
+        /// <param name="pinned"><c>true</c> or <c>false</c>, whether the package is pinned.</param>
+        protected virtual void OutputOutdatedRow(ChocolateyConfiguration config, string id, string version, string availableVersion, string pinned)
+        {
+            OutputHelpers.LimitedOutput(id, version, availableVersion, pinned);
+        }
+
+        /// <summary>
+        ///   Writes one row of the limited output of <c>upgrade</c>.
+        /// </summary>
+        /// <param name="config">The upgrade configuration.</param>
+        /// <param name="id">The package id.</param>
+        /// <param name="version">The installed version.</param>
+        /// <param name="availableVersion">The version that is available, or <c>null</c> when there is none to report.</param>
+        /// <param name="pinned"><c>true</c> or <c>false</c>, whether the package is pinned.</param>
+        protected virtual void OutputUpgradeRow(ChocolateyConfiguration config, string id, string version, string availableVersion, string pinned)
+        {
+            if (availableVersion == null)
+            {
+                OutputHelpers.LimitedOutput(id, version, pinned);
+            }
+            else
+            {
+                OutputHelpers.LimitedOutput(id, version, availableVersion, pinned);
+            }
+        }
+
+        /// <summary>
         ///   The error reported when the dependencies of an install or upgrade cannot be resolved.
         ///   The default is <see cref="GetDependencyResolutionErrorMessage(NuGetResolverConstraintException)"/>.
         ///   This may be overridden to explain the conflict using the packages being installed.
@@ -1537,7 +1579,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         else
                         {
                             //last one is whether this package is pinned or not
-                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe());
+                            OutputUpgradeRow(config, installedPackage.PackageMetadata.Id, installedPackage.Version, null, isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -1558,7 +1600,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                         else
                         {
-                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, isPinned.ToStringSafe().ToLowerSafe());
+                            OutputUpgradeRow(config, installedPackage.PackageMetadata.Id, installedPackage.Version, null, isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -1584,7 +1626,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                             }
                             else
                             {
-                                OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe());
+                                OutputUpgradeRow(config, installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe());
                             }
                         }
 
@@ -1612,7 +1654,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         }
                         else
                         {
-                            OutputHelpers.LimitedOutput(installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToStringSafe(), isPinned.ToStringSafe().ToLowerSafe());
+                            OutputUpgradeRow(config, installedPackage.PackageMetadata.Id, installedPackage.Version, availablePackage.Identity.Version.ToStringSafe(), isPinned.ToStringSafe().ToLowerSafe());
                         }
                     }
 
@@ -2261,11 +2303,11 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                 if (!config.RegularOutput && config.IncludeHeaders && !hasHeaderRowBeenOutput)
                 {
-                    OutputHelpers.LimitedOutput("Id", "Version", "AvailableVersion", "Pinned");
+                    OutputOutdatedHeader(config);
                     hasHeaderRowBeenOutput = true;
                 }
 
-                OutputHelpers.LimitedOutput(installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe());
+                OutputOutdatedRow(config, installedPackage.Name, installedPackage.Version, latestPackage.Identity.Version.ToNormalizedStringChecked(), isPinned.ToStringSafe().ToLowerSafe());
             }
 
             // Reset the configuration again once we are completely done with the processing of
