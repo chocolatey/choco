@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using chocolatey.infrastructure.adapters;
 using chocolatey.infrastructure.app;
 using FluentAssertions;
@@ -14,21 +13,18 @@ namespace chocolatey.tests.infrastructure.adapters
         public abstract class ConsoleSpecsBase : TinySpec
         {
             protected Console Console;
-            private FieldInfo _allowPromptsField;
             private bool _originalAllowPrompts;
 
             public override void Context()
             {
                 Console = new Console();
-                _allowPromptsField = typeof(ApplicationParameters)
-                    .GetField(nameof(ApplicationParameters.AllowPrompts), BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-                _originalAllowPrompts = (bool)_allowPromptsField.GetValue(null);
-                _allowPromptsField.SetValue(null, false);
+                _originalAllowPrompts = ApplicationParameters.AllowPrompts;
+                ApplicationParameters.AllowPrompts = false;
             }
 
             public override void AfterObservations()
             {
-                _allowPromptsField.SetValue(null, _originalAllowPrompts);
+                ApplicationParameters.AllowPrompts = _originalAllowPrompts;
             }
         }
 
