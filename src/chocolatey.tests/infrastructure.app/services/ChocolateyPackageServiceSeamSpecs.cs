@@ -49,7 +49,6 @@ namespace chocolatey.tests.infrastructure.app.services
             public bool SkipUninstallingShims;
             public bool SkipRemovingInformation;
             public string DisplayNamePrefix;
-            public Func<string, PackageResult, string> ResultKey;
             public string ParametersFromTheHook;
 
             public RecordingPackageService(
@@ -114,12 +113,6 @@ namespace chocolatey.tests.infrastructure.app.services
             protected override string GetPackageDisplayName(PackageResult packageResult)
             {
                 return DisplayNamePrefix == null ? base.GetPackageDisplayName(packageResult) : DisplayNamePrefix + packageResult.Name;
-            }
-
-            protected override string GetInstallResultKey(string key, PackageResult result, ConcurrentDictionary<string, PackageResult> packageInstalls)
-            {
-                Events.Add("GetInstallResultKey:" + key);
-                return ResultKey == null ? base.GetInstallResultKey(key, result, packageInstalls) : ResultKey(key, result);
             }
 
             protected override void ApplyAdditionalPackagesConfigSettings(ChocolateyConfiguration packageConfig, PackagesConfigFilePackageSetting pkgSettings)
@@ -446,6 +439,7 @@ namespace chocolatey.tests.infrastructure.app.services
             protected bool InstallWarns;
             protected int ExitCodeOfTheInstall;
 
+            protected bool KeyResultsByInstance;
             protected virtual int EntryCount
             {
                 get { return 2; }
@@ -486,24 +480,25 @@ namespace chocolatey.tests.infrastructure.app.services
 
                         ParametersSeenByTheInstall.Add(config.PackageParameters);
                         installs++;
-                        results["bob"] = new PackageResult(Package.Object, @"c:\lib\bob") { Instance = "instance" + installs };
+                        var key = KeyResultsByInstance ? "bob:instance" + installs : "bob";
+                        results[key] = new PackageResult(Package.Object, @"c:\lib\bob") { Instance = "instance" + installs };
                         if (InstallFails)
                         {
-                            results["bob"].Messages.Add(new ResultMessage(ResultType.Error, "the install failed"));
+                            results[key].Messages.Add(new ResultMessage(ResultType.Error, "the install failed"));
                         }
 
                         if (InstallWarns)
                         {
-                            results["bob"].Messages.Add(new ResultMessage(ResultType.Warn, "it warned"));
+                            results[key].Messages.Add(new ResultMessage(ResultType.Warn, "it warned"));
                         }
 
-                        results["bob"].ExitCode = ExitCodeOfTheInstall;
+                        results[key].ExitCode = ExitCodeOfTheInstall;
                         return results;
                     });
             }
         }
 
-        public class When_installing_the_same_package_twice_from_a_packages_config_with_a_service_that_overrides_nothing : PackagesConfigSpecsBase
+        public class When_installing_the_same_package_twice_from_a_packages_config_and_the_installs_return_the_same_key : PackagesConfigSpecsBase
         {
             public override void Because()
             {
@@ -523,25 +518,19 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            public void Should_ask_for_the_key_of_each_result()
-            {
-                Service.Events.Count(e => e == "GetInstallResultKey:bob").Should().Be(2);
-            }
-
-            [Fact]
             public void Should_install_each_entry_with_the_parameters_it_has_in_the_packages_config()
             {
                 ParametersSeenByTheInstall.Should().Equal("first standard parameters", "second standard parameters");
             }
         }
 
-        public class When_installing_the_same_package_twice_from_a_packages_config_with_a_service_that_tells_the_results_apart : PackagesConfigSpecsBase
+        public class When_installing_the_same_package_twice_from_a_packages_config_and_the_installs_key_their_results_apart : PackagesConfigSpecsBase
         {
             public override void Context()
             {
                 base.Context();
 
-                Service.ResultKey = (key, result) => key + ":" + result.Instance;
+                KeyResultsByInstance = true;
             }
 
             public override void Because()
@@ -550,7 +539,7 @@ namespace chocolatey.tests.infrastructure.app.services
             }
 
             [Fact]
-            public void Should_collect_each_result_under_the_key_the_service_gave_it()
+            public void Should_collect_each_result_under_the_key_the_install_gave_it()
             {
                 Results.Keys.Should().BeEquivalentTo("bob:instance1", "bob:instance2");
             }
@@ -849,7 +838,7 @@ namespace chocolatey.tests.infrastructure.app.services
                 base.Context();
 
                 Service.DisplayNamePrefix = "Shown as ";
-                Service.ResultKey = (key, result) => key + ":" + result.Instance;
+                KeyResultsByInstance = true;
             }
 
             public override void Because()

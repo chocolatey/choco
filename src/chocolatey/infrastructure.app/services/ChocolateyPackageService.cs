@@ -696,19 +696,6 @@ package '{0}' - stopping further execution".FormatWith(GetPackageDisplayName(pac
         }
 
         /// <summary>
-        ///   The key under which an install result is collected into the overall install
-        ///   summary. The default keeps the key the source runner used; extensions override
-        ///   it to keep apart results that would otherwise collide.
-        /// </summary>
-        /// <param name="key">The key the source runner returned the result under.</param>
-        /// <param name="result">The result being collected.</param>
-        /// <param name="packageInstalls">The results collected so far.</param>
-        protected virtual string GetInstallResultKey(string key, PackageResult result, ConcurrentDictionary<string, PackageResult> packageInstalls)
-        {
-            return key;
-        }
-
-        /// <summary>
         ///   Applies any additional per-package settings from a packages.config entry to
         ///   the configuration built for it, after the standard settings have been mapped.
         ///   The default does nothing.
@@ -875,7 +862,7 @@ package '{0}' - stopping further execution".FormatWith(GetPackageDisplayName(pac
 
                     foreach (var result in results)
                     {
-                        packageInstalls.GetOrAdd(GetInstallResultKey(result.Key, result.Value, packageInstalls), result.Value);
+                        packageInstalls.GetOrAdd(result.Key, result.Value);
                     }
                 }
             }
