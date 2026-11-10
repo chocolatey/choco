@@ -102,14 +102,6 @@ namespace chocolatey
                 public const string ChocolateyPackageInstallLocation = nameof(ChocolateyPackageInstallLocation);
 
                 /// <summary>
-                /// The instance name supplied with --instance when installing, upgrading
-                /// or uninstalling a package instance; empty for a default (non-instanced)
-                /// package. Lets package scripts derive per-instance state.
-                /// </summary>
-                /// <remarks>Available in licensed editions only.</remarks>
-                public const string ChocolateyPackageInstance = nameof(ChocolateyPackageInstance);
-
-                /// <summary>
                 /// The name or identifier of the package that is being handled.
                 /// </summary>
                 /// <seealso cref="PackageName" />
@@ -671,7 +663,6 @@ namespace chocolatey
         public static class OptionDescriptions
         {
             public const string IncludeHeaders = "Include header names when --limit-output is used. Requires Chocolatey CLI 2.5.0+";
-            public const string IncludeInstances = "Include package instances in the command output. Hidden by default so existing output is unchanged.";
             public const string IgnoreHttpCache = "Ignore any HTTP caches that have previously been created when querying sources, and create new caches. Available in 2.1.0+";
         }
 
@@ -683,7 +674,6 @@ namespace chocolatey
         public static class Options
         {
             public const string IncludeHeaders = "include-headers";
-            public const string IncludeInstances = "include-instances";
             public const string IgnoreHttpCache = "ignore-http-cache";
         }
     }
