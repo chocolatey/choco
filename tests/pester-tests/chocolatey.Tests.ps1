@@ -508,13 +508,19 @@ exit $error.count
     }
 
     # This is skipped when not run in CI because it modifies the local system.
-    Context '.Net Registry is not set' -Skip:(-not $env:TEST_KITCHEN) {
+    Context '.Net Registry is not set' -Tag DotNet -Skip:(-not $env:TEST_KITCHEN) {
         BeforeAll {
-            $RegistryPath = 'SOFTWARE\Wow6432Node\Microsoft\NET Framework Setup\NDP\v4\Full\'
-            Set-RegistryKeyOwner -Key $RegistryPath
-            $OriginalRelease = Get-ItemPropertyValue -Path "HKLM:\$RegistryPath" -Name Release
-            Remove-ItemProperty -Path "HKLM:\$RegistryPath" -Name Release
-            $Output = Invoke-Choco help
+            $netRegistryError = ''
+            try {
+                $RegistryPath = 'SOFTWARE\Wow6432Node\Microsoft\NET Framework Setup\NDP\v4\Full\'
+                Set-RegistryKeyOwner -Key $RegistryPath
+                $OriginalRelease = Get-ItemPropertyValue -Path "HKLM:\$RegistryPath" -Name Release
+                Remove-ItemProperty -Path "HKLM:\$RegistryPath" -Name Release
+                $Output = Invoke-Choco help
+            }
+            catch {
+                $netRegistryError = $_.Exception.Message
+            }
         }
 
         AfterAll {
@@ -522,10 +528,18 @@ exit $error.count
         }
 
         It "Exits with Failure (1)" {
+            if (-not ([string]::IsNullOrWhiteSpace($netRegistryError))) {
+                Set-ItResult -Inconclusive -Because ".Net setup failed: $netRegistryError."
+            }
+
             $Output.ExitCode | Should -Be 1 -Because $Output.String
         }
 
         It "Reports .NET Framework 4.8 is required" {
+            if (-not ([string]::IsNullOrWhiteSpace($netRegistryError))) {
+                Set-ItResult -Inconclusive -Because ".Net setup failed: $netRegistryError."
+            }
+
             $Output.Lines | Should -Contain '.NET 4.8 is not installed or may need a reboot to complete installation.'
         }
     }
