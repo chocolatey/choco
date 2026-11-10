@@ -1033,25 +1033,7 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
                         var refusalReason = GetInstallRefusalReason(config, packageMetadata, pathResolver);
                         if (!string.IsNullOrWhiteSpace(refusalReason))
                         {
-                            // The files are extracted but no scripts have run yet, so a refusal
-                            // removes what was just laid down and leaves nothing behind.
-                            this.Log().Error(ChocolateyLoggers.Important, refusalReason);
-
-                            nugetProject.DeletePackage(packageDependencyInfo, projectContext, CancellationToken.None, shouldDeleteDirectory: false).GetAwaiter().GetResult();
-                            RemoveRefusedPackageFiles(config, installedPath);
-                            RemovePackageFromCache(config, packageMetadata);
-
-                            var refusedResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe()));
-                            refusedResult.Messages.Add(new ResultMessage(ResultType.Error, refusalReason));
-                            if (refusedResult.ExitCode == 0)
-                            {
-                                refusedResult.ExitCode = 1;
-                            }
-
-                            if (config.Features.StopOnFirstPackageFailure)
-                            {
-                                throw new ApplicationException("Stopping further execution as {0} has failed install.".FormatWith(packageDependencyInfo.Id));
-                            }
+                            RefuseExtractedPackage(config, refusalReason, packageDependencyInfo, packageMetadata, packageRemoteMetadata, installedPath, nugetProject, projectContext, packageResultsToReturn);
 
                             continue;
                         }
@@ -1209,7 +1191,8 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
         /// <summary>
         ///   Called after a package (requested or dependency) has been extracted but before
-        ///   any of its scripts run. Return a non-empty reason to refuse it: the extracted
+        ///   any of its scripts run, on an install and on an upgrade for a package that was
+        ///   not installed before. Return a non-empty reason to refuse it: the extracted
         ///   files are removed again (see <see cref="RemoveRefusedPackageFiles"/>), the
         ///   package is recorded as failed and, when configured, execution stops. The
         ///   default never refuses.
@@ -1231,6 +1214,38 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
         protected virtual void RemoveRefusedPackageFiles(ChocolateyConfiguration config, string installedPath)
         {
             _fileSystem.DeleteDirectoryChecked(installedPath, recursive: true, overrideAttributes: true, isSilent: true);
+        }
+
+        private void RefuseExtractedPackage(
+            ChocolateyConfiguration config,
+            string refusalReason,
+            SourcePackageDependencyInfo packageDependencyInfo,
+            ChocolateyPackageMetadata packageMetadata,
+            IPackageSearchMetadata packageRemoteMetadata,
+            string installedPath,
+            FolderNuGetProject nugetProject,
+            ChocolateyNuGetProjectContext projectContext,
+            ConcurrentDictionary<string, PackageResult> packageResultsToReturn)
+        {
+            // The files are extracted but no scripts have run yet, so a refusal
+            // removes what was just laid down and leaves nothing behind.
+            this.Log().Error(ChocolateyLoggers.Important, refusalReason);
+
+            nugetProject.DeletePackage(packageDependencyInfo, projectContext, CancellationToken.None, shouldDeleteDirectory: false).GetAwaiter().GetResult();
+            RemoveRefusedPackageFiles(config, installedPath);
+            RemovePackageFromCache(config, packageMetadata);
+
+            var refusedResult = packageResultsToReturn.GetOrAdd(packageDependencyInfo.Id.ToLowerSafe(), new PackageResult(packageMetadata, packageRemoteMetadata, installedPath, null, packageDependencyInfo.Source.ToStringSafe()));
+            refusedResult.Messages.Add(new ResultMessage(ResultType.Error, refusalReason));
+            if (refusedResult.ExitCode == 0)
+            {
+                refusedResult.ExitCode = 1;
+            }
+
+            if (config.Features.StopOnFirstPackageFailure)
+            {
+                throw new ApplicationException("Stopping further execution as {0} has failed install.".FormatWith(packageDependencyInfo.Id));
+            }
         }
 
         /// <summary>
@@ -2050,6 +2065,19 @@ Please see https://docs.chocolatey.org/en-us/troubleshooting for more
 
                                 var manifestPath = nugetProject.GetInstalledManifestFilePath(packageDependencyInfo);
                                 var packageMetadata = new ChocolateyPackageMetadata(manifestPath, _fileSystem);
+
+                                // A package that replaces an installed one has already had the old version removed,
+                                // so only a package that is new to this machine can still be refused.
+                                if (packageToUninstall == null)
+                                {
+                                    var refusalReason = GetInstallRefusalReason(config, packageMetadata, pathResolver);
+                                    if (!string.IsNullOrWhiteSpace(refusalReason))
+                                    {
+                                        RefuseExtractedPackage(config, refusalReason, packageDependencyInfo, packageMetadata, packageRemoteMetadata, installedPath, nugetProject, projectContext, packageResultsToReturn);
+
+                                        continue;
+                                    }
+                                }
 
                                 RemovePackageFromNugetCache(packageRemoteMetadata);
 

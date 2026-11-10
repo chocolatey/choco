@@ -44,6 +44,7 @@ namespace chocolatey.tests.integration.scenarios
             public readonly List<string> Events = new List<string>();
             public bool SkipInstall;
             public string RefusalReason;
+            public string RefusedId;
             public bool KeepRefusedFiles;
             public string DisplayNamePrefix;
             public string NotInstalledMessage;
@@ -91,7 +92,13 @@ namespace chocolatey.tests.integration.scenarios
             protected override string GetInstallRefusalReason(ChocolateyConfiguration config, ChocolateyPackageMetadata packageMetadata, ChocolateyPackagePathResolver pathResolver)
             {
                 Events.Add("GetInstallRefusalReason:" + packageMetadata.Id);
-                return RefusalReason ?? base.GetInstallRefusalReason(config, packageMetadata, pathResolver);
+
+                if (RefusalReason != null && (RefusedId == null || RefusedId.Equals(packageMetadata.Id, StringComparison.OrdinalIgnoreCase)))
+                {
+                    return RefusalReason;
+                }
+
+                return base.GetInstallRefusalReason(config, packageMetadata, pathResolver);
             }
 
             protected override void RemoveRefusedPackageFiles(ChocolateyConfiguration config, string installedPath)
@@ -465,6 +472,90 @@ namespace chocolatey.tests.integration.scenarios
             public void Should_not_report_the_default_message()
             {
                 Results.Values.Should().NotContain(r => r.Messages.Any(m => m.Message.Contains("Cannot uninstall a non-existent package.")));
+            }
+        }
+        // hasdependency 2.0.1 is installed with isdependency 1.0.0. Version 2.1.0 replaces isdependency and also
+        // needs isexactversiondependency, which is new to the machine.
+        [ConcernFor("upgrade")]
+        public abstract class UpgradeScenariosBase : InstallScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Configuration = Scenario.Upgrade();
+                Scenario.Reset(Configuration);
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.2.0.1*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "hasdependency.2.1.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.1.0.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isdependency.2.0.0*" + NuGetConstants.PackageExtension);
+                Scenario.AddPackagesToSourceLocation(Configuration, "isexactversiondependency.2.0.0*" + NuGetConstants.PackageExtension);
+                Scenario.InstallPackage(Configuration, "hasdependency", "2.0.1");
+
+                Configuration.PackageNames = Configuration.Input = "hasdependency";
+            }
+
+            public override void Because()
+            {
+                Results = Service.Upgrade(Configuration, (result, config) => Service.Events.Add("ContinueAction:" + result.Name), performAction: true);
+            }
+
+            protected static string LibPath(string id)
+            {
+                return Path.Combine(Scenario.GetTopLevel(), "lib", id);
+            }
+        }
+
+        public class When_upgrading_a_package_and_the_service_refuses_a_dependency_that_is_new_to_the_machine : UpgradeScenariosBase
+        {
+            public override void Context()
+            {
+                base.Context();
+
+                Service.RefusedId = "isexactversiondependency";
+                Service.RefusalReason = "isexactversiondependency may not be installed here.";
+            }
+
+            [Fact]
+            public void Should_ask_the_service_about_the_new_dependency()
+            {
+                Service.Events.Should().Contain("GetInstallRefusalReason:isexactversiondependency");
+            }
+
+            [Fact]
+            public void Should_record_the_reason_as_an_error_for_the_dependency()
+            {
+                Results.Values.Should().Contain(r => r.Messages.Any(m => m.MessageType == ResultType.Error && m.Message == "isexactversiondependency may not be installed here."));
+            }
+
+            [Fact]
+            public void Should_remove_the_files_of_the_refused_dependency()
+            {
+                Service.Events.Should().Contain(e => e.StartsWith("RemoveRefusedPackageFiles:", StringComparison.Ordinal));
+                Directory.Exists(LibPath("isexactversiondependency")).Should().BeFalse();
+            }
+
+            [Fact]
+            public void Should_not_upgrade_the_package_that_needs_it()
+            {
+                Results.Values.Should().NotContain(r => r.Name == "hasdependency" && r.Version == "2.1.0" && r.Success);
+                File.ReadAllText(Path.Combine(LibPath("hasdependency"), "hasdependency.nuspec")).Should().Contain("<version>2.0.1</version>");
+            }
+        }
+
+        public class When_upgrading_a_package_with_a_service_that_refuses_nothing : UpgradeScenariosBase
+        {
+            [Fact]
+            public void Should_upgrade_the_package()
+            {
+                File.ReadAllText(Path.Combine(LibPath("hasdependency"), "hasdependency.nuspec")).Should().Contain("<version>2.1.0</version>");
+            }
+
+            [Fact]
+            public void Should_ask_the_service_only_about_the_package_that_is_new_to_the_machine()
+            {
+                Service.Events.Where(e => e.StartsWith("GetInstallRefusalReason:", StringComparison.Ordinal))
+                    .Should().Equal("GetInstallRefusalReason:isexactversiondependency");
             }
         }
     }
