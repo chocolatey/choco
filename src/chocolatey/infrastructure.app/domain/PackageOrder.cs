@@ -39,6 +39,11 @@ namespace chocolatey.infrastructure.app.domain
         LastPublished,
 
         /// <summary>
+        /// Sort by last updated date, from newest to oldest.
+        /// </summary>
+        LastUpdated,
+
+        /// <summary>
         /// Do not sort; return packages in the order received from the source.
         /// </summary>
         Unsorted

@@ -38,5 +38,6 @@ namespace chocolatey.infrastructure.app.domain
         public string ExtraInformation { get; set; }
         public string DeploymentLocation { get; set; }
         public string SourceInstalledFrom {  get; set; }
+        public string LastUpdated { get; set; }
     }
 }

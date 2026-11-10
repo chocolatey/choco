@@ -71,6 +71,11 @@ namespace chocolatey.infrastructure.results
         /// The package source used to install the package.
         /// </summary>
         public string SourceInstalledFrom { get; set; }
+
+        /// <summary>
+        /// When the packaage was last updated.
+        /// </summary>
+        public string LastUpdated { get; set; }
         public int ExitCode { get; set; }
 
         public void ResetMetadata(IPackageMetadata metadata, IPackageSearchMetadata search)
@@ -141,8 +146,8 @@ namespace chocolatey.infrastructure.results
         }
 
         [Obsolete("This overload is deprecated and will be removed in v3.")]
-        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null)
-            : this(packageMetadata, packageSearch, installLocation, source, null) {  }
+        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source = null, string lastUpdated = null)
+            : this(packageMetadata, packageSearch, installLocation, source, null, lastUpdated) {  }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageResult"/> class.
@@ -152,12 +157,14 @@ namespace chocolatey.infrastructure.results
         /// <param name="installLocation">Assigned to <see cref="InstallLocation"/></param>
         /// <param name="source">Sources available during package installation. Assigned to <see cref="Source"/></param>
         /// <param name="sourceInstalledFrom">The package source used to install the package. Assigned to <see cref="SourceInstalledFrom"/></param>
-        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source, string sourceInstalledFrom)
-            : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation)
+        /// <param name="lastUpdated">The last updated date of the package. Assigned to <see cref="LastUpdated"/></param>
+        public PackageResult(IPackageMetadata packageMetadata, IPackageSearchMetadata packageSearch, string installLocation, string source, string sourceInstalledFrom, string lastUpdated)
+            : this(packageMetadata.Id, packageMetadata.Version.ToNormalizedStringChecked(), installLocation, lastUpdated)
         {
             SearchMetadata = packageSearch;
             PackageMetadata = packageMetadata;
             SourceInstalledFrom = sourceInstalledFrom;
+            LastUpdated = lastUpdated;
             var sources = new List<Uri>();
             if (!string.IsNullOrEmpty(source))
             {
