@@ -94,7 +94,7 @@ jobs:
           code_drop\MSIs\en-US\chocolatey-*.msi
   # Build using mono on MacOS
   macos-build:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v3
       with:
@@ -103,7 +103,16 @@ jobs:
       uses: actions/cache@v4
       with:
         path: tools
-        key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
+        # tools contains architecture-specific binaries, so Arm64 and x64 runners can't share a cache.
+        key: ${{ runner.os }}-${{ runner.arch }}-tools-${{ hashFiles('recipe.cake') }}
+    # Official universal package, which runs Mono as x64 under Rosetta, rather than Homebrew's Arm-native
+    # Mono: the libgit2 bundled in Cake.Git 1.1.0 has no Arm64 macOS build.
+    - name: Install Mono
+      run: |
+        curl -fsSL -o "$RUNNER_TEMP/mono.pkg" https://download.mono-project.com/archive/6.12.0/macos-10-universal/MonoFramework-MDK-6.12.0.206.macos10.xamarin.universal.pkg
+        sudo installer -pkg "$RUNNER_TEMP/mono.pkg" -target /
+        echo "/Library/Frameworks/Mono.framework/Versions/Current/Commands" >> "$GITHUB_PATH"
+        /Library/Frameworks/Mono.framework/Versions/Current/Commands/mono --version
     - name: Install dotnet #needed for GitVersion
       uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
       with:
