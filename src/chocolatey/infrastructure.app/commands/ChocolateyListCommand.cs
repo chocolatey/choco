@@ -34,8 +34,8 @@ namespace chocolatey.infrastructure.app.commands
         private readonly IChocolateyPackageService _packageService;
 
         /// <summary>
-        /// The paging options that were passed. They are obsolete for this command, as it
-        /// only lists local packages, and are only warned about once parsing has finished.
+        /// The paging options that were passed. They are obsolete, and are only warned about
+        /// once parsing has finished.
         /// </summary>
         private readonly List<string> _obsoletePagingOptionsUsed = new List<string>();
 
@@ -108,11 +108,29 @@ namespace chocolatey.infrastructure.app.commands
                      "Version - Specific version of a package to return.",
                      option => configuration.Version = option.UnquoteSafe())
                 .Add("page=",
-                     "Page - OBSOLETE. Ignored: paging only applied when the list command searched remote sources. All local results are returned.",
-                     option => _obsoletePagingOptionsUsed.Add("--page"))
-                .Add("page-size=",
-                     "Page Size - OBSOLETE. Ignored: paging only applied when the list command searched remote sources. All local results are returned.",
-                     option => _obsoletePagingOptionsUsed.Add("--page-size"))
+                     "Page - the 'page' of results to return. Defaults to return all results. OBSOLETE - will be removed in v3.0.0.",
+                     option =>
+                     {
+                         _obsoletePagingOptionsUsed.Add("--page");
+
+                         if (int.TryParse(option, out var page))
+                         {
+                             configuration.ListCommand.Page = page;
+                         }
+                         else
+                         {
+                             configuration.ListCommand.Page = null;
+                         }
+                     })
+                .Add("page-size=", // Does it make sense to have paging on local packages?
+                     "Page Size - the amount of package results to return per page. Defaults to 25. OBSOLETE - will be removed in v3.0.0.",
+                     option =>
+                     {
+                         _obsoletePagingOptionsUsed.Add("--page-size");
+
+                         configuration.ListCommand.PageSize = int.Parse(option);
+                         configuration.ListCommand.ExplicitPageSize = true;
+                     })
                 .Add("e|exact",
                      "Exact - Only return packages with this exact name.",
                      option => configuration.ListCommand.Exact = option != null)
@@ -179,7 +197,7 @@ namespace chocolatey.infrastructure.app.commands
             // limit-output may not have been parsed yet at that point.
             foreach (var option in _obsoletePagingOptionsUsed.Distinct())
             {
-                var message = "The {0} option is obsolete for the list command and is ignored, as the command only lists locally installed packages. All results are returned.".FormatWith(option);
+                var message = "The {0} option is obsolete for the list command and will be removed in version 3.0.0 of Chocolatey CLI.".FormatWith(option);
 
                 if (configuration.RegularOutput)
                 {

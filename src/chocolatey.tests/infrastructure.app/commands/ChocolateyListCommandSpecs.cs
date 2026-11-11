@@ -240,16 +240,16 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
 
                 [Fact]
-                public void Should_ignore_the_page_option()
+                public void Should_still_apply_the_page_option()
                 {
-                    Configuration.ListCommand.Page.Should().BeNull();
+                    Configuration.ListCommand.Page.Should().Be(2);
                 }
 
                 [Fact]
-                public void Should_ignore_the_page_size_option()
+                public void Should_still_apply_the_page_size_option()
                 {
-                    Configuration.ListCommand.ExplicitPageSize.Should().BeFalse();
-                    Configuration.ListCommand.PageSize.Should().Be(25);
+                    Configuration.ListCommand.ExplicitPageSize.Should().BeTrue();
+                    Configuration.ListCommand.PageSize.Should().Be(20);
                 }
 
                 [Fact]
@@ -375,17 +375,16 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
             }
 
-            public class When_a_paging_option_has_a_value_that_is_not_a_number : ChocolateyListCommandSpecsBase
+            public class When_the_page_option_has_a_value_that_is_not_a_number : ChocolateyListCommandSpecsBase
             {
                 public override void Context()
                 {
                     base.Context();
                     Configuration.RegularOutput = true;
 
-                    // The value is ignored with the option, so it is not an error however it is written.
                     var optionSet = new OptionSet();
                     Command.ConfigureArgumentParser(optionSet, Configuration);
-                    optionSet.Parse(new[] { "--page=abc", "--page-size=many" });
+                    optionSet.Parse(new[] { "--page=abc" });
                 }
 
                 public override void Because()
@@ -394,21 +393,42 @@ namespace chocolatey.tests.infrastructure.app.commands
                 }
 
                 [Fact]
-                public void Should_not_apply_either_value()
+                public void Should_not_apply_a_page()
                 {
                     Configuration.ListCommand.Page.Should().BeNull();
-                    Configuration.ListCommand.ExplicitPageSize.Should().BeFalse();
                 }
 
                 [Fact]
-                public void Should_warn_about_both_options()
+                public void Should_still_warn_about_the_option()
                 {
-                    MockLogger.Messages.Should().ContainKey("Warn");
-                    MockLogger.Messages["Warn"].Should().Contain(m => m.Contains("--page option is obsolete"));
-                    MockLogger.Messages["Warn"].Should().Contain(m => m.Contains("--page-size option is obsolete"));
+                    MockLogger.Messages.Should().ContainKey("Warn")
+                        .WhoseValue.Should().ContainSingle(m => m.Contains("--page option is obsolete"));
                 }
             }
 
+            public class When_the_page_size_option_has_a_value_that_is_not_a_number : ChocolateyListCommandSpecsBase
+            {
+                private Action _parse;
+
+                public override void Context()
+                {
+                    base.Context();
+
+                    var optionSet = new OptionSet();
+                    Command.ConfigureArgumentParser(optionSet, Configuration);
+                    _parse = () => optionSet.Parse(new[] { "--page-size=many" });
+                }
+
+                public override void Because()
+                {
+                }
+
+                [Fact]
+                public void Should_be_an_error_as_it_always_was()
+                {
+                    _parse.Should().Throw<Exception>();
+                }
+            }
             public class When_configuring_the_argument_parser_for_the_obsolete_paging_options : ChocolateyListCommandSpecsBase
             {
                 private OptionSet _optionSet;

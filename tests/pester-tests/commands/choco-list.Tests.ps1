@@ -137,6 +137,10 @@ Describe "choco list" -Tag Chocolatey, ListCommand {
         It "Should not contain package <_>" -Foreach @('isdependency', 'hasdependency') {
             $Output.Lines | Should -Not -Contain $_
         }
+
+        It "Should warn that the <_> option is obsolete" -Foreach @('--page', '--page-size') {
+            $Output.Lines | Should -Contain "The $_ option is obsolete for the list command and will be removed in version 3.0.0 of Chocolatey CLI." -Because $Output.String
+        }
     }
 
     Context "Listing local packages with unsupported argument errors out" -ForEach @('-l', '-lo', '--lo', '--local', '--localonly', '--local-only', '--order-by-popularity', '-a', '--all', '--allversions', '--all-versions', '-li', '-il', '-lai', '-lia', '-ali', '-ail', '-ial', '-ila') {
