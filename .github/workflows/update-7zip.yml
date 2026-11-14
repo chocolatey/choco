@@ -1,0 +1,300 @@
+name: Update 7-Zip
+
+on:
+  # Every day at 06:00 UTC
+  schedule:
+    - cron: '0 6 * * *'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# The workflow's own token only reads. Every write (issue, branch, pull request) uses the
+# UPDATE_7ZIP_TOKEN secret instead, so pull requests trigger the build and test workflows.
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+# One run at a time, so two runs cannot both create an issue or pull request for the same line
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+# The logic lives in the .github/scripts/7zipUpdate.psm1 module, so it can also be run by hand.
+# Each step imports it, calls one function and turns the object it returns into step outputs.
+jobs:
+  # Find the latest 7-Zip release, and whether the branch the workflow runs on already bundles it.
+  # A scheduled run uses the default branch; a manual run uses the branch it was started from.
+  # Runs from the 1.x branches (support/1.x, hotfix/1* and release/1*) are refused.
+  # The schedule only runs on chocolatey/choco, so a fork never gets issues, branches or pull
+  # requests it did not ask for. A manual run works in any repository, and only ever writes to
+  # the repository it runs on (GITHUB_REPOSITORY and its own checkout).
+  check-version:
+    if: github.event_name != 'schedule' || github.repository == 'chocolatey/choco'
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      update-needed: ${{ steps.check.outputs.update-needed }}
+    steps:
+      - name: Check out the workflow scripts
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+
+      - name: Compare the latest 7-Zip release with the current branch
+        id: check
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ github.ref_name }}
+        run: |
+          Import-Module ./.github/scripts/7zipUpdate.psm1
+
+          $status = Get-7zipUpdateStatus -Repository $env:GITHUB_REPOSITORY -Branch $env:BRANCH
+
+          "version=$($status.Version)" >> $env:GITHUB_OUTPUT
+          "update-needed=$($status.UpdateNeeded.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+
+  # Update each product line on its own, with one issue and one pull request per line
+  update-line:
+    needs: check-version
+    if: needs.check-version.outputs.update-needed == 'true'
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - line: 1.x
+            fallback-branch: support/1.x
+          # The branch the workflow runs on; check-version refuses 1.x branches
+          - line: 2.x
+            fallback-branch: ${{ github.ref_name }}
+    steps:
+      - name: Check out the workflow scripts
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/scripts
+
+      # Hotfix branches first, then release branches, then the line's fallback branch.
+      # When there is more than one hotfix or release branch, the highest version wins.
+      - name: Find the target branch for ${{ matrix.line }}
+        id: target
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.check-version.outputs.version }}
+          LINE: ${{ matrix.line }}
+          FALLBACK_BRANCH: ${{ matrix.fallback-branch }}
+        run: |
+          Import-Module ./.github/scripts/7zipUpdate.psm1
+
+          $target = Get-7zipTargetBranch -Repository $env:GITHUB_REPOSITORY -Line $env:LINE -FallbackBranch $env:FALLBACK_BRANCH -Version $env:VERSION
+
+          "branch=$($target.Branch)" >> $env:GITHUB_OUTPUT
+          "bundled-version=$($target.BundledVersion)" >> $env:GITHUB_OUTPUT
+          "up-to-date=$($target.UpToDate.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+
+      # The workflow's issue and pull request carry a hidden marker naming the line and version,
+      # for example <!-- 7zip-update line=2.x version=26.06 -->. Open items are considered, plus a
+      # closed issue that is not released yet. One that names the latest version but another
+      # branch gives "retarget": a release or hotfix branch appeared since it was created.
+      - name: Find the open issue and pull request for ${{ matrix.line }}
+        id: existing
+        if: steps.target.outputs.up-to-date == 'false'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.check-version.outputs.version }}
+          LINE: ${{ matrix.line }}
+          TARGET_BRANCH: ${{ steps.target.outputs.branch }}
+        run: |
+          Import-Module ./.github/scripts/7zipUpdate.psm1
+
+          $existing = Find-7zipUpdateItem -Repository $env:GITHUB_REPOSITORY -Line $env:LINE -Version $env:VERSION -TargetBranch $env:TARGET_BRANCH
+
+          "issue-number=$($existing.IssueNumber)" >> $env:GITHUB_OUTPUT
+          "issue-version=$($existing.IssueVersion)" >> $env:GITHUB_OUTPUT
+          "issue-action=$($existing.IssueAction)" >> $env:GITHUB_OUTPUT
+          "issue-state=$($existing.IssueState)" >> $env:GITHUB_OUTPUT
+          "pr-number=$($existing.PullRequestNumber)" >> $env:GITHUB_OUTPUT
+          "pr-version=$($existing.PullRequestVersion)" >> $env:GITHUB_OUTPUT
+          "pr-base=$($existing.PullRequestBase)" >> $env:GITHUB_OUTPUT
+          "pr-action=$($existing.PullRequestAction)" >> $env:GITHUB_OUTPUT
+          "closed-pr-number=$($existing.ClosedPullRequestNumber)" >> $env:GITHUB_OUTPUT
+          "nothing-to-do=$($existing.NothingToDo.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+
+      # Creates the issue, or moves an open one to the new version. When the open issue already
+      # names the new version, only its labels, assignee and milestone are kept in step, and its
+      # number is passed on.
+      - name: Create or update the issue for ${{ matrix.line }}
+        id: issue
+        if: steps.target.outputs.up-to-date == 'false'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.UPDATE_7ZIP_TOKEN }}
+          VERSION: ${{ needs.check-version.outputs.version }}
+          LINE: ${{ matrix.line }}
+          TARGET_BRANCH: ${{ steps.target.outputs.branch }}
+          BUNDLED_VERSION: ${{ steps.target.outputs.bundled-version }}
+          ISSUE_ACTION: ${{ steps.existing.outputs.issue-action }}
+          ISSUE_NUMBER: ${{ steps.existing.outputs.issue-number }}
+          ISSUE_VERSION: ${{ steps.existing.outputs.issue-version }}
+          ISSUE_STATE: ${{ steps.existing.outputs.issue-state }}
+          PR_ACTION: ${{ steps.existing.outputs.pr-action }}
+          NOTHING_TO_DO: ${{ steps.existing.outputs.nothing-to-do }}
+        run: |
+          Import-Module ./.github/scripts/7zipUpdate.psm1
+
+          # Every step from here on writes with this token, so stop early when it is missing
+          if (-not $env:GH_TOKEN) {
+              throw 'The UPDATE_7ZIP_TOKEN secret is not set, so the issue and pull request cannot be created or updated.'
+          }
+
+          # Status labels: the issue is "2 - Working" while the pull request is being created or
+          # updated, and the pull request step moves it to "3 - Review" afterwards. When the pull
+          # request already names this version, that step does not run, so it goes to review here.
+          # Every path also keeps the assignee, the Dependency Change label and the milestone in step.
+          if ($env:ISSUE_ACTION -eq 'none') {
+              Write-Host "Issue #$env:ISSUE_NUMBER already names 7-Zip Version $env:VERSION."
+
+              $statusArguments = @{
+                  Repository   = $env:GITHUB_REPOSITORY
+                  IssueNumber  = $env:ISSUE_NUMBER
+                  TargetBranch = $env:TARGET_BRANCH
+                  Line         = $env:LINE
+              }
+
+              # When the pull request also names this version, nothing else needs doing: keep the
+              # status as it is. Otherwise the pull request does, so the issue is in progress until
+              # the pull request step moves it to review. A closed issue (fixed, not released yet)
+              # on this version is finished, so its status is kept too.
+              if ($env:NOTHING_TO_DO -ne 'true' -and $env:ISSUE_STATE -ne 'closed') {
+                  $statusArguments.Status = 'Working'
+              }
+
+              Set-7zipUpdateIssueStatus @statusArguments
+
+              "number=$env:ISSUE_NUMBER" >> $env:GITHUB_OUTPUT
+              return
+          }
+
+          $arguments = @{
+              Repository     = $env:GITHUB_REPOSITORY
+              Line           = $env:LINE
+              TargetBranch   = $env:TARGET_BRANCH
+              BundledVersion = $env:BUNDLED_VERSION
+              Version        = $env:VERSION
+          }
+
+          # "retarget" updates the issue at the same version: it only names the new branch
+          if ($env:ISSUE_ACTION -in 'update', 'retarget') {
+              $arguments.IssueNumber = $env:ISSUE_NUMBER
+              $arguments.PreviousVersion = $env:ISSUE_VERSION
+          }
+
+          if ($env:PR_ACTION -eq 'none') {
+              $arguments.Status = 'Review'
+          }
+
+          $issue = Set-7zipUpdateIssue @arguments
+
+          "number=$($issue.Number)" >> $env:GITHUB_OUTPUT
+
+      # The rest only runs when the pull request needs creating or moving to the new version.
+      # Keep line endings as stored in the repository, so only real changes show up.
+      - name: Disable line ending conversion
+        if: steps.target.outputs.up-to-date == 'false' && steps.existing.outputs.pr-action != 'none'
+        run: git config --global core.autocrlf false
+
+      # Checked out with the update token, so the push in a later step is made by its account
+      - name: Check out the target branch for ${{ matrix.line }}
+        if: steps.target.outputs.up-to-date == 'false' && steps.existing.outputs.pr-action != 'none'
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.target.outputs.branch }}
+          path: target
+          token: ${{ secrets.UPDATE_7ZIP_TOKEN }}
+
+      # Creates or resets update-7zip-<line> from the target branch, and runs that branch's own
+      # Update-7zipVersion.ps1. The changes are staged, not committed.
+      - name: Update 7-Zip on the work branch for ${{ matrix.line }}
+        id: update
+        if: steps.target.outputs.up-to-date == 'false' && steps.existing.outputs.pr-action != 'none'
+        shell: pwsh
+        env:
+          VERSION: ${{ needs.check-version.outputs.version }}
+          LINE: ${{ matrix.line }}
+        run: |
+          Import-Module ./.github/scripts/7zipUpdate.psm1
+
+          $update = Update-7zipWorkBranch -Path target -Line $env:LINE -Version $env:VERSION
+
+          "work-branch=$($update.WorkBranch)" >> $env:GITHUB_OUTPUT
+          "changed=$($update.Changed.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          "changed-files=$(ConvertTo-Json -InputObject @($update.ChangedFiles) -Compress)" >> $env:GITHUB_OUTPUT
+
+      # Commits the staged update as the account behind the update token, with the issue number
+      # as the subject prefix. Nothing is pushed here.
+      - name: Commit the update for ${{ matrix.line }}
+        id: commit
+        if: steps.update.outputs.changed == 'true'
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.UPDATE_7ZIP_TOKEN }}
+          VERSION: ${{ needs.check-version.outputs.version }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.number }}
+          BUNDLED_VERSION: ${{ steps.target.outputs.bundled-version }}
+        run: |
+          Import-Module ./.github/scripts/7zipUpdate.psm1
+
+          $commit = New-7zipUpdateCommit -Path target -IssueNumber $env:ISSUE_NUMBER -BundledVersion $env:BUNDLED_VERSION -Version $env:VERSION
+
+          "commit=$($commit.Commit)" >> $env:GITHUB_OUTPUT
+          "subject=$($commit.Subject)" >> $env:GITHUB_OUTPUT
+
+      # Force-pushes update-7zip-<line> (it is rebuilt every time), then creates the pull request
+      # into the target branch, or moves the open one to the new version and target branch.
+      - name: Push and create or update the pull request for ${{ matrix.line }}
+        id: pr
+        if: steps.commit.outputs.commit != ''
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.UPDATE_7ZIP_TOKEN }}
+          VERSION: ${{ needs.check-version.outputs.version }}
+          LINE: ${{ matrix.line }}
+          TARGET_BRANCH: ${{ steps.target.outputs.branch }}
+          ISSUE_NUMBER: ${{ steps.issue.outputs.number }}
+          PR_ACTION: ${{ steps.existing.outputs.pr-action }}
+          PR_NUMBER: ${{ steps.existing.outputs.pr-number }}
+          PR_VERSION: ${{ steps.existing.outputs.pr-version }}
+          PR_BASE: ${{ steps.existing.outputs.pr-base }}
+          CLOSED_PR_NUMBER: ${{ steps.existing.outputs.closed-pr-number }}
+        run: |
+          Import-Module ./.github/scripts/7zipUpdate.psm1
+
+          $arguments = @{
+              Repository   = $env:GITHUB_REPOSITORY
+              Path         = 'target'
+              Line         = $env:LINE
+              TargetBranch = $env:TARGET_BRANCH
+              IssueNumber  = $env:ISSUE_NUMBER
+              Version      = $env:VERSION
+          }
+
+          # "retarget" rebuilds the pull request from the new target at the same version, and moves
+          # its base. Only changing the base would show unrelated commits from the old branch.
+          if ($env:PR_ACTION -in 'update', 'retarget') {
+              $arguments.PullRequestNumber = $env:PR_NUMBER
+              $arguments.PreviousVersion = $env:PR_VERSION
+              $arguments.PreviousBase = $env:PR_BASE
+          }
+
+          # A pull request closed without being merged cannot be reused, so the new one links to it
+          if ($env:PR_ACTION -eq 'create' -and $env:CLOSED_PR_NUMBER) {
+              $arguments.ReplacesPullRequestNumber = $env:CLOSED_PR_NUMBER
+          }
+
+          $pullRequest = Set-7zipUpdatePullRequest @arguments
+
+          "number=$($pullRequest.Number)" >> $env:GITHUB_OUTPUT
+          "action=$($pullRequest.Action)" >> $env:GITHUB_OUTPUT
