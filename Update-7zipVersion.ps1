@@ -7,8 +7,8 @@ param(
 $ErrorActionPreference = 'Stop'
 
 if ($Version -eq 'latest') {
-    $latestRelease = Invoke-RestMethod 'https://api.github.com/repos/ip7z/7zip/releases/latest'
-    $Version = $latestRelease.tag_name
+    Import-Module "$PSScriptRoot/.github/scripts/7zipUpdate.psm1" -Force
+    $Version = Get-7zipLatestVersion
     Write-Host "The latest 7-Zip release on GitHub is Version $Version."
 }
 
