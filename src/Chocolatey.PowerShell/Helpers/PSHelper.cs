@@ -39,6 +39,34 @@ namespace Chocolatey.PowerShell.Helpers
         };
 
         /// <summary>
+        /// Returns true if debug output is enabled. In most cases, calling this should not be necessary;
+        /// <see cref="WriteDebug"/> can be called instead, which determines that
+        /// automatically.
+        /// </summary>
+        /// <remarks>
+        /// Gating behaviour behind this check means that it <em>does not happen</em> if --debug (or -Debug)
+        /// is not set, whereas just calling <see cref="WriteDebug"/> will still always reach the log file,
+        /// even if choco is not running with debug enabled.
+        /// </remarks>
+        /// <param name="cmdlet">The cmdlet checking the debug context.</param>
+        /// <returns>If -Debug is set, use that value; otherwise returns whether $DebugPreference is set to show debug messages.</returns>
+        public static bool IsDebug(PSCmdlet cmdlet)
+        {
+            // Prioritise explicitly-set -Debug value if provided; otherwise fallback to $DebugPreference
+            if (cmdlet.MyInvocation.BoundParameters.TryGetValue("Debug", out var value))
+            {
+                return value is SwitchParameter dbg && dbg.IsPresent;
+            }
+
+            var preference = cmdlet.SessionState.PSVariable.GetValue("DebugPreference");
+
+            return TryConvertTo(preference, out ActionPreference action)
+                && (action == ActionPreference.Continue
+                    || action == ActionPreference.Stop
+                    || action == ActionPreference.Inquire);
+        }
+
+        /// <summary>
         /// Writes objects to the output pipeline of the <paramref name="cmdlet"/>, enumerating collections.
         /// </summary>
         /// <param name="cmdlet">The cmdlet calling the method.</param>
@@ -265,7 +293,7 @@ namespace Chocolatey.PowerShell.Helpers
         /// <param name="force">Whether to overwrite existing files.</param>
         public static void CopyFile(PSCmdlet cmdlet, string path, string destinationPath, bool force)
         {
-            var source = ResolveFilePath(cmdlet, path);
+            var source = ResolvePath(cmdlet, path);
             var destination = GetUnresolvedPath(cmdlet, destinationPath);
 
             cmdlet.InvokeProvider.Item.Copy(source.ToArray(), destination, recurse: false, CopyContainers.CopyTargetContainer, force, literalPath: false);
@@ -340,15 +368,14 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
-        /// Resolves a path in the current PowerShell FileSystem provider context to one or more files.
-        /// Wildcards are supported.
+        /// Resolves a relative path to its absolute path based on the current provider.
         /// </summary>
         /// <param name="cmdlet">The cmdlet calling the method.</param>
         /// <param name="path">The unresolved path to fully resolve.</param>
-        /// <returns>A collection of resolved paths on the filesystem.</returns>
-        public static Collection<string> ResolveFilePath(PSCmdlet cmdlet, string path)
+        /// <returns>One or more resolved paths as strings.</returns>
+        public static Collection<string> ResolvePath(PSCmdlet cmdlet, string path)
         {
-            return cmdlet.SessionState.Path.GetResolvedProviderPathFromProviderPath(path, FileSystemProvider.ProviderName);
+            return cmdlet.SessionState.Path.GetResolvedProviderPathFromPSPath(path, out _);
         }
 
         /// <summary>
