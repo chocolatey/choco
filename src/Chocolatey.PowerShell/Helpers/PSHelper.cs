@@ -14,13 +14,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
-using System;
+using System.Linq;
 using System.Management.Automation;
 using System.Reflection;
-
+using Microsoft.PowerShell.Commands;
 using static chocolatey.StringResources;
 
 namespace Chocolatey.PowerShell.Helpers
@@ -48,20 +49,81 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
+        /// Write messages to the debug stream.
+        /// </summary>
+        /// <param name="cmdlet">The cmdlet calling the method.</param>
+        /// <param name="message">The message to write to the debug stream.</param>
+        public static void WriteDebug(PSCmdlet cmdlet, string message)
+        {
+            cmdlet.WriteDebug(message);
+        }
+
+        /// <summary>
+        /// Write messages to the verbose stream.
+        /// </summary>
+        /// <param name="cmdlet">The cmdlet calling the method.</param>
+        /// <param name="message">The message to write to the verbose stream.</param>
+        public static void WriteVerbose(PSCmdlet cmdlet, string message)
+        {
+            cmdlet.WriteVerbose(message);
+        }
+
+        /// <summary>
+        /// Write messages to the warning stream.
+        /// </summary>
+        /// <param name="cmdlet">The cmdlet calling the method.</param>
+        /// <param name="message">The message to write to the warning stream.</param>
+        public static void WriteWarning(PSCmdlet cmdlet, string message)
+        {
+            cmdlet.WriteWarning(message);
+        }
+
+        /// <summary>
         /// Helper method to mimic Write-Host from C#, falls back to Write-Verbose when a host is not available.
         /// </summary>
         /// <param name="cmdlet">The cmdlet calling the method.</param>
         /// <param name="message">The message to write to the host.</param>
         public static void WriteHost(PSCmdlet cmdlet, string message)
         {
+            WriteHost(cmdlet, message, newLine: true);
+        }
+
+        /// <summary>
+        /// Helper method to mimic Write-Host from C#, falls back to Write-Verbose when a host is not available.
+        /// </summary>
+        /// <param name="cmdlet">The cmdlet calling the method.</param>
+        /// <param name="message">The message to write to the host.</param>
+        public static void WriteHost(PSCmdlet cmdlet, string message, bool newLine)
+        {
             if (!(cmdlet.Host is null))
             {
-                cmdlet.Host.UI.WriteLine(message);
+                if (newLine)
+                {
+                    cmdlet.Host.UI.WriteLine(message);
+                }
+                else
+                {
+                    cmdlet.Host.UI.Write(message);
+                }
             }
             else
             {
                 cmdlet.WriteVerbose(message);
             }
+        }
+
+        /// <summary>
+        /// Prompts the user for a credential, securely storing the password.
+        /// </summary>
+        /// <param name="cmdlet">The cmdlet calling the method.</param>
+        /// <param name="caption">The caption for the credential prompt.</param>
+        /// <param name="message">The message to prompt the user with.</param>
+        /// <param name="username">The username for the credential, if known.</param>
+        /// <param name="targetName">The target host for the credential. Unless this is for a domain credential, this will be null.</param>
+        /// <returns>The credentials as a PSCredential object.</returns>
+        public static PSCredential GetCredential(PSCmdlet cmdlet, string caption, string message, string username, string targetName)
+        {
+            return cmdlet.Host.UI.PromptForCredential(caption, message, username, targetName);
         }
 
         /// <summary>
@@ -108,7 +170,8 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
-        /// Convert the given <paramref name="value"/> to the target type <typeparamref name="T"/>, using PowerShell's default conversion semantics.
+        /// Convert the given <paramref name="value"/> to the target type <typeparamref name="T"/>, using
+        /// PowerShell's default conversion semantics.
         /// </summary>
         /// <typeparam name="T">The type to convert the value to.</typeparam>
         /// <param name="value">The value to convert.</param>
@@ -116,6 +179,19 @@ namespace Chocolatey.PowerShell.Helpers
         public static T ConvertTo<T>(object value)
         {
             return (T)LanguagePrimitives.ConvertTo(value, typeof(T));
+        }
+
+        /// <summary>
+        /// Attempt to convert the given <paramref name="value"/> to the target type <typeparamref name="T"/>,
+        /// using PowerShell's default conversion semantics.
+        /// </summary>
+        /// <typeparam name="T">The type to convert the value to.</typeparam>
+        /// <param name="value">The value to convert.</param>
+        /// <param name="result">The converted value if the conversion succeeds, otherwise the default value for the type.</param>
+        /// <returns>True if the value successfully converts, otherwise false.</returns>
+        public static bool TryConvertTo<T>(object value, out T result)
+        {
+            return LanguagePrimitives.TryConvertTo<T>(value, out result);
         }
 
         /// <summary>
@@ -178,6 +254,21 @@ namespace Chocolatey.PowerShell.Helpers
         public static bool FileExists(PSCmdlet cmdlet, string path)
         {
             return ItemExists(cmdlet, path) && !ContainerExists(cmdlet, path);
+        }
+
+        /// <summary>
+        /// Copies the target file to the destination, resolving paths according to PowerShell's path resolution behaviour.
+        /// </summary>
+        /// <param name="cmdlet">The cmdlet calling the method.</param>
+        /// <param name="path">The source file to copy.</param>
+        /// <param name="destinationPath">The destination file.</param>
+        /// <param name="force">Whether to overwrite existing files.</param>
+        public static void CopyFile(PSCmdlet cmdlet, string path, string destinationPath, bool force)
+        {
+            var source = ResolveFilePath(cmdlet, path);
+            var destination = GetUnresolvedPath(cmdlet, destinationPath);
+
+            cmdlet.InvokeProvider.Item.Copy(source.ToArray(), destination, recurse: false, CopyContainers.CopyTargetContainer, force, literalPath: false);
         }
 
         /// <summary>
@@ -249,6 +340,18 @@ namespace Chocolatey.PowerShell.Helpers
         }
 
         /// <summary>
+        /// Resolves a path in the current PowerShell FileSystem provider context to one or more files.
+        /// Wildcards are supported.
+        /// </summary>
+        /// <param name="cmdlet">The cmdlet calling the method.</param>
+        /// <param name="path">The unresolved path to fully resolve.</param>
+        /// <returns>A collection of resolved paths on the filesystem.</returns>
+        public static Collection<string> ResolveFilePath(PSCmdlet cmdlet, string path)
+        {
+            return cmdlet.SessionState.Path.GetResolvedProviderPathFromProviderPath(path, FileSystemProvider.ProviderName);
+        }
+
+        /// <summary>
         /// Creates a new item at the specified <paramref name="path"/>.
         /// </summary>
         /// <param name="cmdlet">The cmdlet calling the method.</param>
@@ -294,6 +397,18 @@ namespace Chocolatey.PowerShell.Helpers
         public static Collection<PSObject> NewDirectory(PSCmdlet cmdlet, string path)
         {
             return NewItem(cmdlet, path, itemType: "Directory");
+        }
+
+        /// <summary>
+        /// Sets the exit code for when the PowerShell host exits. Note that this does not terminate the process, just updates the
+        /// exit code for when it is exited.
+        /// </summary>
+        /// <param name="cmdlet">The calling cmdlet.</param>
+        /// <param name="exitCode">The exit code to set.</param>
+        public static void SetExitCode(PSCmdlet cmdlet, int exitCode)
+        {
+            Environment.SetEnvironmentVariable(EnvironmentVariables.Package.ChocolateyExitCode, exitCode.ToString());
+            cmdlet.Host.SetShouldExit(exitCode);
         }
 
         /// <summary>
