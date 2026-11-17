@@ -14,12 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Chocolatey.PowerShell.Helpers;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Management.Automation;
 using System.Text;
-using Chocolatey.PowerShell.Helpers;
+using System.Threading;
 
 namespace Chocolatey.PowerShell.Shared
 {
@@ -38,6 +39,24 @@ namespace Chocolatey.PowerShell.Shared
             //
             // { "Deprecated-CommandName", "New-CommandName" },
         };
+
+        // These members are used to coordinate use of StopProcessing()
+        private readonly object _lock = new object();
+        private readonly CancellationTokenSource _pipelineStopTokenSource = new CancellationTokenSource();
+
+        /// <summary>
+        /// A cancellation token that will be triggered when <see cref="StopProcessing" /> is called.
+        /// Use this cancellation token for any .NET methods called that accept a cancellation token,
+        /// and prefer overloads that accept a cancellation token.
+        /// This will allow <c>Ctrl+C</c> / <see cref="Cmdlet.StopProcessing" /> to be handled appropriately by commands.
+        /// </summary>
+        protected CancellationToken PipelineStopToken
+        {
+            get
+            {
+                return _pipelineStopTokenSource.Token;
+            }
+        }
 
         /// <summary>
         /// The canonical error ID for the command to assist with traceability.
@@ -130,6 +149,44 @@ namespace Chocolatey.PowerShell.Shared
         /// may not be available or have complete data during this method call.
         /// </summary>
         protected virtual void End()
+        {
+        }
+
+        protected sealed override void StopProcessing()
+        {
+            lock (_lock)
+            {
+                _pipelineStopTokenSource.Cancel();
+                Stop();
+            }
+        }
+
+        /// <summary>
+        /// Override this method to define the cmdlet's behaviour when being asked to stop/cancel processing,
+        /// such as when <c>Ctrl+C</c> is pressed at the command line, a downstream cmdlet throws a terminating
+        /// error during a <c>process {}</c> block, or <c>Select-Object -First $x</c> is included after the
+        /// cmdlet in a pipeline.
+        /// This method will be called by <see cref="StopProcessing"/>, after an exclusive lock is obtained.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item>
+        /// <b>Do not call this method.</b> <see cref="ChocolateyCmdlet"/> calls this method as part of
+        /// <see cref="Cmdlet.StopProcessing"/> handling.
+        /// </item>
+        /// <item>
+        /// <b>This method is typically called from a background thread</b>; some operations may not work as
+        /// expected, including most calls to <see cref="WriteObject(object)"/> and other streams which
+        /// may throw exceptions if called from a background thread.
+        /// </item>
+        /// <item>
+        /// The <see cref="PipelineStopToken"/> will be triggered before this method is called.
+        /// This method should be overridden only if the cmdlet implementing it has its own Stop or Dispose
+        /// behaviour that needs to be managed which are not dependent on the <see cref="PipelineStopToken"/>.
+        /// </item>
+        /// </list>
+        /// </remarks>
+        protected virtual void Stop()
         {
         }
 

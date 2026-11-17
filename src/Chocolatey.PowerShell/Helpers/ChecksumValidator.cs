@@ -172,6 +172,9 @@ namespace Chocolatey.PowerShell.Helpers
         /// <param name="checksum">The expected checksum value.</param>
         /// <param name="checksumType">The type of the checksum to look for.</param>
         /// <param name="url">The url the file was downloaded from originally, if any.</param>
+        /// <exception cref="ChecksumVerificationFailedException">When the checksums don't match.</exception>
+        /// <exception cref="FileNotFoundException">When checksum.exe or the file to verify is missing.</exception>
+        /// <exception cref="ChecksumMissingException">When no checksum is provided and is required.</exception>
         public static void AssertChecksumValid(PSCmdlet cmdlet, string path, string checksum, ChecksumType? checksumType, string url)
         {
             if (!IsValid(cmdlet, path, checksum, checksumType, url, out var exception))
