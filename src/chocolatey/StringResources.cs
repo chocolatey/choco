@@ -114,6 +114,12 @@ namespace chocolatey
                 public const string ChocolateyPackageParameters = "chocolateyPackageParameters";
 
                 /// <summary>
+                /// The package parameters that were passed in by the user during install, upgrade or uninstalls, and
+                /// that must not be written to any log.
+                /// </summary>
+                public const string ChocolateyPackageParametersSensitive = "chocolateyPackageParametersSensitive";
+
+                /// <summary>
                 /// The title of the package that is being handled.
                 /// </summary>
                 /// <seealso cref="PackageTitle" />
