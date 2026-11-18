@@ -29,6 +29,10 @@ namespace Chocolatey.PowerShell.Helpers
         private const string MachineEnvironmentRegistryKeyName = @"SYSTEM\CurrentControlSet\Control\Session Manager\Environment\";
         private const string UserEnvironmentRegistryKeyName = "Environment";
 
+        // Settable for testing purposes only.
+        internal static RegistryKey UserEnvironmentRoot { get; set; } = Registry.CurrentUser;
+        internal static RegistryKey MachineEnvironmentRoot { get; set; } = Registry.LocalMachine;
+
         /// <summary>
         /// Get an environment variable from the current process scope by name.
         /// </summary>
@@ -103,11 +107,26 @@ namespace Chocolatey.PowerShell.Helpers
             switch (scope)
             {
                 case EnvironmentVariableTarget.User:
-                    return Registry.CurrentUser.OpenSubKey(UserEnvironmentRegistryKeyName, writable);
+                    return UserEnvironmentRoot.OpenSubKey(UserEnvironmentRegistryKeyName, writable);
                 case EnvironmentVariableTarget.Machine:
-                    return Registry.LocalMachine.OpenSubKey(MachineEnvironmentRegistryKeyName, writable);
+                    return MachineEnvironmentRoot.OpenSubKey(MachineEnvironmentRegistryKeyName, writable);
                 default:
                     throw new NotSupportedException($"The environment variable scope value '{scope}' is not supported.");
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the registry key that stores environment variables for the target
+        /// <paramref name="scope"/> exists.
+        /// </summary>
+        /// <param name="scope">The scope to check the existence of.</param>
+        /// <returns>True if the registry key for the <paramref name="scope"/> exists.</returns>
+        /// <exception cref="NotSupportedException">Thrown if <paramref name="scope"/> is not <see cref="EnvironmentVariableTarget.User"/> or <see cref="EnvironmentVariableTarget.Machine"/>.</exception>
+        public static bool EnvironmentKeyExists(EnvironmentVariableTarget scope)
+        {
+            using (var registryKey = GetEnvironmentKey(scope))
+            {
+                return !(registryKey is null);
             }
         }
 
