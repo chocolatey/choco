@@ -38,6 +38,12 @@ namespace Chocolatey.PowerShell.Shared
             // the warning will inform the user it is to be removed instead of renamed.
             //
             // { "Deprecated-CommandName", "New-CommandName" },
+            { "Add-BinFile", "New-Shim" },
+            { "Generate-BinFile", "New-Shim" },
+            { "Install-BinFile", "New-Shim" },
+            { "Remove-BinFile", "Remove-Shim" },
+            { "Uninstall-BinFile", "Remove-Shim" },
+
         };
 
         // These members are used to coordinate use of StopProcessing()

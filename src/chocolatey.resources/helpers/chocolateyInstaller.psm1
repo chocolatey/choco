@@ -81,6 +81,13 @@ if (Test-Path $dllPath) {
     }
 }
 
+Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
+Set-Alias -Name 'Generate-BinFile' -Value 'New-Shim'
+Set-Alias -Name 'Add-BinFile' -Value 'New-Shim'
+Set-Alias -Name 'Install-BinFile' -Value 'New-Shim'
+Set-Alias -Name 'Remove-BinFile' -Value 'Remove-Shim'
+Set-Alias -Name 'Uninstall-BinFile' -Value 'Remove-Shim'
+
 # Export built-in functions prior to loading extensions so that
 # extension-specific loading behavior can be used based on built-in
 # functions. This allows those overrides to be much more deterministic
@@ -133,8 +140,6 @@ if (Test-Path $extensionsPath) {
             Import-Module $_
         }
 }
-
-Set-Alias -Name 'Get-CheckSumValid' -Value 'Assert-ValidChecksum'
 
 # Exercise caution and test _thoroughly_ with AND without the licensed extension installed
 # when making any changes here. And make sure to update this comment if needed when any
