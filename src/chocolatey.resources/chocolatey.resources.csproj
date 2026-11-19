@@ -71,9 +71,6 @@
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyEnvironmentVariable.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="helpers\functions\Install-ChocolateyExplorerMenuItem.ps1">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
     <EmbeddedResource Include="helpers\functions\Install-ChocolateyFileAssociation.ps1">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>

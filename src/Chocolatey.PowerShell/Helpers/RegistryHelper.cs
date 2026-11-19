@@ -18,12 +18,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management.Automation;
+using Chocolatey.PowerShell.Shared;
+using Microsoft.Win32;
 
 namespace Chocolatey.PowerShell.Helpers
 {
     /// <summary>
-    /// Finds the uninstall registry keys of installed software by its display name.
-    /// Used by <see cref="Commands.GetUninstallRegistryKeyCommand"/>, and any other commands that need the keys.
+    /// Utility class for handling registry operations like finding software uninstall keys or modifying Explorer
+    /// context menus.
+    /// Used by <see cref="Commands.GetUninstallRegistryKeyCommand"/>,
+    /// <see cref="Commands.InstallChocolateyExplorerMenuItemCommand"/>, and any other commands that need them.
     /// </summary>
     public static class RegistryHelper
     {
@@ -156,6 +160,60 @@ namespace Chocolatey.PowerShell.Helpers
         {
             // A key without a display name matches as an empty name, so it is found by "*".
             return PSHelper.ConvertTo<string>(key.Properties["DisplayName"]?.Value);
+        }
+
+        /// <summary>
+        /// Gets the path, relative to <c>HKEY_CLASSES_ROOT</c>, of the key for a Windows Explorer context menu item.
+        /// </summary>
+        /// <param name="key">The name of the menu item's key.</param>
+        /// <param name="type">The kind of item the menu item is shown for.</param>
+        /// <returns>The path of the menu item's key.</returns>
+        public static string GetExplorerMenuItemKeyPath(string key, ExplorerMenuItemType type)
+        {
+            var itemKey = type == ExplorerMenuItemType.Directory ? "directory" : "*";
+            return $@"{itemKey}\shell\{key}";
+        }
+
+        /// <summary>
+        /// Creates or updates a Windows Explorer context menu item in <c>HKEY_CLASSES_ROOT</c>, which runs
+        /// <paramref name="command"/> with the path of the item that was right-clicked.
+        /// </summary>
+        /// <param name="key">The name of the menu item's key.</param>
+        /// <param name="label">The text shown in the context menu.</param>
+        /// <param name="command">The command line to run, without the path of the item.</param>
+        /// <param name="type">The kind of item the menu item is shown for.</param>
+        public static void SetExplorerMenuItem(string key, string label, string command, ExplorerMenuItemType type)
+        {
+            SetExplorerMenuItem(Registry.ClassesRoot, key, label, command, type);
+        }
+
+        /// <summary>
+        /// Creates or updates a Windows Explorer context menu item under <paramref name="root"/>.
+        /// </summary>
+        /// <remarks>
+        /// Prefer using <see cref="SetExplorerMenuItem(string, string, string, ExplorerMenuItemType)"/> over calling
+        /// this directly. This overload is intended as an entry point to allow unit testing of the functionality
+        /// without writing to <c>HKEY_CLASSES_ROOT</c>.
+        /// </remarks>
+        /// <param name="root">The key to create the menu item under.</param>
+        /// <param name="key">The name of the menu item's key.</param>
+        /// <param name="label">The text shown in the context menu.</param>
+        /// <param name="command">The command line to run, without the path of the item.</param>
+        /// <param name="type">The kind of item the menu item is shown for.</param>
+        internal static void SetExplorerMenuItem(RegistryKey root, string key, string label, string command, ExplorerMenuItemType type)
+        {
+            var menuKeyPath = GetExplorerMenuItemKeyPath(key, type);
+
+            SetDefaultValue(root, menuKeyPath, label);
+            SetDefaultValue(root, $@"{menuKeyPath}\command", $"{command} \"%1\"");
+        }
+
+        private static void SetDefaultValue(RegistryKey root, string keyPath, string value)
+        {
+            using (var key = root.CreateSubKey(keyPath))
+            {
+                key.SetValue(string.Empty, value ?? string.Empty, RegistryValueKind.String);
+            }
         }
     }
 }
