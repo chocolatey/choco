@@ -39,19 +39,14 @@ namespace Chocolatey.PowerShell.Helpers
                 return action();
             }
 
-            // We're going to quote the string in order to pass it to the command,
-            // so escape any double quotes passed in with PowerShell escape chars
-            // to ensure they're passed in correctly.
-            if (fallbackCommand.IndexOf('"') != -1)
-            {
-                fallbackCommand.Replace("\"", "`\"");
-            }
+            // The command is passed as a single-quoted string, so nothing in it is expanded before it is run.
+            var statements = PSHelper.EscapeSingleQuotedStringContent(fallbackCommand);
 
             // This elevation path is known not to work, because this command does *not* invoke the new process with
             // BOTH UseShellExecute=true and Verb=RunAs (see https://github.com/chocolatey/choco/issues/434).
             // This code remains here to mimic the current elevation checks used for the other code path, and is
             // expected to be removed or completely overhaulted and replaced in the near-ish future.
-            return cmdlet.InvokeCommand.InvokeScript($"Start-ChocolateyProcessAsAdmin -statements \"{fallbackCommand}\"");
+            return cmdlet.InvokeCommand.InvokeScript($"Start-ChocolateyProcessAsAdmin -statements '{statements}'");
         }
 
         /// <summary>

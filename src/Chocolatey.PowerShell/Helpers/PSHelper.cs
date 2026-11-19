@@ -21,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Management.Automation;
 using System.Reflection;
+using System.Text;
 using Microsoft.PowerShell.Commands;
 using static chocolatey.StringResources;
 
@@ -302,6 +303,83 @@ namespace Chocolatey.PowerShell.Helpers
         public static string GetFileName(string path)
         {
             return Path.GetFileName(path);
+        }
+
+        /// <summary>
+        /// Escapes a value so that it can be placed between single quotes in PowerShell code, by doubling each
+        /// single quote character in it (the ASCII apostrophe and the typographic single quotes U+2018 to U+201B).
+        /// </summary>
+        /// <param name="value">The value to escape. A <c>null</c> value is treated as an empty string.</param>
+        /// <returns>The escaped value, without adding surrounding quotes.</returns>
+        [Obsolete("This method can be replaced with the System.Management.Automation.Language.CodeGeneration method of the same name when we update PowerShell reference assemblies.")]
+        public static string EscapeSingleQuotedStringContent(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+            {
+                return string.Empty;
+            }
+
+            var result = new StringBuilder(value.Length);
+            foreach (var character in value)
+            {
+                result.Append(character);
+                if (IsSingleQuote(character))
+                {
+                    result.Append(character);
+                }
+            }
+
+            return result.ToString();
+        }
+
+        private static bool IsSingleQuote(char character)
+        {
+            switch (character)
+            {
+                case '\'':
+                case '‘':
+                case '’':
+                case '‚':
+                case '‛':
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets child items under the target path.
+        /// </summary>
+        /// <param name="cmdlet">The calling cmdlet.</param>
+        /// <param name="path">The provider path to search for children of.</param>
+        /// <param name="recurse">Whether to search recursively through child containers.</param>
+        /// <returns>A collection of child items as PSObjects.</returns>
+        public static Collection<PSObject> GetChildItem(PSCmdlet cmdlet, string path, bool recurse)
+        {
+            return cmdlet.InvokeProvider.ChildItem.Get(path, recurse);
+        }
+
+        /// <summary>
+        /// Gets the properties of the target item.
+        /// </summary>
+        /// <param name="cmdlet">The calling cmdlet.</param>
+        /// <param name="path">The path to the item to read properties from.</param>
+        /// <returns>The properties as a collection of PSObjects.</returns>
+        public static Collection<PSObject> GetItemProperty(PSCmdlet cmdlet, string path)
+        {
+            return cmdlet.InvokeProvider.Property.Get(path, providerSpecificPickList: null);
+        }
+
+        /// <summary>
+        /// Gets the properties of the target item, specifying whether the path is literal.
+        /// </summary>
+        /// <param name="cmdlet">The calling cmdlet.</param>
+        /// <param name="path">The path to the item to read properties from.</param>
+        /// <param name="literalPath">Whether the path should be treated as literal.</param>
+        /// <returns>The properties as a collection of PSObjects.</returns>
+        public static Collection<PSObject> GetItemProperty(PSCmdlet cmdlet, string path, bool literalPath)
+        {
+            return cmdlet.InvokeProvider.Property.Get(new[] { path }, providerSpecificPickList: null, literalPath);
         }
 
         /// <summary>

@@ -124,7 +124,7 @@ namespace Chocolatey.PowerShell.Helpers
 
                 if (scope == EnvironmentVariableTarget.Machine)
                 {
-                    Elevation.RunElevated(cmdlet, updatePath, $"Install-ChocolateyPath -PathToInstall '{pathEntry}' -PathType {scope}");
+                    Elevation.RunElevated(cmdlet, updatePath, $"Install-ChocolateyPath -PathToInstall '{PSHelper.EscapeSingleQuotedStringContent(pathEntry)}' -PathType {scope}");
                 }
                 else
                 {
@@ -157,7 +157,7 @@ namespace Chocolatey.PowerShell.Helpers
 
                 if (scope == EnvironmentVariableTarget.Machine)
                 {
-                    Elevation.RunElevated(cmdlet, updatePath, $"Uninstall-ChocolateyPath -PathToInstall '{pathEntry}' -PathType {scope}");
+                    Elevation.RunElevated(cmdlet, updatePath, $"Uninstall-ChocolateyPath -PathToInstall '{PSHelper.EscapeSingleQuotedStringContent(pathEntry)}' -PathType {scope}");
                 }
                 else
                 {
