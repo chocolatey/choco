@@ -327,8 +327,8 @@ object ChocolateyDockerWin : BuildType({
         param("env.vcsroot.branch", "%vcsroot.branch%")
         param("env.Git_Branch", "%teamcity.build.vcs.branch.Chocolatey_ChocolateyVcsRoot%")
         param("teamcity.git.fetchAllHeads", "true")
-        password("env.DOCKER_USER", "%system.DockerUsername%", display = ParameterDisplay.HIDDEN, readOnly = true)
-        password("env.DOCKER_PASSWORD", "%system.DockerPassword%", display = ParameterDisplay.HIDDEN, readOnly = true)
+        password("env.DOCKER_INTERNAL_USER", "%system.InternalDockerUsername%", display = ParameterDisplay.HIDDEN, readOnly = true)
+        password("env.DOCKER_INTERNAL_PASSWORD", "%system.InternalDockerPassword%", display = ParameterDisplay.HIDDEN, readOnly = true)
     }
 
     vcs {
@@ -338,7 +338,7 @@ object ChocolateyDockerWin : BuildType({
     steps {
         script {
             name = "Call Cake"
-            scriptContent = "call build.official.bat --verbosity=diagnostic --target=Docker --shouldRunTests=false --shouldRunAnalyze=false"
+            scriptContent = "call build.official.bat --verbosity=diagnostic --target=Docker --shouldRunTests=false --shouldRunAnalyze=false --dockerInternalRegistry=%system.InternalDockerRegistry% --dockerImageVersion=%env.CHOCOLATEY_VERSION%"
         }
     }
 
@@ -348,6 +348,11 @@ object ChocolateyDockerWin : BuildType({
             successfulOnly = true
             branchFilter = """
                 +:tags/*
+                +:develop
+                +:master
+                +:release/*
+                +:hotfix/*
+                +:support/*
             """.trimIndent()
         }
     }
@@ -388,8 +393,8 @@ object ChocolateyPosix : BuildType({
         param("env.vcsroot.branch", "%vcsroot.branch%")
         param("env.Git_Branch", "%teamcity.build.vcs.branch.Chocolatey_ChocolateyVcsRoot%")
         param("teamcity.git.fetchAllHeads", "true")
-        password("env.DOCKER_USER", "%system.DockerUsername%", display = ParameterDisplay.HIDDEN, readOnly = true)
-        password("env.DOCKER_PASSWORD", "%system.DockerPassword%", display = ParameterDisplay.HIDDEN, readOnly = true)
+        password("env.DOCKER_INTERNAL_USER", "%system.InternalDockerUsername%", display = ParameterDisplay.HIDDEN, readOnly = true)
+        password("env.DOCKER_INTERNAL_PASSWORD", "%system.InternalDockerPassword%", display = ParameterDisplay.HIDDEN, readOnly = true)
     }
 
     vcs {
@@ -431,17 +436,16 @@ object ChocolateyPosix : BuildType({
 
         script {
             name = "Build Docker Image"
-            scriptContent = "./build.official.sh --verbosity=diagnostic --target=Docker"
+            scriptContent = "./build.official.sh --verbosity=diagnostic --target=Docker --dockerInternalRegistry=%system.InternalDockerRegistry% --dockerImageVersion=%env.CHOCOLATEY_VERSION%"
         }
 
         script {
             name = "Create Docker Manifest"
             conditions {
-                exists("env.DOCKER_USER")
-                exists("env.DOCKER_PASSWORD")
-                startsWith("teamcity.build.branch", "tags")
+                exists("env.DOCKER_INTERNAL_USER")
+                exists("env.DOCKER_INTERNAL_PASSWORD")
             }
-            scriptContent = "./build.official.sh --verbosity=diagnostic --target=DockerManifest"
+            scriptContent = "./build.official.sh --verbosity=diagnostic --target=DockerManifest --dockerInternalRegistry=%system.InternalDockerRegistry% --dockerImageVersion=%env.CHOCOLATEY_VERSION%"
         }
     }
 
@@ -451,6 +455,11 @@ object ChocolateyPosix : BuildType({
             successfulOnly = true
             branchFilter = """
                 +:tags/*
+                +:develop
+                +:master
+                +:release/*
+                +:hotfix/*
+                +:support/*
             """.trimIndent()
         }
     }

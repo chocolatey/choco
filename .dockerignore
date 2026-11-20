@@ -1,0 +1,18 @@
+# Keep build output and restored packages out of the Docker build context.
+# The Linux image builds from source inside the container, so these are
+# restored or rebuilt there. The Windows image only needs the Chocolatey
+# package from code_drop.
+# .git and chocolatey.official.snk are deliberately NOT excluded: the Linux
+# build needs them for GitVersion and official strong naming.
+
+code_drop/
+!code_drop/Packages/Chocolatey/
+
+src/packages/
+**/bin/
+**/obj/
+
+tools/
+!tools/packages.config
+
+.vs/
