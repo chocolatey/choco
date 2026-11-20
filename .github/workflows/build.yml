@@ -23,17 +23,22 @@ jobs:
         key: ${{ runner.os }}-tools-${{ hashFiles('recipe.cake') }}
     - name: Install Mono
       run: |
-        sudo apt install ca-certificates gnupg
-        sudo gpg --homedir /tmp --no-default-keyring --keyring /usr/share/keyrings/mono-official-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF
-        echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/ubuntu stable-focal main" | sudo tee /etc/apt/sources.list.d/mono-official-stable.list
+        # Ubuntu's own archive, as Mono's apt repo stops at Ubuntu 20.04 and its packages can't install on 26.04.
         sudo apt update
-        sudo apt install -y mono-complete
+        sudo apt install -y mono-devel
+        # Ubuntu's Mono has no ca-certificates-mono or cert-sync, so point Mono's TLS trust store at the system's hashed CA directory.
+        sudo mkdir -p /usr/share/.mono/new-certs
+        sudo ln -sfn /etc/ssl/certs /usr/share/.mono/new-certs/Trust
         mono --version
     - name: Install dotnet #needed for GitVersion
       uses: actions/setup-dotnet@baa11fbfe1d6520db94683bd5c7a3818018e4309 # v5
       with:
         dotnet-version: |
           5.0.x
+    # .NET SDK 11 no longer runs .NET Framework tests under Mono, so stay on the newest installed 10.0 SDK.
+    - name: Select .NET 10 SDK
+      run: |
+          echo '{ "sdk": { "version": "10.0.100", "rollForward": "latestFeature" } }' > global.json
     - name: Report installed dotnet versions
       run: |
           dotnet --info
@@ -118,6 +123,10 @@ jobs:
       with:
         dotnet-version: |
           5.0.x
+    # .NET SDK 11 no longer runs .NET Framework tests under Mono, so stay on the newest installed 10.0 SDK.
+    - name: Select .NET 10 SDK
+      run: |
+          echo '{ "sdk": { "version": "10.0.100", "rollForward": "latestFeature" } }' > global.json
     - name: Report installed dotnet versions
       run: |
           dotnet --info

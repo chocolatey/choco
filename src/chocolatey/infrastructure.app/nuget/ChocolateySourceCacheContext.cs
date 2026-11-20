@@ -94,7 +94,20 @@ namespace chocolatey.infrastructure.app.nuget
             {
                 try
                 {
-                    Directory.Delete(_generatedChocolateyTempFolder, recursive: true);
+                    // AlphaFS calls Windows APIs directly, so it cannot delete the folder under
+                    // Mono; it is only a fallback here, for long paths on Windows.
+                    System.IO.Directory.Delete(currentTempFolder, recursive: true);
+                }
+                catch (System.IO.IOException)
+                {
+                    try
+                    {
+                        Directory.Delete(currentTempFolder, recursive: true);
+                    }
+                    catch
+                    {
+                        // Ignore failures when cleaning up.
+                    }
                 }
                 catch
                 {
