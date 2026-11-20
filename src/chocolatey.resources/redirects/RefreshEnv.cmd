@@ -130,9 +130,14 @@ REM Get a list of environment variables from registry
     del /f /q "%TEMP%\_envset.tmp" 2>nul
     del /f /q "%TEMP%\_envget.tmp" 2>nul
 
-    REM capture user / architecture
+    REM capture user / architecture / volatile variables
     SET "OriginalUserName=%USERNAME%"
     SET "OriginalArchitecture=%PROCESSOR_ARCHITECTURE%"
+    SET "OriginalAppData=%APPDATA%"
+    SET "OriginalLocalAppData=%LOCALAPPDATA%"
+    SET "OriginalUserProfile=%USERPROFILE%"
+    SET "OriginalHomeDrive=%HOMEDRIVE%"
+    SET "OriginalHomePath=%HOMEPATH%"
 
     REM Set these variables
     call "%TEMP%\_env.cmd"
@@ -140,9 +145,14 @@ REM Get a list of environment variables from registry
     REM Cleanup
     del /f /q "%TEMP%\_env.cmd" 2>nul
 
-    REM reset user / architecture
+    REM reset user / architecture / volatile variables
     SET "USERNAME=%OriginalUserName%"
     SET "PROCESSOR_ARCHITECTURE=%OriginalArchitecture%"
+    SET "APPDATA=%OriginalAppData%"
+    SET "LOCALAPPDATA=%OriginalLocalAppData%"
+    SET "USERPROFILE=%OriginalUserProfile%"
+    SET "HOMEDRIVE=%OriginalHomeDrive%"
+    SET "HOMEPATH=%OriginalHomePath%"
 
     echo | set /p dummy="Finished."
     echo .
