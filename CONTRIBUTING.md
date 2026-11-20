@@ -31,6 +31,7 @@ The Chocolatey team has very explicit information here regarding the process for
 - [Other General Information](#other-general-information)
   - [API and Backwards Compatibility](#api-and-backwards-compatibility)
   - [Architectural Decision Records (ADRs)](#architecture-decision-records-adrs)
+- [`Chocolatey.PowerShell` Guidelines](#chocolateypowershell-project)
 
 <!-- /TOC -->
 
@@ -296,3 +297,7 @@ process.
 External contributors are not expected to create or maintain ADRs. When an
 architectural decision requires an ADR, the appropriate internal team members
 will handle the documentation.
+
+## `Chocolatey.PowerShell` Guidelines
+
+Specific contribution guidelines for the `Chocolatey.PowerShell` project can be found in its [`CONTRIBUTING.md`](./src/Chocolatey.PowerShell/CONTRIBUTING.md) file.

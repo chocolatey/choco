@@ -14,10 +14,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using Chocolatey.PowerShell.Helpers;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Management.Automation;
 using System.Text;
-using Chocolatey.PowerShell.Helpers;
+using System.Threading;
 
 namespace Chocolatey.PowerShell.Shared
 {
@@ -27,6 +30,57 @@ namespace Chocolatey.PowerShell.Shared
     /// </summary>
     public abstract class ChocolateyCmdlet : PSCmdlet
     {
+        // Place deprecated command names and their corresponding replacement in this dictionary to have those commands
+        // warn users about the deprecation when they are called by those names.
+        private readonly Dictionary<string, string> _deprecatedCommandNames = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            // Use the following format to provide a deprecation notice. If the new command name is an empty string,
+            // the warning will inform the user it is to be removed instead of renamed.
+            //
+            // { "Deprecated-CommandName", "New-CommandName" },
+        };
+
+        // These members are used to coordinate use of StopProcessing()
+        private readonly object _lock = new object();
+        private readonly CancellationTokenSource _pipelineStopTokenSource = new CancellationTokenSource();
+
+        /// <summary>
+        /// A cancellation token that will be triggered when <see cref="StopProcessing" /> is called.
+        /// Use this cancellation token for any .NET methods called that accept a cancellation token,
+        /// and prefer overloads that accept a cancellation token.
+        /// This will allow <c>Ctrl+C</c> / <see cref="Cmdlet.StopProcessing" /> to be handled appropriately by commands.
+        /// </summary>
+        protected CancellationToken PipelineStopToken
+        {
+            get
+            {
+                return _pipelineStopTokenSource.Token;
+            }
+        }
+
+        /// <summary>
+        /// The canonical error ID for the command to assist with traceability.
+        /// For more specific error IDs where needed, use <c>"{ErrorId}.EventName"</c>.
+        /// </summary>
+        protected string ErrorId
+        {
+            get
+            {
+                return GetType().Name + "Error";
+            }
+        }
+
+        /// <summary>
+        /// Gets the directory that Chocolatey is installed in.
+        /// </summary>
+        protected string ChocolateyInstallLocation
+        {
+            get
+            {
+                return PSHelper.GetInstallLocation(this);
+            }
+        }
+
         /// <summary>
         /// For compatibility reasons, we always add the -IgnoredArguments parameter, so that newly added parameters
         /// won't break things too much if a package is run with an older version of Chocolatey.
@@ -42,8 +96,20 @@ namespace Chocolatey.PowerShell.Shared
         /// </summary>
         protected virtual bool Logging { get; } = true;
 
+        private void WriteWarningForDeprecatedCommands()
+        {
+            if (_deprecatedCommandNames.TryGetValue(MyInvocation.InvocationName, out var replacement))
+            {
+                var message = string.IsNullOrEmpty(replacement)
+                    ? $"The command '{MyInvocation.InvocationName}' is deprecated and will be removed in a future version"
+                    : $"The '{MyInvocation.InvocationName}' alias is deprecated and will be removed in a future version. Use '{replacement}' to ensure compatibility with future versions of Chocolatey.";
+                WriteWarning(message);
+            }
+        }
+
         protected sealed override void BeginProcessing()
         {
+            WriteWarningForDeprecatedCommands();
             WriteCmdletCallDebugMessage();
             Begin();
         }
@@ -83,6 +149,44 @@ namespace Chocolatey.PowerShell.Shared
         /// may not be available or have complete data during this method call.
         /// </summary>
         protected virtual void End()
+        {
+        }
+
+        protected sealed override void StopProcessing()
+        {
+            lock (_lock)
+            {
+                _pipelineStopTokenSource.Cancel();
+                Stop();
+            }
+        }
+
+        /// <summary>
+        /// Override this method to define the cmdlet's behaviour when being asked to stop/cancel processing,
+        /// such as when <c>Ctrl+C</c> is pressed at the command line, a downstream cmdlet throws a terminating
+        /// error during a <c>process {}</c> block, or <c>Select-Object -First $x</c> is included after the
+        /// cmdlet in a pipeline.
+        /// This method will be called by <see cref="StopProcessing"/>, after an exclusive lock is obtained.
+        /// </summary>
+        /// <remarks>
+        /// <list type="bullet">
+        /// <item>
+        /// <b>Do not call this method.</b> <see cref="ChocolateyCmdlet"/> calls this method as part of
+        /// <see cref="Cmdlet.StopProcessing"/> handling.
+        /// </item>
+        /// <item>
+        /// <b>This method is typically called from a background thread</b>; some operations may not work as
+        /// expected, including most calls to <see cref="WriteObject(object)"/> and other streams which
+        /// may throw exceptions if called from a background thread.
+        /// </item>
+        /// <item>
+        /// The <see cref="PipelineStopToken"/> will be triggered before this method is called.
+        /// This method should be overridden only if the cmdlet implementing it has its own Stop or Dispose
+        /// behaviour that needs to be managed which are not dependent on the <see cref="PipelineStopToken"/>.
+        /// </item>
+        /// </list>
+        /// </remarks>
+        protected virtual void Stop()
         {
         }
 

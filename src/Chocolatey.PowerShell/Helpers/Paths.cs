@@ -20,7 +20,10 @@ using System.IO;
 using System.Management.Automation;
 using System.Text;
 using System.Text.RegularExpressions;
-using static chocolatey.StringResources;
+using Chocolatey.PowerShell.Shared;
+
+using SystemVariables = chocolatey.StringResources.EnvironmentVariables.System;
+using PackageVariables = chocolatey.StringResources.EnvironmentVariables.Package;
 
 namespace Chocolatey.PowerShell.Helpers
 {
@@ -106,7 +109,7 @@ namespace Chocolatey.PowerShell.Helpers
         /// <param name="scope">The target scope of the PATH variable to modify.</param>
         public static void InstallPathEntry(PSCmdlet cmdlet, string pathEntry, EnvironmentVariableTarget scope)
         {
-            var pathEntries = new List<string>(ParsePathString(EnvironmentHelper.GetVariable(cmdlet, EnvironmentVariables.System.Path, scope, preserveVariables: true)));
+            var pathEntries = new List<string>(ParsePathString(EnvironmentHelper.GetVariable(cmdlet, SystemVariables.Path, scope, preserveVariables: true)));
             if (FindPathIndex(pathEntries, pathEntry) == -1)
             {
                 PSHelper.WriteHost(cmdlet, $"PATH environment variable does not have {pathEntry} in it. Adding...");
@@ -116,7 +119,7 @@ namespace Chocolatey.PowerShell.Helpers
 
                 void updatePath()
                 {
-                    EnvironmentHelper.SetVariable(cmdlet, EnvironmentVariables.System.Path, scope, newPath);
+                    EnvironmentHelper.SetVariable(cmdlet, SystemVariables.Path, scope, newPath);
                 }
 
                 if (scope == EnvironmentVariableTarget.Machine)
@@ -138,7 +141,7 @@ namespace Chocolatey.PowerShell.Helpers
         /// <param name="scope">The target scope of the PATH variable to modify.</param>
         public static void UninstallPathEntry(PSCmdlet cmdlet, string pathEntry, EnvironmentVariableTarget scope)
         {
-            var pathEntries = new List<string>(ParsePathString(EnvironmentHelper.GetVariable(cmdlet, EnvironmentVariables.System.Path, scope, preserveVariables: true)));
+            var pathEntries = new List<string>(ParsePathString(EnvironmentHelper.GetVariable(cmdlet, SystemVariables.Path, scope, preserveVariables: true)));
             var removeIndex = FindPathIndex(pathEntries, pathEntry);
             if (removeIndex >= 0)
             {
@@ -149,7 +152,7 @@ namespace Chocolatey.PowerShell.Helpers
 
                 void updatePath()
                 {
-                    EnvironmentHelper.SetVariable(cmdlet, EnvironmentVariables.System.Path, scope, newPath);
+                    EnvironmentHelper.SetVariable(cmdlet, SystemVariables.Path, scope, newPath);
                 }
 
                 if (scope == EnvironmentVariableTarget.Machine)
@@ -161,6 +164,42 @@ namespace Chocolatey.PowerShell.Helpers
                     updatePath();
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the file path corresponding to the desired <paramref name="pathType"/>.
+        /// </summary>
+        /// <param name="pathType">The type of path to retrieve the value for.</param>
+        /// <returns>The requested path as a string.</returns>
+        /// <exception cref="NotImplementedException">If the provided path type is not implemented.</exception>
+        public static string GetChocolateyPathType(PSCmdlet cmdlet, ChocolateyPathType pathType)
+        {
+            switch (pathType)
+            {
+                case ChocolateyPathType.PackagePath:
+                    var path = EnvironmentHelper.GetVariable(PackageVariables.ChocolateyPackageFolder);
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        return path;
+                    }
+
+                    path = EnvironmentHelper.GetVariable(PackageVariables.PackageFolder);
+                    if (!string.IsNullOrEmpty(path))
+                    {
+                        return path;
+                    }
+                    else
+                    {
+                        var installPath = GetChocolateyPathType(cmdlet, ChocolateyPathType.InstallPath);
+                        var packageName = Environment.GetEnvironmentVariable(PackageVariables.ChocolateyPackageName);
+
+                        return PSHelper.CombinePaths(cmdlet, installPath, "lib", packageName);
+                    }
+                case ChocolateyPathType.InstallPath:
+                    return PSHelper.GetInstallLocation(cmdlet);
+                default:
+                    throw new NotImplementedException($"The path value for type '{pathType}' is not known.");
+            };
         }
     }
 }
